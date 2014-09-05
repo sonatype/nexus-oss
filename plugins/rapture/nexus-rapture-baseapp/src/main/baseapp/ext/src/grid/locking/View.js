@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This class is used internally to provide a single interface when using
@@ -23,9 +23,13 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  */
 Ext.define('Ext.grid.locking.View', {
     alternateClassName: 'Ext.grid.LockingView',
+    requires: [
+        'Ext.view.AbstractView'
+    ],
 
     mixins: {
-        observable: 'Ext.util.Observable'
+        observable: 'Ext.util.Observable',
+        bindable: 'Ext.util.Bindable'
     },
 
     /**
@@ -34,43 +38,81 @@ Ext.define('Ext.grid.locking.View', {
      */
     isLockingView: true,
 
+    loadMask: true,
+
     eventRelayRe: /^(beforeitem|beforecontainer|item|container|cell|refresh)/,
 
     constructor: function(config){
         var me = this,
             eventNames = [],
             eventRe = me.eventRelayRe,
-            locked = config.locked.getView(),
-            normal = config.normal.getView(),
+            lockedView,
+            normalView,
             events,
             event;
 
-        Ext.apply(me, {
-            lockedView: locked,
-            normalView: normal,
-            lockedGrid: config.locked,
-            normalGrid: config.normal,
-            panel: config.panel
-        });
-        me.mixins.observable.constructor.call(me, config);
+        me.panel = config.panel;
+
+        // Disable store binding for the two child views.
+        // The store is bound to the *this* locking View.
+        // This avoids the store being bound to two views (with duplicated layouts on each store mutation)
+        // and also avoids the store being bound to the selection model twice.
+        config.locked.viewConfig.bindStore = config.normal.viewConfig.bindStore = Ext.emptyFn;
+
+        // Override the point at which first refresh is kicked off.
+        // The initial refresh of both sides must take place within a layout suspension
+        // to coalescse the resulting layouts into one.
+        config.locked.viewConfig.beforeLayout = config.normal.viewConfig.beforeLayout = me.beforeLayout;
+
+        me.lockedGrid = me.panel.lockedGrid = Ext.ComponentManager.create(config.locked);
+        me.lockedView = lockedView = me.lockedGrid.getView();
+
+        if (me.lockedGrid.isTree) {
+            // Tree must not animate because the partner grid is unable to animate
+            me.lockedView.animate = false;
+
+            // When this is a locked tree, the normal side is just a gridpanel, so needs the flat NodeStore
+            config.normal.store = lockedView.store;
+
+            // Match configs between sides
+            config.normal.viewConfig.stripeRows = me.lockedView.stripeRows;
+            config.normal.rowLines = me.lockedGrid.rowLines;
+        }
+
+        // Set up a bidirectional relationship between the two sides of the locked view.
+        // Inject lockingGrid and normalGrid into owning panel.
+        // This is because during constraction, it must be possible for descendant components
+        // to navigate up to the owning lockable panel and then down into either side.
+        me.normalGrid = me.panel.normalGrid = Ext.ComponentManager.create(config.normal);
+        lockedView.lockingPartner = normalView = me.normalView = me.normalGrid.getView();
+        normalView.lockingPartner = lockedView;
+
+        // This master view takes responsibility for performing refreshes.
+        // It must pbey the deferInitialRefresh configuration.
+        // Defer is *both* views defer.
+        me.deferInitialRefresh = normalView.deferInitialRefresh && lockedView.deferInitialRefresh;
+
+        me.loadMask = (config.loadMask !== undefined) ? config.loadMask : me.loadMask;
+
+        me.mixins.observable.constructor.call(me);
 
         // relay events
-        events = locked.events;
+        events = lockedView.events;
         for (event in events) {
             if (events.hasOwnProperty(event) && eventRe.test(event)) {
                 eventNames.push(event);
             }
         }
-        me.relayEvents(locked, eventNames);
-        me.relayEvents(normal, eventNames);
+        me.relayEvents(lockedView, eventNames);
+        me.relayEvents(normalView, eventNames);
 
-        normal.on({
+        normalView.on({
             scope: me,
             itemmouseleave: me.onItemMouseLeave,
             itemmouseenter: me.onItemMouseEnter
         });
 
-        locked.on({
+        lockedView.on({
             scope: me,
             itemmouseleave: me.onItemMouseLeave,
             itemmouseenter: me.onItemMouseEnter
@@ -80,6 +122,34 @@ Ext.define('Ext.grid.locking.View', {
             render: me.onPanelRender,
             scope: me
         });
+
+        me.loadingText = normalView.loadingText;
+        me.loadingCls = normalView.loadingCls;
+        me.loadingUseMsg = normalView.loadingUseMsg;
+
+        // Bind to the data source. Cache it by the property name "dataSource".
+        // The store property is public and must reference the provided store.
+        // We relay each call into both normal and locked views bracketed by a layout suspension.
+        me.bindStore(normalView.dataSource, true, 'dataSource');
+    },
+
+    // Called in the context of a child view when the first child view begins its layout run
+    beforeLayout: function() {
+        // Access the Lockable object
+        var me = this.ownerCt.ownerLockable.view,
+            lockedView = me.lockedGrid.view,
+            normalView = me.normalGrid.view;
+
+        // Perform the first refresh just before the first layout
+        // Locked grid may be hidden if it began with no columns, so do not refresh it,
+        if (me.lockedGrid.isVisible()) {
+            if (lockedView.refreshNeeded) {
+                lockedView.doFirstRefresh(lockedView.dataSource);
+            }
+        }
+        if (normalView.refreshNeeded) {
+            normalView.doFirstRefresh(normalView.dataSource);
+        }
     },
 
     onPanelRender: function() {
@@ -109,6 +179,10 @@ Ext.define('Ext.grid.locking.View', {
             // LoadMask captures the element upon render.
             me.loadMask = new Ext.LoadMask(cfg);
         }
+    },
+
+    getRefOwner: function() {
+        return this.panel;
     },
 
     getGridColumns: function() {
@@ -177,6 +251,73 @@ Ext.define('Ext.grid.locking.View', {
 
     getStore: function(){
         return this.panel.store;
+    },
+
+    /**
+     * Changes the data store bound to this view and refreshes it.
+     * @param {Ext.data.Store} store The store to bind to this view
+     * @since 3.4.0
+     */
+    bindStore : function(store, initial, propName) {
+        var me = this;
+        me.mixins.bindable.bindStore.apply(me, arguments);
+
+        // Bind the store to our selection model unless it's the initial bind.
+        // Initial bind takes place afterRender
+        if (!initial) {
+            me.getSelectionModel().bindStore(store);
+        }
+
+        // If we have already achieved our first layout, refresh immediately.
+        // If we have bound to the Store before the first layout, then onBoxReady will
+        // call doFirstRefresh
+        if (me.componentLayoutCounter) {
+            Ext.suspendLayouts();
+            me.normalView.doFirstRefresh(store);
+            me.lockedView.doFirstRefresh(store);
+            Ext.resumeLayouts(true);
+        }
+    },
+
+    getStoreListeners: function() {
+        var me = this;
+        return {
+            idchanged: me.onIdChanged,
+            refresh: me.onDataRefresh,
+            replace: me.onReplace,
+            add: me.onAdd,
+            bulkremove: me.onRemove,
+            update: me.onUpdate,
+            clear: me.refresh
+        };
+    },
+
+    onIdChanged: function(eventName, fn, scope){
+        this.relayFn('onIdChanged', arguments);
+    },
+
+    onDataRefresh: function(eventName, fn, scope){
+        this.relayFn('onDataRefresh', arguments);
+    },
+
+    onReplace: function(eventName, fn, scope){
+        this.relayFn('onReplace', arguments);
+    },
+
+    onAdd: function(eventName, fn, scope){
+        this.relayFn('onAdd', arguments);
+    },
+
+    onRemove: function(eventName, fn, scope){
+        this.relayFn('onRemove', arguments);
+    },
+
+    onUpdate: function(eventName, fn, scope){
+        this.relayFn('onUpdate', arguments);
+    },
+
+    refresh: function(eventName, fn, scope){
+        this.relayFn('refresh', arguments);
     },
 
     getNode: function(nodeInfo, dataRow) {
@@ -254,14 +395,6 @@ Ext.define('Ext.grid.locking.View', {
         this.relayFn('refreshNode', arguments);
     },
 
-    refresh: function(){
-        this.relayFn('refresh', arguments);
-    },
-
-    bindStore: function(){
-        this.relayFn('bindStore', arguments);
-    },
-
     addRowCls: function(){
         this.relayFn('addRowCls', arguments);
     },
@@ -274,6 +407,9 @@ Ext.define('Ext.grid.locking.View', {
         var me = this,
             mask = me.loadMask;
             
+        // Needed to inhibit deferred refreshes from firing and attempting to update a destroyed view
+        this.isDestroyed = true;
+
         // Typically the mask unbinding is handled by the view, but
         // we aren't a normal view, so clear it out here
         me.clearListeners();
@@ -282,4 +418,7 @@ Ext.define('Ext.grid.locking.View', {
         }
     }
 
+}, function() {
+    this.borrow(Ext.AbstractComponent, ['up']);
+    this.borrow(Ext.view.AbstractView, ['doFirstRefresh', 'applyFirstRefresh']);
 });

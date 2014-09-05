@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 
 
@@ -100,6 +100,7 @@ Ext._startTime = new Date().getTime();
         
         emptyString: new String(),
 
+        
         baseCSSPrefix: Ext.buildSettings.baseCSSPrefix,
 
         
@@ -639,7 +640,7 @@ Ext.globalEval = Ext.global.execScript
 
 
 
-var version = '4.2.2.1144',
+var version = '4.2.3.1477',
     
     checkVerTemp = [''],
     endOfVersionRe = /([^\d\.])/,
@@ -1027,7 +1028,7 @@ var version = '4.2.2.1144',
 Ext.String = (function() {
     var trimRegex     = /^[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+|[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+$/g,
         escapeRe      = /('|\\)/g,
-        formatRe      = /\{(\d+)\}/g,
+        formatRe      = /\{\d+\}/,
         escapeRegexRe = /([-.*+?\^${}()|\[\]\/\\])/g,
         basicTrimRe   = /^\s+|\s+$/g,
         whitespaceRe  = /\s+/,
@@ -1046,12 +1047,32 @@ Ext.String = (function() {
             if (s === null || s === undefined || other === null || other === undefined) {
                 return false;
             }
-            
+
             return other.length <= s.length; 
+        },
+        
+        
+        
+        formatTplConfig = {useFormat: false, compiled: true, stringFormat: true},
+        formatFns = {},
+        generateFormatFn = function(format) {
+            
+            if (formatRe.test(format)) {
+                format = new Ext.Template(format, formatTplConfig);
+                return function() {
+                    return format.apply(arguments);
+                };
+            }
+            
+            else {
+                return function() {
+                    return format;
+                };
+            }
         };
 
     return {
-        
+
         
         insert: function(s, value, index) {
             if (!s) {
@@ -1191,16 +1212,16 @@ Ext.String = (function() {
         },
 
         
-        ellipsis: function(value, len, word) {
-            if (value && value.length > len) {
+        ellipsis: function(value, length, word) {
+            if (value && value.length > length) {
                 if (word) {
-                    var vs = value.substr(0, len - 2),
+                    var vs = value.substr(0, length - 2),
                     index = Math.max(vs.lastIndexOf(' '), vs.lastIndexOf('.'), vs.lastIndexOf('!'), vs.lastIndexOf('?'));
-                    if (index !== -1 && index >= (len - 15)) {
+                    if (index !== -1 && index >= (length - 15)) {
                         return vs.substr(0, index) + "...";
                     }
                 }
-                return value.substr(0, len - 3) + "...";
+                return value.substr(0, length - 3) + "...";
             }
             return value;
         },
@@ -1232,10 +1253,8 @@ Ext.String = (function() {
 
         
         format: function(format) {
-            var args = Ext.Array.toArray(arguments, 1);
-            return format.replace(formatRe, function(m, i) {
-                return args[i];
-            });
+            var formatFn = formatFns[format] || (formatFns[format] = generateFormatFn(format));
+            return formatFn.apply(this, arguments);
         },
 
         
@@ -2967,10 +2986,17 @@ Ext.Date = new function() {
                         
                         
                         
-                        "year = y || (new Date()).getFullYear(),",
-                        "jan4 = new Date(year, 0, 4, 0, 0, 0),",
-                        "week1monday = new Date(jan4.getTime() - ((jan4.getDay() - 1) * 86400000));",
-                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));",
+                        "year = y || (new Date()).getFullYear();",
+                        "jan4 = new Date(year, 0, 4, 0, 0, 0);",
+                        "d = jan4.getDay();", 
+                        
+                        
+                        "week1monday = new Date(jan4.getTime() - ((d === 0 ? 6 : d - 1) * 86400000));",
+                        
+                        
+                        
+                        
+                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));",
                     "} else {",
                         
                         
@@ -6009,7 +6035,7 @@ var noArgs = [],
     Ext.ns = Ext.namespace;
 
     Class.registerPreprocessor('className', function(cls, data) {
-        if (data.$className) {
+        if ('$className' in data) {
             cls.$className = data.$className;
         }
         
@@ -6305,6 +6331,7 @@ Ext.Loader = new function() {
     var queue = [],
         isClassFileLoaded = {},
         isFileLoaded = {},
+        inFlight = {},
         classNameToFilePathMap = {},
         scriptElements = {},
         readyListeners = [],
@@ -6375,12 +6402,6 @@ Ext.Loader = new function() {
 
                 if (item) {
                     requires = item.requires;
-
-                    
-                    
-                    if (requires.length > Loader.numLoadedFiles) {
-                        continue;
-                    }
 
                     
                     for (j = 0; j < requires.length; ) {
@@ -6531,17 +6552,14 @@ Ext.Loader = new function() {
             Loader.scriptsLoading++;
 
             src = config.disableCaching ?
-                (url + '?' + config.disableCachingParam + '=' + Ext.Date.now()) : url;
+                
+                (url + (url.indexOf('?') === -1 ? '?' : '&') + config.disableCachingParam + '=' + Ext.Date.now()) : url;
 
             scriptElements[url] = Loader.injectScriptElement(src, onScriptLoad, onScriptError);
         },
 
         
         loadScriptFile: function(url, onLoad, onError, scope, synchronous) {
-            if (isFileLoaded[url]) {
-                return Loader;
-            }
-
             var config = Loader.getConfig(),
                 noCacheUrl = url + (config.disableCaching ? ('?' + config.disableCachingParam + '=' + Ext.Date.now()) : ''),
                 isCrossOriginRestricted = false,
@@ -6737,17 +6755,33 @@ Ext.Loader = new function() {
                 }
 
                 if (!isClassFileLoaded.hasOwnProperty(className)) {
-                    isClassFileLoaded[className] = false;
-                    classNameToFilePathMap[className] = filePath;
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (Loader.isFileLoaded[filePath] || inFlight[filePath]) {
+                        isClassFileLoaded[className] = true;
+                    } else {
+                        inFlight[filePath] = true;
+                        isClassFileLoaded[className] = false;
 
-                    Loader.numPendingFiles++;
-                    Loader.loadScriptFile(
-                        filePath,
-                        pass(Loader.onFileLoaded, [className, filePath], Loader),
-                        pass(Loader.onFileLoadError, [className, filePath], Loader),
-                        Loader,
-                        syncModeEnabled
-                    );
+                        Loader.numPendingFiles++;
+                        Loader.loadScriptFile(
+                            filePath,
+                            pass(Loader.onFileLoaded, [className, filePath], Loader),
+                            pass(Loader.onFileLoadError, [className, filePath], Loader),
+                            Loader,
+                            syncModeEnabled
+                        );
+                    }
+                    classNameToFilePathMap[className] = filePath;
                 }
             }
 
@@ -6769,6 +6803,7 @@ Ext.Loader = new function() {
 
             isClassFileLoaded[className] = true;
             isFileLoaded[filePath] = true;
+            delete inFlight[filePath];
 
             
             

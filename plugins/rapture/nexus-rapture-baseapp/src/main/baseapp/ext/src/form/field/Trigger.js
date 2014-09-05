@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a convenient wrapper for TextFields that adds a clickable trigger button (looks like a combobox by default).
@@ -46,8 +46,48 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *         }]
  *     });
  *
- * However, in general you will most likely want to use Trigger as the base class for a reusable component.
+ * In general, you will most likely want to use Trigger as the base class for a reusable component.
  * {@link Ext.form.field.Date} and {@link Ext.form.field.ComboBox} are perfect examples of this.
+ *
+ * ###Multiple Triggers
+ *
+ * There may be some cases in which you would want to utilize more than one trigger.
+ * Multiple triggers can be created using the syntax of: triggerXCls,
+ * where 'X' represents the count of each additional trigger.
+ * The framework translates triggerCls to trigger1Cls.
+ * Each additional trigger will increment starting with trigger2Cls.
+ *
+ * The same incrementing schema also applies to the method used as the trigger action.
+ * Any subsequent trigger can have a corresponding onTriggerXClick.
+ *
+ * To put this to practical use, a triggerfield with two triggers could look like this:
+ *
+ *     @example
+ *     Ext.define('Ext.ux.CustomTrigger', {
+ *         extend: 'Ext.form.field.Trigger',
+ *         alias: 'widget.customtrigger',
+ *         triggerCls: 'x-form-trigger', // the default
+ *         trigger2Cls: 'x-form-clear-trigger',
+ *         // override onTriggerClick
+ *         onTriggerClick: function () {
+ *             Ext.Msg.alert('Status', 'You clicked my first trigger!');
+ *         },
+ *         onTrigger2Click: function () {
+ *             Ext.Msg.alert('Status', 'You clicked my second trigger!');
+ *         }
+ *     });
+ *
+ *     Ext.create('Ext.form.FormPanel', {
+ *         title: 'Form with TriggerField',
+ *         bodyPadding: 5,
+ *         width: 350,
+ *         renderTo: Ext.getBody(),
+ *         items: [{
+ *             xtype: 'customtrigger',
+ *             fieldLabel: 'Sample Trigger',
+ *             emptyText: 'click the trigger'
+ *         }]
+ *     });
  */
 Ext.define('Ext.form.field.Trigger', {
     extend:'Ext.form.field.Text',
@@ -78,8 +118,27 @@ Ext.define('Ext.form.field.Trigger', {
 
     /**
      * @cfg {String} triggerCls
-     * An additional CSS class used to style the trigger button. The trigger will always get the {@link #triggerBaseCls}
-     * by default and triggerCls will be **appended** if specified.
+     *
+     * An additional CSS class used to style the trigger button. The trigger will always
+     * get the `triggerBaseCls` by default.  triggerCls will be appended if specified. The
+     * triggerCls config is synonymous with trigger1Cls. You may add additional triggers by
+     * creating an additional triggerXClass, where X is an integer signifying the position
+     * of the trigger being styled.
+     *
+     * For example, you could include trigger2Cls: 'x-form-clear-trigger', in addition to
+     * triggerCls (or trigger1Cls): 'x-form-search-trigger' to have both search and clear
+     * styled triggers.
+     *
+     * In this scenario, the corresponding handler would be onTriggerXClick, where the X
+     * matches the same integer used in the triggerXCls config.
+     *
+     * Framework trigger styles include:
+     *
+     * + x-form-clear-trigger // the X icon
+     * + x-form-search-trigger // the magnifying glass icon
+     * + x-form-trigger // the down arrow (default for combobox) icon
+     * + x-form-date-trigger // the calendar (default for datefield) icon
+     *
      */
 
     /**
@@ -145,7 +204,7 @@ Ext.define('Ext.form.field.Trigger', {
     mimicing: false,
     // @private
     triggerIndexRe: /trigger-index-(\d+)/,
-    
+
     extraTriggerCls: '',
 
     componentLayout: 'triggerfield',
@@ -153,6 +212,20 @@ Ext.define('Ext.form.field.Trigger', {
     initComponent: function() {
         this.wrapFocusCls = this.triggerWrapCls + '-focus';
         this.callParent(arguments);
+    },
+
+    initEvents: function() {
+        // a global before focus listener to detect when another component takes focus
+        // away from this field because el.focus() was explicitly called.  We have to
+        // attach this listener up front (vs. in onFocus) just in case focus is called
+        // multiple times in the same thread.  In such a case IE processes the events
+        // asynchronously.  for example:
+        //     someTrigger.focus();
+        //     someOther.focus(); // onOtherFocus would not be called here if we wait until
+        //                           onFocus of someTrigger to attach the listener
+        // See EXTJSIV-11712
+        this.mon(Ext.globalEvents, 'beforefocus', this.onOtherFocus, this);
+        this.callParent();
     },
 
     getSubTplMarkup: function(values) {
@@ -176,17 +249,17 @@ Ext.define('Ext.form.field.Trigger', {
             '</table>'
         ].join('');
     },
-    
+
     getSubTplData: function(){
         var me = this,
             data = me.callParent(),
             readOnly = me.readOnly === true,
             editable = me.editable !== false;
-        
+
         return Ext.apply(data, {
             editableCls: (readOnly || !editable) ? ' ' + me.triggerNoEditCls : '',
             readOnly: !editable || readOnly
-        });  
+        });
     },
 
     getLabelableRenderData: function() {
@@ -237,9 +310,9 @@ Ext.define('Ext.form.field.Trigger', {
 
         return Ext.DomHelper.markup(triggerConfigs);
     },
-    
+
     disableCheck: function() {
-        return !this.disabled;    
+        return !this.disabled;
     },
 
     // @private
@@ -247,7 +320,7 @@ Ext.define('Ext.form.field.Trigger', {
         var me = this,
             triggerBaseCls = me.triggerBaseCls,
             tempEl;
-            
+
         /**
          * @property {Number} triggerWidth
          * Width of the trigger element. Unless set explicitly, it will be
@@ -258,7 +331,7 @@ Ext.define('Ext.form.field.Trigger', {
         if (!me.triggerWidth) {
             tempEl = Ext.getBody().createChild({
                 role: 'presentation',
-                style: 'position: absolute;', 
+                style: 'position: absolute;',
                 cls: Ext.baseCSSPrefix + 'form-trigger'
             });
             Ext.form.field.Trigger.prototype.triggerWidth = tempEl.getWidth();
@@ -267,7 +340,7 @@ Ext.define('Ext.form.field.Trigger', {
 
         me.callParent();
 
-        if (triggerBaseCls != Ext.baseCSSPrefix + 'form-trigger') {
+        if (triggerBaseCls !== Ext.baseCSSPrefix + 'form-trigger') {
             // we may need to change the selectors by which we extract trigger elements if is triggerBaseCls isn't the value we
             // stuck in childEls
             me.addChildEls({ name: 'triggerEl', select: '.' + triggerBaseCls });
@@ -312,7 +385,7 @@ Ext.define('Ext.form.field.Trigger', {
      * option at config time.
      * @param {Boolean} editable True to allow the user to directly edit the field text. If false is passed, the user
      * will only be able to modify the field using the trigger. Will also add a click event to the text field which
-     * will call the trigger. 
+     * will call the trigger.
      */
     setEditable: function(editable) {
         if (editable != this.editable) {
@@ -331,7 +404,7 @@ Ext.define('Ext.form.field.Trigger', {
     setReadOnly: function(readOnly) {
         var me = this,
             old = me.readOnly;
-            
+
         me.callParent(arguments);
         if (readOnly != old) {
             me.updateLayout();
@@ -395,6 +468,10 @@ Ext.define('Ext.form.field.Trigger', {
     // @private
     onFocus: function() {
         var me = this;
+
+        // When this is focused, this flag must be cleared
+        me.otherFocused = false;
+
         me.callParent(arguments);
         if (!me.mimicing) {
             me.bodyEl.addCls(me.wrapFocusCls);
@@ -410,7 +487,7 @@ Ext.define('Ext.form.field.Trigger', {
 
     // @private
     checkTab: function(me, e) {
-        if (!this.ignoreMonitorTab && e.getKey() == e.TAB) {
+        if (!this.ignoreMonitorTab && e.getKey() === e.TAB) {
             this.triggerBlur();
         }
     },
@@ -436,24 +513,28 @@ Ext.define('Ext.form.field.Trigger', {
         return state;
     },
 
+    // ensures we trigger a blur if some other component/element is programmatically
+    // focused (see EXTJSIV-11712)
+    onOtherFocus: function(dom) {
+        this.otherFocused = (this.hasFocus && !this.bodyEl.contains(dom));
+    },
+
     /**
      * @private
      * The default blur handling must not occur for a TriggerField, implementing this template method disables that.
      * Instead the tab key is monitored, and the superclass's onBlur is called when tab is detected
      */
     onBlur: function() {
-        var me = this,
-            blurTask = me.blurTask;
-            
-        // Only trigger a blur if called programmatically
-        if (me.blurring) {
-            me.triggerBlur();
+        // Only trigger a blur if blur() or focus() called programmatically
+        if (this.blurring || this.otherFocused) {
+            this.triggerBlur();
+            this.otherFocused = false;
         }
     },
 
     // @private
     mimicBlur: function(e) {
-        if (!this.isDestroyed && !this.bodyEl.contains(e.target) && this.validateBlur(e)) {
+        if (!this.isDestroyed && !this.bodyEl.contains(e.target)) {
             this.triggerBlur(e);
         }
     },
@@ -470,12 +551,6 @@ Ext.define('Ext.form.field.Trigger', {
         if (me.bodyEl) {
             me.bodyEl.removeCls(me.wrapFocusCls);
         }
-    },
-
-    // @private
-    // This should be overridden by any subclass that needs to check whether or not the field can be blurred.
-    validateBlur: function(e) {
-        return true;
     },
 
     // @private

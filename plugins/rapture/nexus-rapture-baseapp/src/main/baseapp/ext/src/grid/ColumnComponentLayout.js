@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Component layout for grid column headers which have a title element at the top followed by content.
@@ -51,20 +51,21 @@ Ext.define('Ext.grid.ColumnComponentLayout', {
 
     // If not shrink wrapping, push height info down into child items
     publishInnerHeight: function(ownerContext, outerHeight) {
-        // TreePanels (and grids with hideHeaders: true) set their column container height to zero ti hide them.
-        // This is because they need to lay out in order to calculate widths for the columns (eg flexes).
-        // If there is no height to lay out, bail out early.
-        if (!outerHeight) {
-            return;
-        }
-
         var me = this,
             owner = me.owner,
-            innerHeight = outerHeight - ownerContext.getBorderInfo().height,
-            availableHeight = innerHeight,
-            textHeight,
-            titleHeight,
-            pt, pb;
+            innerHeight, availableHeight,
+            textHeight, titleHeight, paddingTop, paddingBottom;
+            
+        // TreePanels (and grids with hideHeaders: true) set their column container height to zero to hide them.
+        // This is because they need to lay out in order to calculate widths for the columns (eg flexes).
+        // If there is no height to lay out, bail out early.
+        if (owner.getOwnerHeaderCt().hiddenHeaders) {
+            ownerContext.setProp('innerHeight', 0);
+            return;
+        }
+        
+        innerHeight = outerHeight - ownerContext.getBorderInfo().height;
+        availableHeight = innerHeight;
 
         // We do not have enough information to get the height of the titleEl
         if (!owner.noWrap && !ownerContext.hasDomProp('width')) {
@@ -81,10 +82,10 @@ Ext.define('Ext.grid.ColumnComponentLayout', {
             if (textHeight) {
                 availableHeight -= textHeight;
                 if (availableHeight > 0) {
-                    pt = Math.floor(availableHeight / 2);
-                    pb = availableHeight - pt;
-                    ownerContext.titleContext.setProp('padding-top', pt);
-                    ownerContext.titleContext.setProp('padding-bottom', pb);
+                    paddingTop = Math.floor(availableHeight / 2);
+                    paddingBottom = availableHeight - paddingTop;
+                    ownerContext.titleContext.setProp('padding-top', paddingTop);
+                    ownerContext.titleContext.setProp('padding-bottom', paddingBottom);
                 }
             }
         }

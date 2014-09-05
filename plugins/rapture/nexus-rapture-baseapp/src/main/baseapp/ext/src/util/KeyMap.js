@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Handles mapping key events to handling functions for an element or a Component. One KeyMap can be used for multiple
@@ -120,8 +120,8 @@ Ext.define('Ext.util.KeyMap', {
      *  only when alt is not pressed (defaults to undefined)
      * @cfg {Function} binding.handler The function to call when KeyMap finds the expected key combination
      * @cfg {Function} binding.fn Alias of handler (for backwards-compatibility)
-     * @cfg {Object}   binding.scope The scope of the callback function
-     * @cfg {String}   binding.defaultEventAction A default action to apply to the event. Possible values
+     * @cfg {Object}   binding.scope The scope (`this` context) in which the handler function is executed.
+     * @cfg {String}   binding.defaultEventAction A default action to apply to the event *when the handler returns `true`*. Possible values
      *  are: stopEvent, stopPropagation, preventDefault. If no value is set no action is performed.
      */
 
@@ -220,8 +220,8 @@ Ext.define('Ext.util.KeyMap', {
      * @param {Function} binding.handler The function to call when KeyMap finds the
      * expected key combination.
      * @param {Function} binding.fn Alias of handler (for backwards-compatibility).
-     * @param {Object} binding.scope The scope of the callback function.
-     * @param {String} binding.defaultEventAction A default action to apply to the event.
+     * @param {Object} binding.scope The scope (`this` context) in which the handler function is executed.
+     * @param {String} binding.defaultEventAction A default action to apply to the event *when the handler returns `true`*.
      * Possible values are: stopEvent, stopPropagation, preventDefault. If no value is
      * set no action is performed..
      */
@@ -246,7 +246,7 @@ Ext.define('Ext.util.KeyMap', {
             keyCode: me.processKeys(keyCode)
         }, binding));
     },
-    
+
     /**
      * Remove a binding from this KeyMap.
      * @param {Object} binding See {@link #addBinding for options}
@@ -256,16 +256,16 @@ Ext.define('Ext.util.KeyMap', {
             bindings = me.bindings,
             len = bindings.length,
             i, item, keys;
-            
+
         if (me.processing) {
             me.bindings = bindings.slice(0);
         }
-        
+
         keys = me.processKeys(binding.key);
         for (i = 0; i < len; ++i) {
             item = bindings[i];
-            if (item.fn === binding.fn && item.scope === binding.scope) {
-                if (binding.alt == item.alt && binding.crtl == item.crtl && binding.shift == item.shift) {
+            if ((item.fn || item.handler) === (binding.fn || binding.handler) && item.scope === binding.scope) {
+                if (binding.alt === item.alt && binding.crtl === item.crtl && binding.shift === item.shift) {
                     if (Ext.Array.equals(item.keyCode, keys)) {
                         Ext.Array.erase(me.bindings, i, 1);
                         return;
@@ -274,7 +274,7 @@ Ext.define('Ext.util.KeyMap', {
             }
         }
     },
-    
+
     processKeys: function(keyCode){
         var processed = false,
             key, keys, keyString, len, i;
@@ -349,7 +349,7 @@ Ext.define('Ext.util.KeyMap', {
                 }
                 me.processing = false;
             }
-        }
+        };
     }()),
 
     /**
@@ -357,7 +357,7 @@ Ext.define('Ext.util.KeyMap', {
      * An optional event processor function which accepts the argument list provided by the
      * {@link #eventName configured event} of the {@link #target}, and returns a keyEvent for processing by the KeyMap.
      *
-     * This may be useful when the {@link #target} is a Component with s complex event signature, where the event is not
+     * This may be useful when the {@link #target} is a Component with a complex event signature, where the event is not
      * the first parameter. Extra information from the event arguments may be injected into the event for use by the handler
      * functions before returning it.
      */
@@ -399,7 +399,7 @@ Ext.define('Ext.util.KeyMap', {
      * @param {Ext.EventObject} event
      * @return {Boolean} True if the event matches the binding
      */
-    checkModifiers: function(binding, e) {
+    checkModifiers: function(binding, event) {
         var keys = ['shift', 'ctrl', 'alt'],
             i = 0,
             len = keys.length,
@@ -408,7 +408,7 @@ Ext.define('Ext.util.KeyMap', {
         for (; i < len; ++i){
             key = keys[i];
             val = binding[key];
-            if (!(val === undefined || (val === e[key + 'Key']))) {
+            if (!(val === undefined || (val === event[key + 'Key']))) {
                 return false;
             }
         }

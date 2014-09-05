@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -298,20 +298,19 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
      * @param {Ext.Component} component The component to create the config for
      * @param {Boolean} hideOnClick Passed through to the menu item
      */
-    createMenuConfig : function(component, hideOnClick) {
-        var me = this,
-            config = Ext.apply({}, component.initialConfig),
+    createMenuConfig: function (component, hideOnClick) {
+        var config = Ext.apply({}, component.initialConfig),
             group  = component.toggleGroup;
 
         Ext.copyTo(config, component, [
             'iconCls', 'icon', 'itemId', 'disabled', 'handler', 'scope', 'menu', 'tabIndex'
         ]);
 
-        Ext.apply(config, {
-            text       : component.overflowText || component.text,
+        Ext.applyIf(config, {
+            text: component.overflowText || component.text,
             hideOnClick: hideOnClick,
             destroyMenu: false,
-            listeners  : {}
+            listeners: {}
         });
 
         // Clone must have same value, and must sync original's value on change
@@ -325,16 +324,16 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
             // event will still fire.
             config.listeners.change = function(c, newVal, oldVal) {                            
                 component.setValue(newVal);
-            }
+            };
         }
 
         // ToggleButtons become CheckItems
         else if (group || component.enableToggle) {
             Ext.apply(config, {
                 hideOnClick: false,
-                group  : group,
+                group: group,
                 checked: component.pressed,
-                handler: function(item, e) {
+                handler: function (item, e) {
                     component.onClick(e);
                 }
             });
@@ -343,9 +342,9 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
         // Buttons may have their text or icon changed - this must be propagated to the clone in the overflow menu
         if (component.isButton && !component.changeListenersAdded) {
             component.on({
-                textchange: me.onButtonAttrChange,
-                iconchange: me.onButtonAttrChange,
-                toggle:     me.onButtonToggle
+                textchange: this.onButtonAttrChange,
+                iconchange: this.onButtonAttrChange,
+                toggle: this.onButtonToggle
             });
             component.changeListenersAdded = true;
         }
@@ -390,9 +389,16 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
         var me = this,
         i, items, iLen;
 
-        if (component instanceof Ext.toolbar.Separator) {
+        // No equivalent to fill, skip it
+        if (component instanceof Ext.toolbar.Fill) {
+            return;
+        }
+        // Separator maps to MenuSeparator
+        else if (component instanceof Ext.toolbar.Separator) {
             menu.add('-');
-        } else if (component.isComponent) {
+        }
+        // Other types...
+        else if (component.isComponent) {
             if (component.isXType('splitbutton')) {
                 component.overflowClone = menu.add(me.createMenuConfig(component, true));
 

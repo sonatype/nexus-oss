@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @class Ext.util.AbstractMixedCollection
@@ -97,7 +97,7 @@ Ext.define('Ext.util.AbstractMixedCollection', {
          * @event remove
          * Fires when an item is removed from the collection.
          * @param {Object} o The item being removed.
-         * @param {String} key (optional) The key associated with the removed item.
+         * @param {String} key The key associated with the removed item.
          * @since 1.1.0
          */
 
@@ -123,6 +123,13 @@ Ext.define('Ext.util.AbstractMixedCollection', {
      * In this case just pass the new item in this parameter.
      *
      * @param {Object} [obj] The item to add.
+     *
+     * Note that when adding a value that is iterable, it must be wrapped in brackets, i.e.:
+     *
+     *     c.add([[1, 2]]);
+     *
+     * This will be needed for any value that is iterable, i.e., an array, arguments object,
+     * HTML collections, etc.
      *
      * @return {Object} The item added.
      * @since 1.1.0
@@ -213,7 +220,7 @@ Ext.define('Ext.util.AbstractMixedCollection', {
         }
         return o;
     },
-    
+
     /**
      * Change the key for an existing item in the collection. If the old key
      * does not exist this is a no-op.
@@ -223,8 +230,9 @@ Ext.define('Ext.util.AbstractMixedCollection', {
     updateKey: function(oldKey, newKey) {
         var me = this,
             map = me.map,
-            indexMap = me.indexMap,
             index = me.indexOfKey(oldKey),
+            // Important: Take reference to indexMap AFTER indexOf call which may rebuild it.
+            indexMap = me.indexMap,
             item;
 
         if (index > -1) {
@@ -961,17 +969,17 @@ Ext.define('Ext.util.AbstractMixedCollection', {
      * {@link Ext.util.Filter Filter} for an example of using Filter objects (preferred). Alternatively,
      * MixedCollection can be easily filtered by property like this:</p>
      *
-     *    //create a simple store with a few people defined
-     *    var people = new Ext.util.MixedCollection();
-     *    people.addAll([
-     *        {id: 1, age: 25, name: 'Ed'},
-     *        {id: 2, age: 24, name: 'Tommy'},
-     *        {id: 3, age: 24, name: 'Arne'},
-     *        {id: 4, age: 26, name: 'Aaron'}
-     *    ]);
+     *     //create a simple store with a few people defined
+     *     var people = new Ext.util.MixedCollection();
+     *     people.addAll([
+     *         {id: 1, age: 25, name: 'Ed'},
+     *         {id: 2, age: 24, name: 'Tommy'},
+     *         {id: 3, age: 24, name: 'Arne'},
+     *         {id: 4, age: 26, name: 'Aaron'}
+     *     ]);
      *    
-     *    //a new MixedCollection containing only the items where age == 24
-     *    var middleAged = people.filter('age', 24);
+     *     //a new MixedCollection containing only the items where age == 24
+     *     var middleAged = people.filter('age', 24);
      *
      * @param {Ext.util.Filter[]/String} property A property on your objects, or an array of {@link Ext.util.Filter Filter} objects
      * @param {String/RegExp} value Either string that the property values

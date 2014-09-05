@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A specialized panel intended for use as an application window. Windows are floated, {@link #resizable}, and
@@ -88,6 +88,7 @@ Ext.define('Ext.window.Window', {
      *
      * If a String is provided, the Component will be resolved using the {@link #down} method which uses {@link Ext.ComponentQuery}.
      * If the string begins with an alphanumeric value, it will first attempt to find the Component based on the {@link Ext.AbstractComponent#id} or {@link Ext.AbstractComponent#itemId}.
+     * If a matching component is not found via id, then an attempt to do a query to find a matching component. 
      *
      * An example of finding the Component with an id/itemId:
      *
@@ -150,6 +151,7 @@ Ext.define('Ext.window.Window', {
      *
      *   - The index of a footer Button.
      *   - The id or {@link Ext.AbstractComponent#itemId} of a descendant Component.
+     *   - A {@link Ext.ComponentQuery query} to find a {@link Ext.Component}.
      *   - A descendant {@link Ext.Component}.
      */
 
@@ -276,6 +278,12 @@ Ext.define('Ext.window.Window', {
      * To make closing a Window _hide_ the Window so that it may be reused, set {@link #closeAction} to 'hide'.
      */
     closable: true,
+    
+    /**
+     * @cfg {Boolean} monitorResize
+     * `true` to listen to the viewport resize event and perform any layout updating if necessary.
+     * This is useful if using sizes as percentages for the window.
+     */
 
     /**
      * @cfg {Boolean} hidden
@@ -472,7 +480,7 @@ Ext.define('Ext.window.Window', {
             me.maximized = false;
             me.maximize();
             if (header) {
-                header.removeCls(header.indicateDragCls)
+                header.removeCls(header.indicateDragCls);
             }
         }
 
@@ -512,8 +520,10 @@ Ext.define('Ext.window.Window', {
 
     // @private
     onEsc: function(k, e) {
+        var mgr = Ext['FocusManager'];
+        
         // Only process ESC if the FocusManager is not doing it
-        if (!Ext.FocusManager || !Ext.FocusManager.enabled || Ext.FocusManager.focusedCmp === this) {
+        if (!Ext.enableFocusManager || mgr.focusedCmp === this) {
             e.stopEvent();
             this.close();
         }
@@ -523,7 +533,7 @@ Ext.define('Ext.window.Window', {
     beforeDestroy: function() {
         var me = this;
         if (me.rendered) {
-            delete this.animateTarget;
+            delete me.animateTarget;
             me.hide();
             Ext.destroy(
                 me.keyMap
@@ -535,29 +545,29 @@ Ext.define('Ext.window.Window', {
     /**
      * @private
      * Contribute class-specific tools to the header.
-     * Called by Panel's initTools.
+     *
+     * Called by Panel's initTools at initialization time.
+     *
+     * Implementations should jst add new tool config objects to `this.tools`
      */
     addTools: function() {
-        var me = this;
+        var me = this,
+            tools = me.tools,
+            noArgs = [];
 
-        // Call Panel's initTools
+        // Call Panel's addTools
         me.callParent();
 
         if (me.minimizable) {
-            me.addTool({
+            tools.push({
                 type: 'minimize',
-                handler: Ext.Function.bind(me.minimize, me, [])
+                handler: Ext.Function.bind(me.minimize, me, noArgs)
             });
         }
         if (me.maximizable) {
-            me.addTool({
+            tools.push({
                 type: 'maximize',
-                handler: Ext.Function.bind(me.maximize, me, [])
-            });
-            me.addTool({
-                type: 'restore',
-                handler: Ext.Function.bind(me.restore, me, []),
-                hidden: true
+                handler: Ext.Function.bind(me.toggleMaximize, me, noArgs)
             });
         }
     },
@@ -619,7 +629,7 @@ Ext.define('Ext.window.Window', {
             focusDescendant;
 
         // If the FocusManager is enabled, then we must noy jumpt to focus the default focus. We must focus the Window
-        if ((Ext.FocusManager && Ext.FocusManager.enabled) || ((focusDescendant = me.getDefaultFocus()) === me)) {
+        if (Ext.enableFocusManager || ((focusDescendant = me.getDefaultFocus()) === me)) {
             me.callParent(arguments);
         } else {
             focusDescendant.focus();
@@ -648,7 +658,7 @@ Ext.define('Ext.window.Window', {
         if (me.hidden) {
             me.fireEvent('close', me);
             if (me.closeAction == 'destroy') {
-                this.destroy();
+                me.destroy();
             }
         } else {
             // close after hiding
@@ -712,7 +722,6 @@ Ext.define('Ext.window.Window', {
         if (header && me.maximizable) {
             header.suspendLayouts();
             tools.maximize.hide();
-            tools.restore.hide();
             this.resumeHeaderLayout(true);
         }
         if (me.resizer) {
@@ -730,10 +739,7 @@ Ext.define('Ext.window.Window', {
 
         if (header) {
             header.suspendLayouts();
-            if (me.maximized) {
-                tools.restore.show();
-                changed = true;
-            } else if (me.maximizable) {
+            if (me.maximizable) {
                 tools.maximize.show();
                 changed = true;
             }
@@ -748,7 +754,7 @@ Ext.define('Ext.window.Window', {
     /**
      * Fits the window within its current container and automatically replaces the {@link #maximizable 'maximize' tool
      * button} with the 'restore' tool button. Also see {@link #toggleMaximize}.
-     * @param {Boolean} animate `true` to animate this Window to full size.
+     * @param {Boolean} [animate=false] Pass `true` to animate this Window to full size.
      * @return {Ext.window.Window} this
      */
     maximize: function(animate) {
@@ -774,12 +780,7 @@ Ext.define('Ext.window.Window', {
             if (header) {
                 header.suspendLayouts();
                 if (tools.maximize) {
-                    tools.maximize.hide();
-                    changed = true;
-                }
-                if (tools.restore) {
-                    tools.restore.show();
-                    changed = true;
+                    tools.maximize.setType('restore');
                 }
                 if (me.collapseTool) {
                     me.collapseTool.hide();
@@ -793,7 +794,7 @@ Ext.define('Ext.window.Window', {
             if (me.dd) {
                 me.dd.disable();
                 if (header) {
-                   header.removeCls(header.indicateDragCls)
+                   header.removeCls(header.indicateDragCls);
                 }
             }
             if (me.resizer) {
@@ -821,6 +822,7 @@ Ext.define('Ext.window.Window', {
     /**
      * Restores a {@link #maximizable maximized} window back to its original size and position prior to being maximized
      * and also replaces the 'restore' tool button with the 'maximize' tool button. Also see {@link #toggleMaximize}.
+     * @param {Boolean} [animate=false] Pass `true` to animate the restore.
      * @return {Ext.window.Window} this
      */
     restore: function(animate) {
@@ -837,13 +839,8 @@ Ext.define('Ext.window.Window', {
             // Manipulate visibility of header tools if there is a header
             if (header) {
                 header.suspendLayouts();
-                if (tools.restore) {
-                    tools.restore.hide();
-                    changed = true;
-                }
                 if (tools.maximize) {
-                    tools.maximize.show();
-                    changed = true;
+                    tools.maximize.setType('maximize');
                 }
                 if (me.collapseTool) {
                     me.collapseTool.show();
@@ -870,7 +867,7 @@ Ext.define('Ext.window.Window', {
             if (me.dd) {
                 me.dd.enable();
                 if (header) {
-                    header.addCls(header.indicateDragCls)
+                    header.addCls(header.indicateDragCls);
                 }
             }
 
@@ -909,7 +906,7 @@ Ext.define('Ext.window.Window', {
             if (!currentlyMonitoring) {
                 // but we aren't, so set it up.
                 // Delay so that we jump over any Viewport resize activity
-                Ext.EventManager.onWindowResize(me.onWindowResize, me, {delay: 1});
+                Ext.EventManager.onWindowResize(me.onWindowResize, me, {buffer: 1});
                 me._monitoringResize = true;
             }
         } else if (currentlyMonitoring) {

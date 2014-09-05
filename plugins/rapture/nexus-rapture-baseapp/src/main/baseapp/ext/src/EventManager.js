@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag dom,core
 // @require util/Event.js
@@ -31,6 +31,7 @@ Ext.EventManager = new function() {
     var EventManager = this,
         doc = document,
         win = window,
+        supports = Ext.supports,
         escapeRx = /\\/g,
         prefix = Ext.baseCSSPrefix,
         // IE9strict addEventListener has some issues with using synthetic events
@@ -41,8 +42,8 @@ Ext.EventManager = new function() {
             var bd = doc.body || doc.getElementsByTagName('body')[0],
                 cls = [],
                 htmlCls = [],
-                supportsLG = Ext.supports.CSS3LinearGradient,
-                supportsBR = Ext.supports.CSS3BorderRadius,
+                supportsLG = supports.CSS3LinearGradient,
+                supportsBR = supports.CSS3BorderRadius,
                 html;
 
             /**
@@ -156,7 +157,7 @@ Ext.EventManager = new function() {
                     add('safari5');
                 }
                 if (Ext.isSafari5_0) {
-                    add('safari5_0')
+                    add('safari5_0');
                 }
             }
             if (Ext.isChrome) {
@@ -307,7 +308,7 @@ Ext.EventManager = new function() {
                 Ext._readyTime = new Date().getTime();
                 Ext.isReady = true;
 
-                Ext.supports.init();
+                supports.init();
                 EventManager.onWindowUnload();
                 readyEvent.onReadyChain = EventManager.onReadyChain;    //diags report
 
@@ -339,7 +340,7 @@ Ext.EventManager = new function() {
             }
             EventManager.isFiring = false;
             EventManager.hasFiredReady = true;
-            Ext.EventManager.idleEvent.fire();
+            EventManager.idleEvent.fire();
         },
 
         /**
@@ -393,8 +394,12 @@ Ext.EventManager = new function() {
 
             element = Ext.getDom(element);
 
-            if (element === doc || element === win) {
-                id = element === doc ? Ext.documentId : Ext.windowId;
+            if (element === doc) {
+                id = Ext.documentId;
+
+            // Use of "==" essential here, to avoid IE's bug where window.self !== window
+            } else if (element == win) {
+                id = Ext.windowId;
             }
             else {
                 id = Ext.id(element);
@@ -454,12 +459,12 @@ Ext.EventManager = new function() {
          * @return {Object} The new event name/function
          */
         normalizeEvent: function(eventName, fn) {
-            if (EventManager.mouseEnterLeaveRe.test(eventName) && !Ext.supports.MouseEnterLeave) {
+            if (EventManager.mouseEnterLeaveRe.test(eventName) && !supports.MouseEnterLeave) {
                 if (fn) {
                     fn = Ext.Function.createInterceptor(fn, EventManager.contains);
                 }
                 eventName = eventName == 'mouseenter' ? 'mouseover' : 'mouseout';
-            } else if (eventName == 'mousewheel' && !Ext.supports.MouseWheel && !Ext.isOpera) {
+            } else if (eventName == 'mousewheel' && !supports.MouseWheel && !Ext.isOpera) {
                 eventName = 'DOMMouseScroll';
             }
             return {
@@ -625,9 +630,10 @@ Ext.EventManager = new function() {
         // In this case we still want to return our custom window/doc id.
         normalizeId: function(dom, force) {
             var id;
-            if (dom === document) {
+            if (dom === doc) {
                 id = Ext.documentId;
-            } else if (dom === window) {
+            // Use of "==" essential here, to avoid IE's bug where window.self !== window
+            } else if (dom == win) {
                 id = Ext.windowId;
             } else {
                 id = dom.id;
@@ -774,7 +780,7 @@ Ext.EventManager = new function() {
         /**
          * Recursively removes all previous added listeners from an element and its children. Typically you will use {@link Ext.Element#purgeAllListeners}
          * directly on an Element in favor of calling this version.
-         * @param {String/Ext.Element/HTMLElement/Window} el The id or html element from which to remove all event handlers.
+         * @param {String/Ext.Element/HTMLElement/Window} element The id or html element from which to remove all event handlers.
          * @param {String} eventName (optional) The name of the event.
          */
         purgeElement : function(element, eventName) {
@@ -927,7 +933,7 @@ Ext.EventManager = new function() {
          * Get the event cache for a particular element for a particular event
          * @private
          * @param {HTMLElement} element The element
-         * @param {Object} eventName The event name
+         * @param {String} eventName The event name
          * @return {Array} The events for the element
          */
         getEventListenerCache : function(element, eventName) {

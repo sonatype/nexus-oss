@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Ed Spencer
@@ -210,51 +210,65 @@ Ext.define('Ext.data.Field', {
      *
      * Example of convert functions:
      *
-     *     function fullName(v, record){
-     *         return record.data.last + ', ' + record.data.first;
-     *     }
      *
-     *     function location(v, record){
-     *         return !record.data.city ? '' : (record.data.city + ', ' + record.data.state);
-     *     }
+     *     // Define the Model.
+     *     // The class definition accepts a function which it calls to get class data
+     *     Ext.define('Dude', function() {
      *
-     *     Ext.define('Dude', {
-     *         extend: 'Ext.data.Model',
-     *         fields: [
-     *             {name: 'fullname',  convert: fullName},
-     *             {name: 'firstname', mapping: 'name.first'},
-     *             {name: 'lastname',  mapping: 'name.last'},
-     *             {name: 'city', defaultValue: 'homeless'},
-     *             'state',
-     *             {name: 'location',  convert: location}
-     *         ]
+     *         function fullName(v, record){
+     *             return record.get('firstname') + ', ' + record.get('lastname');
+     *         }
+     *
+     *         function location(v, record){
+     *             return !record.get('city') ? '' : (record.get('city') + ', ' + record.get('state'));
+     *         }
+     *
+     *         return {
+     *             extend: 'Ext.data.Model',
+     *             idProperty: 'key',
+     *             fields: [
+     *                 {name: 'fullname',  convert: fullName},
+     *                 {name: 'firstname', mapping: 'name.first'},
+     *                 {name: 'lastname',  mapping: 'name.last'},
+     *                 {name: 'city', defaultValue: 'homeless'},
+     *                 'state',
+     *                 {name: 'location',  convert: location}
+     *             ]
+     *         };
      *     });
+     *
+     *     var myData = {
+     *         total: 3,
+     *         dudes: [
+     *             { key: 1,
+     *              name: { first: 'Fat',    last:  'Albert' }
+     *              // notice no city, state provided in data object
+     *             },
+     *             { key: 2,
+     *              name: { first: 'Barney', last:  'Rubble' },
+     *              city: 'Bedrock', state: 'Stoneridge'
+     *             },
+     *             { key: 3,
+     *              name: { first: 'Cliff',  last:  'Claven' },
+     *              city: 'Boston',  state: 'MA'
+     *             }
+     *         ]
+     *     };
      *
      *     // create the data store
      *     var store = Ext.create('Ext.data.Store', {
-     *         reader: {
-     *             type: 'json',
-     *             model: 'Dude',
-     *             idProperty: 'key',
-     *             root: 'daRoot',
-     *             totalProperty: 'total'
-     *         }
+     *         model: 'Dude',
+     *         proxy: {
+     *             type: 'memory',
+     *             reader: {
+     *                 type: 'json',
+     *                 root: 'dudes',
+     *                 totalProperty: 'total'
+     *             }
+     *         },
+     *         data: myData
      *     });
      *
-     *     var myData = [
-     *         { key: 1,
-     *           name: { first: 'Fat',    last:  'Albert' }
-     *           // notice no city, state provided in data object
-     *         },
-     *         { key: 2,
-     *           name: { first: 'Barney', last:  'Rubble' },
-     *           city: 'Bedrock', state: 'Stoneridge'
-     *         },
-     *         { key: 3,
-     *           name: { first: 'Cliff',  last:  'Claven' },
-     *           city: 'Boston',  state: 'MA'
-     *         }
-     *     ];
      */
 
     /**
@@ -309,9 +323,9 @@ Ext.define('Ext.data.Field', {
      * If this is not specified, the {@link #dateFormat} will be used. See the {@link Ext.data.writer.Writer} 
      * docs for more information on writing dates. 
      *
-     * **Note that to use a {@link Ext.data.JsonWriter JsonWriter} to send Microsoft format "JSON" dates, which are in fact
-     * invalid JSON, it is not possible to use the standard date serialization pathway or
-     * {@link Ext#USE_NATIVE_JSON native browser JSON production}.**
+     * **Note** It is not possible to use the standard date serialization pathway or {@link Ext#USE_NATIVE_JSON native browser JSON production}
+     * to use a {@link Ext.data.JsonWriter JsonWriter} to send Microsoft formated
+     * "JSON" dates.
      *
      * To use a {@link Ext.data.JsonWriter JsonWriter} to write dates in a JSON packet in the form `"\/Date(1357372800000)\/"`
      * configure the field like this:

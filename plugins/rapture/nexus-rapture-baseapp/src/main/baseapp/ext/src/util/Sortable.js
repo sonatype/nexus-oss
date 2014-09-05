@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @docauthor Tommy Maintz <tommy@sencha.com>
@@ -41,6 +41,26 @@ Ext.define("Ext.util.Sortable", {
         'Ext.util.Sorter'
     ],
 
+    /**
+     * @event beforesort
+     * Fires before a sort occurs.
+     * @param {Ext.util.Sortable} me This object.
+     * @param {Ext.util.Sorter[]} sorters The collection of Sorters being used to generate the comparator function.
+     */
+
+    /**
+     * @cfg {Number} [multiSortLimit=3]
+     * The maximum number of sorters which may be applied to this Sortable when using the "multi" insertion position
+     * when adding sorters.
+     *
+     * New sorters added using the "multi" insertion position are inserted at the top of the sorters list becoming the
+     * new primary sort key.
+     *
+     * If the sorters collection has grown to longer then **`multiSortLimit`**, then the it is trimmed.
+     *
+     */
+    multiSortLimit: 3,
+
     statics: {
         /**
          * Creates a single comparator function which encapsulates the passed Sorter array.
@@ -54,9 +74,10 @@ Ext.define("Ext.util.Sortable", {
                     length = sorters.length,
                     i = 1;
 
-                // if we have more than one sorter, OR any additional sorter functions together
-                for (; i < length; i++) {
-                    result = result || sorters[i].sort.call(this, r1, r2);
+                // While we have not established a comparison value,
+                // loop through subsequent sorters asking for a comparison value
+                for (; !result && i < length; i++) {
+                    result = sorters[i].sort.call(this, r1, r2);
                 }
                 return result;
             }: function() {
@@ -72,7 +93,15 @@ Ext.define("Ext.util.Sortable", {
 
     /**
      * @cfg {Ext.util.Sorter[]/Object[]} sorters
-     * The initial set of {@link Ext.util.Sorter Sorters}
+     * The initial set of {@link Ext.util.Sorter Sorters}.
+     * 
+     *     sorters: [{
+     *         property: 'age',
+     *         direction: 'DESC'
+     *     }, {
+     *         property: 'firstName',
+     *         direction: 'ASC'
+     *     }]
      */
 
     /**
@@ -97,25 +126,22 @@ Ext.define("Ext.util.Sortable", {
     },
 
     /**
-     * Sorts the data in the Store by one or more of its properties. Example usage:
+     * Updates the sorters collection and triggers sorting of this Sortable. Example usage:
      *
      *     //sort by a single field
      *     myStore.sort('myField', 'DESC');
      *
      *     //sorting by multiple fields
-     *     myStore.sort([
-     *         {
-     *             property : 'age',
-     *             direction: 'ASC'
-     *         },
-     *         {
-     *             property : 'name',
-     *             direction: 'DESC'
-     *         }
-     *     ]);
+     *     myStore.sort([{
+     *         property : 'age',
+     *         direction: 'ASC'
+     *     }, {
+     *         property : 'name',
+     *         direction: 'DESC'
+     *     }]);
      *
-     * Internally, Store converts the passed arguments into an array of {@link Ext.util.Sorter} instances, and delegates
-     * the actual sorting to its internal {@link Ext.util.MixedCollection}.
+     * Classes which use this mixin must implement a **`soSort`** method which accepts a comparator function computed from
+     * the full sorter set which performs the sort in an implementation-specific way.
      *
      * When passing a single string argument to sort, Store maintains a ASC/DESC toggler per field, so this code:
      *
@@ -127,25 +153,41 @@ Ext.define("Ext.util.Sortable", {
      *     store.sort('myField', 'ASC');
      *     store.sort('myField', 'DESC');
      *
-     * @param {String/Ext.util.Sorter[]} [sorters] Either a string name of one of the fields in this Store's configured
-     * {@link Ext.data.Model Model}, or an array of sorter configurations.
+     * @param {String/Ext.util.Sorter[]} [sorters] Either a string name of one of the fields in this Store's configured {@link Ext.data.Model Model}, or an array of sorter configurations.
      * @param {String} [direction="ASC"] The overall direction to sort the data by.
-     * @return {Ext.util.Sorter[]}
+     * @param {String} [insertionPosition="replace"] Where to put the new sorter in the collection of sorters.
+     * This may take the following values:
+     *
+     * * `replace` : This means that the new sorter(s) becomes the sole sorter set for this Sortable. This is the most useful call mode
+     *           to programatically sort by multiple fields.  
+     *       
+     * * `prepend` : This means that the new sorters are inserted as the primary sorters, unchanged, and the sorter list length must be controlled by the developer.  
+     *       
+     * * `multi` :  This is mainly useful for implementing intuitive "Sort by this" user interfaces such as the {@link Ext.grid.Panel GridPanel}'s column sorting UI.
+     *
+     *     This mode is only supported when passing a property name and a direction.
+     *
+     *     This means that the new sorter is becomes the primary sorter. If the sorter was **already** the primary sorter, the direction
+     *     of sort is toggled if no direction parameter is specified.
+     *     
+     *     The number of sorters maintained is limited by the {@link #multiSortLimit} configuration.  
+     *       
+     * * `append` : This means that the new sorter becomes the last sorter.
+     * @return {Ext.util.Sorter[]} The new sorters.
      */
-    sort: function(sorters, direction, where, doSort) {
+    sort: function(sorters, direction, insertionPosition, doSort) {
         var me = this,
             sorter,
-            newSorters;
+            overFlow;
 
         if (Ext.isArray(sorters)) {
-            doSort = where;
-            where = direction;
-            newSorters = sorters;
+            doSort = insertionPosition;
+            insertionPosition = direction;
         }
         else if (Ext.isObject(sorters)) {
-            doSort = where;
-            where = direction;
-            newSorters = [sorters];
+            sorters = [sorters];
+            doSort = insertionPosition;
+            insertionPosition = direction;
         }
         else if (Ext.isString(sorters)) {
             sorter = me.sorters.get(sorters);
@@ -155,44 +197,74 @@ Ext.define("Ext.util.Sortable", {
                     property : sorters,
                     direction: direction
                 };
-                newSorters = [sorter];
             }
-            else if (direction === undefined) {
+            else if (direction == null) {
                 sorter.toggle();
             }
             else {
                 sorter.setDirection(direction);
             }
+            sorters = [sorter];
         }
 
-        if (newSorters && newSorters.length) {
-            newSorters = me.decodeSorters(newSorters);
-            if (Ext.isString(where)) {
-                if (where === 'prepend') {
-                    me.sorters.insert(0, newSorters);
-                }
-                else {
-                    me.sorters.addAll(newSorters);
-                }
-            }
-            else {
-                me.sorters.clear();
-                me.sorters.addAll(newSorters);
+        if (sorters && sorters.length) {
+            sorters = me.decodeSorters(sorters);
+
+            switch (insertionPosition) {
+                // multi sorting means always inserting the specified sorters
+                // at the top.
+                // If we are asked to sort by what is already the primary sorter
+                // then toggle its direction.
+                case "multi":
+                    // Insert the new sorter at the beginning.
+                    me.sorters.insert(0, sorters[0]);
+
+                    // If we now are oversize, trim our sorters collection
+                    overFlow = me.sorters.getCount() - me.multiSortLimit;
+                    if (overFlow > 0) {
+                        me.sorters.removeRange(me.multiSortLimit, overFlow);
+                    }
+                    break;
+                case "prepend" :
+                    me.sorters.insert(0, sorters);
+                    break;
+                case "append" :
+                    me.sorters.addAll(sorters);
+                    break;
+                case undefined:
+                case null:
+                case "replace":
+                    me.sorters.clear();
+                    me.sorters.addAll(sorters);
+                    break;
+                default:
+                    //<debug>
+                    Ext.Error.raise('Sorter insertion point must be "multi", "prepend", "append" or "replace"');
+                    //</debug>
             }
         }
 
         if (doSort !== false) {
-            me.fireEvent('beforesort', me, newSorters);
-            me.onBeforeSort(newSorters);
-            
-            sorters = me.sorters.items;
-            if (sorters.length) {
+            me.fireEvent('beforesort', me, sorters);
+            me.onBeforeSort(sorters);
+            if (me.getSorterCount()) {
                 // Sort using a generated sorter function which combines all of the Sorters passed
                 me.doSort(me.generateComparator());
             }
         }
 
         return sorters;
+    },
+
+    /**
+     * @protected
+     * Returns the number of Sorters which apply to this Sortable.
+     *
+     * May be overridden in subclasses. {@link Ext.data.Store Store} in particlar overrides
+     * this because its groupers must contribute to the sorter count so that the sort method above executes doSort.
+     */
+    getSorterCount: function( ){
+        return this.sorters.items.length;
     },
 
     /**

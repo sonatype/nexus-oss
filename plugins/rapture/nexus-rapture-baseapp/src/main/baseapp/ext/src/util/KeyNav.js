@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a convenient wrapper for normalized keyboard navigation. KeyNav allows you to bind navigation keys to
@@ -42,6 +42,17 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *             fn: this.onEsc,
  *             defaultEventAction: false
  *         },
+ *
+ *         // Binding may be keyed by a single character
+ *         A: {
+ *             ctrl: true,
+ *             fn: selectAll
+ *         },
+ *
+ *         // Binding may be keyed by a key code (45 = {@link Ext.EventObject#property-INSERT INSERT})
+ *         45: {
+ *             fn: doInsert
+ *         }
  *         scope : this
  *     });
  */
@@ -125,24 +136,27 @@ Ext.define('Ext.util.KeyNav', {
         keyCodes = Ext.util.KeyNav.keyOptions;
         defaultScope = config.scope || me;
 
-        for (keyName in keyCodes) {
-            if (keyCodes.hasOwnProperty(keyName)) {
-
-                // There is a property named after a key name.
-                // It may be a function or an binding spec containing handler, scope and defaultAction configs
-                if (binding = config[keyName]) {
-                    if (typeof binding === 'function') {
-                        binding = {
-                            handler: binding,
-                            defaultEventAction: (config.defaultEventAction !== undefined) ? config.defaultEventAction : me.defaultEventAction
-                        };
-                    }
-                    map.addBinding({
-                        key: keyCodes[keyName],
-                        handler: Ext.Function.bind(me.handleEvent, binding.scope||defaultScope, binding.handler||binding.fn, true),
-                        defaultEventAction: (binding.defaultEventAction !== undefined) ? binding.defaultEventAction : me.defaultEventAction
-                    });
+        for (keyName in config) {
+            binding = config[keyName];
+            // There is a property named after a key name.
+            // It may be a function or an binding spec containing handler, scope and defaultAction configs
+            // Allow {A: { ctrl: true, handler: onCtrlA }}
+            // Allow {45: doInsert} to use key codes directly
+            if (binding && (keyName.length === 1 || (keyName = keyCodes[keyName]) || (!isNaN(keyName = parseInt(keyName, 10))))) {
+                if (typeof binding === 'function') {
+                    binding = {
+                        handler: binding,
+                        defaultEventAction: (config.defaultEventAction !== undefined) ? config.defaultEventAction : me.defaultEventAction
+                    };
                 }
+                map.addBinding({
+                    key: keyName,
+                    ctrl: binding.ctrl,
+                    shift: binding.shift,
+                    alt: binding.alt,
+                    handler: Ext.Function.bind(me.handleEvent, binding.scope||defaultScope, binding.handler||binding.fn, true),
+                    defaultEventAction: (binding.defaultEventAction !== undefined) ? binding.defaultEventAction : me.defaultEventAction
+                });
             }
         }
 

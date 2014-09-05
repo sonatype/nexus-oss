@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * The Connection class encapsulates a connection to the page's originating domain, allowing requests to be made either
@@ -284,6 +284,9 @@ Ext.define('Ext.data.Connection', {
      *
      * @param {Object/String} options.jsonData JSON data to use as the post. Note: This will be used
      * instead of params for the post data. Any params will be appended to the URL.
+     * 
+     * @param {String} options.rawData A raw string to use as the post. Note: This will be used
+     * instead of params for the post data. Any params will be appended to the URL.
      *
      * @param {Array} options.binaryData An array of bytes to submit in binary form. Any params will be appended to the URL. If binaryData is present, you must set {@link Ext.data.Connection#binary binary} to <tt>true</tt> and options.method to <tt>POST</tt>.
      * 
@@ -503,15 +506,15 @@ Ext.define('Ext.data.Connection', {
             // Opera will fire an extraneous load event on about:blank
             // We want to ignore this since the load event will be fired twice
             if (doc) {
-                 if (Ext.isOpera && doc.location == 'about:blank') {
-                     return;
-                 }
+                if (Ext.isOpera && doc.location == 'about:blank') {
+                    return;
+                }
                 if (doc.body) {
 
                     // Response sent as Content-Type: text/json or text/plain. Browser will embed in a <pre> element
                     // Note: The statement below tests the result of an assignment.
                     if ((contentNode = doc.body.firstChild) && /pre/i.test(contentNode.tagName)) {
-                        response.responseText = contentNode.textContent;
+                        response.responseText = contentNode.textContent || contentNode.innerText;
                     }
 
                     // Response sent as Content-Type: text/html. We must still support JSON response wrapped in textarea.

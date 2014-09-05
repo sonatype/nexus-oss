@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @docauthor Robert Dougan <rob@sencha.com>
@@ -203,6 +203,8 @@ Ext.define('Ext.button.Button', {
     /**
      * @cfg {String} icon
      * The path to an image to display in the button.
+     *
+     * There are no default icons that come with Ext JS.
      */
 
     /**
@@ -309,6 +311,8 @@ Ext.define('Ext.button.Button', {
     /**
      * @cfg {String} iconCls
      * A css class which sets a background image to be used as the icon for this button.
+     *
+     * There are no default icon classes that come with Ext JS.
      */
 
     /**
@@ -398,10 +402,12 @@ Ext.define('Ext.button.Button', {
      hrefTarget: '_blank',
 
      /**
-     * @cfg {Boolean} destroyMenu
-     * Whether or not to destroy any associated menu when this button is destroyed. The menu
-     * will be destroyed unless this is explicitly set to false.
+     * @cfg {Boolean} [destroyMenu=true]
+     * Whether or not to destroy any associated menu when this button is destroyed.
+     * In addition, a value of `true` for this config will destroy the currently bound menu when a new
+     * menu is set in {@link #setMenu} unless overridden by that method's destroyMenu function argument.
      */
+     destroyMenu: true,
 
     /**
      * @cfg {Object} baseParams
@@ -526,6 +532,12 @@ Ext.define('Ext.button.Button', {
 
     frame: true,
 
+    autoEl: {
+        tag: 'a',
+        hidefocus: 'on',
+        unselectable: 'on'
+    },
+
     hasFrameTable: function () {
         // Instead of browser sniffing, it's easier to check for the presence of frameTable.
         // If present, we know that it's a browser that doesn't support CSS3BorderRadius.
@@ -541,27 +553,19 @@ Ext.define('Ext.button.Button', {
     doNavigate: function () {
         // Non-HTML5 browsers don't support a block element inside an A tag.
         // http://stackoverflow.com/questions/5682048/putting-a-table-inside-a-hyperlink-not-working-in-ie
+        // Note use this.getHref() to append any params to the url.
         if (this.hrefTarget === '_blank') {
-            window.open(this.href, this.hrefTarget);
+            window.open(this.getHref(), this.hrefTarget);
         } else {
-            location.href = this.href;
+            location.href = this.getHref();
         }
     },
 
     // A reusable object used by getTriggerRegion to avoid excessive object creation.
     _triggerRegion: {},
 
-    // inherit docs
     initComponent: function() {
         var me = this;
-
-        // the autoEl object can't be on the prototype because we add tabIndex and href
-        // properties to it conditionally.
-        me.autoEl = {
-            tag: 'a',
-            hidefocus: 'on',
-            unselectable: 'on'
-        };
 
         // Ensure no selection happens
         me.addCls(Ext.baseCSSPrefix + 'unselectable');
@@ -667,13 +671,7 @@ Ext.define('Ext.button.Button', {
         if (me.menu) {
             // Flag that we'll have a splitCls
             me.split = true;
-
-            // retrieve menu by id or instantiate instance if needed
-            me.menu = Ext.menu.Manager.get(me.menu);
-
-            // Use ownerButton as the upward link. Menus *must have no ownerCt* - they are global floaters.
-            // Upward navigation is done using the up() method.
-            me.menu.ownerButton = me;
+            me.setMenu(me.menu, /*destroyMenu*/false);
         }
 
         // Accept url as a synonym for href
@@ -698,19 +696,12 @@ Ext.define('Ext.button.Button', {
         me.glyphCls = me.baseCls + '-glyph';
     },
 
-    // inherit docs
     getActionEl: function() {
         return this.el;
     },
 
-    // inherit docs
     getFocusEl: function() {
         return this.el;
-    },
-
-    // See comments in onFocus
-    onDisable: function(){
-        this.callParent(arguments);
     },
 
     // @private
@@ -746,22 +737,28 @@ Ext.define('Ext.button.Button', {
         return cls;
     },
 
-    beforeRender: function () {
+    getElConfig: function() {
         var me = this,
-            autoEl = me.autoEl,
+            config = me.callParent(),
             href = me.getHref(),
             hrefTarget = me.hrefTarget;
 
-        if (!me.disabled) {
-            autoEl.tabIndex = me.tabIndex;
-        }
-
-        if (href) {
-            autoEl.href = href;
-            if (hrefTarget) {
-                autoEl.target = hrefTarget;
+        if (config.tag === 'a') {
+            if (!me.disabled) {
+                config.tabIndex = me.tabIndex;
+            }
+            if (href) {
+                config.href = href;
+                if (hrefTarget) {
+                    config.target = hrefTarget;
+                }
             }
         }
+        return config;
+    },
+
+    beforeRender: function () {
+        var me = this;
 
         me.callParent();
 
@@ -771,6 +768,61 @@ Ext.define('Ext.button.Button', {
 
         // Apply the renderData to the template args
         Ext.applyIf(me.renderData, me.getTemplateArgs());
+    },
+
+    /**
+     * Sets a new menu for this button. Pass a falsy value to unset the current menu.
+     * To destroy the previous menu for this button, explicitly pass `false` as the second argument. If this is not set, the destroy will depend on the
+     * value of {@link #cfg-destroyMenu}.
+     *
+     * @param {Ext.menu.Menu/String/Object/null} menu Accepts a menu component, a menu id or a menu config.
+     * @param {Boolean} destroyMenu By default, will destroy the previous set menu and remove it from the menu manager. Pass `false` to prevent the destroy.
+     */
+    setMenu: function (menu, destroyMenu) {
+        var me = this,
+            oldMenu = me.menu;
+
+        if (oldMenu && destroyMenu !== false && me.destroyMenu) {
+            oldMenu.destroy();
+        }
+
+        if (oldMenu) {
+            oldMenu.ownerCmp = oldMenu.ownerButton = null;
+        }
+
+        if (menu) {
+            // Retrieve menu by id or instantiate instance if needed.
+            menu = Ext.menu.Manager.get(menu);
+
+            // Use ownerCmp as the upward link. Menus *must have no ownerCt* - they are global floaters.
+            // Upward navigation is done using the up() method.
+            menu.ownerCmp = menu.ownerButton = me;
+
+            me.mon(menu, {
+                scope: me,
+                show: me.onMenuShow,
+                hide: me.onMenuHide
+            });
+
+            // If the button wasn't initially configured with a menu or has previously been unset then we need
+            // to poke the split classes onto the btnWrap dom element.
+            if (!oldMenu) {
+                me.split = true;
+                if (me.rendered) {
+                    me.btnWrap.addCls(me.getSplitCls());
+                    me.updateLayout();
+                }
+            }
+
+            me.menu = menu;
+        } else {
+            if (me.rendered) {
+                me.btnWrap.removeCls(me.getSplitCls());
+                me.updateLayout();
+            }
+            me.split = false;
+            me.menu = null;
+        }
     },
 
     // @private
@@ -809,12 +861,6 @@ Ext.define('Ext.button.Button', {
 
         // Check if the button has a menu
         if (me.menu) {
-            me.mon(me.menu, {
-                scope: me,
-                show: me.onMenuShow,
-                hide: me.onMenuHide
-            });
-
             me.keyMap = new Ext.util.KeyMap({
                 target: me.el,
                 key: Ext.EventObject.DOWN,
@@ -922,6 +968,22 @@ Ext.define('Ext.button.Button', {
 
     /**
      * Sets the href of the link dynamically according to the params passed, and any {@link #baseParams} configured.
+     *
+     *     var button = Ext.create('Ext.button.Button', {
+     *         renderTo   : document.body,
+     *         text       : 'Open',
+     *         href       : 'http://www.sencha.com',
+     *         baseParams : {
+     *             foo : 'bar'
+     *         }
+     *     });
+     *
+     *     button.setParams({
+     *         company : 'Sencha'
+     *     });
+     *
+     * When clicked, this button will open a new window with the url http://www.sencha.com/?foo=bar&company=Sencha because
+     * the button wased configured with the {@link #baseParams} to have `foo` = `'bar'` and then used {@link #setParams} to set the `company` parameter to `'Sencha'`.
      *
      * **Only valid if the Button was originally configured with a {@link #href}**
      *
@@ -1117,8 +1179,8 @@ Ext.define('Ext.button.Button', {
         if (me.rendered) {
             me.clearTip();
         }
-        if (me.menu && me.destroyMenu !== false) {
-            Ext.destroy(me.menu);
+        if (me.menu && me.destroyMenu) {
+            me.menu.destroy();
         }
         Ext.destroy(me.btnInnerEl, me.repeater);
         me.callParent();
@@ -1485,7 +1547,6 @@ Ext.define('Ext.button.Button', {
         me.fireEvent('menutriggerout', me, me.menu, e);
     },
 
-    // inherit docs
     enable: function(silent) {
         var me = this;
 
@@ -1499,7 +1560,6 @@ Ext.define('Ext.button.Button', {
         return me;
     },
 
-    // inherit docs
     disable: function(silent) {
         var me = this;
 
@@ -1537,7 +1597,6 @@ Ext.define('Ext.button.Button', {
         me.setUI(ui);
     },
 
-    // inherit docs
     setUI: function(ui) {
         var me = this;
 

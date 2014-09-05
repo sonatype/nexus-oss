@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @docauthor Jason Johnston <jason@sencha.com>
@@ -218,6 +218,8 @@ Ext.define('Ext.form.field.Base', {
     checkChangeEvents: Ext.isIE && (!document.documentMode || document.documentMode < 9) ?
                         ['change', 'propertychange', 'keyup'] :
                         ['change', 'input', 'textInput', 'keyup', 'dragdrop'],
+                        
+    ignoreChangeRe: /data\-errorqtip|style\.|className/,   
 
     /**
      * @cfg {Number} checkChangeBuffer
@@ -501,7 +503,9 @@ Ext.define('Ext.form.field.Base', {
 
         // Some Field subclasses may not render an inputEl
         if (me.inputEl) {
+            me.bindPropertyChange(false);
             me.inputEl.dom.value = value;
+            me.bindPropertyChange(true);
         }
         return value;
     },
@@ -588,7 +592,7 @@ Ext.define('Ext.form.field.Base', {
 
     onBoxReady: function() {
         var me = this;
-        me.callParent();
+        me.callParent(arguments);
         
         if (me.setReadOnlyOnBoxReady) {
             me.setReadOnly(me.readOnly);
@@ -662,17 +666,21 @@ Ext.define('Ext.form.field.Base', {
             onChangeTask,
             onChangeEvent,
             events = me.checkChangeEvents,
-            e,
-            eLen   = events.length,
-            event;
+            ignoreChangeRe = me.ignoreChangeRe,
+            eLen = events.length,
+            e, event;
 
         if (inputEl) {
             me.mon(inputEl, Ext.EventManager.getKeyEvent(), me.fireKey,  me);
 
             // listen for immediate value changes
             onChangeTask = new Ext.util.DelayedTask(me.checkChange, me);
-            me.onChangeEvent = onChangeEvent = function() {
-                onChangeTask.delay(me.checkChangeBuffer);
+            me.onChangeEvent = onChangeEvent = function(e) {
+                // When using propertychange, we want to skip out on various values, since they won't cause
+                // the underlying value to change.
+                if (!(e.type == 'propertychange' && ignoreChangeRe.test(e.browserEvent.propertyName))) {
+                    onChangeTask.delay(me.checkChangeBuffer);
+                }
             };
 
             for (e = 0; e < eLen; e++) {
@@ -689,21 +697,23 @@ Ext.define('Ext.form.field.Base', {
     },
 
     doComponentLayout: function() {
-        var me = this,
-            inputEl = me.inputEl,
-            usesPropertychange = me.usesPropertychange,
-            ename = 'propertychange',
-            onChangeEvent = me.onChangeEvent;
-
         // In IE if propertychange is one of the checkChangeEvents, we need to remove
         // the listener prior to layout and re-add it after, to prevent it from firing
         // needlessly for attribute and style changes applied to the inputEl.
+        this.bindPropertyChange(false);
+        this.callParent(arguments);
+        this.bindPropertyChange(true);
+    },
+    
+    /**
+     * @private
+     */
+    bindPropertyChange: function(active) {
+        var me = this,
+            usesPropertychange = me.usesPropertychange;
+            
         if (usesPropertychange) {
-            me.mun(inputEl, ename, onChangeEvent);
-        }
-        me.callParent(arguments);
-        if (usesPropertychange) {
-            me.mon(inputEl, ename, onChangeEvent);
+            me[active ? 'mon' : 'mun'](me.inputEl, 'propertychange', me.onChangeEvent);
         }
     },
 

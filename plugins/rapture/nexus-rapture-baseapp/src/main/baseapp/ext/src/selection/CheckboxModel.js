@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A selection model that renders a column of checkboxes that can be toggled to
@@ -65,6 +65,8 @@ Ext.define('Ext.selection.CheckboxModel', {
 
     // private
     checkerOnCls: Ext.baseCSSPrefix + 'grid-hd-checker-on',
+    
+    tdCls: Ext.baseCSSPrefix + 'grid-cell-special ' + Ext.baseCSSPrefix + 'grid-cell-row-checker',
     
     constructor: function(){
         var me = this;
@@ -220,6 +222,7 @@ Ext.define('Ext.selection.CheckboxModel', {
             hideable: false,
             menuDisabled: true,
             dataIndex: '',
+            tdCls: me.tdCls,
             cls: showCheck ? Ext.baseCSSPrefix + 'column-header-checkbox ' : '',
             renderer: Ext.Function.bind(me.renderer, me),
             editRenderer: me.editRenderer || me.renderEmpty,
@@ -243,9 +246,7 @@ Ext.define('Ext.selection.CheckboxModel', {
      * See {@link Ext.grid.column.Column#renderer} for description of allowed parameters.
      */
     renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
-        var baseCSSPrefix = Ext.baseCSSPrefix;
-        metaData.tdCls = baseCSSPrefix + 'grid-cell-special ' + baseCSSPrefix + 'grid-cell-row-checker';
-        return '<div class="' + baseCSSPrefix + 'grid-row-checker" role="presentation">&#160;</div>';
+        return '<div class="' + Ext.baseCSSPrefix + 'grid-row-checker" role="presentation">&#160;</div>';
     },
     
     processSelection: function(view, record, item, index, e){
@@ -337,7 +338,7 @@ Ext.define('Ext.selection.CheckboxModel', {
             selected = me.selected;
             hdSelectStatus = true;
             for (i = 0, len = selected.getCount(); i < len; ++i) {
-                if (!me.storeHasSelected(selected.getAt(i))) {
+                if (!me.getStoreRecord(selected.getAt(i))) {
                     break;
                 }
                 ++selectedCount;

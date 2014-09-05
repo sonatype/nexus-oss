@@ -139,6 +139,11 @@
     .#{$prefix}toolbar-item {
         margin: 0 $toolbar-footer-horizontal-spacing 0 0;
     }
+    @if $include-rtl {
+        .#{$prefix}rtl.#{$prefix}toolbar-item {
+            margin: 0 0 0 $toolbar-footer-horizontal-spacing;
+        }
+    }
 }
 
 .#{$prefix}toolbar-spacer {

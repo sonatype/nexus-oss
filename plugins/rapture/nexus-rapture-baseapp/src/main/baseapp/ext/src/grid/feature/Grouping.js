@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,13 +13,13 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This feature allows to display the grid rows aggregated into groups as specified by the {@link Ext.data.Store#groupers}
  * specified on the Store. The group will show the title for the group name and then the appropriate records for the group
  * underneath. The groups can also be expanded and collapsed.
- * 
+ *
  * ## Extra Events
  *
  * This feature adds several extra events that will be fired on the grid to interact with the groups:
@@ -140,13 +140,13 @@ Ext.define('Ext.grid.feature.Grouping', {
     /**
      * @cfg {String/Array/Ext.Template} groupHeaderTpl
      * A string Template snippet, an array of strings (optionally followed by an object containing Template methods) to be used to construct a Template, or a Template instance.
-     * 
+     *
      * - Example 1 (Template snippet):
-     * 
+     *
      *       groupHeaderTpl: 'Group: {name}'
-     *     
+     *
      * - Example 2 (Array):
-     * 
+     *
      *       groupHeaderTpl: [
      *           'Group: ',
      *           '<div>{name:this.formatName}</div>',
@@ -156,9 +156,9 @@ Ext.define('Ext.grid.feature.Grouping', {
      *               }
      *           }
      *       ]
-     *     
+     *
      * - Example 3 (Template Instance):
-     * 
+     *
      *       groupHeaderTpl: Ext.create('Ext.XTemplate',
      *           'Group: ',
      *           '<div>{name:this.formatName}</div>',
@@ -234,7 +234,7 @@ Ext.define('Ext.grid.feature.Grouping', {
      * @cfg {Boolean} [collapsible=true]
      * Set to `false` to disable collapsing groups from the UI.
      *
-     * This is set to `false` when the associated {@link Ext.data.Store store} is 
+     * This is set to `false` when the associated {@link Ext.data.Store store} is
      * {@link Ext.data.Store#buffered buffered}.
      */
     collapsible: true,
@@ -382,9 +382,10 @@ Ext.define('Ext.grid.feature.Grouping', {
 
     init: function(grid) {
         var me = this,
-            view = me.view;
+            view = me.view,
+            store = view.store;
 
-        if (view.store.groupField) {
+        if (store.isGrouped()) {
             view.isGrouping = true;
         }
 
@@ -412,7 +413,7 @@ Ext.define('Ext.grid.feature.Grouping', {
         view.preserveScrollOnRefresh = true;
 
         // Sparse store - we can never collapse groups
-        if (view.store.buffered) {
+        if (store.buffered) {
             me.collapsible = false;
         }
         // If it's a local store we can build a grouped store for use as the view's dataSource
@@ -422,7 +423,7 @@ Ext.define('Ext.grid.feature.Grouping', {
             if (this.lockingPartner && this.lockingPartner.dataSource) {
                 me.dataSource = view.dataSource = this.lockingPartner.dataSource;
             } else {
-                me.dataSource = view.dataSource = new Ext.grid.feature.GroupStore(me, view.store);
+                me.dataSource = view.dataSource = new Ext.grid.feature.GroupStore(me, store);
             }
         }
 
@@ -437,38 +438,7 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     indexOf: function(record) {
-        var me = this,
-            store = me.view.store,
-            recordIdx = record.isModel ? store.indexOf(record) : Math.min(Math.max(record, 0), store.getCount() - 1),
-            storeGroups,
-            i, length, storeGroup, myGroup, groupStart,
-            nextGroupStart = 0,
-            skippedRecords = 0;
-
-        storeGroups = store.getGroups();
-
-        // Loop through each Store group, and access the Grouping Feature's group data
-        for (i = 0, length = storeGroups.length; i < length; i++) {
-            storeGroup = storeGroups[i];
-            myGroup = me.getGroup(storeGroup.name);
-
-            groupStart = nextGroupStart;
-
-            // The start record index of the next group
-            nextGroupStart = groupStart + storeGroup.children.length;
-
-            // Required record is in this group
-            if (recordIdx < nextGroupStart) {
-                return recordIdx - skippedRecords;
-            }
-
-            // Tally all skipped records.
-            // The full complement of collapsed records is skipped, but there is still a placeholder which is still in the view's dataSource
-            if (myGroup.isCollapsed) {
-                skippedRecords += storeGroup.children.length;
-                skippedRecords -= 1;
-            }
-        }
+        return this.dataSource.indexOf(record);
     },
 
     isInCollapsedGroup: function(record) {
@@ -598,19 +568,18 @@ Ext.define('Ext.grid.feature.Grouping', {
         var view = this.view,
             headerCt = view.headerCt,
             menu = headerCt.getMenu(),
-            groupToggleMenuItem  = menu.down('#groupMenuItem'),
+            activeHeader = menu.activeHeader,
+            groupMenuItem  = menu.down('#groupMenuItem'),
+            groupMenuMeth,
             colCount = this.grid.getVisibleColumnManager().getColumns().length,
             items,
             len,
             i;
 
         // "Group by this field" must be disabled if there's only one column left visible.
-        if (groupToggleMenuItem) {
-            if (headerCt.getVisibleGridColumns().length > 1) {
-                groupToggleMenuItem.enable();
-            } else {
-                groupToggleMenuItem.disable();
-            }
+        if (activeHeader && groupMenuItem) {
+            groupMenuMeth = activeHeader.groupable === false || activeHeader.dataIndex == null || this.view.headerCt.getVisibleGridColumns().length < 2 ?  'disable' : 'enable';
+            groupMenuItem[groupMenuMeth]();
         }
 
         // header containing TDs have to span all columns, hiddens are just zero width
@@ -633,6 +602,7 @@ Ext.define('Ext.grid.feature.Grouping', {
 
         if (store.isGrouped()) {
             groups = me.groupCache;
+            Ext.suspendLayouts();
             for (groupName in groups) {
                 if (groups.hasOwnProperty(groupName)) {
                     group = groups[groupName];
@@ -647,6 +617,7 @@ Ext.define('Ext.grid.feature.Grouping', {
                     }
                 }
             }
+            Ext.resumeLayouts(true);
         }
     },
 
@@ -918,7 +889,7 @@ Ext.define('Ext.grid.feature.Grouping', {
             group = me.groupCache[groupName];
 
         // groupCache is shared between two lockingPartners
-        if (group.isCollapsed != collapsed) {
+        if (group.isCollapsed !== collapsed) {
 
             // The GroupStore is shared by partnered Grouping features, so this will refresh both sides.
             // We only want one layout as a result though, so suspend layouts while refreshing.
@@ -958,13 +929,14 @@ Ext.define('Ext.grid.feature.Grouping', {
             field = me.getGroupField(),
             menuItem,
             visibleGridColumns,
-            groupingByLastVisibleColumn;
+            groupingByLastVisibleColumn,
+            newChecked;
 
         if (me.hideGroupedHeader) {
             if (me.lastGroupers && me.lastGroupers.length) {
                 menuItem = me.getMenuItem(me.lastGroupers[0].property);
                 if (menuItem) {
-                    menuItem.setChecked(true);
+                    newChecked = true;
                 }
             }
             if (field) {
@@ -972,11 +944,16 @@ Ext.define('Ext.grid.feature.Grouping', {
 
                 // See if we are being asked to group by the sole remaining visible column.
                 // If so, then do not hide that column.
-                groupingByLastVisibleColumn = ((visibleGridColumns.length === 1) && (visibleGridColumns[0].dataIndex == field));
+                groupingByLastVisibleColumn = ((visibleGridColumns.length === 1) && (visibleGridColumns[0].dataIndex === field));
                 menuItem = me.getMenuItem(field);
                 if (menuItem && !groupingByLastVisibleColumn) {
-                    menuItem.setChecked(false);
+                    newChecked = false;
                 }
+            }
+
+            // Change visibility state of group field's header
+            if (menuItem && menuItem.checked !== newChecked) {
+                menuItem.setChecked(newChecked);
             }
         }
         me.refreshIf();
@@ -1026,7 +1003,7 @@ Ext.define('Ext.grid.feature.Grouping', {
                         if (groupIsCollapsed) {
                             me.expand(groupName);
                         }
-                    } else {
+                    } else if (!groupCache[g].isCollapsed) {
                         me.doCollapseExpand(true, g, false);
                     }
                 }
@@ -1044,10 +1021,12 @@ Ext.define('Ext.grid.feature.Grouping', {
 
     setupRowData: function(record, idx, rowValues) {
         var me = this,
+            recordIndex = rowValues.recordIndex,
             data = me.refreshData,
             groupInfo = me.groupInfo,
             header = data.header,
             groupField = data.groupField,
+            store = me.view.store,
             dataSource = me.view.dataSource,
             grouper, groupName, prev, next;
 
@@ -1089,9 +1068,9 @@ Ext.define('Ext.grid.feature.Grouping', {
 
             else {
                 // See if the current record is the last in the group
-                rowValues.isFirstRow = idx === 0;
+                rowValues.isFirstRow = recordIndex === 0;
                 if (!rowValues.isFirstRow) {
-                    prev = dataSource.getAt(idx - 1);
+                    prev = store.getAt(recordIndex - 1);
                     // If the previous row is of a different group, then we're at the first for a new group
                     if (prev) {
                         // Must use Model's comparison because Date objects are never equal
@@ -1100,9 +1079,9 @@ Ext.define('Ext.grid.feature.Grouping', {
                 }
 
                 // See if the current record is the last in the group
-                rowValues.isLastRow = idx == dataSource.getTotalCount() - 1;
+                rowValues.isLastRow = recordIndex == (store.buffered ? store.getTotalCount() : store.getCount()) - 1;
                 if (!rowValues.isLastRow) {
-                    next = dataSource.getAt(idx + 1);
+                    next = store.getAt(recordIndex + 1);
                     if (next) {
                         // Must use Model's comparison because Date objects are never equal
                         rowValues.isLastRow = !next.isEqual(grouper.getGroupString(next), groupName);
@@ -1145,8 +1124,8 @@ Ext.define('Ext.grid.feature.Grouping', {
     setup: function(rows, rowValues) {
         var me = this,
             data = me.refreshData,
-            isGrouping = !me.disabled && me.view.store.isGrouped();
-            
+            isGrouping = !me.disabled && me.view.isGrouping;
+
         me.skippedRows = 0;
         if (rowValues.view.bufferedRenderer) {
             rowValues.view.bufferedRenderer.variableRowHeight = true;
@@ -1180,7 +1159,7 @@ Ext.define('Ext.grid.feature.Grouping', {
         targetEl = Ext.fly(element).findParent(eventSelector);
 
         if (!targetEl) {
-            // Otherwise, navigate up to the row and look down to see if we can find it    
+            // Otherwise, navigate up to the row and look down to see if we can find it
             row = Ext.fly(element).findParent(view.itemSelector);
             if (row) {
                 targetEl = row.down(eventSelector, true);
@@ -1215,7 +1194,7 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     createGroupCls: function(group) {
-        return this.view.id + '-' + Ext.htmlEncode(group) + '-item';    
+        return this.view.id + '-' + Ext.htmlEncode(group) + '-item';
     },
 
     getGroupField: function(){
@@ -1257,16 +1236,19 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     onReconfigure: function(grid, store, columns, oldStore, oldColumns) {
-        var me = grid;
+        var bufferedStore;
 
         if (store && store !== oldStore) {
+            bufferedStore = store.buffered;
+
             // Grouping involves injecting a dataSource in early
-            if (store.buffered !== oldStore.buffered) {
+            if (bufferedStore !== oldStore.buffered) {
                 Ext.Error.raise('Cannot reconfigure grouping switching between buffered and non-buffered stores');
             }
-            if (store.buffered) {
-                me.bindStore(store);
-                me.dataSource.processStore(store);
+
+            if (bufferedStore || grid.findPlugin('bufferedrenderer')) {
+                // Binding the store will also process it.
+                grid.view.dataSource.bindStore(store);
             }
         }
     }

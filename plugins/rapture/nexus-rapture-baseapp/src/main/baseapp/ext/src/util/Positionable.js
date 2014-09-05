@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag core
 /**
@@ -335,8 +335,8 @@ Ext.define('Ext.util.Positionable', {
         anchor = (anchor || "tl").toLowerCase();
         mySize = mySize || {};
 
-        myWidth = mySize.width || isViewport ? Ext.Element.getViewWidth() : me.getWidth();
-        myHeight = mySize.height || isViewport ? Ext.Element.getViewHeight() : me.getHeight();
+        myWidth = mySize.width || (isViewport ? Ext.Element.getViewWidth() : me.getWidth());
+        myHeight = mySize.height || (isViewport ? Ext.Element.getViewHeight() : me.getHeight());
 
         // Calculate anchor position.
         // Test most common cases for picker alignment first.
@@ -384,13 +384,8 @@ Ext.define('Ext.util.Positionable', {
      */
     getAlignToXY: function(alignToEl, posSpec, offset) {
         var me = this,
-            viewportWidth = Ext.Element.getViewWidth() - 10, // 10px of margin for ie
-            viewportHeight = Ext.Element.getViewHeight() - 10, // 10px of margin for ie
-            doc = document,
-            docElement = doc.documentElement,
-            docBody = doc.body,
-            scrollX = (docElement.scrollLeft || docBody.scrollLeft || 0),
-            scrollY = (docElement.scrollTop  || docBody.scrollTop  || 0),
+            constrainToEl,
+            constrainTo,
             alignMatch, myPosition, alignToElPosition, myWidth, myHeight,
             alignToElRegion, swapY, swapX, constrain, align1, align2,
             p1y, p1x, p2y, p2x, x, y;
@@ -440,8 +435,17 @@ Ext.define('Ext.util.Positionable', {
         x = alignToElPosition[0] - myPosition[0] + offset[0];
         y = alignToElPosition[1] - myPosition[1] + offset[1];
 
-        // If position spec ended with a "?", then constrain to viewport is necessary
+        // If position spec ended with a "?", then constraining is necessary
         if (constrain) {
+            // Constrain to the correct enclosing object:
+            // Attempt to use the constrainTo property.
+            // Otherwise, if we are a Component, there will be a container property.
+            // Otherwise, use this Positionable's element's parent node.
+            constrainToEl = me.constrainTo || me.container || me.el.parent();
+            constrainToEl = Ext.get(constrainToEl.el || constrainToEl)
+            constrainTo = constrainToEl.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainToEl.el.dom.clientWidth;
+
             myWidth = me.getWidth();
             myHeight = me.getHeight();
             alignToElRegion = alignToEl.getRegion();
@@ -453,20 +457,40 @@ Ext.define('Ext.util.Positionable', {
             p1x = align1.charAt(align1.length - 1);
             p2y = align2.charAt(0);
             p2x = align2.charAt(align2.length - 1);
-            swapY = ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
-            swapX = ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
 
-            if (x + myWidth > viewportWidth + scrollX) {
-                x = swapX ? alignToElRegion.left - myWidth : viewportWidth + scrollX - myWidth;
+            // We only need to swap from below to above (or vice versa) if the two elements horizontally overlap.
+            // If they do not horizontally overlap, then simply constraining the Y is fine.
+            swapY = (x < alignToElRegion.right && x + myWidth >= alignToElRegion.left) && ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
+
+            // We only need to swap from right to left (or vice versa) if the two elements vertically overlap.
+            // If they do not vertically overlap, then simply constraining the X is fine.
+            swapX = (y < alignToElRegion.bottom && y + myHeight >= alignToElRegion.top) && ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
+
+            if (x + myWidth > constrainTo.right) {
+                if (swapX) {
+                    x = alignToElRegion.left - myWidth;
+
+                    // Only swap once. If it doesn't fit after that, we have to do a normal constrain
+                    swapX = false;
+                } else {
+                    x = constrainTo.right - myWidth;
+                }
             }
-            if (x < scrollX) {
-                x = swapX ? alignToElRegion.right : scrollX;
+            if (x < constrainTo.left) {
+                x = swapX ? alignToElRegion.right : constrainTo.left;
             }
-            if (y + myHeight > viewportHeight + scrollY) {
-                y = swapY ? alignToElRegion.top - myHeight : viewportHeight + scrollY - myHeight;
+            if (y + myHeight > constrainTo.bottom) {
+                if (swapY) {
+                    y = alignToElRegion.top - myHeight;
+
+                    // Only swap once. If it doesn't fit after that, we have to do a normal constrain
+                    swapY = false;
+                } else {
+                    y = constrainTo.bottom - myHeight;
+                }
             }
-            if (y < scrollY) {
-                y = swapY ? alignToElRegion.bottom : scrollY;
+            if (y < constrainTo.top) {
+                y = swapY ? alignToElRegion.bottom : constrainTo.top;
             }
         }
         return [x,y];
@@ -659,10 +683,18 @@ Ext.define('Ext.util.Positionable', {
             vector = [0, 0],
             shadowSize = (this.shadow && this.constrainShadow && !this.shadowDisabled) ? this.shadow.getShadowSize() : undefined,
             overflowed = false,
+            constrainSize,
             constraintInsets = this.constraintInsets;
 
         if (!(constrainTo instanceof Ext.util.Region)) {
-            constrainTo = Ext.get(constrainTo.el || constrainTo).getViewRegion();
+            constrainTo = Ext.get(constrainTo.el || constrainTo);
+
+            // getRegion uses bounding client rect.
+            // We need to clear any scrollbars, so get the size using getViewSize
+            constrainSize = constrainTo.getViewSize();
+            constrainTo = constrainTo.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainSize.width;
+            constrainTo.bottom = constrainTo.top + constrainSize.height;
         }
 
         // Apply constraintInsets

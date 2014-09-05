@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag foundation,core
 // @require Class.js
@@ -1206,7 +1206,19 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
     /**
      * @cfg {String[]} alias
      * @member Ext.Class
-     * List of short aliases for class names.  Most useful for defining xtypes for widgets:
+     * List of short aliases for class names. An alias consists of a namespace and a name concatenated by a period as &#60;namespace&#62;.&#60;name&#62;
+     *
+     *  - **namespace** - The namespace describes what kind of alias this is and must be all lowercase.
+     *  - **name** - The name of the alias which allows the lazy-instantiation via the alias. The name shouldn't contain any periods.
+     *
+     * A list of namespaces and the usages are:
+     *
+     *  - **feature** - {@link Ext.grid.Panel Grid} features
+     *  - **plugin** - Plugins
+     *  - **store** - {@link Ext.data.Store}
+     *  - **widget** - Components
+     *
+     * Most useful for defining xtypes for widgets:
      *
      *     Ext.define('MyApp.CoolPanel', {
      *         extend: 'Ext.panel.Panel',
@@ -1224,8 +1236,6 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
      *             {xtype: 'coolpanel', html: 'Bar'}
      *         ]
      *     });
-     *
-     * Besides "widget" for xtype there are alias namespaces like "feature" for ftype and "plugin" for ptype.
      */
     Manager.registerPostprocessor('alias', function(name, cls, data) {
         //<debug>
@@ -1829,7 +1839,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
     Ext.ns = Ext.namespace;
 
     Class.registerPreprocessor('className', function(cls, data) {
-        if (data.$className) {
+        if ('$className' in data) {
             cls.$className = data.$className;
             //<debug>
             cls.displayName = cls.$className;

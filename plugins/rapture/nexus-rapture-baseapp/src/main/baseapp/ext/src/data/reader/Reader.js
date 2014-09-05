@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Ed Spencer
@@ -186,6 +186,8 @@ Ext.define('Ext.data.reader.Reader', {
      * @cfg {String} idProperty
      * Name of the property within a row object that contains a record identifier value. Defaults to the id of the
      * model. If an idProperty is explicitly specified it will take precedence over idProperty defined on the model.
+     *
+     * The data values for this field must be unique or there will be id value collisions in the {@link Ext.data.Store Store}.
      */
 
     /**
@@ -206,9 +208,12 @@ Ext.define('Ext.data.reader.Reader', {
     /**
      * @cfg {String} [root]
      * The name of the property which contains the data items corresponding to the Model(s) for which this
-     * Reader is configured.  For JSON reader it's a property name (or a dot-separated list of property names
-     * if the root is nested).  For XML reader it's a CSS selector.  For Array reader the root is not applicable
-     * since the data is assumed to be a single-level array of arrays.
+     * Reader is configured.
+     *
+     * - For a JSON reader it's a property name (or a dot-separated list of property names if the root is nested)
+     *   or a function which returns the array of row data when passed the raw data block.
+     * - For an XML reader it's a CSS selector.
+     * - For an Array reader the root is not applicable since the data is assumed to be a single-level array of arrays.
      * 
      * By default the natural root of the data will be used: the root JSON array, the root XML element, or the array.
      *
@@ -218,7 +223,44 @@ Ext.define('Ext.data.reader.Reader', {
     
     /**
      * @cfg {String} messageProperty
-     * The name of the property which contains a response message. This property is optional.
+     * The name of the property which contains a response message for exception handling. If you want to return a false success
+     * response from the server, maybe due to some server-side validation, the messageProperty can hold the error message. For
+     * example:
+     *
+     *     {
+     *         "success": false,
+     *         "error": "There was an error with your request"
+     *     }
+     *
+     * You can retrieve this error message in a callback when loading a {@link Ext.data.Store Store} or {@link Ext.data.Model Model} like:
+     *
+     *     var store = new Ext.data.Store({
+     *         fields : ['foo'],
+     *         proxy  : {
+     *             type   : 'ajax',
+     *             url    : 'data.json',
+     *             reader : {
+     *                 type            : 'json',
+     *                 root            : 'data',
+     *                 messageProperty : 'error'
+     *             }
+     *         }
+     *     });
+     *
+     *     store.load({
+     *         callback: function(records, operation, success) {
+     *             if (success) {
+     *                 // ...
+     *             } else {
+     *                 var error = operation.getError();
+     *
+     *                 Ext.Msg.alert('Error', error);
+     *             }
+     *         }
+     *     });
+     *
+     * In this example, the callback will execute with `success` being `false` and will therefore show the {@link Ext.MessageBox#alert Ext.Msg.alert} with
+     * the error string returned in the response.
      */
     
     /**
@@ -359,7 +401,7 @@ Ext.define('Ext.data.reader.Reader', {
             total,
             value,
             message;
-        
+
         /*
          * We check here whether fields collection has changed since the last read.
          * This works around an issue when a Model is used for both a Tree and another
@@ -434,9 +476,10 @@ Ext.define('Ext.data.reader.Reader', {
      */
     extractData : function(root) {
         var me = this,
-            Model   = me.model,
+            ModelClass = me.model,
             length  = root.length,
             records = new Array(length),
+            dataConverter,
             convertedValues, node, record, i;
 
         if (!root.length && Ext.isObject(root)) {
@@ -451,10 +494,11 @@ Ext.define('Ext.data.reader.Reader', {
                 // without doing any conversion
                 records[i] = node;
             } else {
+
                 // Create a record with an empty data object.
                 // Populate that data object by extracting and converting field values from raw data.
                 // Must pass the ID to use because we pass no data for the constructor to pluck an ID from
-                records[i] = record = new Model(undefined, me.getId(node), node, convertedValues = {});
+                records[i] = record = new ModelClass(undefined, me.getId(node), node, convertedValues = {});
 
                 // If the server did not include an id in the response data, the Model constructor will mark the record as phantom.
                 // We  need to set phantom to false here because records created from a server response using a reader by definition are not phantom records.
@@ -530,9 +574,11 @@ Ext.define('Ext.data.reader.Reader', {
     },
 
     /**
-     * @private
+     * @protected
+     * @template
+     * This method provides a hook to do any data transformation before the reading process begins.
      * By default this function just returns what is passed to it. It can be overridden in a subclass
-     * to return something else. See XmlReader for an example.
+     * to return something else. See {@link Ext.data.reader.Xml XmlReader} for an example.
      * @param {Object} data The data object
      * @return {Object} The normalized data object
      */
@@ -637,7 +683,7 @@ Ext.define('Ext.data.reader.Reader', {
         
         if (me.convertRecordData) {
             return;
-        }   
+        }
 
         //build the extractors for all the meta data
         if (totalProp) {
@@ -668,9 +714,10 @@ Ext.define('Ext.data.reader.Reader', {
         me.lastFieldGeneration = me.model.prototype.fields.generation;
     },
 
+    // This template function **generates** a data extraction function when passed a Collection of Fields and called in the scope of this Reader
+    // for which to generate
     recordDataExtractorTemplate : [
         'var me = this\n',
-        '    ,fields = me.model.prototype.fields\n',
         '    ,value\n',
         '    ,internalId\n',
         '<tpl for="fields">',
@@ -754,6 +801,8 @@ Ext.define('Ext.data.reader.Reader', {
      * - source A raw row data object of whatever type this Reader consumes
      * - record The record which is being populated.
      *
+     * @param {Ext.Class} model The {@link Ext.data.Model} subclass for which to generate a data extraction function.
+     *
      */
     buildRecordDataExtractor: function() {
         var me = this,
@@ -771,7 +820,7 @@ Ext.define('Ext.data.reader.Reader', {
         // It declares several vars capturing the configured context of this Reader, and returns a function
         // which, when passed a record data object, a raw data row in the format this Reader is configured to read,
         // and the record which is being created, will populate the record's data object from the raw row data.
-        return Ext.functionFactory(me.recordDataExtractorTemplate.apply(templateData)).call(me);
+        return Ext.functionFactory('fields', me.recordDataExtractorTemplate.apply(templateData)).call(me, me.model.prototype.fields);
     },
 
     destroyReader: function() {

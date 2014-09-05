@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,12 +13,12 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
- * Implements row based navigation via keyboard.
+ * A selection model for {@link Ext.grid.Panel grid panels} which allows selection grid rows..
  *
- * Must synchronize across grid sections.
+ * Implements row based navigation via keyboard.
  *
  *     @example
  *     var store = Ext.create('Ext.data.Store', {
@@ -175,6 +175,10 @@ Ext.define('Ext.selection.RowModel', {
             end: me.onKeyEnd,
             space: me.onKeySpace,
             enter: me.onKeyEnter,
+            A: {
+                ctrl: true,
+                handler: me.selectAll
+            },
             scope: me
         });
     },
@@ -221,10 +225,11 @@ Ext.define('Ext.selection.RowModel', {
             // We have to ask the BufferedRenderer to navigate to the target.
             // And that may involve asynchronous I/O, so must postprocess in a callback.
             view.bufferedRenderer.scrollTo(me.store.getCount() - 1, false, function(newIdx, newRecord) {
-                me.afterKeyNavigate(e, newRecord)
+                me.afterKeyNavigate(e, newRecord);
             });
         } else {
-            me.afterKeyNavigate(e, view.getRecord(view.all.getCount() - 1))
+            // Walk forwards to the end record
+            me.afterKeyNavigate(e, view.walkRecs(e.record, view.dataSource.getCount() - 1 - view.dataSource.indexOf(e.record)));
         }
     },
 
@@ -238,10 +243,11 @@ Ext.define('Ext.selection.RowModel', {
             // We have to ask the BufferedRenderer to navigate to the target.
             // And that may involve asynchronous I/O, so must postprocess in a callback.
             view.bufferedRenderer.scrollTo(0, false, function(newIdx, newRecord) {
-                me.afterKeyNavigate(e, newRecord)
+                me.afterKeyNavigate(e, newRecord);
             });
         } else {
-            me.afterKeyNavigate(e, view.getRecord(0));
+            // Walk forwards to the first record
+            me.afterKeyNavigate(e, view.walkRecs(e.record, -view.dataSource.indexOf(e.record)));
         }
     },
 
@@ -293,7 +299,8 @@ Ext.define('Ext.selection.RowModel', {
 
     // Select/Deselect based on pressing Spacebar.
     onKeySpace: function(e) {
-        var record = this.lastFocused;
+        // KeyNav's processEvent stamps the record in.
+        var record = e.record || this.lastFocused;
 
         if (record) {
             this.afterKeyNavigate(e, record);
@@ -327,7 +334,7 @@ Ext.define('Ext.selection.RowModel', {
     },
 
     afterBufferedScrollTo: function(newIdx, newRecord) {
-        this.afterKeyNavigate(this.lastKeyEvent, newRecord)
+        this.afterKeyNavigate(this.lastKeyEvent, newRecord);
     },
 
     scrollByDeltaX: function(delta) {
@@ -350,16 +357,17 @@ Ext.define('Ext.selection.RowModel', {
 
     // Select the record with the event included so that
     // we can take into account ctrlKey, shiftKey, etc
-    onRowClick: function(view, record, item, index, e) {
-        var me = this;
-
+    onRowClick: function (view, record, item, index, e) {
         // Record index will be -1 if the clicked record is a metadata record and not selectable
         if (index !== -1) {
-            if (!me.allowRightMouseSelection(e)) {
+            if (!this.allowRightMouseSelection(e)) {
                 return;
             }
 
-            me.processSelection(view, record, item, index, e);
+            // Don't process if it's a right-click over a previously selected record.
+            if (!(e.type === 'contextmenu' && this.isSelected(record))) {
+                this.processSelection(view, record, item, index, e);
+            }
         }
     },
 
@@ -420,7 +428,7 @@ Ext.define('Ext.selection.RowModel', {
 
         if (oldFocused) {
             rowIdx = views[0].indexOf(oldFocused);
-            if (rowIdx != -1) {
+            if (rowIdx !== -1) {
                 for (; i < viewsLn; i++) {
                     views[i].onRowFocus(rowIdx, false, true);
                 }
@@ -429,7 +437,7 @@ Ext.define('Ext.selection.RowModel', {
 
         if (newFocused) {
             rowIdx = views[0].indexOf(newFocused);
-            if (rowIdx != -1) {
+            if (rowIdx !== -1) {
                 for (i = 0; i < viewsLn; i++) {
                     views[i].onRowFocus(rowIdx, true, supressFocus);
                 }
@@ -474,11 +482,11 @@ Ext.define('Ext.selection.RowModel', {
         }
     },
 
-    selectByPosition: function(position) {
+    selectByPosition: function (position, keepExisting) {
         var context = new Ext.grid.CellContext(this.view);
             
         context.setPosition(position.row, position.column);
-        this.select(context.record);
+        this.select(context.record, keepExisting);
     },
 
     /**

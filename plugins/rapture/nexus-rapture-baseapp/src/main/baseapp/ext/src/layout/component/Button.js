@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Component layout for buttons
@@ -57,16 +57,32 @@ Ext.define('Ext.layout.component.Button', {
 
     beginLayoutCycle: function(ownerContext) {
         var owner = this.owner,
-            lastWidthModel = this.lastWidthModel;
+            lastWidthModel = this.lastWidthModel,
+            lastHeightModel = this.lastHeightModel,
+            btnInnerEl = owner.btnInnerEl,
+            table = owner.getFrameInfo().table;
 
         this.callParent(arguments);
+        
+        // If we are framing and we have a calculated/configured size, that size gets
+        // stamped onto the table frame element. If we're changing from !shrink -> shrink,
+        // we need to clear the dimension of the innerEl (and by extension, the frame el),
+        // so that we can calculate our size properly.
 
-        if (lastWidthModel && !this.lastWidthModel.shrinkWrap &&
+        if (lastWidthModel && !lastWidthModel.shrinkWrap &&
             ownerContext.widthModel.shrinkWrap) {
             // clear any heights we set last time around if needed
             owner.btnWrap.setStyle('height', '');
             owner.btnEl.setStyle('height', '');
-            owner.btnInnerEl.setStyle('line-height', '');
+            btnInnerEl.setStyle('line-height', '');
+            if (table) {
+                btnInnerEl.setStyle('width', '');
+            }
+        }
+        
+        if (table && lastHeightModel && !lastHeightModel.shrinkWrap &&
+            ownerContext.heightModel.shrinkWrap) {
+            btnInnerEl.setStyle('height', '');
         }
     },
 

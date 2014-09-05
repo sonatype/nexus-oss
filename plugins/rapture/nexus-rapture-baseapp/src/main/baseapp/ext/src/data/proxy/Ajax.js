@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Ed Spencer
@@ -211,6 +211,15 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *
  * We can also provide a custom {@link #encodeFilters} function to encode our filters.
  *
+ * # Debugging your Ajax Proxy
+ *
+ * If the data is not being loaded into the store as expected, it could be due to a mismatch between the the way that the {@link #reader}
+ * is configured, and the shape of the incoming data.
+ *
+ * To debug from the point that your data arrives back from the network, set a breakpoint inside the callback function
+ * created in the `createRequestCallback` method of the Ajax Proxy class, and follow the data to where the {@link #reader} attempts
+ * to consume it.
+ *
  * @constructor
  * Note that if this HttpProxy is being used by a {@link Ext.data.Store Store}, then the Store's call to
  * {@link Ext.data.Store#method-load load} will override any specified callback and params options. In this case, use the
@@ -257,14 +266,21 @@ Ext.define('Ext.data.proxy.Ajax', {
     binary: false,
     
     /**
-     * @cfg {Object} headers
-     * Any headers to add to the Ajax request. Defaults to undefined.
+     * @cfg {Object} [headers]
+     * Any headers to add to the Ajax request.
+     *
+     * example:
+     *
+     *     proxy: {
+     *         headers: {'Content-Type': "text/plain" }
+     *         ...
+     *     }
      */
     
     /**
-     * @cfg {Boolean} paramsAsJson `true` to have any request parameters sent as {@link Ext.data.Connection#jsonData} 
+     * @cfg {Boolean} paramsAsJson `true` to have any request parameters sent as {@link Ext.data.Connection#method-request jsonData}
      * where they can be parsed from the raw request. By default, parameters are sent via the 
-     * {@link Ext.data.Connection#params} property. **Note**: This setting does not apply when the
+     * {@link Ext.data.Connection#method-request params} property. **Note**: This setting does not apply when the
      * request is sent as a 'GET' request. See {@link #actionMethods} for controlling the HTTP verb
      * that is used when sending requests.
      */

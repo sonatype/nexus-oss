@@ -2,6 +2,10 @@
     border: $fieldset-border;
     padding: $fieldset-padding;
     margin: $fieldset-margin;
+    @if $fieldset-border-radius != 0 {
+        @include border-radius($fieldset-border-radius);
+    }
+    overflow: hidden;
 }
 
 @if $include-ie {
@@ -110,14 +114,13 @@
 }
 
 .#{$prefix}fieldset-collapsed {
+    @if $fieldset-border-radius != 0 {
+        @include border-radius(0);
+    }
     .#{$prefix}fieldset-body {
         display: none;
     }
-}
-
-.#{$prefix}fieldset-collapsed {
     padding-bottom: 0 !important;
-
     border-width: 1px 1px 0 1px !important;
     border-left-color: transparent !important;
     border-right-color: transparent !important;
@@ -177,16 +180,6 @@
     }
 }
 
-.#{$prefix}fieldset {
-    overflow: hidden;
-}
-
-.#{$prefix}fieldset-bwrap {
-    overflow: hidden;
-
-    zoom: 1;
-}
-
-.#{$prefix}fieldset-body {
+#{$prefix}fieldset-body {
     overflow: hidden;
 }

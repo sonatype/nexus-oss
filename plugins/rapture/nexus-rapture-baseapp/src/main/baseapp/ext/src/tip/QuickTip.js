@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,12 +13,35 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A specialized tooltip class for tooltips that can be specified in markup and automatically managed
  * by the global {@link Ext.tip.QuickTipManager} instance.  See the QuickTipManager documentation for
  * additional usage details and examples.
+ *
+ *      @example     
+ *      Ext.tip.QuickTipManager.init(); // Instantiate the QuickTipManager 
+ *
+ *      Ext.create('Ext.Button', {
+ *
+ *          renderTo: Ext.getBody(),
+ *          text: 'My Button',
+ *          listeners: {
+ *
+ *              afterrender: function(me) {
+ *
+ *                  // Register the new tip with an element's ID
+ *                  Ext.tip.QuickTipManager.register({
+ *                      target: me.getId(), // Target button's ID
+ *                      title : 'My Tooltip',  // QuickTip Header
+ *                      text  : 'My Button has a QuickTip' // Tip content  
+ *                  });
+ *
+ *              }
+ *          }
+ *      });
+ *
  */
 Ext.define('Ext.tip.QuickTip', {
     extend: 'Ext.tip.ToolTip',
@@ -316,7 +339,9 @@ Ext.define('Ext.tip.QuickTip', {
          if (target) {
              el = target.el;
              if (el) {
-                 text = el.getAttribute(cfg.namespace + cfg.attribute);
+                 // Note that if interceptTitles is set that we must assume the same as if data-qtip is set
+                 // on the target.
+                 text = el.getAttribute(cfg.namespace + cfg.attribute) || me.interceptTitles;
                  // Note that the quicktip could also have been registered with the QuickTipManager.
                  // If this was the case, then we don't want to veto showing it.
                  // Simply do a lookup in the registered targets collection.

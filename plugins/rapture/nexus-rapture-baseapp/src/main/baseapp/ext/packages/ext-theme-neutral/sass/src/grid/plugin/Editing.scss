@@ -57,7 +57,7 @@
     }
 
     @if $include-ext-form-field-display {
-        .#{$prefix}form-display-field-body {
+        .#{$prefix}form-display-field {
             height: $grid-editor-height;
         }
 

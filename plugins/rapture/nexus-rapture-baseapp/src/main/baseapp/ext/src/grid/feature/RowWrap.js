@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -38,9 +38,9 @@ Ext.define('Ext.grid.feature.RowWrap', {
 
     wrapTpl: [
         '<tr data-boundView="{view.id}" data-recordId="{record.internalId}" data-recordIndex="{recordIndex}" class="{[values.itemClasses.join(" ")]} ', Ext.baseCSSPrefix, 'grid-wrap-row" {ariaRowAttr}>',
-            '<td class="', Ext.baseCSSPrefix, 'grid-rowwrap ', Ext.baseCSSPrefix, 'grid-td" colSpan="{columns.length}" {ariaCellAttr}>',
+            '<td class="', Ext.baseCSSPrefix, 'grid-rowwrap ', Ext.baseCSSPrefix, 'grid-td" colspan="{columns.length}" {ariaCellAttr}>',
                 '<table class="', Ext.baseCSSPrefix, '{view.id}-table ', Ext.baseCSSPrefix, 'grid-table" border="0" cellspacing="0" cellpadding="0" style="width:100%" {ariaCellInnerTableAttr}>',
-                    '{[values.view.renderColumnSizer(out)]}',
+                    '{[values.view.renderRowWrapColumnSizer(out)]}',
                     '{%',
                         'values.itemClasses.length = 0;',
                         'this.nextTpl.applyOut(values, out, parent)',
@@ -52,27 +52,23 @@ Ext.define('Ext.grid.feature.RowWrap', {
         }
     ],
 
-    init: function(grid) {
-        var me = this;
-        me.view.addTableTpl(me.tableTpl);
-        me.view.addRowTpl(Ext.XTemplate.getTpl(me, 'wrapTpl'));
-        me.view.headerCt.on({
-            columnhide: me.onColumnHideShow,
-            columnshow: me.onColumnHideShow,
-            scope: me
-        });
+    getTargetSelector: function () {
+        return this.itemSelector;
     },
 
-    // Keep row wtap colspan in sync with number of *visible* columns.
-    onColumnHideShow: function() {
-        var view = this.view,
-            items = view.el.query(this.rowWrapTd),
-            colspan = view.headerCt.getVisibleGridColumns().length,
-            len = items.length,
-            i;
-            
-        for (i = 0; i < len; ++i) {
-            items[i].colSpan = colspan;
-        }
-    }
-});
+    init: function(grid) {
+        var me = this,
+            view = me.view;
+
+        view.addTableTpl(me.tableTpl);
+        view.addRowTpl(Ext.XTemplate.getTpl(me, 'wrapTpl'));
+        view.renderRowWrapColumnSizer = me.view.renderColumnSizer;
+        view.renderColumnSizer = Ext.emptyFn;
+
+        // Let the view know that it should use the itemSelector ancestor to retrieve the node
+        // rather than the datarow selector.
+        view.isRowWrapped = true;
+
+        // When looking up the target selector, wrapped rows should always use the itemSelector.
+        view.getTargetSelector = me.getTargetSelector;
+    }});

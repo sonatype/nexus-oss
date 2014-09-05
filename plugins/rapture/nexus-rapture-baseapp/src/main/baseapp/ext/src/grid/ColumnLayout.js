@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -41,7 +41,14 @@ Ext.define('Ext.grid.ColumnLayout', {
         if (me.scrollbarWidth === undefined) {
             me.self.prototype.scrollbarWidth = Ext.getScrollbarSize().width;
         }
-        me.grid = this.owner.up('[scrollerOwner]');
+
+        // The grid which owns this HeaderContainer
+        me.grid = me.owner.up('tablepanel');
+
+        // The grid which was configured by the user and which controls
+        // collapsed state and visible state.
+        // When this view is one side of a lockable assembly, this will be the lockable grid.
+        me.controllingGrid = me.owner.up('[scrollerOwner]');
         me.callParent();
     },
 
@@ -49,8 +56,8 @@ Ext.define('Ext.grid.ColumnLayout', {
     beginLayout: function (ownerContext) {
         var me = this,
             owner = me.owner,
-            grid = me.grid,
-            view = grid.view,
+            grid = me.controllingGrid,
+            view = me.grid.view,
             items = me.getVisibleItems(),
             len = items.length,
             firstCls = me.firstHeaderCls, 
@@ -58,19 +65,19 @@ Ext.define('Ext.grid.ColumnLayout', {
             removeCls = [firstCls, lastCls],
             i, item;
 
-        // If we are one side of a locking grid, then if we are on the "normal" side, we have to grab the normal view
-        // for use in determining whether to subtract scrollbar width from available width.
-        // The locked side does not have scrollbars, so it should not look at the view.
-        if (grid.lockable) {
-            if (owner.up('tablepanel') === view.normalGrid) {
-                view = view.normalGrid.getView();
-            } else {
-                view = null;
-            }
+        // If the associated view is not configured to do vertical scrolling, then
+        // The scrollbar we accommodate in container size calculations will not be present.
+        if (!view.scrollFlags.y) {
+            me.scrollbarWidth = 0;
+        }
+        // In case they change the scroll config dynamically, delete any instance property
+        else {
+            delete me.scrollbarWidth;
         }
 
         for (i = 0; i < len; i++) {
             item = items[i];
+            item.margin = null;
             item.removeCls(removeCls);
             if (i === 0) {
                 item.addCls(firstCls);
@@ -81,12 +88,39 @@ Ext.define('Ext.grid.ColumnLayout', {
             }
         }
 
+        // The grid header container usually needs an extra <scrollbarWidth> pixels of left/right scrollability
+        // because if there is vertical overflow in the table view, the appearance of the vertical scrollbar gives
+        // the table view that extra <scrollbarWidth> of left/right scrollability, and the header container and the
+        // view need to have exactly the same left/right scroll range so they can be kept in sync.
+        // This property is the adjustment value.
+        //
+        // There are bugs in certain browsers which necessitate setting this value to zero in some RTL situations.
+        //
+        // Chrome has a bug which means that in RTL mode the vertical scrollbar does NOT add extra left/right scrolling.
+        // https://code.google.com/p/chromium/issues/detail?id=179332
+        // TODO: Remove the Ext.supports.rtlVertScrollbarOnRight test and the test for it when all supported Chrome versions are fixed.
+        //
+        // Safari keeps the scrollbar on the right in RTL mode so the extra width comes from padding added to the header container.
+        //
+        // See Ext.rtl.grid.ColumnLayout for further information. That class sets scrollbarAdjustment to
+        // zero for an RTL grid when those bugs are present
+        me.scrollbarAdjustment = me.scrollbarWidth;
+
         me.callParent(arguments);
 
         // If the owner is the grid's HeaderContainer, and the UI displays old fashioned scrollbars and there is a rendered View with data in it,
         // collect the View context to interrogate it for overflow, and possibly invalidate it if there is overflow
-        if (!owner.isColumn && me.scrollbarWidth && !grid.collapsed && view &&
-                view.rendered && (ownerContext.viewTable = view.body.dom)) {
+        if (!owner.isColumn && !grid.collapsed && view && view.rendered && (ownerContext.viewTable = view.body.dom) && me.scrollbarWidth) {
+            ownerContext.viewContext = ownerContext.context.getCmp(view);
+        }
+    },
+
+    // TableView performs its non-deferred initial refresh during its render layout run.
+    // Because the ColumnLayout has already been through its beginLayout phase at that point,
+    // a viewContext will not have been captured. This method allows the TableView
+    // to inject a ViewContext at the time of initial refresh.
+    injectViewContext: function(ownerContext, view) {
+        if (!this.controllingGrid.collapsed && view.rendered && (ownerContext.viewTable = view.body.dom) && this.scrollbarWidth) {
             ownerContext.viewContext = ownerContext.context.getCmp(view);
         }
     },
@@ -98,9 +132,7 @@ Ext.define('Ext.grid.ColumnLayout', {
     calculate: function(ownerContext) {
         this.callParent(arguments);
 
-        if (ownerContext.state.parallelDone) {
-            // TODO: auto width columns aren't necessarily done here.
-            // see view.TableLayout, there is a work around for that there 
+        if (ownerContext.state.parallelDone && !(this.owner.forceFit && !ownerContext.state.flexesCalculated)) {
             ownerContext.setProp('columnWidthsDone', true);
         }
 
@@ -117,22 +149,41 @@ Ext.define('Ext.grid.ColumnLayout', {
 
         me.callParent(arguments);
 
-        // If we have not been through this already, and the owning Container is configured
-        // forceFit, is not a group column and and there is a valid width, then convert
-        // widths to flexes, and loop back.
-        if (!ownerContext.flexedItems.length && !state.flexesCalculated && owner.forceFit &&
+        // If there is a table neeeding possible resize and we have not been through this already
+        // and the owning Container is configured forceFit and the conversion of widths to flexes
+        // tells us that the width does not already match the container width, then loop back
+        // and recalculate with every column flexed.
+        if (ownerContext.viewTable && !state.flexesCalculated && !ownerContext.flexedItems.length && owner.forceFit &&
 
             // Recalculate based upon all columns now being flexed instead of sized.
             // Set flag, so that we do not do this infinitely
             me.convertWidthsToFlexes(ownerContext)) {
             me.cacheFlexes(ownerContext);
+
+            // Next time round, the *new* tableHeight needs to be known for the *first* run of getContainerSize to
+            // be able to assess new vertical overflow status.
             ownerContext.invalidate({
                 state: {
-                    flexesCalculated: true
+                    flexesCalculated: true,
+                    tableHeight: ownerContext.viewTable.offsetHeight
                 }
             });
         } else {
             ownerContext.setProp('columnWidthsDone', true);
+        }
+    },
+
+    finishedLayout: function(ownerContext) {
+        var view = this.grid.getView();
+
+        this.callParent(arguments);
+
+        // Keep the HeaderContainer's horizontal scroll position synced with where the user has scrolled the view to (it will reset during a layout)
+        // IF this is a top lever grid HeaderContainer and the view is doing horizontal scrolling and the HeaderContainer overflows.
+        // Only do this after the initial layout where scroll position will be at default.
+        // TODO: In sencha-5.0.x, use scroll setting API
+        if (!this.owner.isColumn && view.scrollFlags.x && this.owner.tooNarrow && this.owner.componentLayoutCounter) {
+            this.owner.el.dom.scrollLeft = view.el.dom.scrollLeft;
         }
     },
 
@@ -174,7 +225,9 @@ Ext.define('Ext.grid.ColumnLayout', {
         var me = this,
             result,
             viewContext = ownerContext.viewContext,
-            viewHeight;
+            viewHeight,
+            viewLayoutContext,
+            shrinkWrapHeight = viewContext && viewContext.heightModel.shrinkWrap;
 
         // Column, NOT the main grid's HeaderContainer
         if (me.owner.isColumn) {
@@ -185,24 +238,30 @@ Ext.define('Ext.grid.ColumnLayout', {
         else {
             result = me.callParent(arguments);
 
-            // If we've collected a viewContext and we're not shrinkwrapping the height
-            // then we see if we have to narrow the width slightly to account for scrollbar
-            if (viewContext && !viewContext.heightModel.shrinkWrap &&
-                    viewContext.target.componentLayout.ownerContext) { // if (its layout is running)
-                viewHeight = viewContext.getProp('height');
-                if (isNaN(viewHeight)) {
-                    me.done = false;
-                } else if (ownerContext.state.tableHeight > viewHeight) {
-                    result.width -= me.scrollbarWidth;
-                    ownerContext.state.parallelDone = false;
-                    viewContext.invalidate();
+            // If scrollbars take up a width and our grid is not configured to ALWAYS leave space for a scrollbar
+            // and we've collected a viewContext and we're not shrinkwrapping the height, and there is vertical scrolling
+            // and (there's at least one flexed column or we are force fitting - all flexed) which has to clear the vertical scrollbar
+            // then we see if we have to increase the width slightly to eat the space we initially left for the scrollbar
+            if (me.scrollbarWidth && !me.controllingGrid.reserveScrollbar && viewContext) {
+                viewLayoutContext = viewContext.target.componentLayout.ownerContext;
+                if (!shrinkWrapHeight && viewContext.target.scrollFlags.y &&
+                    (ownerContext.flexedItems && ownerContext.flexedItems.length || me.owner.forceFit) && viewLayoutContext) { // if (its layout is running)
+                    viewHeight = viewContext.getProp('height');
+                    if (isNaN(viewHeight)) {
+                        me.done = false;
+                    } else if (ownerContext.state.tableHeight <= viewHeight && viewContext.target.scrollFlags.y) {
+                        ownerContext.state.parallelDone = false;
+                        viewLayoutContext.invalidate();
+                        return result;
+                    }
                 }
             }
         }
 
-// TODO - flip the initial assumption to "we have a vscroll" to avoid the invalidate in most
-// cases (and the expensive ones to boot)
-
+        // Initially assume that we need to account for a scrollbar unless the height shrinkwraps content
+        if (!shrinkWrapHeight) {
+            result.width -= me.scrollbarWidth;
+        }
         return result;
     },
 
@@ -257,25 +316,35 @@ Ext.define('Ext.grid.ColumnLayout', {
         };
     },
 
-    // FIX: when flexing we actually don't have enough space as we would
-    // typically because of the scrollOffset on the GridView, must reserve this
     publishInnerCtSize: function(ownerContext) {
         var me = this,
+            owner = me.owner,
             size = ownerContext.state.boxPlan.targetSize,
-            cw = ownerContext.peek('contentWidth'),
-            view;
+            cw = ownerContext.peek('contentWidth');
 
         // Allow the other co-operating objects to know whether the columns overflow the available width.
         me.owner.tooNarrow = ownerContext.state.boxPlan.tooNarrow;
 
-        // InnerCt MUST stretch to accommodate all columns so that left/right scrolling is enabled in the header container.
-        if ((cw != null) && !me.owner.isColumn) {
+        if ((cw != null) && !owner.isColumn) {
             size.width = cw;
 
-            // innerCt must also encompass any vertical scrollbar width if there may be one
-            view = me.owner.ownerCt.view;
-            if (view.scrollFlags.y) {
-                size.width += me.scrollbarWidth;
+            // The grid header container usually needs an extra <scrollbarWidth> pixels of left/right scrollability
+            // because if there is vertical overflow in the table view, the appearance of the vertical scrollbar gives
+            // the table view that extra <scrollbarWidth> of left/right scrollability, and the header container and the
+            // view need to have exactly the same left/right scroll range so they can be kept in sync.
+            //
+            // There are bugs in certain browsers which necessitate setting this value to zero in some RTL situations.
+            //
+            // Chrome has a bug which means that in RTL mode the vertical scrollbar does NOT add extra left/right scrolling.
+            // https://code.google.com/p/chromium/issues/detail?id=179332
+            // TODO: Remove the Ext.supports.rtlVertScrollbarOnRight test and the test for it when all supported Chrome versions are fixed.
+            //
+            // Safari keeps the scrollbar on the right in RTL mode so the extra width comes from padding added to the header container.
+            //
+            // See Ext.rtl.grid.ColumnLayout for further information. That class sets scrollbarAdjustment to
+            // zero for an RTL grid when those bugs are present
+            if (owner.ownerCt.view.scrollFlags.y) {
+                size.width += me.scrollbarAdjustment;
             }
         }
 

@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag core
 /**
@@ -157,7 +157,7 @@ Ext.define('Ext.XTemplateParser', {
             topRe = me.topRe,
             actionsRe = me.actionsRe,
             index, stack, s, m, t, prev, frame, subMatch, begin, end, actions,
-            prop;
+            prop, expectTplNext;
 
         me.level = 0;
         me.stack = stack = [];
@@ -175,8 +175,16 @@ Ext.define('Ext.XTemplateParser', {
             end = topRe.lastIndex;
 
             if (index < begin) {
-                me.doText(str.substring(index, begin));
+                // In the case of a switch statement, we expect a tpl for each case.
+                // However, if we have spaces they will get matched as plaintext, so
+                // we want to skip over them here.
+                s = str.substring(index, begin);
+                if (!(expectTplNext && Ext.String.trim(s) === '')) {
+                    me.doText(s);
+                }
             }
+
+            expectTplNext = false;
 
             if (m[1]) {
                 end = str.indexOf('%}', begin+2);
@@ -226,6 +234,7 @@ Ext.define('Ext.XTemplateParser', {
                 else if (actions['switch']) {
                     me.doSwitch(actions['switch'], actions);
                     stack.push({ type: 'switch' });
+                    expectTplNext = true;
                 }
                 else if (actions['case']) {
                     me.doCase(actions['case'], actions);

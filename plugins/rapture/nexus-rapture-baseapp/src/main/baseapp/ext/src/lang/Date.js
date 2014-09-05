@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag foundation,core
 // @require Object.js
@@ -250,12 +250,19 @@ Ext.Date = new function() {
                         // 3. Simply subtract 5 days from Saturday.
                         // 4. The first week of the year begins on Monday, December 30. Simple!
                         //
-                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));
+                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));
                         // (This is essentially doing the same thing as above but for the week rather than the day)
-                        "year = y || (new Date()).getFullYear(),",
-                        "jan4 = new Date(year, 0, 4, 0, 0, 0),",
-                        "week1monday = new Date(jan4.getTime() - ((jan4.getDay() - 1) * 86400000));",
-                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));",
+                        "year = y || (new Date()).getFullYear();",
+                        "jan4 = new Date(year, 0, 4, 0, 0, 0);",
+                        "d = jan4.getDay();", 
+                        // If the 1st is a Thursday, then the 4th will be a Sunday, so we need the appropriate
+                        // day number here, which is why we use the day === checks.
+                        "week1monday = new Date(jan4.getTime() - ((d === 0 ? 6 : d - 1) * 86400000));",
+                        // The reason for adding 43200000 (12 hours) is to avoid any complication with daylight saving
+                        // switch overs. For example,  if the clock is rolled back, an hour will repeat, so adding 7 days
+                        // will leave us 1 hour short (Sun <date> 23:00:00). By setting is to 12:00, subtraction
+                        // or addition of an hour won't make any difference.
+                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));",
                     "} else {",
                         // plain old Date object
                         // handle years < 100 properly

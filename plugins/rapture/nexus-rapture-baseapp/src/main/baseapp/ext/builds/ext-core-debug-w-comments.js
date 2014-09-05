@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag foundation,core
 // @define Ext
@@ -127,6 +127,22 @@ Ext._startTime = new Date().getTime();
          */
         emptyString: new String(),
 
+        /**
+         * @property {String} [baseCSSPrefix='x-']
+         * The base prefix to use for all `Ext` components. To configure this property, you should use the
+         * Ext.buildSettings object before the framework is loaded:
+         *
+         *     Ext.buildSettings = {
+         *         baseCSSPrefix : 'abc-'
+         *     };
+         *
+         * or you can change it before any components are rendered:
+         *
+         *     Ext.baseCSSPrefix = Ext.buildSettings.baseCSSPrefix = 'abc-';
+         *
+         * This will change what CSS classes components will use and you should
+         * then recompile the SASS changing the `$prefix` SASS variable to match.
+         */
         baseCSSPrefix: Ext.buildSettings.baseCSSPrefix,
 
         /**
@@ -999,7 +1015,7 @@ Ext.globalEval = Ext.global.execScript
 
 // Current core version
 // also fix Ext-more.js
-var version = '4.2.2.1144',
+var version = '4.2.3.1477',
     // used by checkVersion to avoid temp arrays:
     checkVerTemp = [''],
     endOfVersionRe = /([^\d\.])/,
@@ -1393,6 +1409,11 @@ var version = '4.2.2.1144',
     Ext.apply(Ext, {
         /**
          * @private
+         * 
+         * Object containing version information for all packages utilized by your 
+         * application. 
+         * 
+         * For a public getter, please see `Ext.getVersion()`.
          */
         versions: {},
 
@@ -1677,7 +1698,7 @@ var version = '4.2.2.1144',
 Ext.String = (function() {
     var trimRegex     = /^[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+|[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+$/g,
         escapeRe      = /('|\\)/g,
-        formatRe      = /\{(\d+)\}/g,
+        formatRe      = /\{\d+\}/,
         escapeRegexRe = /([-.*+?\^${}()|\[\]\/\\])/g,
         basicTrimRe   = /^\s+|\s+$/g,
         whitespaceRe  = /\s+/,
@@ -1696,12 +1717,32 @@ Ext.String = (function() {
             if (s === null || s === undefined || other === null || other === undefined) {
                 return false;
             }
-            
+
             return other.length <= s.length; 
+        },
+        // Flags for the template compile process.
+        // stringFormat means that token 0 consumes argument 1 etc.
+        // So that String.format does not have to slice the argument list.
+        formatTplConfig = {useFormat: false, compiled: true, stringFormat: true},
+        formatFns = {},
+        generateFormatFn = function(format) {
+            // Generate a function which substitutes value tokens
+            if (formatRe.test(format)) {
+                format = new Ext.Template(format, formatTplConfig);
+                return function() {
+                    return format.apply(arguments);
+                };
+            }
+            // No value tokens
+            else {
+                return function() {
+                    return format;
+                };
+            }
         };
 
     return {
-        
+
         /**
          * Inserts a substring into a string.
          * @param {String} s The original string.
@@ -1770,7 +1811,7 @@ Ext.String = (function() {
         /**
          * Checks if a string ends with a substring
          * @param {String} s The original string
-         * @param {String} start The substring to check
+         * @param {String} end The substring to check
          * @param {Boolean} [ignoreCase=false] True to ignore the case in the comparison
          */
         endsWith: function(s, end, ignoreCase){
@@ -1820,7 +1861,7 @@ Ext.String = (function() {
         /**
          * Checks if a string has values needing to be html encoded.
          * @private
-         * @param {String} The string to test
+         * @param {String} s The string to test
          * @return {Boolean} `true` if the string contains HTML characters
          */
         hasHtmlCharacters: function(s) {
@@ -1853,7 +1894,7 @@ Ext.String = (function() {
          * The set of character entities may be reset back to the default state by using
          * the {@link Ext.String#resetCharacterEntities} method
          *
-         * @param {Object} entities The set of character entities to add to the current
+         * @param {Object} newEntities The set of character entities to add to the current
          * definitions.
          */
         addCharacterEntities: function(newEntities) {
@@ -1943,16 +1984,16 @@ Ext.String = (function() {
          * @param {Boolean} [word=false] `true` to try to find a common word break.
          * @return {String} The converted text.
          */
-        ellipsis: function(value, len, word) {
-            if (value && value.length > len) {
+        ellipsis: function(value, length, word) {
+            if (value && value.length > length) {
                 if (word) {
-                    var vs = value.substr(0, len - 2),
+                    var vs = value.substr(0, length - 2),
                     index = Math.max(vs.lastIndexOf(' '), vs.lastIndexOf('.'), vs.lastIndexOf('!'), vs.lastIndexOf('?'));
-                    if (index !== -1 && index >= (len - 15)) {
+                    if (index !== -1 && index >= (length - 15)) {
                         return vs.substr(0, index) + "...";
                     }
                 }
-                return value.substr(0, len - 3) + "...";
+                return value.substr(0, length - 3) + "...";
             }
             return value;
         },
@@ -2031,10 +2072,8 @@ Ext.String = (function() {
          * @return {String} The formatted string.
          */
         format: function(format) {
-            var args = Ext.Array.toArray(arguments, 1);
-            return format.replace(formatRe, function(m, i) {
-                return args[i];
-            });
+            var formatFn = formatFns[format] || (formatFns[format] = generateFormatFn(format));
+            return formatFn.apply(this, arguments);
         },
 
         /**
@@ -2897,7 +2936,7 @@ Ext.Number = new function() {
         },
 
         /**
-         * Returns the first item in the array which elicits a true return value from the
+         * Returns the first item in the array which elicits a truthy return value from the
          * passed selection function.
          * @param {Array} array The array to search
          * @param {Function} fn The selection function to execute for each item.
@@ -5017,12 +5056,19 @@ Ext.Date = new function() {
                         // 3. Simply subtract 5 days from Saturday.
                         // 4. The first week of the year begins on Monday, December 30. Simple!
                         //
-                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));
+                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));
                         // (This is essentially doing the same thing as above but for the week rather than the day)
-                        "year = y || (new Date()).getFullYear(),",
-                        "jan4 = new Date(year, 0, 4, 0, 0, 0),",
-                        "week1monday = new Date(jan4.getTime() - ((jan4.getDay() - 1) * 86400000));",
-                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));",
+                        "year = y || (new Date()).getFullYear();",
+                        "jan4 = new Date(year, 0, 4, 0, 0, 0);",
+                        "d = jan4.getDay();", 
+                        // If the 1st is a Thursday, then the 4th will be a Sunday, so we need the appropriate
+                        // day number here, which is why we use the day === checks.
+                        "week1monday = new Date(jan4.getTime() - ((d === 0 ? 6 : d - 1) * 86400000));",
+                        // The reason for adding 43200000 (12 hours) is to avoid any complication with daylight saving
+                        // switch overs. For example,  if the clock is rolled back, an hour will repeat, so adding 7 days
+                        // will leave us 1 hour short (Sun <date> 23:00:00). By setting is to 12:00, subtraction
+                        // or addition of an hour won't make any difference.
+                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));",
                     "} else {",
                         // plain old Date object
                         // handle years < 100 properly
@@ -7322,6 +7368,8 @@ var noArgs = [],
          *      });
          * 
          *      Ext.define('Ext.some.DerivedClass', {
+         *          extend: 'Ext.some.Class',
+         *
          *          method: function () {
          *              console.log('Bad');
          * 
@@ -7331,10 +7379,10 @@ var noArgs = [],
          *          }
          *      });
          * 
-         * To patch the bug in `DerivedClass.method`, the typical solution is to create an
+         * To patch the bug in `Ext.some.DerivedClass.method`, the typical solution is to create an
          * override:
          * 
-         *      Ext.define('App.paches.DerivedClass', {
+         *      Ext.define('App.patches.DerivedClass', {
          *          override: 'Ext.some.DerivedClass',
          *          
          *          method: function () {
@@ -9470,7 +9518,19 @@ var noArgs = [],
     /**
      * @cfg {String[]} alias
      * @member Ext.Class
-     * List of short aliases for class names.  Most useful for defining xtypes for widgets:
+     * List of short aliases for class names. An alias consists of a namespace and a name concatenated by a period as &#60;namespace&#62;.&#60;name&#62;
+     *
+     *  - **namespace** - The namespace describes what kind of alias this is and must be all lowercase.
+     *  - **name** - The name of the alias which allows the lazy-instantiation via the alias. The name shouldn't contain any periods.
+     *
+     * A list of namespaces and the usages are:
+     *
+     *  - **feature** - {@link Ext.grid.Panel Grid} features
+     *  - **plugin** - Plugins
+     *  - **store** - {@link Ext.data.Store}
+     *  - **widget** - Components
+     *
+     * Most useful for defining xtypes for widgets:
      *
      *     Ext.define('MyApp.CoolPanel', {
      *         extend: 'Ext.panel.Panel',
@@ -9488,8 +9548,6 @@ var noArgs = [],
      *             {xtype: 'coolpanel', html: 'Bar'}
      *         ]
      *     });
-     *
-     * Besides "widget" for xtype there are alias namespaces like "feature" for ftype and "plugin" for ptype.
      */
     Manager.registerPostprocessor('alias', function(name, cls, data) {
         
@@ -10068,7 +10126,7 @@ var noArgs = [],
     Ext.ns = Ext.namespace;
 
     Class.registerPreprocessor('className', function(cls, data) {
-        if (data.$className) {
+        if ('$className' in data) {
             cls.$className = data.$className;
         }
         
@@ -10661,6 +10719,7 @@ Ext.Loader = new function() {
     var queue = [],
         isClassFileLoaded = {},
         isFileLoaded = {},
+        inFlight = {},
         classNameToFilePathMap = {},
         scriptElements = {},
         readyListeners = [],
@@ -10776,12 +10835,6 @@ Ext.Loader = new function() {
                 if (item) {
                     requires = item.requires;
 
-                    // Don't bother checking when the number of files loaded
-                    // is still less than the array length
-                    if (requires.length > Loader.numLoadedFiles) {
-                        continue;
-                    }
-
                     // Remove any required classes that are loaded
                     for (j = 0; j < requires.length; ) {
                         if (Manager.isCreated(requires[j])) {
@@ -10809,6 +10862,13 @@ Ext.Loader = new function() {
         /**
          * Inject a script element to document's head, call onLoad and onError accordingly
          * @private
+         * @param {String} url The url of the script node to load.
+         * @param {Function} onLoad The function to execute once the script node loads. For <IE9, this function will only execute
+         * once the readyState is `loaded` or `complete`.
+         * @param {Function} onError The function to execute if the script node fails to load such as a 404 status is returned.
+         * @param {Object} scope The scope to execute the `onLoad` and `onError` functions.
+         * @param {String} charset The value for the charset attribute to be used on the script node. Useful if you need to use `utf-8` for the returned code.
+         * @return {HTMLElement} The script node that was created
          */
         injectScriptElement: function(url, onLoad, onError, scope, charset) {
             var script = document.createElement('script'),
@@ -10952,7 +11012,8 @@ Ext.Loader = new function() {
             Loader.scriptsLoading++;
 
             src = config.disableCaching ?
-                (url + '?' + config.disableCachingParam + '=' + Ext.Date.now()) : url;
+                // If there is a querystring, append _dc to it with an ampersand.
+                (url + (url.indexOf('?') === -1 ? '?' : '&') + config.disableCachingParam + '=' + Ext.Date.now()) : url;
 
             scriptElements[url] = Loader.injectScriptElement(src, onScriptLoad, onScriptError);
         },
@@ -10962,10 +11023,6 @@ Ext.Loader = new function() {
          * @private
          */
         loadScriptFile: function(url, onLoad, onError, scope, synchronous) {
-            if (isFileLoaded[url]) {
-                return Loader;
-            }
-
             var config = Loader.getConfig(),
                 noCacheUrl = url + (config.disableCaching ? ('?' + config.disableCachingParam + '=' + Ext.Date.now()) : ''),
                 isCrossOriginRestricted = false,
@@ -11161,17 +11218,33 @@ Ext.Loader = new function() {
                 }
 
                 if (!isClassFileLoaded.hasOwnProperty(className)) {
-                    isClassFileLoaded[className] = false;
-                    classNameToFilePathMap[className] = filePath;
+                    // If the filepath has already been loaded or if it's currently pending, don't attempt to download it again.
+                    // Note that if the Loader isn't told about where to find the classes for both namespaces then the Loader will
+                    // have no way of knowning that they are, in fact, aliases to the same namespace. So, the filepaths will never
+                    // match (Loader.config.paths won't be aware of the path, see Loader.getPath()).
+                    //
+                    // For example, without calling setPath, Ext.spec.Foo and Foo.spec.Foo will have the following paths:
+                    //      Ext.spec.Foo === http://localhost/SDK/extjs/src/spec/Foo.js
+                    //      Foo.spec.Foo === Foo/spec/Foo.js
+                    //
+                    // This is only to try and catch an edge case, but the Loader can only match what it knows about.
+                    // See EXTJSIV-11711.
+                    if (Loader.isFileLoaded[filePath] || inFlight[filePath]) {
+                        isClassFileLoaded[className] = true;
+                    } else {
+                        inFlight[filePath] = true;
+                        isClassFileLoaded[className] = false;
 
-                    Loader.numPendingFiles++;
-                    Loader.loadScriptFile(
-                        filePath,
-                        pass(Loader.onFileLoaded, [className, filePath], Loader),
-                        pass(Loader.onFileLoadError, [className, filePath], Loader),
-                        Loader,
-                        syncModeEnabled
-                    );
+                        Loader.numPendingFiles++;
+                        Loader.loadScriptFile(
+                            filePath,
+                            pass(Loader.onFileLoaded, [className, filePath], Loader),
+                            pass(Loader.onFileLoadError, [className, filePath], Loader),
+                            Loader,
+                            syncModeEnabled
+                        );
+                    }
+                    classNameToFilePathMap[className] = filePath;
                 }
             }
 
@@ -11197,6 +11270,7 @@ Ext.Loader = new function() {
 
             isClassFileLoaded[className] = true;
             isFileLoaded[filePath] = true;
+            delete inFlight[filePath];
 
             // In FF, when we sync load something that has had a script tag inserted, the load event may
             // sometimes fire even if we clean it up and set it to null, so check if we're already loaded here.
@@ -12074,7 +12148,10 @@ Ext.apply(Ext, {
     isReady: false,
 
     /**
-     * True to automatically uncache orphaned Ext.Elements periodically
+     * `true` to automatically uncache orphaned Ext.Elements periodically. If set to `false`, the application will be required
+     * to clean up orpaned Ext.Elements and it's listeners as to not cause memory leakage.
+     *
+     * Normally, you should **never** need to set this to `false`.
      */
     enableGarbageCollector: true,
 
@@ -12118,11 +12195,18 @@ Ext.apply(Ext, {
         return entry;
     },
 
-    updateCacheEntry: function(cacheItem, dom){
+    updateCacheEntry: function(cacheItem, dom) {
+        var oldDom = cacheItem.dom;
+        // If the dom element has changed, then any events we
+        // have for this object are now redundant. Go and clear them.
+        if (dom !== oldDom) {
+            Ext.EventManager.removeAll(oldDom);
+        }
         cacheItem.dom = dom;
         if (cacheItem.el) {
             cacheItem.el.dom = dom;
         }
+
         return cacheItem;
     },
 
@@ -12325,7 +12409,44 @@ Ext.apply(Ext, {
      */
     urlAppend : function(url, s) {
         return Ext.String.urlAppend(url, s);
-    }
+    },
+    
+    /**
+     * @private
+     */
+    splitAndUnescape: (function() {
+        var cache = {};
+        
+        return function(origin, delimiter) {
+            if (!origin) {
+                return [];
+            }
+            else if (!delimiter) {
+                return [origin];
+            }
+        
+            var replaceRe = cache[delimiter] || (cache[delimiter] = new RegExp('\\\\' + delimiter, 'g')),
+                result = [],
+                parts, part;
+        
+            parts = origin.split(delimiter);
+        
+            while ((part = parts.shift()) !== undefined) {
+                // If any of the parts ends with the delimiter that means
+                // the delimiter was escaped and the split was invalid. Roll back.
+                while (part.charAt(part.length - 1) === '\\' && parts.length > 0) {
+                    part = part + delimiter + parts.shift();
+                }
+            
+                // Now that we have split the parts, unescape the delimiter char
+                part = part.replace(replaceRe, delimiter);
+            
+                result.push(part);
+            }
+        
+            return result;
+        }
+    })()
 });
 
 
@@ -12413,8 +12534,8 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
     nullLog.info = nullLog.warn = nullLog.error = Ext.emptyFn;
 
     // also update Version.js
-    Ext.setVersion('ext', '4.2.2.1144');
-    Ext.setVersion('extjs', '4.2.2.1144');
+    Ext.setVersion('ext', '4.2.3.1477');
+    Ext.setVersion('extjs', '4.2.3.1477');
     Ext.apply(Ext, {
         /**
          * @property {String} SSL_SECURE_URL
@@ -12554,7 +12675,12 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
 
         isStrict: isStrict,
 
-        // IE10+ quirks behaves like Gecko/WebKit quirks, so don't include it here
+        /**
+         * `true` if the detected browser is Internet Explorer and is in quirks mode. If the browser is IE10, quirks mode
+         * behaves like Gecko/WebKit quirks so IE10 is not included in this check.
+         *
+         * @type Boolean
+         */
         isIEQuirks: isIE && (!isStrict && (isIE6 || isIE7 || isIE8 || isIE9)),
 
         /**
@@ -13357,7 +13483,7 @@ Ext.application = function(config) {
         stripTagsRE    = /<\/?[^>]+>/gi,
         stripScriptsRe = /(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)/ig,
         nl2brRe        = /\r?\n/g,
-        allHashes      = /^#+$/,
+        hashRe         = /#+$/,
 
         // Match a format string characters to be able to detect remaining "literal" characters
         formatPattern = /[\d,\.#]+/,
@@ -13368,6 +13494,7 @@ Ext.application = function(config) {
         // A RegExp to remove from a number format string, all characters except digits and the local decimal separator.
         // Created on first use. The local decimal separator character must be initialized for this to be created.
         I18NFormatCleanRe,
+        lastDecimalSeparator,
 
         // Cache ofg number formatting functions keyed by format string
         formatFns = {};
@@ -13642,26 +13769,28 @@ Ext.application = function(config) {
          *
          * By default, "," is expected as the thousand separator, and "." is expected as the decimal separator.
          *
-         * ## New to Ext JS 4
-         *
          * Locale-specific characters are always used in the formatted output when inserting
-         * thousand and decimal separators.
+         * thousand and decimal separators. These can be set using the {@link #thousandSeparator} and
+         * {@link #decimalSeparator} options.
          *
          * The format string must specify separator characters according to US/UK conventions ("," as the
          * thousand separator, and "." as the decimal separator)
          *
          * To allow specification of format strings according to local conventions for separator characters, add
-         * the string `/i` to the end of the format string.
+         * the string `/i` to the end of the format string. This format depends on the {@link #thousandSeparator} and
+         * {@link #decimalSeparator} options. For example, if using European style separators, then the format string
+         * can be specified as `'0.000,00'`. This would be equivalent to using `'0,000.00'` when using US style formatting.
          *
-         * examples (123456.789):
+         * Examples (123456.789):
          * 
-         * - `0` - (123456) show only digits, no precision
-         * - `0.00` - (123456.78) show only digits, 2 precision
+         * - `0` - (123457) show only digits, no precision
+         * - `0.00` - (123456.79) show only digits, 2 precision
          * - `0.0000` - (123456.7890) show only digits, 4 precision
-         * - `0,000` - (123,456) show comma and digits, no precision
-         * - `0,000.00` - (123,456.78) show comma and digits, 2 precision
-         * - `0,0.00` - (123,456.78) shortcut method, show comma and digits, 2 precision
-         * - `0.####` - (123,456,789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0,000` - (123,457) show comma and digits, no precision
+         * - `0,000.00` - (123,456.79) show comma and digits, 2 precision
+         * - `0,0.00` - (123,456.79) shortcut method, show comma and digits, 2 precision
+         * - `0.####` - (123,456.789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0.00##` - (123456.789) Show at least 2 decimal places, maximum 4, but do not right pad with zeroes
          *
          * @param {Number} v The number to format.
          * @param {String} format The way you would like to format this text.
@@ -13687,18 +13816,21 @@ Ext.application = function(config) {
                     extraChars,
                     multiplier,
                     trimTrailingZeroes,
-                    code;
+                    code, len;
 
                 // The "/i" suffix allows caller to use a locale-specific formatting string.
                 // Clean the format string by removing all but numerals and the decimal separator.
                 // Then split the format string into pre and post decimal segments according to *what* the
                 // decimal separator is. If they are specifying "/i", they are using the local convention in the format string.
                 if (formatString.substr(formatString.length - 2) == '/i') {
-                    if (!I18NFormatCleanRe) {
-                        I18NFormatCleanRe = new RegExp('[^\\d\\' + UtilFormat.decimalSeparator + ']','g');
+                    // In a vast majority of cases, the separator will never change over the lifetime of the application.
+                    // So we'll only regenerate this if we really need to
+                    if (!I18NFormatCleanRe || lastDecimalSeparator !== decimalSeparator) {
+                        I18NFormatCleanRe = new RegExp('[^\\d\\' + decimalSeparator + ']','g');
+                        lastDecimalSeparator = decimalSeparator;
                     }
                     formatString = formatString.substr(0, formatString.length - 2);
-                    hasComma = formatString.indexOf(comma) != -1;
+                    hasComma = formatString.indexOf(comma) !== -1;
                     splitFormat = formatString.replace(I18NFormatCleanRe, '').split(decimalSeparator);
                 } else {
                     hasComma = formatString.indexOf(',') != -1;
@@ -13711,10 +13843,11 @@ Ext.application = function(config) {
                     precision = splitFormat[1].length;
 
                     // Formatting ending in .##### means maximum 5 trailing significant digits
-                    trimTrailingZeroes = allHashes.test(splitFormat[1]);
+                    trimTrailingZeroes = splitFormat[1].match(hashRe);
                     if (trimTrailingZeroes) {
+                        len = trimTrailingZeroes[0].length;
                         // Need to escape, since this will be '.' by default
-                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "?0+$")'
+                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "*0{0,' + len + '}$")'
                     }
                 }
                 
@@ -13766,16 +13899,16 @@ Ext.application = function(config) {
                     '}';
                 }
 
-                if (trimTrailingZeroes) {
-                    code[code.length] = 'fnum=fnum.replace(trailingZeroes,"");';
-                }
-
                 /*
                  * Edge case. If we have a very small negative number it will get rounded to 0,
                  * however the initial check at the top will still report as negative. Replace
                  * everything but 1-9 and check if the string is empty to determine a 0 value.
                  */
                 code[code.length] = 'if(neg&&fnum!=="' + (precision ? '0.' + Ext.String.repeat('0', precision) : '0') + '")fnum="-"+fnum;';
+
+                if (trimTrailingZeroes) {
+                    code[code.length] = 'fnum=fnum.replace(trailingZeroes,"");';
+                }
 
                 code[code.length] = 'return ';
 
@@ -13815,11 +13948,13 @@ Ext.application = function(config) {
                     name;
 
                 for (name in attributes) {
-                    result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    if (attributes.hasOwnProperty(name)) {
+                        result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    }
                 }
                 attributes = result.join('');
             }
-            return attributes||'';
+            return attributes || '';
         },
 
         /**
@@ -14060,6 +14195,9 @@ Ext.define('Ext.util.TaskRunner', {
      * be easily started and stopped.
      * @param {Object} config The config object. For details on the supported properties,
      * see {@link #start}.
+     *
+     * @return {Ext.util.TaskRunner.Task} 
+     * Ext.util.TaskRunner.Task instance, which can be useful for method chaining.
      */
     newTask: function (config) {
         var task = new Ext.util.TaskRunner.Task(config);
@@ -15013,17 +15151,19 @@ Ext.is.init();
         return style[styleName];
     },
     supportsVectors = {
-        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,1,1,0,0,1,0,1,0,0,0],
-        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,0,0,1,0,1,0,0,0],
-        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,1,0,1,0,0,1],
-        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1],
-        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1],
-        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1]
-    };
+        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,0,1,0,0,1,0,0],
+        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,0,0],
+        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0],
+        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0]
+    },
+    doc = document,
+    div = doc.createElement('div');
 
 function getBrowserKey() {
     var browser = Ext.isIE6 ? 'IE6' : Ext.isIE7 ? 'IE7' : Ext.isIE8 ? 'IE8' :
@@ -15046,15 +15186,14 @@ Ext.supports = {
      */
     init : function() {
         var me = this,
-            doc = document,
             toRun = me.toRun || me.tests,
             n = toRun.length,
-            div = n && Ext.isReady && doc.createElement('div'),
             notRun = [],
             browserKey = getBrowserKey(),
-            test, vector, value;
+            test, vector, value,
+            docReady = Ext.isReady;
 
-        if (div) {
+        if (docReady) {
             div.innerHTML = [
                 '<div style="height:30px;width:50px;">',
                     '<div style="height:20px;width:20px;"></div>',
@@ -15075,14 +15214,14 @@ Ext.supports = {
             value = vector && vector[n];
             if (value !== undefined) {
                 me[test.identity] = value;
-            } else if (div || test.early) {
+            } else if (docReady || test.early) {
                 me[test.identity] = test.fn.call(me, doc, div);
             } else {
                 notRun.push(test);
             }
         }
 
-        if (div) {
+        if (docReady) {
             doc.body.removeChild(div);
         }
 
@@ -15158,6 +15297,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 0
             identity: 'Transitions',
             fn: function(doc, div) {
                 var prefix = [
@@ -15197,6 +15337,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 1
             identity: 'RightMargin',
             fn: function(doc, div) {
                 var view = doc.defaultView;
@@ -15215,6 +15356,7 @@ Ext.supports = {
          * version number as Safari 5 (according to http://unixpapa.com/js/gecko.html).
          */
         {
+            // support Vector 2
             identity: 'DisplayChangeInputSelectionBug',
             early: true,
             fn: function() {
@@ -15234,6 +15376,7 @@ Ext.supports = {
          * be fixed in Chrome 11.
          */
         {
+            // support Vector 3
             identity: 'DisplayChangeTextAreaSelectionBug',
             early: true,
             fn: function() {
@@ -15264,6 +15407,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 4
             identity: 'TransparentColor',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -15276,6 +15420,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 5
             identity: 'ComputedStyle',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -15288,6 +15433,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 6
             identity: 'Svg',
             fn: function(doc) {
                 return !!doc.createElementNS && !!doc.createElementNS( "http:/" + "/www.w3.org/2000/svg", "svg").createSVGRect;
@@ -15299,10 +15445,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 7
             identity: 'Canvas',
             fn: function(doc) {
                 return !!doc.createElement('canvas').getContext;
-            }
+            },
+            early: true
         },
 
         /**
@@ -15310,12 +15458,14 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 8
             identity: 'Vml',
             fn: function(doc) {
                 var d = doc.createElement("div");
                 d.innerHTML = "<!--[if vml]><br/><br/><![endif]-->";
                 return (d.childNodes.length == 2);
-            }
+            },
+            early: true
         },
 
         /**
@@ -15323,10 +15473,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 9
             identity: 'Float',
-            fn: function(doc, div) {
-                return !!div.lastChild.style.cssFloat;
-            }
+            fn: function(doc) {
+                return 'cssFloat' in doc.documentElement.style;
+            },
+            early: true
         },
 
         /**
@@ -15334,10 +15486,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 10
             identity: 'AudioTag',
             fn: function(doc) {
                 return !!doc.createElement('audio').canPlayType;
-            }
+            },
+            early: true
         },
 
         /**
@@ -15345,11 +15499,28 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 11
             identity: 'History',
             fn: function() {
                 var history = window.history;
                 return !!(history && history.pushState);
-            }
+            },
+            early: true
+        },
+
+        /**
+         * @property Hashchange True if the user agent supports the hashchange event
+         * @type {Boolean}
+         */
+        {
+            // support Vector 12
+            identity: 'Hashchange',
+            fn: function() {
+                // Note that IE8 in IE7 compatibility mode reports true for 'onhashchange' in window, so also test documentMode
+                var docMode = document.documentMode;
+                return 'onhashchange' in window && (docMode === undefined || docMode > 7);
+            },
+            early: true
         },
 
         /**
@@ -15357,10 +15528,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 13
             identity: 'CSS3DTransform',
             fn: function() {
                 return (typeof WebKitCSSMatrix != 'undefined' && new WebKitCSSMatrix().hasOwnProperty('m41'));
-            }
+            },
+            early: true
         },
 
 		/**
@@ -15368,6 +15541,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 14
             identity: 'CSS3LinearGradient',
             fn: function(doc, div) {
                 var property = 'background-image:',
@@ -15381,7 +15555,8 @@ Ext.supports = {
                 div.style.cssText = options.join(';');
 
                 return (("" + div.style.backgroundImage).indexOf('gradient') !== -1) && !Ext.isIE9;
-            }
+            },
+            early: true
         },
 
         /**
@@ -15389,18 +15564,19 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 15
             identity: 'CSS3BorderRadius',
-            fn: function(doc, div) {
+            fn: function(doc) {
                 var domPrefixes = ['borderRadius', 'BorderRadius', 'MozBorderRadius', 'WebkitBorderRadius', 'OBorderRadius', 'KhtmlBorderRadius'],
-                    pass = false,
                     i;
                 for (i = 0; i < domPrefixes.length; i++) {
-                    if (document.body.style[domPrefixes[i]] !== undefined) {
+                    if (domPrefixes[i] in doc.documentElement.style) {
                         return true;
                     }
                 }
-                return pass;
-            }
+                return false;
+            },
+            early: true
         },
 
         /**
@@ -15408,56 +15584,66 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 16
             identity: 'GeoLocation',
             fn: function() {
                 // Use the in check for geolocation, see https://github.com/Modernizr/Modernizr/issues/513
                 return (typeof navigator != 'undefined' && 'geolocation' in navigator) || (typeof google != 'undefined' && typeof google.gears != 'undefined');
-            }
+            },
+            early: true
         },
         /**
          * @property MouseEnterLeave True if the browser supports mouseenter and mouseleave events
          * @type {Boolean}
          */
         {
+            // support Vector 17
             identity: 'MouseEnterLeave',
-            fn: function(doc, div){
-                return ('onmouseenter' in div && 'onmouseleave' in div);
-            }
+            fn: function(doc){
+                return ('onmouseenter' in doc.documentElement && 'onmouseleave' in doc.documentElement);
+            },
+            early: true
         },
         /**
          * @property MouseWheel True if the browser supports the mousewheel event
          * @type {Boolean}
          */
         {
+            // support Vector 18
             identity: 'MouseWheel',
-            fn: function(doc, div) {
-                return ('onmousewheel' in div);
-            }
+            fn: function(doc) {
+                return ('onmousewheel' in doc.documentElement);
+            },
+            early: true
         },
         /**
          * @property Opacity True if the browser supports normal css opacity
          * @type {Boolean}
          */
         {
+            // support Vector 19
             identity: 'Opacity',
             fn: function(doc, div){
                 // Not a strict equal comparison in case opacity can be converted to a number.
                 if (Ext.isIE6 || Ext.isIE7 || Ext.isIE8) {
                     return false;
                 }
-                div.firstChild.style.cssText = 'opacity:0.73';
-                return div.firstChild.style.opacity == '0.73';
-            }
+                div.style.cssText = 'opacity:0.73';
+                return div.style.opacity == '0.73';
+            },
+            early: true
         },
         /**
          * @property Placeholder True if the browser supports the HTML5 placeholder attribute on inputs
          * @type {Boolean}
          */
         {
+            // support Vector 20
             identity: 'Placeholder',
             fn: function(doc) {
                 return 'placeholder' in doc.createElement('input');
-            }
+            },
+            early: true
         },
 
         /**
@@ -15466,20 +15652,25 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 21
             identity: 'Direct2DBug',
-            fn: function() {
-                return Ext.isString(document.body.style.msTransformOrigin) && Ext.isIE10m;
-            }
+            fn: function(doc) {
+                return Ext.isString(doc.documentElement.style.msTransformOrigin) && Ext.isIE10m;
+            },
+            early: true
         },
         /**
          * @property BoundingClientRect True if the browser supports the getBoundingClientRect method on elements
          * @type {Boolean}
          */
         {
+            // support Vector 22.
+            // Note that though it is present, it does not work properly in IE quirks
             identity: 'BoundingClientRect',
-            fn: function(doc, div) {
-                return Ext.isFunction(div.getBoundingClientRect);
-            }
+            fn: function(doc) {
+                return !Ext.isIEQuirks && 'getBoundingClientRect' in doc.documentElement;
+            },
+            early: true
         },
         /**
          * @property RotatedBoundingClientRect True if the BoundingClientRect is
@@ -15487,11 +15678,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 23
             identity: 'RotatedBoundingClientRect',
-            fn: function() {
-                var body = document.body,
+            fn: function(doc) {
+                var body = doc.body,
                     supports = false,
-                    el = document.createElement('div'),
+                    el = doc.createElement('div'),
                     style = el.style;
 
                 if (el.getBoundingClientRect) {
@@ -15499,7 +15691,7 @@ Ext.supports = {
                         style.OTransform = style.transform = 'rotate(90deg)';
                     style.width = '100px';
                     style.height = '30px';
-                    body.appendChild(el)
+                    body.appendChild(el);
 
                     supports = el.getBoundingClientRect().height !== 100;
                     body.removeChild(el);
@@ -15509,12 +15701,14 @@ Ext.supports = {
             }
         },
         {
+            // support Vector 24
             identity: 'IncludePaddingInWidthCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetWidth == 210;
             }
         },
         {
+            // support Vector 25
             identity: 'IncludePaddingInHeightCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetHeight == 210;
@@ -15526,33 +15720,39 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 26
             identity: 'ArraySort',
             fn: function() {
                 var a = [1,2,3,4,5].sort(function(){ return 0; });
                 return a[0] === 1 && a[1] === 2 && a[2] === 3 && a[3] === 4 && a[4] === 5;
-            }
+            },
+            early: true
         },
         /**
          * @property Range True if browser support document.createRange native method.
          * @type {Boolean}
          */
         {
+            // support Vector 27
             identity: 'Range',
-            fn: function() {
-                return !!document.createRange;
-            }
+            fn: function(doc) {
+                return !!doc.createRange;
+            },
+            early: true
         },
         /**
          * @property CreateContextualFragment True if browser support CreateContextualFragment range native methods.
          * @type {Boolean}
          */
         {
+            // support Vector 28
             identity: 'CreateContextualFragment',
-            fn: function() {
-                var range = Ext.supports.Range ? document.createRange() : false;
+            fn: function(doc) {
+                var range = doc.createRange ? doc.createRange() : false;
 
                 return range && !!range.createContextualFragment;
-            }
+            },
+            early: true
         },
 
         /**
@@ -15560,11 +15760,13 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 29
             identity: 'WindowOnError',
             fn: function () {
                 // sadly, we cannot feature detect this...
                 return Ext.isIE || Ext.isGecko || Ext.webKitVersion >= 534.16; // Chrome 10+
-            }
+            },
+            early: true
         },
 
         /**
@@ -15572,11 +15774,13 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 30
             identity: 'TextAreaMaxLength',
-            fn: function(){
-                var el = document.createElement('textarea');
+            fn: function(doc) {
+                var el = doc.createElement('textarea');
                 return ('maxlength' in el);
-            }
+            },
+            early: true
         },
         /**
          * @property GetPositionPercentage True if the browser will return the left/top/right/bottom
@@ -15585,6 +15789,7 @@ Ext.supports = {
          */
         // Related bug: https://bugzilla.mozilla.org/show_bug.cgi?id=707691#c7
         {
+            // support Vector 31
             identity: 'GetPositionPercentage',
             fn: function(doc, div){
                return getStyle(div.childNodes[2], 'left') == '10%';
@@ -15600,6 +15805,7 @@ Ext.supports = {
          * @private
          */
         {
+            // support Vector 32
             identity: 'PercentageHeightOverflowBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -15644,6 +15850,7 @@ Ext.supports = {
          * @private
          */
         {
+            // support Vector 33
             identity: 'xOriginBug',
             fn: function(doc, div) {
                div.innerHTML = '<div id="b1" style="height:100px;width:100px;direction:rtl;position:relative;overflow:scroll">' +
@@ -15670,6 +15877,7 @@ Ext.supports = {
          * This method returns true if the browser is affected by this bug.
          */
         {
+            // support Vector 34
             identity: 'ScrollWidthInlinePaddingBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -15692,6 +15900,54 @@ Ext.supports = {
                 doc.body.removeChild(el);
                 
                 return hasBug;
+            }
+        },
+
+        /**
+         * @property {Boolean} rtlVertScrollbarOnRight
+         * Safari, in RTL mode keeps the scrollbar at the right side.
+         * This means that when two elements must keep their left/right positions synched, if one has no vert
+         * scrollbar, it must have some extra padding.
+         * See https://sencha.jira.com/browse/EXTJSIV-11245
+         *
+         * @private
+         */
+        {
+            identity: 'rtlVertScrollbarOnRight',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:scroll">' +
+                    '<div style="width:20px;height:200px;"></div>' +
+                '</div>';
+
+                var outerBox = div.firstChild,
+                    innerBox = outerBox.firstChild;
+
+                return (innerBox.offsetLeft + innerBox.offsetWidth !== outerBox.offsetLeft + outerBox.offsetWidth);
+            }
+        },
+
+        /**
+         * @property {Boolean} rtlVertScrollbarOverflowBug
+         * In Chrome, in RTL mode, horizontal overflow only into the vertical scrollbar does NOT trigger horizontal scrollability.
+         * See https://code.google.com/p/chromium/issues/detail?id=179332
+         * We need to detect this for when a grid header needs to have exactly the same horizontal scrolling range as its table view.
+         * See {@link Ext.grid.ColumnLayout#beginLayout}
+         * TODO: Remove this when all supported Chrome versions are fixed.
+         *
+         * @private
+         */
+        {
+            identity: 'rtlVertScrollbarOverflowBug',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:auto">' +
+                    '<div style="width:95px;height:200px;"></div>' +
+                '</div>';
+
+                // If the bug is present, the 95 pixel wide inner div, encroaches into the
+                // vertical scrollbar, but does NOT trigger horizontal overflow, so the clientHeight remains
+                // equal to the offset height.
+                var outerBox = div.firstChild;
+                return outerBox.clientHeight === outerBox.offsetHeight;
             }
         }
     ]
@@ -16018,13 +16274,17 @@ Ext.define('Ext.util.Event', function() {
     },
 
     suspend: function() {
-        this.suspended += 1;
+        ++this.suspended;
     },
 
     resume: function() {
         if (this.suspended) {
-            this.suspended--;
+            --this.suspended;
         }
+    },
+    
+    isSuspended: function() {
+        return this.suspended > 0;
     },
 
     fire: function() {
@@ -16112,6 +16372,7 @@ Ext.EventManager = new function() {
     var EventManager = this,
         doc = document,
         win = window,
+        supports = Ext.supports,
         escapeRx = /\\/g,
         prefix = Ext.baseCSSPrefix,
         // IE9strict addEventListener has some issues with using synthetic events
@@ -16122,8 +16383,8 @@ Ext.EventManager = new function() {
             var bd = doc.body || doc.getElementsByTagName('body')[0],
                 cls = [],
                 htmlCls = [],
-                supportsLG = Ext.supports.CSS3LinearGradient,
-                supportsBR = Ext.supports.CSS3BorderRadius,
+                supportsLG = supports.CSS3LinearGradient,
+                supportsBR = supports.CSS3BorderRadius,
                 html;
 
             /**
@@ -16237,7 +16498,7 @@ Ext.EventManager = new function() {
                     add('safari5');
                 }
                 if (Ext.isSafari5_0) {
-                    add('safari5_0')
+                    add('safari5_0');
                 }
             }
             if (Ext.isChrome) {
@@ -16388,7 +16649,7 @@ Ext.EventManager = new function() {
                 Ext._readyTime = new Date().getTime();
                 Ext.isReady = true;
 
-                Ext.supports.init();
+                supports.init();
                 EventManager.onWindowUnload();
                 readyEvent.onReadyChain = EventManager.onReadyChain;    //diags report
 
@@ -16420,7 +16681,7 @@ Ext.EventManager = new function() {
             }
             EventManager.isFiring = false;
             EventManager.hasFiredReady = true;
-            Ext.EventManager.idleEvent.fire();
+            EventManager.idleEvent.fire();
         },
 
         /**
@@ -16474,8 +16735,12 @@ Ext.EventManager = new function() {
 
             element = Ext.getDom(element);
 
-            if (element === doc || element === win) {
-                id = element === doc ? Ext.documentId : Ext.windowId;
+            if (element === doc) {
+                id = Ext.documentId;
+
+            // Use of "==" essential here, to avoid IE's bug where window.self !== window
+            } else if (element == win) {
+                id = Ext.windowId;
             }
             else {
                 id = Ext.id(element);
@@ -16535,12 +16800,12 @@ Ext.EventManager = new function() {
          * @return {Object} The new event name/function
          */
         normalizeEvent: function(eventName, fn) {
-            if (EventManager.mouseEnterLeaveRe.test(eventName) && !Ext.supports.MouseEnterLeave) {
+            if (EventManager.mouseEnterLeaveRe.test(eventName) && !supports.MouseEnterLeave) {
                 if (fn) {
                     fn = Ext.Function.createInterceptor(fn, EventManager.contains);
                 }
                 eventName = eventName == 'mouseenter' ? 'mouseover' : 'mouseout';
-            } else if (eventName == 'mousewheel' && !Ext.supports.MouseWheel && !Ext.isOpera) {
+            } else if (eventName == 'mousewheel' && !supports.MouseWheel && !Ext.isOpera) {
                 eventName = 'DOMMouseScroll';
             }
             return {
@@ -16695,9 +16960,10 @@ Ext.EventManager = new function() {
         // In this case we still want to return our custom window/doc id.
         normalizeId: function(dom, force) {
             var id;
-            if (dom === document) {
+            if (dom === doc) {
                 id = Ext.documentId;
-            } else if (dom === window) {
+            // Use of "==" essential here, to avoid IE's bug where window.self !== window
+            } else if (dom == win) {
                 id = Ext.windowId;
             } else {
                 id = dom.id;
@@ -16844,7 +17110,7 @@ Ext.EventManager = new function() {
         /**
          * Recursively removes all previous added listeners from an element and its children. Typically you will use {@link Ext.Element#purgeAllListeners}
          * directly on an Element in favor of calling this version.
-         * @param {String/Ext.Element/HTMLElement/Window} el The id or html element from which to remove all event handlers.
+         * @param {String/Ext.Element/HTMLElement/Window} element The id or html element from which to remove all event handlers.
          * @param {String} eventName (optional) The name of the event.
          */
         purgeElement : function(element, eventName) {
@@ -16997,7 +17263,7 @@ Ext.EventManager = new function() {
          * Get the event cache for a particular element for a particular event
          * @private
          * @param {HTMLElement} element The element
-         * @param {Object} eventName The event name
+         * @param {String} eventName The event name
          * @return {Array} The events for the element
          */
         getEventListenerCache : function(element, eventName) {
@@ -17751,7 +18017,7 @@ Ext.define('Ext.util.Observable', function(Observable) {
         *
         *  A `Destroyable` object. An object which implements the `destroy` method which removes all listeners added in this call. For example:
         *
-        *     this.btnListeners =  = myButton.mon({
+        *     this.btnListeners = myButton.mon({
         *         destroyable: true
         *         mouseover:   function() { console.log('mouseover'); },
         *         mouseout:    function() { console.log('mouseout'); },
@@ -17946,6 +18212,8 @@ Ext.define('Ext.util.Observable', function(Observable) {
         },
 
         /**
+        * The {@link #on} method is shorthand for {@link #addListener}.
+        *
         * Appends an event handler to this object.  For example:
         *
         *     myGridPanel.on("mouseover", this.onMouseOver, this);
@@ -18263,6 +18531,22 @@ Ext.define('Ext.util.Observable', function(Observable) {
         hasListener: function(ename) {
             return !!this.hasListeners[ename.toLowerCase()];
         },
+        
+        /**
+         * Checks if all events, or a specific event, is suspended.
+         * @param {String} [event] The name of the specific event to check
+         * @return {Boolean} `true` if events are suspended
+         */
+        isSuspended: function(event) {
+            var suspended = this.eventsSuspended > 0;
+            if (!suspended && event) {
+                event = this.events[event];
+                if (event && event.isEvent) {
+                    return event.isSuspended();
+                }
+            }
+            return suspended;
+        },
 
         /**
         * Suspends the firing of all events. (see {@link #resumeEvents})
@@ -18289,15 +18573,18 @@ Ext.define('Ext.util.Observable', function(Observable) {
          */
         suspendEvent: function(eventName) {
             var len = arguments.length,
-                i, event;
+                events = this.events,
+                i, event, ename;
 
             for (i = 0; i < len; i++) {
-                event = this.events[arguments[i]];
-
-                // If it exists, and is an Event object (not still a boolean placeholder), suspend it
-                if (event && event.suspend) {
-                    event.suspend();
+                ename = arguments[i];
+                event = events[ename];
+                if (!event || typeof event == 'boolean') {
+                    events[ename] = event = new ExtEvent(this, ename);
                 }
+
+                // Forcibly create the event, since we may not have anything bound when asking to suspend
+                event.suspend();
             }
         },
 
@@ -18356,9 +18643,11 @@ Ext.define('Ext.util.Observable', function(Observable) {
         *
         *     this.relayEvents(this.getStore(), ['load']);
         *
-        * The grid instance will then have an observable 'load' event which will be passed the
-        * parameters of the store's load event and any function fired with the grid's load event
-        * would have access to the grid using the `this` keyword.
+        * The grid instance will then have an observable 'load' event which will be passed 
+        * the parameters of the store's load event and any function fired with the grid's 
+        * load event would have access to the grid using the this keyword (unless the event 
+        * is handled by a controller's control/listen event listener in which case 'this' 
+        * will be the controller rather than the grid).
         *
         * @param {Object} origin The Observable whose events this object is to relay.
         * @param {String[]} events Array of event names to relay.
@@ -18541,7 +18830,6 @@ Ext.define('Ext.util.Observable', function(Observable) {
     Observable.createAlias({
         /**
          * @method
-         * Shorthand for {@link #addListener}.
          * @inheritdoc Ext.util.Observable#addListener
          */
         on: 'addListener',
@@ -18755,7 +19043,7 @@ Ext.define('Ext.util.Observable', function(Observable) {
  * @class Ext.EventObject
 
 Just as {@link Ext.Element} wraps around a native DOM node, Ext.EventObject
-wraps the browser's native event-object normalizing cross-browser differences,
+wraps the {@link #property-browserEvent} browser's native event object}, normalizing cross-browser differences,
 such as which mouse button is clicked, keys pressed, mechanisms to stop
 event-propagation along with a method to prevent default actions from taking place.
 
@@ -19025,7 +19313,7 @@ Ext.define('Ext.EventObjectImpl', {
         63275: 35 // end
     },
     // normalize button clicks, don't see any way to feature detect this.
-    btnMap: Ext.isIE ? {
+    btnMap: Ext.isIE9m ? {
         1: 0,
         4: 1,
         2: 2
@@ -19048,6 +19336,16 @@ Ext.define('Ext.EventObjectImpl', {
      * @property {Boolean} shiftKey
      * True if the shift key was down during the event.
      */
+    /**
+     * @property {DomEvent} browserEvent
+     * The raw browser event which this object wraps.
+     */
+
+    /** 
+     * @property {Boolean} isEvent
+     * `true` in this class to identify an object as an instantiated Event, or subclass thereof.
+     */
+    isEvent: true,
 
     constructor: function(event, freezeEvent){
         if (event) {
@@ -19417,7 +19715,8 @@ Ext.getBody().on('click', function(e,t){
     * @return {Boolean}
     */
     hasModifier : function(){
-        return this.ctrlKey || this.altKey || this.shiftKey || this.metaKey;
+        var me = this;
+        return !!(me.ctrlKey || me.altKey || me.shiftKey || me.metaKey);
     },
 
     /**
@@ -19700,7 +19999,7 @@ Ext.define('Ext.dom.AbstractQuery', {
             root = document.getElementById(root);
         }
 
-        q = q.split(",");
+        q = Ext.splitAndUnescape(q, ",");
 
         for (i = 0,qlen = q.length; i < qlen; i++) {
             if (typeof q[i] == 'string') {
@@ -19861,7 +20160,7 @@ Ext.define('Ext.dom.AbstractHelper', {
      * 
      * @param {Object} styles The object describing the styles.
      * @param {String[]} [buffer] The output buffer.
-     * @param {Boolean} [encode] `true` to {@link Ext.String.htmlEncode} property values if they
+     * @param {Boolean} [encode] `true` to {@link Ext.String#htmlEncode} property values if they
      * are going to be inserted as HTML attributes.
      * @return {String/String[]} If buffer is passed, it is returned. Otherwise the style
      * string is returned.
@@ -22153,7 +22452,7 @@ myElement.dom.className = Ext.core.Element.removeCls(this.initialClasses, 'x-inv
     /**
      * Returns true if this element is an ancestor of the passed element
      * @param {HTMLElement/String} el The element to check
-     * @return {Boolean} True if this element is an ancestor of el, else false
+     * @return {Boolean} True if this element is an ancestor of el or the el itself, else false
      */
     contains: (function () {
         // In earlier versions of FF, the elements are XUL elements and are wrapped as an XPCNativeWrapper
@@ -22182,6 +22481,7 @@ myElement.dom.className = Ext.core.Element.removeCls(this.initialClasses, 'x-inv
                 dom = el.dom || el;
 
             // we need el-contains-itself logic here because isAncestor does not do that:
+            // https://developer.mozilla.org/en-US/docs/Web/API/Node.contains
             return (dom === me.dom) || Ext.dom.AbstractElement.isAncestor(me.dom, dom);
         };
     }()),
@@ -23052,6 +23352,11 @@ Ext.define('Ext.Template', {
         }
     },
 
+    // Chrome really likes "new Function" to realize the code block (as in it is
+    // 2x-3x faster to call it than using eval), but Firefox chokes on it badly.
+    // IE and Opera are also fine with the "new Function" technique.
+    useEval: Ext.isGecko,
+
     /* End Definitions */
 
     /**
@@ -23119,7 +23424,36 @@ Ext.define('Ext.Template', {
      */
     disableFormats: false,
 
-    re: /\{([\w\-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
+    /**
+     * @property {RegExp} re
+     * Regular expression used to extract tokens.
+     *
+     * Finds the following expressions within a format string
+     *
+     *                  {AND?}
+     *                   / \
+     *                  /   \
+     *                 /     \
+     *                /       \
+     *               /         \
+     *              /           \
+     *             /             \
+     *            /               \
+     *           /                 \
+     *          OR                 AND?
+     *         /  \                / \
+     *        /    \              /   \
+     *       /      \            /     \
+     *  (\d*)  ([\w\-]+)        /       \
+     *  index    name          /         \
+     *                        /           \
+     *                       /             \
+     *              \:([A-Za-z_\.]*)   (?:\((.*?)?\))?
+     *                   formatFn           args
+     *
+     * Numeric index or (name followed by optional formatting function and args)
+     */
+    re: /\{(?:(?:(\d*)|([\w\-]+))(?:\:([A-Za-z_\.]*)(?:\((.*?)?\))?)?)\}/g,
 
     /**
      * Returns an HTML fragment of this template with the specified values applied.
@@ -23137,28 +23471,44 @@ Ext.define('Ext.Template', {
      * @return {String} The HTML fragment
      */
     apply: function(values) {
+        if (this.compiled) {
+            return this.compiled(values).join('');
+        }
+        return this.evaluate(values);
+    },
+
+    // Private
+    // Do not create the substitution closure on every apply call
+    evaluate: function(values) {
         var me = this,
             useFormat = me.disableFormats !== true,
             fm = Ext.util.Format,
-            tpl = me,
-            ret;
+            tpl = me;
 
-        if (me.compiled) {
-            return me.compiled(values).join('');
-        }
-
-        function fn(m, name, format, args) {
-            if (format && useFormat) {
+        function fn(match, index, name, formatFn, args) {
+            // Calculate the correct name extracted from the {}
+            // Certain browser pass unmatched parameters as undefined, some as an empty string.
+            if (name == null || name == '') {
+                name = index;
+            }
+            if (formatFn && useFormat) {
                 if (args) {
                     args = [values[name]].concat(Ext.functionFactory('return ['+ args +'];')());
                 } else {
                     args = [values[name]];
                 }
-                if (format.substr(0, 5) == "this.") {
-                    return tpl[format.substr(5)].apply(tpl, args);
+
+                // Caller used '{0:this.bold}'. Create a call to tpl member function
+                if (formatFn.substr(0, 5) === "this.") {
+                    return tpl[formatFn.substr(5)].apply(tpl, args);
                 }
+                // Caller used '{0:number("0.00")}'. Create a call to Ext.util.Format function
+                else if (fm[formatFn]) {
+                    return fm[formatFn].apply(fm, args);
+                }
+                // Caller used '{0:someRandomText}'. We must return it unchanged
                 else {
-                    return fm[format].apply(fm, args);
+                    return match;
                 }
             }
             else {
@@ -23166,8 +23516,7 @@ Ext.define('Ext.Template', {
             }
         }
 
-        ret = me.html.replace(me.re, fn);
-        return ret;
+        return me.html.replace(me.re, fn);
     },
 
     /**
@@ -23221,31 +23570,59 @@ Ext.define('Ext.Template', {
      */
     compile: function() {
         var me = this,
-            fm = Ext.util.Format,
-            useFormat = me.disableFormats !== true,
-            body, bodyReturn;
+            code;
 
-        function fn(m, name, format, args) {
-            if (format && useFormat) {
-                args = args ? ',' + args: "";
-                if (format.substr(0, 5) != "this.") {
-                    format = "fm." + format + '(';
-                }
-                else {
-                    format = 'this.' + format.substr(5) + '(';
-                }
-            }
-            else {
-                args = '';
-                format = "(values['" + name + "'] == undefined ? '' : ";
-            }
-            return "'," + format + "values['" + name + "']" + args + ") ,'";
-        }
-
-        bodyReturn = me.html.replace(me.compileARe, '\\\\').replace(me.compileBRe, '\\n').replace(me.compileCRe, "\\'").replace(me.re, fn);
-        body = "this.compiled = function(values){ return ['" + bodyReturn + "'];};";
-        eval(body);
+        code = me.html.replace(me.compileARe, '\\\\').replace(me.compileBRe, '\\n').replace(me.compileCRe, "\\'").replace(me.re, Ext.Function.bind(me.regexReplaceFn, me));
+        code = (this.disableFormats !== true ? 'var fm=Ext.util.Format;' : '') +
+                (me.useEval ? '$=' : 'return') +
+                " function(v){return ['" + code + "'];};";
+        me.compiled = me.useEval ? me.evalCompiled(code) : (new Function('Ext', code))(Ext);
         return me;
+    },
+
+    // @private
+    evalCompiled: function($) {
+
+        // We have to use eval to realize the code block and capture the inner func we also
+        // don't want a deep scope chain. We only do this in Firefox and it is also unhappy
+        // with eval containing a return statement, so instead we assign to "$" and return
+        // that. Because we use "eval", we are automatically sandboxed properly.
+        eval($);
+        return $;
+    },
+
+    regexReplaceFn: function fn(match, index, name, formatFn, args) {
+        // Calculate the correct expression to use to index into the values object/array
+        // index may be a numeric string, or a quoted alphanumeric string.
+        // Certain browser pass unmatched parameters as undefined, some as an empty string.
+        if (index == null || index == '') {
+            index = '"' + name + '"';
+        }
+        // If we are being used as a formatter for Ext.String.format, we must skip the string itself in the argument list.
+        // Doing this enables String.format to omit the Array slice call.
+        else if (this.stringFormat) {
+            index = parseInt(index) + 1;
+        }
+        if (formatFn && this.disableFormats !== true) {
+            args = args ? ',' + args: "";
+
+            // Caller used '{0:this.bold}'. Create a call to member function
+            if (formatFn.substr(0, 5) === "this.") {
+                formatFn = formatFn + '(';
+            }
+            // Caller used '{0:number("0.00")}'. Create a call to Ext.util.Format function
+            else if (Ext.util.Format[formatFn]) {
+                formatFn = "fm." + formatFn + '(';
+            }
+            // Caller used '{0:someRandomText}'. We must pass it through unchanged
+            else {
+                return match;
+            }
+            return "'," + formatFn + "v[" + index + "]" + args + "),'";
+        }
+        else {
+            return "',v[" + index + "] == undefined ? '' : v[" + index + "],'";
+        }
     },
 
     /**
@@ -23459,7 +23836,7 @@ Ext.define('Ext.XTemplateParser', {
             topRe = me.topRe,
             actionsRe = me.actionsRe,
             index, stack, s, m, t, prev, frame, subMatch, begin, end, actions,
-            prop;
+            prop, expectTplNext;
 
         me.level = 0;
         me.stack = stack = [];
@@ -23477,8 +23854,16 @@ Ext.define('Ext.XTemplateParser', {
             end = topRe.lastIndex;
 
             if (index < begin) {
-                me.doText(str.substring(index, begin));
+                // In the case of a switch statement, we expect a tpl for each case.
+                // However, if we have spaces they will get matched as plaintext, so
+                // we want to skip over them here.
+                s = str.substring(index, begin);
+                if (!(expectTplNext && Ext.String.trim(s) === '')) {
+                    me.doText(s);
+                }
             }
+
+            expectTplNext = false;
 
             if (m[1]) {
                 end = str.indexOf('%}', begin+2);
@@ -23528,6 +23913,7 @@ Ext.define('Ext.XTemplateParser', {
                 else if (actions['switch']) {
                     me.doSwitch(actions['switch'], actions);
                     stack.push({ type: 'switch' });
+                    expectTplNext = true;
                 }
                 else if (actions['case']) {
                     me.doCase(actions['case'], actions);
@@ -23753,11 +24139,13 @@ Ext.define('Ext.XTemplateCompiler', {
     },
 
     doSwitch: function (action) {
-        var me = this;
+        var me = this,
+            key;
 
         // If it's just a propName, use it directly in the switch
-        if (action === '.') {
-            me.body.push('switch (values) {\n');
+        if (action === '.' || action === '#') {
+            key = action === '.' ? 'values' : 'xindex';
+            me.body.push('switch (', key, ') {\n');
         } else if (me.propNameRe.test(action)) {
             me.body.push('switch (', me.parseTag(action), ') {\n');
         }
@@ -24525,6 +24913,7 @@ Ext.define('Ext.XTemplate', {
 
 // @tag dom,core
 // @require Helper.js
+
 // @define Ext.dom.Query
 // @define Ext.core.DomQuery
 // @define Ext.DomQuery
@@ -24629,9 +25018,7 @@ Ext.ns('Ext.core');
 Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
     var DQ,
         doc = document,
-        cache = {},
-        simpleCache = {},
-        valueCache = {},
+        cache, simpleCache, valueCache,
         useClassList = !!doc.documentElement.classList,
         useElementPointer = !!doc.documentElement.firstElementChild,
         useChildrenCollection = (function() {
@@ -25119,6 +25506,12 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
     }
 
     return DQ = {
+        clearCache: function () {
+            cache && cache.clear();
+            valueCache && valueCache.clear();
+            simpleCache && simpleCache.clear();
+        },
+
         getStyle: function(el, name) {
             return Ext.fly(el, '_DomQuery').getStyle(name);
         },
@@ -25226,36 +25619,44 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
          * no matches, and empty Array is returned.
          */
         jsSelect: function(path, root, type) {
+            if (!cache) {
+                DQ._cache = cache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
             // set root to doc if not specified.
             root = root || doc;
 
             if (typeof root == "string") {
                 root = doc.getElementById(root);
             }
-            var paths = path.split(","),
+            var paths = Ext.splitAndUnescape(path, ","),
                 results = [],
+                query,
                 i, len, subPath, result;
 
             // loop over each selector
             for (i = 0, len = paths.length; i < len; i++) {
                 subPath = paths[i].replace(trimRe, "");
                 // compile and place in cache
-                if (!cache[subPath]) {
+                query = cache.get(subPath);
+                if (!query) {
                     // When we compile, escaping is handled inside the compile method
-                    cache[subPath] = DQ.compile(subPath, type);
-                    if (!cache[subPath]) {
+                    query = DQ.compile(subPath, type);
+                    if (!query) {
                         Ext.Error.raise({
                             sourceClass:'Ext.DomQuery',
                             sourceMethod:'jsSelect',
                             msg:subPath + ' is not a valid selector'
                         });
                     }
+                    cache.add(subPath, query);
                 } else {
                     // If we've already compiled, we still need to check if the
                     // selector has escaping and setup the appropriate flags
                     setupEscapes(subPath);
                 }
-                result = cache[subPath](root);
+                result = query(root);
                 if (result && result !== doc) {
                     results = results.concat(result);
                 }
@@ -25341,15 +25742,23 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
          * @return {String}
          */
         selectValue: function(path, root, defaultValue) {
+            if (!valueCache) {
+                DQ._valueCache = valueCache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
             path = path.replace(trimRe, "");
-            if (!valueCache[path]) {
-                valueCache[path] = DQ.compile(path, "select");
+            var query = valueCache.get(path),
+                n, v;
+
+            if (!query) {
+                query = DQ.compile(path, "select");
+                valueCache.add(path, query);
             } else {
                 setupEscapes(path);
             }
 
-            var n = valueCache[path](root),
-                v;
+            n = query(root);
 
             n = n[0] ? n[0] : n;
 
@@ -25404,13 +25813,22 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
          */
         filter: function(els, ss, nonMatches) {
             ss = ss.replace(trimRe, "");
-            if (!simpleCache[ss]) {
-                simpleCache[ss] = DQ.compile(ss, "simple");
+            if (!simpleCache) {
+                DQ._simpleCache = simpleCache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
+            var query = simpleCache.get(ss),
+                result;
+
+            if (!query) {
+                query = DQ.compile(ss, "simple");
+                simpleCache.add(ss, query);
             } else {
                 setupEscapes(ss);
             }
 
-            var result = simpleCache[ss](els);
+            result = query(els);
             return nonMatches ? quickDiff(result, els) : result;
         },
 
@@ -27840,6 +28258,51 @@ Ext.define('Ext.dom.Element_scroll', {
 
     /**
      * Scrolls this element into view within the passed container.
+     *
+     *          
+     *       Ext.create('Ext.data.Store', {
+     *           storeId:'simpsonsStore',
+     *           fields:['name', 'email', 'phone'],
+     *           data:{'items':[
+     *               { 'name': 'Lisa',  "email":"lisa@simpsons.com",  "phone":"555-111-1224"  },
+     *               { 'name': 'Bart',  "email":"bart@simpsons.com",  "phone":"555-222-1234" },
+     *               { 'name': 'Homer', "email":"homer@simpsons.com",  "phone":"555-222-1244"  },
+     *               { 'name': 'Marge', "email":"marge@simpsons.com", "phone":"555-222-1254"  },
+     *               { 'name': 'Milhouse', "email":"milhouse@simpsons.com",  "phone":"555-222-1244"  },
+     *               { 'name': 'Willy', "email":"willy@simpsons.com", "phone":"555-222-1254"  },
+     *               { 'name': 'Skinner', "email":"skinner@simpsons.com",  "phone":"555-222-1244"  },
+     *               { 'name': 'Hank (last row)', "email":"hank@simpsons.com", "phone":"555-222-1254"  }
+     *           ]},
+     *           proxy: {
+     *               type: 'memory',
+     *               reader: {
+     *                   type: 'json',
+     *                   rootProperty: 'items'
+     *               }
+     *           }
+     *       });
+     *       
+     *       var grid = Ext.create('Ext.grid.Panel', {
+     *           title: 'Simpsons',
+     *           store: Ext.data.StoreManager.lookup('simpsonsStore'),
+     *           columns: [
+     *               { text: 'Name',  dataIndex: 'name', width: 125 },
+     *               { text: 'Email', dataIndex: 'email', flex: 1 },
+     *               { text: 'Phone', dataIndex: 'phone' }
+     *           ],
+     *           height: 190,
+     *           width: 400,
+     *           renderTo: Ext.getBody(),
+     *           tbar: [{
+     *               text: 'Scroll row 7 into view',
+     *               handler: function () {
+     *                   var view = grid.getView();
+     *                   
+     *                   Ext.get(view.getRow(7)).scrollIntoView(view.getEl(), null, true);
+     *               }
+     *           }]
+     *       });
+     * 
      * @param {String/HTMLElement/Ext.Element} [container=document.body] The container element
      * to scroll.  Should be a string (id), dom node, or Ext.Element.
      * @param {Boolean} [hscroll=true] False to disable horizontal scroll.
@@ -29140,8 +29603,8 @@ Ext.define('Ext.util.Positionable', {
         anchor = (anchor || "tl").toLowerCase();
         mySize = mySize || {};
 
-        myWidth = mySize.width || isViewport ? Ext.Element.getViewWidth() : me.getWidth();
-        myHeight = mySize.height || isViewport ? Ext.Element.getViewHeight() : me.getHeight();
+        myWidth = mySize.width || (isViewport ? Ext.Element.getViewWidth() : me.getWidth());
+        myHeight = mySize.height || (isViewport ? Ext.Element.getViewHeight() : me.getHeight());
 
         // Calculate anchor position.
         // Test most common cases for picker alignment first.
@@ -29189,13 +29652,8 @@ Ext.define('Ext.util.Positionable', {
      */
     getAlignToXY: function(alignToEl, posSpec, offset) {
         var me = this,
-            viewportWidth = Ext.Element.getViewWidth() - 10, // 10px of margin for ie
-            viewportHeight = Ext.Element.getViewHeight() - 10, // 10px of margin for ie
-            doc = document,
-            docElement = doc.documentElement,
-            docBody = doc.body,
-            scrollX = (docElement.scrollLeft || docBody.scrollLeft || 0),
-            scrollY = (docElement.scrollTop  || docBody.scrollTop  || 0),
+            constrainToEl,
+            constrainTo,
             alignMatch, myPosition, alignToElPosition, myWidth, myHeight,
             alignToElRegion, swapY, swapX, constrain, align1, align2,
             p1y, p1x, p2y, p2x, x, y;
@@ -29226,8 +29684,17 @@ Ext.define('Ext.util.Positionable', {
         x = alignToElPosition[0] - myPosition[0] + offset[0];
         y = alignToElPosition[1] - myPosition[1] + offset[1];
 
-        // If position spec ended with a "?", then constrain to viewport is necessary
+        // If position spec ended with a "?", then constraining is necessary
         if (constrain) {
+            // Constrain to the correct enclosing object:
+            // Attempt to use the constrainTo property.
+            // Otherwise, if we are a Component, there will be a container property.
+            // Otherwise, use this Positionable's element's parent node.
+            constrainToEl = me.constrainTo || me.container || me.el.parent();
+            constrainToEl = Ext.get(constrainToEl.el || constrainToEl)
+            constrainTo = constrainToEl.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainToEl.el.dom.clientWidth;
+
             myWidth = me.getWidth();
             myHeight = me.getHeight();
             alignToElRegion = alignToEl.getRegion();
@@ -29239,20 +29706,40 @@ Ext.define('Ext.util.Positionable', {
             p1x = align1.charAt(align1.length - 1);
             p2y = align2.charAt(0);
             p2x = align2.charAt(align2.length - 1);
-            swapY = ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
-            swapX = ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
 
-            if (x + myWidth > viewportWidth + scrollX) {
-                x = swapX ? alignToElRegion.left - myWidth : viewportWidth + scrollX - myWidth;
+            // We only need to swap from below to above (or vice versa) if the two elements horizontally overlap.
+            // If they do not horizontally overlap, then simply constraining the Y is fine.
+            swapY = (x < alignToElRegion.right && x + myWidth >= alignToElRegion.left) && ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
+
+            // We only need to swap from right to left (or vice versa) if the two elements vertically overlap.
+            // If they do not vertically overlap, then simply constraining the X is fine.
+            swapX = (y < alignToElRegion.bottom && y + myHeight >= alignToElRegion.top) && ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
+
+            if (x + myWidth > constrainTo.right) {
+                if (swapX) {
+                    x = alignToElRegion.left - myWidth;
+
+                    // Only swap once. If it doesn't fit after that, we have to do a normal constrain
+                    swapX = false;
+                } else {
+                    x = constrainTo.right - myWidth;
+                }
             }
-            if (x < scrollX) {
-                x = swapX ? alignToElRegion.right : scrollX;
+            if (x < constrainTo.left) {
+                x = swapX ? alignToElRegion.right : constrainTo.left;
             }
-            if (y + myHeight > viewportHeight + scrollY) {
-                y = swapY ? alignToElRegion.top - myHeight : viewportHeight + scrollY - myHeight;
+            if (y + myHeight > constrainTo.bottom) {
+                if (swapY) {
+                    y = alignToElRegion.top - myHeight;
+
+                    // Only swap once. If it doesn't fit after that, we have to do a normal constrain
+                    swapY = false;
+                } else {
+                    y = constrainTo.bottom - myHeight;
+                }
             }
-            if (y < scrollY) {
-                y = swapY ? alignToElRegion.bottom : scrollY;
+            if (y < constrainTo.top) {
+                y = swapY ? alignToElRegion.bottom : constrainTo.top;
             }
         }
         return [x,y];
@@ -29445,10 +29932,18 @@ Ext.define('Ext.util.Positionable', {
             vector = [0, 0],
             shadowSize = (this.shadow && this.constrainShadow && !this.shadowDisabled) ? this.shadow.getShadowSize() : undefined,
             overflowed = false,
+            constrainSize,
             constraintInsets = this.constraintInsets;
 
         if (!(constrainTo instanceof Ext.util.Region)) {
-            constrainTo = Ext.get(constrainTo.el || constrainTo).getViewRegion();
+            constrainTo = Ext.get(constrainTo.el || constrainTo);
+
+            // getRegion uses bounding client rect.
+            // We need to clear any scrollbars, so get the size using getViewSize
+            constrainSize = constrainTo.getViewSize();
+            constrainTo = constrainTo.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainSize.width;
+            constrainTo.bottom = constrainTo.top + constrainSize.height;
         }
 
         // Apply constraintInsets
@@ -29792,7 +30287,12 @@ Ext.define('Ext.util.Positionable', {
  * For working with collections of Elements, see {@link Ext.CompositeElement}
  *
  * @constructor
- * Creates new Element directly.
+ * Creates new Element directly by passing an id or the HTMLElement.
+ *
+ *     var el = new Ext.dom.Element('foo');
+ *
+ *     var el = Ext.create('Ext.dom.Element', document.getElementById('foo'));
+ *
  * @param {String/HTMLElement} element
  * @param {Boolean} [forceNew] By default the constructor checks to see if there is already an instance of this
  * element in the cache and if there is it returns the same instance. This will skip that check (useful for extending
@@ -29848,6 +30348,8 @@ Ext.define('Ext.dom.Element', function(Element) {
                                    
           
         
+        isElement: true,
+
         tableTagRe: /^(?:tr|td|table|tbody)$/i,
 
         mixins: [
@@ -29871,6 +30373,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 if (Number(defer)) {
                     Ext.defer(me.focus, defer, me, [null, dom]);
                 } else {
+                    Ext.globalEvents.fireEvent('beforefocus', dom);
                     dom.focus();
                 }
             } catch(e) {
@@ -29904,10 +30407,11 @@ Ext.define('Ext.dom.Element', function(Element) {
         */
         isBorderBox: function() {
             var box = Ext.isBorderBox;
-            
-            // IE6/7 force input elements to content-box even if border-box is set explicitly
-            if (box && Ext.isIE7m) {
-                box = !((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
+
+            // In IE6/7 "strict" when we cannot enforce border box model, certain
+            // elements still use border box model. These are enumerated in noBoxAdjust.
+            if (Ext.isIE7m && !box) {
+                box = ((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
             }
             return box;
         },
@@ -30077,12 +30581,14 @@ Ext.define('Ext.dom.Element', function(Element) {
 
         /**
         * Puts a mask over this element to disable user interaction. Requires core.css.
-        * This method can only be applied to elements which accept child nodes.
+        * This method can only be applied to elements which accept child nodes. Use 
+        * {@link #unmask} to remove the mask.
+        * 
         * @param {String} [msg] A message to display in the mask
         * @param {String} [msgCls] A css class to apply to the msg element
         * @return {Ext.dom.Element} The mask element
         */
-        mask : function(msg, msgCls /* private - passed by AbstractComponent.mask to avoid the need to interrogate the DOM to get the height*/, elHeight) {
+        mask: function (msg, msgCls /* private - passed by AbstractComponent.mask to avoid the need to interrogate the DOM to get the height*/, elHeight) {
             var me            = this,
                 dom           = me.dom,
                 // In some cases, setExpression will exist but not be of a function type,
@@ -30161,10 +30667,8 @@ Ext.define('Ext.dom.Element', function(Element) {
             // Older IE browsers in quirks mode will not get the fixed-mask class but
             // instead will use CSS expressions to achieve the same result (see below).
             // See EXTJSIV-10726.
-            if (Ext.isStrict && !Ext.isIE6) {
-                if (dom === DOC.body) {
-                    maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
-                }
+            if (Ext.isStrict && !Ext.isIE6 && (dom === DOC.body)) {
+                maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
             }
 
             // NOTE: CSS expressions are resource intensive and to be used only as a last resort
@@ -31237,7 +31741,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 // A tabIndex of -1 means it has to be programatically focused, so that needs FocusManager,
                 // and it has to be the focus holding el of a Component within the Component tree.
                 if (tabIndex == -1) { // note that the value is a string
-                    canFocus = Ext.FocusManager && Ext.FocusManager.enabled && asFocusEl;
+                    canFocus = Ext.enableFocusManager && asFocusEl;
                 }
                 else {
                     // See if it's a naturally focusable element

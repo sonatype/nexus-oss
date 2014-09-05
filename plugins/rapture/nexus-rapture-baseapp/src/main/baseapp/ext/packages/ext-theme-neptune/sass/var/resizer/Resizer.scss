@@ -1,5 +1,5 @@
 /** @class Ext.resizer.Resizer */
 //
 
-$resizer-handle-size: 6px !default;
+$resizer-handle-size: $panel-frame-border-width !default;
 $resizer-handle-border-radius: $resizer-handle-size !default;

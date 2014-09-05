@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag dom,core
 // @require EventManager.js
@@ -23,7 +23,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  * @class Ext.EventObject
 
 Just as {@link Ext.Element} wraps around a native DOM node, Ext.EventObject
-wraps the browser's native event-object normalizing cross-browser differences,
+wraps the {@link #property-browserEvent} browser's native event object}, normalizing cross-browser differences,
 such as which mouse button is clicked, keys pressed, mechanisms to stop
 event-propagation along with a method to prevent default actions from taking place.
 
@@ -293,7 +293,7 @@ Ext.define('Ext.EventObjectImpl', {
         63275: 35 // end
     },
     // normalize button clicks, don't see any way to feature detect this.
-    btnMap: Ext.isIE ? {
+    btnMap: Ext.isIE9m ? {
         1: 0,
         4: 1,
         2: 2
@@ -316,6 +316,16 @@ Ext.define('Ext.EventObjectImpl', {
      * @property {Boolean} shiftKey
      * True if the shift key was down during the event.
      */
+    /**
+     * @property {DomEvent} browserEvent
+     * The raw browser event which this object wraps.
+     */
+
+    /** 
+     * @property {Boolean} isEvent
+     * `true` in this class to identify an object as an instantiated Event, or subclass thereof.
+     */
+    isEvent: true,
 
     constructor: function(event, freezeEvent){
         if (event) {
@@ -685,7 +695,8 @@ Ext.getBody().on('click', function(e,t){
     * @return {Boolean}
     */
     hasModifier : function(){
-        return this.ctrlKey || this.altKey || this.shiftKey || this.metaKey;
+        var me = this;
+        return !!(me.ctrlKey || me.altKey || me.shiftKey || me.metaKey);
     },
 
     /**

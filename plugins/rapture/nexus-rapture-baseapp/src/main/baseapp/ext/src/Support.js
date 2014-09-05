@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag extras,core
 // @require perf/Monitor.js
@@ -167,17 +167,19 @@ Ext.is.init();
         return style[styleName];
     },
     supportsVectors = {
-        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,1,1,0,0,1,0,1,0,0,0],
-        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,0,0,1,0,1,0,0,0],
-        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,1,0,1,0,0,1],
-        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1],
-        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1],
-        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1]
-    };
+        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,0,1,0,0,1,0,0],
+        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,0,0],
+        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0],
+        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0]
+    },
+    doc = document,
+    div = doc.createElement('div');
 
 function getBrowserKey() {
     var browser = Ext.isIE6 ? 'IE6' : Ext.isIE7 ? 'IE7' : Ext.isIE8 ? 'IE8' :
@@ -200,15 +202,14 @@ Ext.supports = {
      */
     init : function() {
         var me = this,
-            doc = document,
             toRun = me.toRun || me.tests,
             n = toRun.length,
-            div = n && Ext.isReady && doc.createElement('div'),
             notRun = [],
             browserKey = getBrowserKey(),
-            test, vector, value;
+            test, vector, value,
+            docReady = Ext.isReady;
 
-        if (div) {
+        if (docReady) {
             div.innerHTML = [
                 '<div style="height:30px;width:50px;">',
                     '<div style="height:20px;width:20px;"></div>',
@@ -229,14 +230,14 @@ Ext.supports = {
             value = vector && vector[n];
             if (value !== undefined) {
                 me[test.identity] = value;
-            } else if (div || test.early) {
+            } else if (docReady || test.early) {
                 me[test.identity] = test.fn.call(me, doc, div);
             } else {
                 notRun.push(test);
             }
         }
 
-        if (div) {
+        if (docReady) {
             doc.body.removeChild(div);
         }
 
@@ -332,6 +333,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 0
             identity: 'Transitions',
             fn: function(doc, div) {
                 var prefix = [
@@ -371,6 +373,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 1
             identity: 'RightMargin',
             fn: function(doc, div) {
                 var view = doc.defaultView;
@@ -389,6 +392,7 @@ Ext.supports = {
          * version number as Safari 5 (according to http://unixpapa.com/js/gecko.html).
          */
         {
+            // support Vector 2
             identity: 'DisplayChangeInputSelectionBug',
             early: true,
             fn: function() {
@@ -408,6 +412,7 @@ Ext.supports = {
          * be fixed in Chrome 11.
          */
         {
+            // support Vector 3
             identity: 'DisplayChangeTextAreaSelectionBug',
             early: true,
             fn: function() {
@@ -438,6 +443,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 4
             identity: 'TransparentColor',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -450,6 +456,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 5
             identity: 'ComputedStyle',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -462,6 +469,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 6
             identity: 'Svg',
             fn: function(doc) {
                 return !!doc.createElementNS && !!doc.createElementNS( "http:/" + "/www.w3.org/2000/svg", "svg").createSVGRect;
@@ -473,10 +481,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 7
             identity: 'Canvas',
             fn: function(doc) {
                 return !!doc.createElement('canvas').getContext;
-            }
+            },
+            early: true
         },
 
         /**
@@ -484,12 +494,14 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 8
             identity: 'Vml',
             fn: function(doc) {
                 var d = doc.createElement("div");
                 d.innerHTML = "<!--[if vml]><br/><br/><![endif]-->";
                 return (d.childNodes.length == 2);
-            }
+            },
+            early: true
         },
 
         /**
@@ -497,10 +509,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 9
             identity: 'Float',
-            fn: function(doc, div) {
-                return !!div.lastChild.style.cssFloat;
-            }
+            fn: function(doc) {
+                return 'cssFloat' in doc.documentElement.style;
+            },
+            early: true
         },
 
         /**
@@ -508,10 +522,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 10
             identity: 'AudioTag',
             fn: function(doc) {
                 return !!doc.createElement('audio').canPlayType;
-            }
+            },
+            early: true
         },
 
         /**
@@ -519,11 +535,28 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 11
             identity: 'History',
             fn: function() {
                 var history = window.history;
                 return !!(history && history.pushState);
-            }
+            },
+            early: true
+        },
+
+        /**
+         * @property Hashchange True if the user agent supports the hashchange event
+         * @type {Boolean}
+         */
+        {
+            // support Vector 12
+            identity: 'Hashchange',
+            fn: function() {
+                // Note that IE8 in IE7 compatibility mode reports true for 'onhashchange' in window, so also test documentMode
+                var docMode = document.documentMode;
+                return 'onhashchange' in window && (docMode === undefined || docMode > 7);
+            },
+            early: true
         },
 
         /**
@@ -531,10 +564,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 13
             identity: 'CSS3DTransform',
             fn: function() {
                 return (typeof WebKitCSSMatrix != 'undefined' && new WebKitCSSMatrix().hasOwnProperty('m41'));
-            }
+            },
+            early: true
         },
 
 		/**
@@ -542,6 +577,7 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 14
             identity: 'CSS3LinearGradient',
             fn: function(doc, div) {
                 var property = 'background-image:',
@@ -555,7 +591,8 @@ Ext.supports = {
                 div.style.cssText = options.join(';');
 
                 return (("" + div.style.backgroundImage).indexOf('gradient') !== -1) && !Ext.isIE9;
-            }
+            },
+            early: true
         },
 
         /**
@@ -563,18 +600,19 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 15
             identity: 'CSS3BorderRadius',
-            fn: function(doc, div) {
+            fn: function(doc) {
                 var domPrefixes = ['borderRadius', 'BorderRadius', 'MozBorderRadius', 'WebkitBorderRadius', 'OBorderRadius', 'KhtmlBorderRadius'],
-                    pass = false,
                     i;
                 for (i = 0; i < domPrefixes.length; i++) {
-                    if (document.body.style[domPrefixes[i]] !== undefined) {
+                    if (domPrefixes[i] in doc.documentElement.style) {
                         return true;
                     }
                 }
-                return pass;
-            }
+                return false;
+            },
+            early: true
         },
 
         /**
@@ -582,56 +620,66 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 16
             identity: 'GeoLocation',
             fn: function() {
                 // Use the in check for geolocation, see https://github.com/Modernizr/Modernizr/issues/513
                 return (typeof navigator != 'undefined' && 'geolocation' in navigator) || (typeof google != 'undefined' && typeof google.gears != 'undefined');
-            }
+            },
+            early: true
         },
         /**
          * @property MouseEnterLeave True if the browser supports mouseenter and mouseleave events
          * @type {Boolean}
          */
         {
+            // support Vector 17
             identity: 'MouseEnterLeave',
-            fn: function(doc, div){
-                return ('onmouseenter' in div && 'onmouseleave' in div);
-            }
+            fn: function(doc){
+                return ('onmouseenter' in doc.documentElement && 'onmouseleave' in doc.documentElement);
+            },
+            early: true
         },
         /**
          * @property MouseWheel True if the browser supports the mousewheel event
          * @type {Boolean}
          */
         {
+            // support Vector 18
             identity: 'MouseWheel',
-            fn: function(doc, div) {
-                return ('onmousewheel' in div);
-            }
+            fn: function(doc) {
+                return ('onmousewheel' in doc.documentElement);
+            },
+            early: true
         },
         /**
          * @property Opacity True if the browser supports normal css opacity
          * @type {Boolean}
          */
         {
+            // support Vector 19
             identity: 'Opacity',
             fn: function(doc, div){
                 // Not a strict equal comparison in case opacity can be converted to a number.
                 if (Ext.isIE6 || Ext.isIE7 || Ext.isIE8) {
                     return false;
                 }
-                div.firstChild.style.cssText = 'opacity:0.73';
-                return div.firstChild.style.opacity == '0.73';
-            }
+                div.style.cssText = 'opacity:0.73';
+                return div.style.opacity == '0.73';
+            },
+            early: true
         },
         /**
          * @property Placeholder True if the browser supports the HTML5 placeholder attribute on inputs
          * @type {Boolean}
          */
         {
+            // support Vector 20
             identity: 'Placeholder',
             fn: function(doc) {
                 return 'placeholder' in doc.createElement('input');
-            }
+            },
+            early: true
         },
 
         /**
@@ -640,20 +688,25 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 21
             identity: 'Direct2DBug',
-            fn: function() {
-                return Ext.isString(document.body.style.msTransformOrigin) && Ext.isIE10m;
-            }
+            fn: function(doc) {
+                return Ext.isString(doc.documentElement.style.msTransformOrigin) && Ext.isIE10m;
+            },
+            early: true
         },
         /**
          * @property BoundingClientRect True if the browser supports the getBoundingClientRect method on elements
          * @type {Boolean}
          */
         {
+            // support Vector 22.
+            // Note that though it is present, it does not work properly in IE quirks
             identity: 'BoundingClientRect',
-            fn: function(doc, div) {
-                return Ext.isFunction(div.getBoundingClientRect);
-            }
+            fn: function(doc) {
+                return !Ext.isIEQuirks && 'getBoundingClientRect' in doc.documentElement;
+            },
+            early: true
         },
         /**
          * @property RotatedBoundingClientRect True if the BoundingClientRect is
@@ -661,11 +714,12 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 23
             identity: 'RotatedBoundingClientRect',
-            fn: function() {
-                var body = document.body,
+            fn: function(doc) {
+                var body = doc.body,
                     supports = false,
-                    el = document.createElement('div'),
+                    el = doc.createElement('div'),
                     style = el.style;
 
                 if (el.getBoundingClientRect) {
@@ -673,7 +727,7 @@ Ext.supports = {
                         style.OTransform = style.transform = 'rotate(90deg)';
                     style.width = '100px';
                     style.height = '30px';
-                    body.appendChild(el)
+                    body.appendChild(el);
 
                     supports = el.getBoundingClientRect().height !== 100;
                     body.removeChild(el);
@@ -683,12 +737,14 @@ Ext.supports = {
             }
         },
         {
+            // support Vector 24
             identity: 'IncludePaddingInWidthCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetWidth == 210;
             }
         },
         {
+            // support Vector 25
             identity: 'IncludePaddingInHeightCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetHeight == 210;
@@ -700,33 +756,39 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 26
             identity: 'ArraySort',
             fn: function() {
                 var a = [1,2,3,4,5].sort(function(){ return 0; });
                 return a[0] === 1 && a[1] === 2 && a[2] === 3 && a[3] === 4 && a[4] === 5;
-            }
+            },
+            early: true
         },
         /**
          * @property Range True if browser support document.createRange native method.
          * @type {Boolean}
          */
         {
+            // support Vector 27
             identity: 'Range',
-            fn: function() {
-                return !!document.createRange;
-            }
+            fn: function(doc) {
+                return !!doc.createRange;
+            },
+            early: true
         },
         /**
          * @property CreateContextualFragment True if browser support CreateContextualFragment range native methods.
          * @type {Boolean}
          */
         {
+            // support Vector 28
             identity: 'CreateContextualFragment',
-            fn: function() {
-                var range = Ext.supports.Range ? document.createRange() : false;
+            fn: function(doc) {
+                var range = doc.createRange ? doc.createRange() : false;
 
                 return range && !!range.createContextualFragment;
-            }
+            },
+            early: true
         },
 
         /**
@@ -734,11 +796,13 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 29
             identity: 'WindowOnError',
             fn: function () {
                 // sadly, we cannot feature detect this...
                 return Ext.isIE || Ext.isGecko || Ext.webKitVersion >= 534.16; // Chrome 10+
-            }
+            },
+            early: true
         },
 
         /**
@@ -746,11 +810,13 @@ Ext.supports = {
          * @type {Boolean}
          */
         {
+            // support Vector 30
             identity: 'TextAreaMaxLength',
-            fn: function(){
-                var el = document.createElement('textarea');
+            fn: function(doc) {
+                var el = doc.createElement('textarea');
                 return ('maxlength' in el);
-            }
+            },
+            early: true
         },
         /**
          * @property GetPositionPercentage True if the browser will return the left/top/right/bottom
@@ -759,6 +825,7 @@ Ext.supports = {
          */
         // Related bug: https://bugzilla.mozilla.org/show_bug.cgi?id=707691#c7
         {
+            // support Vector 31
             identity: 'GetPositionPercentage',
             fn: function(doc, div){
                return getStyle(div.childNodes[2], 'left') == '10%';
@@ -774,6 +841,7 @@ Ext.supports = {
          * @private
          */
         {
+            // support Vector 32
             identity: 'PercentageHeightOverflowBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -818,6 +886,7 @@ Ext.supports = {
          * @private
          */
         {
+            // support Vector 33
             identity: 'xOriginBug',
             fn: function(doc, div) {
                div.innerHTML = '<div id="b1" style="height:100px;width:100px;direction:rtl;position:relative;overflow:scroll">' +
@@ -844,6 +913,7 @@ Ext.supports = {
          * This method returns true if the browser is affected by this bug.
          */
         {
+            // support Vector 34
             identity: 'ScrollWidthInlinePaddingBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -866,6 +936,54 @@ Ext.supports = {
                 doc.body.removeChild(el);
                 
                 return hasBug;
+            }
+        },
+
+        /**
+         * @property {Boolean} rtlVertScrollbarOnRight
+         * Safari, in RTL mode keeps the scrollbar at the right side.
+         * This means that when two elements must keep their left/right positions synched, if one has no vert
+         * scrollbar, it must have some extra padding.
+         * See https://sencha.jira.com/browse/EXTJSIV-11245
+         *
+         * @private
+         */
+        {
+            identity: 'rtlVertScrollbarOnRight',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:scroll">' +
+                    '<div style="width:20px;height:200px;"></div>' +
+                '</div>';
+
+                var outerBox = div.firstChild,
+                    innerBox = outerBox.firstChild;
+
+                return (innerBox.offsetLeft + innerBox.offsetWidth !== outerBox.offsetLeft + outerBox.offsetWidth);
+            }
+        },
+
+        /**
+         * @property {Boolean} rtlVertScrollbarOverflowBug
+         * In Chrome, in RTL mode, horizontal overflow only into the vertical scrollbar does NOT trigger horizontal scrollability.
+         * See https://code.google.com/p/chromium/issues/detail?id=179332
+         * We need to detect this for when a grid header needs to have exactly the same horizontal scrolling range as its table view.
+         * See {@link Ext.grid.ColumnLayout#beginLayout}
+         * TODO: Remove this when all supported Chrome versions are fixed.
+         *
+         * @private
+         */
+        {
+            identity: 'rtlVertScrollbarOverflowBug',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:auto">' +
+                    '<div style="width:95px;height:200px;"></div>' +
+                '</div>';
+
+                // If the bug is present, the 95 pixel wide inner div, encroaches into the
+                // vertical scrollbar, but does NOT trigger horizontal overflow, so the clientHeight remains
+                // equal to the offset height.
+                var outerBox = div.firstChild;
+                return outerBox.clientHeight === outerBox.offsetHeight;
             }
         }
     ]

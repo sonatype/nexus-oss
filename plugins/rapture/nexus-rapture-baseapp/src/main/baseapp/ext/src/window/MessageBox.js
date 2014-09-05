@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @define Ext.MessageBox, Ext.Msg
 
@@ -44,10 +44,19 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *
  *     @example
  *     Ext.Msg.show({
- *          title:'Save Changes?',
- *          msg: 'You are closing a tab that has unsaved changes. Would you like to save your changes?',
- *          buttons: Ext.Msg.YESNOCANCEL,
- *          icon: Ext.Msg.QUESTION
+ *         title:'Save Changes?',
+ *         msg: 'You are closing a tab that has unsaved changes. Would you like to save your changes?',
+ *         buttons: Ext.Msg.YESNOCANCEL,
+ *         icon: Ext.Msg.QUESTION,
+ *         fn: function(btn) {
+ *             if (btn === 'yes') {
+ *                 console.log('Yes pressed');
+ *             } else if (btn === 'no') {
+ *                 console.log('No pressed');
+ *             } else {
+ *                 console.log('Cancel pressed');
+ *             } 
+ *         }
  *     });
  */
 Ext.define('Ext.window.MessageBox', {
@@ -237,7 +246,7 @@ Ext.define('Ext.window.MessageBox', {
 
     hide: function() {
         var me = this,
-            cls = me.cfg.cls;
+            cls = me.cfg ? me.cfg.cls : '';
 
         me.progressBar.reset();
         if (cls) {
@@ -264,7 +273,9 @@ Ext.define('Ext.window.MessageBox', {
             baseId = me.id,
             i, button;
 
-        me.title = '&#160;';
+        // A title or iconCls could have been passed in the config to the constructor.
+        me.title = me.title || '&#160;';
+        me.iconCls = me.iconCls || '';
 
         me.topContainer = new Ext.container.Container({
             layout: 'hbox',
@@ -362,8 +373,10 @@ Ext.define('Ext.window.MessageBox', {
             hideToolbar = true,
             oldButtonText = me.buttonText,
             resizer = me.resizer,
-            resizeTracker, width, height, i, textArea, textField,
-            msg, progressBar, msgButtons;
+            header = me.header,
+            headerCfg = header && !header.isHeader,
+            resizeTracker, title, width, height, i, textArea,
+            textField, msg, progressBar, msgButtons;
 
         // Restore default buttonText before reconfiguring.
         me.updateButtonText();
@@ -403,9 +416,13 @@ Ext.define('Ext.window.MessageBox', {
         // Defaults to modal
         me.modal = cfg.modal !== false;
 
-        // Show the title/icon
-        me.setTitle(cfg.title || '');
-        me.setIconCls(cfg.iconCls || '');
+        // Show the title/icon if a title/iconCls config was passed in the config to either the constructor
+        // or the show() method. Note that anything passed in the config should win.
+        //
+        // Note that if there is no title/iconCls in the config, check the headerCfg and default to the instance
+        // properties. This works because there are default values defined in initComponent.
+        me.setTitle(cfg.title || (headerCfg && header.title) || me.title);
+        me.setIconCls(cfg.iconCls || (headerCfg && header.iconCls) || me.iconCls);
 
         // Extract button configs
         if (Ext.isObject(cfg.buttons)) {
@@ -444,13 +461,19 @@ Ext.define('Ext.window.MessageBox', {
 
         // Hide or show the close tool
         me.closable = cfg.closable !== false && !cfg.wait;
-        me.header.child('[type=close]').setVisible(me.closable);
 
-        // Hide or show the header
-        if (!cfg.title && !me.closable && !cfg.iconCls) {
-            me.header.hide();
-        } else {
-            me.header.show();
+        // We need to redefine `header` because me.setIconCls() could create a Header instance.
+        header = me.header;
+
+        if (header) {
+            header.child('[type=close]').setVisible(me.closable);
+
+            // Hide or show the header
+            if (!cfg.title && !me.closable && !cfg.iconCls) {
+                header.hide();
+            } else {
+                header.show();
+            }
         }
 
         // Default to dynamic drag: drag the window, not a ghost
@@ -707,6 +730,8 @@ Ext.define('Ext.window.MessageBox', {
         var me = this,
             visibleFocusables;
 
+        cfg = cfg || {};
+
         // If called during global layout suspension, make the call after layout resumption
         if (Ext.AbstractComponent.layoutSuspendCount) {
             Ext.on({
@@ -946,7 +971,7 @@ Ext.define('Ext.window.MessageBox', {
      * @alternateClassName Ext.Msg
      * @extends Ext.window.MessageBox
      * @singleton
-     * Singleton instance of {@link Ext.window.MessageBox}.
+     * @inheritdoc Ext.window.MessageBox
      */
     Ext.MessageBox = Ext.Msg = new this();
 });

@@ -73,6 +73,7 @@
         Compile from sources and appending to stubs containing just the license header.
         -->
         <x-sencha-command dir="${basedir}">
+            <![CDATA[
             compile
                 -ignore=diag
 
@@ -271,7 +272,6 @@
                     and
                     concatenate
                         +append
-                        +yui
                         -output-file=${build.dir}/ext.js
                     and
                     concatenate
@@ -288,9 +288,39 @@
                         +append
                         +yui
                         -output-file=${build.dir}/builds/ext-foundation.js
-            
+                    
+                    and
+                    include
+                        +all
+                    and
+                    exclude
+                        -tag=core
+                    and
+        
+                    metadata
+                        +append
+                        +alternates
+                        -base-path=${build.dir}
+                        -output-file=${build.dir}/ext.js
+                    and
+                    metadata
+                        +append
+                        +alias
+                        -base-path=${build.dir}
+                        -output-file=${build.dir}/ext.js
+            ]]>
         </x-sencha-command>
 
+        <x-compress-js srcfile="${build.dir}/ext.js"
+                       outfile="${build.dir}/ext.js"/>
+
+        <move file="${build.dir}/ext.js" tofile="${build.dir}/ext.js.was"/>
+        <concat destfile="${build.dir}/ext.js">
+            <fileset file="${build.dir}/file-header.js"/>
+            <fileset file="${build.dir}/ext.js.was"/>
+        </concat>
+        <delete file="${build.dir}/ext.js.was"/>
+        
         <!--
         Strip comments and compress all flavors.
         -->

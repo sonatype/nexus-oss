@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a time input field with a time dropdown and automatic time validation.
@@ -133,8 +133,13 @@ Ext.define('Ext.form.field.Time', {
     //</locale>
 
     /**
-     * @cfg {Number} increment
+     * @cfg {Number} [increment=15]
      * The number of minutes between each time value in the list.
+     *
+     * Note that this only affects the *list of suggested times.*
+     *
+     * To enforce that only times on the list are valid, use {@link #snapToIncrement}. That will coerce
+     * any typed values to the nearest increment point upon blur.
      */
     increment: 15,
 
@@ -149,10 +154,12 @@ Ext.define('Ext.form.field.Time', {
      * Whether the Tab key should select the currently highlighted item.
      */
     selectOnTab: true,
-    
+
     /**
      * @cfg {Boolean} [snapToIncrement=false]
      * Specify as `true` to enforce that only values on the {@link #increment} boundary are accepted.
+     *
+     * Typed values will be coerced to the nearest {@link #increment} point on blur.
      */
     snapToIncrement: false,
 
@@ -178,12 +185,16 @@ Ext.define('Ext.form.field.Time', {
         var me = this,
             min = me.minValue,
             max = me.maxValue;
+        
         if (min) {
             me.setMinValue(min);
         }
         if (max) {
             me.setMaxValue(max);
         }
+        // Forcibly create the picker, since we need the store it creates
+        me.store = me.getPicker().store;
+        
         me.displayTpl = new Ext.XTemplate(
             '<tpl for=".">' +
                 '{[typeof values === "string" ? values : this.formatDate(values["' + me.displayField + '"])]}' +
@@ -191,7 +202,7 @@ Ext.define('Ext.form.field.Time', {
             '</tpl>', {
             formatDate: Ext.Function.bind(me.formatDate, me)
         });
-        this.callParent();
+        me.callParent();
     },
 
     /**
@@ -280,9 +291,10 @@ Ext.define('Ext.form.field.Time', {
         me[isMin ? 'minValue' : 'maxValue'] = val;
     },
     
-    getInitDate: function(hours, minutes) {
+    getInitDate: function (hours, minutes, seconds) {
         var parts = this.initDateParts;
-        return new Date(parts[0], parts[1], parts[2], hours || 0, minutes || 0, 0, 0);    
+
+        return new Date(parts[0], parts[1], parts[2], hours || 0, minutes || 0, seconds || 0, 0);    
     },
 
     valueToRaw: function(value) {
@@ -427,7 +439,6 @@ Ext.define('Ext.form.field.Time', {
             maxHeight: me.pickerMaxHeight
         }, me.listConfig);
         picker = me.callParent();
-        me.bindStore(picker.store);
         return picker;
     },
     
@@ -486,7 +497,10 @@ Ext.define('Ext.form.field.Time', {
                                }
                            }
                         }
-                        selModel.select(toSelect);
+
+                        if (toSelect.length) {
+                            selModel.select(toSelect);
+                        }
                     }
                 }
             }
@@ -536,11 +550,12 @@ Ext.define('Ext.form.field.Time', {
         return me.parseDate(item);
     },
 
-    setValue: function(v) {
-        // Store MUST be created for parent setValue to function
+    setValue: function (v) {
+        // Store MUST be created for parent setValue to function.
         this.getPicker();
+
         if (Ext.isDate(v)) {
-            v = this.getInitDate(v.getHours(), v.getMinutes());
+            v = this.getInitDate(v.getHours(), v.getMinutes(), v.getSeconds());
         }
 
         return this.callParent([v]);

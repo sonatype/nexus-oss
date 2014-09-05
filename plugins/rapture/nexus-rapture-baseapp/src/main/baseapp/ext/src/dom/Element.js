@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag dom,core
 /**
@@ -90,7 +90,12 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  * For working with collections of Elements, see {@link Ext.CompositeElement}
  *
  * @constructor
- * Creates new Element directly.
+ * Creates new Element directly by passing an id or the HTMLElement.
+ *
+ *     var el = new Ext.dom.Element('foo');
+ *
+ *     var el = Ext.create('Ext.dom.Element', document.getElementById('foo'));
+ *
  * @param {String/HTMLElement} element
  * @param {Boolean} [forceNew] By default the constructor checks to see if there is already an instance of this
  * element in the cache and if there is it returns the same instance. This will skip that check (useful for extending
@@ -146,6 +151,8 @@ Ext.define('Ext.dom.Element', function(Element) {
             'Ext.dom.Element_style'
         ],
         
+        isElement: true,
+
         tableTagRe: /^(?:tr|td|table|tbody)$/i,
 
         mixins: [
@@ -169,6 +176,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 if (Number(defer)) {
                     Ext.defer(me.focus, defer, me, [null, dom]);
                 } else {
+                    Ext.globalEvents.fireEvent('beforefocus', dom);
                     dom.focus();
                 }
             } catch(e) {
@@ -202,10 +210,11 @@ Ext.define('Ext.dom.Element', function(Element) {
         */
         isBorderBox: function() {
             var box = Ext.isBorderBox;
-            
-            // IE6/7 force input elements to content-box even if border-box is set explicitly
-            if (box && Ext.isIE7m) {
-                box = !((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
+
+            // In IE6/7 "strict" when we cannot enforce border box model, certain
+            // elements still use border box model. These are enumerated in noBoxAdjust.
+            if (Ext.isIE7m && !box) {
+                box = ((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
             }
             return box;
         },
@@ -375,12 +384,14 @@ Ext.define('Ext.dom.Element', function(Element) {
 
         /**
         * Puts a mask over this element to disable user interaction. Requires core.css.
-        * This method can only be applied to elements which accept child nodes.
+        * This method can only be applied to elements which accept child nodes. Use 
+        * {@link #unmask} to remove the mask.
+        * 
         * @param {String} [msg] A message to display in the mask
         * @param {String} [msgCls] A css class to apply to the msg element
         * @return {Ext.dom.Element} The mask element
         */
-        mask : function(msg, msgCls /* private - passed by AbstractComponent.mask to avoid the need to interrogate the DOM to get the height*/, elHeight) {
+        mask: function (msg, msgCls /* private - passed by AbstractComponent.mask to avoid the need to interrogate the DOM to get the height*/, elHeight) {
             var me            = this,
                 dom           = me.dom,
                 // In some cases, setExpression will exist but not be of a function type,
@@ -459,10 +470,8 @@ Ext.define('Ext.dom.Element', function(Element) {
             // Older IE browsers in quirks mode will not get the fixed-mask class but
             // instead will use CSS expressions to achieve the same result (see below).
             // See EXTJSIV-10726.
-            if (Ext.isStrict && !Ext.isIE6) {
-                if (dom === DOC.body) {
-                    maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
-                }
+            if (Ext.isStrict && !Ext.isIE6 && (dom === DOC.body)) {
+                maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
             }
 
             // NOTE: CSS expressions are resource intensive and to be used only as a last resort
@@ -1546,7 +1555,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 // A tabIndex of -1 means it has to be programatically focused, so that needs FocusManager,
                 // and it has to be the focus holding el of a Component within the Component tree.
                 if (tabIndex == -1) { // note that the value is a string
-                    canFocus = Ext.FocusManager && Ext.FocusManager.enabled && asFocusEl;
+                    canFocus = Ext.enableFocusManager && asFocusEl;
                 }
                 else {
                     // See if it's a naturally focusable element

@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A time picker which provides a list of times from which to choose. This is used by the Ext.form.field.Time
@@ -183,7 +183,8 @@ Ext.define('Ext.picker.Time', {
         }
 
         return new Ext.data.Store({
-            fields: ['disp', 'date'],
+            model: me.modelType,
+            autoDestroy: true,
             data: times
         });
     },
@@ -193,5 +194,9 @@ Ext.define('Ext.picker.Time', {
         // so this is here to prevent focus of the boundlist view. See EXTJSIV-7319.
         return false;
     }
-
+}, function() {
+    this.prototype.modelType = Ext.define(null, {
+        extend: 'Ext.data.Model',
+        fields: ['disp', 'date']
+    });
 });

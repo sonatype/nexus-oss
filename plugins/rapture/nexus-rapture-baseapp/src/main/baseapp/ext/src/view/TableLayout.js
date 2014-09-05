@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  *  Component layout for {@link Ext.view.Table}
@@ -112,61 +112,98 @@ Ext.define('Ext.view.TableLayout', {
     },
 
     setColumnWidths: function(ownerContext) {
+        // No content to size. We're done
+        if (!this.owner.body.dom) {
+            return true;
+        }
+
         var me = this,
             owner = me.owner,
             context = ownerContext.context,
             columns = me.headerCt.getVisibleGridColumns(),
             column,
-            i = 0, len = columns.length,
+            i,
+            len = columns.length,
             tableWidth = 0,
             columnLineWidth = 0,
             childContext,
             colWidth,
-            isContentBox = !Ext.isBorderBox;
+            isContentBox = !Ext.isBorderBox,
+            colGroup = owner.body.dom.firstChild,
+            isColGroup = colGroup.tagName.toUpperCase() === 'COLGROUP',
+            changedColumns = [];
 
         // So that the setProp can trigger this layout.
         if (context) {
             context.currentLayout = me;
         }
 
-        // Set column width corresponding to each header
+        // Collect columns which have a changed width
         for (i = 0; i < len; i++) {
             column = columns[i];
             childContext = context.getCmp(column);
-            colWidth = childContext.props.width;
-            if (isNaN(colWidth)) {
-                // We don't have a width set, so we need to trigger when this child
-                // actually gets a width assigned so we can continue. Technically this
-                // shouldn't happen however we have a bug inside ColumnLayout where
-                // columnWidthsDone is set incorrectly. This is just a workaround.
-                childContext.getProp('width');
-                return false;
+
+            // Only bother with columns with changed width since last fluch of ColumnLayout, or since last setColumnWidths call.
+            if (!column.lastBox || column.lastBox.invalid || childContext.props.width !== column.lastBox.width || (childContext.cellWidth && childContext.cellWidth != childContext.props.width)) {
+                colWidth = childContext.props.width;
+                if (isNaN(colWidth)) {
+                    // We don't have a width set, so we need to trigger when this child
+                    // actually gets a width assigned so we can continue. Technically this
+                    // shouldn't happen however we have a bug inside ColumnLayout where
+                    // columnWidthsDone is set incorrectly. This is just a workaround.
+                    childContext.getProp('width');
+                    return false;
+                }
+                tableWidth += colWidth;
+                childContext.columnIndex = i;
+                changedColumns.push(childContext);
+            } else {
+                tableWidth += column.lastBox.width;
             }
-            tableWidth += colWidth;
+
+            // Track flushed cell width so we can check for changes.
+            childContext.cellWidth = childContext.props.width;
+        }
+
+        // If no columns need changing, we're done
+        len = changedColumns.length;
+        if (!len) {
+            return true;
+        }
+
+        // Set width of main table
+        owner.body.setWidth(tableWidth);
+
+        // Set column width corresponding to each header
+        for (i = 0; i < len; i++) {
+            childContext = changedColumns[i];
+            colWidth = childContext.props.width;
+
             // https://sencha.jira.com/browse/EXTJSIV-9263 - Browsers which cannot be switched to border box when doctype present (IE6 & IE7) - must subtract borders width from width of cells.
+            // TODO: Remove this when IE7 & IE7 are dropped.
             if (isContentBox && owner.columnLines) {
-                // https://sencha.jira.com/browse/EXTJSIV-9744 - default border width to 1 because
-                // We are looking at the *header* border widths and Neptune, being a borderless theme
-                // omits the border from the last column *HEADER*. But we are interrogating that to
-                // know the width of border lines between cells which are not omitted.
                 if (!columnLineWidth) {
-                    columnLineWidth = context.getCmp(column).borderInfo.width || 1;
+                    columnLineWidth = ownerContext.headerContext.childItems[0].borderInfo.width;
                 }
                 colWidth -= columnLineWidth;
             }
 
-            // Select column sizing <col> elements within every <table> within the grid.
-            // 90% of the time, there will be only one table.
-            // The RowWrap and Summary Features embed tables within colspanning cells, and these also
-            // get <colgroup><col></colgroup> sizers which need updating.
+            // Resize the <col> elements within the single <colgroup> element which is at the top of a grid's <table>
+            // WHEN IT IS NOT USING RowWrap.
             // On IE8, sizing <col> elements to control column width was about 2.25 times
             // faster than selecting all the cells in the column to be resized.
             // Column sizing using dynamic CSS rules is *extremely* expensive on IE.
-            owner.body.select(owner.getColumnSizerSelector(column)).setWidth(colWidth);
+            if (isColGroup) {
+                colGroup.childNodes[childContext.columnIndex].style.width = colWidth + 'px';
+            }
 
+            // This will be the slow bit.
+            // Sizing changed columns using DomQuery.
+            if (owner.features.length) {
+                owner.body.select(owner.getColumnSizerSelector(childContext.target)).setWidth(colWidth);
+            }
         }
-        // Set widths of all tables (includes tables embedded in RowWrap and Summary rows)
-        owner.el.select(owner.getBodySelector()).setWidth(tableWidth);
+
         return true;
     },
 

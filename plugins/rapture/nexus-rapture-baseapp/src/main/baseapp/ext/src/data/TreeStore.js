@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * The TreeStore is a store implementation that is backed by by an {@link Ext.data.Tree}.
@@ -24,7 +24,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *
  * # Using Models
  *
- * If no Model is specified, an implicit model will be created that implements {@link Ext.data.NodeInterface}.
+ * If no Model is specified, an implicit model will be created that extends {@link Ext.data.TreeModel}.
  * The standard Tree fields will also be copied onto the Model for maintaining their state. These fields are listed
  * in the {@link Ext.data.NodeInterface} documentation.
  *
@@ -42,11 +42,12 @@ Ext.define('Ext.data.TreeStore', {
     requires: [
         'Ext.util.Sorter',
         'Ext.data.Tree',
+        'Ext.data.TreeModel',
         'Ext.data.NodeInterface'
     ],
 
     /**
-     * @cfg {Ext.data.Model/Ext.data.NodeInterface/Object} root
+     * @cfg {Ext.data.TreeModel/Ext.data.NodeInterface/Object} root
      * The root node for this store. For example:
      *
      *     root: {
@@ -65,7 +66,7 @@ Ext.define('Ext.data.TreeStore', {
 
     /**
      * @cfg {Boolean} [clearOnLoad=true]
-     * Remove previously existing child nodes before loading. 
+     * Remove previously existing child nodes before loading.
      */
     clearOnLoad : true,
 
@@ -87,7 +88,7 @@ Ext.define('Ext.data.TreeStore', {
      * The default root id.
      */
     defaultRootId: 'root',
-    
+
     /**
      * @cfg {String} [defaultRootText="Root"]
      * The default root text (if not specified)/
@@ -96,13 +97,34 @@ Ext.define('Ext.data.TreeStore', {
 
     /**
      * @cfg {String} [defaultRootProperty="children"]
-     * The root property to specify on the reader if one is not explicitly defined.
+     * The root property to specify on the automatically generated {@link Ext.data.Reader Reader} used to extract
+     * child nodes from a raw data packet if one is not explicitly defined in the configured {@link #cfg-proxy}.
+     *
+     * If the nodes in this store may be of different types (a heterogeneous tree), then it is possible that node
+     * data at different levels may use different property names to reference an array of child nodes.
+     *
+     * To handle this situation, configure the {@link Ext.data.TreeModel} subclasses with a specific
+     * {@link Ext.data.TreeModel#cfg-proxy proxy} which contains a reader definition:
+     *
+     *    Ext.define('myApp.Folder', {
+     *        extend: 'Ext.data.TreeModel',
+     *
+     *        // When loading child nodes for a Folder we look at the "files" property of the incoming object.
+     *        proxy: {
+     *            type: 'ajax',
+     *            reader: {
+     *                root: 'files'
+     *            }
+     *        },
+     *
+     *        fields: [{
+     *            name: 'text',
+     *            mapping: 'directoryName'
+     *        }]
+     *    });
      */
     defaultRootProperty: 'children',
-    
-    // Keep a copy of the default so we know if it's been changed in a subclass/config
-    rootProperty: 'children',
-    
+
     fillCount: 0,
 
     /**
@@ -115,35 +137,52 @@ Ext.define('Ext.data.TreeStore', {
         var me = this,
             root,
             fields,
-            defaultRoot;
+            model;
 
         config = Ext.apply({}, config);
 
         /**
-         * If we have no fields declare for the store, add some defaults.
-         * These will be ignored if a model is explicitly specified.
+         * @cfg {Object[]} [fields]
+         * If you wish to create a Tree*Grid*, and configure your tree with a {@link Ext.panel.Table#cfg-columns} columns configuration,
+         * it is possilble to define the set of fields you wish to use in the Store instead of configuting the store with a {@link #cfg-model}.
+         *
+         * By default, the Store uses an {@link Ext.data.TreeModel}. If you configure fields, it uses a subclass of {@link Ext.data.TreeModel}
+         * defined with the set of fields that you specify (In addition to the fields which it uses for storing internal state).
          */
         fields = config.fields || me.fields;
-        if (!fields) {
-            config.fields = [
-                {name: 'text', type: 'string'}
-            ];
-            defaultRoot = config.defaultRootProperty || me.defaultRootProperty;
-            if (defaultRoot !== me.defaultRootProperty) {
-                config.fields.push({
-                    name: defaultRoot,   
-                    type: 'auto',   
-                    defaultValue: null, 
+        model = config.model || me.model;
+
+        // If not using a configured or prototype Model, we should use a subclass of Ext.data.TreeModel.
+        if (!model) {
+            if (!fields) {
+                fields = [{
+                    name: 'text', type: 'string'
+                }];
+            }
+            if (me.defaultRootProperty !== me.self.prototype.defaultRootProperty) {
+                fields.push({
+                    name: me.defaultRootProperty,
+                    type: 'auto',
+                    defaultValue: null,
                     persist: false
                 });
             }
+
+            // Our model will be a subclass of Ext.data.TreeModel augmented with the necessary fields.
+            config.model = Ext.define(null, {
+                extend: 'Ext.data.TreeModel',
+                fields: fields,
+                proxy: me.proxy || me.defaultProxyType
+            });
+            delete me.fields;
+            me.implicitModel = true;
         }
 
         me.callParent([config]);
 
         // We create our data tree.
         me.tree = new Ext.data.Tree();
-        
+
         // data tree has an upward link
         me.tree.treeStore = me;
 
@@ -201,17 +240,6 @@ Ext.define('Ext.data.TreeStore', {
          * @inheritdoc Ext.data.Tree#sort
          */
 
-        me.tree.on({
-            scope: me,
-            remove: me.onNodeRemove,
-            // this event must follow the relay to beforeitemexpand to allow users to
-            // cancel the expand:
-            beforeexpand: me.onBeforeNodeExpand,
-            append: me.onNodeAdded,
-            insert: me.onNodeAdded,
-            sort: me.onNodeSort
-        });
-
         me.onBeforeSort();
 
         root = me.root;
@@ -231,7 +259,10 @@ Ext.define('Ext.data.TreeStore', {
         //</deprecated>
     },
 
-    // inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     setProxy: function(proxy) {
         var reader,
             needsRoot;
@@ -263,7 +294,71 @@ Ext.define('Ext.data.TreeStore', {
         return proxy;
     },
 
-    // inherit docs
+    /**
+     * @inheritdoc Ext.data.Store#filter
+     */
+    filter: function(filters, value) {
+        if (Ext.isString(filters)) {
+            filters = {
+                property: filters,
+                value: value
+            };
+        }
+
+        var me = this,
+            decoded = me.decodeFilters(filters),
+            i,
+            length = decoded.length,
+            root = me.getRootNode(),
+            filteredNodes;
+
+        // Merge new filters into current filter set.
+        for (i = 0; i < length; i++) {
+            me.filters.replace(decoded[i]);
+        }
+
+        filters = me.filters.items;
+
+        if (filters.length) {
+            filteredNodes = [];
+            me.filterFn = Ext.util.Filter.createFilterFn(filters);
+
+            root.cascadeBy({
+                after: function(node) {
+                    node.set('visible', me.filterFn(node));
+                }
+            });
+            for (i = 0, length = root.childNodes.length; i < length; i++) {
+                if (root.childNodes[i].get('visible')) {
+                    filteredNodes.push(root.childNodes[i]);
+                }
+            }
+
+            me.fireEvent('datachanged', me);
+            me.fireEvent('refresh', me);
+        } else {
+            filteredNodes = root.childNodes;
+        }
+        root.fireEvent('filterchange', root, filteredNodes);
+        me.fireEvent('filterchange', me, filters);
+    },
+
+    /**
+     * @inheritdoc Ext.data.Store#clearFilter
+     */
+    clearFilter: function() {
+        var me = this,
+            root = me.getRootNode();
+
+        me.filters.clear();
+        me.filterFn = null;
+        root.cascadeBy(function(node) {
+            node.set('visible', true);
+        });
+        root.fireEvent('filterchange', root, root.childNodes);
+        me.fireEvent('filterchange', me, []);
+    },
+
     onBeforeSort: function() {
         if (this.folderSort) {
             this.sort({
@@ -287,21 +382,13 @@ Ext.define('Ext.data.TreeStore', {
      */
     onBeforeNodeExpand: function(node, callback, scope, args) {
         var me = this,
-            reader, dataRoot, data,
+            reader = me.proxy.getReader(),
+            children,
             callbackArgs;
-        
-        // Children are loaded go ahead with expand
+
+        // childNodes are loaded: go ahead with expand
+        // This will also expand phantom nodes with childNodes.
         if (node.isLoaded()) {
-            callbackArgs = [node.childNodes];
-            if (args) {
-                callbackArgs.push.apply(callbackArgs, args);
-            }
-            Ext.callback(callback, scope || node, callbackArgs);
-        }
-        // There are unloaded child nodes in the raw data because of the lazy configuration, load them then call back.
-        else if (dataRoot = (data = (node.raw || node[node.persistenceProperty])[(reader = me.getProxy().getReader()).root])) {
-            me.fillNode(node, reader.extractData(dataRoot));
-            delete data[reader.root];
             callbackArgs = [node.childNodes];
             if (args) {
                 callbackArgs.push.apply(callbackArgs, args);
@@ -321,32 +408,59 @@ Ext.define('Ext.data.TreeStore', {
                 priority: 1001
             });
         }
-        // Node needs loading
+        // There are unloaded child nodes in the raw data because of the lazy configuration, load them then call back.
         else {
-            me.read({
-                node: node,
-                // We use internalCallback here because we want trigger to
-                // the loading event after we've loaded children
-                internalCallback: function() {
-                    // Clear the callback, since if we're introducing a custom one,
-                    // it may be re-used on reload
-                    delete me.lastOptions.internalCallback;
-                    callbackArgs = [node.childNodes];
-                    if (args) {
-                        callbackArgs.push.apply(callbackArgs, args);
-                    }
-                    Ext.callback(callback, scope || node, callbackArgs);
+            // 1. If the raw data read in for the node contains a root (children array), then read it.
+            // 2. If a phantom w/o any children, it should still be processed if expanded so check for
+            //    that here as well. See EXTJS-13509.
+            children = reader.getRoot(node.raw || node[node.persistenceProperty]);
+
+            if (children || node.phantom) {
+                if (children) {
+                    me.fillNode(node, reader.extractData(children));
                 }
-            });
+
+                callbackArgs = [node.childNodes];
+
+                if (args) {
+                    callbackArgs.push.apply(callbackArgs, args);
+                }
+
+                Ext.callback(callback, scope || node, callbackArgs);
+            }
+            // Node needs loading
+            else {
+                me.read({
+                    node: node,
+                    // We use internalCallback here because we want trigger to
+                    // the loading event after we've loaded children
+                    internalCallback: function() {
+                        // Clear the callback, since if we're introducing a custom one,
+                        // it may be re-used on reload
+                        delete me.lastOptions.internalCallback;
+                        callbackArgs = [node.childNodes];
+                        if (args) {
+                            callbackArgs.push.apply(callbackArgs, args);
+                        }
+                        Ext.callback(callback, scope || node, callbackArgs);
+                    }
+                });
+            }
         }
     },
 
-    //inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     getNewRecords: function() {
         return Ext.Array.filter(this.tree.flatten(), this.filterNew);
     },
 
-    //inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     getUpdatedRecords: function() {
         return Ext.Array.filter(this.tree.flatten(), this.filterUpdated);
     },
@@ -358,7 +472,7 @@ Ext.define('Ext.data.TreeStore', {
         // Phantom nodes should never be included in the removed collection.
         // Also, if we're moving a node a remove will be fired, however we'll
         // be inserting it again, so don't push it into the removed collection
-        if (!node.phantom && !isMove) {
+        if (!node.phantom && !isMove && !me.loading) {
             Ext.Array.include(me.removed, node);
         }
 
@@ -369,20 +483,28 @@ Ext.define('Ext.data.TreeStore', {
 
     onNodeAdded: function(parent, node) {
         var me = this,
-            proxy = me.getProxy(),
-            reader = proxy.getReader(),
+            reader = me.proxy.getReader(),
             data = node.raw || node[node.persistenceProperty],
-            dataRoot;
+            dataRoot,
+            isVisible;
+
+        if (me.filterFn) {
+            isVisible = me.filterFn(node);
+            node.set('visible', isVisible);
+
+            // If a node which passes the filter is added to a parent node
+            if (isVisible) {
+                parent.set('visible', me.filterFn(parent));
+            }
+        }
 
         Ext.Array.remove(me.removed, node);
         node.join(me);
 
-        // If node has raw data, load the child nodes from it.
-        if (!node.isLeaf() && !me.lazyFill) {
+        if (!node.isLeaf() && !node.isLoaded() && !me.lazyFill) {
             dataRoot = reader.getRoot(data);
             if (dataRoot) {
                 me.fillNode(node, reader.extractData(dataRoot));
-                delete data[reader.root];
             }
         }
 
@@ -399,36 +521,43 @@ Ext.define('Ext.data.TreeStore', {
 
     /**
      * Sets the root node for this store.  See also the {@link #root} config option.
-     * @param {Ext.data.Model/Ext.data.NodeInterface/Object} root
+     * @param {Ext.data.TreeModel/Ext.data.NodeInterface/Object} root
      * @return {Ext.data.NodeInterface} The new root
      */
     setRootNode: function(root, /* private */ preventLoad) {
         var me = this,
             model = me.model,
-            idProperty = model.prototype.idProperty
+            idProperty = model.prototype.idProperty;
 
-        root = root || {};
-        if (!root.isModel) {
-            root = Ext.apply({}, root);
-            // create a default rootNode and create internal data struct.
-            Ext.applyIf(root, {
-                id: me.defaultRootId,
-                text: me.defaultRootText,
-                allowDrag: false
-            });
-            if (root[idProperty] === undefined) {
-                root[idProperty] = me.defaultRootId;
-            }
-            Ext.data.NodeInterface.decorate(model);
-            root = Ext.ModelManager.create(root, model);
-        } else if (root.isModel && !root.isNode) {
+        // Ensure that the model has the required fields to function as a tree node.
+        if (!model.prototype.isNode) {
             Ext.data.NodeInterface.decorate(model);
         }
 
+        // Convert to a node. Even if they are passing a normal Model, the Model will not yet
+        // have been decorated with the constructor which initializes properties, so we always
+        // have to construct a new node if the passed root is not a Node.
+        if (!root || !root.isNode) {
+            // create a default rootNode and create internal data struct.
+            root = Ext.apply({
+                id: me.defaultRootId,
+                text: me.defaultRootText,
+                allowDrag: false
+            }, root);
+            if (root[idProperty] === undefined) {
+                root[idProperty] = me.defaultRootId;
+            }
+
+            // Create the root.
+            root = Ext.ModelManager.create(root, model);
+        }
 
         // Because we have decorated the model with new fields,
         // we need to build new extactor functions on the reader.
         me.getProxy().getReader().buildExtractors(true);
+
+        // Ensure the root node is filtered, registered and joined.
+        me.onNodeAdded(null, root);
 
         // When we add the root to the tree, it will automaticaly get the NodeInterface
         me.tree.setRootNode(root);
@@ -456,13 +585,13 @@ Ext.define('Ext.data.TreeStore', {
 
     /**
      * Returns the record node by id
+     * @param {String} id The id of the node to get.
      * @return {Ext.data.NodeInterface}
      */
     getNodeById: function(id) {
         return this.tree.getNodeById(id);
     },
 
-    // inherit docs
     getById: function(id) {
         return this.getNodeById(id);
     },
@@ -484,7 +613,7 @@ Ext.define('Ext.data.TreeStore', {
             scope = options.scope,
             operation;
 
-        // If there is not a node it means the user hasnt defined a rootnode yet. In this case let's just
+        // If there is not a node it means the user hasn't defined a root node yet. In this case let's just
         // create one for them.
         if (!node) {
             node = me.setRootNode({
@@ -513,7 +642,7 @@ Ext.define('Ext.data.TreeStore', {
 
                 // Call the original callback (if any)
                 Ext.callback(callback, scope, arguments);
-            }
+            };
         }
 
         // Assign the ID of the Operation so that a ServerProxy can set its idParam parameter,
@@ -532,19 +661,18 @@ Ext.define('Ext.data.TreeStore', {
         operation = new Ext.data.Operation(options);
 
         if (me.fireEvent('beforeload', me, operation) !== false) {
-             if (me.clearOnLoad) {
-                if(me.clearRemovedOnLoad) {
+
+            // Set the loading flag early
+            // Used by onNodeRemove to NOT add the removed nodes to the removed collection
+            me.loading = true;
+            if (me.clearOnLoad) {
+                if (me.clearRemovedOnLoad) {
                     // clear from the removed array any nodes that were descendants of the node being reloaded so that they do not get saved on next sync.
                     me.clearRemoved(node);
                 }
-                // temporarily remove the onNodeRemove event listener so that when removeAll is called, the removed nodes do not get added to the removed array
-                me.tree.un('remove', me.onNodeRemove, me);
                 // remove all the nodes
                 node.removeAll(false);
-                // reattach the onNodeRemove listener
-                me.tree.on('remove', me.onNodeRemove, me);
             }
-            me.loading = true;
             me.proxy.read(operation, me.onProxyLoad, me);
         }
 
@@ -614,50 +742,63 @@ Ext.define('Ext.data.TreeStore', {
      * Fills a node with a series of child records.
      * @private
      * @param {Ext.data.NodeInterface} node The node to fill
-     * @param {Ext.data.Model[]} newNodes The records to add
+     * @param {Ext.data.TreeModel[]} newNodes The records to add
      */
     fillNode: function(node, newNodes) {
         var me = this,
-            ln = newNodes ? newNodes.length : 0,
+            newNodeCount = newNodes ? newNodes.length : 0,
             sorters = me.sorters,
             i, sortCollection,
             needsIndexSort = false,
-            performLocalSort = ln && me.sortOnLoad && !me.remoteSort && sorters && sorters.items && sorters.items.length,
+            performLocalSort = me.sortOnLoad && !me.remoteSort && sorters && sorters.items && sorters.items.length,
             node1, node2, rootFill;
 
-        // See if there are any differing index values in the new nodes. If not, then we do not have to sortByIndex
-        for (i = 1; i < ln; i++) {
-            node1 = newNodes[i];
-            node2 = newNodes[i - 1];
-            needsIndexSort = node1[node1.persistenceProperty].index != node2[node2.persistenceProperty].index;
-            if (needsIndexSort) {
-                break;
-            }
-        }
+        if (newNodeCount) {
 
-        // If there is a set of local sorters defined.
-        if (performLocalSort) {
-            // If sorting by index is needed, sort by index first
-            if (needsIndexSort) {
-                me.sorters.insert(0, me.indexSorter);
+            // Apply any filter to the nodes as we fill
+            if (me.filterFn) {
+                newNodes[0].set('visible', me.filterFn(newNodes[0]));
             }
-            sortCollection = new Ext.util.MixedCollection();
-            sortCollection.addAll(newNodes);
-            sortCollection.sort(me.sorters.items);
-            newNodes = sortCollection.items;
 
-            // Remove the index sorter
-            me.sorters.remove(me.indexSorter);
-        } else if (needsIndexSort) {
-            Ext.Array.sort(newNodes, me.sortByIndex);
+            // See if there are any differing index values in the new nodes. If not, then we do not have to sortByIndex
+            for (i = 1; !needsIndexSort && i < newNodeCount; i++) {
+
+                node1 = newNodes[i];
+                node2 = newNodes[i - 1];
+
+                // Apply any filter to the nodes as we fill
+                if (me.filterFn) {
+                    node1.set('visible', me.filterFn(node1));
+                }
+                needsIndexSort = node1[node1.persistenceProperty].index !== node2[node2.persistenceProperty].index;
+            }
+
+            // If there is a set of local sorters defined.
+            if (performLocalSort) {
+                // If sorting by index is needed, sort by index first
+                if (needsIndexSort) {
+                    me.sorters.insert(0, me.indexSorter);
+                }
+                sortCollection = new Ext.util.MixedCollection();
+                sortCollection.addAll(newNodes);
+                sortCollection.sort(me.sorters.items);
+                newNodes = sortCollection.items;
+
+                // Remove the index sorter
+                me.sorters.remove(me.indexSorter);
+            } else if (needsIndexSort) {
+                Ext.Array.sort(newNodes, me.sortByIndex);
+            }
         }
 
         node.set('loaded', true);
-        
-        // Fill node gets called recursively (indirectly) as we're populating the
-        // nodes via a load or when appending a new child. As such, when we hit
-        // the top most node, we fire an event to let the view know we'll be doing
-        // a bulk operation so it can take appropriate action
+
+        // Fill node gets called recursively.
+        // The appendChild calls through to onNodeAdded for each of these newNodes.
+        // If this.lazyFill is false, that immediately loads locally available nodes from the raw data object captured for
+        // the newNode. That in turn calls fillNode.
+        // As such, when we hit the top most node, we fire an event to let any views know we'll be doing
+        // a bulk operation so they can take appropriate action.
         rootFill = me.fillCount === 0;
         if (rootFill) {
             // internal event
@@ -668,13 +809,13 @@ Ext.define('Ext.data.TreeStore', {
         if (newNodes.length) {
             node.appendChild(newNodes, undefined, true);
         }
-        
+
         if (rootFill) {
             // internal event
             me.fireEvent('fillcomplete', me, node, newNodes);
         }
         --me.fillCount;
-        
+
         return newNodes;
     },
 
@@ -688,13 +829,12 @@ Ext.define('Ext.data.TreeStore', {
     sortByIndex: function(node1, node2) {
         return node1[node1.persistenceProperty].index - node2[node2.persistenceProperty].index;
     },
-    
+
     onIdChanged: function(model, oldId, newId, oldInternalId){
         this.tree.onNodeIdChanged(model, oldId, newId, oldInternalId);
-        this.callParent(arguments);    
+        this.callParent(arguments);
     },
 
-    // inherit docs
     onProxyLoad: function(operation) {
         var me = this,
             successful = operation.wasSuccessful(),
@@ -718,7 +858,7 @@ Ext.define('Ext.data.TreeStore', {
          * Fires whenever the store reads data from a remote data source.
          * @param {Ext.data.TreeStore} this
          * @param {Ext.data.NodeInterface} node The node that was loaded.
-         * @param {Ext.data.Model[]} records An array of records.
+         * @param {Ext.data.TreeModel[]} records An array of records.
          * @param {Boolean} successful True if the operation was successful.
          */
         // deprecate read?
@@ -728,7 +868,7 @@ Ext.define('Ext.data.TreeStore', {
         //this is a callback that would have been passed to the 'read' function and is optional
         Ext.callback(operation.callback, scope, args);
     },
-    
+
     cleanRecords: function(node, records){
         var nodeHash = {},
             childNodes = node.childNodes,
@@ -736,23 +876,26 @@ Ext.define('Ext.data.TreeStore', {
             len  = childNodes.length,
             out = [],
             rec;
-            
+
         // build a hash of all the childNodes under the current node for performance
         for (; i < len; ++i) {
             nodeHash[childNodes[i].getId()] = true;
         }
-        
+
         for (i = 0, len = records.length; i < len; ++i) {
             rec = records[i];
             if (!nodeHash[rec.getId()]) {
-                out.push(rec);    
+                out.push(rec);
             }
         }
-        
+
         return out;
     },
 
-    // inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     removeAll: function() {
         var root = this.getRootNode();
         if (root) {
@@ -761,7 +904,6 @@ Ext.define('Ext.data.TreeStore', {
         this.fireEvent('clear', this);
     },
 
-    // inherit docs
     doSort: function(sorterFn) {
         var me = this;
         if (me.remoteSort) {

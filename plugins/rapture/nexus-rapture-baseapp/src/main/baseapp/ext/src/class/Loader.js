@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag foundation,core
 // @require ClassManager.js
@@ -523,6 +523,7 @@ Ext.Loader = new function() {
     var queue = [],
         isClassFileLoaded = {},
         isFileLoaded = {},
+        inFlight = {},
         classNameToFilePathMap = {},
         scriptElements = {},
         readyListeners = [],
@@ -638,12 +639,6 @@ Ext.Loader = new function() {
                 if (item) {
                     requires = item.requires;
 
-                    // Don't bother checking when the number of files loaded
-                    // is still less than the array length
-                    if (requires.length > Loader.numLoadedFiles) {
-                        continue;
-                    }
-
                     // Remove any required classes that are loaded
                     for (j = 0; j < requires.length; ) {
                         if (Manager.isCreated(requires[j])) {
@@ -671,6 +666,13 @@ Ext.Loader = new function() {
         /**
          * Inject a script element to document's head, call onLoad and onError accordingly
          * @private
+         * @param {String} url The url of the script node to load.
+         * @param {Function} onLoad The function to execute once the script node loads. For <IE9, this function will only execute
+         * once the readyState is `loaded` or `complete`.
+         * @param {Function} onError The function to execute if the script node fails to load such as a 404 status is returned.
+         * @param {Object} scope The scope to execute the `onLoad` and `onError` functions.
+         * @param {String} charset The value for the charset attribute to be used on the script node. Useful if you need to use `utf-8` for the returned code.
+         * @return {HTMLElement} The script node that was created
          */
         injectScriptElement: function(url, onLoad, onError, scope, charset) {
             var script = document.createElement('script'),
@@ -814,7 +816,8 @@ Ext.Loader = new function() {
             Loader.scriptsLoading++;
 
             src = config.disableCaching ?
-                (url + '?' + config.disableCachingParam + '=' + Ext.Date.now()) : url;
+                // If there is a querystring, append _dc to it with an ampersand.
+                (url + (url.indexOf('?') === -1 ? '?' : '&') + config.disableCachingParam + '=' + Ext.Date.now()) : url;
 
             scriptElements[url] = Loader.injectScriptElement(src, onScriptLoad, onScriptError);
         },
@@ -824,10 +827,6 @@ Ext.Loader = new function() {
          * @private
          */
         loadScriptFile: function(url, onLoad, onError, scope, synchronous) {
-            if (isFileLoaded[url]) {
-                return Loader;
-            }
-
             var config = Loader.getConfig(),
                 noCacheUrl = url + (config.disableCaching ? ('?' + config.disableCachingParam + '=' + Ext.Date.now()) : ''),
                 isCrossOriginRestricted = false,
@@ -1043,17 +1042,33 @@ Ext.Loader = new function() {
                 }
 
                 if (!isClassFileLoaded.hasOwnProperty(className)) {
-                    isClassFileLoaded[className] = false;
-                    classNameToFilePathMap[className] = filePath;
+                    // If the filepath has already been loaded or if it's currently pending, don't attempt to download it again.
+                    // Note that if the Loader isn't told about where to find the classes for both namespaces then the Loader will
+                    // have no way of knowning that they are, in fact, aliases to the same namespace. So, the filepaths will never
+                    // match (Loader.config.paths won't be aware of the path, see Loader.getPath()).
+                    //
+                    // For example, without calling setPath, Ext.spec.Foo and Foo.spec.Foo will have the following paths:
+                    //      Ext.spec.Foo === http://localhost/SDK/extjs/src/spec/Foo.js
+                    //      Foo.spec.Foo === Foo/spec/Foo.js
+                    //
+                    // This is only to try and catch an edge case, but the Loader can only match what it knows about.
+                    // See EXTJSIV-11711.
+                    if (Loader.isFileLoaded[filePath] || inFlight[filePath]) {
+                        isClassFileLoaded[className] = true;
+                    } else {
+                        inFlight[filePath] = true;
+                        isClassFileLoaded[className] = false;
 
-                    Loader.numPendingFiles++;
-                    Loader.loadScriptFile(
-                        filePath,
-                        pass(Loader.onFileLoaded, [className, filePath], Loader),
-                        pass(Loader.onFileLoadError, [className, filePath], Loader),
-                        Loader,
-                        syncModeEnabled
-                    );
+                        Loader.numPendingFiles++;
+                        Loader.loadScriptFile(
+                            filePath,
+                            pass(Loader.onFileLoaded, [className, filePath], Loader),
+                            pass(Loader.onFileLoadError, [className, filePath], Loader),
+                            Loader,
+                            syncModeEnabled
+                        );
+                    }
+                    classNameToFilePathMap[className] = filePath;
                 }
             }
 
@@ -1079,6 +1094,7 @@ Ext.Loader = new function() {
 
             isClassFileLoaded[className] = true;
             isFileLoaded[filePath] = true;
+            delete inFlight[filePath];
 
             // In FF, when we sync load something that has had a script tag inserted, the load event may
             // sometimes fire even if we clean it up and set it to null, so check if we're already loaded here.

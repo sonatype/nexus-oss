@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -80,12 +80,22 @@ Ext.define('Ext.Queryable', {
      * @return Ext.Component The matching child Ext.Component (or `null` if no match was found).
      */
     child: function (selector) {
+        var children = this.getRefItems();
+
         if (selector && selector.isComponent) {
             selector = '#' + Ext.escapeId(selector.getItemId());
         }
 
-        selector = selector || '';
-        return this.query('> ' + selector)[0] || null;
+        // Filter children array to only matches.
+        if (selector) {
+            children = Ext.ComponentQuery.query(selector, children);
+        }
+
+        // Return first match
+        if (children.length) {
+            return children[0];
+        }
+        return null;
     },
     
     /**
@@ -104,6 +114,48 @@ Ext.define('Ext.Queryable', {
         return this.query(selector)[0] || null;
     },
     
+    /**
+     * Traverses the tree rooted at this node in pre-order mode, calling the passed function on the nodes at each level.
+     * That is the function is called upon each node **before** being called on its children).
+     *
+     * This method is used at each level down the cascade. Currently {@link Ext.Component Component}s
+     * and {@link Ext.data.TreeModel TreeModel}s are queryable.
+     *
+     * If you have tree-structured data, you can make your nodes queryable, and use ComponentQuery on them.
+     *
+     * @param {Object} selector A ComponentQuery selector used to filter candidate nodes before calling the function.
+     * An empty string matches any node.
+     * @param {Function} fn The function to call. Return `false` to aborl the traverse.
+     * @param {Object} fn.node The node being visited.
+     * @param {Object} [scope] The context (`this` reference) in which the function is executed.
+     * @param {Array} [extraArgs] A set of arguments to be appended to the function's argument list to pass down extra data known to the caller
+     * **after** the node being visited.
+     */
+    visitPreOrder: function(selector, fn, scope, extraArgs) {
+        Ext.ComponentQuery._visit(true, selector, this, fn, scope, extraArgs);
+    },
+
+    /**
+     * Traverses the tree rooted at this node in post-order mode, calling the passed function on the nodes at each level.
+     * That is the function is called upon each node **after** being called on its children).
+     *
+     * This method is used at each level down the cascade. Currently {@link Ext.Component Component}s
+     * and {@link Ext.data.TreeModel TreeModel}s are queryable.
+     *
+     * If you have tree-structured data, you can make your nodes queryable, and use ComponentQuery on them.
+     *
+     * @param {Object} selector A ComponentQuery selector used to filter candidate nodes before calling the function.
+     * An empty string matches any node.
+     * @param {Function} fn The function to call. Return `false` to aborl the traverse.
+     * @param {Object} fn.node The node being visited.
+     * @param {Object} [scope] The context (`this` reference) in which the function is executed.
+     * @param {Array} [extraArgs] A set of arguments to be appended to the function's argument list to pass down extra data known to the caller
+     * **after** the node being visited.
+     */
+    visitPostOrder: function(selector, fn, scope, extraArgs) {
+        Ext.ComponentQuery._visit(false, selector, this, fn, scope, extraArgs);
+    },
+
     getRefItems: function(){
         return [];
     }

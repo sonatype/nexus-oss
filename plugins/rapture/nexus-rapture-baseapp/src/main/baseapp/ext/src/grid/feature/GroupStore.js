@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,14 +13,14 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Private record store class which takes the place of the view's data store to provide a grouped
  * view of the data when the Grouping feature is used.
- * 
+ *
  * Relays granular mutation events from the underlying store as refresh events to the view.
- * 
+ *
  * On mutation events from the underlying store, updates the summary rows by firing update events on the corresponding
  * summary records.
  * @private
@@ -119,7 +119,7 @@ Ext.define('Ext.grid.feature.GroupStore', {
     },
 
     isCollapsed: function(name) {
-        return this.groupingFeature.groupCache[name].isCollapsed; 
+        return this.groupingFeature.groupCache[name].isCollapsed;
     },
 
     isInCollapsedGroup: function(record) {
@@ -162,6 +162,12 @@ Ext.define('Ext.grid.feature.GroupStore', {
         return this.store.getById(id);
     },
 
+    getByInternalId: function(internalId) {
+        // Try searching the snapshot collection first because the store could be shared between
+        // locking partners and a locking partner could have filtered its data. See EXTJS-13374.
+        return (this.store.snapshot || this.data).get(internalId) || null;
+    },
+
     expandGroup: function(group) {
         var me = this,
             startIdx;
@@ -170,19 +176,20 @@ Ext.define('Ext.grid.feature.GroupStore', {
             group = me.groupingFeature.groupCache[group];
         }
 
-        if (group && group.children.length && (startIdx = me.indexOf(group.children[0], true, true)) !== -1) {
+        if (group && group.children.length && (startIdx = me.data.indexOf(group.placeholder)) !== -1) {
 
             // Any event handlers must see the new state
             group.isCollapsed = false;
             me.isExpandingOrCollapsing = 1;
-            
+
             // Remove the collapsed group placeholder record
             me.data.removeAt(startIdx);
-            me.fireEvent('bulkremove', me, [me.getGroupPlaceholder(group)], [startIdx]);
 
             // Insert the child records in its place
             me.data.insert(startIdx, group.children);
-            me.fireEvent('add', me, group.children, startIdx);
+
+            // Update views
+            me.fireEvent('replace', me, startIdx, [group.placeholder], group.children);
 
             me.fireEvent('groupexpand', me, group);
             me.isExpandingOrCollapsing = 0;
@@ -193,14 +200,13 @@ Ext.define('Ext.grid.feature.GroupStore', {
         var me = this,
             startIdx,
             placeholder,
-            i, j, len,
-            removeIndices;
+            len;
 
         if (typeof group === 'string') {
             group = me.groupingFeature.groupCache[group];
         }
 
-        if (group && (len = group.children.length) && (startIdx = me.indexOf(group.children[0], true)) !== -1) {
+        if (group && (len = group.children.length) && (startIdx = me.data.indexOf(group.children[0])) !== -1) {
 
             // Any event handlers must see the new state
             group.isCollapsed = true;
@@ -209,16 +215,11 @@ Ext.define('Ext.grid.feature.GroupStore', {
             // Remove the group child records
             me.data.removeRange(startIdx, len);
 
-            // Indices argument is mandatory and used by views - we MUST build it.
-            removeIndices = new Array(len);
-            for (i = 0, j = startIdx; i < len; i++, j++) {
-                removeIndices[i] = j;
-            }
-            me.fireEvent('bulkremove', me, group.children, removeIndices);
-
             // Insert a placeholder record in their place
             me.data.insert(startIdx, placeholder = me.getGroupPlaceholder(group));
-            me.fireEvent('add', me, [placeholder], startIdx);
+
+            // Update views
+            me.fireEvent('replace', me, startIdx, group.children, [placeholder]);
 
             me.fireEvent('groupcollapse', me, group);
             me.isExpandingOrCollapsing = 0;
@@ -237,31 +238,9 @@ Ext.define('Ext.grid.feature.GroupStore', {
 
     // Find index of record in group store.
     // If it's in a collapsed group, then it's -1, not present
-    // Otherwise, loop through groups keeping tally of intervening records.
-    indexOf: function(record, viewOnly, includeCollapsed) {
-        var me = this,
-            groups,
-            groupCount,
-            i,
-            group,
-            groupIndex,
-            result = 0;
-
-        if (record && (includeCollapsed || !me.isInCollapsedGroup(record))) {
-            groups = me.store.getGroups();
-            groupCount = groups.length;
-            for (i = 0; i < groupCount; i++) {
-
-                // group contains eg
-                // { children: [childRec0, childRec1...], name: <group field value for group> }
-                group = groups[i];
-                if (group.name === this.store.getGroupString(record)) {
-                    groupIndex = Ext.Array.indexOf(group.children, record);
-                    return result + groupIndex;
-                }
-
-                result += (viewOnly && me.isCollapsed(group.name)) ? 1 : group.children.length;
-            }
+    indexOf: function(record) {
+        if (!record.isCollapsedPlaceholder) {
+            return this.data.indexOf(record);
         }
         return -1;
     },
@@ -283,9 +262,17 @@ Ext.define('Ext.grid.feature.GroupStore', {
         this.fireEvent('refresh', this);
     },
 
-    onBulkRemove: function(store, records, indices) {
+    onBulkRemove: function(store, records, indices, isMove, removeRange) {
         this.processStore(this.store);
-        this.fireEvent('refresh', this);
+
+        // If a contiguous range is being removed, we can relay the replace event.
+        // Use indexOf to find the index of the records removed.
+        // It will be different in this store, and this store is what the View sees.
+        if (removeRange) {
+            this.fireEvent('replace', this, this.indexOf(records[0]), records, []);
+        } else {
+            this.fireEvent('refresh', this);
+        }
     },
 
     onClear: function(store, records, startIndex) {
@@ -295,7 +282,10 @@ Ext.define('Ext.grid.feature.GroupStore', {
 
     onAdd: function(store, records, startIndex) {
         this.processStore(this.store);
-        this.fireEvent('refresh', this);
+
+        // Use indexOf to find the index of the records added.
+        // It will be different in this store, and this store is what the View sees.
+        this.fireEvent('replace', this, this.indexOf(records[0]), [], records);
     },
 
     onUpdate: function(store, record, operation, modifiedFieldNames) {

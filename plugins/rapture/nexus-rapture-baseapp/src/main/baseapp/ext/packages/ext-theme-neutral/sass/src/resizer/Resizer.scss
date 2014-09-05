@@ -19,31 +19,29 @@
     display: none;
 }
 
-.#{$prefix}resizable-over {
-    .#{$prefix}resizable-handle-north {
-        cursor: n-resize;
-    }
-    .#{$prefix}resizable-handle-south {
-        cursor: s-resize;
-    }
-    .#{$prefix}resizable-handle-east {
-        cursor: e-resize;
-    }
-    .#{$prefix}resizable-handle-west {
-        cursor: w-resize;
-    }
-    .#{$prefix}resizable-handle-southeast {
-        cursor: se-resize;
-    }
-    .#{$prefix}resizable-handle-northwest {
-        cursor: nw-resize;
-    }
-    .#{$prefix}resizable-handle-northeast {
-        cursor: ne-resize;
-    }
-    .#{$prefix}resizable-handle-southwest {
-        cursor: sw-resize;
-    }
+.#{$prefix}resizable-handle-north {
+    cursor: n-resize;
+}
+.#{$prefix}resizable-handle-south {
+    cursor: s-resize;
+}
+.#{$prefix}resizable-handle-east {
+    cursor: e-resize;
+}
+.#{$prefix}resizable-handle-west {
+    cursor: w-resize;
+}
+.#{$prefix}resizable-handle-southeast {
+    cursor: se-resize;
+}
+.#{$prefix}resizable-handle-northwest {
+    cursor: nw-resize;
+}
+.#{$prefix}resizable-handle-northeast {
+    cursor: ne-resize;
+}
+.#{$prefix}resizable-handle-southwest {
+    cursor: sw-resize;
 }
 
 .#{$prefix}resizable-handle-east {
@@ -106,25 +104,6 @@
     z-index: 101;
 }
 
-/*IE rounding error*/
-@if $include-ie {
-    .#{$prefix}ie {
-        .#{$prefix}resizable-handle-east {
-            margin-right: -1px; /*IE rounding error*/
-        }
-
-        .#{$prefix}resizable-handle-south {
-            margin-bottom: -1px;
-        }
-    }
-}
-
-// If the pinned config is set, then handles are visible
-.#{$prefix}resizable-pinned .#{$prefix}resizable-handle,
-.#{$prefix}resizable-over .#{$prefix}resizable-handle {
-    @include opacity(1);
-}
-
 @if $include-ext-window-window {
     .#{$prefix}window .#{$prefix}window-handle {
         @include opacity(0);
@@ -142,9 +121,43 @@
     z-index: 50000;
 }
 
-.#{$prefix}resizable-over,
-.#{$prefix}resizable-pinned {
+// If the pinned config is set, then handles are visible
+.#{$prefix}resizable-handle-over,
+.#{$prefix}resizable-pinned .#{$prefix}resizable-handle {
+    @include opacity(1);
+}
 
+.#{$prefix}resizable-handle-east-over,
+.#{$prefix}resizable-handle-west-over {
+    background-image: theme-background-image('sizer/e-handle');
+}
+
+.#{$prefix}resizable-handle-south-over,
+.#{$prefix}resizable-handle-north-over {
+    background-image: theme-background-image('sizer/s-handle');
+}
+
+.#{$prefix}resizable-handle-southeast-over {
+    background-position: top left;
+    background-image: theme-background-image('sizer/se-handle');
+}
+
+.#{$prefix}resizable-handle-northwest-over {
+    background-position: bottom right;
+    background-image: theme-background-image('sizer/nw-handle');
+}
+
+.#{$prefix}resizable-handle-northeast-over {
+    background-position: bottom left;
+    background-image: theme-background-image('sizer/ne-handle');
+}
+
+.#{$prefix}resizable-handle-southwest-over {
+    background-position: top right;
+    background-image: theme-background-image('sizer/sw-handle');
+}
+
+.#{$prefix}resizable-pinned {
     // themes provide position-x based upon image width
     .#{$prefix}resizable-handle-east,
     .#{$prefix}resizable-handle-west {

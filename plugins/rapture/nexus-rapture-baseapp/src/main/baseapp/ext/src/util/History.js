@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * History management component that allows you to register arbitrary tokens that signify application
@@ -35,15 +35,11 @@ Ext.define('Ext.util.History', {
 
     /**
      * @property
-     * True to use `window.top.location.hash` or false to use `window.location.hash`.
+     * True to use `window.top.location.hash` or false to use `window.location.hash`. Must be set before {@link #init} is called
+     * because the hashchange event listener is added to the window at initialization time.
      */
     useTopWindow: true,
 
-    /**
-     * @property
-     * The id of the hidden field required for storing the current history token.
-     */
-    fieldId: Ext.baseCSSPrefix + 'history-field',
     /**
      * @property
      * The id of the iframe required by IE to manage the history stack.
@@ -51,79 +47,68 @@ Ext.define('Ext.util.History', {
     iframeId: Ext.baseCSSPrefix + 'history-frame',
 
     constructor: function() {
-        var me = this;
-        me.oldIEMode = Ext.isIE7m || !Ext.isStrict && Ext.isIE8;
+        var me = this,
+            hash,
+            newHash;
+
+        // Must track history in an iframe to prevent back button from navigating away from the page in IE6, 7 and (8 & 9 quirks)
+        me.oldIEMode = Ext.isIE7m || Ext.isIEQuirks && (Ext.isIE8 || Ext.isIE9);
         me.iframe = null;
         me.hiddenField = null;
         me.ready = false;
         me.currentToken = null;
         me.mixins.observable.constructor.call(me);
+        me.onHashChange = function () {
+            newHash = me.getHash();
+            if (newHash !== hash) {
+                hash = newHash;
+                me.handleStateChange(hash);
+            }
+        };
     },
 
     getHash: function() {
-        var href = window.location.href,
-            i = href.indexOf("#");
-
-        return i >= 0 ? href.substr(i + 1) : null;
+        return this.win.location.hash.substr(1);
     },
 
     setHash: function (hash) {
-        var me = this,
-            win = me.useTopWindow ? window.top : window;
         try {
-            win.location.hash = hash;
+            this.win.location.hash = hash;
         } catch (e) {
             // IE can give Access Denied (esp. in popup windows)
         }
     },
-
-    doSave: function() {
-        this.hiddenField.value = this.currentToken;
-    },
-
 
     handleStateChange: function(token) {
         this.currentToken = token;
         this.fireEvent('change', token);
     },
 
-    updateIFrame: function(token) {
-        var html = '<html><body><div id="state" role="presentation">' +
-                    Ext.util.Format.htmlEncode(token) +
-                    '</div></body></html>',
-            doc;
+    updateIFrame: function(hash) {
+        var iframe = this.iframe,
+            doc = iframe && iframe.contentWindow && iframe.contentWindow.document;
 
-        try {
-            doc = this.iframe.contentWindow.document;
-            doc.open();
-            doc.write(html);
-            doc.close();
-            return true;
-        } catch (e) {
-            return false;
-        }
+        doc.open().close();
+        doc.location.hash = hash;
+        return true;
     },
 
     checkIFrame: function () {
         var me = this,
             contentWindow = me.iframe.contentWindow,
-            doc, elem, oldToken, oldHash;
+            oldToken, oldHash;
 
         if (!contentWindow || !contentWindow.document) {
-            Ext.Function.defer(this.checkIFrame, 10, this);
+            Ext.Function.defer(me.checkIFrame, 10, me);
             return;
         }
 
-        doc = contentWindow.document;
-        elem = doc.getElementById("state");
-        oldToken = elem ? elem.innerText : null;
+        oldToken = contentWindow.location.hash.substr(1);
         oldHash = me.getHash();
 
         Ext.TaskManager.start({
             run: function () {
-                var doc = contentWindow.document,
-                    elem = doc.getElementById("state"),
-                    newToken = elem ? elem.innerText : null,
+                var newToken = contentWindow.location.hash.substr(1),
                     newHash = me.getHash();
 
                 if (newToken !== oldToken) {
@@ -131,7 +116,6 @@ Ext.define('Ext.util.History', {
                     me.handleStateChange(newToken);
                     me.setHash(newToken);
                     oldHash = newToken;
-                    me.doSave();
                 } else if (newHash !== oldHash) {
                     oldHash = newHash;
                     me.updateIFrame(newHash);
@@ -145,31 +129,25 @@ Ext.define('Ext.util.History', {
     },
 
     startUp: function () {
-        var me = this,
-            hash;
+        var me = this;
 
-        me.currentToken = me.hiddenField.value || this.getHash();
+        me.currentToken = me.getHash();
 
         if (me.oldIEMode) {
             me.checkIFrame();
         } else {
-            hash = me.getHash();
-            Ext.TaskManager.start({
-                run: function () {
-                    var newHash = me.getHash();
-                    if (newHash !== hash) {
-                        hash = newHash;
-                        me.handleStateChange(hash);
-                        me.doSave();
-                    }
-                },
-                interval: 50,
-                scope: me
-            });
+            if (Ext.supports.Hashchange) {
+                Ext.EventManager.on(me.win, 'hashchange', me.onHashChange);
+            }
+            else {
+                Ext.TaskManager.start({
+                    run: me.onHashChange,
+                    interval: 50
+                });
+            }
             me.ready = true;
             me.fireEvent('ready', me);
         }
-
     },
 
     /**
@@ -180,8 +158,7 @@ Ext.define('Ext.util.History', {
      * Defaults to the browser window.
      */
     init: function (onReady, scope) {
-        var me = this,
-            DomHelper = Ext.DomHelper;
+        var me = this;
 
         if (me.ready) {
             Ext.callback(onReady, scope, [me]);
@@ -195,34 +172,15 @@ Ext.define('Ext.util.History', {
             return;
         }
 
-        /*
-        <form id="history-form" class="x-hide-display">
-            <input type="hidden" id="x-history-field" />
-            <iframe id="x-history-frame"></iframe>
-        </form>
-        */
-        me.hiddenField = Ext.getDom(me.fieldId);
-        if (!me.hiddenField) {
-            me.hiddenField = Ext.getBody().createChild({
-                id: Ext.id(),
-                tag: 'form',
-                role: 'presentation',
-                cls: Ext.baseCSSPrefix + 'hide-display',
-                children: [{
-                    tag: 'input',
-                    type: 'hidden',
-                    id: me.fieldId
-                }]
-            }, false, true).firstChild;
-        }
-
+        me.win = me.useTopWindow ? window.top : window;
         if (me.oldIEMode) {
             me.iframe = Ext.getDom(me.iframeId);
             if (!me.iframe) {
-                me.iframe = DomHelper.append(me.hiddenField.parentNode, {
+                me.iframe = Ext.DomHelper.append(document.body, {
                     tag: 'iframe',
                     role: 'presentation',
                     id: me.iframeId,
+                    style: 'display:none;',
                     src: Ext.SSL_SECURE_URL
                 });
             }
@@ -264,10 +222,10 @@ Ext.define('Ext.util.History', {
      * it will not save a new history step. Set to false if the same state can be saved more than once
      * at the same history stack location.
      */
-    add: function (token, preventDup) {
+    add: function (token, preventDuplicates) {
         var me = this;
 
-        if (preventDup !== false) {
+        if (preventDuplicates !== false) {
             if (me.getToken() === token) {
                 return true;
             }
@@ -285,14 +243,16 @@ Ext.define('Ext.util.History', {
      * Programmatically steps back one step in browser history (equivalent to the user pressing the Back button).
      */
     back: function() {
-        window.history.go(-1);
+        var win = this.useTopWindow ? window.top : window;
+        win.history.go(-1);
     },
 
     /**
      * Programmatically steps forward one step in browser history (equivalent to the user pressing the Forward button).
      */
     forward: function(){
-        window.history.go(1);
+        var win = this.useTopWindow ? window.top : window;
+        win.history.go(1);
     },
 
     /**

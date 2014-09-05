@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This class manages state information for a component or element during a layout.
@@ -800,10 +800,8 @@ Ext.define('Ext.layout.ContextItem', {
         // Only animate if the Component has been previously layed out: first layout should not animate
         if (animateFrom) {
             target = me.target;
-            targetAnim = target.layout && target.layout.animate;
-            if (targetAnim) {
-                duration = Ext.isNumber(targetAnim) ? targetAnim : targetAnim.duration;
-            }
+            targetAnim = target.getAnimationProps();
+            duration = targetAnim.duration;
             animateProps = Ext.Object.getKeys(me.animatePolicy);
 
             // Create an animation block using the targetAnim configuration to provide defaults.

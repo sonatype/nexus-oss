@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Ed Spencer
@@ -44,6 +44,7 @@ Ext.define('Ext.data.AbstractStore', {
     requires: [
         'Ext.util.MixedCollection',
         'Ext.data.proxy.Proxy',
+        'Ext.data.proxy.Memory',
         'Ext.data.Operation',
         'Ext.util.Filter'
     ],
@@ -119,6 +120,7 @@ Ext.define('Ext.data.AbstractStore', {
      * @cfg {Boolean/Object} autoLoad
      * If data is not specified, and if autoLoad is true or an Object, this store's load method is automatically called
      * after creation. If the value of autoLoad is an Object, this Object will be passed to the store's load method.
+     * Set this explicitly to `false` to force a stateful grid to not make a network request.
      * @since 2.3.0
      */
     autoLoad: undefined,
@@ -148,7 +150,7 @@ Ext.define('Ext.data.AbstractStore', {
     /**
      * @cfg {Boolean} sortOnLoad
      * If true, any sorters attached to this Store will be run after loading data, before the datachanged event is fired.
-     * Defaults to true, igored if {@link Ext.data.Store#remoteSort remoteSort} is true
+     * Defaults to true, ignored if {@link Ext.data.Store#remoteSort remoteSort} is true
      */
     sortOnLoad: true,
 
@@ -201,9 +203,15 @@ Ext.define('Ext.data.AbstractStore', {
      */
 
     /**
-     * @cfg {String} model
+     * @cfg {String/Ext.data.Model} model
      * Name of the {@link Ext.data.Model Model} associated with this store.
-     * The string is used as an argument for {@link Ext.ModelManager#getModel}.
+     *
+     * May also be the actual Model subclass.
+     *
+     * A string is used as an argument for {@link Ext.ModelManager#getModel}.
+     *
+     * This config is required for the store to be able to read data unless you have defined
+     * the {@link #fields} config which will create an implicit {@link Ext.data.Model Model}.
      */
 
     /**
@@ -224,6 +232,12 @@ Ext.define('Ext.data.AbstractStore', {
     /**
      * @cfg {Boolean} [statefulFilters=false]
      * Configure as `true` to have the filters saved when a client {@link Ext.grid.Panel grid} saves its state.
+     */
+
+    /**
+     * @property {Object} lastOptions
+     * Property to hold the last options from a {@link #method-load} method call. This object is used for the {@link #method-reload}
+     * to reuse the same options. Please see {@link #method-reload} for a simple example on how to use the lastOptions property.
      */
 
     sortRoot: 'data',
@@ -265,6 +279,7 @@ Ext.define('Ext.data.AbstractStore', {
          * @param {Ext.data.Model[]} records The array of records that were removed (In the order they appear in the Store)
          * @param {Number[]} indexes The indexes of the records that were removed
          * @param {Boolean} isMove `true` if the child nodes are being removed so they can be moved to another position in this Store.
+         * @param {Boolean} removeRange `true` if the records being removed are a contiguous range.
          */
 
         /**
@@ -378,7 +393,7 @@ Ext.define('Ext.data.AbstractStore', {
 
         //Supports the 3.x style of simply passing an array of fields to the store, implicitly creating a model
         if (!me.model && me.fields) {
-            me.model = Ext.define('Ext.data.Store.ImplicitModel-' + (me.storeId || Ext.id()), {
+            me.model = Ext.define(null, {
                 extend: 'Ext.data.Model',
                 fields: me.fields,
                 proxy: me.proxy || me.defaultProxyType
@@ -646,7 +661,7 @@ Ext.define('Ext.data.AbstractStore', {
     },
 
     /**
-     * Returns all Model instances that have been updated in the Store but not yet synchronized with the Proxy
+     * Returns all valid, non-phantom Model instances that have been updated in the Store but not yet synchronized with the Proxy
      * @return {Ext.data.Model[]} The updated Model instances
      */
     getUpdatedRecords: function() {
@@ -881,8 +896,56 @@ Ext.define('Ext.data.AbstractStore', {
     },
 
     /**
-     * Reloads the store using the last options passed to the {@link #method-load} method.
-     * @param {Object} options A config object which contains options which may override the options passed to the previous load call.
+     * Reloads the store using the last options passed to the {@link #method-load} method. You can use the reload method to reload the
+     * store using the parameters from the last load() call. For example:
+     *
+     *     store.load({
+     *         params : {
+     *             userid : 22216
+     *         }
+     *     });
+     *
+     *     //...
+     *
+     *     store.reload();
+     *
+     * The initial {@link #method-load} execution will pass the `userid` parameter in the request. The {@link #reload} execution
+     * will also send the same `userid` parameter in its request as it will reuse the `params` object from the last {@link #method-load} call.
+     *
+     * You can override a param by passing in the config object with the `params` object:
+     *
+     *     store.load({
+     *         params : {
+     *             userid : 22216,
+     *             foo    : 'bar'
+     *         }
+     *     });
+     *
+     *     //...
+     *
+     *     store.reload({
+     *         params : {
+     *             userid : 1234
+     *         }
+     *     });
+     *
+     * The initial {@link #method-load} execution sends the `userid` and `foo` parameters but in the {@link #reload} it only sends
+     * the `userid` paramter because you are overriding the `params` config not just overriding the one param. To only change a single param
+     * but keep other params, you will have to get the last params from the {@link #lastOptions} property:
+     *
+     *     var lastOptions = store.lastOptions,
+     *         lastParams = Ext.clone(lastOptions.params); // make a copy of the last params so we don't affect future reload() calls
+     *
+     *     lastParams.userid = 1234;
+     *
+     *     store.reload({
+     *         params : lastParams
+     *     });
+     *
+     * This will now send the `userid` parameter as `1234` and the `foo` param as `'bar'`.
+     *
+     * @param {Object} [options] A config object which contains options which may override the options passed to the previous load call. See the
+     * {@link #method-load} method for valid configs.
      */
     reload: function(options) {
         var o = Ext.apply({}, options, this.lastOptions);
@@ -954,30 +1017,24 @@ Ext.define('Ext.data.AbstractStore', {
 
     // private
     destroyStore: function() {
-        var implicitModelName,
-            me = this;
+        var me = this;
 
         if (!me.isDestroyed) {
             me.clearListeners();
             if (me.storeId) {
                 Ext.data.StoreManager.unregister(me);
             }
-            me.clearData();
-            me.data = me.tree = me.sorters = me.filters = me.groupers = null;
+            me.destroyClear();
             if (me.reader) {
                 me.reader.destroyReader();
             }
-            me.proxy = me.reader = me.writer = null;
+            me.data = me.tree = me.sorters = me.filters = me.groupers = me.proxy = me.reader = me.writer = me.model = null;
             me.isDestroyed = true;
-
-            if (me.implicitModel) {
-                implicitModelName = Ext.getClassName(me.model);
-                Ext.undefine(implicitModelName);
-                Ext.ModelManager.unregisterType(implicitModelName);
-            } else {
-                me.model = null;
-            }
         }
+    },
+
+    destroyClear: function() {
+        this.clearData();
     },
     
     /**
@@ -1069,6 +1126,11 @@ Ext.define('Ext.data.AbstractStore', {
 
         // Data manipulated by the server - reload 
         if (me.autoLoad && (me.remoteSort || me.remoteGroup || me.remoteFilter)) {
+            if (me.autoLoadTask) {
+                me.autoLoadTask.cancel();
+                delete me.autoLoadTask;
+            }
+
             if (me.autoLoad === true) {
                 me.reload();
             } else {

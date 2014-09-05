@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @class Ext.chart.axis.Axis
@@ -27,6 +27,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *     axes: [{
  *         type: 'Numeric',
  *         position: 'left',
+ *         titleAlign: 'end', // or 'start', or 'center' (default)
  *         fields: ['data1', 'data2', 'data3'],
  *         title: 'Number of Hits',
  *         grid: {
@@ -1003,6 +1004,7 @@ Ext.define('Ext.chart.axis.Axis', {
     drawTitle: function (maxWidth, maxHeight) {
         var me = this,
             position = me.position,
+            titleAlign = me.titleAlign,
             surface = me.chart.surface,
             displaySprite = me.displaySprite,
             title = me.title,
@@ -1027,7 +1029,13 @@ Ext.define('Ext.chart.axis.Axis', {
         pad = me.dashSize + me.label.padding;
 
         if (rotate) {
-            y -= ((me.length / 2) - (bbox.height / 2));
+            if (titleAlign === 'end') {
+                y -= me.length - bbox.height;
+            }
+            else if (!titleAlign || titleAlign === 'center') {
+                y -= ((me.length / 2) - (bbox.height / 2));
+            }
+            
             if (position == 'left') {
                 x -= (maxWidth + pad + (bbox.width / 2));
             }
@@ -1037,7 +1045,13 @@ Ext.define('Ext.chart.axis.Axis', {
             me.bbox.width += bbox.width + 10;
         }
         else {
-            x += (me.length / 2) - (bbox.width * 0.5);
+            if (titleAlign === 'end' || (me.reverse && titleAlign === 'start')) {
+                x += me.length - bbox.width;
+            }
+            else if (!titleAlign || titleAlign === 'center') {
+                x += (me.length / 2) - (bbox.width * 0.5);
+            }
+            
             if (position == 'top') {
                 y -= (maxHeight + pad + (bbox.height * 0.3));
             }

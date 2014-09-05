@@ -171,8 +171,8 @@
     // See the docs above
     $ui-force-header-border: $window-force-header-border,
     $ui-include-border-management-rules: $window-include-border-management-rules,
-    $ui-wrap-border-color: $window-wrap-border-color,
-    $ui-wrap-border-width: $window-wrap-border-width,
+    $ui-wrap-border-color: null,
+    $ui-wrap-border-width: null,
 
     // deprecated - use $ui instead
     $ui-label: null
@@ -183,6 +183,22 @@
             $ui: $ui-label;
         } @else {
             @warn "#{error('$ui is required')}";
+        }
+    }
+
+    @if is-null($ui-wrap-border-color) {
+        @if $ui == 'default' {
+            $ui-wrap-border-color: $window-wrap-border-color;
+        } @else {
+            $ui-wrap-border-color: $ui-border-color;
+        }
+    }
+
+    @if is-null($ui-wrap-border-width) {
+        @if $ui == 'default' {
+            $ui-wrap-border-width: $window-wrap-border-width;
+        } @else {
+            $ui-wrap-border-width: $ui-border-width;
         }
     }
 
@@ -570,4 +586,8 @@
     @include extjs-window-ui(
         $ui: 'default'
     );
+}
+
+.#{$prefix}window-body-plain {
+    background-color: transparent;
 }

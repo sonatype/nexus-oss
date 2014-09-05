@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * The Editor class is used to provide inline editing for elements on the page. The editor
@@ -318,22 +318,19 @@ Ext.define('Ext.Editor', {
      */
     startEdit : function(el, value) {
         var me = this,
-            field = me.field;
+            field = me.field,
+            dom;
 
         me.completeEdit();
         me.boundEl = Ext.get(el);
-        value = Ext.isDefined(value) ? value : Ext.String.trim(me.boundEl.dom.innerText || me.boundEl.dom.innerHTML);
+        dom = me.boundEl.dom;
+        value = Ext.isDefined(value) ? value : Ext.String.trim(dom.textContent || dom.innerText || dom.innerHTML);
 
-        if (!me.rendered) {
-            // Render to the ownerCt's element
-            // Being floating, we do not need to use the actual layout's target.
-            // Indeed, it's better if we do not so that we do not interfere with layout's child management,
-            // especially with CellEditors in the element of a TablePanel.
-            if (me.ownerCt) {
-                me.parentEl = me.ownerCt.el;
-                me.parentEl.position();
-            }
-            me.render(me.parentEl || document.body);
+        // If NOT configured with a renderTo, render to the ownerCt's element
+        // Being floating, we do not need to use the actual layout's target.
+        // Indeed, it's better if we do not so that we do not interfere with layout's child management.
+        if (!me.rendered && !me.renderTo && me.ownerCt) {
+            (me.renderTo = me.ownerCt.el).position();
         }
 
         if (me.fireEvent('beforestartedit', me, me.boundEl, value) !== false) {
@@ -513,7 +510,6 @@ Ext.define('Ext.Editor', {
 
         Ext.destroy(me.field);
         delete me.field;
-        delete me.parentEl;
         delete me.boundEl;
 
         me.callParent(arguments);

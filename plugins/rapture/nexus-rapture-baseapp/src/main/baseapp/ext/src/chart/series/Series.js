@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @class Ext.chart.series.Series
@@ -103,7 +103,14 @@ Ext.define('Ext.chart.series.Series', {
     /**
      * @cfg {Function} renderer
      * A function that can be overridden to set custom styling properties to each rendered element.
-     * Passes in (sprite, record, attributes, index, store) to the function.
+     * Passes in (sprite, record, attributes, index, store) to the function. This function **must** return
+     * an object of attributes. By default, the renderer will return the attributes parameter.
+     * @param {Ext.draw.Sprite} sprite The sprite being rendered.
+     * @param {Ext.data.Model} record The record associated with the sprite data point being rendered.
+     * @param {Object} attributes The attributes used to style the sprite.
+     * @param {Number} index The index of the record in the store.
+     * @param {Ext.data.Store} store The store for the chart.
+     * @return {Object} The attributes the sprite will use to render.
      */
     renderer: function(sprite, record, attributes, index, store) {
         return attributes;
@@ -111,7 +118,43 @@ Ext.define('Ext.chart.series.Series', {
 
     /**
      * @cfg {Array} shadowAttributes
-     * An array with shadow attributes
+     * An array with shadow attributes.
+     * 
+     * Defaults to: 
+     *
+     *     [{
+     *         "stroke-width": 6,
+     *         "stroke-opacity": 1,
+     *         "stroke": 'rgb(200, 200, 200)',
+     *         "translate": {
+     *             "x": 1.2,
+     *             "y": 2
+     *         }
+     *     },
+     *     {
+     *         "stroke-width": 4,
+     *         "stroke-opacity": 1,
+     *         "stroke": 'rgb(150, 150, 150)',
+     *         "translate": {
+     *             "x": 0.9,
+     *             "y": 1.5
+     *         }
+     *     },
+     *     {
+     *         "stroke-width": 2,
+     *         "stroke-opacity": 1,
+     *         "stroke": 'rgb(100, 100, 100)',
+     *         "translate": {
+     *             "x": 0.6,
+     *             "y": 1
+     *         }
+     *     }]
+     *
+     * Each object in the array will be applied to a sprite to make up the 
+     * underlying shadow. 
+     *
+     * Only applicable when the chart's shadow property is `true`.
+     * 
      */
     shadowAttributes: null,
 

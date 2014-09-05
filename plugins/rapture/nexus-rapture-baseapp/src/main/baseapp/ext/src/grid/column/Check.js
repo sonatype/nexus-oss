@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column subclass which renders a checkbox in each column cell which toggles the truthiness of the associated data field on click.
@@ -27,7 +27,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *             items : [
  *                 { name : 'Lisa',  email : 'lisa@simpsons.com',  phone : '555-111-1224', active : true  },
  *                 { name : 'Bart',  email : 'bart@simpsons.com',  phone : '555-222-1234', active : true  },
- *                 { name : 'Homer', email : 'home@simpsons.com',  phone : '555-222-1244', active : false },
+ *                 { name : 'Homer', email : 'homer@simpsons.com',  phone : '555-222-1244', active : false },
  *                 { name : 'Marge', email : 'marge@simpsons.com', phone : '555-222-1254', active : true  }
  *             ]
  *         },

@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Base Class for HBoxLayout and VBoxLayout Classes. Generally it should not need to be used directly.
@@ -245,6 +245,8 @@ Ext.define('Ext.layout.container.Box', {
             infiniteValue = Infinity,
             aTarget = a.target,
             bTarget = b.target,
+            aFlex = aTarget.flex,
+            bFlex = bTarget.flex,
             result = 0,
             aMin, bMin, aMax, bMax,
             hasMin, hasMax;
@@ -267,6 +269,15 @@ Ext.define('Ext.layout.container.Box', {
             // b) The max values were the same
             if (result === 0 && hasMin) {
                 result = bMin - aMin;
+            }
+
+            // If 0, it means either the max and/or minimum was the same
+            if (result === 0) {
+                if (hasMax) {
+                    result = bFlex - aFlex;
+                } else {
+                    result = aFlex - bFlex;
+                }
             }
         }
         return result;
@@ -1142,6 +1153,10 @@ Ext.define('Ext.layout.container.Box', {
             el = comp.getEl();
             el.setStyle(names.beforeY, '');
             el.setStyle(names.beforeX, '');
+
+            // Box layout imposes margin:0 on its child items and the layout provides margins
+            // using its absolute positioning strategy. This has to be reversed on remove.
+            el.setStyle('margin', '');
         }
     },
 

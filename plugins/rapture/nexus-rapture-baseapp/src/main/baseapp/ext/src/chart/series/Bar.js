@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Creates a Bar Chart. A Bar Chart is a useful visualization technique to display quantitative information for
@@ -668,6 +668,7 @@ Ext.define('Ext.chart.series.Bar', {
                 if (!shadow) {
                     shadow = surface.add(Ext.apply({
                         type: 'rect',
+                        isShadow: true,
                         group: shadowGroups[shadowIndex]
                     }, Ext.apply({}, baseAttrs, shadowBarAttr)));
                 }
@@ -691,7 +692,7 @@ Ext.define('Ext.chart.series.Bar', {
                 rendererAttributes.hidden = !!barAttr.hidden;
                 if (animate) {
                     me.onAnimate(shadow, {
-                        zero: bounds.zero + bounds.bbox.width, 
+                        zero: bounds.zero + (reverse ? bounds.bbox.width : 0), 
                         to: rendererAttributes 
                     });
                 }
@@ -783,7 +784,7 @@ Ext.define('Ext.chart.series.Bar', {
                 rendererAttributes = me.renderer(sprite, store.getAt(i), barAttr, i, store);
                 sprite._to = rendererAttributes;
                 anim = me.onAnimate(sprite, {
-                    zero: bounds.zero + bounds.bbox.width,  
+                    zero: bounds.zero + (me.reverse ? bounds.bbox.width : 0),
                     to: Ext.apply(rendererAttributes, endSeriesStyle) 
                 });
                 if (enableShadows && stacked && (i % bounds.barsLen === 0)) {
@@ -1181,20 +1182,53 @@ Ext.define('Ext.chart.series.Bar', {
     // @private used to animate label, markers and other sprites.
     onAnimate: function(sprite, attr) {
         var me = this,
-            to = attr.to;
+            to = attr.to,
+            stacked = me.stacked,
+            reverse = me.reverse,
+            width = 0,
+            isText, bbox, x, from;
             
         sprite.show();
         
-        if (me.reverse && !me.column) {
-            attr.from = {
-                x: (me.stacked || sprite.type == 'text') ? attr.zero : to.x + to.width,
-                width: 0
-            };
+        if (!me.column) {
+            if (reverse) {
+                bbox = sprite.getBBox();
+                isText = sprite.type == 'text';
+                // If we're highlighting, we don't want to reset the position
+                // so just grab the current position
+                if (!me.inHighlight) {
+                    if (!stacked) {
+                        if (isText) {
+                            // Fudge factor, if the text has yet to be positioned it will be < 5
+                            x = bbox.x >= 5 ? x : attr.zero;
+                        } else {
+                            if (bbox.width) {
+                                width = bbox.width;
+                            }
+                            x = bbox.width ? bbox.x : to.x + to.width;
+                        }
+                    } else {
+                        x = attr.zero;
+                    }
+                }
+                attr.from = {
+                    x: x,
+                    width: width
+                };
+            }
             
-            // If we're highlighting, we don't want to reset the position
-            // so just grab the current position
-            if (me.inHighlight) {
-                delete attr.from.x;
+            if (stacked) {
+                from = attr.from;
+                if (!from) {
+                    from = attr.from = {};
+                }
+                from.y = to.y;
+                if (!reverse) {
+                    from.x = attr.zero;
+                    if (sprite.isShadow) {
+                        from.width = 0;
+                    }
+                }
             }
         }
         

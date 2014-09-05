@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a lightweight HTML Editor component. Some toolbar features are not supported by Safari and will be
@@ -613,7 +613,7 @@ Ext.define('Ext.form.field.HtmlEditor', {
         return Ext.String.format(
             (oldIE ? '' : '<!DOCTYPE html>')                        
             + '<html><head><style type="text/css">' 
-            + (Ext.isOpera ? 'p{margin:0}' : '')
+            + (Ext.isOpera ? 'p{margin:0;}' : '')
             + 'body{border:0;margin:0;padding:{0}px;direction:' + (me.rtl ? 'rtl;' : 'ltr;')
             + (oldIE ? Ext.emptyString : 'min-')
             + 'height:{1}px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:text;background-color:white;' 
@@ -1411,7 +1411,9 @@ Ext.define('Ext.form.field.HtmlEditor', {
     },
 
     // @private
-    fixKeys: (function() { // load time branching for fastest keydown performance
+    fixKeys: (function () { // load time branching for fastest keydown performance
+        var tag;
+
         if (Ext.isIE) {
             return function(e){
                 var me = this,
@@ -1433,17 +1435,27 @@ Ext.define('Ext.form.field.HtmlEditor', {
                             me.deferFocus();
                         }
                     }
-                }
-                else if (k === e.ENTER) {
+                } else if (k === e.ENTER) {
                     if (!readOnly) {
-                        range = doc.selection.createRange();
-                        if (range) {
-                            target = range.parentElement();
-                            if(!target || target.tagName.toLowerCase() !== 'li'){
+                        if (Ext.isIE10m) {
+                            range = doc.selection.createRange();
+                            if (range) {
+                                target = range.parentElement();
+                                if (!target || target.tagName.toLowerCase() !== 'li') {
+                                    e.stopEvent();
+                                    range.pasteHTML('<br />');
+                                    range.collapse(false);
+                                    range.select();
+                                }
+                            }
+                        } else {
+                            // IE 11
+                            range = doc.getSelection().getRangeAt(0);
+                            if (range && range.commonAncestorContainer.parentNode.tagName.toLowerCase() !== 'li') {
+                                // Use divs so it doesn't double-space.
                                 e.stopEvent();
-                                range.pasteHTML('<br />');
-                                range.collapse(false);
-                                range.select();
+                                tag = doc.createElement('div');
+                                range.insertNode(tag);
                             }
                         }
                     }
@@ -1646,15 +1658,7 @@ Ext.define('Ext.form.field.HtmlEditor', {
      * @private
      */
     /**
-     * @cfg {String} msgFx
-     * @private
-     */
-    /**
      * @cfg {Boolean} allowDomMove
-     * @private
-     */
-    /**
-     * @cfg {String} applyTo
      * @private
      */
     /**

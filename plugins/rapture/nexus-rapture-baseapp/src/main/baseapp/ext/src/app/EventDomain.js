@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This class is a base class for an event domain. In the context of MVC, an "event domain"
@@ -96,7 +96,7 @@ Ext.define('Ext.app.EventDomain', {
     dispatch: function(target, ev, args) {
         var me = this,
             bus = me.bus,
-            selectors = bus[ev],
+            selectors = bus[ev.toLowerCase()],
             selector, controllers, id, events, event, i, ln;
 
         if (!selectors) {
@@ -179,6 +179,7 @@ Ext.define('Ext.app.EventDomain', {
                         options  = null;
                         listener = listeners[ev];
                         scope    = controller;
+                        ev       = ev.toLowerCase();
                         event    = new Ext.util.Event(controller, ev);
 
                         // Normalize the listener
@@ -278,6 +279,7 @@ Ext.define('Ext.app.EventDomain', {
             controllers, ev, selector, selectors;
 
         for (ev in bus) {
+            ev = ev.toLowerCase();
             if (bus.hasOwnProperty(ev) && (selectors = bus[ev])) {
                 for (selector in selectors) {
                     controllers = selectors[selector];

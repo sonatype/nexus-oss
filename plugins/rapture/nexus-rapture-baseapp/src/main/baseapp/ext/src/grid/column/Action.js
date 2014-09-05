@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Grid header type which renders an icon, or a series of icons in a grid cell, and offers a scoped click
@@ -74,12 +74,16 @@ Ext.define('Ext.grid.column.Action', {
      * @cfg {String} icon
      * The URL of an image to display as the clickable element in the column.
      *
+     * There are no default icons that come with Ext JS.
+     *
      * Defaults to `{@link Ext#BLANK_IMAGE_URL}`.
      */
     /**
      * @cfg {String} iconCls
      * A CSS class to apply to the icon image. To determine the class dynamically, configure the Column with
      * a `{@link #getClass}` function.
+     *
+     * There are no default icon classes that come with Ext JS.
      */
     /**
      * @cfg {Function} handler
@@ -112,8 +116,12 @@ Ext.define('Ext.grid.column.Action', {
      */
     /**
      * @cfg {Boolean} [stopSelection=true]
-     * Prevent grid selection upon mousedown.
+     * Prevent grid selection upon click.
+     * Beware that if you allow for the selection to happen then the selection model will steal focus from
+     * any possible floating window (like a message box) raised in the handler. This will prevent closing the
+     * window when pressing the Escape button since it will no longer contain a focused component.
      */
+     stopSelection: true,
     /**
      * @cfg {Function} getClass
      * A function which returns the CSS class to apply to the icon image.
@@ -232,6 +240,8 @@ Ext.define('Ext.grid.column.Action', {
 
     innerCls: Ext.baseCSSPrefix + 'grid-cell-inner-action-col',
 
+    actionIconCls: Ext.baseCSSPrefix + 'action-col-icon',
+
     constructor: function(config) {
         var me = this,
             cfg = Ext.apply({}, config),
@@ -301,11 +311,11 @@ Ext.define('Ext.grid.column.Action', {
             }
 
             ret += '<img role="button" alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
-                '" class="' + prefix + 'action-col-icon ' + prefix + 'action-col-' + String(i) + ' ' + (disabled ? prefix + 'item-disabled' : ' ') +
-                ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope || scope, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
+                '" class="' + me.actionIconCls + ' ' + prefix + 'action-col-' + String(i) + ' ' + (disabled ? prefix + 'item-disabled' : ' ') +
+                (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope || scope, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
                 (tooltip ? ' data-qtip="' + tooltip + '"' : '') + ' />';
         }
-        return ret;    
+        return ret;
     },
 
     /**
@@ -365,8 +375,13 @@ Ext.define('Ext.grid.column.Action', {
             target = e.getTarget(),
             match,
             item, fn,
-            key = type == 'keydown' && e.getKey(),
+            key = (type === 'keydown' && e.getKey()),
             disabled;
+
+        // Don't process mousedown events anymore!
+        if (type === 'mousedown') {
+            return false;
+        }
 
         // If the target was not within a cell (ie it's a keydown event from the View), then
         // rely on the selection data injected by View.processUIEvent to grab the
@@ -385,11 +400,16 @@ Ext.define('Ext.grid.column.Action', {
                     if (fn) {
                         fn.call(item.scope || me.origScope || me, view, recordIndex, cellIndex, item, e, record, row);
                     }
-                } else if (type == 'mousedown' && item.stopSelection !== false) {
-                    return false;
+
+                    // The default is to stop the event from propagating (thus preventing the selection model from
+                    // selecting and focusing the grid row). See EXTJSIV-11177.
+                    if (item.stopSelection !== false) {
+                        return false;
+                    }
                 }
             }
         }
+
         return me.callParent(arguments);
     },
 

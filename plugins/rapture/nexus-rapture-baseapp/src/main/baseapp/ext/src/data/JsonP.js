@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,13 +13,47 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @class Ext.data.JsonP
  * @singleton
  * This class is used to create JSONP requests. JSONP is a mechanism that allows for making
- * requests for data cross domain. More information is available <a href="http://en.wikipedia.org/wiki/JSONP">here</a>.
+ * requests for data cross domain. JSONP is basically a `<script>` node with the source of the url executing
+ * a function that was created by Ext.data.JsonP. Once the resource has loaded, the `<script>` node will be destroyed.
+ *
+ * If you have a request such as:
+ *
+ *     Ext.data.JsonP.request({
+ *         url : 'foo.php'
+ *     });
+ *
+ * Ext.data.JsonP will create a `<script>` node in the `<head>` with the `src` attribute pointing to
+ * `foo.php?callback=Ext.data.JsonP.callback1`. The `foo.php` script will have to detect the `callback` URL parameter
+ * and return valid JavaScript:
+ *
+ *     Ext.data.JsonP.callback1({"foo":"bar"});
+ *
+ * A simple PHP example would look like:
+ *
+ *     <?php
+ *
+ *     $data = array('foo' => 'bar');
+ *
+ *     if (!empty($_REQUEST['callback'])) {
+ *         header('Content-Type: application/javascript');
+ *         echo $_REQUEST['callback'] . '(';
+ *     }
+ *
+ *     echo json_encode($data);
+ *
+ *     if (!empty($_REQUEST['callback']) {
+ *         echo ');';
+ *     }
+ *
+ *     ?>
+ *
+ * More information is available <a href="http://en.wikipedia.org/wiki/JSONP">here</a>. You can also use <a href="http://www.jsonplint.com">JSONPLint</a> to test your JSONP.
  */
 Ext.define('Ext.data.JsonP', {
 

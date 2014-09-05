@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Used as a view by {@link Ext.tree.Panel TreePanel}.
@@ -46,8 +46,6 @@ Ext.define('Ext.tree.View', {
     nodeAnimWrapCls: Ext.baseCSSPrefix + 'tree-animator-wrap',
     
     ariaRole: 'tree',
-
-    blockRefresh: true,
 
     /**
      * @cfg {Boolean}
@@ -93,7 +91,6 @@ Ext.define('Ext.tree.View', {
                 var record = rowValues.record,
                     view = rowValues.view;
 
-                rowValues.rowAttr = {};
                 // We always need to set the qtip/qtitle, because they may have been
                 // emptied, which means we still need to flush that change to the DOM
                 // so the old values are overwritten
@@ -299,7 +296,8 @@ Ext.define('Ext.tree.View', {
      */
     createAnimWrap: function(record, index) {
         var me = this,
-            node = me.getNode(record),
+            // Row-wrapped features need to return the itemSelector ancestor node, not the data source node.
+            node = me.getNode(record, !me.isRowWrapped),
             tmpEl, nodeEl,
             columnSizer = [];
 
@@ -641,7 +639,11 @@ Ext.define('Ext.tree.View', {
                 afteranimate: function() {
                     // In case lastframe did not fire because the animation was stopped.
                     animWrap.el.remove();
-                    me.refreshSize();
+                    
+                    if (!me.isDestroyed) {
+                        me.refreshSize();
+                    }
+                    
                     delete me.animWraps[animWrap.record.internalId];
                     delete queue[id];
                 }

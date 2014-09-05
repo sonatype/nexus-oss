@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A base class for all menu items that require menu-related functionality such as click handling,
@@ -118,12 +118,16 @@ Ext.define('Ext.menu.Item', {
      * @cfg {String} icon
      * The path to an icon to display in this item.
      *
+     * There are no default icons that come with Ext JS.
+     *
      * Defaults to `Ext.BLANK_IMAGE_URL`.
      */
 
     /**
      * @cfg {String} iconCls
      * A CSS class that specifies a `background-image` to use as the icon for this item.
+     *
+     * There are no default icon classes that come with Ext JS.
      */
 
     /**
@@ -199,7 +203,7 @@ Ext.define('Ext.menu.Item', {
             '{text}',
         '<tpl else>',
             '<a id="{id}-itemEl"',
-                ' class="{linkCls} {indentCls}{childElCls}"',
+                ' class="{linkCls} {childElCls}"',
                 ' href="{href}" role="presentation" ',
                 '<tpl if="hrefTarget"> target="{hrefTarget}"</tpl>',
                 ' hidefocus="true"',
@@ -209,7 +213,7 @@ Ext.define('Ext.menu.Item', {
                     ' tabIndex="{tabIndex}"',
                 '</tpl>',
             '>',
-                '<span id="{id}-textEl" class="{textCls}{childElCls}" unselectable="on">{text}</span>',
+                '<span id="{id}-textEl" class="{textCls} {indentCls}{childElCls}" unselectable="on">{text}</span>',
                 '<tpl if="hasIcon">',
                     '<div role="presentation" id="{id}-iconEl" class="{baseIconCls}',
                         '{[values.rightIcon ? "-right" : ""]} {iconCls}',
@@ -335,8 +339,9 @@ Ext.define('Ext.menu.Item', {
 
         if (me.activated && (!menu.rendered || !menu.isVisible())) {
             me.parentMenu.activeChild = menu;
-            menu.parentItem = me;
+            menu.ownerCmp = menu.ownerItem = me;
             menu.parentMenu = me.parentMenu;
+            menu.constrainTo = document.body;
             menu.showBy(me, me.menuAlign);
         }
     },
@@ -428,15 +433,17 @@ Ext.define('Ext.menu.Item', {
         me.callParent(arguments);
     },
 
-    onClick: function(e) {
+    onClick: function (e) {
         var me = this,
-            clickHideDelay = me.clickHideDelay;
+            clickHideDelay = me.clickHideDelay,
+            browserEvent = e.browserEvent,
+            preventDefault;
 
-        if (!me.href) {
+        if (!me.href || me.disabled) {
             e.stopEvent();
         }
 
-        if (me.disabled) {
+        if (me.disabled || me.handlingClick) {
             return;
         }
 
@@ -451,6 +458,27 @@ Ext.define('Ext.menu.Item', {
         Ext.callback(me.handler, me.scope || me, [me, e]);
         me.fireEvent('click', me, e);
 
+        // If there's an href, invoke dom.click() after we've fired the click event in case a click
+        // listener wants to handle it.
+        //
+        // Note that we're having to do this because the key navigation code will blindly call stopEvent()
+        // on all key events that it handles!
+        //
+        // But, we need to check the browser event object that was passed to the listeners to determine if
+        // the default action has been prevented.  If so, we don't want to honor the .href config.
+        if (Ext.isIE9m || Ext.isIEQuirks) {
+            // Here we need to invert the value since it's meaning is the opposite of defaultPrevented.
+            preventDefault = (browserEvent.returnValue === false) ? true : false;
+        } else {
+            preventDefault = !!browserEvent.defaultPrevented;
+        }
+
+        if (me.href && !preventDefault) {
+            me.handlingClick = true;
+            me.itemEl.dom.click();
+            delete me.handlingClick;
+        }
+
         if (!me.hideOnClick) {
             me.focus();
         }
@@ -464,7 +492,7 @@ Ext.define('Ext.menu.Item', {
             me.parentMenu.deactivateActiveItem();
         }
         me.callParent(arguments);
-        me.parentMenu = me.ownerButton = null;
+        me.parentMenu = me.ownerCmp = me.ownerButton = null;
     },
 
     // @private
@@ -564,7 +592,7 @@ Ext.define('Ext.menu.Item', {
             me.setTooltip(me.tooltip, true);
         }
     },
-    
+
     /**
      * Set a child menu for this item. See the {@link #cfg-menu} configuration.
      * @param {Ext.menu.Menu/Object} menu A menu, or menu configuration. null may be
@@ -577,23 +605,21 @@ Ext.define('Ext.menu.Item', {
         var me = this,
             oldMenu = me.menu,
             arrowEl = me.arrowEl;
-            
+
         if (oldMenu) {
-            delete oldMenu.parentItem;
-            delete oldMenu.parentMenu;
-            delete oldMenu.ownerItem;
-            
+            oldMenu.ownerCmp = oldMenu.ownerItem = oldMenu.parentMenu = null;
+
             if (destroyMenu === true || (destroyMenu !== false && me.destroyMenu)) {
                 Ext.destroy(oldMenu);
             }
         }
         if (menu) {
             me.menu = Ext.menu.Manager.get(menu);
-            me.menu.ownerItem = me;
+            me.menu.ownerCmp = me.menu.ownerItem = me;
         } else {
             me.menu = null;
         }
-        
+
         if (me.rendered && !me.destroying && arrowEl) {
             arrowEl[me.menu ? 'addCls' : 'removeCls'](me.arrowCls);
         }

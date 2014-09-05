@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag foundation,core
 // @define Ext
@@ -127,6 +127,22 @@ Ext._startTime = new Date().getTime();
          */
         emptyString: new String(),
 
+        /**
+         * @property {String} [baseCSSPrefix='x-']
+         * The base prefix to use for all `Ext` components. To configure this property, you should use the
+         * Ext.buildSettings object before the framework is loaded:
+         *
+         *     Ext.buildSettings = {
+         *         baseCSSPrefix : 'abc-'
+         *     };
+         *
+         * or you can change it before any components are rendered:
+         *
+         *     Ext.baseCSSPrefix = Ext.buildSettings.baseCSSPrefix = 'abc-';
+         *
+         * This will change what CSS classes components will use and you should
+         * then recompile the SASS changing the `$prefix` SASS variable to match.
+         */
         baseCSSPrefix: Ext.buildSettings.baseCSSPrefix,
 
         /**
@@ -1014,7 +1030,7 @@ Ext.globalEval = Ext.global.execScript
 
 // Current core version
 // also fix Ext-more.js
-var version = '4.2.2.1144',
+var version = '4.2.3.1477',
     // used by checkVersion to avoid temp arrays:
     checkVerTemp = [''],
     endOfVersionRe = /([^\d\.])/,
@@ -1408,6 +1424,11 @@ var version = '4.2.2.1144',
     Ext.apply(Ext, {
         /**
          * @private
+         * 
+         * Object containing version information for all packages utilized by your 
+         * application. 
+         * 
+         * For a public getter, please see `Ext.getVersion()`.
          */
         versions: {},
 
@@ -1692,7 +1713,7 @@ var version = '4.2.2.1144',
 Ext.String = (function() {
     var trimRegex     = /^[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+|[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+$/g,
         escapeRe      = /('|\\)/g,
-        formatRe      = /\{(\d+)\}/g,
+        formatRe      = /\{\d+\}/,
         escapeRegexRe = /([-.*+?\^${}()|\[\]\/\\])/g,
         basicTrimRe   = /^\s+|\s+$/g,
         whitespaceRe  = /\s+/,
@@ -1711,12 +1732,32 @@ Ext.String = (function() {
             if (s === null || s === undefined || other === null || other === undefined) {
                 return false;
             }
-            
+
             return other.length <= s.length; 
+        },
+        // Flags for the template compile process.
+        // stringFormat means that token 0 consumes argument 1 etc.
+        // So that String.format does not have to slice the argument list.
+        formatTplConfig = {useFormat: false, compiled: true, stringFormat: true},
+        formatFns = {},
+        generateFormatFn = function(format) {
+            // Generate a function which substitutes value tokens
+            if (formatRe.test(format)) {
+                format = new Ext.Template(format, formatTplConfig);
+                return function() {
+                    return format.apply(arguments);
+                };
+            }
+            // No value tokens
+            else {
+                return function() {
+                    return format;
+                };
+            }
         };
 
     return {
-        
+
         /**
          * Inserts a substring into a string.
          * @param {String} s The original string.
@@ -1785,7 +1826,7 @@ Ext.String = (function() {
         /**
          * Checks if a string ends with a substring
          * @param {String} s The original string
-         * @param {String} start The substring to check
+         * @param {String} end The substring to check
          * @param {Boolean} [ignoreCase=false] True to ignore the case in the comparison
          */
         endsWith: function(s, end, ignoreCase){
@@ -1835,7 +1876,7 @@ Ext.String = (function() {
         /**
          * Checks if a string has values needing to be html encoded.
          * @private
-         * @param {String} The string to test
+         * @param {String} s The string to test
          * @return {Boolean} `true` if the string contains HTML characters
          */
         hasHtmlCharacters: function(s) {
@@ -1868,7 +1909,7 @@ Ext.String = (function() {
          * The set of character entities may be reset back to the default state by using
          * the {@link Ext.String#resetCharacterEntities} method
          *
-         * @param {Object} entities The set of character entities to add to the current
+         * @param {Object} newEntities The set of character entities to add to the current
          * definitions.
          */
         addCharacterEntities: function(newEntities) {
@@ -1958,16 +1999,16 @@ Ext.String = (function() {
          * @param {Boolean} [word=false] `true` to try to find a common word break.
          * @return {String} The converted text.
          */
-        ellipsis: function(value, len, word) {
-            if (value && value.length > len) {
+        ellipsis: function(value, length, word) {
+            if (value && value.length > length) {
                 if (word) {
-                    var vs = value.substr(0, len - 2),
+                    var vs = value.substr(0, length - 2),
                     index = Math.max(vs.lastIndexOf(' '), vs.lastIndexOf('.'), vs.lastIndexOf('!'), vs.lastIndexOf('?'));
-                    if (index !== -1 && index >= (len - 15)) {
+                    if (index !== -1 && index >= (length - 15)) {
                         return vs.substr(0, index) + "...";
                     }
                 }
-                return value.substr(0, len - 3) + "...";
+                return value.substr(0, length - 3) + "...";
             }
             return value;
         },
@@ -2046,10 +2087,8 @@ Ext.String = (function() {
          * @return {String} The formatted string.
          */
         format: function(format) {
-            var args = Ext.Array.toArray(arguments, 1);
-            return format.replace(formatRe, function(m, i) {
-                return args[i];
-            });
+            var formatFn = formatFns[format] || (formatFns[format] = generateFormatFn(format));
+            return formatFn.apply(this, arguments);
         },
 
         /**
@@ -2936,7 +2975,7 @@ Ext.Number = new function() {
         },
 
         /**
-         * Returns the first item in the array which elicits a true return value from the
+         * Returns the first item in the array which elicits a truthy return value from the
          * passed selection function.
          * @param {Array} array The array to search
          * @param {Function} fn The selection function to execute for each item.
@@ -5061,12 +5100,19 @@ Ext.Date = new function() {
                         // 3. Simply subtract 5 days from Saturday.
                         // 4. The first week of the year begins on Monday, December 30. Simple!
                         //
-                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));
+                        // v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));
                         // (This is essentially doing the same thing as above but for the week rather than the day)
-                        "year = y || (new Date()).getFullYear(),",
-                        "jan4 = new Date(year, 0, 4, 0, 0, 0),",
-                        "week1monday = new Date(jan4.getTime() - ((jan4.getDay() - 1) * 86400000));",
-                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));",
+                        "year = y || (new Date()).getFullYear();",
+                        "jan4 = new Date(year, 0, 4, 0, 0, 0);",
+                        "d = jan4.getDay();", 
+                        // If the 1st is a Thursday, then the 4th will be a Sunday, so we need the appropriate
+                        // day number here, which is why we use the day === checks.
+                        "week1monday = new Date(jan4.getTime() - ((d === 0 ? 6 : d - 1) * 86400000));",
+                        // The reason for adding 43200000 (12 hours) is to avoid any complication with daylight saving
+                        // switch overs. For example,  if the clock is rolled back, an hour will repeat, so adding 7 days
+                        // will leave us 1 hour short (Sun <date> 23:00:00). By setting is to 12:00, subtraction
+                        // or addition of an hour won't make any difference.
+                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));",
                     "} else {",
                         // plain old Date object
                         // handle years < 100 properly
@@ -7401,6 +7447,8 @@ var noArgs = [],
          *      });
          * 
          *      Ext.define('Ext.some.DerivedClass', {
+         *          extend: 'Ext.some.Class',
+         *
          *          method: function () {
          *              console.log('Bad');
          * 
@@ -7410,10 +7458,10 @@ var noArgs = [],
          *          }
          *      });
          * 
-         * To patch the bug in `DerivedClass.method`, the typical solution is to create an
+         * To patch the bug in `Ext.some.DerivedClass.method`, the typical solution is to create an
          * override:
          * 
-         *      Ext.define('App.paches.DerivedClass', {
+         *      Ext.define('App.patches.DerivedClass', {
          *          override: 'Ext.some.DerivedClass',
          *          
          *          method: function () {
@@ -9627,7 +9675,19 @@ var noArgs = [],
     /**
      * @cfg {String[]} alias
      * @member Ext.Class
-     * List of short aliases for class names.  Most useful for defining xtypes for widgets:
+     * List of short aliases for class names. An alias consists of a namespace and a name concatenated by a period as &#60;namespace&#62;.&#60;name&#62;
+     *
+     *  - **namespace** - The namespace describes what kind of alias this is and must be all lowercase.
+     *  - **name** - The name of the alias which allows the lazy-instantiation via the alias. The name shouldn't contain any periods.
+     *
+     * A list of namespaces and the usages are:
+     *
+     *  - **feature** - {@link Ext.grid.Panel Grid} features
+     *  - **plugin** - Plugins
+     *  - **store** - {@link Ext.data.Store}
+     *  - **widget** - Components
+     *
+     * Most useful for defining xtypes for widgets:
      *
      *     Ext.define('MyApp.CoolPanel', {
      *         extend: 'Ext.panel.Panel',
@@ -9645,8 +9705,6 @@ var noArgs = [],
      *             {xtype: 'coolpanel', html: 'Bar'}
      *         ]
      *     });
-     *
-     * Besides "widget" for xtype there are alias namespaces like "feature" for ftype and "plugin" for ptype.
      */
     Manager.registerPostprocessor('alias', function(name, cls, data) {
         Ext.classSystemMonitor && Ext.classSystemMonitor(name, 'Ext.ClassManager#aliasPostProcessor', arguments);
@@ -10233,7 +10291,7 @@ var noArgs = [],
     Ext.ns = Ext.namespace;
 
     Class.registerPreprocessor('className', function(cls, data) {
-        if (data.$className) {
+        if ('$className' in data) {
             cls.$className = data.$className;
             cls.displayName = cls.$className;
         }
@@ -10836,6 +10894,7 @@ Ext.Loader = new function() {
     var queue = [],
         isClassFileLoaded = {},
         isFileLoaded = {},
+        inFlight = {},
         classNameToFilePathMap = {},
         scriptElements = {},
         readyListeners = [],
@@ -10951,12 +11010,6 @@ Ext.Loader = new function() {
                 if (item) {
                     requires = item.requires;
 
-                    // Don't bother checking when the number of files loaded
-                    // is still less than the array length
-                    if (requires.length > Loader.numLoadedFiles) {
-                        continue;
-                    }
-
                     // Remove any required classes that are loaded
                     for (j = 0; j < requires.length; ) {
                         if (Manager.isCreated(requires[j])) {
@@ -10984,6 +11037,13 @@ Ext.Loader = new function() {
         /**
          * Inject a script element to document's head, call onLoad and onError accordingly
          * @private
+         * @param {String} url The url of the script node to load.
+         * @param {Function} onLoad The function to execute once the script node loads. For <IE9, this function will only execute
+         * once the readyState is `loaded` or `complete`.
+         * @param {Function} onError The function to execute if the script node fails to load such as a 404 status is returned.
+         * @param {Object} scope The scope to execute the `onLoad` and `onError` functions.
+         * @param {String} charset The value for the charset attribute to be used on the script node. Useful if you need to use `utf-8` for the returned code.
+         * @return {HTMLElement} The script node that was created
          */
         injectScriptElement: function(url, onLoad, onError, scope, charset) {
             var script = document.createElement('script'),
@@ -11127,7 +11187,8 @@ Ext.Loader = new function() {
             Loader.scriptsLoading++;
 
             src = config.disableCaching ?
-                (url + '?' + config.disableCachingParam + '=' + Ext.Date.now()) : url;
+                // If there is a querystring, append _dc to it with an ampersand.
+                (url + (url.indexOf('?') === -1 ? '?' : '&') + config.disableCachingParam + '=' + Ext.Date.now()) : url;
 
             scriptElements[url] = Loader.injectScriptElement(src, onScriptLoad, onScriptError);
         },
@@ -11137,10 +11198,6 @@ Ext.Loader = new function() {
          * @private
          */
         loadScriptFile: function(url, onLoad, onError, scope, synchronous) {
-            if (isFileLoaded[url]) {
-                return Loader;
-            }
-
             var config = Loader.getConfig(),
                 noCacheUrl = url + (config.disableCaching ? ('?' + config.disableCachingParam + '=' + Ext.Date.now()) : ''),
                 isCrossOriginRestricted = false,
@@ -11344,17 +11401,33 @@ Ext.Loader = new function() {
                 }
 
                 if (!isClassFileLoaded.hasOwnProperty(className)) {
-                    isClassFileLoaded[className] = false;
-                    classNameToFilePathMap[className] = filePath;
+                    // If the filepath has already been loaded or if it's currently pending, don't attempt to download it again.
+                    // Note that if the Loader isn't told about where to find the classes for both namespaces then the Loader will
+                    // have no way of knowning that they are, in fact, aliases to the same namespace. So, the filepaths will never
+                    // match (Loader.config.paths won't be aware of the path, see Loader.getPath()).
+                    //
+                    // For example, without calling setPath, Ext.spec.Foo and Foo.spec.Foo will have the following paths:
+                    //      Ext.spec.Foo === http://localhost/SDK/extjs/src/spec/Foo.js
+                    //      Foo.spec.Foo === Foo/spec/Foo.js
+                    //
+                    // This is only to try and catch an edge case, but the Loader can only match what it knows about.
+                    // See EXTJSIV-11711.
+                    if (Loader.isFileLoaded[filePath] || inFlight[filePath]) {
+                        isClassFileLoaded[className] = true;
+                    } else {
+                        inFlight[filePath] = true;
+                        isClassFileLoaded[className] = false;
 
-                    Loader.numPendingFiles++;
-                    Loader.loadScriptFile(
-                        filePath,
-                        pass(Loader.onFileLoaded, [className, filePath], Loader),
-                        pass(Loader.onFileLoadError, [className, filePath], Loader),
-                        Loader,
-                        syncModeEnabled
-                    );
+                        Loader.numPendingFiles++;
+                        Loader.loadScriptFile(
+                            filePath,
+                            pass(Loader.onFileLoaded, [className, filePath], Loader),
+                            pass(Loader.onFileLoadError, [className, filePath], Loader),
+                            Loader,
+                            syncModeEnabled
+                        );
+                    }
+                    classNameToFilePathMap[className] = filePath;
                 }
             }
 
@@ -11380,6 +11453,7 @@ Ext.Loader = new function() {
 
             isClassFileLoaded[className] = true;
             isFileLoaded[filePath] = true;
+            delete inFlight[filePath];
 
             // In FF, when we sync load something that has had a script tag inserted, the load event may
             // sometimes fire even if we clean it up and set it to null, so check if we're already loaded here.

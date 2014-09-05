@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 
 /**
@@ -78,6 +78,55 @@ Ext.define('Ext.AbstractComponent', {
         },
 
         /**
+          * Walk the DOM tree upwards and find the Component these elements belong to.
+          * @private
+          */
+        findComponentByElement: function(node) {
+            var topmost = document.body,
+                target = node,
+                cmp;
+
+            while (target && target.nodeType === 1 && target !== topmost) {
+                cmp = Ext.getCmp(target.id);
+
+                if (cmp) {
+                    return cmp;
+                }
+
+                target = target.parentNode;
+            }
+
+            return null;
+       },
+
+        /**
+         * Find a Component that the given Element belongs to.
+         *
+         * @param {Ext.dom.Element/HTMLElement} el
+         * @return {Ext.Component/null} Component, or null
+         * @private
+         */
+        getComponentByElement: function(el) {
+            var cmpIdAttr = Ext.Component.componentIdAttribute,
+                cmpId;
+
+            el = Ext.fly(el);
+
+            if (!el) {
+                return null;
+            }
+
+            cmpId = el.getAttribute(cmpIdAttr);
+
+            if (cmpId) {
+                return Ext.getCmp(cmpId);
+            }
+            else {
+                return Ext.Component.findComponentByElement(el.dom);
+            }
+        },
+
+        /**
          * Performs all pending layouts that were scheduled while
          * {@link Ext.AbstractComponent#suspendLayouts suspendLayouts} was in effect.
          * @static
@@ -96,9 +145,9 @@ Ext.define('Ext.AbstractComponent', {
                         // finishedLayout calls because they call afterComponentLayout
                         // which can re-enter by calling doLayout/doComponentLayout.
                         me.runningLayoutContext = null;
-                         
+
                         var result = this.callParent(); // not "me" here!
-                        if (Ext.globalEvents.hasListeners.afterlayout) {                            
+                        if (Ext.globalEvents.hasListeners.afterlayout) {
                             Ext.globalEvents.fireEvent('afterlayout');
                         }
                         return result;
@@ -199,6 +248,9 @@ Ext.define('Ext.AbstractComponent', {
      * It should not be necessary to use this configuration except for singleton objects in your application. Components
      * created with an `id` may be accessed globally using {@link Ext#getCmp Ext.getCmp}.
      *
+     * id should be composed of only alphanumeric characters, dashes, and underscores.
+     * Characters outside of (a-zA-Z0-9_-) have the potential to cause parsing errors.
+     *
      * Instead of using assigned ids, use the {@link #itemId} config, and {@link Ext.ComponentQuery ComponentQuery}
      * which provides selector-based searching for Sencha Components analogous to DOM querying. The {@link
      * Ext.container.Container Container} class contains {@link Ext.container.Container#down shortcut methods} to query
@@ -232,6 +284,9 @@ Ext.define('Ext.AbstractComponent', {
      * `itemId`'s or {@link #id}'s. Since `itemId`'s are an index to the container's internal MixedCollection, the
      * `itemId` is scoped locally to the container -- avoiding potential conflicts with {@link Ext.ComponentManager}
      * which requires a **unique** `{@link #id}`.
+     *
+     * itemId should be composed of only alphanumeric characters, dashes, and underscores.
+     * Characters outside of (a-zA-Z0-9_-) have the potential to cause parsing errors.
      *
      *     var c = new Ext.panel.Panel({ //
      *         {@link Ext.Component#height height}: 300,
@@ -421,6 +476,19 @@ Ext.define('Ext.AbstractComponent', {
      *
      * A more flexible, but somewhat slower, approach is {@link #renderSelectors}.
      */
+
+    /**
+     * @cfg {String} [maskElement=null]
+     * Related to the {@link #cfg-childEls} configuration which specifies named properties which correspond to component sub-elements.
+     *
+     * The name of the element property in this component to mask when masked by a LoadMask.
+     *
+     * Defaults to `null` to indicate that Components cannot by default contain a LoadMask, and that any LoadMask should be rendered into the document body.
+     *
+     * For example, Panels use `"el"` to indicate that the whole panel should be masked. This could be configured to be
+     * `"body"` so that only the body is masked and toolbars and the header are still mouse-accessible.
+     */
+    maskElement: null,
 
     /**
      * @cfg {String/HTMLElement/Ext.Element} renderTo
@@ -699,7 +767,7 @@ Ext.define('Ext.AbstractComponent', {
      *         borderColor: 'red',
      *         borderStyle: 'solid'
      *     }
-     * 
+     *
      * To turn off the border, use `border: false`.
      */
 
@@ -728,6 +796,22 @@ Ext.define('Ext.AbstractComponent', {
      * @since 2.3.0
      */
     disabled: false,
+
+    // http://www.w3.org/TR/html5/disabled-elements.html
+    disabledRe: /^(?:button|input|select|textarea|optgroup|option|fieldset)$/i,
+
+    nonMaskableRe: (function () {
+        var re = ['input', 'select', 'textarea', 'optgroup', 'option', 'table'];
+
+        // All IE browsers 9 and below except for IE 9 standards.
+        if (Ext.isIE9m && !(Ext.isIE9 && !Ext.isIEQuirks)) {
+            // <p>.insertAdjacentHTML('BeforeEnd', '<div>...</div>') yields
+            // 'Invalid source HTML for this operation' in all IEs not IE 9 standards.
+            re.push('p');
+        }
+
+        return new RegExp('^(?:' + re.join('|') + ')$', 'i');
+    }()),
 
     /**
      * @cfg {Boolean} [draggable=false]
@@ -907,7 +991,7 @@ Ext.define('Ext.AbstractComponent', {
      *
      * By using config object with ptype:
      *
-     *     plugins: [{ptype: 'cellediting', clicksToEdit: 1}],
+     *     plugins: {ptype: 'cellediting', clicksToEdit: 1},
      *
      * Or with just a ptype:
      *
@@ -1043,9 +1127,9 @@ Ext.define('Ext.AbstractComponent', {
      * @property {String} [contentPaddingProperty='padding']
      * The name of the padding property that is used by the layout to manage
      * padding.  See {@link Ext.layout.container.Auto#managePadding managePadding}
-     */ 
+     */
     contentPaddingProperty: 'padding',
-    
+
     horizontalPosProp: 'left',
 
     // private
@@ -1278,10 +1362,6 @@ Ext.define('Ext.AbstractComponent', {
         me.renderData = me.renderData || {};
         me.renderSelectors = me.renderSelectors || {};
 
-        if (me.plugins) {
-            me.plugins = me.constructPlugins();
-        }
-
         // we need this before we call initComponent
         if (!me.hasListeners) {
             me.hasListeners = new me.HasListeners();
@@ -1335,8 +1415,8 @@ Ext.define('Ext.AbstractComponent', {
     initComponent: function () {
         var me = this;
 
-        // If plugins have been added by a subclass's initComponent before calling up to here,
-        // The processed flag will not have been set, and we must process them again.
+        // If plugins have been added by a subclass's initComponent before calling up to here (or any components
+        // that don't have a table view), the processed flag will not have been set, and we must process them again.
         if (me.plugins && !me.plugins.processed) {
             me.plugins = me.constructPlugins();
         }
@@ -1460,7 +1540,7 @@ Ext.define('Ext.AbstractComponent', {
 
             // During animated sizing, overflow has to be hidden to clip expanded content
             if (hasToHeight || hasToWidth) {
-                oldOverflow = me.el.getStyle('overtflow');
+                oldOverflow = me.el.getStyle('overflow');
                 if (oldOverflow !== 'hidden') {
                     me.el.setStyle('overflow', 'hidden');
                 }
@@ -1516,10 +1596,10 @@ Ext.define('Ext.AbstractComponent', {
         }
         return me.mixins.animate.animate.apply(me, arguments);
     },
-    
+
     setHiddenState: function(hidden){
         var hierarchyState = this.getHierarchyState();
-        
+
         this.hidden = hidden;
         if (hidden) {
             hierarchyState.hidden = true;
@@ -1547,11 +1627,11 @@ Ext.define('Ext.AbstractComponent', {
      *
      * Ensures that the constructed plugin always has a `cmp` reference back to this component.
      * The setting up of this is done in PluginManager. The PluginManager ensures that a reference to this
-     * component is passed to the constructor. It also ensures that the plugin's `setCmp` method (if any) is called. 
+     * component is passed to the constructor. It also ensures that the plugin's `setCmp` method (if any) is called.
      */
     constructPlugin: function(plugin) {
         var me = this;
-        
+
         // ptype only, pass as the defultType
         if (typeof plugin == 'string') {
             plugin = Ext.PluginManager.create({}, plugin, me);
@@ -1578,7 +1658,7 @@ Ext.define('Ext.AbstractComponent', {
         if (plugins) {
             result = [];
 
-            // The processed flag indicates that the plugins have been constructed. THis is usually done
+            // The processed flag indicates that the plugins have been constructed. This is usually done
             // at construction time, so if at initComponent time, there is a non-zero array of plugins which
             // does NOT have the processed flag, it needs to be processed again.
             result.processed = true;
@@ -1698,7 +1778,7 @@ Ext.define('Ext.AbstractComponent', {
         if (!me.rendered) {
             return;
         }
-        if (++me.layoutSuspendCount == 1) {
+        if (++me.layoutSuspendCount === 1) {
             me.suspendLayout = true;
         }
     },
@@ -1708,7 +1788,12 @@ Ext.define('Ext.AbstractComponent', {
         if (!me.rendered) {
             return;
         }
-        if (! --me.layoutSuspendCount) {
+        //<debug>
+        if (!me.layoutSuspendCount) {
+            Ext.log.warn('Mismatched call to resumeLayouts - layouts are currently not suspended.');
+        }
+        //</debug>
+        if (me.layoutSuspendCount && !--me.layoutSuspendCount) {
             me.suspendLayout = false;
             if (flushOptions && !me.isLayoutSuspended()) {
                 me.updateLayout(flushOptions);
@@ -2112,7 +2197,7 @@ Ext.define('Ext.AbstractComponent', {
 
         if (padding != null) {
             if (me.layout && me.layout.managePadding && me.contentPaddingProperty === 'padding') {
-                // If the container layout manages padding, the layout will apply the 
+                // If the container layout manages padding, the layout will apply the
                 // padding to an inner element rather than the target element.  The
                 // assumed intent is for the configured padding to override any padding
                 // that is applied to the target element via stylesheet rules.  It is
@@ -2125,22 +2210,22 @@ Ext.define('Ext.AbstractComponent', {
             }
         }
     },
-    
+
     parseBox: function(box) {
-        return Ext.dom.Element.parseBox(box);    
+        return Ext.dom.Element.parseBox(box);
     },
-    
+
     unitizeBox: function(box) {
-        return Ext.dom.Element.unitizeBox(box);    
+        return Ext.dom.Element.unitizeBox(box);
     },
-    
+
     /**
      * Sets the margin on the target element.
      * @param {Number/String} margin The margin to set. See the {@link #margin} config.
      */
     setMargin: function(margin, /* private */ preventLayout) {
         var me = this;
-        
+
         if (me.rendered) {
             if (!margin && margin !== 0) {
                 margin = '';
@@ -2191,7 +2276,7 @@ Ext.define('Ext.AbstractComponent', {
     /**
      * @private
      * Sets up the focus listener on this Component's {@link #getFocusEl focusEl} if it has one.
-     * 
+     *
      * Form Components which must implicitly participate in tabbing order usually have a naturally focusable
      * element as their {@link #getFocusEl focusEl}, and it is the DOM event of that receiving focus which drives
      * the Component's `onFocus` handling, and the DOM event of it being blurred which drives the `onBlur` handling.
@@ -2223,7 +2308,7 @@ Ext.define('Ext.AbstractComponent', {
             // onFocus handling.
             // If *not* naturally focusable, then we only need the focus listener if the FocusManager is enabled.
             needsTabIndex = focusEl.needsTabIndex();
-            if (!me.focusListenerAdded && (!needsTabIndex || Ext.FocusManager.enabled)) {
+            if (!me.focusListenerAdded && (!needsTabIndex || Ext.enableFocusManager)) {
                 if (needsTabIndex) {
                     focusEl.dom.tabIndex = -1;
                 }
@@ -2323,6 +2408,34 @@ Ext.define('Ext.AbstractComponent', {
      * @param {Ext.EventObject} e The event object
      */
     postBlur : Ext.emptyFn,
+
+    /**
+     * @private
+     * @param {HTMLElement/Ext.EventObject/Ext.Element} element The child item to test.
+     * Returns `true` if the passed element is within the container tree of this component.
+     *
+     * For example if a menu's submenu contains an {@link Ext.form.field.Date}, that top level
+     * menu owns the elements of the date picker. Using this method, you can tell if an event took place
+     * within a certain component tree.
+     */
+    owns: function (element) {
+        var result = false,
+            cmp;
+
+        if (element.isEvent) {
+            element = element.target;
+        } else if (element.isElement) {
+            element = element.dom;
+        }
+
+        cmp = Ext.AbstractComponent.findComponentByElement(element);
+
+        if (cmp) {
+            result = (cmp === this) || (!!cmp.up(this));
+        }
+
+        return result;
+    },
 
     /**
      * Tests whether this Component matches the selector string.
@@ -2567,7 +2680,7 @@ Ext.define('Ext.AbstractComponent', {
     getTargetEl: function() {
         return this.frameBody || this.el;
     },
-    
+
     /**
      * Get an el for overflowing, defaults to the target el
      * @private
@@ -2609,7 +2722,7 @@ Ext.define('Ext.AbstractComponent', {
                 if (ox && ox === true) {
                     ox = 'auto';
                 }
-                
+
                 if (oy && oy === true) {
                     oy = 'auto';
                 }
@@ -2623,10 +2736,10 @@ Ext.define('Ext.AbstractComponent', {
                 * @property {Object} scrollFlags
                 * An object property which provides unified information as to which dimensions are scrollable based upon
                 * the {@link #autoScroll}, {@link #overflowX} and {@link #overflowY} settings (And for *views* of trees and grids, the owning panel's {@link Ext.panel.Table#scroll scroll} setting).
-                * 
+                *
                 * Note that if you set overflow styles using the {@link #style} config or {@link Ext.panel.Panel#bodyStyle bodyStyle} config, this object does not include that information;
                 * it is best to use {@link #autoScroll}, {@link #overflowX} and {@link #overflowY} if you need to access these flags.
-                * 
+                *
                 * This object has the following properties:
                 * @property {Boolean} scrollFlags.x `true` if this Component is scrollable horizontally - style setting may be `'auto'` or `'scroll'`.
                 * @property {Boolean} scrollFlags.y `true` if this Component is scrollable vertically - style setting may be `'auto'` or `'scroll'`.
@@ -2751,7 +2864,10 @@ Ext.define('Ext.AbstractComponent', {
     update : function(htmlOrData, loadScripts, cb) {
         var me = this,
             isData = (me.tpl && !Ext.isString(htmlOrData)),
-            el;
+            el,
+            sizeModel = me.getSizeModel(),
+            // Do a layout if any dimension is shrinkWrap
+            doLayout = sizeModel.width.shrinkWrap || sizeModel.height.shrinkWrap;
 
         if (isData) {
             me.data = htmlOrData;
@@ -2760,13 +2876,23 @@ Ext.define('Ext.AbstractComponent', {
         }
 
         if (me.rendered) {
-            el = me.isContainer ? me.layout.getRenderTarget() : me.getTargetEl();
+            if (me.isContainer) {
+                el = me.layout.getRenderTarget();
+
+                // If we are a non-empty container being updated with raw content we have to lay out
+                doLayout = doLayout || me.items.items.length > 0;
+            } else {
+                el = me.getTargetEl();
+            }
             if (isData) {
                 me.tpl[me.tplWriteMode](el, htmlOrData || {});
             } else {
                 el.update(me.html, loadScripts, cb);
             }
-            me.updateLayout();
+
+            if (doLayout) {
+                me.updateLayout();
+            }
         }
 
     },
@@ -2849,7 +2975,7 @@ Ext.define('Ext.AbstractComponent', {
      *
      * @param {Number} width The width of this component
      * @param {Number} height The height of this component
-     * 
+     *
      * @template
      * @protected
      */
@@ -2870,7 +2996,7 @@ Ext.define('Ext.AbstractComponent', {
         if (me.draggable) {
             me.initDraggable();
         }
-        
+
         if (me.hasListeners.boxready) {
             me.fireEvent('boxready', me, width, height);
         }
@@ -2936,9 +3062,20 @@ Ext.define('Ext.AbstractComponent', {
      * @protected
      */
     onEnable: function() {
-        if (this.maskOnDisable) {
-            this.el.dom.disabled = false;
-            this.unmask();
+        var me = this,
+            dom, nodeName;
+
+        if (me.maskOnDisable) {
+            dom = me.el.dom;
+            nodeName = dom.nodeName;
+
+            if (me.disabledRe.test(nodeName)) {
+                dom.disabled = false;
+            }
+
+            if (!me.nonMaskableRe.test(nodeName)) {
+                me.unmask();
+            }
         }
     },
 
@@ -2949,24 +3086,45 @@ Ext.define('Ext.AbstractComponent', {
      * @template
      * @protected
      */
-    onDisable : function() {
+    onDisable: function() {
         var me = this,
             focusCls = me.focusCls,
-            focusEl = me.getFocusEl();
-            
+            focusEl = me.getFocusEl(),
+            dom, nodeName;
+
         if (focusCls && focusEl) {
             focusEl.removeCls(me.removeClsWithUI(focusCls, true));
         }
-        
+
         if (me.maskOnDisable) {
-            me.el.dom.disabled = true;
-            me.mask();
+            dom = me.el.dom;
+            nodeName = dom.nodeName;
+
+            if (me.disabledRe.test(nodeName)) {
+                dom.disabled = true;
+            }
+
+            if (!me.nonMaskableRe.test(nodeName)) {
+                me.mask();
+            }
         }
     },
 
+    /**
+     * Masks this component with a semi-opaque layer and makes the contents unavailable to clicks.
+     *
+     * See {@link #unmask}.
+     *
+     * @param {String} [msg] A message to show in the center of the mask layer.
+     * @param {String} [msgCls] A CSS clas name to use on the message element in the center of the layer.
+     *
+     */
     mask: function (msg, msgCls, elHeight) {
         var box = this.lastBox,
-            target = this.getMaskTarget();
+            // getMaskTarget mayu be overridden in subclasses/
+            // null means that a LoadMask has to be rendered to document.body
+            // Element masking falls back to masking the local el
+            target = this.getMaskTarget() || this.el;
 
         // Pass it the height of our element if we know it.
         if (box) {
@@ -2975,12 +3133,32 @@ Ext.define('Ext.AbstractComponent', {
         target.mask(msg, msgCls, elHeight);
     },
 
+    /**
+     * Removes the mask applied by {@link #mask}
+     *
+     */
     unmask: function() {
-        this.getMaskTarget().unmask();
+        (this.getMaskTarget() || this.el).unmask();
     },
 
-    getMaskTarget: function(){
-        return this.el;
+    /**
+     * @protected
+     * Returns the element which is masked by the {@link #mask} method, or into which the {@link #setLoading LoadMask} is rendered into.
+     *
+     * The default implementation uses the {@link #maskElement} configuration to access the Component's child element by name. By default, {@link #maskElement}
+     * is `null` which means that `null` is returned from this method indicating that the mask needs to be rendered into the document because
+     * component structure should not be contaminated by mask elements.
+     *
+     * Some subclasses may override this method if they have knowledge about external structures where a mask could usefully be rendered.
+     *
+     * For example a {@link Ext.view.Table GridView} will request that its owning {@link Ext.panel.Table GridPanel} be masked. The
+     * GridPanel will have its own implementation of `getMaskTarget` which will return the element dicated by its own {@link #maskElement}
+     * Panels use `"el"` as their {@link #maskElement} by default, but that could be overridden to be `"body"` to leave toolbars and the header
+     * mouse-accessible.
+     *
+     */
+    getMaskTarget: function() {
+        return this.maskElement ? this[this.maskElement] : null;
     },
 
     /**
@@ -3201,7 +3379,7 @@ Ext.define('Ext.AbstractComponent', {
             me.hierarchyState.invalid = true;
             // We can now delete the old hierarchyState since it is invalid.  IMPORTANT:
             // the descendants are still linked to the old hierarchy state via the
-            // prototype chain, and their heirarchyState property will be synced up 
+            // prototype chain, and their heirarchyState property will be synced up
             // the next time their getHierarchyState() method is called.  For this reason
             // hierarchyState should always be accessed using getHierarchyState()
             delete me.hierarchyState;
@@ -3306,7 +3484,7 @@ Ext.define('Ext.AbstractComponent', {
         } else if (width === null) {
             delete me.width;
         }
-        
+
         if (typeof height == 'number') {
             me.height = Ext.Number.constrain(height, me.minHeight, me.maxHeight);
         } else if (height === null) {
@@ -3886,10 +4064,6 @@ Ext.define('Ext.AbstractComponent', {
     onDestroy : function() {
         var me = this;
 
-        if (me.monitorResize && Ext.EventManager.resizeEvent) {
-            Ext.EventManager.resizeEvent.removeListener(me.setSize, me);
-        }
-
         // Destroying the floatingItems ZIndexManager will also destroy descendant floating Components
         Ext.destroy(
             me.componentLayout,
@@ -3960,6 +4134,7 @@ Ext.define('Ext.AbstractComponent', {
                     delete me.frameBody;
                     delete me.rendered;
                 }
+                delete me.initialConfig;
 
                 me.destroying = false;
                 me.isDestroyed = true;
@@ -3982,24 +4157,24 @@ Ext.define('Ext.AbstractComponent', {
      * A component's hierarchyState is used to keep track of aspects of a component's
      * state that affect its descendants hierarchically like "collapsed" and "hidden".
      * For example, if this.hierarchyState.hidden == true, it means that either this
-     * component, or one of its ancestors is hidden. 
-     * 
+     * component, or one of its ancestors is hidden.
+     *
      * Hierarchical state management is implemented by chaining each component's
      * hierarchyState property to its parent container's hierarchyState property via the
      * prototype. The result is such that if a component's hierarchyState does not have
      * it's own property, it inherits the property from the nearest ancestor that does.
-     * 
+     *
      * To set a hierarchical "hidden" value:
-     * 
+     *
      *     this.getHierarchyState().hidden = true;
-     *     
+     *
      * It is important to remember when unsetting hierarchyState properties to delete
      * them instead of just setting them to a falsy value.  This ensures that the
      * hierarchyState returns to a state of inheriting the value instead of overriding it
      * To unset the hierarchical "hidden" value:
-     * 
+     *
      *     delete this.getHierarchyState().hidden;
-     * 
+     *
      * IMPORTANT! ALWAYS access hierarchyState using this method, not by accessing
      * this.hierarchyState directly.  The hierarchyState property does not exist until
      * the first time getHierarchyState() is called.  At that point getHierarchyState()
@@ -4010,7 +4185,7 @@ Ext.define('Ext.AbstractComponent', {
      * is moved to a new container. In such a case the hierarchy state remains invalid
      * until the next time getHierarchyState() is called on the component or one of its
      * descendants.
-     * 
+     *
      * @private
      */
     getHierarchyState: function (inner) {
@@ -4018,14 +4193,14 @@ Ext.define('Ext.AbstractComponent', {
             hierarchyState = (inner && me.hierarchyStateInner) || me.hierarchyState,
             ownerCt = me.ownerCt,
             parent, layout, hierarchyStateInner, getInner;
- 
+
         if (!hierarchyState || hierarchyState.invalid) {
             // Use upward navigational link, not ownerCt.
             // 99% of the time, this will use ownerCt/floatParent.
             // Certain floating components do not have an ownerCt, but they are still linked
             // into a navigational hierarchy. The getRefOwner method normalizes these differences.
             parent = me.getRefOwner();
-            
+
             if (ownerCt) {
                 // This will only be true if the item is a "child" of its owning container
                 // For example, a docked item will not get the inner hierarchy state
@@ -4154,7 +4329,8 @@ Ext.define('Ext.AbstractComponent', {
     });
 
     /**
-     * @inheritdoc Ext.AbstractComponent#resumeLayouts
+     * @method
+     * @inheritdoc Ext.AbstractComponent#static-resumeLayouts
      * @member Ext
      */
     Ext.resumeLayouts = function (flush) {
@@ -4162,7 +4338,8 @@ Ext.define('Ext.AbstractComponent', {
     };
 
     /**
-     * @inheritdoc Ext.AbstractComponent#suspendLayouts
+     * @method
+     * @inheritdoc Ext.AbstractComponent#static-suspendLayouts
      * @member Ext
      */
     Ext.suspendLayouts = function () {

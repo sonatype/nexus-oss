@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -86,8 +86,18 @@ Ext.define('Ext.view.DragZone', {
         }
     },
 
-    // private template method
-    isPreventDrag: function(e) {
+    /**
+     * @protected
+     * Template method called upon mousedown. May be overridden in subclasses, or configured
+     * into an instance.
+     *
+     * Return `true` to prevent drag start.
+     * @param {Ext.EventObject} e The mousedown event.
+     * @param {Ext.data.Model} record The record mousedowned upon.
+     * @param {HtmlElement} item The grid row mousedowned upon.
+     * @param {Number} index The row number mousedowned upon.
+     */
+    isPreventDrag: function(e, record, item, index) {
         return false;
     },
 
@@ -130,7 +140,7 @@ Ext.define('Ext.view.DragZone', {
 
     getDragText: function() {
         var count = this.dragData.records.length;
-        return Ext.String.format(this.dragText, count, count == 1 ? '' : 's');
+        return Ext.String.format(this.dragText, count, count === 1 ? '' : 's');
     },
 
     getRepairXY : function(e, data){

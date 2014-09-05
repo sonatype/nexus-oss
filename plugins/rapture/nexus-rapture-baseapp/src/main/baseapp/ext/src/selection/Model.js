@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Tracks what records are currently selected in a databound component.
@@ -221,6 +221,18 @@ Ext.define('Ext.selection.Model', {
         }
     },
 
+    getSelectionStart: function () {
+        if (!this.selectionStart) {
+            this.setSelectionStart(this.lastFocused);
+        }
+
+        return this.selectionStart;
+    },
+
+    setSelectionStart: function (selection) {
+        this.selectionStart = selection;
+    },
+
     // Provides differentiation of logic between MULTI, SIMPLE and SINGLE
     // selection modes. Requires that an event be passed so that we can know
     // if user held ctrl or shift.
@@ -229,7 +241,7 @@ Ext.define('Ext.selection.Model', {
             isSelected = me.isSelected(record),
             shift = e.shiftKey,
             ctrl = e.ctrlKey,
-            start = me.selectionStart,
+            start = shift && me.getSelectionStart(),
             selected = me.getSelection(),
             len = selected.length,
             allowDeselect = me.allowDeselect,
@@ -368,7 +380,9 @@ Ext.define('Ext.selection.Model', {
                 break;
             case 'SIMPLE':
                 if (isSelected) {
-                    me.doDeselect(record);
+                    if (me.allowDeselect) {
+                        me.doDeselect(record);
+                    }
                 } else {
                     me.doSelect(record, true);
                 }
@@ -377,8 +391,10 @@ Ext.define('Ext.selection.Model', {
                 // Space hit
                 if (isSpace) {
                     if (isSelected) {
-                        me.doDeselect(record);
-                        me.setLastFocused(record);
+                        if (me.allowDeselect) {
+                            me.doDeselect(record);
+                            me.setLastFocused(record);
+                        }
                     } else {
                         me.doSelect(record);
                     }
@@ -389,14 +405,21 @@ Ext.define('Ext.selection.Model', {
                     me.setLastFocused(record);
                 }
 
-                // if allowDeselect is on and this record isSelected, deselect it
-                else if (me.allowDeselect && isSelected) {
+                // if allowDeselect is on and this record isSelected and we just SPACED on it, deselect it
+                else if (isSpace && me.allowDeselect && isSelected) {
                     me.doDeselect(record);
                 }
 
                 // select the record and do NOT maintain existing selections
                 else {
                     me.doSelect(record, false);
+
+                    // In case the select did not take place because we were CTRL+navigating back to
+                    // an already selected item. Obey the navigation and focus the item.
+                    // TODO: In Sencha 5, selection will not implicitly focus.
+                    // This method will perform as a NavigationModel and move focus to the correct point
+                    // until a NavigationModel class can be separated off into its own class.
+                    me.setLastFocused(record);
                 }
                 break;
         }
@@ -459,7 +482,11 @@ Ext.define('Ext.selection.Model', {
             me.resumeChanges();
         }
         
-        me.doMultiSelect(toSelect, true);
+        if (toSelect.length) {
+            me.doMultiSelect(toSelect, true);
+        } else {
+            me.maybeFireSelectionChange(toDeselect.length > 0);
+        }
     },
 
     /**
@@ -487,7 +514,9 @@ Ext.define('Ext.selection.Model', {
                 toDeselect.push(record);
             }
         }
-        me.doDeselect(toDeselect);
+        if (toDeselect.length) {
+            me.doDeselect(toDeselect);
+        }
     },
     
     normalizeRowRange: function(startRow, endRow) {
@@ -526,7 +555,7 @@ Ext.define('Ext.selection.Model', {
      */
     select: function(records, keepExisting, suppressEvent) {
         // Automatically selecting eg store.first() or store.last() will pass undefined, so that must just return;
-        if (Ext.isDefined(records)) {
+        if (Ext.isDefined(records) && !(Ext.isArray(records) && !records.length)) {
             this.doSelect(records, keepExisting, suppressEvent);
         }
     },
@@ -866,7 +895,7 @@ Ext.define('Ext.selection.Model', {
         if (me.pruneRemoved) {
             for (i = 0; i < len; i++) {
                 item = selected.getAt(i);
-                if (!this.storeHasSelected(item)) {
+                if (!me.getStoreRecord(item)) {
                     toRemove.push(item);
                 }
             }
@@ -882,25 +911,27 @@ Ext.define('Ext.selection.Model', {
     // We need this special check because we could have a model
     // without an idProperty. getById() is fast, so we use that
     // if possible, otherwise we need to check the internalId
-    storeHasSelected: function(record) {
+    getStoreRecord: function(record) {
         var store = this.store,
-            records,
-            len, id, i;
+            records, rec, len, id, i;
+        
+        if (record) {
+            if (record.hasId()) {
+                return store.getById(record.getId());
+            } else {
+                records = store.data.items;
+                len = records.length;
+                id = record.internalId;
 
-        if (record.hasId() && store.getById(record.getId())) {
-            return true;
-        } else {
-            records = store.data.items;
-            len = records.length;
-            id = record.internalId;
-
-            for (i = 0; i < len; ++i) {
-                if (id === records[i].internalId) {
-                    return true;
+                for (i = 0; i < len; ++i) {
+                    rec = records[i];
+                    if (id === rec.internalId) {
+                        return rec;
+                    }
                 }
             }
         }
-        return false;
+        return null;
     },
 
     refresh: function() {
@@ -1066,7 +1097,35 @@ Ext.define('Ext.selection.Model', {
     // if records are updated
     onStoreUpdate: Ext.emptyFn,
 
-    onStoreRefresh: Ext.emptyFn,
+    onStoreRefresh: function(){
+        var me = this,
+            selected = me.selected,
+            items, length, i, rec, storeRec;
+            
+        if (me.store.buffered) {
+            return;
+        }
+            
+        items = selected.items;
+        length = items.length;
+         
+        me.lastSelected = me.getStoreRecord(me.lastSelected);
+        
+        for (i = 0; i < length; ++i) {
+            rec = items[i];
+            storeRec = me.getStoreRecord(rec);
+            if (storeRec) {
+                if (rec.hasId()) {
+                    // Only update if we have an id, otherwise they are auto loaded records
+                    // Will look up the key and replace
+                    me.selected.replace(storeRec);
+                }
+            } else {
+                // record is no longer in the store.  remove from selection
+                me.selected.remove(rec);
+            }
+        }   
+    },
 
     /**
      * @abstract

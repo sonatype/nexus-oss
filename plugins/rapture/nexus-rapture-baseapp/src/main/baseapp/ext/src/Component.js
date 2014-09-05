@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Base class for all Ext components.
@@ -137,16 +137,20 @@ Ext.define('Ext.Component', {
     /**
      * @cfg {String} overflowX
      * Possible values are:
-     *  * `'auto'` to enable automatic horizontal scrollbar (overflow-x: 'auto').
-     *  * `'scroll'` to always enable horizontal scrollbar (overflow-x: 'scroll').
+     *
+     *  - `'auto'` to enable automatic horizontal scrollbar (Style overflow-x: 'auto').
+     *  - `'scroll'` to always enable horizontal scrollbar (Style overflow-x: 'scroll').
+     *
      * The default is overflow-x: 'hidden'. This should not be combined with {@link #autoScroll}.
      */
 
     /**
      * @cfg {String} overflowY
      * Possible values are:
-     *  * `'auto'` to enable automatic vertical scrollbar (overflow-y: 'auto').
-     *  * `'scroll'` to always enable vertical scrollbar (overflow-y: 'scroll').
+     *
+     *  - `'auto'` to enable automatic vertical scrollbar (Style overflow-y: 'auto').
+     *  - `'scroll'` to always enable vertical scrollbar (Style overflow-y: 'scroll').
+     *
      * The default is overflow-y: 'hidden'. This should not be combined with {@link #autoScroll}.
      */
 
@@ -184,13 +188,28 @@ Ext.define('Ext.Component', {
      * not be set.
      */
     floating: false,
+
+    /**
+     * @cfg {String} [defaultAlign="c-c"]
+     * The default {@link Ext.util.Positionable#getAlignToXY Ext.Element#getAlignToXY} anchor position value for this component
+     * relative to its {@link #alignTarget) (which defaults to its owning Container).
+     *
+     * *Only applicable if this component is {@link #floating}*
+     * 
+     * *Used upon first show*.
+     */
+    defaultAlign: 'c-c',
     
     /**
-     * @cfg {String} [defaultAlign="tl-bl?"]
-     * The default {@link Ext.util.Positionable#getAlignToXY Ext.Element#getAlignToXY} anchor position value for this menu
-     * relative to its element of origin. Used in conjunction with {@link #showBy}.
+     * @cfg {String} [alignTarget]
+     * A Component or Element by which to position this component according to the {@link #defaultAlign}.
+     * Defaults to ths owning Container.
+     *
+     * *Only applicable if this component is {@link #floating}*
+     * 
+     * *Used upon first show*.
      */
-    defaultAlign: 'tl-bl?',
+    alignTarget: null,
 
     /**
      * @cfg {Boolean} toFrontOnShow
@@ -468,7 +487,8 @@ Ext.define('Ext.Component', {
      */
     setOverflowXY: function(overflowX, overflowY) {
         var me = this,
-            argCount = arguments.length;
+            argCount = arguments.length,
+            ownerCt = me.ownerCt;
 
         if (argCount) {
             me.overflowX = overflowX || '';
@@ -483,7 +503,10 @@ Ext.define('Ext.Component', {
         if (me.rendered) {
             me.getOverflowEl().setStyle(me.getOverflowStyle());
         }
-        me.updateLayout();
+
+        // When overflow status changes, addition/removal of scrollbars potentially changes calculated content size.
+        // Lay the owning container out if we have one.
+        (ownerCt || me).updateLayout();
         return me;
     },
 
@@ -599,36 +622,59 @@ Ext.define('Ext.Component', {
     /**
      * This method allows you to show or hide a LoadMask on top of this component.
      *
+     * The mask will be rendered into the element returned by {@link #getMaskEl} which for most Components is the Component's
+     * element. See {@link #getMaskTarget} and {@link #maskElement}.
+     *
+     * Most Components will return `null` indicating that their LoadMask cannot reside inside their element, but must
+     * be rendered into the document body.
+     *
+     * {@link Ext.table.View Grid Views} however will direct a LoadMask to be rendered into the owning {@link Ext.table.Panel GridPanel}.
+     *
      * @param {Boolean/Object/String} load True to show the default LoadMask, a config object that will be passed to the
      * LoadMask constructor, or a message String to show. False to hide the current LoadMask.
-     * @param {Boolean} [targetEl=false] True to mask the targetEl of this Component instead of the `this.el`. For example,
-     * setting this to true on a Panel will cause only the body to be masked.
      * @return {Ext.LoadMask} The LoadMask instance that has just been shown.
      */
-    setLoading : function(load, targetEl) {
+    setLoading: function (load, /*deprecated */ targetEl) {
         var me = this,
             config = {
                 target: me
             };
 
         if (me.rendered) {
-            Ext.destroy(me.loadMask);
-            me.loadMask = null;
-
-            if (load !== false && !me.collapsed) {
-                if (Ext.isObject(load)) {
-                    Ext.apply(config, load);
-                } else if (Ext.isString(load)) {
+            // Shows mask for anything but false.
+            if (load !== false) {
+                if (Ext.isString(load)) {
                     config.msg = load;
+                } else {
+                    Ext.apply(config, load);
                 }
-                
-                if (targetEl) {
-                    Ext.applyIf(config, {
-                        useTargetEl: true
-                    });
+                // We do not already have a LoadMask: create one
+                if (!me.loadMask || !me.loadMask.isLoadMask) {
+                    // Deprecated second parameter.
+                    // AbstractComponent's maskElement config replaces this
+                    if (targetEl && config.useTargetEl == null) {
+                        config.useTargetEl = true;
+                    }
+                    me.loadMask = new Ext.LoadMask(config);
                 }
-                me.loadMask = new Ext.LoadMask(config);
-                me.loadMask.show();
+                // Change any settings according to load config
+                else {
+                    Ext.apply(me.loadMask, config);
+                }
+                // If already visible, just update display with passed configs.
+                if (me.loadMask.isVisible()) {
+                    me.loadMask.afterShow();
+                }
+                // Otherwise show with new configs
+                else {
+                    me.loadMask.show();
+                }
+            }
+            // load == falsy: Hide the mask if it exists
+            else {
+                if (me.loadMask && me.loadMask.isLoadMask) {
+                    me.loadMask.hide();
+                }
             }
         }
         return me.loadMask;
@@ -703,8 +749,8 @@ Ext.define('Ext.Component', {
      * Used when this component is {@link #floating}.
      * @param {Ext.Component/Ext.dom.Element} component The {@link Ext.Component} or {@link Ext.Element} to show the component by.
      * @param {String} [position] Alignment position as used by {@link Ext.util.Positionable#getAlignToXY}.
-     * Defaults to `{@link #defaultAlign}`.
-     * @param {Number[]} [offsets] Alignment offsets as used by {@link Ext.util.Positionable#getAlignToXY}.
+     * Defaults to `{@link #defaultAlign}`. See {@link #alignTo} for possible values.
+     * @param {Number[]} [offsets] Alignment offsets as used by {@link Ext.util.Positionable#getAlignToXY}. See {@link #alignTo} for possible values.
      * @return {Ext.Component} this
      */
     showBy: function(cmp, pos, off) {
@@ -713,21 +759,28 @@ Ext.define('Ext.Component', {
         //<debug>
         if (!me.floating) {
             Ext.log.warn('Using showBy on a non-floating component');
-            return me;
         }
         //</debug>
 
         if (me.floating && cmp) {
+            me.alignTarget = cmp;
+
+            if (pos) {
+                me.defaultAlign = pos;
+            }
+
+            if (off) {
+                me.alignOffset = off;
+            }
+
             me.show();
 
-            // Show may have been vetoed
-            if (me.rendered && !me.hidden) {
-                // Align to Component or Element using alignTo because normal show methods
-                // are container-relative, and we must align to the requested element or
-                // Component:
-                me.alignTo(cmp, pos || me.defaultAlign, off);
+            // Could have been vetoed.
+            if (!me.hidden) {
+                me.alignTo(cmp, pos || me.defaultAlign, off || me.alignOffset);
             }
         }
+
         return me;
     },
 
@@ -1222,7 +1275,8 @@ Ext.define('Ext.Component', {
                 me.resizer,
                 me.proxy,
                 me.proxyWrap,
-                me.resizerComponent
+                me.resizerComponent,
+                me.loadMask
             );
         }
         delete me.focusTask;
@@ -1389,7 +1443,8 @@ Ext.define('Ext.Component', {
      * based upon ownerCt, such as BoundLists being owned by Fields or Menus being owned by Buttons.
      */
     getRefOwner: function() {
-        return this.ownerCt || this.floatParent;
+        // Look for ownerCmp before floatParent for scenarios like a button menu inside a floating window.
+        return this.ownerCt || this.ownerCmp || this.floatParent;
     },
 
     /**
@@ -1477,7 +1532,7 @@ Ext.define('Ext.Component', {
     },
 
     /**
-     * Bubbles up the component/container heirarchy, calling the specified function with each component. The scope
+     * Bubbles up the component/container hierarchy, calling the specified function with each component. The scope
      * (*this*) of function call will be the scope provided or the current component. The arguments to the function will
      * be the args provided or the current component. If the function returns false at any point, the bubble is stopped.
      *

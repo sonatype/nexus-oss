@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @class Ext.chart.series.Line
@@ -106,6 +106,47 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  * an object as highlight so that markers animate smoothly to the properties in highlight
  * when hovered. The second series has `fill=true` which means that the line will also
  * have an area below it of the same color.
+ *
+ * In some uses, a line will not be continuous and may have gaps. In order to accomplish this,
+ * the data must return `false` and the series will not be continues for this data point.
+ *
+ *     @example
+ *     Ext.create('Ext.chart.Chart', {
+ *           renderTo: Ext.getBody(),
+ *           height: 300,
+ *           width: 500,
+ *           axes: [{
+ *               position: 'bottom',
+ *               title: 'X',
+ *               fields: ['x'],
+ *               type: 'Numeric'
+ *           }, {
+ *               position: 'left',
+ *               title: 'Y',
+ *               fields: ['y'],
+ *               type: 'Numeric'
+ *           }],
+ *           series: [{
+ *               xField: 'x',
+ *               yField: 'y',
+ *               type: 'line'
+ *           }],
+ *           store: {
+ *               fields: [
+ *                   'x', 'y'
+ *               ],
+ *               data: [
+ *                   { x: 0,   y: 0     },
+ *                   { x: 25,  y: 25    },
+ *                   { x: 50,  y: false },
+ *                   { x: 75,  y: 75    },
+ *                   { x: 100, y: 100   }
+ *               ]
+ *           }
+ *       });
+ *
+ * The third data point has a `y` value of `false` which will make the line not be drawn for this
+ * data point causing the line to be split into two different lines.
  *
  * **Note:** In the series definition remember to explicitly set the axis to bind the
  * values of the line series to. This can be done by using the `axis` configuration property.
@@ -905,9 +946,12 @@ Ext.define('Ext.chart.series.Line', {
                 x: x,
                 y: y
             }, true);
-            if (resizing && me.animation) {
-                me.animation.on('afteranimate', function() {
-                    label.show(true);
+            if (resizing && chart.animate) {
+                me.on({
+                    single: true,
+                    afterrender: function() {
+                        label.show(true);
+                    }
                 });
             } else {
                 label.show(true);

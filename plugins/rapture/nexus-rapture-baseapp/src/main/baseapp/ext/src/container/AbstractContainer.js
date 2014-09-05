@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * An abstract base class which provides shared methods for Containers across the Sencha product line.
@@ -727,7 +727,7 @@ Ext.define('Ext.container.AbstractContainer', {
      * @param {Number} index The index at which the Component will be inserted
      * into the Container's items collection
      *
-     * @param {Ext.Component/Object} component The child Component to insert.
+     * @param {Ext.Component/Object/Ext.Component[]/Object[]} component The child Component or config object to insert.
      *
      * Ext uses lazy rendering, and will only render the inserted Component should
      * it become necessary.
@@ -737,6 +737,8 @@ Ext.define('Ext.container.AbstractContainer', {
      * inserted Component will not be rendered immediately. To take advantage of
      * this 'lazy instantiation', set the {@link Ext.Component#xtype} config
      * property to the registered type of the Component wanted.
+     *
+     * You can pass an array of Component instances and config objects.
      *
      * For a list of all available xtypes, see {@link Ext.enums.Widget}.
      *
@@ -769,13 +771,16 @@ Ext.define('Ext.container.AbstractContainer', {
         if (fromIdx.isComponent) {
             fromIdx = items.indexOf(fromIdx);
         }
-        item = items.removeAt(fromIdx);
-        if (item === false) {
-            return false;
+        item = items.getAt(fromIdx);
+        if (fromIdx !== toIdx) {
+            item = items.removeAt(fromIdx);
+            if (item === false) {
+                return false;
+            }
+            items.insert(toIdx, item);
+            this.onMove(item, fromIdx, toIdx);
+            this.updateLayout();
         }
-        items.insert(toIdx, item);
-        this.onMove(item, fromIdx, toIdx);
-        this.updateLayout();
         return item;
     },
 
@@ -794,8 +799,9 @@ Ext.define('Ext.container.AbstractContainer', {
      */
     onBeforeAdd : function(item) {
         // Remove from current container if it's not us.
-        if (item.ownerCt && item.ownerCt !== this) {
-            item.ownerCt.remove(item, false);
+        var owner = item.ownerCt;
+        if (owner && owner !== this) {
+            owner.remove(item, false);
         }
     },
 
@@ -994,7 +1000,7 @@ Ext.define('Ext.container.AbstractContainer', {
                     c.cascade(fn, scope, origArgs);
                 } else {
                     args[componentIndex] = c;
-                    fn.apply(scope || cs, args);
+                    fn.apply(scope || c, args);
                 }
             }
         }
@@ -1073,13 +1079,35 @@ Ext.define('Ext.container.AbstractContainer', {
         }
     },
 
+    /**
+     * A method to find a child component after the passed child parameter. If a selector is also provided,
+     * the first child component matching the selector will be returned.
+     *
+     * @param {Ext.Component} child The child to use as a starting point to find the next child.
+     * @param {String} [selector] A {@link Ext.ComponentQuery} selector to find the next child. This will return the next child matching this selector. This parameter is optional.
+     * @returns {Ext.Component} The next child found, `null` if no child found.
+     */
     nextChild: function(child, selector) {
         var me = this,
-            result,
-            childIndex = me.items.indexOf(child);
+            items = me.items,
+            childIndex = items.indexOf(child),
+            i = 0,
+            len = items.length,
+            result;
 
         if (childIndex !== -1) {
-            result = selector ? Ext.ComponentQuery(selector, me.items.items.slice(childIndex + 1)) : me.items.getAt(childIndex + 1);
+            if (selector) {
+                for (; i < len; i++) {
+                    result = items.getAt(childIndex + i);
+
+                    if (!result || Ext.ComponentQuery.is(result, selector)) {
+                        break;
+                    }
+                }
+            } else {
+                result = items.getAt(childIndex + 1);
+            }
+
             if (!result && me.ownerCt) {
                 result = me.ownerCt.nextChild(me, selector);
             }
@@ -1087,13 +1115,35 @@ Ext.define('Ext.container.AbstractContainer', {
         return result;
     },
 
+    /**
+     * A method to find a child component before the passed child parameter. If a selector is also provided,
+     * the first child component matching the selector will be returned.
+     *
+     * @param {Ext.Component} child The child to use as a starting point to find the previous child.
+     * @param {String} [selector] A {@link Ext.ComponentQuery} selector to find the previous child. This will return the first child matching this selector. This parameter is optional.
+     * @returns {Ext.Component} The previous child found, `null` if no child found.
+     */
     prevChild: function(child, selector) {
         var me = this,
-            result,
-            childIndex = me.items.indexOf(child);
+            items = me.items,
+            childIndex = items.indexOf(child),
+            i = 0,
+            len = items.length,
+            result;
 
         if (childIndex !== -1) {
-            result = selector ? Ext.ComponentQuery(selector, me.items.items.slice(childIndex + 1)) : me.items.getAt(childIndex + 1);
+            if (selector) {
+                for (; i < len; i++) {
+                    result = items.getAt(childIndex - i);
+
+                    if (!result || Ext.ComponentQuery.is(result, selector)) {
+                        break;
+                    }
+                }
+            } else {
+                result = items.getAt(childIndex - 1);
+            }
+
             if (!result && me.ownerCt) {
                 result = me.ownerCt.nextChild(me, selector);
             }
@@ -1101,9 +1151,10 @@ Ext.define('Ext.container.AbstractContainer', {
         return result;
     },
 
-    // @private
-    // Enable all immediate children that was previously disabled
-    // Override enable because onEnable only gets called when rendered
+    /**
+     * @override
+     * Enables all child input fields and buttons.
+     */
     enable: function() {
         this.callParent(arguments);
 
@@ -1122,9 +1173,10 @@ Ext.define('Ext.container.AbstractContainer', {
         return this;
     },
 
-    // Inherit docs
-    // Disable all immediate children that was previously disabled
-    // Override disable because onDisable only gets called when rendered
+    /**
+     * @override
+     * Disables all child input fields and buttons.
+     */
     disable: function() {
         this.callParent(arguments);
 

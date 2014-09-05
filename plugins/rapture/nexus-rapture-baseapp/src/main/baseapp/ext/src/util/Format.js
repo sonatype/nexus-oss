@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag extras,core
 // @require ../Ext-more.js
@@ -81,7 +81,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
         stripTagsRE    = /<\/?[^>]+>/gi,
         stripScriptsRe = /(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)/ig,
         nl2brRe        = /\r?\n/g,
-        allHashes      = /^#+$/,
+        hashRe         = /#+$/,
 
         // Match a format string characters to be able to detect remaining "literal" characters
         formatPattern = /[\d,\.#]+/,
@@ -92,6 +92,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
         // A RegExp to remove from a number format string, all characters except digits and the local decimal separator.
         // Created on first use. The local decimal separator character must be initialized for this to be created.
         I18NFormatCleanRe,
+        lastDecimalSeparator,
 
         // Cache ofg number formatting functions keyed by format string
         formatFns = {};
@@ -366,26 +367,28 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
          *
          * By default, "," is expected as the thousand separator, and "." is expected as the decimal separator.
          *
-         * ## New to Ext JS 4
-         *
          * Locale-specific characters are always used in the formatted output when inserting
-         * thousand and decimal separators.
+         * thousand and decimal separators. These can be set using the {@link #thousandSeparator} and
+         * {@link #decimalSeparator} options.
          *
          * The format string must specify separator characters according to US/UK conventions ("," as the
          * thousand separator, and "." as the decimal separator)
          *
          * To allow specification of format strings according to local conventions for separator characters, add
-         * the string `/i` to the end of the format string.
+         * the string `/i` to the end of the format string. This format depends on the {@link #thousandSeparator} and
+         * {@link #decimalSeparator} options. For example, if using European style separators, then the format string
+         * can be specified as `'0.000,00'`. This would be equivalent to using `'0,000.00'` when using US style formatting.
          *
-         * examples (123456.789):
+         * Examples (123456.789):
          * 
-         * - `0` - (123456) show only digits, no precision
-         * - `0.00` - (123456.78) show only digits, 2 precision
+         * - `0` - (123457) show only digits, no precision
+         * - `0.00` - (123456.79) show only digits, 2 precision
          * - `0.0000` - (123456.7890) show only digits, 4 precision
-         * - `0,000` - (123,456) show comma and digits, no precision
-         * - `0,000.00` - (123,456.78) show comma and digits, 2 precision
-         * - `0,0.00` - (123,456.78) shortcut method, show comma and digits, 2 precision
-         * - `0.####` - (123,456,789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0,000` - (123,457) show comma and digits, no precision
+         * - `0,000.00` - (123,456.79) show comma and digits, 2 precision
+         * - `0,0.00` - (123,456.79) shortcut method, show comma and digits, 2 precision
+         * - `0.####` - (123,456.789) Allow maximum 4 decimal places, but do not right pad with zeroes
+         * - `0.00##` - (123456.789) Show at least 2 decimal places, maximum 4, but do not right pad with zeroes
          *
          * @param {Number} v The number to format.
          * @param {String} format The way you would like to format this text.
@@ -411,18 +414,21 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
                     extraChars,
                     multiplier,
                     trimTrailingZeroes,
-                    code;
+                    code, len;
 
                 // The "/i" suffix allows caller to use a locale-specific formatting string.
                 // Clean the format string by removing all but numerals and the decimal separator.
                 // Then split the format string into pre and post decimal segments according to *what* the
                 // decimal separator is. If they are specifying "/i", they are using the local convention in the format string.
                 if (formatString.substr(formatString.length - 2) == '/i') {
-                    if (!I18NFormatCleanRe) {
-                        I18NFormatCleanRe = new RegExp('[^\\d\\' + UtilFormat.decimalSeparator + ']','g');
+                    // In a vast majority of cases, the separator will never change over the lifetime of the application.
+                    // So we'll only regenerate this if we really need to
+                    if (!I18NFormatCleanRe || lastDecimalSeparator !== decimalSeparator) {
+                        I18NFormatCleanRe = new RegExp('[^\\d\\' + decimalSeparator + ']','g');
+                        lastDecimalSeparator = decimalSeparator;
                     }
                     formatString = formatString.substr(0, formatString.length - 2);
-                    hasComma = formatString.indexOf(comma) != -1;
+                    hasComma = formatString.indexOf(comma) !== -1;
                     splitFormat = formatString.replace(I18NFormatCleanRe, '').split(decimalSeparator);
                 } else {
                     hasComma = formatString.indexOf(',') != -1;
@@ -444,10 +450,11 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
                     precision = splitFormat[1].length;
 
                     // Formatting ending in .##### means maximum 5 trailing significant digits
-                    trimTrailingZeroes = allHashes.test(splitFormat[1]);
+                    trimTrailingZeroes = splitFormat[1].match(hashRe);
                     if (trimTrailingZeroes) {
+                        len = trimTrailingZeroes[0].length;
                         // Need to escape, since this will be '.' by default
-                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "?0+$")'
+                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "*0{0,' + len + '}$")'
                     }
                 }
                 
@@ -499,16 +506,16 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
                     '}';
                 }
 
-                if (trimTrailingZeroes) {
-                    code[code.length] = 'fnum=fnum.replace(trailingZeroes,"");';
-                }
-
                 /*
                  * Edge case. If we have a very small negative number it will get rounded to 0,
                  * however the initial check at the top will still report as negative. Replace
                  * everything but 1-9 and check if the string is empty to determine a 0 value.
                  */
                 code[code.length] = 'if(neg&&fnum!=="' + (precision ? '0.' + Ext.String.repeat('0', precision) : '0') + '")fnum="-"+fnum;';
+
+                if (trimTrailingZeroes) {
+                    code[code.length] = 'fnum=fnum.replace(trailingZeroes,"");';
+                }
 
                 code[code.length] = 'return ';
 
@@ -548,11 +555,13 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
                     name;
 
                 for (name in attributes) {
-                    result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    if (attributes.hasOwnProperty(name)) {
+                        result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    }
                 }
                 attributes = result.join('');
             }
-            return attributes||'';
+            return attributes || '';
         },
 
         /**

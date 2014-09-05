@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Internal utility class that provides default configuration for cell editing.
@@ -21,6 +21,10 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  */
 Ext.define('Ext.grid.CellEditor', {
     extend: 'Ext.Editor',
+
+    // Editor must appear at the top so that it does not contribute to scrollbars
+    y: 0,
+
     constructor: function(config) {
         config = Ext.apply({}, config);
         
@@ -29,14 +33,103 @@ Ext.define('Ext.grid.CellEditor', {
         }
         this.callParent([config]);
     },
-    
+
+    // Set the grid that owns this editor.
+    // Usually this will only *change* once, and the renderTo will cause
+    // rendering into the owning grid.
+    // However in a Lockable assembly the editor has to swap sides if the column is moved across.
+    // Called by CellEditing#getEditor
+    setGrid: function(grid) {
+        var me = this,
+            oldGrid = me.grid,
+            view,
+            viewListeners;
+
+        if (grid != oldGrid) {
+            viewListeners = {
+                beforerefresh: me.beforeViewRefresh,
+                refresh: me.onViewRefresh,
+                scope: me
+            };
+            // Remove previous refresh listener
+            if (oldGrid) {
+                oldGrid.getView().un(viewListeners);
+            }
+
+            // Set the renderTo target to reflect new grid view ownership
+            // TODO: In Sencha-5.0.x use view.getScrollerEl() if Ext.touchScroll
+            view = grid.getView(),
+            me.renderTo = view.getTargetEl().dom;
+            me.grid = me.ownerCt = grid;
+
+            // On view refresh, we need to copy our DOM into the detached body to prevent it from being garbage collected.
+            view.on(viewListeners);
+        }
+    },
+
+    // @private
+    // @override
+    // Final position is decided upon by the Editor's realign() call which syncs position over the edited element.
+    adjustPosition: function() {
+        return {x:0,y:0};
+    },
+
+    beforeViewRefresh: function() {
+        var me = this,
+            dom = me.el && me.el.dom;
+
+        if (dom && dom.parentNode) {
+            if (me.editing && !me.field.column.sorting) {
+                // Set the Editor.allowBlur setting so that it does not process the upcoming field blur event and terminate the edit
+                me.wasAllowBlur = me.allowBlur;
+                me.allowBlur = false;
+            }
+
+            // Remove the editor from the view to protect it from anihilation: https://sencha.jira.com/browse/EXTJSIV-11713
+            dom.parentNode.removeChild(dom);
+        }
+    },
+
+    onViewRefresh: function() {
+        var me = this,
+            dom = me.el && me.el.dom,
+            sorting;
+
+        if (dom) {
+            sorting = me.field.column.sorting;
+
+            // If the view was refreshed while we were editing, replace it.
+            if (me.editing && !sorting) {
+                me.allowBlur = me.wasAllowBlur;
+                me.renderTo.appendChild(dom);
+                me.field.focus();
+            } else if (!sorting) {
+                Ext.getDetachedBody().dom.appendChild(dom);
+            }
+
+            // If the column was sorted while editing, we must detect that and complete the edit
+            // because the view will be refreshed and the editor will be removed from the dom.
+            if (me.editing && sorting) {
+                me.completeEdit();
+            }
+        }
+    },
+
     /**
      * @private
+     * Shows the editor, end ensures that it is rendered into the correct view
      * Hides the grid cell inner element when a cell editor is shown.
      */
     onShow: function() {
         var me = this,
             innerCell = me.boundEl.first();
+
+        // If we have had our owning grid changed (by a column switching sides in a Lockable assembly)
+        // or, if a view refresh has removed us from the DOM
+        // append this component into its renderTo target.
+        if (me.el.dom.parentNode !== me.renderTo) {
+            me.renderTo.appendChild(me.el.dom);
+        }
 
         if (innerCell) {
             if (me.isForTree) {
@@ -75,6 +168,7 @@ Ext.define('Ext.grid.CellEditor', {
             field = me.field;
 
         me.callParent(arguments);
+
         if (field.isCheckbox) {
             field.mon(field.inputEl, {
                 mousedown: me.onCheckBoxMouseDown,

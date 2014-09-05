@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -34,6 +34,11 @@ Ext.define('Ext.chart.axis.Radial', {
      * @cfg {Number} maximum
      * The maximum value drawn by the axis. If not set explicitly, the axis
      * maximum will be calculated automatically.
+     */
+
+    /**
+     * @cfg {Number} minimum
+     * The minimum value drawn by the axis. Default is 0.
      */
 
     /**
@@ -129,6 +134,7 @@ Ext.define('Ext.chart.axis.Radial', {
             categories = [], xField,
             aggregate = !this.maximum,
             maxValue = this.maximum || 0,
+            minValue = this.minimum || 0,
             steps = this.steps, i = 0, j, dx, dy,
             pi2 = Math.PI * 2,
             cos = Math.cos, sin = Math.sin,
@@ -202,7 +208,7 @@ Ext.define('Ext.chart.axis.Radial', {
                 //draw values
                 for (i = 0; i < steps; i++) {
                     labelArray[i].setAttributes({
-                        text: round((i + 1) / steps * maxValue),
+                        text: round((i + 1) / steps * (maxValue - minValue) + minValue),
                         x: centerX,
                         y: centerY - rho * (i + 1) / steps,
                         'text-anchor': 'middle',
@@ -229,12 +235,6 @@ Ext.define('Ext.chart.axis.Radial', {
             }
         }
         this.labelArray = labelArray;
-    },
-
-    getRange: function () {
-        var range = this.callParent();
-        range.min = 0;  // Radial charts currently assume that the origin is always 0.
-        return range;
     },
 
     processView: function() {

@@ -1,5 +1,5 @@
 Ext JS 4.2 - JavaScript Library
-Copyright (c) 2006-2013, Sencha Inc.
+Copyright (c) 2006-2014, Sencha Inc.
 All rights reserved.
 licensing@sencha.com
 

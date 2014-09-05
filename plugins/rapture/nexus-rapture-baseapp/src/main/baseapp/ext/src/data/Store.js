@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * The Store class encapsulates a client side cache of {@link Ext.data.Model Model} objects. Stores load data via a
@@ -223,7 +223,6 @@ Ext.define('Ext.data.Store', {
         'Ext.data.StoreManager',
         'Ext.data.Model',
         'Ext.data.proxy.Ajax',
-        'Ext.data.proxy.Memory',
         'Ext.data.reader.Json',
         'Ext.data.writer.Json',
         'Ext.data.PageMap',
@@ -247,7 +246,7 @@ Ext.define('Ext.data.Store', {
 
     /**
      * @cfg {Boolean} [remoteFilter=false]
-     * `true` if the grouping should be performed on the server side, false if it is local only.
+     * `true` to defer any filtering operation to the server. If `false`, filtering is done locally on the client.
      *
      * {@link #buffered Buffered} stores automatically set this to `true`. Buffered stores contain an abitrary
      * subset of the full dataset which depends upon various configurations and which pages have been requested
@@ -296,7 +295,7 @@ Ext.define('Ext.data.Store', {
      * @cfg {String} groupDir
      * The direction in which sorting should be applied when grouping. Supported values are "ASC" and "DESC".
      */
-    groupDir: "ASC",
+    groupDir: 'ASC',
 
     /**
      * @cfg {Number} trailingBufferZone
@@ -504,7 +503,7 @@ Ext.define('Ext.data.Store', {
             if (config.getGroupString || (me.getGroupString !== Ext.data.Store.prototype.getGroupString)) {
                 groupers[0].getGroupString = function(record) {
                     return me.getGroupString(record);
-                }
+                };
             }
         }
         delete config.groupers;
@@ -568,9 +567,6 @@ Ext.define('Ext.data.Store', {
             me.remoteSort = true;
         }
 
-        // Keep sorters updated with prepended groupers so that subsequent adds work
-        me.sorters.insert(0, me.groupers.getRange());
-
         proxy = me.proxy;
         data = me.inlineData;
 
@@ -581,6 +577,8 @@ Ext.define('Ext.data.Store', {
         }
 
         // Load inline data
+        // If sorters or groupers are present, and sorting is a local operation,
+        // then sorting *and grouping* will be applied by the insert method.
         if (data) {
             if (proxy instanceof Ext.data.proxy.Memory) {
                 proxy.data = data;
@@ -588,25 +586,13 @@ Ext.define('Ext.data.Store', {
             } else {
                 me.add.apply(me, [data]);
             }
-            
-            // If there are sorters (These will include any groupers by this stage) and we are sorting locally,
-            // then call group. This will sort, and create groups only if this store has groupers.
-            if (me.sorters.items.length && !me.remoteSort) {
-                me.group(null, null, true);
-            }
 
             delete me.inlineData;
         }
         else if (me.autoLoad) {
             // Defer the load until after the current event handler has finished and set up any associated views.
-            Ext.defer(me.load, 1, me, [ typeof me.autoLoad === 'object' ? me.autoLoad : undefined ]);
-        }
-    },
-
-    onBeforeSort: function() {
-        var groupers = this.groupers;
-        if (groupers.getCount() > 0) {
-            this.sort(groupers.items, 'prepend', false);
+            me.autoLoadTask = new Ext.util.DelayedTask(me.load, me, [ typeof me.autoLoad === 'object' ? me.autoLoad : undefined ]);
+            me.autoLoadTask.delay(1);
         }
     },
 
@@ -692,7 +678,7 @@ Ext.define('Ext.data.Store', {
                 if (!grouper) {
                     grouper = {
                         property : groupers,
-                        direction: direction || 'ASC'
+                        direction: direction || me.groupDir
                     };
                     newGroupers = [grouper];
                 } else if (direction === undefined) {
@@ -1205,7 +1191,7 @@ Ext.define('Ext.data.Store', {
         }
 
         length = records.length;
-        isSorted = !me.remoteSort && me.sorters && me.sorters.items.length;
+        isSorted = !me.remoteSort && me.getSorterCount();
 
         // If this Store is sorted, and they only passed one Record (99% or use cases)
         // then it's much more efficient to add it sorted than to append and then sort.
@@ -1305,6 +1291,9 @@ Ext.define('Ext.data.Store', {
             info = [],
             allRecords = [],
             indexes = [],
+            // This holds phantom records to be removed from their groups.
+            grouped = [],
+            groupsLn = me.groups.length,
             item,
             isNotPhantom,
             index,
@@ -1407,6 +1396,10 @@ Ext.define('Ext.data.Store', {
                 // The record's index property won't do, as that is the index in the overall dataset when Store is buffered.
                 record.removedFrom = index;
                 me.removed.push(record);
+            } else if (groupsLn) {
+                // We still need to remove the record from its group (if applicable) so push onto the stack to be batched
+                // (see below).
+                grouped.push(record);
             }
 
             record.unjoin(me);
@@ -1428,6 +1421,10 @@ Ext.define('Ext.data.Store', {
             }
         }
 
+        if (groupsLn) {
+            me.updateGroupsOnRemove(me.removed.concat(grouped));
+        }
+
         // If there was no listener for the single remove event, remove all records
         // from collection in one call
         if (removeRange) {
@@ -1435,7 +1432,7 @@ Ext.define('Ext.data.Store', {
         }
 
         if (!silent) {
-            me.fireEvent('bulkremove', me, allRecords, indexes, !!isMove);
+            me.fireEvent('bulkremove', me, allRecords, indexes, !!isMove, removeRange);
             me.fireEvent('datachanged', me);
         }
         if (!isMove && me.autoSync && sync && !me.autoSyncSuspended) {
@@ -1451,6 +1448,9 @@ Ext.define('Ext.data.Store', {
     removeAt: function(index, count) {
         var me = this,
             storeCount = me.getCount();
+
+        // Sanity check input.
+        index = Math.max(index, 0);
 
         if (index <= storeCount) {
             if (arguments.length === 1) {
@@ -1666,12 +1666,18 @@ Ext.define('Ext.data.Store', {
         Ext.callback(operation.callback, operation.scope || me, [records, operation, successful]);
     },
 
-    //inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     getNewRecords: function() {
         return (this.snapshot || this.data).filterBy(this.filterNew).items;
     },
 
-    //inherit docs
+    /**
+     * @method
+     * @inheritdoc
+     */
     getUpdatedRecords: function() {
         return (this.snapshot || this.data).filterBy(this.filterUpdated).items;
     },
@@ -1768,7 +1774,8 @@ Ext.define('Ext.data.Store', {
                 /**
                 * @property {Ext.util.MixedCollection} snapshot
                 * A pristine (unfiltered) collection of the records in this store. This is used to reinstate
-                * records when a filter is removed or changed
+                * records when a filter is removed or changed. The property is only defined once the store has
+                 * been filtered, otherwise the property is `undefined`.
                 */
                 me.snapshot = me.snapshot || me.data.clone();
 
@@ -2017,6 +2024,8 @@ Ext.define('Ext.data.Store', {
      *
      * Use this method if you are attempting to load data and want to utilize the configured data reader.
      *
+     * As of 4.2, this method will no longer fire the {@link #event-load} event.
+     *
      * @param {Object[]} data The full JSON object you'd like to load into the Data store.
      * @param {Boolean} [append=false] `true` to add the records to the existing records in the store, `false`
      * to remove the old ones first.
@@ -2085,7 +2094,7 @@ Ext.define('Ext.data.Store', {
         }
 
         if (me.sortOnLoad && !me.remoteSort) {
-            me.sort(undefined, undefined, undefined, true);
+            me.sort();
         }
 
         me.resumeEvents();
@@ -2142,18 +2151,20 @@ Ext.define('Ext.data.Store', {
     },
 
     // private
-    clearData: function(isLoad) {
+    clearData: function(isLoad, data) {
         var me = this,
             records,
             i;
+
+        data = data || me.data;
 
         // We only have to do the unjoining if not buffered. PageMap will unjoin its records when it clears itself.
         // There is a potential for a race condition in stores configured with autoDestroy: true;
         // if loading was initiated but didn't complete by the time the store is destroyed,
         // the data MC may not have been created yet so we have to check for its existence
         // here and below.
-        if (!me.buffered && me.data) {
-            records = me.data.items;
+        if (!me.buffered && data) {
+            records = data.items;
             i = records.length;
             while (i--) {
                 records[i].unjoin(me);
@@ -2161,13 +2172,19 @@ Ext.define('Ext.data.Store', {
         }
 
         // Remove all data from the Collection/PageMap. PageMap will perform unjoining.
-        if (me.data) {
-            me.data.clear();
+        if (data) {
+            data.clear();
         }
         
         if (isLoad !== true || me.clearRemovedOnLoad) {
             me.removed.length = 0;
         }
+    },
+
+    destroyClear: function() {
+        // Clear everything from the snapshot if we have one, otherwise clearData
+        // will use me.data
+        this.clearData(null, this.snapshot);
     },
 
     loadToPrefetch: function(options) {
@@ -2223,6 +2240,12 @@ Ext.define('Ext.data.Store', {
             Ext.Error.raise('Buffered store configured without a pageSize', me);
         }
         //</debug>
+
+        // Ensure that the purgePageCount allows enough pages to be kept cached to cover the
+        // requested range. If the pageSize is very small we might need a lot of pages.
+        if (me.purgePageCount) {
+            me.data.maxSize = me.purgePageCount = Math.max(me.purgePageCount, endPage - startPage + 1);
+        }
 
         if (me.fireEvent('beforeload', me, options) !== false) {
 
@@ -2621,8 +2644,63 @@ Ext.define('Ext.data.Store', {
         me.prefetchRange(start, end);
     },
 
-    // because prefetchData is stored by index
-    // this invalidates all of the prefetchedData
+    /**
+     * Sorts the data in the Store by one or more of its properties. Example usage:
+     *
+     *     //sort by a single field
+     *     myStore.sort('myField', 'DESC');
+     *
+     *     //sorting by multiple fields
+     *     myStore.sort([{
+     *         property : 'age',
+     *         direction: 'ASC'
+     *     }, {
+     *         property : 'name',
+     *         direction: 'DESC'
+     *     }]);
+     *
+     *     // Sort the store using the existing sorter set.
+     *     myStore.sort();
+     *
+     * Internally, Store converts the passed arguments into an array of {@link Ext.util.Sorter} instances, and delegates
+     * the actual sorting to its internal {@link #property-sorters sorters collection}.
+     *
+     * When passing a single string argument to sort, Store maintains a ASC/DESC toggler per field, so this code:
+     *
+     *     store.sort('myField');
+     *     store.sort('myField');
+     *
+     * Is equivalent to this code, because Store handles the toggling automatically:
+     *
+     *     store.sort('myField', 'ASC');
+     *     store.sort('myField', 'DESC');
+     *
+     * If the store is {@link Ext.data.Store#buffered buffered}, then prefetchData is stored by index, this invalidates all of the prefetchedData.
+     *
+     * Be aware that sorting a store with {@link #remoteSort} `true` will initiate a load of the store.
+     *
+     * @param {String/Ext.util.Sorter[]} [sorters] Either a string name of one of the fields in this Store's configured {@link Ext.data.Model Model}, or an array of sorter configurations.
+     * @param {String} [direction="ASC"] The overall direction to sort the data by.
+     * @param {String} [insertionPosition="replace"] Where to put the new sorter in the collection of sorters.
+     * This may take the following values:
+     *
+     * * `replace` : This means that the new sorter(s) becomes the sole sorter set for this Sortable. This is the most useful call mode
+     *           to programatically sort by multiple fields.  
+     *       
+     * * `prepend` : This means that the new sorters are inserted as the primary sorters, unchanged, and the sorter list length must be controlled by the developer.  
+     *       
+     * * `multi` :  This is mainly useful for implementing intuitive "Sort by this" user interfaces such as the {@link Ext.grid.Panel GridPanel}'s column sorting UI.
+     *
+     *     This mode is only supported when passing a property name and a direction.
+     *
+     *     This means that the new sorter is becomes the primary sorter. If the sorter was **already** the primary sorter, the direction
+     *     of sort is toggled if no direction parameter is specified.
+     *     
+     *     The number of sorters maintained is limited by the {@link #multiSortLimit} configuration.  
+     *       
+     * * `append` : This means that the new sorter becomes the last sorter.
+     * @return {Ext.util.Sorter[]} The new sorters.
+     */
     sort: function(sorters) {
         var me = this;
 
@@ -2633,26 +2711,82 @@ Ext.define('Ext.data.Store', {
         return me.callParent(arguments);
     },
 
-    // overriden to provide striping of the indexes as sorting occurs.
-    // this cannot be done inside of sort because datachanged has already
-    // fired and will trigger a repaint of the bound view.
+    /**
+     * @private
+     * @override
+     * Generate a comparator function based upon the groupers followed by the sorters.
+     * groupers are the first in the evaluation chain.
+     * Sorters which duplicate a grouper are removed, but there direction property overrides that of the matching grouper
+     */
+    generateComparator: function() {
+        var me = this,
+            sorters = me.sorters.items,
+            numSorters = sorters.length,
+            // Make an array copy if we have some sorters to append
+            groupers = numSorters ? me.groupers.getRange() : me.groupers.items,
+            i,
+            sorter, matchingGrouper;
+
+        // If there are groupers, we have to append sorters.
+        // But first, look through the sorters seeing if there is a grouper operating upon the same field
+        if (groupers.length) {
+            for (i = 0; i < numSorters; i++) {
+                sorter = sorters[i];
+
+                // If the sorter is operating upon a named field, and there is a grouper which is targeting that field
+                // Set the matchinh grouper's direction
+                if (sorter.property && (matchingGrouper = me.groupers.get(sorter.property))) {
+                    matchingGrouper.setDirection(sorter.direction);
+                }
+
+                // No matching grouper. Append the sorter to the groupers copy array
+                else {
+                    Ext.Array.push(groupers, sorter);
+                }
+            }
+            sorters = groupers;
+        }
+
+        return sorters.length ? this.createComparator(sorters) : this.emptyComparator;
+    },
+
+    /**
+     * @private
+     * @override
+     * Overrides the Sortable implementation which just returns the number of Sorters.
+     * We count the groupers as well.
+     */
+    getSorterCount: function() {
+        return this.groupers.items.length + this.sorters.items.length;
+    },
+
+    /**
+     * @private
+     * @override
+     */
     doSort: function(sorterFn) {
         var me = this,
             range,
             ln,
-            i;
+            i,
+            afterSort = function () {
+                me.fireEvent('sort', me, me.sorters.getRange());
+            };
 
         if (me.remoteSort) {
-
             // For a buffered Store, we have to clear the prefetch cache since it is keyed by the index within the dataset.
             // Then we must prefetch the new page 1, and when that arrives, reload the visible part of the Store
             // via the guaranteedrange event
             if (me.buffered) {
                 me.data.clear();
-                me.loadPage(1);
+                me.loadPage(1, {
+                    callback: afterSort
+                });
             } else {
                 //the load function will pick up the new sorters and request the sorted data from the proxy
-                me.load();
+                me.load({
+                    callback: afterSort
+                });
             }
         } else {
             //<debug>
@@ -2672,6 +2806,7 @@ Ext.define('Ext.data.Store', {
             }
             me.fireEvent('datachanged', me);
             me.fireEvent('refresh', me);
+            afterSort();
         }
     },
 
@@ -2888,8 +3023,8 @@ Ext.define('Ext.data.Store', {
             requiredEnd,
             maxIndex = me.totalCount - 1,
             lastRequestStart = me.lastRequestStart,
-            pageAddHandler,
-            result;
+            result = [],
+            pageAddHandler;
 
         options = Ext.apply({
             prefetchStart: start,
