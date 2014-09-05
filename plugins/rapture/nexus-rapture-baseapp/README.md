@@ -54,7 +54,7 @@ If the content has changed, then the result needs to be committed:
 To upgrade ExtJS, replace the src/main/baseapp/ext directory with the upgrade distribution:
 
     rm -rf src/main/baseapp/ext
-    unzip -d src/main/baseapp <ext-version>.zip
+    unzip -d src/main/baseapp ext-<version>.zip
     mv src/main/baseapp/ext-* src/main/baseapp/ext  
 
 Install Ext.ux examples:
