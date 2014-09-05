@@ -33,6 +33,9 @@ Ext.define('NX.coreui.view.upload.UploadFile', {
     allowBlank: false
   },
 
+  /**
+   * @override
+   */
   initComponent: function() {
     var me = this;
 
