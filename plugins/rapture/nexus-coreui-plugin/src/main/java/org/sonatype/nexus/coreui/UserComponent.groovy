@@ -274,7 +274,8 @@ extends DirectComponentSupport
         password: Password.fakePassword(),
         roles: user.roles.collect { role ->
           role.roleId
-        }
+        },
+        readOnly: user.source != DEFAULT_SOURCE
     )
   }
 

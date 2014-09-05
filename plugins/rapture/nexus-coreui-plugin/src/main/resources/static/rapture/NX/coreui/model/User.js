@@ -27,6 +27,7 @@ Ext.define('NX.coreui.model.User', {
     'lastName',
     'email',
     'status',
-    'roles'
+    'roles',
+    'readOnly'
   ]
 });

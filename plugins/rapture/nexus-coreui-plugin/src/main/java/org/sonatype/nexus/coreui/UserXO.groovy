@@ -51,4 +51,6 @@ class UserXO
 
   @NotEmpty
   Set<String> roles
+
+  Boolean readOnly
 }

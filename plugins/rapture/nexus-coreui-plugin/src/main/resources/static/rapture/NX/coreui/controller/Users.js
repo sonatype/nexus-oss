@@ -358,7 +358,8 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @protected
-   * Enable 'Delete' when user has 'delete' permission and user is not the current logged in used or the anonymous user.
+   * Enable 'Delete' when user has 'delete' permission and user is not read only and user is not the current signed on
+   * used or the anonymous user.
    */
   bindDeleteButton: function (button) {
     var me = this;
@@ -366,8 +367,9 @@ Ext.define('NX.coreui.controller.Users', {
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
             NX.Conditions.gridHasSelection(me.list, function (model) {
-              var userId = model.getId();
-              return (userId !== NX.State.getUser().id) && (userId !== NX.State.getValue('anonymousUsername'));
+              return !model.get('readOnly')
+                  && (model.getId() !== NX.State.getUser().id)
+                  && (model.getId() !== NX.State.getValue('anonymousUsername'));
             })
         ),
         {
@@ -415,8 +417,7 @@ Ext.define('NX.coreui.controller.Users', {
                 NX.Conditions.isPermitted('security:usersreset', 'delete')
             ),
             NX.Conditions.gridHasSelection(me.list, function (model) {
-              var userId = model.getId();
-              return userId !== NX.State.getValue('anonymousUsername');
+              return !model.get('readOnly') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),
         {

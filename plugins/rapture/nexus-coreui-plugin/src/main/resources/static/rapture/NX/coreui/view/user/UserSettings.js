@@ -31,12 +31,17 @@ Ext.define('NX.coreui.view.user.UserSettings', {
     return 'User updated: ' + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users',
+  editableMarker: 'You do not have permission to update users or user is readonly',
 
   initComponent: function () {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('security:users', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.and(
+        NX.Conditions.isPermitted('security:users', 'update'),
+        NX.Conditions.formHasRecord('nx-coreui-user-settings', function (model) {
+          return !model.get('readOnly');
+        })
+    );
 
     me.items = [
       {
