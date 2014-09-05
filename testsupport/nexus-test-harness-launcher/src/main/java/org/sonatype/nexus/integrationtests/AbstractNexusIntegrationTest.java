@@ -52,11 +52,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
- * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
- * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * Support for legacy (embedded-server) integration tests.
  */
-// @RunWith(ConsoleLoggingRunner.class)
 public abstract class AbstractNexusIntegrationTest
   extends TestSupport
 {
