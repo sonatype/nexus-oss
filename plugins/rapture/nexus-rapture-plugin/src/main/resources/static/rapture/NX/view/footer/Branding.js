@@ -10,32 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.rapture.internal.capability;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
+/*global Ext*/
 
 /**
- * Automatically create Rapture capabilities.
+ * Footer branding panel.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class RaptureCapabilitiesBooter
-    extends CapabilityBooterSupport
-{
-  @Override
-  protected void boot(final CapabilityRegistry registry) throws Exception {
-    maybeAddCapability(
-        registry,
-        SettingsCapabilityDescriptor.TYPE,
-        true, // enabled
-        null, // no notes
-        new SettingsCapabilityConfiguration().asMap()
-    );
-  }
-}
+Ext.define('NX.view.footer.Branding', {
+  extend: 'Ext.container.Container',
+  alias: 'widget.nx-footer-branding'
+});

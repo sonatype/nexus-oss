@@ -32,6 +32,10 @@ Ext.define('NX.app.PluginConfig', {
     'User',
 
     {
+      id: 'Branding',
+      active: true // branding is active in also when we are unlicensed or browser is not supported
+    },
+    {
       id: 'Unlicensed',
       active: function () {
         return NX.app.Application.supportedBrowser() && NX.app.Application.unlicensed();

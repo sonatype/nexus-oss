@@ -28,7 +28,8 @@ Ext.define('NX.controller.Unlicensed', {
     'header.Panel',
     'header.Branding',
     'header.Logo',
-    'Footer'
+    'footer.Panel',
+    'footer.Branding'
   ],
 
   refs: [

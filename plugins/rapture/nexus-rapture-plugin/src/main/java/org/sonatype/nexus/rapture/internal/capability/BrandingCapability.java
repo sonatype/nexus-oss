@@ -19,45 +19,45 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.rapture.Rapture;
+import org.sonatype.nexus.rapture.internal.ui.Branding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Rapture Settings capability.
+ * Branding capability.
  *
  * @since 3.0
  */
-@Named(RaptureSettingsCapabilityDescriptor.TYPE_ID)
-public class RaptureSettingsCapability
-    extends CapabilitySupport<RaptureSettingsCapabilityConfiguration>
+@Named(BrandingCapabilityDescriptor.TYPE_ID)
+public class BrandingCapability
+    extends CapabilitySupport<BrandingCapabilityConfiguration>
 {
 
-  private final Rapture rapture;
+  private final Branding branding;
 
   @Inject
-  public RaptureSettingsCapability(final Rapture rapture) {
-    this.rapture = checkNotNull(rapture, "rapture");
+  public BrandingCapability(final Branding branding) {
+    this.branding = checkNotNull(branding, "branding");
   }
 
   @Override
-  protected RaptureSettingsCapabilityConfiguration createConfig(final Map<String, String> properties) {
-    return new RaptureSettingsCapabilityConfiguration(properties);
+  protected BrandingCapabilityConfiguration createConfig(final Map<String, String> properties) {
+    return new BrandingCapabilityConfiguration(properties);
   }
 
   @Override
-  protected void onActivate(final RaptureSettingsCapabilityConfiguration config) throws Exception {
-    rapture.setSettings(config);
+  protected void onActivate(final BrandingCapabilityConfiguration config) throws Exception {
+    branding.set(config);
   }
 
   @Override
-  protected void onPassivate(final RaptureSettingsCapabilityConfiguration config) throws Exception {
-    rapture.resetSettings();
+  protected void onPassivate(final BrandingCapabilityConfiguration config) throws Exception {
+    branding.reset();
   }
 
   @Override
-  protected void onRemove(final RaptureSettingsCapabilityConfiguration config) throws Exception {
-    rapture.resetSettings();
+  protected void onRemove(final BrandingCapabilityConfiguration config) throws Exception {
+    branding.reset();
   }
 
   @Override
