@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
@@ -42,7 +41,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class TargetMessageUtil
-    extends ITUtil
 {
   private XStream xstream;
 
@@ -50,8 +48,7 @@ public class TargetMessageUtil
 
   private static final Logger LOG = LoggerFactory.getLogger(TargetMessageUtil.class);
 
-  public TargetMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public TargetMessageUtil(XStream xstream, MediaType mediaType) {
     this.xstream = xstream;
     this.mediaType = mediaType;
   }
@@ -168,7 +165,7 @@ public class TargetMessageUtil
       throws IOException
   {
     // check the nexus.xml
-    Configuration config = getTest().getNexusConfigUtil().getNexusConfig();
+    Configuration config = new NexusConfigUtil().getNexusConfig();
 
     List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
 
@@ -212,7 +209,7 @@ public class TargetMessageUtil
       throws IOException
   {
     // check the nexus.xml
-    Configuration config = getTest().getNexusConfigUtil().getNexusConfig();
+    Configuration config = new NexusConfigUtil().getNexusConfig();
 
     List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
     // check to see if the size matches

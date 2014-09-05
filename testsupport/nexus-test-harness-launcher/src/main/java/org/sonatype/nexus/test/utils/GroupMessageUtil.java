@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GroupMessageUtil
-    extends ITUtil
 {
   public static final String SERVICE_PART = "service/local/repo_groups";
 
@@ -40,8 +38,7 @@ public class GroupMessageUtil
 
   private final RepositoryGroupsNexusRestClient groupNRC;
 
-  public GroupMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public GroupMessageUtil(XStream xstream, MediaType mediaType) {
     groupNRC = new RepositoryGroupsNexusRestClient(
         RequestFacade.getNexusRestClient(),
         xstream,
@@ -150,13 +147,14 @@ public class GroupMessageUtil
   private void validateRepoInNexusConfig(RepositoryGroupResource group)
       throws IOException
   {
-    CRepository cGroup = getTest().getNexusConfigUtil().getRepo(group.getId());
+    NexusConfigUtil configUtil = new NexusConfigUtil();
+    CRepository cGroup = configUtil.getRepo(group.getId());
 
     Assert.assertEquals(cGroup.getId(), group.getId());
     Assert.assertEquals(cGroup.getName(), group.getName());
 
     List<RepositoryGroupMemberRepository> expectedRepos = group.getRepositories();
-    List<String> actualRepos = getTest().getNexusConfigUtil().getGroup(group.getId()).getMemberRepositoryIds();
+    List<String> actualRepos = configUtil.getGroup(group.getId()).getMemberRepositoryIds();
 
     this.validateRepoLists(expectedRepos, actualRepos);
   }

@@ -14,24 +14,29 @@ package org.sonatype.nexus.testsuite.security.nexus395;
 
 import javax.mail.internet.MimeMessage;
 
-import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.EmailServerHelper;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 import org.junit.Assert;
+import org.junit.ClassRule;
 
 /**
  * @author juven
  */
 public abstract class AbstractForgotUserNameIT
-    extends AbstractEmailServerNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  @ClassRule
+  public static final EmailServerHelper emailServerHelper = new EmailServerHelper();
+
   protected void assertRecoveredUserName(String expectedUserName)
       throws Exception
   {
     // Need 1 message
-    waitForMail(1);
+    emailServerHelper.waitForMail(1);
 
-    MimeMessage[] msgs = server.getReceivedMessages();
+    MimeMessage[] msgs = emailServerHelper.getReceivedMessages();
 
     for (MimeMessage msg : msgs) {
       log.debug("Mail Title:\n" + GreenMailUtil.getHeaders(msg));

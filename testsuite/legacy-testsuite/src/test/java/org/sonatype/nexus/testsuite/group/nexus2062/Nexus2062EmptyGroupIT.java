@@ -29,7 +29,7 @@ public class Nexus2062EmptyGroupIT
   public void createEmptyGroup()
       throws Exception
   {
-    GroupMessageUtil groupUtil = new GroupMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    GroupMessageUtil groupUtil = new GroupMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
 
     RepositoryGroupResource resource = new RepositoryGroupResource();
     resource.setExposed(true);
@@ -47,7 +47,7 @@ public class Nexus2062EmptyGroupIT
   public void createGroupWithRepoAndDelete()
       throws Exception
   {
-    GroupMessageUtil groupUtil = new GroupMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    GroupMessageUtil groupUtil = new GroupMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
 
     RepositoryGroupResource resource = new RepositoryGroupResource();
     resource.setExposed(true);

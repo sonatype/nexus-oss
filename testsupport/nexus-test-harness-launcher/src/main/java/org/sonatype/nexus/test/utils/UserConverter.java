@@ -15,7 +15,7 @@ package org.sonatype.nexus.test.utils;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
 
-public class UserConverter
+class UserConverter
 {
   public static CUser toCUser(UserResource resource) {
     CUser user = new CUser();

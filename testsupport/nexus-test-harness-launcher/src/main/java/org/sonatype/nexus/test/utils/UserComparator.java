@@ -17,7 +17,7 @@ import java.util.Comparator;
 import org.sonatype.security.model.CUser;
 
 
-public class UserComparator
+class UserComparator
     implements Comparator<CUser>
 {
 

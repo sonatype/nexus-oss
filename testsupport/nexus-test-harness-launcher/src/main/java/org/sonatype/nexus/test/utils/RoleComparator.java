@@ -21,7 +21,7 @@ import org.sonatype.security.model.CRole;
 /**
  * This only works for equals...
  */
-public class RoleComparator
+class RoleComparator
     implements Comparator<CRole>
 {
 

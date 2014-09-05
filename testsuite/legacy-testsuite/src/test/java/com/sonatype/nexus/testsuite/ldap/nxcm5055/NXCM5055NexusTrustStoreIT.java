@@ -32,6 +32,7 @@ import org.sonatype.nexus.client.rest.NexusClientFactory;
 import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
@@ -456,7 +457,8 @@ public class NXCM5055NexusTrustStoreIT
   private NexusClient getNexusClient()
       throws Exception
   {
-    final NexusClientFactory nexusClientFactory = lookup(JerseyNexusClientFactory.class);
+    final NexusClientFactory nexusClientFactory = TestContainer
+        .getInstance().getPlexusContainer().lookup(JerseyNexusClientFactory.class);
     return nexusClientFactory.createFor(
         baseUrlFrom(getBaseNexusUrl()),
         new UsernamePasswordAuthenticationInfo("admin", "admin123")

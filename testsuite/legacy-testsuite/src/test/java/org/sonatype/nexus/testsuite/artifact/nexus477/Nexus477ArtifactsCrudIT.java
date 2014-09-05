@@ -29,6 +29,8 @@ import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 /**
  * Test the privilege for CRUD operations.
  */
@@ -100,7 +102,7 @@ public class Nexus477ArtifactsCrudIT
     // we need to check read first...
     response =
         RequestFacade.sendMessage("content/repositories/" + this.getTestRepositoryId() + "/"
-            + this.getRelitiveArtifactPath(gav), Method.GET);
+            + getRelitiveArtifactPath(gav), Method.GET);
     Assert.assertEquals("Could not get artifact", response.getStatus().getCode(), 200);
 
     response = RequestFacade.sendMessage(serviceURI, Method.DELETE);
@@ -122,7 +124,7 @@ public class Nexus477ArtifactsCrudIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     String serviceURI =
-        "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath(gav);
+        "content/repositories/" + this.getTestRepositoryId() + "/" + getRelitiveArtifactPath(gav);
 
     Response response = RequestFacade.sendMessage(serviceURI, Method.GET);
     Assert.assertEquals("Artifact should not have been read", response.getStatus().getCode(), 403);

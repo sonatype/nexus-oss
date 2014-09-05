@@ -79,7 +79,7 @@ public class Nexus1696ValidateBaseUrlIT
       throws Exception
   {
     GroupMessageUtil groupUtil =
-        new GroupMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+        new GroupMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
     ContentListMessageUtil contentUtil =
         new ContentListMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
@@ -107,7 +107,7 @@ public class Nexus1696ValidateBaseUrlIT
       throws Exception
   {
     RepositoryMessageUtil repoUtil =
-        new RepositoryMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+        new RepositoryMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
     ContentListMessageUtil contentUtil =
         new ContentListMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
@@ -134,7 +134,7 @@ public class Nexus1696ValidateBaseUrlIT
       throws Exception
   {
     List<PrivilegeStatusResource> privs =
-        new PrivilegesMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML).getList();
+        new PrivilegesMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML).getList();
     Assert.assertFalse("No itens to be tested", privs.isEmpty());
 
     for (PrivilegeStatusResource priv : privs) {
@@ -148,7 +148,7 @@ public class Nexus1696ValidateBaseUrlIT
   public void checkRoles()
       throws Exception
   {
-    List<RoleResource> roles = new RoleMessageUtil(this, null, null).getList();
+    List<RoleResource> roles = new RoleMessageUtil(null, null).getList();
     Assert.assertFalse("No itens to be tested", roles.isEmpty());
 
     for (RoleResource role : roles) {
@@ -162,7 +162,7 @@ public class Nexus1696ValidateBaseUrlIT
   public void checkUsers()
       throws Exception
   {
-    List<UserResource> users = new UserMessageUtil(this, null, null).getList();
+    List<UserResource> users = new UserMessageUtil(null, null).getList();
     Assert.assertFalse("No itens to be tested", users.isEmpty());
 
     for (UserResource user : users) {
@@ -184,7 +184,7 @@ public class Nexus1696ValidateBaseUrlIT
     memberRepo1.setId("nexus-test-harness-repo");
     resource.addRepository(memberRepo1);
 
-    RoutesMessageUtil routesUtil = new RoutesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    RoutesMessageUtil routesUtil = new RoutesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
     Status status = routesUtil.sendMessage(Method.POST, resource).getStatus();
     Assert.assertTrue("Unable to create a route " + status, status.isSuccess());
 
@@ -242,7 +242,7 @@ public class Nexus1696ValidateBaseUrlIT
     patterns.add(".*bar.*");
     resource.setPatterns(patterns);
 
-    TargetMessageUtil targetUtil = new TargetMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    TargetMessageUtil targetUtil = new TargetMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     targetUtil.createTarget(resource);
 
     List<RepositoryTargetListResource> targets = TargetMessageUtil.getList();

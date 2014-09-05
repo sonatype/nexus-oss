@@ -55,7 +55,7 @@ public abstract class AbstractNexusProxyIntegrationTest
     this.localStorageDir = TestProperties.getString("proxy.repo.base.dir");
     this.proxyPort = TestProperties.getInteger("proxy.server.port");
 
-    this.repositoryUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    this.repositoryUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Override

@@ -58,7 +58,7 @@ public abstract class AbstractNexusP2GeneratorIT
     if (nexusClient == null) {
       try {
         nexusClient = new NexusClientFactoryImpl(
-            Lists.<SubsystemProvider>newArrayList(new GuiceSubsystemProvider(lookup(Injector.class)))
+            Lists.<SubsystemProvider>newArrayList(new GuiceSubsystemProvider(TestContainer.getInstance().getPlexusContainer().lookup(Injector.class)))
         ).createFor(
             BaseUrl.baseUrlFrom(nexusBaseUrl),
             new UsernamePasswordAuthenticationInfo(checkNotNull("admin"), checkNotNull("admin123"))
@@ -110,7 +110,7 @@ public abstract class AbstractNexusP2GeneratorIT
   {
     final String deployUrl = getNexusTestRepoUrl(repoId);
     final String deployUrlProtocol = deployUrl.substring(0, deployUrl.indexOf(":"));
-    final String wagonHint = getWagonHintForDeployProtocol(deployUrlProtocol);
+    final String wagonHint = deployUrlProtocol;
     getDeployUtils().deployWithWagon(wagonHint, deployUrl, fileToDeploy, path);
   }
 
@@ -118,8 +118,8 @@ public abstract class AbstractNexusP2GeneratorIT
       throws IOException
   {
     final File downloadDir = new File("target/downloads/" + this.getClass().getSimpleName());
-    final File p2Artifacts =
-        downloadArtifact(groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getCanonicalPath());
+    final File p2Artifacts = downloadArtifact(getNexusTestRepoUrl(),
+        groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getCanonicalPath());
     return p2Artifacts;
   }
 
@@ -127,8 +127,8 @@ public abstract class AbstractNexusP2GeneratorIT
       throws IOException
   {
     final File downloadDir = new File("target/downloads/" + this.getClass().getSimpleName());
-    final File p2Content =
-        downloadArtifact(groupId, artifactId, version, "xml", "p2Content", downloadDir.getCanonicalPath());
+    final File p2Content = downloadArtifact(getNexusTestRepoUrl(),
+        groupId, artifactId, version, "xml", "p2Content", downloadDir.getCanonicalPath());
     return p2Content;
   }
 

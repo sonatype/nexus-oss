@@ -16,8 +16,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 
+import com.google.common.base.Throwables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -26,10 +29,10 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.wagon.Wagon;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 public class DeployUtils
@@ -41,16 +44,25 @@ public class DeployUtils
 
   private final WagonDeployer.Factory wagonFactory;
 
-  public DeployUtils(final NexusRestClient nexusRestClient) {
-    this.nexusRestClient = checkNotNull(nexusRestClient);
-    this.wagonFactory = null;
+  public DeployUtils(NexusRestClient nexusRestClient, WagonDeployer.Factory wagonFactory) {
+    this.nexusRestClient = nexusRestClient;
+    this.wagonFactory = wagonFactory;
   }
 
-  public DeployUtils(final NexusRestClient nexusRestClient,
-                     final WagonDeployer.Factory wagonFactory)
-  {
-    this.nexusRestClient = checkNotNull(nexusRestClient);
-    this.wagonFactory = checkNotNull(wagonFactory);
+  public DeployUtils() {
+    this.nexusRestClient = RequestFacade.getNexusRestClient();
+    this.wagonFactory = new WagonDeployer.Factory()
+    {
+      @Override
+      public Wagon get(final String protocol) {
+        try {
+          return (Wagon) TestContainer.getInstance().getPlexusContainer().lookup(Wagon.ROLE, protocol);
+        }
+        catch (ComponentLookupException e) {
+          throw Throwables.propagate(e);
+        }
+      }
+    };
   }
 
   public void deployWithWagon(final String wagonHint,

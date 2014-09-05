@@ -89,8 +89,8 @@ public abstract class AbstractNexus1923
   public void init()
       throws ComponentLookupException
   {
-    this.repoUtils = new RepositoryMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
-    this.groupUtils = new GroupMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.repoUtils = new RepositoryMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.groupUtils = new GroupMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   private RepositoryResource createRepository() {

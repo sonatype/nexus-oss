@@ -44,7 +44,7 @@ public class Nexus532GroupsCrudXmlIT
   protected GroupMessageUtil messageUtil;
 
   public Nexus532GroupsCrudXmlIT() {
-    this.messageUtil = new GroupMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new GroupMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @BeforeClass
