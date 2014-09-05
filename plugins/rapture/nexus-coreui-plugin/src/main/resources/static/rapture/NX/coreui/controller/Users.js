@@ -367,7 +367,7 @@ Ext.define('NX.coreui.controller.Users', {
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
             NX.Conditions.gridHasSelection(me.list, function (model) {
-              return !model.get('readOnly')
+              return !model.get('external')
                   && (model.getId() !== NX.State.getUser().id)
                   && (model.getId() !== NX.State.getValue('anonymousUsername'));
             })
@@ -417,7 +417,7 @@ Ext.define('NX.coreui.controller.Users', {
                 NX.Conditions.isPermitted('security:usersreset', 'delete')
             ),
             NX.Conditions.gridHasSelection(me.list, function (model) {
-              return !model.get('readOnly') && model.getId() !== NX.State.getValue('anonymousUsername');
+              return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),
         {

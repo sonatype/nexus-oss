@@ -275,7 +275,7 @@ extends DirectComponentSupport
         roles: user.roles.collect { role ->
           role.roleId
         },
-        readOnly: user.source != DEFAULT_SOURCE
+        external: user.source != DEFAULT_SOURCE
     )
   }
 

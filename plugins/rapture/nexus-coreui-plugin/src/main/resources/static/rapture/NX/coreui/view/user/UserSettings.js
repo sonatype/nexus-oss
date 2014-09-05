@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.user.UserSettings', {
     return 'User updated: ' + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users or user is readonly',
+  editableMarker: 'You do not have permission to update users or is an external user',
 
   initComponent: function () {
     var me = this;
@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.user.UserSettings', {
     me.editableCondition = me.editableCondition || NX.Conditions.and(
         NX.Conditions.isPermitted('security:users', 'update'),
         NX.Conditions.formHasRecord('nx-coreui-user-settings', function (model) {
-          return !model.get('readOnly');
+          return !model.get('external');
         })
     );
 
