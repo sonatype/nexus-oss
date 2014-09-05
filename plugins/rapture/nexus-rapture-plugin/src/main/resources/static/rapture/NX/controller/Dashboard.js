@@ -33,7 +33,7 @@ Ext.define('NX.controller.Dashboard', {
       view: 'NX.view.dashboard.Welcome',
       description: 'Welcome to Sonatype Nexus!',
       iconConfig: {
-        file: 'emotion_cool.png',
+        file: 'house.png',
         variants: ['x16', 'x32']
       },
       weight: 10,
