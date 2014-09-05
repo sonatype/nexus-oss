@@ -24,11 +24,11 @@ import org.jetbrains.annotations.NonNls;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Configuration adapter for {@link RaptureSettingsCapability}.
+ * Configuration adapter for {@link SettingsCapability}.
  *
  * @since 3.0
  */
-public class RaptureSettingsCapabilityConfiguration
+public class SettingsCapabilityConfiguration
     extends RaptureSettings
 {
 
@@ -47,11 +47,11 @@ public class RaptureSettingsCapabilityConfiguration
   @NonNls
   public static final String TITLE = "title";
 
-  public RaptureSettingsCapabilityConfiguration() {
+  public SettingsCapabilityConfiguration() {
     this(Maps.<String, String>newHashMap());
   }
 
-  public RaptureSettingsCapabilityConfiguration(final Map<String, String> properties) {
+  public SettingsCapabilityConfiguration(final Map<String, String> properties) {
     checkNotNull(properties);
     setDebugAllowed(parseBoolean(properties.get(DEBUG_ALLOWED), DEFAULT_DEBUG_ALLOWED));
     setStatusIntervalAuthenticated(

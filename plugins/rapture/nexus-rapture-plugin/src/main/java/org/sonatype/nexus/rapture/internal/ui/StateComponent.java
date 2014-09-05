@@ -92,6 +92,12 @@ public class StateComponent
   public Map<String, Object> getValues(final Map<String, String> hashes) {
     HashMap<String, Object> values = Maps.newHashMap();
 
+    // First add an entry for each hash we got.
+    // If state will not contribute a value for it, the state will be send back as null and such will be removed in UI
+    for (String key : hashes.keySet()) {
+      values.put(key, null);
+    }
+
     for (Provider<StateContributor> contributor : stateContributors) {
       try {
         Map<String, Object> stateValues = contributor.get().getState();
@@ -161,6 +167,7 @@ public class StateComponent
                     final String key,
                     final Object value)
   {
+    values.remove(key);
     String hash = hash(value);
     if (!ObjectUtils.equals(hash, hashes.get(key))) {
       StateValueXO stateValueXO = new StateValueXO();

@@ -32,10 +32,10 @@ public class RaptureCapabilitiesBooter
   protected void boot(final CapabilityRegistry registry) throws Exception {
     maybeAddCapability(
         registry,
-        RaptureSettingsCapabilityDescriptor.TYPE,
+        SettingsCapabilityDescriptor.TYPE,
         true, // enabled
         null, // no notes
-        new RaptureSettingsCapabilityConfiguration().asMap()
+        new SettingsCapabilityConfiguration().asMap()
     );
   }
 }

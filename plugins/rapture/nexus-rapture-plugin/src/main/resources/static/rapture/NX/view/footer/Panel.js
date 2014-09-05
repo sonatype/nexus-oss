@@ -17,27 +17,28 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.Footer', {
+Ext.define('NX.view.footer.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-footer',
 
-  layout: 'fit',
-
-  style: {
-    backgroundColor: '#444444'
+  layout: {
+    type: 'vbox',
+    align: 'stretch',
+    pack: 'start'
   },
 
   items: [
     {
       xtype: 'container',
-      html: 'Sonatype Nexus&trade; ' +
-          '&copy; Copyright Sonatype, Inc.',
+      html: 'Sonatype Nexus&trade; &copy; Copyright Sonatype, Inc.',
       style: {
+        'background-color': '#444444',
         'color': '#C6C6C6',
         'font-size': '8px',
         'text-align': 'right',
         'padding': '1px 2px 0px 0px'
       }
-    }
+    },
+    { xtype: 'nx-footer-branding', hidden: true }
   ]
 });

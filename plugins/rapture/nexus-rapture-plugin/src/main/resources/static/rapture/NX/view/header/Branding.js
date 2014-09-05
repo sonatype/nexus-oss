@@ -13,46 +13,11 @@
 /*global Ext*/
 
 /**
- * Banding header panel.
- * TODO: implement
+ * Header branding panel.
  *
  * @since 3.0
  */
 Ext.define('NX.view.header.Branding', {
   extend: 'Ext.container.Container',
-  alias: 'widget.nx-header-branding',
-
-  // HACK: Adding some bogus style here to show branding panel
-
-  style: {
-    backgroundColor: '#3f5c9a'
-  },
-  padding: 15,
-
-  layout: {
-    type: 'hbox',
-    align: 'stretch',
-    pack: 'start'
-  },
-
-  items: [
-    {
-      xtype: 'label',
-      text: 'MegaCorp Repositories',
-      flex: 1,
-      style: {
-        'color': '#FFFFFF',
-        'font-size': '30px',
-        'font-variant': 'small-caps'
-      }
-    },
-    {
-      xtype: 'label',
-      html: 'Big is for babies.<br/>Go MEGA or go home!',
-      style: {
-        'color': '#CCCCCC',
-        'font-size': '15px'
-      }
-    }
-  ]
+  alias: 'widget.nx-header-branding'
 });

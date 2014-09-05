@@ -31,7 +31,8 @@ Ext.define('NX.controller.UnsupportedBrowser', {
     'header.Panel',
     'header.Branding',
     'header.Logo',
-    'Footer'
+    'footer.Panel',
+    'footer.Branding'
   ],
 
   refs: [

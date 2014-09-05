@@ -32,7 +32,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.listen({
@@ -53,35 +53,38 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
    * @param field.useTrustStore
    * @param field.useTrustStoreField
    */
-  manageTrustStore: function (field) {
+  manageTrustStore: function(field) {
     var me = this,
         container = field.up('container'),
         useTrustStoreField = field.useTrustStoreField,
-        config;
+        config, hostAndPort;
 
     if (Ext.isFunction(field.useTrustStore)) {
       config = field.useTrustStore.call(field, field);
       if (config) {
-        if (useTrustStoreField && (useTrustStoreField.name !== config.name)) {
+        hostAndPort = me.getHostAndPort(config);
+        if (useTrustStoreField && ((useTrustStoreField.name !== config.name) || !hostAndPort.host)) {
           container.remove(useTrustStoreField);
           delete field.useTrustStoreField;
           useTrustStoreField = undefined;
         }
-        if (!useTrustStoreField) {
-          container.insert(container.items.indexOf(field) + 1, {
-            xtype: 'nx-coreui-sslusetruststore',
-            name: config.name,
-            fieldLabel: field.useTrustStoreFieldLabel,
-            boxLabel: field.useTrustStoreBoxLabel,
-            useTrustStoreConfig: config,
-            listeners: {
-              afterrender: me.bindConditions
-            }
-          });
-          field.useTrustStoreField = container.down('nx-coreui-sslusetruststore[name=' + config.name + ']');
-        }
-        else {
-          useTrustStoreField.useTrustStoreConfig = config;
+        if (hostAndPort.host) {
+          if (!useTrustStoreField) {
+            container.insert(container.items.indexOf(field) + 1, {
+              xtype: 'nx-coreui-sslusetruststore',
+              name: config.name,
+              fieldLabel: field.useTrustStoreFieldLabel,
+              boxLabel: field.useTrustStoreBoxLabel,
+              useTrustStoreConfig: config,
+              listeners: {
+                afterrender: me.bindConditions
+              }
+            });
+            field.useTrustStoreField = container.down('nx-coreui-sslusetruststore[name=' + config.name + ']');
+          }
+          else {
+            useTrustStoreField.useTrustStoreConfig = config;
+          }
         }
       }
     }
@@ -95,12 +98,29 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
    * @private
    * Retrieves certificate, showing the certificate details if successful.
    */
-  loadCertificate: function (button) {
+  loadCertificate: function(button) {
     var me = this,
         panel = button.up('panel').up('panel'),
-        config = button.up('nx-coreui-sslusetruststore').useTrustStoreConfig,
+        hostAndPort = me.getHostAndPort(button.up('nx-coreui-sslusetruststore').useTrustStoreConfig),
+        sslCertificates = me.getController('NX.coreui.controller.SslCertificates');
+
+    panel.getEl().mask('Loading certificate...');
+    NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, undefined, function(response) {
+      panel.getEl().unmask();
+      if (Ext.isObject(response) && response.success) {
+        sslCertificates.showCertificateDetails(response.data);
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Get host/port out of config.
+   */
+  getHostAndPort: function(config) {
+    var me = this,
         sslCertificates = me.getController('NX.coreui.controller.SslCertificates'),
-        valueOf = function (value) {
+        valueOf = function(value) {
           if (Ext.isString(value)) {
             return value;
           }
@@ -121,16 +141,13 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
       port = valueOf(config.port);
     }
 
-    panel.getEl().mask('Loading certificate...');
-    NX.direct.ssl_Certificate.retrieveFromHost(host, port, undefined, function (response) {
-      panel.getEl().unmask();
-      if (Ext.isObject(response) && response.success) {
-        sslCertificates.showCertificateDetails(response.data);
-      }
-    });
+    return {
+      host: host,
+      port: port
+    };
   },
 
-  bindConditions: function (useTrustStoreField) {
+  bindConditions: function(useTrustStoreField) {
     var useTrustStoreCheckbox, useTrustStoreButton;
 
     useTrustStoreCheckbox = useTrustStoreField.down('checkbox');
