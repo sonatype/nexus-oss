@@ -37,6 +37,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       xtype: 'combo',
       name: 'protocol',
+      itemId: 'protocol',
       fieldLabel: 'Protocol',
       helpText: 'Use plain text (ldap://) or secure (ldaps://) connection.',
       emptyText: 'select a connection type',
@@ -62,7 +63,13 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       name: 'host',
       itemId: 'host',
       fieldLabel: 'Host',
-      helpText: 'The host name of the LDAP server.'
+      helpText: 'The host name of the LDAP server.',
+      listeners: {
+        change: function(){
+          var protocol = this.up('form').down('#protocol');
+          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
+        }
+      }
     },
     {
       xtype: 'numberfield',

@@ -56,6 +56,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
           {
             xtype: 'combo',
             name: 'connectionType',
+            itemId: 'connectionType',
             fieldLabel: 'SMTP server type',
             helpText: 'Connection level security to be used with SMTP server. Use any of the SSL/TLS provided solutions for greater security.',
             emptyText: 'select a connection type',
@@ -82,7 +83,13 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'host',
             itemId: 'host',
             fieldLabel: 'Hostname',
-            helpText: 'The host name of an SMTP server.'
+            helpText: 'The host name of an SMTP server.',
+            listeners: {
+              change: function(){
+                var cType = this.up('form').down('#connectionType');
+                cType.fireEvent('change', cType, cType.getValue(), cType.getValue());
+              }
+            }
           },
           {
             xtype: 'numberfield',
