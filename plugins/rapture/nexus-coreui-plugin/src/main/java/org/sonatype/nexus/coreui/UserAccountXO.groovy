@@ -25,7 +25,7 @@ import org.hibernate.validator.constraints.NotEmpty
 class UserAccountXO
 {
   @NotEmpty
-  String id
+  String userId
 
   @NotEmpty
   String firstName

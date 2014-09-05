@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.user.UserSettings', {
     submit: 'NX.direct.coreui_User.update'
   },
   settingsFormSuccessMessage: function (data) {
-    return 'User updated: ' + data['id'];
+    return 'User updated: ' + data['userId'];
   },
 
   editableMarker: 'You do not have permission to update users',
@@ -40,8 +40,8 @@ Ext.define('NX.coreui.view.user.UserSettings', {
 
     me.items = [
       {
-        name: 'id',
-        itemId: 'id',
+        name: 'userId',
+        itemId: 'userId',
         readOnly: true,
         fieldLabel: 'ID',
         helpText: 'The ID assigned to this user, will be used as the username.',

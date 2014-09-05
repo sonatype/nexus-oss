@@ -31,11 +31,10 @@ Ext.define('NX.coreui.store.User', {
     reader: {
       type: 'json',
       root: 'data',
-      idProperty: 'id',
       successProperty: 'success'
     }
   },
 
   sortOnLoad: true,
-  sorters: { property: 'id', direction: 'ASC' }
+  sorters: { property: 'userId', direction: 'ASC' }
 });

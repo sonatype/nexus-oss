@@ -115,7 +115,7 @@ extends DirectComponentSupport
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
     User user = userAccountManager.readAccount(currentUserId)
     return new UserAccountXO(
-        id: user.userId,
+        userId: user.userId,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.emailAddress
@@ -133,7 +133,7 @@ extends DirectComponentSupport
   @Validate(groups = [Create.class, Default.class])
   UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
-        userId: userXO.id,
+        userId: userXO.userId,
         source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
         lastName: userXO.lastName,
@@ -155,7 +155,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
+    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.userId).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
       emailAddress = userXO.email
@@ -261,7 +261,7 @@ extends DirectComponentSupport
 
   private static asUserXO(final User user) {
     new UserXO(
-        id: user.userId,
+        userId: user.userId,
         realm: user.source,
         firstName: user.firstName,
         lastName: user.lastName,

@@ -38,8 +38,8 @@ Ext.define('NX.coreui.view.user.UserAccount', {
             html: '<p>Manage your account settings.</p>'
           },
           {
-            name: 'id',
-            itemId: 'id',
+            name: 'userId',
+            itemId: 'userId',
             readOnly: true,
             fieldLabel: 'ID',
             helpText: 'The ID assigned to you, used as the username.',

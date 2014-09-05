@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
   ],
 
   title: 'Create new user',
-  defaultFocus: 'id',
+  defaultFocus: 'userId',
 
   /**
    * @override
@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         submit: 'NX.direct.coreui_User.create'
       },
       settingsFormSuccessMessage: function (data) {
-        return 'User created: ' + data['id'];
+        return 'User created: ' + data['userId'];
       },
       editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
       editableMarker: 'You do not have permission to create users'
@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
 
     me.callParent(arguments);
 
-    me.down('#id').setReadOnly(false);
+    me.down('#userId').setReadOnly(false);
 
     me.down('form').insert(5, [
       {
