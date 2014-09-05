@@ -22,6 +22,10 @@ import org.apache.shiro.authz.annotation.RequiresUser
 import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.configuration.validation.InvalidConfigurationException
+import org.sonatype.configuration.validation.ValidationMessage
+import org.sonatype.configuration.validation.ValidationResponse
+import org.sonatype.micromailer.Address
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -137,7 +141,7 @@ extends DirectComponentSupport
         source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
         lastName: userXO.lastName,
-        emailAddress: userXO.email,
+        emailAddress: validateEmail(userXO.email),
         status: userXO.status,
         roles: userXO.roles?.collect { id ->
           new RoleIdentifier(DEFAULT_SOURCE, id)
@@ -158,7 +162,7 @@ extends DirectComponentSupport
     asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.userId).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
-      emailAddress = userXO.email
+      emailAddress = validateEmail(userXO.email)
       status = userXO.status
       roles = userXO.roles?.collect { id ->
         new RoleIdentifier(DEFAULT_SOURCE, id)
@@ -247,7 +251,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:delete')
   @Validate
   void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
-              final @NotEmpty(message = '[source] may not be empty') String source)
+               final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
     if (isAnonymousUser(id)) {
@@ -284,6 +288,24 @@ extends DirectComponentSupport
       return false
     }
     return subject.principal == userId
+  }
+
+  private static String validateEmail(final String email) {
+    if (email) {
+      try {
+        new Address(email)
+      }
+      catch (IllegalArgumentException e) {
+        def validations = new ValidationResponse()
+        def message = e.message
+        if (e.cause?.message) {
+          message += ': ' + e.cause.message
+        }
+        validations.addValidationError(new ValidationMessage('email', message))
+        throw new InvalidConfigurationException(validations)
+      }
+    }
+    return email
   }
 
 }
