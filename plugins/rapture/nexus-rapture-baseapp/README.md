@@ -61,7 +61,7 @@ Install Ext.ux examples:
 
     mv src/main/baseapp/ext/examples/ux src/main/baseapp/ext/src/
 
-Delete some unheeded files from the distribution:
+Delete unneeded files from the distribution:
 
     rm -rf src/main/baseapp/ext/.sencha
     rm -rf src/main/baseapp/ext/docs
