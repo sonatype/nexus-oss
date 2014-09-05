@@ -113,7 +113,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     if (Ext.isDefined(model)) {
       me.getFeature().setDescriptionIconName('privilege-' + model.get('type'));
       info = {
-        'Id': model.get('id'),
+        'Id': model.getId(),
         'Name': model.get('name'),
         'Description': model.get('description'),
         'Method': model.get('method')
