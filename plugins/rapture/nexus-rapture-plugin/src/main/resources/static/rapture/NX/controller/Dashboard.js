@@ -32,7 +32,7 @@ Ext.define('NX.controller.Dashboard', {
       mode: 'browse',
       view: 'NX.view.dashboard.Welcome',
       iconConfig: {
-        file: 'dashboard.png',
+        file: 'emotion_cool.png',
         variants: ['x16', 'x32']
       },
       weight: 10,
