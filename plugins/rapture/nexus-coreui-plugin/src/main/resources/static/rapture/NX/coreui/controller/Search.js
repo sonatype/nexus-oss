@@ -20,7 +20,9 @@
 Ext.define('NX.coreui.controller.Search', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Bookmarks'
+    'NX.Bookmarks',
+    'NX.Conditions',
+    'NX.Permissions'
   ],
 
   stores: [

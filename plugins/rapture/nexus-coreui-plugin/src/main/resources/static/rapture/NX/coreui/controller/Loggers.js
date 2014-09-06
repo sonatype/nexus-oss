@@ -19,6 +19,12 @@
  */
 Ext.define('NX.coreui.controller.Loggers', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Conditions',
+    'NX.Dialogs',
+    'NX.Permissions',
+    'NX.Messages'
+  ],
 
   stores: [
     'Logger'
