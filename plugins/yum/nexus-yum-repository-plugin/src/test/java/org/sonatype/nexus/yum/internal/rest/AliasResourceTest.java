@@ -19,10 +19,10 @@ package org.sonatype.nexus.yum.internal.rest;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.capability.CapabilityContext;
+import org.sonatype.nexus.capability.CapabilityIdentity;
+import org.sonatype.nexus.capability.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityRegistry;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.capabilities.GenerateMetadataCapability;

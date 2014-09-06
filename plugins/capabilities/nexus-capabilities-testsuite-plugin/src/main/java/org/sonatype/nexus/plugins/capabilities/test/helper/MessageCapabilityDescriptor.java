@@ -18,15 +18,15 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.PasswordFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 import com.google.common.collect.Lists;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
+import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
 
 @Named(MessageCapabilityDescriptor.TYPE_ID)
 @Singleton

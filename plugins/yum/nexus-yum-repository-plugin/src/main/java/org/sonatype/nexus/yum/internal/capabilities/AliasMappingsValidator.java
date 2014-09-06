@@ -14,9 +14,9 @@ package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.ValidationResult;
-import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
+import org.sonatype.nexus.capability.ValidationResult;
+import org.sonatype.nexus.capability.Validator;
+import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

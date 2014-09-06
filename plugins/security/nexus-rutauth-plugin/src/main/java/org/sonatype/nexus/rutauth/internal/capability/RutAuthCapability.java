@@ -17,8 +17,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.rutauth.internal.RutAuthAuthenticationTokenFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;

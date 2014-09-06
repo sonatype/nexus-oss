@@ -18,9 +18,9 @@ import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 import com.sonatype.security.ldap.persist.LdapServerNotFoundException;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.ValidationResult;
-import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
+import org.sonatype.nexus.capability.ValidationResult;
+import org.sonatype.nexus.capability.Validator;
+import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 

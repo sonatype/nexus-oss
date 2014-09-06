@@ -15,7 +15,7 @@ package org.sonatype.nexus.capability.support;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.capability.Capability;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;

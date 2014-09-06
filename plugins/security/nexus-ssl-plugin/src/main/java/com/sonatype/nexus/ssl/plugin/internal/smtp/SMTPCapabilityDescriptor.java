@@ -20,20 +20,20 @@ import javax.inject.Singleton;
 
 import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 
+import org.sonatype.nexus.capability.CapabilityType;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
+import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.Tag;
-import org.sonatype.nexus.plugins.capabilities.Taggable;
-import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import com.google.common.collect.Lists;
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.capabilities.Tag.categoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
+import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
+import static org.sonatype.nexus.capability.Tag.categoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 
 /**
  * {@link SMTPCapability} descriptor.

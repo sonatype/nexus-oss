@@ -22,8 +22,8 @@ import com.sonatype.nexus.ldap.internal.capabilities.LdapConditions;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 
+import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 

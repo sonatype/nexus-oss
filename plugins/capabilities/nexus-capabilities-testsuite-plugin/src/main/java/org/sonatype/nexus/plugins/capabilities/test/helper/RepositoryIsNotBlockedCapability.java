@@ -17,15 +17,15 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.Tag;
-import org.sonatype.nexus.plugins.capabilities.Taggable;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
-import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
+import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
+import org.sonatype.nexus.capability.support.condition.Conditions;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
 
-import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
+import static org.sonatype.nexus.capability.Tag.repositoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 import static org.sonatype.nexus.plugins.capabilities.test.helper.MessageCapabilityDescriptor.REPOSITORY;
 
 @Named(RepositoryIsNotBlockedCapabilityDescriptor.TYPE_ID)

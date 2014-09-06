@@ -15,8 +15,8 @@ package org.sonatype.nexus.yum.internal.capabilities;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
+import org.sonatype.nexus.capability.CapabilityRegistry;
+import org.sonatype.nexus.capability.support.CapabilityBooterSupport;
 import org.sonatype.nexus.yum.YumRegistry;
 
 /**

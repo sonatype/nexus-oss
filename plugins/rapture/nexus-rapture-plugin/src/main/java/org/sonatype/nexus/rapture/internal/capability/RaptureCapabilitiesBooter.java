@@ -15,8 +15,8 @@ package org.sonatype.nexus.rapture.internal.capability;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityBooterSupport;
+import org.sonatype.nexus.capability.CapabilityRegistry;
+import org.sonatype.nexus.capability.support.CapabilityBooterSupport;
 
 /**
  * Automatically create Rapture capabilities.
