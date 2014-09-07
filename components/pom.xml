@@ -35,6 +35,7 @@
     <module>nexus-bootstrap</module>
     <module>nexus-client-core</module>
     <module>nexus-componentmetadata</module>
+    <module>nexus-component-model</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
