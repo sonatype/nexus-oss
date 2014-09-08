@@ -16,13 +16,13 @@ import java.util.Set;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
-import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.Tag;
-import org.sonatype.nexus.plugins.capabilities.Taggable;
 
-import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
+import static org.sonatype.nexus.capability.Tag.repositoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 
 /**
  * A test/demo capability for using {@link RepositoryCombobox}.

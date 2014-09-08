@@ -12,7 +12,7 @@
  */
 package com.sonatype.nexus.ssl.plugin.spi;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityReference;
 
 /**
  * Manages retrieve / update of Trust Store capabilities / type.

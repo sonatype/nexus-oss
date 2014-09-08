@@ -14,9 +14,9 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import java.util.Date;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
-import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.capability.CapabilityContext;
+import org.sonatype.nexus.capability.Condition;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;

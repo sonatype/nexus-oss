@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 
-import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.capability.Validator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

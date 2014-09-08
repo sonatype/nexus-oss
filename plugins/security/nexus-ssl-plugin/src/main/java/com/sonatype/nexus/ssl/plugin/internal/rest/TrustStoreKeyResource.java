@@ -31,7 +31,7 @@ import com.sonatype.nexus.ssl.model.TrustStoreKeyXO;
 import com.sonatype.nexus.ssl.plugin.SSLPlugin;
 import com.sonatype.nexus.ssl.plugin.spi.CapabilityManager;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityReference;
 import org.sonatype.siesta.Resource;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

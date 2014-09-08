@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.capability.Capability;
 
 @Named(MessageCapabilityDescriptor.TYPE_ID)
 public class MessageCapability

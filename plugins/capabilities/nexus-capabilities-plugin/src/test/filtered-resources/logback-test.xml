@@ -24,7 +24,7 @@
 
   <logger name="Sisu" level="${test.log.level.Sisu:-INFO}"/>
 
-  <logger name="org.sonatype.nexus.plugins.capabilities" level="TRACE"/>
+  <logger name="org.sonatype.nexus.capability" level="TRACE"/>
 
   <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>
