@@ -44,6 +44,18 @@ Ext.define('NX.ext.grid.column.Icon', {
   /**
    * @override
    */
+  initComponent: function () {
+    var me = this;
+
+    me.callParent(arguments);
+
+    // HACK: Force scope to ourselves, seems this is needed in Ext 4.2.3 with rowediting plugin.
+    me.scope = me;
+  },
+
+  /**
+   * @override
+   */
   defaultRenderer: function(value, meta, record) {
     var me = this,
         cls,
