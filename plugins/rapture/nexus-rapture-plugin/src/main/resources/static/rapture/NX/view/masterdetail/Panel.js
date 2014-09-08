@@ -60,10 +60,6 @@ Ext.define('NX.view.masterdetail.Panel', {
     ];
 
     me.callParent(arguments);
-
-    if (Ext.isDefined(me.iconName)) {
-      me.setDescriptionIconName(me.iconName);
-    }
   },
 
   setDescription: function (description) {
