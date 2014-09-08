@@ -88,7 +88,7 @@ public class Nexus502MavenExecutionIT
   private UserResource disableUser(String userId)
       throws IOException
   {
-    UserMessageUtil util = new UserMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    UserMessageUtil util = new UserMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
     return util.disableUser(userId);
   }
 }

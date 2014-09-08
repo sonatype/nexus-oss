@@ -148,7 +148,7 @@ public class Nexus1170ReducePermissionCheckingIT
 
     Set<String> privIds = new HashSet<String>();
     List<PrivilegeStatusResource> privs =
-        new PrivilegesMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML).getList();
+        new PrivilegesMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML).getList();
     for (PrivilegeStatusResource priv : privs) {
       if (priv.getType().equals("method")) {
         for (PrivilegeProperty prop : priv.getProperties()) {

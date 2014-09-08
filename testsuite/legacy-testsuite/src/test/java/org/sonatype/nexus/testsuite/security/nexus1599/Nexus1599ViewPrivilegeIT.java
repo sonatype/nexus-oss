@@ -40,7 +40,7 @@ public class Nexus1599ViewPrivilegeIT
     super(REPO_TEST_HARNESS_REPO);
 
     this.repoMsgUtil = new RepositoryMessageUtil(
-        this, this.getJsonXStream(),
+        this.getJsonXStream(),
         MediaType.APPLICATION_JSON);
   }
 

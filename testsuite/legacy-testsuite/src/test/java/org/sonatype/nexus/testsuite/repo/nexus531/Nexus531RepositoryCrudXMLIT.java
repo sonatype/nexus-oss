@@ -23,7 +23,7 @@ public class Nexus531RepositoryCrudXMLIT
     extends Nexus531RepositoryCrudJsonIT
 {
   public Nexus531RepositoryCrudXMLIT() {
-    this.messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @BeforeClass

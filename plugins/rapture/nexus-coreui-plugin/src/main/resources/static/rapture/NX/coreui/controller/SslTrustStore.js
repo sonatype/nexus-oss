@@ -19,12 +19,15 @@
  */
 Ext.define('NX.coreui.controller.SslTrustStore', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Conditions',
+    'NX.coreui.controller.SslCertificates'
+  ],
+
   mixins: {
     logAware: 'NX.LogAware'
   },
-  requires: [
-    'NX.coreui.controller.SslCertificates'
-  ],
+
   views: [
     'ssl.SslUseTrustStore'
   ],

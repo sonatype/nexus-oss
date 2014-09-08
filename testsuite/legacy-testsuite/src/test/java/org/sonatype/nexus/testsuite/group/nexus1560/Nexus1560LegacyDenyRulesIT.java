@@ -17,6 +17,8 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 public class Nexus1560LegacyDenyRulesIT
     extends AbstractLegacyRulesIT
 {

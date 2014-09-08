@@ -30,6 +30,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTTP Request helper (trying to hide any mention of the actual request implementation.)
@@ -42,6 +44,7 @@ import org.restlet.resource.Representation;
  */
 public class RequestFacade
 {
+  private static final Logger log = LoggerFactory.getLogger(RequestFacade.class);
 
   public static final String SERVICE_LOCAL = "service/local/";
 
@@ -328,6 +331,7 @@ public class RequestFacade
   public static File downloadFile(URL url, String targetFile)
       throws IOException
   {
+    log.info("Downloading {} to: {}", url, targetFile);
     return nexusRestClient.downloadFile(url, targetFile);
   }
 

@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Messages'
+  ],
 
   views: [
     'routing.RoutingHostedRepositorySettings',

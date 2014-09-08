@@ -97,14 +97,14 @@ public abstract class AbstractPrivilegeTest
   {
     XStream xstream = this.getXMLXStream();
 
-    this.userUtil = new UserMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.roleUtil = new RoleMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.privUtil = new PrivilegesMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.targetUtil = new TargetMessageUtil(this, xstream, MediaType.APPLICATION_XML);
+    this.userUtil = new UserMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.roleUtil = new RoleMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.privUtil = new PrivilegesMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.targetUtil = new TargetMessageUtil(xstream, MediaType.APPLICATION_XML);
     TestContainer.getInstance().getTestContext().setSecureTest(true);
-    this.routeUtil = new RoutesMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.repoUtil = new RepositoryMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.groupUtil = new GroupMessageUtil(this, xstream, MediaType.APPLICATION_XML);
+    this.routeUtil = new RoutesMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.repoUtil = new RepositoryMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.groupUtil = new GroupMessageUtil(xstream, MediaType.APPLICATION_XML);
   }
 
   @Before

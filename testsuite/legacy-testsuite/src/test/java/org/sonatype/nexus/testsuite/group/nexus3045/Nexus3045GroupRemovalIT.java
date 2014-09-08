@@ -52,9 +52,9 @@ public class Nexus3045GroupRemovalIT
       throws ComponentLookupException
   {
     super();
-    routesUtil = new RoutesMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
-    repoUtil = new RepositoryMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
-    groupUtil = new GroupMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+    routesUtil = new RoutesMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+    repoUtil = new RepositoryMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+    groupUtil = new GroupMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
   }
 
   private static final String GROUP_ROUTE_ID = "297bf5de34f";

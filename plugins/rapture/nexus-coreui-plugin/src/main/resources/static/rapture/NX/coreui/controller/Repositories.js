@@ -20,8 +20,13 @@
 Ext.define('NX.coreui.controller.Repositories', {
   extend: 'NX.controller.MasterDetail',
   requires: [
+    'Ext.direct.Manager',
     'NX.util.Url',
-    'NX.Dialogs'
+    'NX.Conditions',
+    'NX.Dialogs',
+    'NX.Messages',
+    'NX.Bookmarks',
+    'NX.Permissions'
   ],
 
   list: 'nx-coreui-repository-list',

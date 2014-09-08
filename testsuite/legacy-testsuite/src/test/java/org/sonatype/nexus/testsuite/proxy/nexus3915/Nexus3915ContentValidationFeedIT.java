@@ -50,7 +50,7 @@ public class Nexus3915ContentValidationFeedIT
   {
 
     // make sure it is validating the content!
-    RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
     RepositoryProxyResource repo = (RepositoryProxyResource) repoUtil.getRepository(REPO_RELEASE_PROXY_REPO1);
     repo.setFileTypeValidation(true);
     repoUtil.updateRepo(repo);

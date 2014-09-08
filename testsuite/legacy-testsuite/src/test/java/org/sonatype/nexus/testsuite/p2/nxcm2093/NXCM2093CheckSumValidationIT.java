@@ -77,7 +77,7 @@ public class NXCM2093CheckSumValidationIT
     }
 
     final RepositoryMessageUtil repoUtil =
-        new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+        new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
     final RepositoryStatusResource repoStatusResource = repoUtil.getStatus(getTestRepositoryId());
 
     assertThat(repoStatusResource.getProxyMode(), is(equalTo(ProxyMode.ALLOW.name())));

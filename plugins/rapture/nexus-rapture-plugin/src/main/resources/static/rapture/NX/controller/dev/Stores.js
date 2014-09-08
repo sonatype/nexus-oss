@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.dev.Stores', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'Ext.data.StoreManager'
+  ],
 
   refs: [
     {

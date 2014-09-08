@@ -143,6 +143,6 @@ public class Nexus1581MirrorMetadataIT
     resource.setRemoteStorage(remoteStorage);
     resource.setRepoPolicy(RepositoryPolicy.RELEASE.name());
     resource.setChecksumPolicy(ChecksumPolicy.IGNORE.name());
-    new RepositoryMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON).createRepository(resource);
+    new RepositoryMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON).createRepository(resource);
   }
 }

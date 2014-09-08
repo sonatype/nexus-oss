@@ -36,7 +36,7 @@ public class Nexus3039IndexTreeIT
     RequestFacade.doGet(RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/");
 
     RepositoryMessageUtil repoUtil =
-        new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+        new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
     RepositoryResource resource = (RepositoryResource) repoUtil.getRepository(repoId);
     resource.setIndexable(false);

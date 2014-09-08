@@ -53,7 +53,8 @@ public class Nexus260MultipleDeployIT
 
     // download it
     File artifact =
-        downloadArtifact("org.sonatype.nexus-integration-tests.multiple-deploy-test", "singleDeployTest", "1",
+        downloadArtifact(getNexusTestRepoUrl(),
+            "org.sonatype.nexus-integration-tests.multiple-deploy-test", "singleDeployTest", "1",
             "xml", null, "./target/downloaded-jars");
 
     // make sure its here
@@ -83,7 +84,8 @@ public class Nexus260MultipleDeployIT
 
     // download it
     File artifact =
-        downloadArtifact("org.sonatype.nexus-integration-tests.multiple-deploy-test",
+        downloadArtifact(getNexusTestRepoUrl(),
+            "org.sonatype.nexus-integration-tests.multiple-deploy-test",
             "deploySameFileMultipleTimesTest", "1", "xml", null, "./target/downloaded-jars");
 
     // make sure its here
@@ -116,7 +118,8 @@ public class Nexus260MultipleDeployIT
 
     // download it
     File artifact =
-        downloadArtifact("org.sonatype.nexus-integration-tests.multiple-deploy-test",
+        downloadArtifact(getNexusTestRepoUrl(),
+            "org.sonatype.nexus-integration-tests.multiple-deploy-test",
             "deployChangedFileMultipleTimesTest", "1", "xml", null, "./target/downloaded-jars");
 
     // make sure its here

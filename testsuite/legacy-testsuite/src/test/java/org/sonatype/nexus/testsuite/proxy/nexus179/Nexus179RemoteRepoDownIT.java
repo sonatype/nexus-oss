@@ -57,7 +57,7 @@ public class Nexus179RemoteRepoDownIT
     serverResource.getServerProvider().stop();
 
     // delete everything under this tests group id if exist anything
-    this.deleteFromRepository("nexus179/");
+    this.deleteFromRepository(getTestRepositoryId(), "nexus179/");
 
     Gav gav =
         new Gav(this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0, new Date().getTime(),
@@ -69,7 +69,7 @@ public class Nexus179RemoteRepoDownIT
     Assert.assertTrue("The File: " + localFile + " does not exist.", localFile.exists());
 
     try {
-      this.downloadArtifact(gav, "target/downloads");
+      this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads");
       Assert.fail("A FileNotFoundException should have been thrown.");
     }
     catch (FileNotFoundException e) {
@@ -80,7 +80,7 @@ public class Nexus179RemoteRepoDownIT
 
     // should not be able to download artifact after starting proxy, without clearing the cache.
     try {
-      this.downloadArtifact(gav, "target/downloads");
+      this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads");
       Assert.fail("A FileNotFoundException should have been thrown.");
     }
     catch (FileNotFoundException e) {
@@ -91,7 +91,7 @@ public class Nexus179RemoteRepoDownIT
     // unblock the proxy
     repositoryUtil.setBlockProxy(REPO_RELEASE_PROXY_REPO1, false);
 
-    File artifact = this.downloadArtifact(gav, "target/downloads");
+    File artifact = this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads");
 
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(artifact, localFile));
   }

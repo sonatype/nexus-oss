@@ -46,7 +46,8 @@ public class Nexus1111ProxyRemote500ErrorIT
       throws Exception
   {
     // first the proxy works
-    downloadArtifact("nexus1111", "artifact", "1.0", "jar", null, "target/downloads");
+    downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1111", "artifact", "1.0", "jar", null, "target/downloads");
 
     // stop the healthy server
     int port = serverResource.getServerProvider().getPort();
@@ -57,7 +58,8 @@ public class Nexus1111ProxyRemote500ErrorIT
 
     // download again
     try {
-      downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+      downloadArtifact(getNexusTestRepoUrl(),
+          "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
       Assert.fail("Should throw exception coz the remote is in a error status");
     }
     catch (Exception e) {
@@ -86,12 +88,13 @@ public class Nexus1111ProxyRemote500ErrorIT
     // clear cache, then download
     ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");
-    prop.setValue(testRepositoryId);
+    prop.setValue(getTestRepositoryId());
     TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
 
     try {
       // the proxy is now working <- NOT TRUE, it is auto blocked!
-      downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+      downloadArtifact(getNexusTestRepoUrl(),
+          "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
       Assert.fail("Should fail, since repository is in AutoBlock mode!");
     }
     catch (Exception e) {
@@ -101,9 +104,9 @@ public class Nexus1111ProxyRemote500ErrorIT
     // check for auto block
     // TODO: interestingly RepositoryMessageUtil.getStatus() neglects JSON here, so
     // not using it and switched back to XML as it is wired in it this util class.
-    RepositoryMessageUtil util = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    RepositoryMessageUtil util = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
 
-    RepositoryStatusResource status = util.getStatus(this.testRepositoryId);
+    RepositoryStatusResource status = util.getStatus(getTestRepositoryId());
 
     Assert.assertEquals("Repository should be auto-blocked", status.getProxyMode(), ProxyMode.BLOCKED_AUTO.name());
 
@@ -121,6 +124,7 @@ public class Nexus1111ProxyRemote500ErrorIT
     util.updateStatus(status);
 
     // and now, all should go well
-    downloadArtifact("nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
+    downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1111", "artifact", "1.1", "jar", null, "target/downloads");
   }
 }

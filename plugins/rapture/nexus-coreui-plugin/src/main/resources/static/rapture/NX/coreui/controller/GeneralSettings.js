@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.GeneralSettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions'
+  ],
 
   views: [
     'system.GeneralSettings'

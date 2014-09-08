@@ -37,7 +37,7 @@ public class Nexus448PrivilegeUrlIT
   private PrivilegesMessageUtil messageUtil;
 
   public Nexus448PrivilegeUrlIT() {
-    this.messageUtil = new PrivilegesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new PrivilegesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @BeforeClass

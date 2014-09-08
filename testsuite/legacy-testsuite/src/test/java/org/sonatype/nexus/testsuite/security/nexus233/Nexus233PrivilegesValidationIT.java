@@ -47,7 +47,7 @@ public class Nexus233PrivilegesValidationIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new PrivilegesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new PrivilegesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @SuppressWarnings("unchecked")

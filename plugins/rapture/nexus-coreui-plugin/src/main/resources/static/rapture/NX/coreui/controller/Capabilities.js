@@ -20,7 +20,10 @@
 Ext.define('NX.coreui.controller.Capabilities', {
   extend: 'NX.controller.MasterDetail',
   requires: [
-    'NX.Dialogs'
+    'NX.Conditions',
+    'NX.Dialogs',
+    'NX.Messages',
+    'NX.Permissions'
   ],
 
   list: 'nx-coreui-capability-list',

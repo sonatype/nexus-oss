@@ -15,8 +15,6 @@ package org.sonatype.nexus.integrationtests;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.test.utils.TestProperties;
 
@@ -92,24 +90,6 @@ public class TestContainer
 
   public void reset() {
     getTestContext().reset();
-  }
-
-  public <T> T invokeAsAdministrator(final Callable<T> callable) throws Exception {
-    final TestContext ctx = TestContainer.getInstance().getTestContext();
-    final String username = ctx.getUsername();
-    final String password = ctx.getPassword();
-    final boolean secure = ctx.isSecureTest();
-    ctx.useAdminForRequests();
-    ctx.setSecureTest(true);
-
-    try {
-      return callable.call();
-    }
-    finally {
-      ctx.setUsername(username);
-      ctx.setPassword(password);
-      ctx.setSecureTest(secure);
-    }
   }
 
   // ==

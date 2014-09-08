@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.index.nexus3638;
 import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 import org.apache.maven.index.artifact.Gav;
 
@@ -41,7 +42,7 @@ public class Downloader
   public void run() {
     try {
       // it.downloadSnapshotArtifact( "nexus3638", gav, new File( "target/downloads/nexus3638/" + i ) );
-      it.downloadFile(
+      RequestFacade.downloadFile(
           new URL(AbstractNexusIntegrationTest.nexusBaseUrl
               + AbstractNexusIntegrationTest.REPOSITORY_RELATIVE_URL + "nexus3638"
               +

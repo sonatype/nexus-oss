@@ -19,6 +19,12 @@
  */
 Ext.define('NX.coreui.controller.Tasks', {
   extend: 'NX.controller.MasterDetail',
+  requires: [
+    'NX.Conditions',
+    'NX.Dialogs',
+    'NX.Messages',
+    'NX.Permissions'
+  ],
 
   list: 'nx-coreui-task-list',
 

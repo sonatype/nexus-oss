@@ -47,8 +47,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class Nexus2120EnableDownloadRemoteIndexIT
     extends AbstractNexusIntegrationTest
@@ -100,7 +104,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
   public void start()
       throws Exception
   {
-    repoUtil = new RepositoryMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+    repoUtil = new RepositoryMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
   }
 
   @After

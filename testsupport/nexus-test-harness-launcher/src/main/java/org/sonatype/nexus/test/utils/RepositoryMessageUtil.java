@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -42,7 +41,6 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 public class RepositoryMessageUtil
-    extends ITUtil
 {
   public static final String SERVICE_PART = RepositoriesNexusRestClient.SERVICE_PART;
 
@@ -51,17 +49,16 @@ public class RepositoryMessageUtil
   private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
       RequestFacade.getNexusRestClient(),
       new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
-      new EventInspectorsUtil(RequestFacade.getNexusRestClient())
+      new EventInspectorsUtil()
   );
 
   private final RepositoriesNexusRestClient repositoryNRC;
 
-  public RepositoryMessageUtil(AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType) {
-    super(test);
+  public RepositoryMessageUtil(XStream xstream, MediaType mediaType) {
     repositoryNRC = new RepositoriesNexusRestClient(
         RequestFacade.getNexusRestClient(),
         new TasksNexusRestClient(RequestFacade.getNexusRestClient()),
-        test.getEventInspectorsUtil(),
+        new EventInspectorsUtil(),
         xstream,
         mediaType
     );
@@ -234,13 +231,13 @@ public class RepositoryMessageUtil
   private void validateRepoInNexusConfig(RepositoryBaseResource repo)
       throws IOException
   {
+    NexusConfigUtil configUtil = new NexusConfigUtil();
 
     if (repo.getRepoType().equals("virtual")) {
       // check mirror
       RepositoryShadowResource expected = (RepositoryShadowResource) repo;
-      CRepository cRepo = getTest().getNexusConfigUtil().getRepo(repo.getId());
-      M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo =
-          getTest().getNexusConfigUtil().getRepoShadow(repo.getId());
+      CRepository cRepo = configUtil.getRepo(repo.getId());
+      M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo = configUtil.getRepoShadow(repo.getId());
 
       Assert.assertEquals(cShadowRepo.getMasterRepositoryId(), expected.getShadowOf());
       Assert.assertEquals(cRepo.getId(), expected.getId());
@@ -257,7 +254,7 @@ public class RepositoryMessageUtil
     }
     else {
       RepositoryResource expected = (RepositoryResource) repo;
-      CRepository cRepo = getTest().getNexusConfigUtil().getRepo(repo.getId());
+      CRepository cRepo = configUtil.getRepo(repo.getId());
 
       Assert.assertEquals(expected.getId(), cRepo.getId());
 
@@ -298,7 +295,7 @@ public class RepositoryMessageUtil
 
       // check maven repo props (for not just check everything that is a Repository
       if (expected.getProvider().matches("maven[12]")) {
-        M2RepositoryConfiguration cM2Repo = getTest().getNexusConfigUtil().getM2Repo(repo.getId());
+        M2RepositoryConfiguration cM2Repo = configUtil.getM2Repo(repo.getId());
 
         if (expected.getChecksumPolicy() != null) {
           Assert.assertEquals(cM2Repo.getChecksumPolicy().name(), expected.getChecksumPolicy());

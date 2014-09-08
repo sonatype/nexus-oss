@@ -41,7 +41,7 @@ public class Nexus531RepositoryCrudJsonIT
     extends AbstractNexusIntegrationTest
 {
 
-  protected RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this, this.getJsonXStream(),
+  protected RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this.getJsonXStream(),
       MediaType.APPLICATION_JSON);
 
   public Nexus531RepositoryCrudJsonIT() {

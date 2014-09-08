@@ -109,23 +109,23 @@ public class Nexus4660AttributeStorageFSLSTransitioningUpgrade
   {
     assertUpgradeStepsByOldNewAttributeCount(8, 0);
 
-    downloadArtifact("junit", "junit", "3.8.1", "pom", null, junkFile.getAbsolutePath());
-    downloadArtifact("junit", "junit", "3.8.1", "pom.sha1", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "junit", "junit", "3.8.1", "pom", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "junit", "junit", "3.8.1", "pom.sha1", null, junkFile.getAbsolutePath());
 
     assertUpgradeStepsByOldNewAttributeCount(6, 2);
 
-    downloadArtifact("junit", "junit", "3.8.1", "jar", null, junkFile.getAbsolutePath());
-    downloadArtifact("junit", "junit", "3.8.1", "jar.sha1", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "junit", "junit", "3.8.1", "jar", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "junit", "junit", "3.8.1", "jar.sha1", null, junkFile.getAbsolutePath());
 
     assertUpgradeStepsByOldNewAttributeCount(4, 4);
 
-    downloadArtifact("classworlds", "classworlds", "1.1", "pom", null, junkFile.getAbsolutePath());
-    downloadArtifact("classworlds", "classworlds", "1.1", "pom.sha1", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "classworlds", "classworlds", "1.1", "pom", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "classworlds", "classworlds", "1.1", "pom.sha1", null, junkFile.getAbsolutePath());
 
     assertUpgradeStepsByOldNewAttributeCount(2, 6);
 
-    downloadArtifact("classworlds", "classworlds", "1.1-alpha-2", "pom", null, junkFile.getAbsolutePath());
-    downloadArtifact("classworlds", "classworlds", "1.1-alpha-2", "pom.sha1", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "classworlds", "classworlds", "1.1-alpha-2", "pom", null, junkFile.getAbsolutePath());
+    downloadArtifact(getNexusTestRepoUrl(), "classworlds", "classworlds", "1.1-alpha-2", "pom.sha1", null, junkFile.getAbsolutePath());
 
     assertUpgradeStepsByOldNewAttributeCount(0, 8);
 

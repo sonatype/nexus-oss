@@ -50,8 +50,8 @@ public class Nexus3615ArtifactInfoSecurityIT
   @Before
   public void setUp() {
     XStream xstream = this.getXMLXStream();
-    this.userUtil = new UserMessageUtil(this, xstream, MediaType.APPLICATION_XML);
-    this.roleUtil = new RoleMessageUtil(this, xstream, MediaType.APPLICATION_XML);
+    this.userUtil = new UserMessageUtil(xstream, MediaType.APPLICATION_XML);
+    this.roleUtil = new RoleMessageUtil(xstream, MediaType.APPLICATION_XML);
   }
 
   protected void giveUserRole(String userId, String roleId, boolean overwrite)

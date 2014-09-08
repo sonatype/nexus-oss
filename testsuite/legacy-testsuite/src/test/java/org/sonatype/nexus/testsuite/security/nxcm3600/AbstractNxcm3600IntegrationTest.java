@@ -38,7 +38,7 @@ public class AbstractNxcm3600IntegrationTest
 
   public AbstractNxcm3600IntegrationTest() {
     super(REPO_TEST_HARNESS_RELEASE_REPO);
-    this.repositoryMessageUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    this.repositoryMessageUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   protected RepositoryMessageUtil getRepositoryMessageUtil() {

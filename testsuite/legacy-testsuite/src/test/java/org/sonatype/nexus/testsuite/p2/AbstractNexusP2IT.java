@@ -18,10 +18,12 @@ import java.util.Map;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.restlet.data.MediaType;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,10 +53,11 @@ public abstract class AbstractNexusP2IT
                                 final Map<String, String> sysProps)
       throws Exception
   {
-    boolean wasAnonymousAdministrator = isAnonymousAdministrator();
+    UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+    boolean wasAnonymousAdministrator = userUtil.isAnonymousAdministrator();
 
     try {
-      makeAnonymousAdministrator(true);
+      userUtil.makeAnonymousAdministrator(true);
 
       FileUtils.deleteDirectory(new File(destination));
 
@@ -91,7 +94,7 @@ public abstract class AbstractNexusP2IT
       FileUtils.deleteDirectory(testDir);
     }
     finally {
-      makeAnonymousAdministrator(wasAnonymousAdministrator);
+      userUtil.makeAnonymousAdministrator(wasAnonymousAdministrator);
     }
   }
 

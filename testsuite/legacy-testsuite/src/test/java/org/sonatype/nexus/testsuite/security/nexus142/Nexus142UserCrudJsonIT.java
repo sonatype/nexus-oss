@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
@@ -44,14 +45,14 @@ public class Nexus142UserCrudJsonIT
   private PasswordService passwordService;
 
   public Nexus142UserCrudJsonIT() {
-    this.messageUtil = new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    this.messageUtil = new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Before
   public void setUp()
       throws Exception
   {
-    passwordService = lookup(PasswordService.class);
+    passwordService = TestContainer.getInstance().getPlexusContainer().lookup(PasswordService.class);
   }
 
   @Test

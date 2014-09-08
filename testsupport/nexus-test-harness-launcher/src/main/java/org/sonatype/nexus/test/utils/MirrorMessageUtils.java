@@ -13,7 +13,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -61,7 +60,7 @@ public class MirrorMessageUtils
 
     Assert.assertNotNull("Resource Response shouldn't be null", resourceResponse);
 
-    for (MirrorResource resource : (List<MirrorResource>) resourceResponse.getData()) {
+    for (MirrorResource resource : resourceResponse.getData()) {
       Assert.assertNotNull("Id shouldn't be null", resource.getId());
     }
 
@@ -89,13 +88,13 @@ public class MirrorMessageUtils
 
     Assert.assertNotNull("Resource Response shouldn't be null", resourceResponse);
 
-    for (MirrorResource resource : (List<MirrorResource>) resourceResponse.getData()) {
+    for (MirrorResource resource : resourceResponse.getData()) {
       Assert.assertNotNull(resource.getId(), "Id shouldn't be null");
     }
 
     for (int i = 0; i < resourceResponse.getData().size(); i++) {
-      Assert.assertEquals(((MirrorResource) resourceRequest.getData().get(i)).getUrl(),
-          ((MirrorResource) resourceResponse.getData().get(i)).getUrl());
+      Assert.assertEquals(resourceRequest.getData().get(i).getUrl(),
+          resourceResponse.getData().get(i).getUrl());
     }
 
     return resourceResponse;
@@ -120,7 +119,7 @@ public class MirrorMessageUtils
 
     Assert.assertNotNull("Resource Response shouldn't be null", resourceResponse);
 
-    for (MirrorResource resource : (List<MirrorResource>) resourceResponse.getData()) {
+    for (MirrorResource resource : resourceResponse.getData()) {
       Assert.assertNotNull(resource.getUrl(), "URL shouldn't be null");
     }
 

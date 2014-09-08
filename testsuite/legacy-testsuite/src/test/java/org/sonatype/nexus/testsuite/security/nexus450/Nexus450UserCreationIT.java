@@ -14,12 +14,13 @@ package org.sonatype.nexus.testsuite.security.nexus450;
 
 import javax.mail.internet.MimeMessage;
 
-import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.EmailServerHelper;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.sonatype.nexus.testsuite.security.ChangePasswordUtils;
 import org.sonatype.security.rest.model.UserResource;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
@@ -27,6 +28,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -36,8 +38,10 @@ import org.restlet.data.Status;
  * change password. Confirm if it can login.
  */
 public class Nexus450UserCreationIT
-    extends AbstractEmailServerNexusIT
+    extends AbstractNexusIntegrationTest
 {
+  @ClassRule
+  public static final EmailServerHelper emailServerHelper = new EmailServerHelper();
 
   private UserMessageUtil userUtil;
 
@@ -51,7 +55,7 @@ public class Nexus450UserCreationIT
   @Before
   public void init() {
     userUtil =
-        new UserMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+        new UserMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Test
@@ -72,10 +76,10 @@ public class Nexus450UserCreationIT
 
     // get email
     // two e-mails (first confirming user creating and second with users pw)
-    waitForMail(2);
+    emailServerHelper.waitForMail(2);
     Thread.sleep(1000); //w8 a few more
 
-    MimeMessage[] msgs = server.getReceivedMessages();
+    MimeMessage[] msgs = emailServerHelper.getReceivedMessages();
     String password = null;
     StringBuilder emailsContent = new StringBuilder();
 

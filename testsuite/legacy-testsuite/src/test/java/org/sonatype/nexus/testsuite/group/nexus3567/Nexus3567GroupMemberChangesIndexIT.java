@@ -63,9 +63,9 @@ public class Nexus3567GroupMemberChangesIndexIT
   public Nexus3567GroupMemberChangesIndexIT()
       throws ComponentLookupException
   {
-    repoUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
-    groupUtil = new GroupMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
-    searchUtil = new SearchMessageUtil(this);
+    repoUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+    groupUtil = new GroupMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+    searchUtil = new SearchMessageUtil();
   }
 
   @Test
