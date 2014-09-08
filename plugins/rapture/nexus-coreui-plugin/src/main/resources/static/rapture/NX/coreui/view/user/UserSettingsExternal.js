@@ -71,7 +71,6 @@ Ext.define('NX.coreui.view.user.UserSettingsExternal', {
         submitValue: false
       },
       {
-        xtype: 'nx-email',
         name: 'email',
         fieldLabel: 'Email',
         helpText: 'Email address, to notify user when necessary.',
