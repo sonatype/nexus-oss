@@ -53,6 +53,14 @@ Ext.define('NX.controller.State', {
    */
   receiving: false,
 
+  /**
+   * @event changed
+   * Fires when any of application context values changes.
+   */
+
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -73,14 +81,6 @@ Ext.define('NX.controller.State', {
         }
       }
     });
-
-    me.addEvents(
-        /**
-         * @event changed
-         * Fires when any of application context values changes.
-         */
-        'changed'
-    );
   },
 
   onLaunch: function () {

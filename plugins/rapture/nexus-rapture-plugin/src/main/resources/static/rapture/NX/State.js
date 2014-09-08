@@ -24,19 +24,16 @@ Ext.define('NX.State', {
     logAware: 'NX.LogAware'
   },
 
+  /**
+   * @event changed
+   * Fires when any of application context values changes.
+   * @param {NX.State} this
+   */
+
   constructor: function (config) {
     var me = this;
 
     me.mixins.observable.constructor.call(me, config);
-
-    me.addEvents(
-        /**
-         * @event changed
-         * Fires when any of application context values changes.
-         * @param {NX.State} this
-         */
-        'changed'
-    );
   },
 
   /**

@@ -36,6 +36,19 @@ Ext.define('NX.ext.SearchBox', {
   trigger1Cls: 'nx-form-fa-times-circle-trigger',
 
   /**
+   * @event search
+   * Fires when a search values was typed. Fires with a delay of **{@link #searchDelay}**.
+   * @param {NX.view.header.SearchBox} this search box
+   * @param {String} search value
+   */
+
+  /**
+   * @event searchcleared
+   * Fires when a search value had been cleared.
+   * @param {NX.view.header.SearchBox} this search box
+   */
+
+  /**
    * @override
    */
   initComponent: function () {
@@ -48,23 +61,6 @@ Ext.define('NX.ext.SearchBox', {
     me.callParent(arguments);
 
     me.on('change', me.onValueChange, me);
-
-    me.addEvents(
-        /**
-         * @event search
-         * Fires when a search values was typed. Fires with a delay of **{@link #searchDelay}**.
-         * @param {NX.view.header.SearchBox} this search box
-         * @param {String} search value
-         */
-        'search',
-
-        /**
-         * @event searchcleared
-         * Fires when a search value had been cleared.
-         * @param {NX.view.header.SearchBox} this search box
-         */
-        'searchcleared'
-    );
   },
 
   /**

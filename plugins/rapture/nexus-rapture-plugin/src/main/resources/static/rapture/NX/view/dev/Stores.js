@@ -32,58 +32,59 @@ Ext.define('NX.view.dev.Stores', {
   initComponent: function () {
     var me = this;
 
-    Ext.apply(me, {
-      items: {
-        xtype: 'panel',
-        tbar:[
-          {
-            xtype: 'combo',
-            name: 'storeId',
-            emptyText: 'select a store',
-            queryMode: 'local',
-            displayField: 'id',
-            valueField: 'id',
-            trigger2Cls: 'x-form-search-trigger',
-            onTrigger2Click: function () {
-              this.getStore().load();
-            },
-            store: Ext.create('Ext.data.Store', {
-              fields: ['id'],
-              data: Ext.data.StoreManager,
-              proxy: {
-                type: 'memory',
-                reader: {
-                  type: 'json',
-                  read: function (data) {
-                    var me = this,
-                        stores = [];
-
-                    data.each(function (store) {
-                      stores.push({
-                        id: store.storeId
-                      });
-                    });
-
-                    return me.readRecords(stores);
-                  }
-                }
-              },
-              sorters: { property: 'id', direction: 'ASC' }
-            })
-          },
-          {
-            xtype: 'button',
-            text: 'Load store',
-            action: 'load'
-          },
-          {
-            xtype: 'button',
-            text: 'Clear store',
-            action: 'clear'
-          }
-        ]
-      }
-    });
+    // FIXME: fix for ext-5
+    //Ext.apply(me, {
+    //  items: {
+    //    xtype: 'panel',
+    //    tbar:[
+    //      {
+    //        xtype: 'combo',
+    //        name: 'storeId',
+    //        emptyText: 'select a store',
+    //        queryMode: 'local',
+    //        displayField: 'id',
+    //        valueField: 'id',
+    //        trigger2Cls: 'x-form-search-trigger',
+    //        onTrigger2Click: function () {
+    //          this.getStore().load();
+    //        },
+    //        store: Ext.create('Ext.data.Store', {
+    //          fields: ['id'],
+    //          data: Ext.data.StoreManager,
+    //          proxy: {
+    //            type: 'memory',
+    //            reader: {
+    //              type: 'json',
+    //              read: function (data) {
+    //                var me = this,
+    //                    stores = [];
+    //
+    //                data.each(function (store) {
+    //                  stores.push({
+    //                    id: store.storeId
+    //                  });
+    //                });
+    //
+    //                return me.readRecords(stores);
+    //              }
+    //            }
+    //          },
+    //          sorters: { property: 'id', direction: 'ASC' }
+    //        })
+    //      },
+    //      {
+    //        xtype: 'button',
+    //        text: 'Load store',
+    //        action: 'load'
+    //      },
+    //      {
+    //        xtype: 'button',
+    //        text: 'Clear store',
+    //        action: 'clear'
+    //      }
+    //    ]
+    //  }
+    //});
 
     me.callParent();
   }

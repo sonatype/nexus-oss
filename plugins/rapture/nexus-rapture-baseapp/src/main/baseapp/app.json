@@ -1,8 +1,50 @@
 {
-    "name": "BaseApp",
+  "name": "baseapp",
 
-    "requires": [
-    ],
+  "id": "ccfbd1c7-9334-499d-9fb6-ecb811999bc8",
 
-    "id": "7ab894a2-c860-4858-81fe-e27ac87611e2"
+  "classpath": "${app.dir}/app",
+
+  "overrides": "${app.dir}/overrides",
+
+  "framework": "ext",
+
+  "compatibility": {
+    "ext": "4.2"
+  },
+
+  "theme": "ext-theme-crisp",
+  //"theme": "rapture-theme",
+
+  "requires": [
+    "ext-charts"
+  ],
+
+  "sass": {
+    "namespace": "baseapp"
+  },
+
+  "resources": [],
+
+  "ignore": [
+    "^\\.svn$",
+    "^\\.git$"
+  ],
+
+  "archivePath": "archive",
+
+  "bootstrap": {
+    "base": "${app.dir}",
+    "manifest": "bootstrap.json",
+    "microloader": "bootstrap.js",
+    "css": "bootstrap.css"
+  },
+
+  "output": {
+    "base": "${workspace.build.dir}/${build.environment}/${app.name}",
+    "microloader": {
+      "embed": false,
+      "enable": true
+    }
+  }
 }

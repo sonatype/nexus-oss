@@ -88,6 +88,12 @@ Ext.define('NX.controller.Menu', {
   navigateToFirstFeature: false,
 
   /**
+   * @event featureselected
+   * Fires when a feature is selected.
+   * @param {NX.model.Feature} selected feature
+   */
+
+  /**
    * @override
    */
   init: function () {
@@ -134,15 +140,6 @@ Ext.define('NX.controller.Menu', {
         }
       }
     });
-
-    me.addEvents(
-        /**
-         * @event featureselected
-         * Fires when a feature is selected.
-         * @param {NX.model.Feature} selected feature
-         */
-        'featureselected'
-    );
   },
 
   /**

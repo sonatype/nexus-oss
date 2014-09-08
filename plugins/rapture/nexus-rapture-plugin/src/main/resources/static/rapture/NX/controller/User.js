@@ -61,6 +61,20 @@ Ext.define('NX.controller.User', {
     }
   ],
 
+  /**
+   * @event login
+   * Fires when a user had been successfully signed-in.
+   * @param {Object} user
+   */
+
+  /**
+   * @event logout
+   * Fires when a user had been successfully signed-out.
+   */
+
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -95,21 +109,6 @@ Ext.define('NX.controller.User', {
         }
       }
     });
-
-    me.addEvents(
-        /**
-         * @event login
-         * Fires when a user had been successfully signed-in.
-         * @param {Object} user
-         */
-        'login',
-
-        /**
-         * @event logout
-         * Fires when a user had been successfully signed-out.
-         */
-        'logout'
-    );
   },
 
   /**

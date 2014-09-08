@@ -1,6 +1,3 @@
-// Require the core ExtJS framework classes, as we can not know ahead of time what plugins may use
-// NOTE: Excluding a few bits for now until we plan to use them
-// FIXME: Excludes are not working here we have to list all the patterns and Ext.{class} which need to be included
 Ext.require([
   'Ext.app.*',
   'Ext.button.*',
@@ -31,5 +28,6 @@ Ext.require([
   'Ext.ux.*',
   'Ext.view.*',
   'Ext.window.*',
-  'Ext.Action'
+  'Ext.Action',
+  'Ext.Img'
 ]);

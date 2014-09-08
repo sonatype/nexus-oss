@@ -34,6 +34,12 @@ Ext.define('NX.controller.Bookmarking', {
   launched: false,
 
   /**
+   * @event navigate
+   * Fires when user navigates to a new bookmark.
+   * @param {String} bookmark value
+   */
+
+  /**
    * @override
    */
   init: function () {
@@ -46,15 +52,6 @@ Ext.define('NX.controller.Bookmarking', {
     Ext.History.init();
 
     me.bindToHistory();
-
-    me.addEvents(
-        /**
-         * @event navigate
-         * Fires when user navigates to a new bookmark.
-         * @param {String} bookmark value
-         */
-        'navigate'
-    );
   },
 
   /**

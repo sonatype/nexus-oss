@@ -30,6 +30,12 @@ Ext.define('NX.controller.Permissions', {
     'Permission'
   ],
 
+  /**
+   * @event changed
+   * Fires when permissions change.
+   * @param {NX.Permissions}
+   */
+
   init: function () {
     var me = this;
 
@@ -48,15 +54,6 @@ Ext.define('NX.controller.Permissions', {
         }
       }
     });
-
-    me.addEvents(
-        /**
-         * @event changed
-         * Fires when permissions change.
-         * @param {NX.Permissions}
-         */
-        'changed'
-    );
   },
 
   onLaunch: function () {

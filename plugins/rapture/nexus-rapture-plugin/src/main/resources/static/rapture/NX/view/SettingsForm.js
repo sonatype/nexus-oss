@@ -99,6 +99,27 @@ Ext.define('NX.view.SettingsForm', {
   ],
 
   /**
+   * @event recordloaded
+   * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
+   * @param {Ext.form.Panel} this form
+   * @param {Ext.data.Model} loaded record
+   */
+
+  /**
+   * @event loaded
+   * Fires after form was loaded via configured api.
+   * @param {Ext.form.Panel} this form
+   * @param {Ext.form.action.Action} load action
+   */
+
+  /**
+   * @event submitted
+   * Fires after form was submitted via configured api.
+   * @param {Ext.form.Panel} this form
+   * @param {Ext.form.action.Action} submit action
+   */
+
+  /**
    * @override
    */
   initComponent: function () {
@@ -109,30 +130,6 @@ Ext.define('NX.view.SettingsForm', {
     }
 
     me.callParent(arguments);
-
-    me.addEvents(
-        /**
-         * @event recordloaded
-         * Fires when a record is loaded via {@link Ext.form.Panel#loadRecord}.
-         * @param {Ext.form.Panel} this form
-         * @param {Ext.data.Model} loaded record
-         */
-        'recordloaded',
-        /**
-         * @event loaded
-         * Fires after form was loaded via configured api.
-         * @param {Ext.form.Panel} this form
-         * @param {Ext.form.action.Action} load action
-         */
-        'loaded',
-        /**
-         * @event submitted
-         * Fires after form was submitted via configured api.
-         * @param {Ext.form.Panel} this form
-         * @param {Ext.form.action.Action} submit action
-         */
-        'submitted'
-    );
   },
 
   /**

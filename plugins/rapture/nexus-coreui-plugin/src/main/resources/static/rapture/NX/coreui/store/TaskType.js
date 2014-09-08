@@ -31,7 +31,7 @@ Ext.define('NX.coreui.store.TaskType', {
 
     reader: {
       type: 'json',
-      root: 'data',
+      rootProperty: 'data',
       idProperty: 'id',
       successProperty: 'success'
     }

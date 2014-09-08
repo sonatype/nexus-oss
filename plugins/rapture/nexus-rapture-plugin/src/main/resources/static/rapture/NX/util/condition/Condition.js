@@ -46,27 +46,24 @@ Ext.define('NX.util.condition.Condition', {
    */
   satisfied: false,
 
+  /**
+   * @event satisfied
+   * Fires when condition is satisfied.
+   * @param {NX.util.condition.Condition} this
+   */
+
+  /**
+   * @event unsatisfied
+   * Fires when condition is not satisfied.
+   * @param {NX.util.condition.Condition} this
+   */
+
   constructor: function (config) {
     var me = this;
 
     me.id = me.self.getName() + '-' + NX.util.condition.Condition.counter++;
 
     me.mixins.observable.constructor.call(me, config);
-
-    me.addEvents(
-        /**
-         * @event satisfied
-         * Fires when condition is satisfied.
-         * @param {NX.util.condition.Condition} this
-         */
-        'satisfied',
-        /**
-         * @event unsatisfied
-         * Fires when condition is not satisfied.
-         * @param {NX.util.condition.Condition} this
-         */
-        'unsatisfied'
-    );
   },
 
   // HACK: comment the following lines to let debug messages flow

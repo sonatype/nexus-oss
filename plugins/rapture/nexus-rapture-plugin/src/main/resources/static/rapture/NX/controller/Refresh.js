@@ -31,6 +31,11 @@ Ext.define('NX.controller.Refresh', {
   ],
 
   /**
+   * @event refresh
+   * Fires when refresh should be performed.
+   */
+
+  /**
    * @override
    */
   init: function () {
@@ -43,14 +48,6 @@ Ext.define('NX.controller.Refresh', {
         }
       }
     });
-
-    me.addEvents(
-        /**
-         * @event refresh
-         * Fires when refresh should be performed.
-         */
-        'refresh'
-    );
   },
 
   /**

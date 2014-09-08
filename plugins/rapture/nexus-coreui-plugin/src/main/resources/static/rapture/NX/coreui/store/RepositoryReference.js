@@ -30,7 +30,7 @@ Ext.define('NX.coreui.store.RepositoryReference', {
 
     reader: {
       type: 'json',
-      root: 'data',
+      rootProperty: 'data',
       idProperty: 'id',
       successProperty: 'success'
     }

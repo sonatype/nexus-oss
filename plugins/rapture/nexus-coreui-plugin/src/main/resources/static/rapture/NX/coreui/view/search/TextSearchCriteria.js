@@ -36,6 +36,11 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   labelAlign: 'top',
   labelSeparator: '',
 
+  /**
+   * @event criteriaremoved
+   * Fires when search criteria is removed.
+   */
+
   filter: function() {
     var me = this;
     if (me.value) {
@@ -52,14 +57,6 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
     }
 
     me.callParent(arguments);
-
-    me.addEvents(
-        /**
-         * @event criteriaremoved
-         * Fires when search criteria is removed.
-         */
-        'criteriaremoved'
-    );
   },
 
   /**

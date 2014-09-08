@@ -346,6 +346,7 @@ public class RaptureWebResourceBundle
   private List<URI> getScripts() {
     List<URI> scripts = Lists.newArrayList();
 
+    scripts.add(uri(mode("microloader-{mode}.js")));
     scripts.add(uri(mode("baseapp-{mode}.js")));
     scripts.add(uri(mode("extdirect-{mode}.js")));
     scripts.add(uri("bootstrap.js"));

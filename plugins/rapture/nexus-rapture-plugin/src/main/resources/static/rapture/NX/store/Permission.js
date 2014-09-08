@@ -31,7 +31,7 @@ Ext.define('NX.store.Permission', {
 
     reader: {
       type: 'json',
-      root: 'data',
+      rootProperty: 'data',
       idProperty: 'id',
       successProperty: 'success'
     }

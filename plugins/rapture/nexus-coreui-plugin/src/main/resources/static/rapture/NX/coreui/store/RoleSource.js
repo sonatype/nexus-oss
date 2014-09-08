@@ -31,7 +31,7 @@ Ext.define('NX.coreui.store.RoleSource', {
 
     reader: {
       type: 'json',
-      root: 'data',
+      rootProperty: 'data',
       idProperty: 'id',
       successProperty: 'success'
     }
