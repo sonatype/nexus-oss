@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 
-import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.capability.Condition;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;

@@ -18,10 +18,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.capability.CapabilityContext;
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.support.condition.Conditions;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;

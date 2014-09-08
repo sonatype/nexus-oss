@@ -15,9 +15,9 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.nexus.capability.Capability;
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.support.condition.Conditions;
 
 @Named(CapabilityOfTypeActiveCapabilityDescriptor.TYPE_ID)
 public class CapabilityOfTypeActiveCapability

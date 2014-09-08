@@ -15,7 +15,7 @@ package com.sonatype.nexus.ssl.plugin.internal
 import com.sonatype.nexus.ssl.plugin.spi.CapabilityManager
 import groovy.transform.WithReadLock
 import groovy.transform.WithWriteLock
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference
+import org.sonatype.nexus.capability.CapabilityReference
 import org.sonatype.nexus.rapture.TrustStoreKeys
 import org.sonatype.sisu.goodies.common.ComponentSupport
 

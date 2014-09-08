@@ -29,6 +29,8 @@
 # export KARAF_OPTS # Additional available Karaf options
 # export KARAF_DEBUG # Enable debug mode
 
+export JAVA_MIN_MEM=256M
+export JAVA_MAX_MEM=768M
 export JAVA_MAX_PERM_MEM=256M
 
 export KARAF_OPTS="-Djava.net.preferIPv4Stack=true"
