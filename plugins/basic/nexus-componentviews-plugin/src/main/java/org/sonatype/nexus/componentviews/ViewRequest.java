@@ -66,5 +66,5 @@ public interface ViewRequest
    * Retrieves a value from the request context.
    */
   @Nullable
-  Object getAttribute(String name);
+  <T> T getAttribute(String name);
 }

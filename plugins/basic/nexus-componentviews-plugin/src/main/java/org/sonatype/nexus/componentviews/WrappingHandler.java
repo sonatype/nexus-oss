@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.componentviews;
 
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A Handler that wraps another handler, adding functionality, filtering requests or responses.
  *
@@ -23,10 +27,42 @@ public abstract class WrappingHandler
   private final Handler innerHandler;
 
   public WrappingHandler(final Handler innerHandler) {
-    this.innerHandler = innerHandler;
+    this.innerHandler = checkNotNull(innerHandler);
   }
 
   protected Handler getInnerHandler() {
     return innerHandler;
   }
+
+  @Override
+  public final ViewResponse handle(final ViewRequest request) {
+    return around(request);
+  }
+
+  /**
+   * Override this method to provide custom checks before the request is passed onto the next link in the chain. If
+   * this method returns a response, it will be returned to the client and the next link in the chain will never be
+   * called.
+   *
+   * To communicate between handlers, see {@link ViewRequest#setAttribute(String, Object)} and {@link
+   * ViewRequest#getAttribute(String)}.
+   */
+  @Nullable
+  protected ViewResponse before(final ViewRequest request) {
+    return null;
+  }
+
+  /**
+   * Override this method to implement custom request-intercepting of the next link in the handler chain.
+   */
+  protected ViewResponse around(final ViewRequest request) {
+    final ViewResponse earlyResponse = before(request);
+
+    if (earlyResponse != null) {
+      return earlyResponse;
+    }
+
+    return innerHandler.handle(request);
+  }
+
 }
