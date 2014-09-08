@@ -22,37 +22,18 @@ import org.sonatype.security.usermanagement.UserStatus
 import javax.validation.constraints.NotNull
 
 /**
- * User exchange object.
+ * User role mappings exchange object.
  *
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class UserXO
+class UserRoleMappingsXO
 {
   @NotEmpty
   String userId
 
+  @NotEmpty
   String realm
 
-  @NotEmpty
-  String firstName
-
-  @NotEmpty
-  String lastName
-
-  @NotEmpty
-  String email
-
-  @NotNull
-  UserStatus status
-
-  @NotNull(groups = Create.class)
-  Password password
-
-  @NotEmpty
   Set<String> roles
-
-  Boolean external
-
-  Set<String> externalRoles
 }

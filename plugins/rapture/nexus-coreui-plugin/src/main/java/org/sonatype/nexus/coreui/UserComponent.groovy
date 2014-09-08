@@ -172,6 +172,35 @@ extends DirectComponentSupport
   }
 
   /**
+   * Update user role mappings.
+   * @param userRoleMappingsXO to be updated
+   * @return updated user
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('security:users:update')
+  @Validate(groups = [Update.class, Default.class])
+  UserXO updateRoleMappings(final @NotNull(message = '[UserRoleMappingsXO] may not be null') @Valid UserRoleMappingsXO userRoleMappingsXO) {
+    def mappedRoles = userRoleMappingsXO.roles
+    if (mappedRoles?.size()) {
+      User user = securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm)
+      user.roles.each { role ->
+        if (role.source == userRoleMappingsXO.realm) {
+          mappedRoles.remove(role.roleId)
+        }
+      }
+    }
+    securitySystem.setUsersRoles(
+        userRoleMappingsXO.userId,
+        userRoleMappingsXO.realm,
+        mappedRoles?.size() > 0
+        ? mappedRoles?.collect { roleId -> new RoleIdentifier(DEFAULT_SOURCE, roleId) } as Set
+        : null
+    )
+    return asUserXO(securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm))
+  }
+
+  /**
    * Update user account (logged in user info).
    * @param userAccountXO to be updated
    * @return current logged in user account
@@ -264,7 +293,7 @@ extends DirectComponentSupport
   }
 
   private static asUserXO(final User user) {
-    new UserXO(
+    UserXO userXO = new UserXO(
         userId: user.userId,
         realm: user.source,
         firstName: user.firstName,
@@ -277,6 +306,12 @@ extends DirectComponentSupport
         },
         external: user.source != DEFAULT_SOURCE
     )
+    if (userXO.external) {
+      userXO.externalRoles = user.roles
+          .findResults { RoleIdentifier role -> return role.source == DEFAULT_SOURCE ? null : role }
+          .collect { role -> role.roleId }
+    }
+    return userXO
   }
 
   private boolean isAnonymousUser(final String userId) {
