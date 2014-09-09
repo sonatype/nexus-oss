@@ -62,15 +62,6 @@ Ext.define('NX.view.masterdetail.Panel', {
     me.callParent(arguments);
   },
 
-  listeners: {
-    boxready: function() {
-      var me = this;
-      if (Ext.isDefined(me.iconName)) {
-        me.setDescriptionIconName(me.iconName);
-      }
-    }
-  },
-
   setDescription: function (description) {
     this.down('nx-masterdetail-tabs').setDescription(description);
   },
