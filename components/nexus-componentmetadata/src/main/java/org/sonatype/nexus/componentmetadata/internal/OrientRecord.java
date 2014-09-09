@@ -137,7 +137,6 @@ class OrientRecord
   @Override
   public Record save() {
     session.checkOpen();
-    System.out.println(type);
     document = document.save();
     return this;
   }
