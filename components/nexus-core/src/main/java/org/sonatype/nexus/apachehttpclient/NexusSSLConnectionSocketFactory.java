@@ -94,7 +94,11 @@ public class NexusSSLConnectionSocketFactory
     if (localAddress != null) {
       sock.bind(localAddress);
     }
-    // NEXUS-6838: SNI support
+    // NEXUS-6838: Server Name Indication support, a TLS feature that allows SSL
+    // "virtual hosting" (multiple certificates) over single IP address + port.
+    // Some CDN solutions requires this for HTTPS, as they choose certificate
+    // to use based on "expected" hostname that is being passed here below
+    // and is used during SSL handshake. Requires Java7+
     if (sock instanceof SSLSocketImpl) {
       ((SSLSocketImpl)sock).setHost(host.getHostName());
     }
