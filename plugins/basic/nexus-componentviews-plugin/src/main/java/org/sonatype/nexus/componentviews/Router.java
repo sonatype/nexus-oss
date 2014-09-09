@@ -17,6 +17,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Polls an ordered list of {@link RequestMatcher}s to find the first one willing to handle a given request.
  *
@@ -24,19 +26,44 @@ import javax.annotation.Nullable;
  */
 public class Router
 {
-  private final List<RequestMatcher> requestMatchers;
-
-  public Router(final List<RequestMatcher> requestMatchers) {
-    this.requestMatchers = new ArrayList<>(requestMatchers);
-  }
+  private final List<Route> routes = new ArrayList<>();
 
   @Nullable
-  public RequestMatcher findRoute(ViewRequest request) {
-    for (RequestMatcher requestMatcher : requestMatchers) {
-      if (requestMatcher.matches(request)) {
-        return requestMatcher;
+  public Handler findHandler(ViewRequest request) {
+
+    for (Route route : routes) {
+      if (route.getRequestMatcher().matches(request)) {
+        return route.getHandler();
       }
     }
+
     return null;
+  }
+
+  /**
+   * Routes will be considered in the order they're added.
+   */
+  public void addRoute(final RequestMatcher requestMatcher, final Handler handler) {
+    routes.add(new Route(checkNotNull(requestMatcher), checkNotNull(handler)));
+  }
+
+  private static class Route
+  {
+    private final RequestMatcher requestMatcher;
+
+    private final Handler handler;
+
+    private Route(final RequestMatcher requestMatcher, final Handler handler) {
+      this.requestMatcher = requestMatcher;
+      this.handler = handler;
+    }
+
+    public RequestMatcher getRequestMatcher() {
+      return requestMatcher;
+    }
+
+    public Handler getHandler() {
+      return handler;
+    }
   }
 }

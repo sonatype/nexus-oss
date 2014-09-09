@@ -17,8 +17,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
-import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
@@ -26,10 +24,7 @@ import org.sonatype.nexus.componentviews.config.ViewFactory;
 import org.sonatype.nexus.componentviews.example.NotFoundHandler;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
-import com.google.common.collect.ImmutableMap;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Arrays.asList;
 
 /**
  * @since 3.0
@@ -59,11 +54,9 @@ public class RawBinaryViewFactory
 
     final AllRequestMatcher binariesRequestMatcher = new AllRequestMatcher("binaries");
 
-    final Router router = new Router(asList((RequestMatcher) binariesRequestMatcher));
+    final Router router = new Router();
+    router.addRoute(binariesRequestMatcher, new RawBinariesHandler(binaryStore));
 
-    final ImmutableMap<String, Handler> handlers = ImmutableMap
-        .of("binaries", (Handler) new RawBinariesHandler(binaryStore));
-
-    return new View(config, router, handlers, new NotFoundHandler());
+    return new View(config, router, new NotFoundHandler());
   }
 }

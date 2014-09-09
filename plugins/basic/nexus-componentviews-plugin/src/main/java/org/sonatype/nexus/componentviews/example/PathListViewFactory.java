@@ -12,21 +12,15 @@
  */
 package org.sonatype.nexus.componentviews.example;
 
-import java.util.Arrays;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
-import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * @since 3.0
@@ -50,10 +44,10 @@ public class PathListViewFactory
 
   @Override
   public View createView(final ViewConfig config) {
-    final Router router = new Router(Arrays.asList((RequestMatcher) new AllRequestMatcher("pathList")));
+    final Router router = new Router();
+    router.addRoute(new AllRequestMatcher(), new ExamplePathListHandler());
 
-    final View view = new View(config, router,
-        ImmutableMap.of("pathList", (Handler) new ExamplePathListHandler()), new NotFoundHandler());
+    final View view = new View(config, router, new NotFoundHandler());
 
     return view;
   }
