@@ -28,6 +28,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
+import sun.security.ssl.SSLSocketImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -83,6 +85,7 @@ public class NexusSSLConnectionSocketFactory
   }
 
   @Override
+  @IgnoreJRERequirement
   public Socket connectSocket(final int connectTimeout, final Socket socket, final HttpHost host,
                               final InetSocketAddress remoteAddress,
                               final InetSocketAddress localAddress, final HttpContext context) throws IOException
@@ -92,6 +95,14 @@ public class NexusSSLConnectionSocketFactory
     final Socket sock = socket != null ? socket : createSocket(context);
     if (localAddress != null) {
       sock.bind(localAddress);
+    }
+    // NEXUS-6838: Server Name Indication support, a TLS feature that allows SSL
+    // "virtual hosting" (multiple certificates) over single IP address + port.
+    // Some CDN solutions requires this for HTTPS, as they choose certificate
+    // to use based on "expected" hostname that is being passed here below
+    // and is used during SSL handshake. Requires Java7+
+    if (sock instanceof SSLSocketImpl) {
+      ((SSLSocketImpl)sock).setHost(host.getHostName());
     }
     try {
       sock.connect(remoteAddress, connectTimeout);
