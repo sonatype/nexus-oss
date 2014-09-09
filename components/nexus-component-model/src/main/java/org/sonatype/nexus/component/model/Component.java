@@ -24,9 +24,9 @@ import org.sonatype.nexus.componentmetadata.Record;
 public interface Component
 {
   /**
-   * @return canonical id of this component in the component system
+   * @return canonical id of this component
    */
-  ComponentId getComponentId();
+  ComponentId getId();
 
   /**
    * @return current metadata record for this component
