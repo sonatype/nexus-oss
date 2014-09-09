@@ -26,6 +26,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import sun.security.ssl.SSLSocketImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -82,6 +83,7 @@ public class NexusSSLConnectionSocketFactory
   }
 
   @Override
+  @IgnoreJRERequirement
   public Socket connectSocket(final int connectTimeout, final Socket socket, final HttpHost host,
                               final InetSocketAddress remoteAddress,
                               final InetSocketAddress localAddress, final HttpContext context) throws IOException
