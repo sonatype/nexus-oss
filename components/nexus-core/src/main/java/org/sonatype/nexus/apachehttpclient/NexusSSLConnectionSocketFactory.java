@@ -26,6 +26,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
+import sun.security.ssl.SSLSocketImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -90,6 +91,10 @@ public class NexusSSLConnectionSocketFactory
     final Socket sock = socket != null ? socket : createSocket(context);
     if (localAddress != null) {
       sock.bind(localAddress);
+    }
+    // NEXUS-6838: SNI support
+    if (sock instanceof SSLSocketImpl) {
+      ((SSLSocketImpl)sock).setHost(host.getHostName());
     }
     try {
       sock.connect(remoteAddress, connectTimeout);
