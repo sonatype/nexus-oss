@@ -4364,146 +4364,6 @@ div.x-editor {
   position: absolute;
 }
 
-/* line 1, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked {
-  position: absolute !important;
-  z-index: 1;
-}
-
-/* line 7, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-vertical {
-  position: static;
-}
-
-/* line 11, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-top {
-  border-bottom-width: 0 !important;
-}
-
-/* line 15, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-bottom {
-  border-top-width: 0 !important;
-}
-
-/* line 19, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-left {
-  border-right-width: 0 !important;
-}
-
-/* line 23, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-right {
-  border-left-width: 0 !important;
-}
-
-/* line 27, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-noborder-top {
-  border-top-width: 0 !important;
-}
-
-/* line 31, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-noborder-right {
-  border-right-width: 0 !important;
-}
-
-/* line 35, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-noborder-bottom {
-  border-bottom-width: 0 !important;
-}
-
-/* line 39, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-docked-noborder-left {
-  border-left-width: 0 !important;
-}
-
-/* line 45, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-l {
-  border-left-width: 0 !important;
-}
-
-/* line 48, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-b {
-  border-bottom-width: 0 !important;
-}
-
-/* line 51, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-bl {
-  border-bottom-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 55, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-r {
-  border-right-width: 0 !important;
-}
-
-/* line 58, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-rl {
-  border-right-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 62, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-rb {
-  border-right-width: 0 !important;
-  border-bottom-width: 0 !important;
-}
-
-/* line 66, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-rbl {
-  border-right-width: 0 !important;
-  border-bottom-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 71, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-t {
-  border-top-width: 0 !important;
-}
-
-/* line 74, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-tl {
-  border-top-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 78, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-tb {
-  border-top-width: 0 !important;
-  border-bottom-width: 0 !important;
-}
-
-/* line 82, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-tbl {
-  border-top-width: 0 !important;
-  border-bottom-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 87, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-tr {
-  border-top-width: 0 !important;
-  border-right-width: 0 !important;
-}
-
-/* line 91, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-trl {
-  border-top-width: 0 !important;
-  border-right-width: 0 !important;
-  border-left-width: 0 !important;
-}
-
-/* line 96, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-trb {
-  border-top-width: 0 !important;
-  border-right-width: 0 !important;
-  border-bottom-width: 0 !important;
-}
-
-/* line 101, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
-.x-noborder-trbl {
-  border-width: 0 !important;
-}
-
 /* line 1, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/button/Button.scss */
 .x-btn {
   display: inline-block;
@@ -4727,6 +4587,146 @@ div.x-editor {
 /* line 75, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/dd/StatusProxy.scss */
 .x-dd-drop-nodrop div.x-dd-drop-icon {
   background-image: url(images/dd/drop-no.png);
+}
+
+/* line 1, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked {
+  position: absolute !important;
+  z-index: 1;
+}
+
+/* line 7, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-vertical {
+  position: static;
+}
+
+/* line 11, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-top {
+  border-bottom-width: 0 !important;
+}
+
+/* line 15, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-bottom {
+  border-top-width: 0 !important;
+}
+
+/* line 19, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-left {
+  border-right-width: 0 !important;
+}
+
+/* line 23, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-right {
+  border-left-width: 0 !important;
+}
+
+/* line 27, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-noborder-top {
+  border-top-width: 0 !important;
+}
+
+/* line 31, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-noborder-right {
+  border-right-width: 0 !important;
+}
+
+/* line 35, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-noborder-bottom {
+  border-bottom-width: 0 !important;
+}
+
+/* line 39, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-docked-noborder-left {
+  border-left-width: 0 !important;
+}
+
+/* line 45, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-l {
+  border-left-width: 0 !important;
+}
+
+/* line 48, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-b {
+  border-bottom-width: 0 !important;
+}
+
+/* line 51, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-bl {
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 55, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-r {
+  border-right-width: 0 !important;
+}
+
+/* line 58, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-rl {
+  border-right-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 62, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-rb {
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+}
+
+/* line 66, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-rbl {
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 71, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-t {
+  border-top-width: 0 !important;
+}
+
+/* line 74, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-tl {
+  border-top-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 78, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-tb {
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
+}
+
+/* line 82, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-tbl {
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 87, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-tr {
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+}
+
+/* line 91, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-trl {
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+  border-left-width: 0 !important;
+}
+
+/* line 96, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-trb {
+  border-top-width: 0 !important;
+  border-right-width: 0 !important;
+  border-bottom-width: 0 !important;
+}
+
+/* line 101, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/layout/component/Dock.scss */
+.x-noborder-trbl {
+  border-width: 0 !important;
 }
 
 /* line 2, ../../../../baseapp/ext/packages/ext-theme-base/sass/src/panel/Panel.scss */
@@ -24512,9 +24512,4 @@ a.x-color-picker-item:hover {
 .x-btn-danger-small-icon .x-btn-button,
 .x-btn-danger-small-noicon .x-btn-button {
   height: 16px;
-}
-/* line 350, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-danger-small-icon .x-btn-inner,
-.x-btn-danger-small-noicon .x-btn-inner {
-  line-height: 16px;
 }

@@ -1,3 +1,8 @@
+.x-btn-danger-small-icon .x-btn-inner,
+.x-btn-danger-small-noicon .x-btn-inner {
+  line-height: 16px;
+}
+
 /* line 360, ../../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-icon .x-btn-arrow-right .x-btn-inner,
 .x-btn-danger-small-noicon .x-btn-arrow-right .x-btn-inner,
