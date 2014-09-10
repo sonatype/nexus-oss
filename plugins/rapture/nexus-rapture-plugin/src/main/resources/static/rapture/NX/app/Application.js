@@ -50,6 +50,7 @@ Ext.define('NX.app.Application', {
   },
 
   uses: [
+    'Ext.patch.EXTJS_15047',
     'NX.ext.grid.plugin.FilterBox',
     'NX.ext.grid.plugin.Filtering',
     'NX.ext.form.OptionalFieldSet',
