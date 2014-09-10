@@ -1,19 +1,19 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
-Commercial Usage
-Licensees holding valid commercial licenses may use this file in accordance with the Commercial
-Software License Agreement provided with the Software or, alternatively, in accordance with the
-terms contained in a written agreement between you and Sencha.
+Pre-release code in the Ext repository is intended for development purposes only and will
+not always be stable. 
 
-If you are unsure which license is appropriate for your use, please contact the sales department
-at http://www.sencha.com/contact.
+Use of pre-release code is permitted with your application at your own risk under standard
+Ext license terms. Public redistribution is prohibited.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+For early licensing, please contact us at licensing@sencha.com
+
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a common registry of all menus on a page.
@@ -123,19 +123,26 @@ Ext.define('Ext.menu.Manager', {
     onMouseDown: function(e) {
         var me = this,
             active = me.active,
+            activeMenuCount = active.length,
             lastShow = me.lastShow,
-            doHide = true;
+            i;
 
-        if (Ext.Date.getElapsed(lastShow) > 50 && active.length > 0 && !e.getTarget(me.menuSelector)) {
+        if (Ext.Date.getElapsed(lastShow) > 50 && activeMenuCount) {
             // Because we use a buffer in IE, the target may have been removed from the
             // DOM by the time we get here, so the selector will never find the menu. In this
             // case, it's safer to not hide than menus than to do so
             if (Ext.isIE9m && !Ext.getDoc().contains(e.target)) {
-                doHide = false;
+                return;
             }
-            if (doHide) {
-                me.hideAll();
+            else {
+                // If any active menus are an ancestor of the target element, we don't hide
+                for (i = 0; i < activeMenuCount; i++) {
+                    if (active.items[i].owns(e.target)) {
+                        return;
+                    }
+                }
             }
+            me.hideAll();
         }
     },
 

@@ -2,7 +2,12 @@
     "name": "ext-theme-access",
     "type": "theme",
     "creator": "Sencha",
-    "version": "4.2.2",
+    "summary": "Ext JS Accessibility Theme",
+    "detailedDescription": "An Ext JS Theme that uses a high-contrast color scheme",
+    "version": "4.2.3.1477",
     "compatVersion": "4.2.0",
+    "format": "1",
+    "local": true,
+    "requires": [],
     "extend": "ext-theme-classic"
 }

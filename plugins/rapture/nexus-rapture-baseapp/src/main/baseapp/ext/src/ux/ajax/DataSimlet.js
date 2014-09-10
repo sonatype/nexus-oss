@@ -35,11 +35,12 @@ Ext.define('Ext.ux.ajax.DataSimlet', function () {
             var me = this,
                 data = me.data,
                 params = ctx.params,
-                order = (params.group||'')+'-'+(params.sort||'')+'-'+(params.dir||''),
+                order = (params.group || '') + '-' + (params.sort || '') + '-' + (params.dir || ''),
                 fields,
                 sortFn;
 
-            if (!order) {
+            // If no order is passed, because of the concat we've done the value will be --
+            if (order === '--') {
                 return data;
             }
 

@@ -28,8 +28,9 @@ Ext.require([
   'Ext.toolbar.*',
   'Ext.tree.*',
   'Ext.util.*',
-  'Ext.ux.*',
   'Ext.view.*',
   'Ext.window.*',
-  'Ext.Action'
+  'Ext.Action',
+  'Ext.ux.form.MultiSelect',
+  'Ext.ux.form.ItemSelector'
 ]);

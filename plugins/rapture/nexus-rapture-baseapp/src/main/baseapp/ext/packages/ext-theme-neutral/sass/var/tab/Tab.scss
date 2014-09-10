@@ -383,7 +383,7 @@ $tab-icon-opacity-disabled: .5 !default;
  * The direction to rotate the contents of a left-aligned tab.  `right` to rotate
  * clockwise or `left` to rotate counterclockwise. Defaults to `left`.
  */
-$tab-left-rotate-direction: 'left';
+$tab-left-rotate-direction: 'left' !default;
 
 /**
  * @var {string}
@@ -391,7 +391,7 @@ $tab-left-rotate-direction: 'left';
  * The direction to rotate the contents of a right-aligned tab.  `right` to rotate
  * clockwise or `left` to rotate counterclockwise. Defaults to `right`.
  */
-$tab-right-rotate-direction: 'right';
+$tab-right-rotate-direction: 'right' !default;
 
 /**
  * @var {boolean}

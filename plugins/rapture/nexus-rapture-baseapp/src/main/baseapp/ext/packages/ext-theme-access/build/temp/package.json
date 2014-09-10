@@ -1,9 +1,11 @@
 {
   "name": "ext-theme-access",
   "format": "1",
-  "version": "4.2.2",
-  "compatVersion": "4.2.0",
+  "version": "4.2.0",
   "creator": "Sencha",
+  "summary": "Ext JS Accessibility Theme",
+  "detailedDescription": "An Ext JS Theme that uses a high-contrast color scheme",
   "type": "theme",
-  "extend": "ext-theme-classic"
+  "extend": "ext-theme-classic",
+  "local": true
 }

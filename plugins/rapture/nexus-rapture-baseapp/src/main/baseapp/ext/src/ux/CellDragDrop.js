@@ -160,19 +160,20 @@ Ext.define('Ext.ux.CellDragDrop', {
                     var view = this.view,
                         item = e.getTarget(view.getItemSelector()),
                         record = view.getRecord(item),
-                        clickedEl = e.getTarget(view.getCellSelector()),
-                        dragEl;
+                        cell = e.getTarget(view.getCellSelector()),
+                        dragEl, header;
 
                     if (item) {
                         dragEl = document.createElement('div');
                         dragEl.className = 'x-form-text';
-                        dragEl.appendChild(document.createTextNode(clickedEl.textContent || clickedEl.innerText));
+                        dragEl.appendChild(document.createTextNode(cell.textContent || cell.innerText));
 
+                        header = view.getHeaderByCell(cell);
                         return {
                             event: new Ext.EventObjectImpl(e),
                             ddel: dragEl,
                             item: e.target,
-                            columnName: view.getGridColumns()[clickedEl.cellIndex].dataIndex,
+                            columnName: header.dataIndex,
                             record: record
                         };
                     }
@@ -208,20 +209,20 @@ Ext.define('Ext.ux.CellDragDrop', {
 
                 getTargetFromEvent: function (e) {
                     var self = this,
-                        v = self.view,
-                        cell = e.getTarget(v.cellSelector),
-                        row, columnIndex;
+                        view = self.view,
+                        cell = e.getTarget(view.cellSelector),
+                        row, header;
 
                     // Ascertain whether the mousemove is within a grid cell.
                     if (cell) {
-                        row = v.findItemByChild(cell);
-                        columnIndex = cell.cellIndex;
+                        row = view.findItemByChild(cell);
+                        header = view.getHeaderByCell(cell);
 
-                        if (row && Ext.isDefined(columnIndex)) {
+                        if (row && header) {
                             return {
                                 node: cell,
-                                record: v.getRecord(row),
-                                columnName: self.view.up('grid').columns[columnIndex].dataIndex
+                                record: view.getRecord(row),
+                                columnName: header.dataIndex
                             };
                         }
                     }

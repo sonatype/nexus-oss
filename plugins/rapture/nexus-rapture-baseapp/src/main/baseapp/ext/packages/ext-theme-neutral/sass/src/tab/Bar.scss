@@ -1,6 +1,14 @@
 /**
  * Creates a visual theme for a Tab Bar
  *
+ * Note: When creating a tab bar UI with the extjs-tab-bar-ui mixin, 
+ * you will need to create a corresponding tab-ui of the same name.  
+ * This will ensure that the tabs render properly in your theme. 
+ * Not creating a matching tab theme may result in unpredictable 
+ * tab rendering.
+ *
+ * See `Ext.tab.Tab-css_mixin-extjs-tab-ui`
+ * 
  * @param {string} $ui
  * The name of the UI being created. Can not included spaces or special punctuation
  * (used in CSS class names).

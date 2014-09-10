@@ -1,15 +1,10 @@
-.#{$prefix}summary-bottom {
-    border-bottom-color: $grid-header-background-color;
-}
-
 .#{$prefix}docked-summary {
-    border-width: 1px;
-    border-color: $panel-body-border-color;
-    border-style: $panel-body-border-style;
-    
     .#{$prefix}grid-table {
         width: 100%;
+        border: 0 none;
     }
+    // When in a border layout, the background-color shows through the summary content
+    background: $grid-body-background-color!important;
 }
 
 .#{$prefix}grid-row-summary {
@@ -17,12 +12,23 @@
     .#{$prefix}grid-rowwrap,
     .#{$prefix}grid-cell-rowbody {
         border-color: $grid-row-cell-border-color;
+
+        // !important needed here so that mouseover background style does not apply to summary row that's in a row wrap
         background-color: transparent !important;
         border-top-width: 0;
         font: $grid-row-cell-font;
     }
 }
 
+// Ensure no border between summary and panel border, and that the background is consistent.
+.#{$prefix}docked-summary-bottom .#{$prefix}grid-row-summary .#{$prefix}grid-cell {
+    border-bottom: 0 none;
+}
+.#{$prefix}docked-summary-top .#{$prefix}grid-row-summary .#{$prefix}grid-cell {
+    border-top: 0 none;
+}
+
+// Embedded tables within rows do not get their own borders
 .#{$prefix}grid-with-row-lines .#{$prefix}grid-table-summary {
     border: 0;
 }

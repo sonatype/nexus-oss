@@ -24,7 +24,11 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
   store: 'SearchResultVersion',
 
   allowDeselect: true,
-  emptyText: 'No versions found',
+
+  viewConfig: {
+    emptyText: 'No versions found',
+    deferEmptyText: false
+  },
 
   columns: [
     {

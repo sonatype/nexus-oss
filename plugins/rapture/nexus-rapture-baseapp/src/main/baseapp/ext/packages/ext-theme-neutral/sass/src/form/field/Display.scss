@@ -1,4 +1,4 @@
-.#{$prefix}form-display-field-body {
+.#{$prefix}form-display-field {
     height: $form-field-height;
 
     @if $include-ext-toolbar-toolbar and $form-toolbar-field-height != $form-field-height {

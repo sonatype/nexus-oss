@@ -1,19 +1,19 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
-Commercial Usage
-Licensees holding valid commercial licenses may use this file in accordance with the Commercial
-Software License Agreement provided with the Software or, alternatively, in accordance with the
-terms contained in a written agreement between you and Sencha.
+Pre-release code in the Ext repository is intended for development purposes only and will
+not always be stable. 
 
-If you are unsure which license is appropriate for your use, please contact the sales department
-at http://www.sencha.com/contact.
+Use of pre-release code is permitted with your application at your own risk under standard
+Ext license terms. Public redistribution is prohibited.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+For early licensing, please contact us at licensing@sencha.com
+
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * As the number of records increases, the time required for the browser to render them increases. Paging is used to
@@ -236,7 +236,14 @@ Ext.define('Ext.toolbar.Paging', {
      * @private
      */
     getPagingItems: function() {
-        var me = this;
+        var me = this,
+            inputListeners = {
+                scope: me,
+                blur: me.onPagingBlur
+            };
+        
+        inputListeners[Ext.EventManager.getKeyEvent()] = me.onPagingKeyDown;
+        
         return [{
             itemId: 'first',
             tooltip: me.firstText,
@@ -272,11 +279,7 @@ Ext.define('Ext.toolbar.Paging', {
             isFormField: false,
             width: me.inputItemWidth,
             margins: '-1 2 3 2',
-            listeners: {
-                scope: me,
-                keydown: me.onPagingKeyDown,
-                blur: me.onPagingBlur
-            }
+            listeners: inputListeners
         },{
             xtype: 'tbtext',
             itemId: 'afterTextItem',
@@ -374,9 +377,13 @@ Ext.define('Ext.toolbar.Paging', {
     },
     
     beforeRender: function() {
-        this.callParent(arguments);
-        if (!this.store.isLoading()) {
-            this.onLoad();    
+        var me = this;
+        
+        me.callParent(arguments);
+        if (!me.store.isLoading()) {
+            me.calledFromRender = true;
+            me.onLoad();    
+            delete me.calledFromRender;
         }    
     },
     
@@ -452,7 +459,9 @@ Ext.define('Ext.toolbar.Paging', {
         me.updateInfo();
         Ext.resumeLayouts(true);
 
-        me.fireEvent('change', me, pageData);
+        if (!me.calledFromRender) {
+            me.fireEvent('change', me, pageData);
+        }
     },
     
     setChildDisabled: function(selector, disabled){

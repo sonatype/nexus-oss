@@ -41,7 +41,10 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
     { header: 'Fingerprint', dataIndex: 'fingerprint', flex: 1 }
   ],
 
-  emptyText: 'No SSL certificates',
+  viewConfig: {
+    emptyText: 'No SSL certificates',
+    deferEmptyText: false
+  },
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No SSL certificate matched criteria "$filter"' }

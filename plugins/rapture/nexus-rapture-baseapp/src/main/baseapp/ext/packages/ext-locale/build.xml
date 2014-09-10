@@ -51,8 +51,12 @@
                      target="js"
                      useNativeBasedir="true"
                      inheritrefs="true">
-                    <property name="package.locale" value="${build.locale}"/>
                     <property name="cmd.dir" value="${cmd.dir}"/>
+                    <property name="compiler.ref.id" 
+                              value="${compiler.ref.id}-${build.locale}"/>
+                    <property name="package.locale" value="${build.locale}"/>
+                    <property name="build.name.prefix" value="${build.dir}/${package.name}-${build.locale}"/>
+                    <property name="build.name.css.prefix" value="${build.resources.dir}/${package.name}-${build.locale}"/>
                 </ant>
 
             </sequential>

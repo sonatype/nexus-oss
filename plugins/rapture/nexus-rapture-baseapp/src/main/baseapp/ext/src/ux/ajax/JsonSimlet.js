@@ -13,7 +13,7 @@ Ext.define('Ext.ux.ajax.JsonSimlet', {
             ret = me.callParent(arguments), // pick up status/statusText
             response = {};
 
-        if (reader && reader.root) {
+        if (reader && reader.root && Ext.isArray(page)) {
             response[reader.root] = page;
             response[reader.totalProperty] = data.length;
         } else {

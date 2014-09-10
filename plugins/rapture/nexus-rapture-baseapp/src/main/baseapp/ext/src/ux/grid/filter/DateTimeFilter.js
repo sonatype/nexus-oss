@@ -150,14 +150,15 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
     reTime: /\s(am|pm)/i,
 
     /**
-     * Replaces the selected value of the timepicker with the default 00:00:00.
+     * Mix the value for the timepicker into the datepicker's date.
      * @private
-     * @param {Object} date
+     * @param {Ext.picker.Date} datepicker
      * @param {Ext.picker.Time} timepicker
      * @return Date object
      */
-    addTimeSelection: function (date, timepicker) {
+    addTimeSelection: function (datepicker, timepicker) {
         var me = this,
+            date = datepicker.value,
             selection = timepicker.getSelectionModel().getSelection(),
             time, len, fn, val,
             i = 0,
@@ -217,6 +218,7 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
 
         pickerCtnCfg = Ext.apply(me.pickerOpts, {
             xtype: !dockCfg ? 'container' : 'panel',
+            border: 0,
             layout: 'hbox',
             items: items
         });
@@ -265,6 +267,8 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
                     itemId: item,
                     text: me[item + 'Text'],
                     menu: Ext.create('Ext.menu.Menu', {
+                        layout: 'auto',
+                        plain: true,
                         items: pickerCtnCfg
                     }),
                     listeners: {
@@ -282,19 +286,22 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
     /**
      * @private
      */
-    onCheckChange: function (item, checked) {
-        var me = this,
-            menu = item.menu,
+    getCacheValues: function (item, checked) {
+        var menu = item.menu,
             timepicker = menu.down('timepicker'),
             datepicker = menu.down('datepicker'),
-            itemId = datepicker.itemId,
-            values = me.values;
+            key = datepicker.itemId;
 
-        if (checked) {
-            values[itemId] = me.addTimeSelection(datepicker.value, timepicker);
-        } else {
-            delete values[itemId];
-        }
+        return [key, checked ? this.addTimeSelection(datepicker, timepicker) : null];
+    },
+
+    /**
+     * @private
+     */
+    onCheckChange: function (item, checked) {
+        var me = this;
+
+        me.setFieldValue.apply(me, me.getCacheValues(item, checked));
         me.setActive(me.isActivatable());
         me.fireEvent('update', me);
     },
@@ -305,19 +312,18 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
      * @param {Object} date
      */
     onMenuSelect: function (picker, date) {
-        // NOTE: we need to redefine the picker.
         var me = this,
             menu = me.menu,
             fields = me.fields,
             field;
 
         if (me.dock) {
-            // If there is a dock config then the button will trigger the menu select.
-            // In these cases, the picker function arg isn't actually a picker but the
-            // button that was clicked, so redefine the picker.
-            //
+            // If there is a dock config then the button will trigger the menu select. In these cases, the picker
+            // function arg isn't actually a picker but the button that was clicked, so redefine the picker.
+            // Similarly, the date function argument will not be a Date type, so get it from the datepicker.
             // The focusEl is going to be the check item.
             picker = menu.getFocusEl().down('datepicker');
+            date = picker.value;
         }
 
         field = me.fields[picker.itemId];
@@ -334,14 +340,13 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
                 fields.after.setChecked(false, true);
             }   
         }   
+
+        // Note that the date will not have the H:i:s info mixed into it. getCacheValues() will handle this.
+        me.setFieldValue.apply(me, me.getCacheValues(field, true));
+
         me.fireEvent('update', me);
 
-        // The timepicker's getBubbleTarget() returns the boundlist's implementation,
-        // so it doesn't look up ownerCt chain (it looks up this.pickerField).
-        // This is a problem :)
-        // This can be fixed by just walking up the ownerCt chain
-        // (same thing, but confusing without comment).
-        picker.ownerCt.ownerCt.hide();
+        picker.up('menu').hide();
     },
 
     /**
@@ -394,6 +399,10 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
                 // which we don't want, so just call update() instead and set the value on the component.
                 datepicker.update(val);
                 datepicker.value = val;
+                // keep track of the picker value separately because the menu gets destroyed
+                // when columns order changes.  We return this value from getValue() instead
+                // of picker.getValue()
+                me.setFieldValue(key, val);
 
                 fields[key].setChecked(true);
             } else if (!preserve) {
@@ -417,7 +426,7 @@ Ext.define('Ext.ux.grid.filter.DateTimeFilter', {
             pickerValue,
             val = record.get(me.dataIndex);
 
-        if(!Ext.isDate(val)){
+        if (!Ext.isDate(val)) {
             return false;
         }
 

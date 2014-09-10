@@ -49,6 +49,36 @@ If the content has changed, then the result needs to be committed:
 
     mvn clean install -Pwatch
 
+## Upgrading ExtJS
+
+To upgrade ExtJS, replace the src/main/baseapp/ext directory with the upgrade distribution:
+
+    rm -rf src/main/baseapp/ext
+    unzip -d src/main/baseapp ext-<version>.zip
+    mv src/main/baseapp/ext-* src/main/baseapp/ext  
+
+Install Ext.ux examples:
+
+    mv src/main/baseapp/ext/examples/ux src/main/baseapp/ext/src/
+
+Delete unneeded files from the distribution:
+
+    rm -rf src/main/baseapp/ext/.sencha
+    rm -rf src/main/baseapp/ext/docs
+    rm -rf src/main/baseapp/ext/examples
+    rm -rf src/main/baseapp/ext/welcome
+
+Commit changes:
+
+    git add --ignore-removal src/main/baseapp/ext
+    git ci -a -m "Upgrade ExtJS <version>"
+
+Regenerate baseapp:
+
+    mvn clean install -Pregenerate
+
+Sanity check and commit baseapp.
+
 ## Other
  
 Various other examples of Sencha CMD usage.

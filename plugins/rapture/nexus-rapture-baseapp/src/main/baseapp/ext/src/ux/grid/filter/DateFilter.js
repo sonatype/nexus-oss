@@ -107,6 +107,7 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
             minDate: me.minDate,
             maxDate: me.maxDate,
             format:  me.dateFormat,
+            border: 0,
             listeners: {
                 scope: me,
                 select: me.onMenuSelect
@@ -121,6 +122,7 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
                     itemId: 'range-' + item,
                     text: me[item + 'Text'],
                     menu: Ext.create('Ext.menu.Menu', {
+                        layout: 'auto',
                         plain: true,
                         items: [
                             Ext.apply(pickerCfg, {
@@ -144,14 +146,9 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
     onCheckChange : function (item, checked) {
         var me = this,
             picker = item.menu.items.first(),
-            itemId = picker.itemId,
-            values = me.values;
+            itemId = picker.itemId;
 
-        if (checked) {
-            values[itemId] = picker.getValue();
-        } else {
-            delete values[itemId]
-        }
+        me.setFieldValue(itemId, checked ? picker.getValue() : null);
         me.setActive(me.isActivatable());
         me.fireEvent('update', me);
     },
@@ -195,7 +192,7 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
         // keep track of the picker value separately because the menu gets destroyed
         // when columns order changes.  We return this value from getValue() instead
         // of picker.getValue()
-        this.values[picker.itemId] = date;
+        this.setFieldValue(picker.itemId, date);
 
         this.fireEvent('update', this);
 
@@ -225,11 +222,18 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
      * of the other fields.  Defaults to false, unchecking the
      * other fields
      */
-    setValue : function (value, preserve) {
-        var key;
+    setValue: function (value, preserve) {
+        var key, val;
+
         for (key in this.fields) {
-            if(value[key]){
-                this.getPicker(key).setValue(value[key]);
+            val = value[key];
+
+            if (val) {
+                this.getPicker(key).setValue(val);
+                // keep track of the picker value separately because the menu gets destroyed
+                // when columns order changes.  We return this value from getValue() instead
+                // of picker.getValue()
+                this.setFieldValue(key, val);
                 this.fields[key].setChecked(true);
             } else if (!preserve) {
                 this.fields[key].setChecked(false);
@@ -281,6 +285,13 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
      */
     getFieldValue : function(item){
         return this.values[item];
+    },
+
+    /**
+     * @private
+     */
+    setFieldValue: function (item, value) {
+        this.values[item] = value;
     },
 
     /**

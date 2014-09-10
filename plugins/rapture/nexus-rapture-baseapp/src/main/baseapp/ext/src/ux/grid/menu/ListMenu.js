@@ -131,33 +131,37 @@ Ext.define('Ext.ux.grid.menu.ListMenu', {
 
     createMenuStore: function () {
         var me = this,
-            options = [],
-            i, len, value;
+            options = me.options || me.grid.store.collect(me.dataIndex, false, true),
+            i = 0,
+            len = options.length,
+            storeOptions = [],
+            idField = me.idField,
+            labelField = me.labelField,
+            value;
 
-        me.options = me.grid.store.collect(me.dataIndex, false, true);
+        for (; i < len; i++) {
+            value = options[i];
 
-        for (i = 0, len = me.options.length; i < len; i++) {
-            value = me.options[i];
             switch (Ext.type(value)) {
-                case 'array': 
-                    options.push(value);
+                case 'array':
+                    storeOptions.push(value);
                     break;
                 case 'object':
-                    options.push([value[me.idField], value[me.labelField]]);
+                    storeOptions.push([value[idField], value[labelField]]);
                     break;
                 default:
                     if (value != null) {
-                        options.push([value, value]);
+                        storeOptions.push([value, value]);
                     }
             }
         }
 
         me.store = Ext.create('Ext.data.ArrayStore', {
-            fields: [me.idField, me.labelField],
-            data:   options,
+            fields: [idField, labelField],
+            data: storeOptions,
             listeners: {
                 load: me.onLoad,
-                scope:  me
+                scope: me
             }
         });
 

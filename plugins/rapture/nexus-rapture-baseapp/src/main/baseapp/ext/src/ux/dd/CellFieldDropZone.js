@@ -56,7 +56,7 @@ Ext.define('Ext.ux.dd.CellFieldDropZone', {
                 return {
                     node: cell,
                     record: v.getRecord(row),
-                    fieldName: me.grid.columns[columnIndex].dataIndex
+                    fieldName: me.grid.getVisibleColumnManager().getColumns()[columnIndex].dataIndex
                 };
             }
         }

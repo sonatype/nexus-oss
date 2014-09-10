@@ -8,6 +8,17 @@
     }
 }
 
+// When the locking grid is configured with a splitter, the locked grid needs a border on its trailing edge
+.#{$prefix}grid-locked-split .#{$prefix}grid-inner-normal {
+    border-width: 0 0 0 $grid-lockable-separator-border-width;
+    border-style: $grid-lockable-separator-border-style;
+}
+@if $include-rtl {
+    .#{$prefix}grid-locked-split .#{$prefix}rtl.#{$prefix}grid-inner-normal {
+        border-width: 0 $grid-lockable-separator-border-width 0 0;
+    }
+}
+
 // Inner locked grid has a 1px border. Last cell looks bad with an extra grey one.
 // The rules must be last because they override default header and cell bordering.
 // Must use the border-right property because we have to override the .x-column-header border-right setting.

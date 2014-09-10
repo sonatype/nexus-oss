@@ -28,14 +28,14 @@ Ext.define('NX.coreui.model.Task', {
     'status',
     'statusDescription',
     'schedule',
-    { name: 'nextRun', type: Ext.data.Types.DATE, dateFormat: 'c' },
-    { name: 'lastRun', type: Ext.data.Types.DATE, dateFormat: 'c' },
+    { name: 'nextRun', type: 'date', dateFormat: 'c' },
+    { name: 'lastRun', type: 'date', dateFormat: 'c' },
     'lastRunResult',
     'runnable',
     'stoppable',
     'alertEmail',
     'properties',
-    { name: 'startDate', type: Ext.data.Types.DATE, dateFormat: 'c' },
+    { name: 'startDate', type: 'date', dateFormat: 'c' },
     'recurringDays',
     'cronExpression'
   ]

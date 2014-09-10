@@ -188,7 +188,12 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
         me.bindStore(view.getStore(), true);
 
         // Listen for header menu being created
-        headerCt.on('menucreate', me.onMenuCreate, me);
+        headerCt.on({
+            scope: me,
+            menucreate: me.onMenuCreate,
+            add: me.onAddRemoveColumn,
+            remove: me.onAddRemoveColumn
+        });
 
         view.on('refresh', me.onRefresh, me);
         grid.on({
@@ -290,6 +295,10 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
         }
     },
 
+    onAddRemoveColumn: function () {
+        this.createFilters();
+    },
+
     /**
      * @private Handle creation of the grid's header menu. Initializes the filters and listens
      * for the menu being shown.
@@ -303,6 +312,7 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
             me.createFilters();
             me.filtersNeedReCreating = false;
         }
+
         menu.on({
             beforeshow: me.onMenuBeforeShow,
             destroy: me.onMenuDestroy,
@@ -390,9 +400,7 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
             }
         }
         me.deferredUpdate.cancel();
-        if (me.local) {
-            me.reload();
-        }
+
         delete me.applyingState;
         delete state.filters;
     },
@@ -410,6 +418,7 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
                 filters[filter.dataIndex] = filter.getValue();
             }
         });
+
         return (state.filters = filters);
     },
 
@@ -419,6 +428,8 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
      */
     destroy : function () {
         var me = this;
+        
+        me.deferredUpdate.cancel();
         Ext.destroyMembers(me, 'menuItem', 'sep');
         me.removeAll();
         me.clearListeners();
@@ -464,13 +475,19 @@ Ext.define('Ext.ux.grid.FiltersFeature', {
         me.store = store;
     },
 
+    getFilterByDataIndex: function (dataIndex) {
+        return Ext.Array.findBy(this.getFilterItems(), function (item) {
+            return item.dataIndex === dataIndex;
+        });
+    },
+
     /**
      * @private
      * Get the filter menu from the filters MixedCollection based on the clicked header
      */
     getMenuFilter : function () {
         var header = this.view.headerCt.getMenu().activeHeader;
-        return header ? this.filters.get(header.dataIndex) : null;
+        return header ? this.getFilterByDataIndex(header.dataIndex) : null;
     },
 
     /** @private */

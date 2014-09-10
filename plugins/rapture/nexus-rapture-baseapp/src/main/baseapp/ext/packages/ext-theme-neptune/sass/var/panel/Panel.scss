@@ -28,10 +28,12 @@ $panel-light-header-font-weight: bold !default;
 $panel-light-header-color: #666 !default;
 $panel-light-header-background-color: mix($base-light-color, $neutral-light-color, 30%) !default;
 $panel-light-header-text-transform: none !default;
-$panel-light-body-border-color: $panel-light-header-background-color !default;
+$panel-light-border-color: $panel-light-header-background-color !default;
+$panel-light-header-border-color: $panel-light-border-color !default;
+$panel-light-body-border-color: $panel-light-border-color !default;
 $panel-light-tool-background-image: 'tools/tool-sprites-dark' !default;
 
-$panel-light-frame-border-color: $panel-light-header-background-color !default;
+$panel-light-frame-border-color: $panel-light-border-color !default;
 $panel-include-border-management-rules: true !default;
 
 /**

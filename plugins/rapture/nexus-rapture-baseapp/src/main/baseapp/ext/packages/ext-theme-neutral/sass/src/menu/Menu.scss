@@ -49,7 +49,7 @@ $menu-item-icon-top: round(($menu-item-height - vertical($menu-item-border-width
     cursor: $menu-item-cursor;
 }
 
-.#{$prefix}menu-item-link,
+.#{$prefix}menu-item-text,
 .#{$prefix}menu-item-cmp {
     margin: 0 after($menu-item-text-horizontal-spacing) 0 before($menu-item-text-horizontal-spacing);
 }
@@ -73,7 +73,7 @@ $menu-item-icon-top: round(($menu-item-height - vertical($menu-item-border-width
 
 @if $include-rtl {
     .#{$prefix}rtl {
-        &.#{$prefix}menu-item-link,
+        &.#{$prefix}menu-item-text,
         &.#{$prefix}menu-item-cmp {
             margin: 0 before($menu-item-text-horizontal-spacing) 0 after($menu-item-text-horizontal-spacing);
         }
@@ -186,6 +186,10 @@ $stretch: slicer-background-stretch(menu-item-link, bottom);
         left: after($menu-item-icon-horizontal-spacing);
 
         .#{$prefix}menu-item-active & {
+            // Needs right overriding within the .x-menu-item-active .x-rtl.x-menu-item-right rule
+            // IEQuirks sees that as equivalent to .x-menu-item-active .x-menu-item-right, so
+            // https://sencha.jira.com/browse/EXTJSIV-11176
+            right: auto;
             left: after($menu-item-icon-horizontal-spacing) - right($menu-item-border-width);
         }
     }

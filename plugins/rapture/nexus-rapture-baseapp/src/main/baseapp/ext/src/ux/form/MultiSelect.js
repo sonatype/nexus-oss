@@ -100,7 +100,7 @@ Ext.define('Ext.ux.form.MultiSelect', {
     delimiter: ',',
     
     /**
-     * @cfg String [dragText="{0} Item{1}"] The text to show while dragging items.
+     * @cfg {String} [dragText="{0} Item{1}"] The text to show while dragging items.
      * {0} will be replaced by the number of items. {1} will be replaced by the plural
      * form if there is more than 1 item.
      */

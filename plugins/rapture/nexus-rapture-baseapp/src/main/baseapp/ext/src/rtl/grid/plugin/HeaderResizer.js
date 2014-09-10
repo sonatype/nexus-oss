@@ -1,22 +1,45 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
-Commercial Usage
-Licensees holding valid commercial licenses may use this file in accordance with the Commercial
-Software License Agreement provided with the Software or, alternatively, in accordance with the
-terms contained in a written agreement between you and Sencha.
+Pre-release code in the Ext repository is intended for development purposes only and will
+not always be stable. 
 
-If you are unsure which license is appropriate for your use, please contact the sales department
-at http://www.sencha.com/contact.
+Use of pre-release code is permitted with your application at your own risk under standard
+Ext license terms. Public redistribution is prohibited.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+For early licensing, please contact us at licensing@sencha.com
+
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('Ext.rtl.grid.plugin.HeaderResizer', {
     override: 'Ext.grid.plugin.HeaderResizer',
+
+    onBeforeStart : function(e) {
+        var me = this;
+
+        if (this.headerCt.isOppositeRootDirection()) {
+            // cache the activeHd because it will be cleared.
+            me.dragHd = me.activeHd;
+
+            if (!!me.dragHd && !me.headerCt.dragging) {
+
+                // Calculate how far off the right marker line the mouse pointer is.
+                // This will be the xDelta during the following drag operation.
+                me.xDelta = me.dragHd.getX() - me.tracker.getXY()[0];
+                this.tracker.constrainTo = this.getConstrainRegion();
+                return true;
+            } else {
+                me.headerCt.dragging = false;
+                return false;
+            }
+        } else {
+            return this.callParent(arguments);
+        }
+    },
 
     adjustColumnWidth: function(offsetX) {
         if (this.headerCt.isOppositeRootDirection()) {
@@ -35,25 +58,13 @@ Ext.define('Ext.rtl.grid.plugin.HeaderResizer', {
             mouseX = this.tracker.getXY('point')[0];
         
         if (this.headerCt.isOppositeRootDirection()) {
-            return mouseX - gridX;    
+            return mouseX - gridX + this.xDelta;    
         } else {
             return this.callParent(arguments);
         }   
 
     },
 
-    getViewOffset: function(gridSection, view) {
-        var headerCtRtl = this.headerCt.getHierarchyState().rtl,
-            borderWidth = gridSection.el.getBorderWidth(headerCtRtl ? 'r': 'l'),
-            offset = view.getX() - gridSection.getX();
-            
-        if (!headerCtRtl !== !Ext.rootHierarchyState.rtl) {
-            offset = -(offset + view.getWidth() - gridSection.getWidth());
-        }
-
-        return offset - borderWidth;
-    },
-    
     getMovingMarker: function(markerOwner){
         if (this.headerCt.isOppositeRootDirection()) {
             return markerOwner.getLhsMarker();

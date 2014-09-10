@@ -53,6 +53,12 @@ $fieldset-border-style: solid !default;
  */
 $fieldset-border-color: #B5B8C8 !default;
 
+/**
+ * @var {number}
+ * The border radius of FieldSet elements.
+ */
+$fieldset-border-radius: 0!default;
+
 // private
 $fieldset-border: $fieldset-border-width $fieldset-border-style $fieldset-border-color !default;
 
