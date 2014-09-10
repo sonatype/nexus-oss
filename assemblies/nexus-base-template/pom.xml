@@ -332,7 +332,7 @@
                 <!-- include a few additional extra packages required by our environment -->
                 <replace file="${project.build.directory}/assembly/etc/config.properties"
                   token="packages.extra="
-                  value="packages.extra=sun.misc,com.sun.net.httpserver,javax.annotation.security;version=1.2,org.xerial.snappy,"/>
+                  value="packages.extra= \${line.separator} sun.misc, \${line.separator} sun.security.ssl, \${line.separator} com.sun.net.httpserver, \${line.separator} javax.annotation;version=1.2, \${line.separator} javax.annotation.security;version=1.2, \${line.separator} org.xerial.snappy,"/>
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
