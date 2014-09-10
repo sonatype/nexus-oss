@@ -19,9 +19,9 @@ import javax.inject.Named;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
+import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.capability.support.WithoutConfiguration;
-import org.sonatype.nexus.plugins.capabilities.Condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sonatype.nexus.ssl.model.SMTPTrustStoreKey.smtpTrustStoreKey;

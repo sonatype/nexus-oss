@@ -27,8 +27,10 @@ import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
+
 
 /**
  * Tests the ?describe=maven2 content view.

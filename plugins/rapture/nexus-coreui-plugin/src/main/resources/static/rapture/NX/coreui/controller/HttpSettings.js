@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.HttpSettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions'
+  ],
 
   views: [
     'system.HttpSettings'

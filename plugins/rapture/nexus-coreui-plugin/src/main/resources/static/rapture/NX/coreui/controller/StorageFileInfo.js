@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.StorageFileInfo', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.util.Url'
+  ],
 
   views: [
     'repositorybrowse.StorageFileInfo'

@@ -20,6 +20,7 @@
 Ext.define('NX.coreui.controller.Users', {
   extend: 'NX.controller.MasterDetail',
   requires: [
+    'NX.Conditions',
     'NX.State',
     'NX.Permissions',
     'NX.Security',

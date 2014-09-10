@@ -53,7 +53,7 @@ public class Nexus2351DisableRedeployUploadIT
   public void init()
       throws ComponentLookupException
   {
-    this.repoUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.repoUtil = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

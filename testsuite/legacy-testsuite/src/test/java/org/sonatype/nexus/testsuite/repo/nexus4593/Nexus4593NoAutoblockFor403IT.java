@@ -28,8 +28,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.tests.http.server.fluent.Behaviours.content;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 import static org.sonatype.tests.http.server.fluent.Behaviours.get;
@@ -76,19 +76,19 @@ public class Nexus4593NoAutoblockFor403IT
         .serve("/remote/release-proxy-repo-1/nexus4593/*").withBehaviours(get(getTestFile("/")))
         .start();
 
-    downloadArtifact(GavUtil.newGav("nexus4593", "artifact", "1.0.0"), "target");
+    downloadArtifact(getNexusTestRepoUrl(), GavUtil.newGav("nexus4593", "artifact", "1.0.0"), "target");
 
     assertThat(ProxyMode.valueOf(getStatus().getProxyMode()), is(ProxyMode.ALLOW));
 
     server.serve("/*").withBehaviours(error(403));
 
     // download will not fail because we have a local copy cached, but the remote will be hit b/c maxAge is set to 0
-    downloadArtifact(GavUtil.newGav("nexus4593", "artifact", "1.0.0"), "target");
+    downloadArtifact(getNexusTestRepoUrl(), GavUtil.newGav("nexus4593", "artifact", "1.0.0"), "target");
 
     assertThat(ProxyMode.valueOf(getStatus().getProxyMode()), is(ProxyMode.ALLOW));
 
     try {
-      downloadArtifact(GavUtil.newGav("g", "a", "403"), "target");
+      downloadArtifact(getNexusTestRepoUrl(), GavUtil.newGav("g", "a", "403"), "target");
       assertThat("should fail b/c of 403", false);
     }
     catch (IOException e) {
@@ -110,7 +110,7 @@ public class Nexus4593NoAutoblockFor403IT
     startErrorServer(401);
 
     try {
-      downloadArtifact(GavUtil.newGav("g", "a", "401"), "target");
+      downloadArtifact(getNexusTestRepoUrl(), GavUtil.newGav("g", "a", "401"), "target");
     }
     catch (IOException e) {
       // expected, remote will answer with 401
@@ -153,7 +153,7 @@ public class Nexus4593NoAutoblockFor403IT
   private RepositoryStatusResource getStatus()
       throws IOException
   {
-    return new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML).getStatus(
+    return new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML).getStatus(
         getTestRepositoryId());
   }
 

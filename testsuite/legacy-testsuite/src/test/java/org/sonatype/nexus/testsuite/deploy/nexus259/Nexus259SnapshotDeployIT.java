@@ -69,7 +69,7 @@ public class Nexus259SnapshotDeployIT
     boolean fileWasUploaded = true;
     try {
       // download it
-      downloadArtifact(gav, "./target/downloaded-jars");
+      downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
     }
     catch (FileNotFoundException e) {
       fileWasUploaded = false;
@@ -108,7 +108,7 @@ public class Nexus259SnapshotDeployIT
     boolean fileWasUploaded = true;
     try {
       // download it
-      downloadArtifact(gav, "./target/downloaded-jars");
+      downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
     }
     catch (FileNotFoundException e) {
       fileWasUploaded = false;

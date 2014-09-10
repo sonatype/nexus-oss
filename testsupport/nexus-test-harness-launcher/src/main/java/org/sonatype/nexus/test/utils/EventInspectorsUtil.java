@@ -15,21 +15,19 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 import org.restlet.data.Status;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Util class to talk with nexus events
  */
 public class EventInspectorsUtil
 {
-
   private final NexusRestClient nexusRestClient;
 
-  public EventInspectorsUtil(final NexusRestClient nexusRestClient) {
-    this.nexusRestClient = checkNotNull(nexusRestClient);
+  public EventInspectorsUtil() {
+    this.nexusRestClient = RequestFacade.getNexusRestClient();
   }
 
   /**

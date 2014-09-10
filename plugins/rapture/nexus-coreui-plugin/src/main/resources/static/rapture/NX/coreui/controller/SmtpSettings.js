@@ -19,6 +19,10 @@
  */
 Ext.define('NX.coreui.controller.SmtpSettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Messages',
+    'NX.Permissions'
+  ],
 
   views: [
     'system.SmtpSettings',

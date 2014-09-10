@@ -20,8 +20,8 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import static org.sonatype.nexus.test.utils.MavenMetadataHelper.assertEquals;
-import static org.sonatype.nexus.test.utils.MavenMetadataHelper.getMetadata;
+import static org.sonatype.nexus.testsuite.maven.nexus4970.MavenMetadataHelper.assertEquals;
+import static org.sonatype.nexus.testsuite.maven.nexus4970.MavenMetadataHelper.getMetadata;
 
 public class Nexus4970InvalidMetadataMergeOnGroupsIT
     extends AbstractNexusIntegrationTest

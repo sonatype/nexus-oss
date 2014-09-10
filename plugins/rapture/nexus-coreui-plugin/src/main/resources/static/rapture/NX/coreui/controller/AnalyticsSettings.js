@@ -19,6 +19,10 @@
  */
 Ext.define('NX.coreui.controller.AnalyticsSettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions',
+    'NX.State'
+  ],
 
   views: [
     'analytics.AnalyticsSettings'

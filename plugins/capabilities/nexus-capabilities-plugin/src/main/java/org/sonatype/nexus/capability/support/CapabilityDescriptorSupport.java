@@ -17,10 +17,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.Validator;
-import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
+import org.sonatype.nexus.capability.CapabilityDescriptor;
+import org.sonatype.nexus.capability.CapabilityIdentity;
+import org.sonatype.nexus.capability.Validator;
+import org.sonatype.nexus.capability.support.validator.Validators;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;

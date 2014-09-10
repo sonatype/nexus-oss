@@ -34,8 +34,8 @@ public class Nexus3257ModifyRepoTargetIT
   PrivilegesMessageUtil privUtil;
 
   public Nexus3257ModifyRepoTargetIT() {
-    targetUtil = new TargetMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
-    privUtil = new PrivilegesMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    targetUtil = new TargetMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+    privUtil = new PrivilegesMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

@@ -19,6 +19,10 @@
  */
 Ext.define('NX.coreui.controller.Roles', {
   extend: 'NX.controller.MasterDetail',
+  requires: [
+    'NX.Messages',
+    'NX.Permissions'
+  ],
 
   list: 'nx-coreui-role-list',
 

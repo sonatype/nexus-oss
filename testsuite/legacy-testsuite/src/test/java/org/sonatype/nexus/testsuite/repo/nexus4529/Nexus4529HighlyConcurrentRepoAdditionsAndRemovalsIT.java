@@ -36,7 +36,7 @@ import org.restlet.data.Method;
 public class Nexus4529HighlyConcurrentRepoAdditionsAndRemovalsIT
     extends AbstractNexusIntegrationTest
 {
-  protected RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(this, getJsonXStream(),
+  protected RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(getJsonXStream(),
       MediaType.APPLICATION_JSON);
 
   @Test

@@ -35,6 +35,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.restlet.data.Status;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 public class Nexus3233IndexPomSha1IT
     extends AbstractNexusIntegrationTest
 {

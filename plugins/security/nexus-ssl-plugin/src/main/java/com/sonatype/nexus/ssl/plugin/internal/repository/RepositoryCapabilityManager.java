@@ -20,12 +20,12 @@ import javax.inject.Singleton;
 
 import com.sonatype.nexus.ssl.plugin.spi.CapabilityManager;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
+import org.sonatype.nexus.capability.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityRegistry;
+import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
+import static org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
  * {@link RepositoryCapability} manager.

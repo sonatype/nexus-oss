@@ -61,7 +61,7 @@ public class Nexus178BlockProxyDownloadIT
             "Simple Test Artifact", false, null, false, null);
 
     // download file
-    File originalFile = this.downloadArtifact(gav, "target/downloads/original");
+    File originalFile = this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/original");
 
     // blockProxy
     repositoryUtil.setBlockProxy(TEST_RELEASE_REPO, true);
@@ -75,7 +75,7 @@ public class Nexus178BlockProxyDownloadIT
       this.changeFile(localFile);
 
       // redownload file
-      File newFile = this.downloadArtifact(gav, "target/downloads/new");
+      File newFile = this.downloadArtifact(getNexusTestRepoUrl(), gav, "target/downloads/new");
 
       // check to see if file matches original file
       Assert.assertTrue(FileTestingUtils.compareFileSHA1s(originalFile, newFile));

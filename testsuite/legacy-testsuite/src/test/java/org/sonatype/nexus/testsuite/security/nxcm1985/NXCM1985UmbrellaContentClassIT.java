@@ -37,6 +37,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 /**
  * Test the privilege for CRUD operations.
  */
@@ -69,7 +71,7 @@ public class NXCM1985UmbrellaContentClassIT
 
     // read failure
     String serviceURI =
-        "content/repositories/" + this.getTestRepositoryId() + "/" + this.getRelitiveArtifactPath(gav);
+        "content/repositories/" + this.getTestRepositoryId() + "/" + getRelitiveArtifactPath(gav);
     Response response = RequestFacade.sendMessage(serviceURI, Method.GET);
     Assert.assertEquals("Status", response.getStatus().getCode(), 403);
 
@@ -126,7 +128,7 @@ public class NXCM1985UmbrellaContentClassIT
       Assert.fail("Target not found!");
     }
 
-    PrivilegesMessageUtil util = new PrivilegesMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    PrivilegesMessageUtil util = new PrivilegesMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
 
     PrivilegeResource resource = new PrivilegeResource();
 

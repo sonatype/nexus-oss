@@ -19,6 +19,9 @@
  */
 Ext.define('NX.controller.Content', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Icons'
+  ],
   mixins: {
     logAware: 'NX.LogAware'
   },

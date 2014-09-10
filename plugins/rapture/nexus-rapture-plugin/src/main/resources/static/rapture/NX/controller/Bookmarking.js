@@ -20,6 +20,7 @@
 Ext.define('NX.controller.Bookmarking', {
   extend: 'Ext.app.Controller',
   requires: [
+    'Ext.History',
     'NX.Bookmark',
     'NX.Bookmarks'
   ],

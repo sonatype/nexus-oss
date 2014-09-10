@@ -61,7 +61,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
 
     this.localStorageDir = TestProperties.getString("proxy.repo.base.dir");
     this.proxyPort = TestProperties.getInteger("proxy.server.port");
-    this.repositoryMessageUtil = new RepositoryMessageUtil(this, getXMLXStream(), MediaType.APPLICATION_XML);
+    this.repositoryMessageUtil = new RepositoryMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   protected ServerProvider buildServerProvider() {

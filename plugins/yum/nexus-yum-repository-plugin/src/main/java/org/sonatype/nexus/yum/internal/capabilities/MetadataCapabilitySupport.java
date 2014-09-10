@@ -17,11 +17,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.Tag;
-import org.sonatype.nexus.plugins.capabilities.Taggable;
-import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -37,8 +37,8 @@ import com.google.common.base.Throwables;
 import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
+import static org.sonatype.nexus.capability.Tag.repositoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 import static org.sonatype.nexus.yum.internal.capabilities.MetadataCapabilityConfigurationSupport.REPOSITORY_ID;
 
 /**
