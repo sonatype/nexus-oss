@@ -23,8 +23,8 @@ public class ContentStreamResponse
 {
   private final InputStream inputStream;
 
-  public ContentStreamResponse(final InputStream inputStream, final String mimeType, final Date modifiedDate) {
-    super(mimeType, modifiedDate);
+  public ContentStreamResponse(final InputStream inputStream, final String contentType, final Date modifiedDate) {
+    super(contentType, modifiedDate);
     this.inputStream = inputStream;
   }
 

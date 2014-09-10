@@ -50,7 +50,7 @@ public class RawBinariesHandler
 
       case PUT:
         try {
-          final boolean result = binaryStore.create(req.getPath(), req.getMimeType(), req.getInputStream());
+          final boolean result = binaryStore.create(req.getPath(), req.getContentType(), req.getInputStream());
 
           if (result) {
             return Responses.created();

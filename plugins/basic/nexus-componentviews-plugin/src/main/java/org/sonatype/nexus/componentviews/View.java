@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A binding between a view name (which is part of the URL), and a list of {@link RequestMatcher request matchers},
- * each of which can delegate to a chain of {@link Handler}.
+ * each of which can delegate to a chain of {@link Handler}s.
  *
  * @since 3.0
  */

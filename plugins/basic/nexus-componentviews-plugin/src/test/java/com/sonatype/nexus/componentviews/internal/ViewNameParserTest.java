@@ -12,7 +12,7 @@
  */
 package com.sonatype.nexus.componentviews.internal;
 
-import org.sonatype.nexus.componentviews.internal.PathDecomposer;
+import org.sonatype.nexus.componentviews.internal.ViewNameParser;
 
 import org.junit.Test;
 
@@ -23,26 +23,26 @@ import static org.hamcrest.Matchers.is;
 /**
  * @since 3.0
  */
-public class PathDecomposerTest
+public class ViewNameParserTest
 {
   @Test
   public void nullPath() {
-    checkPaths(null, "", "/");
+    checkPaths(null, "", "");
   }
 
   @Test
   public void emptyPath() {
-    checkPaths("", "", "/");
+    checkPaths("", "", "");
   }
 
   @Test
   public void bareSlash() {
-    checkPaths("/", "", "/");
+    checkPaths("/", "", "");
   }
 
   @Test
   public void viewOnly() {
-    checkPaths("/viewname", "viewname", "/");
+    checkPaths("/viewname", "viewname", "");
   }
 
   @Test
@@ -51,14 +51,19 @@ public class PathDecomposerTest
   }
 
   @Test
-  public void viewWithExtraPath() {
-    checkPaths("/viewname/plusDetails/foo", "viewname", "/plusDetails/foo");
+  public void viewOnlyWithTwoFinalSlashes() {
+    checkPaths("/viewname//", "viewname", "//");
   }
 
-  private void checkPaths(final String path, final String viewName, final String remainingPath) {
-    final PathDecomposer pathDecomposer = new PathDecomposer(path);
+  @Test
+  public void noViewName() {
+    checkPaths("//path", "", "/path");
+  }
 
-    assertThat(pathDecomposer.getViewName(), is(equalTo(viewName)));
-    assertThat(pathDecomposer.getRemainingPath(), is(equalTo(remainingPath)));
+  private void checkPaths(final String path, final String expectedViewName, final String expectedRemainingPath) {
+    final ViewNameParser viewNameParser = new ViewNameParser(path);
+
+    assertThat(viewNameParser.getViewName(), is(equalTo(expectedViewName)));
+    assertThat(viewNameParser.getRemainingPath(), is(equalTo(expectedRemainingPath)));
   }
 }

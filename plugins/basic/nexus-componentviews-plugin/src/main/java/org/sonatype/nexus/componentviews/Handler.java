@@ -19,5 +19,8 @@ package org.sonatype.nexus.componentviews;
  */
 public interface Handler
 {
+  /**
+   * Determines the appropriate {@link ViewResponse} given the request.
+   */
   ViewResponse handle(ViewRequest req);
 }

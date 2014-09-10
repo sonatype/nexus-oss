@@ -49,7 +49,7 @@ public class ViewModuleBooter
 {
   private final EventBus eventBus;
 
-  private final ViewFactorySource recipeBook;
+  private final ViewFactorySource viewFactorySource;
 
   private final ViewConfigStore viewConfigStore;
 
@@ -61,14 +61,14 @@ public class ViewModuleBooter
   private final PathListViewFactory pathListViewFactory;
 
   @Inject
-  public ViewModuleBooter(final EventBus eventBus, final ViewFactorySource recipeBook,
+  public ViewModuleBooter(final EventBus eventBus, final ViewFactorySource viewFactorySource,
                           final ViewConfigStore viewConfigStore, final ViewRegistry viewRegistry,
                           final PathListViewFactory pathListViewFactory,
-                          final Set<ViewConfigContributor> configContributors, final Set<ViewFactory> recipes)
+                          final Set<ViewConfigContributor> configContributors)
   {
     this.configContributors = checkNotNull(configContributors);
     this.eventBus = checkNotNull(eventBus);
-    this.recipeBook = checkNotNull(recipeBook);
+    this.viewFactorySource = checkNotNull(viewFactorySource);
     this.viewConfigStore = checkNotNull(viewConfigStore);
     this.viewRegistry = checkNotNull(viewRegistry);
     this.pathListViewFactory = checkNotNull(pathListViewFactory);
@@ -93,14 +93,14 @@ public class ViewModuleBooter
   {
     log.debug("Creating component views.");
     for (ViewConfig config : viewConfigStore.getAll().values()) {
-      final ViewFactory recipe = recipeBook.getRecipe(config.getRecipeName());
-      if (recipe != null) {
-        log.debug("Creating view {}" + config.getViewName());
-        viewRegistry.registerView(recipe.createView(config));
+      final ViewFactory factory = viewFactorySource.getFactory(config.getFactoryName());
+      if (factory != null) {
+        log.debug("Creating view {}", config.getViewName());
+        viewRegistry.registerView(factory.createView(config));
       }
       else {
-        log.error("No view creation found for user supplied config {}", config);
-        throw new IllegalStateException("No recipe found with recipe name " + config.getRecipeName());
+        log.error("No view factory found for view config {}", config);
+        throw new IllegalStateException("No view factory found for view config " + config);
       }
     }
   }

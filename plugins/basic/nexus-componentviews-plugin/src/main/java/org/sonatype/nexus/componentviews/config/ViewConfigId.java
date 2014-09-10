@@ -19,11 +19,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class ViewConfigIdentity
+public class ViewConfigId
 {
   private final String value;
 
-  public ViewConfigIdentity(final String value) {
+  public ViewConfigId(final String value) {
     this.value = checkNotNull(value);
   }
 
@@ -36,7 +36,7 @@ public class ViewConfigIdentity
       return false;
     }
 
-    ViewConfigIdentity that = (ViewConfigIdentity) o;
+    ViewConfigId that = (ViewConfigId) o;
 
     if (!value.equals(that.value)) {
       return false;

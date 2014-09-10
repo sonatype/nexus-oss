@@ -22,5 +22,5 @@ import javax.annotation.Nullable;
 public interface ViewFactorySource
 {
   @Nullable
-  ViewFactory getRecipe(String recipeName);
+  ViewFactory getFactory(String factoryName);
 }

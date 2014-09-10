@@ -12,24 +12,38 @@
  */
 package org.sonatype.nexus.componentviews.internal;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Strings.nullToEmpty;
+
 /**
  * A utility class for parsing the view name out of a request URI.
  *
  * @since 3.0
  */
-public class PathDecomposer
+public class ViewNameParser
 {
-  private final String path;
+  private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");
 
   private final String viewName;
 
   private final String remainingPath;
 
-  public PathDecomposer(final String path) {
-    this.path = path == null || "".equals(path) ? "/" : path;
-    viewName = firstPathSegment(this.path);
-    remainingPath = remainingPath(this.path);
+  /**
+   * Parses a view name (the first path segment) out of a path.
+   */
+  public ViewNameParser(final String path) {
+    final Matcher matcher = PATTERN.matcher(nullToEmpty(path));
+
+    if (!matcher.matches()) {
+      throw new IllegalArgumentException("View name can't be parsed from this path.");
+    }
+
+    viewName = matcher.group(1);
+    remainingPath = matcher.group(2);
   }
+
 
   public String getViewName() {
     return viewName;
@@ -37,23 +51,5 @@ public class PathDecomposer
 
   public String getRemainingPath() {
     return remainingPath;
-  }
-
-  private String firstPathSegment(String path) {
-    final String[] split = path.split("/");
-    if (split.length < 2) {
-      return "";
-    }
-    return split[1];
-  }
-
-  private String remainingPath(final String wholePath) {
-    final String substring = wholePath.substring(viewName.length() + 1);
-
-    if (substring.startsWith("/")) {
-      return substring;
-    }
-
-    return "/" + substring;
   }
 }

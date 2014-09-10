@@ -53,7 +53,7 @@ public class PathListViewFactory
     final Router router = new Router(Arrays.asList((RequestMatcher) new AllRequestMatcher("pathList")));
 
     final View view = new View(config, router,
-        ImmutableMap.of("pathList", (Handler) new ExamplePathListHandler()), new NotFoundHandler());
+        ImmutableMap.of("pathList", (Handler) new ExamplePathListHandler()), notFound);
 
     return view;
   }
