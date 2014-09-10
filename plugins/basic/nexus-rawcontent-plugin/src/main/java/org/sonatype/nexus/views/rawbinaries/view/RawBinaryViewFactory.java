@@ -52,7 +52,7 @@ public class RawBinaryViewFactory
   public View createView(final ViewConfig config) {
     checkNotNull(config);
 
-    final AllRequestMatcher binariesRequestMatcher = new AllRequestMatcher("binaries");
+    final AllRequestMatcher binariesRequestMatcher = new AllRequestMatcher();
 
     final Router router = new Router();
     router.addRoute(binariesRequestMatcher, new RawBinariesHandler(binaryStore));
