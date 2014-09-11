@@ -46,25 +46,16 @@ Ext.define('NX.coreui.controller.Users', {
     'user.UserChangePassword',
     'user.UserFeature',
     'user.UserList',
-    'user.UserSettings'
+    'user.UserSettings',
+    'user.UserSettingsExternal'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-user-list'
-    },
-    {
-      ref: 'settings',
-      selector: 'nx-coreui-user-feature nx-coreui-user-settings'
-    },
-    {
-      ref: 'privilegeTrace',
-      selector: 'nx-coreui-user-feature nx-coreui-privilege-trace'
-    },
-    {
-      ref: 'roleTree',
-      selector: 'nx-coreui-user-feature nx-coreui-role-tree'
-    }
+    { ref: 'feature', selector: 'nx-coreui-user-feature' },
+    { ref: 'list', selector: 'nx-coreui-user-list' },
+    { ref: 'settings', selector: 'nx-coreui-user-feature nx-coreui-user-settings' },
+    { ref: 'externalSettings', selector: 'nx-coreui-user-feature nx-coreui-user-settings-external' },
+    { ref: 'privilegeTrace', selector: 'nx-coreui-user-feature nx-coreui-privilege-trace' },
+    { ref: 'roleTree', selector: 'nx-coreui-user-feature nx-coreui-role-tree' }
   ],
   icons: {
     'user-default': {
@@ -90,7 +81,7 @@ Ext.define('NX.coreui.controller.Users', {
         file: 'group.png',
         variants: ['x16', 'x32']
       },
-      visible: function () {
+      visible: function() {
         return NX.Permissions.check('security:users', 'read');
       },
       weight: 30
@@ -104,7 +95,7 @@ Ext.define('NX.coreui.controller.Users', {
         file: 'user.png',
         variants: ['x16', 'x32']
       },
-      visible: function () {
+      visible: function() {
         return NX.Security.hasUser();
       }
     }
@@ -114,7 +105,7 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -138,6 +129,9 @@ Ext.define('NX.coreui.controller.Users', {
           click: me.showAddWindow
         },
         'nx-coreui-user-settings': {
+          submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-user-settings-external': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-user-list menuitem[action=filter]': {
@@ -172,18 +166,44 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('firstName') + ' ' + model.get('lastName');
   },
 
   /**
    * @override
    */
-  onSelection: function (list, model) {
-    var me = this;
+  onSelection: function(list, model) {
+    var me = this,
+        settingsPanel = me.getSettings(),
+        externalSettingsPanel = me.getExternalSettings();
 
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      if (model.get('external')) {
+        if (!externalSettingsPanel) {
+          me.getFeature().addTab({ xtype: 'nx-coreui-user-settings-external', title: 'Settings', weight: 10 });
+          externalSettingsPanel = me.getExternalSettings();
+        }
+        externalSettingsPanel.loadRecord(model)
+      }
+      else {
+        if (!settingsPanel) {
+          me.getFeature().addTab({ xtype: 'nx-coreui-user-settings', title: 'Settings', weight: 10 });
+          settingsPanel = me.getSettings();
+        }
+        settingsPanel.loadRecord(model)
+      }
+
+      if (model.get('external')) {
+        if (settingsPanel) {
+          me.getFeature().removeTab(settingsPanel);
+        }
+      }
+      else {
+        if (externalSettingsPanel) {
+          me.getFeature().removeTab(externalSettingsPanel);
+        }
+      }
       me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
     }
@@ -192,14 +212,14 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-user-add');
   },
 
   /**
    * @private
    */
-  showChangePasswordWindowForSelection: function () {
+  showChangePasswordWindowForSelection: function() {
     var me = this,
         list = me.getList(),
         userId = list.getSelectionModel().getSelection()[0].getId();
@@ -207,7 +227,7 @@ Ext.define('NX.coreui.controller.Users', {
     NX.Security.doWithAuthenticationToken(
         'Changing password requires validation of your credentials.',
         {
-          success: function (authToken) {
+          success: function(authToken) {
             Ext.widget('nx-coreui-user-changepassword', { userId: userId, authToken: authToken });
           }
         }
@@ -217,13 +237,13 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  showChangePasswordWindowForUserAccount: function (button) {
+  showChangePasswordWindowForUserAccount: function(button) {
     var userId = button.up('form').down('#id').getValue();
 
     NX.Security.doWithAuthenticationToken(
         'Changing password requires validation of your credentials.',
         {
-          success: function (authToken) {
+          success: function(authToken) {
             Ext.widget('nx-coreui-user-changepassword', { userId: userId, authToken: authToken });
           }
         }
@@ -234,7 +254,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    * Load store for selected source.
    */
-  loadStore: function () {
+  loadStore: function() {
     var me = this,
         list = me.getList(),
         userSourceButton;
@@ -260,7 +280,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    * (Re)load related stores.
    */
-  loadRelatedStores: function () {
+  loadRelatedStores: function() {
     var me = this,
         list = me.getList();
 
@@ -274,7 +294,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    * (Re)create user source filters.
    */
-  onUserSourceLoad: function (store) {
+  onUserSourceLoad: function(store) {
     var me = this,
         list = me.getList(),
         userSourceButton;
@@ -287,7 +307,7 @@ Ext.define('NX.coreui.controller.Users', {
       if (!userSourceButton.sourceId) {
         userSourceButton.sourceId = 'default';
       }
-      store.each(function (source) {
+      store.each(function(source) {
         var iconCls = NX.Icons.cls(source.getId().toLowerCase() + '-security-source', 'x16');
         userSourceButton.menu.add({
           text: source.get('name'),
@@ -308,7 +328,7 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  filterBySource: function (menuItem) {
+  filterBySource: function(menuItem) {
     var me = this,
         userSourceButton = me.getList().down('button[action=filter]');
 
@@ -322,29 +342,43 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  onRoleTreeActivate: function (panel) {
-    var me = this;
+  onRoleTreeActivate: function(panel) {
+    var me = this,
+        settingPanel = me.getSettings();
 
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue()
-    });
+    if (!settingPanel) {
+      settingPanel = me.getExternalSettings();
+    }
+
+    if (settingPanel) {
+      panel.loadRecord({
+        roles: settingPanel.down('#roles').getValue()
+      });
+    }
   },
 
   /**
    * @private
    */
-  onPrivilegeTraceActivate: function (panel) {
-    var me = this;
+  onPrivilegeTraceActivate: function(panel) {
+    var me = this,
+        settingPanel = me.getSettings();
 
-    panel.loadRecord({
-      roles: me.getSettings().down('#roles').getValue()
-    });
+    if (!settingPanel) {
+      settingPanel = me.getExternalSettings();
+    }
+
+    if (settingPanel) {
+      panel.loadRecord({
+        roles: settingPanel.down('#roles').getValue()
+      });
+    }
   },
 
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-user-add');
 
@@ -359,16 +393,18 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @protected
-   * Enable 'Delete' when user has 'delete' permission and user is not the current logged in used or the anonymous user.
+   * Enable 'Delete' when user has 'delete' permission and user is not read only and user is not the current signed on
+   * used or the anonymous user.
    */
-  bindDeleteButton: function (button) {
+  bindDeleteButton: function(button) {
     var me = this;
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list, function (model) {
-              var userId = model.getId();
-              return (userId !== NX.State.getUser().id) && (userId !== NX.State.getValue('anonymousUsername'));
+            NX.Conditions.gridHasSelection(me.list, function(model) {
+              return !model.get('external')
+                  && (model.getId() !== NX.State.getUser().id)
+                  && (model.getId() !== NX.State.getValue('anonymousUsername'));
             })
         ),
         {
@@ -385,11 +421,11 @@ Ext.define('NX.coreui.controller.Users', {
    * Deletes a user.
    * @param model user to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_User.delete_(model.getId(), model.get('realm'), function (response) {
+    NX.direct.coreui_User.delete_(model.getId(), model.get('realm'), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
@@ -404,7 +440,7 @@ Ext.define('NX.coreui.controller.Users', {
    * Enable 'More' when user is not the anonymous user and it has 'security:userschangepw:create' or
    * 'security:usersreset:delete' permission.
    */
-  bindMoreButton: function (button) {
+  bindMoreButton: function(button) {
     var me = this,
         resetMenuItem = button.down('menuitem[action=resetpassword]'),
         setMenuItem = button.down('menuitem[action=setpassword]');
@@ -415,9 +451,8 @@ Ext.define('NX.coreui.controller.Users', {
                 NX.Conditions.isPermitted('security:userschangepw', 'create'),
                 NX.Conditions.isPermitted('security:usersreset', 'delete')
             ),
-            NX.Conditions.gridHasSelection(me.list, function (model) {
-              var userId = model.getId();
-              return userId !== NX.State.getValue('anonymousUsername');
+            NX.Conditions.gridHasSelection(me.list, function(model) {
+              return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),
         {
@@ -451,7 +486,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    * Enable 'Change Password' when user has 'security:userschangepw:create' permission.
    */
-  bindChangePasswordButton: function (button) {
+  bindChangePasswordButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('security:userschangepw', 'create')
@@ -467,11 +502,11 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  changePassword: function (button) {
+  changePassword: function(button) {
     var win = button.up('window'),
         password = button.up('form').down('#password').getValue();
 
-    NX.direct.coreui_User.changePassword(win.authToken, win.userId, password, function (response) {
+    NX.direct.coreui_User.changePassword(win.authToken, win.userId, password, function(response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
         NX.Messages.add({ text: 'Password changed', type: 'success' });

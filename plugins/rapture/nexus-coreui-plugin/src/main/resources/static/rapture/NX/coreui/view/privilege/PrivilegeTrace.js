@@ -141,12 +141,14 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
 
     if (me.active) {
       Ext.suspendLayouts();
-      if (me.model.privileges) {
-        Ext.Array.each(Ext.Array.from(me.model.privileges), function (privilegeId) {
-          me.pushPrivilege(privileges, privilegeId);
-        });
+      if (me.model) {
+        if (me.model.privileges) {
+          Ext.Array.each(Ext.Array.from(me.model.privileges), function(privilegeId) {
+            me.pushPrivilege(privileges, privilegeId);
+          });
+        }
+        me.extractPrivileges(privileges, [], me.model.roles);
       }
-      me.extractPrivileges(privileges, [], me.model.roles);
       me.privilegeTreeStore.getRootNode().removeAll();
       me.roleTreeStore.getRootNode().removeAll();
       privileges.each(function (entry) {

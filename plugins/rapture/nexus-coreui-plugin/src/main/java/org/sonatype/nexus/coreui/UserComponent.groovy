@@ -22,6 +22,10 @@ import org.apache.shiro.authz.annotation.RequiresUser
 import org.apache.shiro.subject.Subject
 import org.eclipse.sisu.inject.BeanLocator
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.configuration.validation.InvalidConfigurationException
+import org.sonatype.configuration.validation.ValidationMessage
+import org.sonatype.configuration.validation.ValidationResponse
+import org.sonatype.micromailer.Address
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.Password
@@ -115,7 +119,7 @@ extends DirectComponentSupport
     String currentUserId = securitySystem.getSubject().getPrincipal().toString()
     User user = userAccountManager.readAccount(currentUserId)
     return new UserAccountXO(
-        id: user.userId,
+        userId: user.userId,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.emailAddress
@@ -133,11 +137,11 @@ extends DirectComponentSupport
   @Validate(groups = [Create.class, Default.class])
   UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
     asUserXO(securitySystem.addUser(new DefaultUser(
-        userId: userXO.id,
+        userId: userXO.userId,
         source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
         lastName: userXO.lastName,
-        emailAddress: userXO.email,
+        emailAddress: validateEmail(userXO.email),
         status: userXO.status,
         roles: userXO.roles?.collect { id ->
           new RoleIdentifier(DEFAULT_SOURCE, id)
@@ -155,16 +159,45 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.id).with {
+    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.userId).with {
       firstName = userXO.firstName
       lastName = userXO.lastName
-      emailAddress = userXO.email
+      emailAddress = validateEmail(userXO.email)
       status = userXO.status
       roles = userXO.roles?.collect { id ->
         new RoleIdentifier(DEFAULT_SOURCE, id)
       }
       return it
     }))
+  }
+
+  /**
+   * Update user role mappings.
+   * @param userRoleMappingsXO to be updated
+   * @return updated user
+   */
+  @DirectMethod
+  @RequiresAuthentication
+  @RequiresPermissions('security:users:update')
+  @Validate(groups = [Update.class, Default.class])
+  UserXO updateRoleMappings(final @NotNull(message = '[UserRoleMappingsXO] may not be null') @Valid UserRoleMappingsXO userRoleMappingsXO) {
+    def mappedRoles = userRoleMappingsXO.roles
+    if (mappedRoles?.size()) {
+      User user = securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm)
+      user.roles.each { role ->
+        if (role.source == userRoleMappingsXO.realm) {
+          mappedRoles.remove(role.roleId)
+        }
+      }
+    }
+    securitySystem.setUsersRoles(
+        userRoleMappingsXO.userId,
+        userRoleMappingsXO.realm,
+        mappedRoles?.size() > 0
+        ? mappedRoles?.collect { roleId -> new RoleIdentifier(DEFAULT_SOURCE, roleId) } as Set
+        : null
+    )
+    return asUserXO(securitySystem.getUser(userRoleMappingsXO.userId, userRoleMappingsXO.realm))
   }
 
   /**
@@ -247,7 +280,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:delete')
   @Validate
   void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
-              final @NotEmpty(message = '[source] may not be empty') String source)
+               final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
     if (isAnonymousUser(id)) {
@@ -260,8 +293,8 @@ extends DirectComponentSupport
   }
 
   private static asUserXO(final User user) {
-    new UserXO(
-        id: user.userId,
+    UserXO userXO = new UserXO(
+        userId: user.userId,
         realm: user.source,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -270,8 +303,15 @@ extends DirectComponentSupport
         password: Password.fakePassword(),
         roles: user.roles.collect { role ->
           role.roleId
-        }
+        },
+        external: user.source != DEFAULT_SOURCE
     )
+    if (userXO.external) {
+      userXO.externalRoles = user.roles
+          .findResults { RoleIdentifier role -> return role.source == DEFAULT_SOURCE ? null : role }
+          .collect { role -> role.roleId }
+    }
+    return userXO
   }
 
   private boolean isAnonymousUser(final String userId) {
@@ -284,6 +324,24 @@ extends DirectComponentSupport
       return false
     }
     return subject.principal == userId
+  }
+
+  private static String validateEmail(final String email) {
+    if (email) {
+      try {
+        new Address(email)
+      }
+      catch (IllegalArgumentException e) {
+        def validations = new ValidationResponse()
+        def message = e.message
+        if (e.cause?.message) {
+          message += ': ' + e.cause.message
+        }
+        validations.addValidationError(new ValidationMessage('email', message))
+        throw new InvalidConfigurationException(validations)
+      }
+    }
+    return email
   }
 
 }

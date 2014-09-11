@@ -10,31 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+
+package org.sonatype.nexus.coreui
+
+import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.validation.Create
+import org.sonatype.security.usermanagement.UserStatus
+
+import javax.validation.constraints.NotNull
 
 /**
- * User store.
+ * User role mappings exchange object.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.store.User', {
-  extend: 'Ext.data.Store',
-  model: 'NX.coreui.model.User',
+@ToString(includePackage = false, includeNames = true)
+class UserRoleMappingsXO
+{
+  @NotEmpty
+  String userId
 
-  proxy: {
-    type: 'direct',
+  @NotEmpty
+  String realm
 
-    api: {
-      read: 'NX.direct.coreui_User.read'
-    },
-
-    reader: {
-      type: 'json',
-      root: 'data',
-      successProperty: 'success'
-    }
-  },
-
-  sortOnLoad: true,
-  sorters: { property: 'userId', direction: 'ASC' }
-});
+  Set<String> roles
+}

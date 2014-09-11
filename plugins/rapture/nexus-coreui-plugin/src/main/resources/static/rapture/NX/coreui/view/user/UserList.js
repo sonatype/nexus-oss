@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.user.UserList', {
         return 'user-default';
       }
     },
-    {header: 'User Id', dataIndex: 'id'},
+    {header: 'User Id', dataIndex: 'userId'},
     {header: 'Realm', dataIndex: 'realm'},
     {header: 'First name', dataIndex: 'firstName'},
     {header: 'Last name', dataIndex: 'lastName', width: 300},

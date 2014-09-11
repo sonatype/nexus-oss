@@ -28,20 +28,25 @@ Ext.define('NX.coreui.view.user.UserSettings', {
     submit: 'NX.direct.coreui_User.update'
   },
   settingsFormSuccessMessage: function (data) {
-    return 'User updated: ' + data['id'];
+    return 'User updated: ' + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users',
+  editableMarker: 'You do not have permission to update users or is an external user',
 
   initComponent: function () {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('security:users', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.and(
+        NX.Conditions.isPermitted('security:users', 'update'),
+        NX.Conditions.formHasRecord('nx-coreui-user-settings', function (model) {
+          return !model.get('external');
+        })
+    );
 
     me.items = [
       {
-        name: 'id',
-        itemId: 'id',
+        name: 'userId',
+        itemId: 'userId',
         readOnly: true,
         fieldLabel: 'ID',
         helpText: 'The ID assigned to this user, will be used as the username.',
