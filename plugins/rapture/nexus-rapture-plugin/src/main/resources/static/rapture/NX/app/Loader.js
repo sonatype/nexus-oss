@@ -53,6 +53,10 @@ Ext.define('NX.app.Loader', {
       Ext.Error.raise("Invalid config property: 'state' (expected object): " + config.state);
     }
 
+    //<if debug>
+    me.logDebug('ExtJS version: ' + Ext.getVersion('extjs'));
+    //</if>
+
     me.controllers = Ext.create('Ext.util.MixedCollection');
 
     // attach initial application state

@@ -27,3 +27,7 @@ May completely revisit this solution later.
 If the content has changed, then the result needs to be committed:
 
     git commit . -m "regenerated baseapp"
+
+## Locally install ExtJS distribution
+
+    mvn -Pinstall-ext -Dext.dist=ext-4.2.2-commercial.zip -Dext.version=4.2.2
