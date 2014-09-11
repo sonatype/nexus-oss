@@ -88,6 +88,12 @@
     <dependency>
       <groupId>org.sonatype.sisu.jacksbee</groupId>
       <artifactId>jacksbee-runtime</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jsr173_api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
