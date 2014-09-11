@@ -19,12 +19,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
+
 /**
- * Examines a string...
+ * <p>Parses path-like strings against a template pattern, a literal string with embedded variables.</p>
  *
- * TODO: Document the format.
+ * <p>e.g. {@code "/{binName}/{bucketName}"} would match {@code "/bin12/overages"}.</p>
  *
- * By default, variables are matched against the regexp {@link TokenPatternParser#DEFAULT_VARIABLE_REGEXP}.
+ * <p>By default, variables are matched against the regexp {@link PatternParser#DEFAULT_VARIABLE_REGEXP}, which
+ * excludes the path separator ({@code '/'}). To override this, specify the regexp explicitly:</p>
+ *
+ * <p>e.g. {@code "/{group:.+}/{artifact}/{version}/{name}-{version}.{ext}"}</p>
+ *
+ * <p>{@code "{letterCode:[A-Za-z]}"}</p>
+ *
+ * <p>The backslash ({@code '\'}) serves as an escape character, if (say) it is necessary to use curly braces in the
+ * regular expression.  If escape characters appear in regular expressions, these must be double-escaped.</p>
+ *
+ * <p><b>Caveat:</b> the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause parsing
+ * errors.</p>
  *
  * @since 3.0
  */
@@ -35,7 +49,7 @@ public class TokenMatcher
   private final Pattern pattern;
 
   public TokenMatcher(final String templatePattern) {
-    final List<Token> tokens = new TokenPatternParser(templatePattern).getTokens();
+    final List<Token> tokens = new PatternParser(templatePattern).getTokens();
     pattern = Pattern.compile(regexp(tokens));
 
     // Separate the variable tokens
@@ -47,6 +61,12 @@ public class TokenMatcher
     }
   }
 
+  /**
+   * Attempts to parse the provided path against the template pattern.  If the pattern matches, the resulting Map
+   * contains an entry for each variable in the pattern. The variable names are keys, with the matching portions of the
+   * path as values.  Returns {@code null} if the pattern does not match.
+   */
+  @Nullable
   public Map<String, String> matchTokens(String path) {
     final Matcher matcher = pattern.matcher(path);
     if (!matcher.matches()) {

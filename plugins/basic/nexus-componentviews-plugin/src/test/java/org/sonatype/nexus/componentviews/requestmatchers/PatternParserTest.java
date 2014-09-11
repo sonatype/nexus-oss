@@ -24,9 +24,9 @@ import static org.hamcrest.Matchers.is;
 /**
  * @since 3.0
  */
-public class TokenPatternParserTest
+public class PatternParserTest
 {
-  public static final String DEFAULT = TokenPatternParser.DEFAULT_VARIABLE_REGEXP;
+  public static final String DEFAULT = PatternParser.DEFAULT_VARIABLE_REGEXP;
 
   @Test
   public void parseSimplePatterns() {
@@ -56,13 +56,13 @@ public class TokenPatternParserTest
   }
 
   private void checkTokenDetection(final String pattern, Token... expectedTokens) {
-    final TokenPatternParser parser = parse(pattern);
+    final PatternParser parser = parse(pattern);
     final List<Token> tokens = parser.getTokens();
 
     assertThat(tokens, is(equalTo(asList(expectedTokens))));
   }
 
-  private TokenPatternParser parse(final String pattern) {return new TokenPatternParser(pattern);}
+  private PatternParser parse(final String pattern) {return new PatternParser(pattern);}
 
   private static Token var(String name, String regexp) {
     return new VariableToken(name, regexp);

@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 /**
  * @since 3.0
  */
-public class TokenPatternParser
+public class PatternParser
 {
   public static final String DEFAULT_VARIABLE_REGEXP = "[^/]+";
 
@@ -34,7 +34,7 @@ public class TokenPatternParser
 
   private static final List<Character> NONE = Collections.<Character>emptyList();
 
-  public TokenPatternParser(String tokenPattern) {
+  public PatternParser(String tokenPattern) {
     checkNotNull(tokenPattern);
 
     parseTemplate(new StringCharacterIterator(tokenPattern));

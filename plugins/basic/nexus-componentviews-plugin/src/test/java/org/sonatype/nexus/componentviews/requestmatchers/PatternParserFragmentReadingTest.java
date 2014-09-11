@@ -23,12 +23,12 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.componentviews.requestmatchers.TokenPatternParser.readFragment;
+import static org.sonatype.nexus.componentviews.requestmatchers.PatternParser.readFragment;
 
 /**
  * @since 3.0
  */
-public class TokenPatternParserFragmentReadingTest
+public class PatternParserFragmentReadingTest
 {
   public static final String WILD = ".+";
 
