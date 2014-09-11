@@ -28,6 +28,6 @@ public class LiteralToken
   }
 
   public String toString() {
-    return "lit(" + value + ")";
+    return String.format("lit(%s))", value);
   }
 }

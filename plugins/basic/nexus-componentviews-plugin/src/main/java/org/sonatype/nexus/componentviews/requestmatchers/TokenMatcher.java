@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkState;
+
 
 /**
  * <p>Parses path-like strings against a template pattern, a literal string with embedded variables.</p>
@@ -37,7 +39,8 @@ import javax.annotation.Nullable;
  * <p>The backslash ({@code '\'}) serves as an escape character, if (say) it is necessary to use curly braces in the
  * regular expression.  If escape characters appear in regular expressions, these must be double-escaped.</p>
  *
- * <p><b>Caveat:</b> the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause parsing
+ * <p><b>Caveat:</b> the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause
+ * parsing
  * errors.</p>
  *
  * @since 3.0
@@ -73,12 +76,9 @@ public class TokenMatcher
       return null;
     }
 
-    if (matcher.groupCount() != variables.size()) {
-      throw new IllegalStateException(
-          "Mismatch between the number of captured groups (" + matcher.groupCount() + " and the number of variables, " +
-              variables.size() + ".");
-    }
-
+    checkState(matcher.groupCount() == variables.size(),
+        "Mismatch between the number of captured groups (%s) and the number of variables, %s.", matcher.groupCount(),
+        variables.size());
 
     Map<String, String> values = new HashMap<>();
     for (int i = 0; i < matcher.groupCount(); i++) {

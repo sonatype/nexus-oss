@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Preconditions;
-
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 
@@ -76,8 +75,7 @@ public class PatternParser
     }
 
     // The iterator should now be pointing to the varname end delimiter.
-    Preconditions.checkArgument(iterator.current() == '}',
-        "Variable does not end with '}' at position " + iterator.getIndex());
+    checkArgument(iterator.current() == '}', "Variable does not end with '}' at position %s", iterator.getIndex());
     // Consume it.
     iterator.next();
   }
@@ -134,9 +132,7 @@ public class PatternParser
   }
 
   private static void checkAllowed(CharacterIterator iterator, List<Character> disallowed) {
-    if (disallowed.contains(iterator.current())) {
-      throw new IllegalArgumentException(
-          "Disallowed character " + iterator.current() + " at position " + iterator.getIndex());
-    }
+    checkArgument(!disallowed.contains(iterator.current()), "Disallowed character %s at position %s",
+        iterator.current(), iterator.getIndex());
   }
 }

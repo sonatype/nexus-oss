@@ -28,6 +28,9 @@ public class Router
 {
   private final List<Route> routes = new ArrayList<>();
 
+  /**
+   * Gets the handler for the given request, or {@code null} if no matching handler exists.
+   */
   @Nullable
   public Handler findHandler(ViewRequest request) {
 

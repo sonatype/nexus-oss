@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.componentviews.requestmatchers;
 
+import com.google.common.base.Objects;
+
 /**
  * A named variable that matches a regular expression.
  *
@@ -36,29 +38,26 @@ public class VariableToken
     return "(" + value + ")";
   }
 
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof VariableToken)) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
 
-    return name.equals(((VariableToken) o).name) && super.equals(o);
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof VariableToken)) {
+      return false;
+    }
+    final VariableToken other = (VariableToken) obj;
+    return Objects.equal(getName(), other.getName())
+        && super.equals(obj);
   }
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + name.hashCode();
-    return result;
+    return Objects.hashCode(name, value);
   }
 
   public String toString() {
-    return "var(" + name + "," + value + ")";
+    return String.format("var(%s,%s)", name, value);
   }
 }

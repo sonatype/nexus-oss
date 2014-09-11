@@ -67,8 +67,6 @@ public class TokenMatcherTest
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.size(), is(equalTo(5)));
 
-    // TODO: This works through sheer luck because 'group' is the first variable.
-
     assertThat(tokens.get("group"), is(equalTo("org/sonatype/nexus")));
     assertThat(tokens.get("module"), is(equalTo("components")));
     assertThat(tokens.get("version"), is(equalTo("1234")));
