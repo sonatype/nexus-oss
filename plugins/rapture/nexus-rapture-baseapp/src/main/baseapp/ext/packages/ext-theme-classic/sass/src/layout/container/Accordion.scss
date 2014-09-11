@@ -1,8 +1,0 @@
-.#{$prefix}accordion-hd {
-    // !important is needed to override dock layout's border:0 !important
-    border-width: $accordion-header-border-width !important;
-    @include single-box-shadow($accordion-header-background-color, 0, 0, 0, 0, true);
-}
-.#{$prefix}accordion-hd-sibling-expanded {
-    @include single-box-shadow($panel-header-inner-border-color, 0, 1px, 0, 0, true);
-}

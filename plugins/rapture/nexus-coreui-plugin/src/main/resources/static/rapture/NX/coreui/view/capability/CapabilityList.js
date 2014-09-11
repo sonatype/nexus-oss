@@ -37,9 +37,9 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
     { text: 'Notes', dataIndex: 'notes', flex: 1 }
   ],
 
-  emptyText: 'No capabilities defined',
-
   viewConfig: {
+    emptyText: 'No capabilities defined',
+    deferEmptyText: false,
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
         return 'nx-red-marker';

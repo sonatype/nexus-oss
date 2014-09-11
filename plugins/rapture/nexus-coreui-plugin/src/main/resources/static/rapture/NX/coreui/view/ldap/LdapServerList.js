@@ -37,7 +37,10 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
     { header: 'Url', dataIndex: 'url', flex: 1 }
   ],
 
-  emptyText: 'No LDAP servers defined',
+  viewConfig: {
+    emptyText: 'No LDAP servers defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },

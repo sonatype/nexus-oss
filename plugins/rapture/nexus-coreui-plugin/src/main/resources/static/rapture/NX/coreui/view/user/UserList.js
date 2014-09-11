@@ -40,7 +40,10 @@ Ext.define('NX.coreui.view.user.UserList', {
     {header: 'Status', dataIndex: 'status'}
   ],
 
-  emptyText: 'No users defined',
+  viewConfig: {
+    emptyText: 'No users defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },

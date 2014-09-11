@@ -42,7 +42,10 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     { header: 'Method', dataIndex: 'method', flex: 1 }
   ],
 
-  emptyText: 'No privileges defined',
+  viewConfig: {
+    emptyText: 'No privileges defined',
+    deferEmptyText: false
+  },
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No privilege matched criteria "$filter"' }

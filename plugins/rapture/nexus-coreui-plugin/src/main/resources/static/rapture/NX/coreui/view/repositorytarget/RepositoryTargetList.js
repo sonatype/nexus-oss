@@ -37,7 +37,10 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
     { header: 'Patterns', dataIndex: 'patterns', flex: 1 }
   ],
 
-  emptyText: 'No repository targets defined',
+  viewConfig: {
+    emptyText: 'No repository targets defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },

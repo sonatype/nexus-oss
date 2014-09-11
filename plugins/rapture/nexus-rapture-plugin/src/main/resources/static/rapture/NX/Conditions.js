@@ -21,6 +21,7 @@ Ext.define('NX.Conditions', {
   singleton: true,
   requires: [
     'NX.util.condition.Conjunction',
+    'NX.util.condition.Disjunction',
     'NX.util.condition.FormHasRecord',
     'NX.util.condition.GridHasSelection',
     'NX.util.condition.IsPermitted',

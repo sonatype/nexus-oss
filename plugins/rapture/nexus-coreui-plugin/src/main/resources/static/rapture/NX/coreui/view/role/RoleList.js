@@ -40,7 +40,10 @@ Ext.define('NX.coreui.view.role.RoleList', {
     {header: 'Description', dataIndex: 'description', flex: 1}
   ],
 
-  emptyText: 'No roles defined',
+  viewConfig: {
+    emptyText: 'No roles defined',
+    deferEmptyText: false
+  },
 
   plugins: [
     { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }

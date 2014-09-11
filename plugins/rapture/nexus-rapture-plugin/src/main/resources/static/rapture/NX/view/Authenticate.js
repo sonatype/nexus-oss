@@ -29,6 +29,7 @@ Ext.define('NX.view.Authenticate', {
   constrain: true,
   width: 320,
   defaultFocus: 'password',
+  resizable: false,
 
   /**
    * @cfg message Message to be shown

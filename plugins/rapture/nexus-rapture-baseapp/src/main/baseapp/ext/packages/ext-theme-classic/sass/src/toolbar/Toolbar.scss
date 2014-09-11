@@ -1,6 +1,0 @@
-// Classic theme uses a different "more" icon on the left
-@if $include-rtl {
-    .#{$prefix}rtl.#{$prefix}toolbar-more-icon {
-        background-image: theme-background-image('toolbar/more-left') !important;
-    }
-}

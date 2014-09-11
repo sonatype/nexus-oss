@@ -29,6 +29,7 @@ Ext.define('NX.view.Login', {
   constrain: true,
   width: 320,
   defaultFocus: 'username',
+  resizable: false,
 
   /**
    * @protected

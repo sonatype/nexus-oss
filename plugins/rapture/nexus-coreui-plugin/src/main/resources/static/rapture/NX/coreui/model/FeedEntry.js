@@ -21,7 +21,7 @@ Ext.define('NX.coreui.model.FeedEntry', {
   extend: 'Ext.data.Model',
   fields: [
     'title',
-    { name: 'published', type: Ext.data.Types.DATE, dateFormat: 'c' },
+    { name: 'published', type: 'date', dateFormat: 'c' },
     'content'
   ]
 });

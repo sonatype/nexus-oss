@@ -44,44 +44,106 @@
   <profiles>
     <profile>
       <id>regenerate</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.gmaven</groupId>
-            <artifactId>gmaven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <classpathIncludes>none</classpathIncludes>
-                  <source>file:${project.basedir}/src/main/script/regenerate.groovy</source>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
-    <profile>
-      <id>watch</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.sencha</groupId>
+          <artifactId>ext</artifactId>
+          <classifier>commercial</classifier>
+          <type>zip</type>
+          <version>4.2.2</version>
+        </dependency>
+      </dependencies>
+
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.gmaven</groupId>
-            <artifactId>gmaven-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
                 <phase>generate-resources</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>run</goal>
                 </goals>
                 <configuration>
-                  <classpathIncludes>none</classpathIncludes>
-                  <source>file:${project.basedir}/src/main/script/watch.groovy</source>
+                  <target>
+                    <mkdir dir="${project.build.directory}/ext"/>
+
+                    <!-- Extract ExtJS distribution -->
+                    <unzip src="${com.sencha:ext:zip:commercial}" dest="${project.build.directory}/ext">
+                      <cutdirsmapper dirs="1"/>
+                      <patternset>
+                        <exclude name="ext-*/docs/**"/>
+                        <exclude name="ext-*/welcome/**"/>
+                      </patternset>
+                    </unzip>
+
+                    <!-- Re-generate sencha cmd app -->
+                    <exec executable="sencha" dir="${project.build.directory}">
+                      <arg value="-sdk"/>
+                      <arg file="${project.build.directory}/ext"/>
+                      <arg line="generate app baseapp"/>
+                      <arg file="${project.build.directory}/baseapp"/>
+                    </exec>
+
+                    <!-- Strip out crude from sencha cmd app template -->
+                    <delete>
+                      <fileset dir="${project.build.directory}/baseapp">
+                        <include name="app/**"/>
+                      </fileset>
+                    </delete>
+
+                    <!-- Apply customizations to app -->
+                    <copy todir="${project.build.directory}/baseapp" overwrite="true" filtering="true">
+                      <fileset dir="${project.basedir}/src/main/baseapp">
+                        <include name="**"/>
+                      </fileset>
+                      <filterset>
+                        <filter token="project.build.directory" value="${project.build.directory}"/>
+                      </filterset>
+                    </copy>
+
+                    <!-- Generate 'debug' flavor -->
+                    <exec executable="sencha" dir="${project.build.directory}/baseapp">
+                      <arg line="app build testing"/>
+                    </exec>
+
+                    <!-- Generate 'prod' flavor -->
+                    <exec executable="sencha" dir="${project.build.directory}/baseapp">
+                    <arg line="app build production"/>
+                    </exec>
+
+                    <!-- Install generated baseapp resources -->
+                    <mkdir dir="${project.basedir}/src/main/resources/static/rapture"/>
+                    <delete>
+                      <fileset dir="${project.basedir}/src/main/resources/static/rapture">
+                        <include name="baseapp-*.js"/>
+                        <include name="resources/**"/>
+                      </fileset>
+                    </delete>
+
+                    <copy todir="${project.basedir}/src/main/resources/static/rapture">
+                      <fileset dir="${project.build.directory}/testing/baseapp">
+                        <include name="baseapp-*.js"/>
+                        <include name="resources/*.css"/>
+                      </fileset>
+                    </copy>
+
+                    <copy todir="${project.basedir}/src/main/resources/static/rapture">
+                      <fileset dir="${project.build.directory}/production/baseapp">
+                        <include name="baseapp-*.js"/>
+                        <include name="resources/*.css"/>
+                      </fileset>
+                    </copy>
+
+                    <!-- Install 'prod' images, which are identical to 'debug' images -->
+                    <copy todir="${project.basedir}/src/main/resources/static/rapture">
+                      <fileset dir="${project.build.directory}/production/baseapp">
+                        <include name="resources/images/**"/>
+                      </fileset>
+                    </copy>
+                  </target>
                 </configuration>
               </execution>
             </executions>

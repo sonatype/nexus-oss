@@ -28,8 +28,7 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
 
   viewConfig: {
     emptyText: 'No entries',
-    deferEmptyText: false,
-    stripeRows: true
+    deferEmptyText: false
   },
 
   columns: [
