@@ -13,6 +13,8 @@
 package org.sonatype.nexus.componentviews.requestmatchers;
 
 /**
+ * A named variable that matches a regular expression.
+ *
  * @since 3.0
  */
 public class VariableToken
@@ -20,8 +22,8 @@ public class VariableToken
 {
   private final String name;
 
-  public VariableToken(final String name, final String value) {
-    super(value);
+  public VariableToken(final String name, final String regexp) {
+    super(regexp);
     this.name = name;
   }
 
@@ -32,5 +34,31 @@ public class VariableToken
   @Override
   public String toRegexp() {
     return "(" + value + ")";
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof VariableToken)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    return name.equals(((VariableToken) o).name) && super.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + name.hashCode();
+    return result;
+  }
+
+  public String toString() {
+    return "var(" + name + "," + value + ")";
   }
 }

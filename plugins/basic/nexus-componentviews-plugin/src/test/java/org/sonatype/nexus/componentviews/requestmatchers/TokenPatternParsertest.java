@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -25,37 +26,49 @@ import static org.hamcrest.Matchers.is;
  */
 public class TokenPatternParserTest
 {
+  public static final String DEFAULT = TokenPatternParser.DEFAULT_VARIABLE_REGEXP;
+
   @Test
   public void parseSimplePatterns() {
-    checkTokenDetection("asdfasdf", "asdfasdf");
-    checkTokenDetection("/{a}", "/(.+)");
-    checkTokenDetection("/{a}/{b}", "/(.+)/(.+)");
-    checkTokenDetection("{chocolate}/{build}-{version}.{extension}", "(.+)/(.+)-(.+)\\.(.+)");
+    checkTokenDetection("asdfasdf", lit("asdfasdf"));
+    checkTokenDetection("/{a}", lit("/"), var("a", DEFAULT));
+    checkTokenDetection("/{a}/{b}", lit("/"), var("a", DEFAULT), lit("/"), var("b", DEFAULT));
+    checkTokenDetection("{chocolate}/{build}-{version}.{extension}", var("chocolate", DEFAULT), lit("/"),
+        var("build", DEFAULT), lit("-"), var("version", DEFAULT), lit("."), var("extension", DEFAULT));
   }
 
   @Test
-  public void parseRegexp(){
+  public void parseRegexp() {
+    // A simple regexp variable that matches everything
+    checkTokenDetection("{name:.*}", var("name", ".*"));
+
+    // A variable that matches only letters
+    checkTokenDetection("{letters:[A-Za-z]*}", var("letters", "[A-Za-z]*"));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void unfinishedVariableFails() {
+  public void parsingUnfinishedVariableFails() {
     parse("{");
   }
 
-  @Test(expected=IllegalArgumentException.class)
-  public void unstartedVariableFails(){
-    parse("/hi}");
+  public void parseEscapedVariableStartAsLiteral() {
+    checkTokenDetection("\\{hi}", lit("\\{hi}"));
   }
 
-  private void checkTokenDetection(final String pattern, final String regexpValue) {
+  private void checkTokenDetection(final String pattern, Token... expectedTokens) {
     final TokenPatternParser parser = parse(pattern);
     final List<Token> tokens = parser.getTokens();
-    StringBuilder regexp = new StringBuilder();
-    for (Token token : tokens) {
-      regexp.append(token.toRegexp());
-    }
-    assertThat(regexp.toString(), is(equalTo(regexpValue)));
+
+    assertThat(tokens, is(equalTo(asList(expectedTokens))));
   }
 
   private TokenPatternParser parse(final String pattern) {return new TokenPatternParser(pattern);}
+
+  private static Token var(String name, String regexp) {
+    return new VariableToken(name, regexp);
+  }
+
+  private static Token lit(String value) {
+    return new LiteralToken(value);
+  }
 }

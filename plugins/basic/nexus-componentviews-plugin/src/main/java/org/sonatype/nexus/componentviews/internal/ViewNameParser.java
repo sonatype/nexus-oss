@@ -44,7 +44,6 @@ public class ViewNameParser
     remainingPath = matcher.group(2);
   }
 
-
   public String getViewName() {
     return viewName;
   }

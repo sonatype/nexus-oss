@@ -43,7 +43,7 @@ public class TokenMatcherTest
   }
 
   @Test
-  public void parsingMaven() {
+  public void mavenLikeTemplate() {
     final String pattern = "/{group}/{module}/{version}/{name}-{version}.{ext}";
     final TokenMatcher tokenMatcher = new TokenMatcher(pattern);
     final Map<String, String> tokens = tokenMatcher.matchTokens("/foo/bar/1234/bar-1234.zip");
@@ -59,8 +59,8 @@ public class TokenMatcherTest
   }
 
   @Test
-  public void testSlashesInMavenGroup(){
-    final String pattern = "/{group}/{module}/{version}/{name}-{version}.{ext}";
+  public void mavenGroupsHaveMultiplePathSegments() {
+    final String pattern = "/{group:.+}/{module}/{version}/{name}-{version}.{ext}";
     final TokenMatcher tokenMatcher = new TokenMatcher(pattern);
     final Map<String, String> tokens = tokenMatcher.matchTokens("/org/sonatype/nexus/components/1234/bar-1234.zip");
 
@@ -74,5 +74,18 @@ public class TokenMatcherTest
     assertThat(tokens.get("version"), is(equalTo("1234")));
     assertThat(tokens.get("name"), is(equalTo("bar")));
     assertThat(tokens.get("ext"), is(equalTo("zip")));
+  }
+
+  @Test
+  public void slashesInTheSecondGroup() {
+    final String pattern = "/{singleSegment}/{manySegments:.+}";
+    final TokenMatcher tokenMatcher = new TokenMatcher(pattern);
+    final Map<String, String> tokens = tokenMatcher.matchTokens("/1/2/3/4/5");
+
+    assertThat(tokens, is(notNullValue()));
+    assertThat(tokens.size(), is(equalTo(2)));
+
+    assertThat(tokens.get("singleSegment"), is(equalTo("1")));
+    assertThat(tokens.get("manySegments"), is(equalTo("2/3/4/5")));
   }
 }

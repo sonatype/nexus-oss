@@ -15,22 +15,27 @@ package org.sonatype.nexus.componentviews.requestmatchers;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 
 /**
  * @since 3.0
  */
 public class TokenPatternParser
 {
+  public static final String DEFAULT_VARIABLE_REGEXP = "[^/]+";
+
   private List<Token> tokens = new ArrayList<>();
 
-  private StringBuilder currentToken;
+  private static final List<Character> NONE = Collections.<Character>emptyList();
 
   public TokenPatternParser(String tokenPattern) {
     checkNotNull(tokenPattern);
-    resetToken();
 
     parseTemplate(new StringCharacterIterator(tokenPattern));
   }
@@ -52,64 +57,86 @@ public class TokenPatternParser
         default:
           parseLiteral(iterator);
       }
-      iterator.next();
     }
   }
 
   private void parseVariable(CharacterIterator iterator) {
-    while (true) {
-      final char cha = iterator.current();
+    final String varName = readFragment(iterator, asList(':', '}'), asList('\\'), asList(' ', '}'));
+    // Consume the final '}' character
 
-      switch (cha) {
-        case '}': // We're done!
-          defineVariable();
-          return;
-        case CharacterIterator.DONE:
-          throw new IllegalArgumentException("Unfinished variable.");
-        default:
-          pushChar(cha);
-      }
+    // The iterator is currently pointing to the end character.
+    if (iterator.current() == ':') {
+      // Skip the ':' character
       iterator.next();
+      final String regexp = readFragment(iterator, asList('}'), asList('\\'), NONE);
+      tokens.add(new VariableToken(varName, regexp));
     }
+    else {
+      tokens.add(new VariableToken(varName, DEFAULT_VARIABLE_REGEXP));
+    }
+
+    // The iterator should now be pointing to the varname end delimiter.
+    Preconditions.checkArgument(iterator.current() == '}',
+        "Variable does not end with '}' at position " + iterator.getIndex());
+    // Consume it.
+    iterator.next();
   }
 
   private void parseLiteral(CharacterIterator iterator) {
+    final String literal = readFragment(iterator, asList('{'), asList('\\'), NONE);
+    tokens.add(new LiteralToken(literal));
+  }
+
+  /**
+   * Reads from the character iterator until either a stop character is reached or the iterator is {@link
+   * CharacterIterator#DONE done}. The stop character is not consumed. Escape characters indicate that the
+   * following character should not be considered as a stop character.
+   *
+   * @throws IllegalArgumentException if the fragment isn't at least one character
+   */
+  static String readFragment(CharacterIterator iterator, List<Character> stopChars,
+                             List<Character> escapeChars, List<Character> disallowed)
+  {
+    StringBuilder b = new StringBuilder();
+    boolean escaping = false;
     while (true) {
       final char cha = iterator.current();
 
-      switch (cha) {
-        case '{': // We've hit a variable, back up and return
-          iterator.previous();
-          defineLiteral();
-          return;
-        case '}': // Variable being n
-          throw new IllegalArgumentException("Stray } character.");
-        case CharacterIterator.DONE:
-          defineLiteral();
-          return;
-        default:
-          pushChar(cha);
+      if (cha == CharacterIterator.DONE) {
+        if (escaping) {
+          throw new IllegalArgumentException(
+              "Unexpected end after escape character '" + cha + "' at position " + iterator.getIndex());
+        }
+        if (b.length() < 1) {
+          throw new IllegalArgumentException("Zero-length fragment at position " + iterator.getIndex());
+        }
+        return b.toString();
       }
+
+      if (escaping) {
+        checkAllowed(iterator, disallowed);
+        b.append(cha);
+        escaping = false;
+      }
+      else if (escapeChars.contains(cha)) {
+        escaping = true;
+      }
+      else if (stopChars.contains(cha)) {
+        return b.toString();
+      }
+      else {
+        checkAllowed(iterator, disallowed);
+        b.append(cha);
+      }
+
       iterator.next();
     }
   }
 
-  private void defineVariable() {
-    tokens.add(new VariableToken(currentToken.toString(), ".*"));
-    resetToken();
+  private static void checkAllowed(CharacterIterator iterator, List<Character> disallowed) {
+    if (disallowed.contains(iterator.current())) {
+      throw new IllegalArgumentException(
+          "Disallowed character " + iterator.current() + " at position " + iterator.getIndex());
+    }
   }
-
-  private void defineLiteral() {
-    tokens.add(new LiteralToken(currentToken.toString()));
-    resetToken();
-  }
-
-  private void pushChar(char character) {
-    currentToken.append(character);
-  }
-
-  private void resetToken() {
-    currentToken = new StringBuilder();
-  }
-
 }

@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
  *
  * TODO: Document the format.
  *
+ * By default, variables are matched against the regexp {@link TokenPatternParser#DEFAULT_VARIABLE_REGEXP}.
+ *
  * @since 3.0
  */
 public class TokenMatcher

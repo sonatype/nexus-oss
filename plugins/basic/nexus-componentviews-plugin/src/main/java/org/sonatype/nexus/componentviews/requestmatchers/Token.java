@@ -54,4 +54,22 @@ public abstract class Token
       charIterator.next();
     }
   }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Token)) {
+      return false;
+    }
+
+    Token token = (Token) o;
+    return value.equals(token.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return value.hashCode();
+  }
 }

@@ -26,4 +26,8 @@ public class LiteralToken
   public String toRegexp() {
     return escapeRegexpChars(value);
   }
+
+  public String toString() {
+    return "lit(" + value + ")";
+  }
 }
