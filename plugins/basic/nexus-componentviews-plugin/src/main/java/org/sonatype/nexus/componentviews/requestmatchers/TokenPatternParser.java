@@ -95,7 +95,7 @@ public class TokenPatternParser
   }
 
   private void defineVariable() {
-    tokens.add(new VariableToken(currentToken.toString()));
+    tokens.add(new VariableToken(currentToken.toString(), ".*"));
     resetToken();
   }
 

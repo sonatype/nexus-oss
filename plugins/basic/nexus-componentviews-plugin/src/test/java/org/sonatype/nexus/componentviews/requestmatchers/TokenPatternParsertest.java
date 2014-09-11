@@ -35,7 +35,6 @@ public class TokenPatternParserTest
 
   @Test
   public void parseRegexp(){
-    checkTokenDetection
   }
 
   @Test(expected = IllegalArgumentException.class)

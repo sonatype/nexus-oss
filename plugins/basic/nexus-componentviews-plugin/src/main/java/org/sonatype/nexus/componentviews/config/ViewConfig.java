@@ -27,15 +27,15 @@ public class ViewConfig
 {
   private final String viewName;
 
-  private final String recipeName;
+  private final String factoryName;
 
   private final Map<String, Object> configuration;
 
-  public ViewConfig(final String viewName, final String recipeName,
+  public ViewConfig(final String viewName, final String factoryName,
                     final Map<String, Object> configuration)
   {
     this.viewName = checkNotNull(viewName);
-    this.recipeName = checkNotNull(recipeName);
+    this.factoryName = checkNotNull(factoryName);
     this.configuration = Collections.unmodifiableMap(new HashMap<>(checkNotNull(configuration)));
   }
 
@@ -43,11 +43,19 @@ public class ViewConfig
     return viewName;
   }
 
-  public String getRecipeName() {
-    return recipeName;
+  public String getFactoryName() {
+    return factoryName;
   }
 
   public Map<String, Object> getConfiguration() {
     return configuration;
+  }
+
+  @Override
+  public String toString() {
+    return "ViewConfig{" +
+        "viewName='" + viewName + '\'' +
+        ", factoryName='" + factoryName + '\'' +
+        '}';
   }
 }

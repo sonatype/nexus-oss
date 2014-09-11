@@ -31,17 +31,17 @@ import static org.mockito.Mockito.mock;
 public class ViewConfigApiDemo
 {
   /**
-   * Render all recipes in the config store, such as might be done as Nexus starts.
+   * Turn all the view configs in the config store into views, as happens when Nexus starts.
    */
   @Test
   public void instantiateAndRegisterAllViews() throws IOException {
     ViewConfigStore usvcStore = mock(ViewConfigStore.class);
-    ViewFactorySource recipeBook = mock(ViewFactorySource.class);
+    ViewFactorySource factorySource = mock(ViewFactorySource.class);
     ViewRegistry viewRegistry = mock(ViewRegistry.class);
 
     for (ViewConfig config : usvcStore.getAll().values()) {
-      final ViewFactory recipe = recipeBook.getRecipe(config.getRecipeName());
-      final View view = recipe.createView(config);
+      final ViewFactory factory = factorySource.getFactory(config.getFactoryName());
+      final View view = factory.createView(config);
       viewRegistry.registerView(view);
     }
   }
@@ -50,14 +50,14 @@ public class ViewConfigApiDemo
    * Reloading a view in response to a configuration change.
    */
   public void reloadView() {
-    final ViewFactorySource recipeBook = mock(ViewFactorySource.class);
+    final ViewFactorySource factorySource = mock(ViewFactorySource.class);
     final ViewRegistry viewRegistry = mock(ViewRegistry.class);
 
     // A changed (and persisted) configuration created by an admin
     final ViewConfig config = mock(ViewConfig.class);
 
-    final ViewFactory recipe = recipeBook.getRecipe(config.getRecipeName());
-    final View newView = recipe.createView(config);
+    final ViewFactory factory = factorySource.getFactory(config.getFactoryName());
+    final View newView = factory.createView(config);
 
     // If there's an existing view, we need to wait until it's safely unregistered.
     final View existingView = viewRegistry.findViewByName(config.getViewName());

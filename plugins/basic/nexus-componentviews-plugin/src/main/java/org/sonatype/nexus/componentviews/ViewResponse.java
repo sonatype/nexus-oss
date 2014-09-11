@@ -23,5 +23,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface ViewResponse
 {
+  /**
+   * Render the response down into the {@link HttpServletResponse}.
+   */
   void send(HttpServletResponse response) throws IOException;
 }

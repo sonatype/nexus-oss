@@ -17,10 +17,10 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.sonatype.nexus.capability.CapabilityDescriptor;
+import org.sonatype.nexus.capability.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 import com.google.common.collect.Maps;
 

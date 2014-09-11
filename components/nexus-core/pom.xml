@@ -395,6 +395,13 @@
       <artifactId>hibernate-validator</artifactId>
     </dependency>
 
+    <!-- Animal Sniffer -->
+    <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>animal-sniffer-annotations</artifactId>
+      <optional>true</optional>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

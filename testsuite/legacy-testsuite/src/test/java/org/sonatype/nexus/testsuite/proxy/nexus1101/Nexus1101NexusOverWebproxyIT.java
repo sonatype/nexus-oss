@@ -32,11 +32,13 @@ public class Nexus1101NexusOverWebproxyIT
       throws Exception
   {
     File pomFile = this.getLocalFile("release-proxy-repo-1", "nexus1101", "artifact", "1.0", "pom");
-    File pomArtifact = this.downloadArtifact("nexus1101", "artifact", "1.0", "pom", null, "target/downloads");
+    File pomArtifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1101", "artifact", "1.0", "pom", null, "target/downloads");
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(pomArtifact, pomFile));
 
     File jarFile = this.getLocalFile("release-proxy-repo-1", "nexus1101", "artifact", "1.0", "jar");
-    File jarArtifact = this.downloadArtifact("nexus1101", "artifact", "1.0", "jar", null, "target/downloads");
+    File jarArtifact = this.downloadArtifact(getNexusTestRepoUrl(),
+        "nexus1101", "artifact", "1.0", "jar", null, "target/downloads");
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(jarArtifact, jarFile));
 
     String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1101/artifact/1.0/artifact-1.0.jar";

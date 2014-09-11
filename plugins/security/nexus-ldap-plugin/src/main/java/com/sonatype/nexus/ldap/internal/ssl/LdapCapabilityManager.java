@@ -21,13 +21,13 @@ import javax.inject.Singleton;
 import com.sonatype.nexus.ssl.plugin.spi.CapabilityManager;
 import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
+import org.sonatype.nexus.capability.CapabilityReference;
+import org.sonatype.nexus.capability.CapabilityRegistry;
+import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
+import static org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder.capabilities;
 
 /**
  * {@link LdapCapability} manager.

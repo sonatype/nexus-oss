@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.AnonymousSettings', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.Permissions'
+  ],
 
   views: [
     'security.AnonymousSettings'

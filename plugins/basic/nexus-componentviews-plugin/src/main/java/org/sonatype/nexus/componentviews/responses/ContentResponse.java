@@ -30,12 +30,12 @@ import com.google.common.io.ByteStreams;
 public abstract class ContentResponse
     implements ViewResponse
 {
-  private final String mimeType;
+  protected final String contentType;
 
   private final Date modifiedDate;
 
-  protected ContentResponse(final String mimeType, final Date modifiedDate) {
-    this.mimeType = mimeType;
+  protected ContentResponse(final String contentType, final Date modifiedDate) {
+    this.contentType = contentType;
     this.modifiedDate = modifiedDate;
   }
 
@@ -44,11 +44,11 @@ public abstract class ContentResponse
   @Override
   public void send(final HttpServletResponse response) throws IOException {
     response.setStatus(200);
-    // TODO: Set last modified headers
+
     if (modifiedDate != null) {
       response.setDateHeader("Last-Modified", modifiedDate.getTime());
     }
-    response.setContentType(mimeType);
+    response.setContentType(contentType);
 
     ByteStreams.copy(getInputStream(), response.getOutputStream());
   }

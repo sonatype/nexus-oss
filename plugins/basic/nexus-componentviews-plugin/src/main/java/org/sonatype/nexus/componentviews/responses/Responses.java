@@ -26,8 +26,10 @@ import org.sonatype.nexus.componentviews.ViewResponse;
  */
 public class Responses
 {
-  public static ViewResponse streamResponse(final InputStream inputStream, final String mimeType, final Date modifiedDate) {
-    return new ContentStreamResponse(inputStream, mimeType, modifiedDate);
+  public static ViewResponse streamResponse(final InputStream inputStream, final String contentType,
+                                            final Date modifiedDate)
+  {
+    return new ContentStreamResponse(inputStream, contentType, modifiedDate);
   }
 
   public static RedirectResponse movedPermanently(String location) {
@@ -54,10 +56,12 @@ public class Responses
    * A simple acknowledgement.
    */
   public static final StatusResponse noContent() {
-    return new StatusResponse(HttpServletResponse.SC_NO_CONTENT, null);
+    return new StatusResponse(HttpServletResponse.SC_NO_CONTENT);
   }
 
-  public static final StatusResponse deleted() {return noContent();}
+  public static final StatusResponse deleted() {
+    return noContent();
+  }
 
   public static final StatusResponse methodNotAllowed() {
     return new StatusResponse(HttpServletResponse.SC_METHOD_NOT_ALLOWED);

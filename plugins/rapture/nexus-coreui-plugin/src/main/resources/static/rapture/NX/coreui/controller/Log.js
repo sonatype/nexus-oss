@@ -23,8 +23,12 @@ Ext.define('NX.coreui.controller.Log', {
     logAware: 'NX.LogAware'
   },
   requires: [
+    'Ext.util.TaskManager',
+    'Ext.Ajax',
     'NX.util.Url',
-    'NX.util.DownloadHelper'
+    'NX.util.DownloadHelper',
+    'NX.Permissions',
+    'NX.Conditions'
   ],
 
   views: [

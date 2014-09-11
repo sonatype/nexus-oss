@@ -47,10 +47,10 @@ public interface ViewRequest
   HttpMethod getMethod();
 
   /**
-   * The MIME type of the content, for PUT and POST requests.
+   * The content type of the content, for PUT and POST requests.
    */
   @Nullable
-  String getMimeType();
+  String getContentType();
 
   /**
    * An input stream for the request body.

@@ -21,6 +21,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.State',
+    'NX.Permissions',
     'NX.Windows'
   ],
 

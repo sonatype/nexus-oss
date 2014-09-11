@@ -38,7 +38,9 @@ public class ViewRegistry
   private final EventBus eventBus;
 
   @Inject
-  public ViewRegistry(final EventBus eventBus) {this.eventBus = eventBus;}
+  public ViewRegistry(final EventBus eventBus) {
+    this.eventBus = eventBus;
+  }
 
   public void registerView(View view) {
     checkNotNull(view);
@@ -55,9 +57,7 @@ public class ViewRegistry
   }
 
   /**
-   * Unregistraters a view and fires a {@link ViewUnregisteredEvent}. The view immediately stops receiving new
-   * requests.
-   * Once any outstanding requests are processed, a
+   * Unregistraters a view and fires a {@link ViewUnregisteredEvent}.
    */
   public void unregisterView(View view) {
     checkNotNull(view);
@@ -65,10 +65,6 @@ public class ViewRegistry
     final View remove = activeViews.remove(view.getName());
 
     eventBus.post(new ViewUnregisteredEvent(this, view));
-
-    // TODO: Determine when the outgoing view has actually done handling all its events. unregister should return
-    // immediately, with this event being fired a bit later, probably by another thread.
-    eventBus.post(new ViewRequestsCompletedEvent(this, view));
   }
 
   @Nullable

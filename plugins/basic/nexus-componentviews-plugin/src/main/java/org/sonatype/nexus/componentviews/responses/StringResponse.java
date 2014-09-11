@@ -16,6 +16,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
+
+import com.google.common.base.Throwables;
+
 /**
  * A response whose body is defined by a String.
  *
@@ -26,14 +31,41 @@ public class StringResponse
 {
   private final String content;
 
-  public StringResponse(final String content, final String mimeType) {
-    super(mimeType, null);
+  private ContentType parsedContentType;
+
+  public StringResponse(final String content, final String contentType) {
+    super(contentType, null);
     this.content = content;
+    try {
+      if (contentType != null) {
+        parsedContentType = new ContentType(contentType);
+      }
+    }
+    catch (ParseException e) {
+      Throwables.propagate(e);
+    }
   }
 
   @Override
   protected InputStream getInputStream() {
-    return new ByteArrayInputStream(content.getBytes(Charset.forName("UTF-8")));
+    String charset = determineCharset();
+    return createStream(charset);
   }
 
+  protected ByteArrayInputStream createStream(
+      final String charset)
+  {
+    return new ByteArrayInputStream(content.getBytes(Charset.forName(charset)));
+  }
+
+  private String determineCharset() {
+    if (parsedContentType != null) {
+      final String charset = parsedContentType.getParameter("charset");
+      if (charset != null) {
+        return charset;
+      }
+    }
+
+    return "UTF-8";
+  }
 }

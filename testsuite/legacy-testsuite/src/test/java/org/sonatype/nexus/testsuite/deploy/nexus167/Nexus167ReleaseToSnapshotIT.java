@@ -29,6 +29,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 /**
  * Deploy a release artifact to a snapshot repo. (should fail)
  */
@@ -71,8 +73,8 @@ public class Nexus167ReleaseToSnapshotIT
     try {
       // deploy it
       // this should fail
-      getDeployUtils().deployWithWagon("http", this.getNexusTestRepoUrl(), fileToDeploy, this
-          .getRelitiveArtifactPath(gav));
+      getDeployUtils().deployWithWagon("http", this.getNexusTestRepoUrl(), fileToDeploy,
+          getRelitiveArtifactPath(gav));
       Assert.fail("Should not be able to deploy a releases artifact into a snapshot repo");
     }
     catch (TransferFailedException e) {
@@ -122,7 +124,7 @@ public class Nexus167ReleaseToSnapshotIT
     boolean fileWasUploaded = true;
     try {
       // download it
-      downloadArtifact(gav, "./target/downloaded-jars");
+      downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
     }
     catch (FileNotFoundException e) {
       fileWasUploaded = false;
@@ -176,7 +178,7 @@ public class Nexus167ReleaseToSnapshotIT
     boolean fileWasUploaded = true;
     try {
       // download it
-      downloadArtifact(gav, "./target/downloaded-jars");
+      downloadArtifact(getNexusTestRepoUrl(), gav, "./target/downloaded-jars");
     }
     catch (FileNotFoundException e) {
       fileWasUploaded = false;

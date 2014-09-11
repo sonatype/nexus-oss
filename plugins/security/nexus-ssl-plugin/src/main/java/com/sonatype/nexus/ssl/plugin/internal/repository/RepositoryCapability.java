@@ -20,11 +20,11 @@ import javax.inject.Named;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.Tag;
+import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.Tag;
-import org.sonatype.nexus.plugins.capabilities.Taggable;
-import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
+import org.sonatype.nexus.capability.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.sisu.goodies.i18n.I18N;
@@ -32,8 +32,8 @@ import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sonatype.nexus.ssl.model.RepositoryTrustStoreKey.repositoryTrustStoreKey;
-import static org.sonatype.nexus.plugins.capabilities.Tag.repositoryTag;
-import static org.sonatype.nexus.plugins.capabilities.Tag.tags;
+import static org.sonatype.nexus.capability.Tag.repositoryTag;
+import static org.sonatype.nexus.capability.Tag.tags;
 
 /**
  * Repository capability (enables Nexus SSL Trust Store / repository).

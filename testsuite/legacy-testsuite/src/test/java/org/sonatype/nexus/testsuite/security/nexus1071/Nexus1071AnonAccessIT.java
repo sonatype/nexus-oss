@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.security.nexus1071;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -59,30 +58,6 @@ public class Nexus1071AnonAccessIT
             + gav.getExtension());
 
     Assert.assertTrue(FileTestingUtils.compareFileSHA1s(originalFile, artifact));
-
-  }
-
-  @Test
-  @Category(SECURITY.class)
-  public void downloadArtifactFromInternalRepo()
-      throws Exception
-  {
-    if (true) {
-      printKnownErrorButDoNotFail(getClass(), "downloadArtifactFromInternalRepo");
-      return;
-    }
-
-    Gav gav =
-        new Gav(this.getTestId(), "release-jar-internal", "1", null, "jar", 0, new Date().getTime(),
-            "Release Jar Internal", false, null, false, null);
-    try {
-      downloadArtifactFromRepository("Internal", gav, "./target/downloaded-jars");
-
-      Assert.fail("Should throw 401 error");
-    }
-    catch (IOException e) {
-      Assert.assertTrue(e.getMessage().contains("401"));
-    }
 
   }
 }

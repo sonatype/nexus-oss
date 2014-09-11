@@ -56,15 +56,15 @@ public class ComponentViewServlet
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
-    final PathDecomposer pathDecomposer = new PathDecomposer(req.getPathInfo());
+    final ViewNameParser viewNameParser = new ViewNameParser(req.getPathInfo());
 
-    final View view = viewRegistry.getView(pathDecomposer.getViewName());
+    final View view = viewRegistry.getView(viewNameParser.getViewName());
     if (view == null) {
       throw new ErrorStatusException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "View not found.");
     }
 
-    final ViewRequest request = new WrappingViewRequest(req, pathDecomposer.getViewName(), view.getConfig(),
-        pathDecomposer.getRemainingPath());
+    final ViewRequest request = new WrappingViewRequest(req, viewNameParser.getViewName(), view.getConfig(),
+        viewNameParser.getRemainingPath());
 
     try {
       view.dispatch(request).send(resp);

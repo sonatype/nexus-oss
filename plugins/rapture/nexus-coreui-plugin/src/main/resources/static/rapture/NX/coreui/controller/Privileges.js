@@ -19,6 +19,11 @@
  */
 Ext.define('NX.coreui.controller.Privileges', {
   extend: 'NX.controller.MasterDetail',
+  requires: [
+    'NX.Conditions',
+    'NX.Messages',
+    'NX.Permissions'
+  ],
 
   list: 'nx-coreui-privilege-list',
 

@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.sonatype.nexus.test.utils.GavUtil.getRelitiveArtifactPath;
+
 public class Nexus1560LegacyAllowGroupRulesIT
     extends AbstractLegacyRulesIT
 {

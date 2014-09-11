@@ -47,8 +47,6 @@ public class PathListViewFactory
     final Router router = new Router();
     router.addRoute(new AllRequestMatcher(), new ExamplePathListHandler());
 
-    final View view = new View(config, router, new NotFoundHandler());
-
-    return view;
+    return new View(config, router, notFound);
   }
 }

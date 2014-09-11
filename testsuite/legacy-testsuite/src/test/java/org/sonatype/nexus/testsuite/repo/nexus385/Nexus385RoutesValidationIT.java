@@ -44,7 +44,7 @@ public class Nexus385RoutesValidationIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new RoutesMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new RoutesMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

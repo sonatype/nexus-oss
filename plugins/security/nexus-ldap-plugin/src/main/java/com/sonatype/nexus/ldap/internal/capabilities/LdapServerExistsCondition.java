@@ -14,9 +14,9 @@ package com.sonatype.nexus.ldap.internal.capabilities;
 
 import com.sonatype.security.ldap.persist.LdapConfigurationManager;
 
-import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.Evaluable;
-import org.sonatype.nexus.plugins.capabilities.condition.EvaluableCondition;
+import org.sonatype.nexus.capability.Condition;
+import org.sonatype.nexus.capability.Evaluable;
+import org.sonatype.nexus.capability.condition.EvaluableCondition;
 import org.sonatype.security.ldap.realms.persist.LdapClearCacheEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.i18n.I18N;

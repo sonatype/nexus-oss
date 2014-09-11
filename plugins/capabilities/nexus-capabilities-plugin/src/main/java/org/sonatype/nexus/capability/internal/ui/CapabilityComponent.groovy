@@ -20,17 +20,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.sonatype.nexus.capability.Capability
+import org.sonatype.nexus.capability.CapabilityDescriptor
+import org.sonatype.nexus.capability.CapabilityDescriptorRegistry
+import org.sonatype.nexus.capability.CapabilityReference
+import org.sonatype.nexus.capability.CapabilityRegistry
+import org.sonatype.nexus.capability.Tag
+import org.sonatype.nexus.capability.Taggable
+import org.sonatype.nexus.capability.support.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.plugins.capabilities.Capability
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry
-import org.sonatype.nexus.plugins.capabilities.Tag
-import org.sonatype.nexus.plugins.capabilities.Taggable
-import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
@@ -42,8 +42,8 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.groups.Default
 
-import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType
+import static org.sonatype.nexus.capability.CapabilityIdentity.capabilityIdentity
+import static org.sonatype.nexus.capability.CapabilityType.capabilityType
 
 /**
  * Capabilities {@link DirectComponent}.

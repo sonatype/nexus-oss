@@ -39,7 +39,7 @@ public class NXCM1916CRUDP2RepositoryIT
       throws ComponentLookupException
   {
     super("nxcm1916");
-    messageUtil = new RepositoryMessageUtil(this, getJsonXStream(), MediaType.APPLICATION_JSON);
+    messageUtil = new RepositoryMessageUtil(getJsonXStream(), MediaType.APPLICATION_JSON);
   }
 
   @Test

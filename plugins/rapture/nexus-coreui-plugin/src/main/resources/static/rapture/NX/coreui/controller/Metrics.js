@@ -21,6 +21,8 @@
 Ext.define('NX.coreui.controller.Metrics', {
   extend: 'Ext.app.Controller',
   requires: [
+    'Ext.Ajax',
+    'NX.Messages',
     'NX.Permissions',
     'NX.util.Url',
     'NX.util.DownloadHelper'

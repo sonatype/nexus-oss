@@ -24,7 +24,8 @@ Ext.define('NX.controller.MasterDetail', {
     'NX.view.info.Panel',
     'NX.view.info.Entry',
     'NX.Conditions',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.Bookmarks'
   ],
   mixins: {
     logAware: 'NX.LogAware'

@@ -22,7 +22,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.config.ViewConfig;
-import org.sonatype.nexus.componentviews.config.ViewConfigIdentity;
+import org.sonatype.nexus.componentviews.config.ViewConfigId;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
@@ -36,7 +36,6 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
-import org.eclipse.sisu.EagerSingleton;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -76,7 +75,6 @@ public class OrientViewConfigStore
       // register schema
       entityType = entityAdapter.register(db);
     }
-    //eventBus.post(new ViewConfigStoreStartedEvent(this));
   }
 
   @Override
@@ -92,17 +90,17 @@ public class OrientViewConfigStore
     return databaseInstance.get().acquire();
   }
 
-  private ViewConfigIdentity convertId(final ORID rid) {
+  private ViewConfigId convertId(final ORID rid) {
     String encoded = recordIdObfuscator.encode(entityType, rid);
-    return new ViewConfigIdentity(encoded);
+    return new ViewConfigId(encoded);
   }
 
-  private ORID convertId(final ViewConfigIdentity id) {
+  private ORID convertId(final ViewConfigId id) {
     return recordIdObfuscator.decode(entityType, id.toString());
   }
 
   @Override
-  public ViewConfigIdentity add(final ViewConfig item) throws IOException {
+  public ViewConfigId add(final ViewConfig item) throws IOException {
     ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = entityAdapter.create(db, item);
@@ -114,7 +112,7 @@ public class OrientViewConfigStore
   }
 
   @Override
-  public void update(final ViewConfigIdentity id, final ViewConfig item) throws IOException {
+  public void update(final ViewConfigId id, final ViewConfig item) throws IOException {
     ORID rid = convertId(id);
 
     try (ODatabaseDocumentTx db = openDb()) {
@@ -131,7 +129,7 @@ public class OrientViewConfigStore
   }
 
   @Override
-  public void remove(final ViewConfigIdentity id) throws IOException {
+  public void remove(final ViewConfigId id) throws IOException {
     ORID rid = convertId(id);
 
     try (ODatabaseDocumentTx db = openDb()) {
@@ -149,9 +147,9 @@ public class OrientViewConfigStore
   }
 
   @Override
-  public Map<ViewConfigIdentity, ViewConfig> getAll() throws IOException {
+  public Map<ViewConfigId, ViewConfig> getAll() throws IOException {
 
-    Map<ViewConfigIdentity, ViewConfig> items = Maps.newHashMap();
+    Map<ViewConfigId, ViewConfig> items = Maps.newHashMap();
 
     try (ODatabaseDocumentTx db = openDb()) {
       for (ODocument doc : entityAdapter.browse(db)) {

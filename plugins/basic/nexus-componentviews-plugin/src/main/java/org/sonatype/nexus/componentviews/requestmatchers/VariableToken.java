@@ -18,16 +18,19 @@ package org.sonatype.nexus.componentviews.requestmatchers;
 public class VariableToken
     extends Token
 {
-  public VariableToken(final String value) {
+  private final String name;
+
+  public VariableToken(final String name, final String value) {
     super(value);
+    this.name = name;
   }
 
   public String getName() {
-    return value;
+    return name;
   }
 
   @Override
   public String toRegexp() {
-    return "(.+)";
+    return "(" + value + ")";
   }
 }

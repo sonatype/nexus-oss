@@ -20,7 +20,11 @@
 Ext.define('NX.coreui.controller.BrowseRepositories', {
   extend: 'Ext.app.Controller',
   requires: [
+    'NX.Conditions',
+    'NX.Dialogs',
+    'NX.Permissions',
     'NX.Bookmarks',
+    'NX.Messages',
     'NX.Windows'
   ],
   mixins: {

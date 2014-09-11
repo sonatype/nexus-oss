@@ -48,7 +48,7 @@ public class Nexus379VirtualRepoSameIdIT
 
   @Before
   public void setUp() {
-    this.messageUtil = new RepositoryMessageUtil(this, this.getXMLXStream(), MediaType.APPLICATION_XML);
+    this.messageUtil = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
   }
 
   @Test

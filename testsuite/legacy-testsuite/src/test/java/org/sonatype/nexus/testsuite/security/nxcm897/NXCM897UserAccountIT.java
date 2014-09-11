@@ -14,9 +14,9 @@ package org.sonatype.nexus.testsuite.security.nxcm897;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.UserAccount;
-import org.sonatype.nexus.test.utils.UserAccountMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.nexus.testsuite.security.UserAccountMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
 
 import org.junit.Assert;
@@ -32,7 +32,7 @@ public class NXCM897UserAccountIT
   protected UserAccountMessageUtil accountMsgUtil = new UserAccountMessageUtil();
 
   protected UserMessageUtil userMsgUtil =
-      new UserMessageUtil(this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML.APPLICATION_XML);
+      new UserMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML.APPLICATION_XML);
 
   @Test
   public void userAccountCRU()

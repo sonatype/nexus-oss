@@ -32,18 +32,18 @@ import org.sonatype.nexus.componentviews.config.ViewFactorySource;
 public class InMemoryViewFactorySource
     implements ViewFactorySource
 {
-  private final Set<ViewFactory> recipes;
+  private final Set<ViewFactory> factories;
 
   @Inject
-  public InMemoryViewFactorySource(final Set<ViewFactory> recipes) {
-    this.recipes = recipes;
+  public InMemoryViewFactorySource(final Set<ViewFactory> factories) {
+    this.factories = factories;
   }
 
   @Override
-  public ViewFactory getRecipe(final String recipeName) {
-    for (ViewFactory recipe : recipes) {
-      if (recipe.getFactoryName().equals(recipeName)) {
-        return recipe;
+  public ViewFactory getFactory(final String factoryName) {
+    for (ViewFactory factory : factories) {
+      if (factory.getFactoryName().equals(factoryName)) {
+        return factory;
       }
     }
     return null;

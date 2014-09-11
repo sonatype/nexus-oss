@@ -44,7 +44,7 @@ public class ViewConfigEntityAdapter
 
   public static final String P_VIEWNAME = "viewName";
 
-  public static final String P_RECIPENAME = "recipeName";
+  public static final String P_FACTORYNAME = "factoryName";
 
   public static final String P_CONFIGURATION = "configuration";
 
@@ -62,7 +62,7 @@ public class ViewConfigEntityAdapter
 
       type.createProperty(P_VIEWNAME, OType.STRING).setNotNull(true);
       type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
-      type.createProperty(P_RECIPENAME, OType.STRING).setNotNull(true);
+      type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
@@ -89,7 +89,7 @@ public class ViewConfigEntityAdapter
     checkNotNull(entity);
 
     document.field(P_VIEWNAME, entity.getViewName());
-    document.field(P_RECIPENAME, entity.getRecipeName());
+    document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 
     return document.save();
@@ -102,7 +102,7 @@ public class ViewConfigEntityAdapter
     checkNotNull(document);
 
     ViewConfig entity = new ViewConfig((String) document.field(P_VIEWNAME, OType.STRING),
-        (String) document.field(P_RECIPENAME, OType.STRING),
+        (String) document.field(P_FACTORYNAME, OType.STRING),
         (Map<String, Object>) document.field(P_CONFIGURATION, OType.EMBEDDEDMAP)
     );
 

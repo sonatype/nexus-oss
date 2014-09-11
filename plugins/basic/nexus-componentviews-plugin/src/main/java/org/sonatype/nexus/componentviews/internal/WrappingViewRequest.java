@@ -75,7 +75,7 @@ public class WrappingViewRequest
   }
 
   @Override
-  public String getMimeType() {
+  public String getContentType() {
     return request.getContentType();
   }
 
@@ -93,13 +93,5 @@ public class WrappingViewRequest
   @Override
   public Object getAttribute(final String name) {
     return requestContext.get(name);
-  }
-
-  private String firstPathSegment(String path) {
-    final String[] split = path.split("/");
-    if (split.length < 2) {
-      return null;
-    }
-    return split[1];
   }
 }

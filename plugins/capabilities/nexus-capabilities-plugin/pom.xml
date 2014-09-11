@@ -84,7 +84,6 @@
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>capabilities-configuration</id>
             <goals>
               <goal>java</goal>
               <goal>xsd</goal>
@@ -94,7 +93,7 @@
             <configuration>
               <version>2.0.0</version>
               <models>
-                <model>src/main/mdo/capabilities-configuration.xml</model>
+                <model>src/main/mdo/legacy-configuration.xml</model>
               </models>
               <packageWithVersion>false</packageWithVersion>
               <useJava5>true</useJava5>

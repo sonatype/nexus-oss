@@ -46,7 +46,7 @@ public class Nexus1286RoleListIT
   public void defaultSourceRoles()
       throws IOException
   {
-    RoleMessageUtil roleUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    RoleMessageUtil roleUtil = new RoleMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<PlexusRoleResource> roles = roleUtil.getRoles("default");
 
     Set<String> ids = this.getRoleIds(roles);
@@ -59,7 +59,7 @@ public class Nexus1286RoleListIT
   public void allSourceRoles()
       throws IOException
   {
-    RoleMessageUtil roleUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    RoleMessageUtil roleUtil = new RoleMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<PlexusRoleResource> roles = roleUtil.getRoles("all");
 
     Set<String> ids = this.getRoleIds(roles);
@@ -70,7 +70,7 @@ public class Nexus1286RoleListIT
   public void getdefaultExternalRoleMap()
       throws IOException
   {
-    RoleMessageUtil roleUtil = new RoleMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON);
+    RoleMessageUtil roleUtil = new RoleMessageUtil(this.getJsonXStream(), MediaType.APPLICATION_JSON);
     List<ExternalRoleMappingResource> roles = roleUtil.getExternalRoleMap("all");
     Assert.assertEquals(0, roles.size());
 
