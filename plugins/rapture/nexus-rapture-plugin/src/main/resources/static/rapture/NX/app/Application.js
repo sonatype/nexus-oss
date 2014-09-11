@@ -29,20 +29,7 @@ Ext.define('NX.app.Application', {
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
-    'NX.util.DownloadHelper',
-    'NX.util.DateFormat',
-    'NX.State',
-
-    // Ext overrides
-    'NX.ext.form.action.DirectLoad',
-    'NX.ext.form.action.DirectSubmit',
-    'NX.ext.form.field.Base',
-    'NX.ext.form.field.Checkbox',
-    'NX.ext.form.field.Display',
-    'NX.ext.form.FieldContainer',
-    'NX.ext.grid.column.Date',
-
-    'NX.ext.SearchBox'
+    'NX.State'
   ],
 
   mixins: {
@@ -50,6 +37,13 @@ Ext.define('NX.app.Application', {
   },
 
   uses: [
+    'NX.ext.form.action.DirectLoad',
+    'NX.ext.form.action.DirectSubmit',
+    'NX.ext.form.field.Base',
+    'NX.ext.form.field.Checkbox',
+    'NX.ext.form.field.Display',
+    'NX.ext.form.FieldContainer',
+    'NX.ext.grid.column.Date',
     'NX.ext.grid.plugin.FilterBox',
     'NX.ext.grid.plugin.Filtering',
     'NX.ext.form.OptionalFieldSet',
@@ -62,7 +56,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.DateDisplayField',
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
-    'NX.Conditions'
+    'NX.ext.SearchBox'
   ],
 
   name: 'NX',
