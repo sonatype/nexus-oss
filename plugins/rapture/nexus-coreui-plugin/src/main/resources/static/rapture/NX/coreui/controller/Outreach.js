@@ -86,12 +86,23 @@ Ext.define('NX.coreui.controller.Outreach', {
             flex: 1,
             border: false,
             frame: false,
+            hidden: true,
             autoEl: {
               tag: 'iframe',
               // include version and edition for iframe request to allow for client-side content templates
               src: NX.util.Url.urlOf('service/outreach/?version=' + status.version +
                   '&edition=' + status.edition +
                   '&usertype=' + usertype)
+            },
+            listeners: {
+              load: {
+                element: 'el',
+                fn: function (event, el) {
+                  if (el.contentDocument.title.indexOf('Nexus') > -1) {
+                    welcomePage.down('#outreach').show();
+                  }
+                }
+              }
             }
           });
         }
