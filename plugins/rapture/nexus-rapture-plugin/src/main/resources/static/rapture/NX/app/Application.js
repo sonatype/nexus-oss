@@ -50,7 +50,6 @@ Ext.define('NX.app.Application', {
   },
 
   uses: [
-    'Ext.patch.EXTJSIV_612',
     'NX.ext.grid.plugin.FilterBox',
     'NX.ext.grid.plugin.Filtering',
     'NX.ext.form.OptionalFieldSet',
@@ -63,7 +62,6 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.DateDisplayField',
     'NX.ext.grid.column.Icon',
     'NX.ext.grid.column.Link',
-    'NX.ext.tree.View',
     'NX.Conditions'
   ],
 
