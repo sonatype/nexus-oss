@@ -33,6 +33,11 @@ public class TokenPatternParserTest
     checkTokenDetection("{chocolate}/{build}-{version}.{extension}", "(.+)/(.+)-(.+)\\.(.+)");
   }
 
+  @Test
+  public void parseRegexp(){
+    checkTokenDetection
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void unfinishedVariableFails() {
     parse("{");
