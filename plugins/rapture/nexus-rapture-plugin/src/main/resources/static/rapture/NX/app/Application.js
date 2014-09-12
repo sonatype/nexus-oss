@@ -37,6 +37,9 @@ Ext.define('NX.app.Application', {
   },
 
   uses: [
+    // framework patches
+    'Ext.patch.Ticket_18964',
+
     // direct overrides
     'NX.ext.form.action.DirectLoad',
     'NX.ext.form.action.DirectSubmit',
@@ -57,6 +60,7 @@ Ext.define('NX.app.Application', {
     'NX.ext.form.field.DateDisplayField',
     'NX.ext.form.field.ValueSet',
     'NX.ext.SearchBox',
+    'Ext.ux.form.ItemSelector',
 
     // grid plugins
     'NX.ext.grid.plugin.FilterBox',
