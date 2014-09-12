@@ -29,20 +29,7 @@ Ext.define('NX.app.Application', {
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
-    'NX.util.DownloadHelper',
-    'NX.util.DateFormat',
-    'NX.State',
-
-    // Ext overrides
-    'NX.ext.form.action.DirectLoad',
-    'NX.ext.form.action.DirectSubmit',
-    'NX.ext.form.field.Base',
-    'NX.ext.form.field.Checkbox',
-    'NX.ext.form.field.Display',
-    'NX.ext.form.FieldContainer',
-    'NX.ext.grid.column.Date',
-
-    'NX.ext.SearchBox'
+    'NX.State'
   ],
 
   mixins: {
@@ -50,21 +37,41 @@ Ext.define('NX.app.Application', {
   },
 
   uses: [
-    'Ext.patch.EXTJSIV_612',
-    'NX.ext.grid.plugin.FilterBox',
-    'NX.ext.grid.plugin.Filtering',
+    // framework patches
+    'Ext.patch.Ticket_18964',
+
+    // direct overrides
+    'NX.ext.form.action.DirectLoad',
+    'NX.ext.form.action.DirectSubmit',
+
+    // form overrides
+    'NX.ext.form.FieldContainer',
+    'NX.ext.form.field.Base',
+    'NX.ext.form.field.Checkbox',
+    'NX.ext.form.field.Display',
+
+    // custom form fields
     'NX.ext.form.OptionalFieldSet',
-    'NX.ext.form.field.ClearableComboBox',
     'NX.ext.form.field.Email',
     'NX.ext.form.field.Password',
     'NX.ext.form.field.RegExp',
     'NX.ext.form.field.Url',
-    'NX.ext.form.field.ValueSet',
+    'NX.ext.form.field.ClearableComboBox',
     'NX.ext.form.field.DateDisplayField',
+    'NX.ext.form.field.ValueSet',
+    'NX.ext.SearchBox',
+    'Ext.ux.form.ItemSelector',
+
+    // grid plugins
+    'NX.ext.grid.plugin.FilterBox',
+    'NX.ext.grid.plugin.Filtering',
+
+    // grid overrides
+    'NX.ext.grid.column.Date',
+
+    // custom grid columns
     'NX.ext.grid.column.Icon',
-    'NX.ext.grid.column.Link',
-    'NX.ext.tree.View',
-    'NX.Conditions'
+    'NX.ext.grid.column.Link'
   ],
 
   name: 'NX',

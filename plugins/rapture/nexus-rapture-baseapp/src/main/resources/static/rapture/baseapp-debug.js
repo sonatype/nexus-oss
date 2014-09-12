@@ -1,7 +1,7 @@
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -13,7 +13,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 
 
@@ -100,6 +100,7 @@ Ext._startTime = new Date().getTime();
         
         emptyString: new String(),
 
+        
         baseCSSPrefix: Ext.buildSettings.baseCSSPrefix,
 
         
@@ -655,7 +656,7 @@ Ext.globalEval = Ext.global.execScript
 
 
 
-var version = '4.2.2.1144',
+var version = '4.2.3.1477',
     
     checkVerTemp = [''],
     endOfVersionRe = /([^\d\.])/,
@@ -1044,7 +1045,7 @@ var version = '4.2.2.1144',
 Ext.String = (function() {
     var trimRegex     = /^[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+|[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000]+$/g,
         escapeRe      = /('|\\)/g,
-        formatRe      = /\{(\d+)\}/g,
+        formatRe      = /\{\d+\}/,
         escapeRegexRe = /([-.*+?\^${}()|\[\]\/\\])/g,
         basicTrimRe   = /^\s+|\s+$/g,
         whitespaceRe  = /\s+/,
@@ -1063,12 +1064,32 @@ Ext.String = (function() {
             if (s === null || s === undefined || other === null || other === undefined) {
                 return false;
             }
-            
+
             return other.length <= s.length; 
+        },
+        
+        
+        
+        formatTplConfig = {useFormat: false, compiled: true, stringFormat: true},
+        formatFns = {},
+        generateFormatFn = function(format) {
+            
+            if (formatRe.test(format)) {
+                format = new Ext.Template(format, formatTplConfig);
+                return function() {
+                    return format.apply(arguments);
+                };
+            }
+            
+            else {
+                return function() {
+                    return format;
+                };
+            }
         };
 
     return {
-        
+
         
         insert: function(s, value, index) {
             if (!s) {
@@ -1208,16 +1229,16 @@ Ext.String = (function() {
         },
 
         
-        ellipsis: function(value, len, word) {
-            if (value && value.length > len) {
+        ellipsis: function(value, length, word) {
+            if (value && value.length > length) {
                 if (word) {
-                    var vs = value.substr(0, len - 2),
+                    var vs = value.substr(0, length - 2),
                     index = Math.max(vs.lastIndexOf(' '), vs.lastIndexOf('.'), vs.lastIndexOf('!'), vs.lastIndexOf('?'));
-                    if (index !== -1 && index >= (len - 15)) {
+                    if (index !== -1 && index >= (length - 15)) {
                         return vs.substr(0, index) + "...";
                     }
                 }
-                return value.substr(0, len - 3) + "...";
+                return value.substr(0, length - 3) + "...";
             }
             return value;
         },
@@ -1249,10 +1270,8 @@ Ext.String = (function() {
 
         
         format: function(format) {
-            var args = Ext.Array.toArray(arguments, 1);
-            return format.replace(formatRe, function(m, i) {
-                return args[i];
-            });
+            var formatFn = formatFns[format] || (formatFns[format] = generateFormatFn(format));
+            return formatFn.apply(this, arguments);
         },
 
         
@@ -3018,10 +3037,17 @@ Ext.Date = new function() {
                         
                         
                         
-                        "year = y || (new Date()).getFullYear(),",
-                        "jan4 = new Date(year, 0, 4, 0, 0, 0),",
-                        "week1monday = new Date(jan4.getTime() - ((jan4.getDay() - 1) * 86400000));",
-                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000)));",
+                        "year = y || (new Date()).getFullYear();",
+                        "jan4 = new Date(year, 0, 4, 0, 0, 0);",
+                        "d = jan4.getDay();", 
+                        
+                        
+                        "week1monday = new Date(jan4.getTime() - ((d === 0 ? 6 : d - 1) * 86400000));",
+                        
+                        
+                        
+                        
+                        "v = Ext.Date.clearTime(new Date(week1monday.getTime() + ((W - 1) * 604800000 + 43200000)));",
                     "} else {",
                         
                         
@@ -6184,7 +6210,7 @@ var noArgs = [],
     Ext.ns = Ext.namespace;
 
     Class.registerPreprocessor('className', function(cls, data) {
-        if (data.$className) {
+        if ('$className' in data) {
             cls.$className = data.$className;
             cls.displayName = cls.$className;
         }
@@ -6491,6 +6517,7 @@ Ext.Loader = new function() {
     var queue = [],
         isClassFileLoaded = {},
         isFileLoaded = {},
+        inFlight = {},
         classNameToFilePathMap = {},
         scriptElements = {},
         readyListeners = [],
@@ -6561,12 +6588,6 @@ Ext.Loader = new function() {
 
                 if (item) {
                     requires = item.requires;
-
-                    
-                    
-                    if (requires.length > Loader.numLoadedFiles) {
-                        continue;
-                    }
 
                     
                     for (j = 0; j < requires.length; ) {
@@ -6717,17 +6738,14 @@ Ext.Loader = new function() {
             Loader.scriptsLoading++;
 
             src = config.disableCaching ?
-                (url + '?' + config.disableCachingParam + '=' + Ext.Date.now()) : url;
+                
+                (url + (url.indexOf('?') === -1 ? '?' : '&') + config.disableCachingParam + '=' + Ext.Date.now()) : url;
 
             scriptElements[url] = Loader.injectScriptElement(src, onScriptLoad, onScriptError);
         },
 
         
         loadScriptFile: function(url, onLoad, onError, scope, synchronous) {
-            if (isFileLoaded[url]) {
-                return Loader;
-            }
-
             var config = Loader.getConfig(),
                 noCacheUrl = url + (config.disableCaching ? ('?' + config.disableCachingParam + '=' + Ext.Date.now()) : ''),
                 isCrossOriginRestricted = false,
@@ -6931,17 +6949,33 @@ Ext.Loader = new function() {
                 }
 
                 if (!isClassFileLoaded.hasOwnProperty(className)) {
-                    isClassFileLoaded[className] = false;
-                    classNameToFilePathMap[className] = filePath;
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (Loader.isFileLoaded[filePath] || inFlight[filePath]) {
+                        isClassFileLoaded[className] = true;
+                    } else {
+                        inFlight[filePath] = true;
+                        isClassFileLoaded[className] = false;
 
-                    Loader.numPendingFiles++;
-                    Loader.loadScriptFile(
-                        filePath,
-                        pass(Loader.onFileLoaded, [className, filePath], Loader),
-                        pass(Loader.onFileLoadError, [className, filePath], Loader),
-                        Loader,
-                        syncModeEnabled
-                    );
+                        Loader.numPendingFiles++;
+                        Loader.loadScriptFile(
+                            filePath,
+                            pass(Loader.onFileLoaded, [className, filePath], Loader),
+                            pass(Loader.onFileLoadError, [className, filePath], Loader),
+                            Loader,
+                            syncModeEnabled
+                        );
+                    }
+                    classNameToFilePathMap[className] = filePath;
                 }
             }
 
@@ -6963,6 +6997,7 @@ Ext.Loader = new function() {
 
             isClassFileLoaded[className] = true;
             isFileLoaded[filePath] = true;
+            delete inFlight[filePath];
 
             
             
@@ -7708,11 +7743,18 @@ Ext.apply(Ext, {
         return entry;
     },
 
-    updateCacheEntry: function(cacheItem, dom){
+    updateCacheEntry: function(cacheItem, dom) {
+        var oldDom = cacheItem.dom;
+        
+        
+        if (dom !== oldDom) {
+            Ext.EventManager.removeAll(oldDom);
+        }
         cacheItem.dom = dom;
         if (cacheItem.el) {
             cacheItem.el.dom = dom;
         }
+
         return cacheItem;
     },
 
@@ -7859,7 +7901,42 @@ Ext.apply(Ext, {
     
     urlAppend : function(url, s) {
         return Ext.String.urlAppend(url, s);
-    }
+    },
+    
+    
+    splitAndUnescape: (function() {
+        var cache = {};
+        
+        return function(origin, delimiter) {
+            if (!origin) {
+                return [];
+            }
+            else if (!delimiter) {
+                return [origin];
+            }
+        
+            var replaceRe = cache[delimiter] || (cache[delimiter] = new RegExp('\\\\' + delimiter, 'g')),
+                result = [],
+                parts, part;
+        
+            parts = origin.split(delimiter);
+        
+            while ((part = parts.shift()) !== undefined) {
+                
+                
+                while (part.charAt(part.length - 1) === '\\' && parts.length > 0) {
+                    part = part + delimiter + parts.shift();
+                }
+            
+                
+                part = part.replace(replaceRe, delimiter);
+            
+                result.push(part);
+            }
+        
+            return result;
+        }
+    })()
 });
 
 
@@ -8088,8 +8165,8 @@ window.undefined = window.undefined;
     nullLog.info = nullLog.warn = nullLog.error = Ext.emptyFn;
 
     
-    Ext.setVersion('ext', '4.2.2.1144');
-    Ext.setVersion('extjs', '4.2.2.1144');
+    Ext.setVersion('ext', '4.2.3.1477');
+    Ext.setVersion('extjs', '4.2.3.1477');
     Ext.apply(Ext, {
         
         SSL_SECURE_URL : isSecure && isIE ? 'javascript:\'\'' : 'about:blank',
@@ -8568,7 +8645,7 @@ Ext.application = function(config) {
         stripTagsRE    = /<\/?[^>]+>/gi,
         stripScriptsRe = /(?:<script.*?>)((\n|\r|.)*?)(?:<\/script>)/ig,
         nl2brRe        = /\r?\n/g,
-        allHashes      = /^#+$/,
+        hashRe         = /#+$/,
 
         
         formatPattern = /[\d,\.#]+/,
@@ -8579,6 +8656,7 @@ Ext.application = function(config) {
         
         
         I18NFormatCleanRe,
+        lastDecimalSeparator,
 
         
         formatFns = {};
@@ -8765,18 +8843,21 @@ Ext.application = function(config) {
                     extraChars,
                     multiplier,
                     trimTrailingZeroes,
-                    code;
+                    code, len;
 
                 
                 
                 
                 
                 if (formatString.substr(formatString.length - 2) == '/i') {
-                    if (!I18NFormatCleanRe) {
-                        I18NFormatCleanRe = new RegExp('[^\\d\\' + UtilFormat.decimalSeparator + ']','g');
+                    
+                    
+                    if (!I18NFormatCleanRe || lastDecimalSeparator !== decimalSeparator) {
+                        I18NFormatCleanRe = new RegExp('[^\\d\\' + decimalSeparator + ']','g');
+                        lastDecimalSeparator = decimalSeparator;
                     }
                     formatString = formatString.substr(0, formatString.length - 2);
-                    hasComma = formatString.indexOf(comma) != -1;
+                    hasComma = formatString.indexOf(comma) !== -1;
                     splitFormat = formatString.replace(I18NFormatCleanRe, '').split(decimalSeparator);
                 } else {
                     hasComma = formatString.indexOf(',') != -1;
@@ -8796,10 +8877,11 @@ Ext.application = function(config) {
                     precision = splitFormat[1].length;
 
                     
-                    trimTrailingZeroes = allHashes.test(splitFormat[1]);
+                    trimTrailingZeroes = splitFormat[1].match(hashRe);
                     if (trimTrailingZeroes) {
+                        len = trimTrailingZeroes[0].length;
                         
-                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "?0+$")'
+                        trimPart = 'trailingZeroes=new RegExp(Ext.String.escapeRegex(utilFormat.decimalSeparator) + "*0{0,' + len + '}$")'
                     }
                 }
                 
@@ -8851,12 +8933,12 @@ Ext.application = function(config) {
                     '}';
                 }
 
+                
+                code[code.length] = 'if(neg&&fnum!=="' + (precision ? '0.' + Ext.String.repeat('0', precision) : '0') + '")fnum="-"+fnum;';
+
                 if (trimTrailingZeroes) {
                     code[code.length] = 'fnum=fnum.replace(trailingZeroes,"");';
                 }
-
-                
-                code[code.length] = 'if(neg&&fnum!=="' + (precision ? '0.' + Ext.String.repeat('0', precision) : '0') + '")fnum="-"+fnum;';
 
                 code[code.length] = 'return ';
 
@@ -8887,11 +8969,13 @@ Ext.application = function(config) {
                     name;
 
                 for (name in attributes) {
-                    result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    if (attributes.hasOwnProperty(name)) {
+                        result.push(name, '="', name === 'style' ? Ext.DomHelper.generateStyles(attributes[name], null, true) : Ext.htmlEncode(attributes[name]), '"');
+                    }
                 }
                 attributes = result.join('');
             }
-            return attributes||'';
+            return attributes || '';
         },
 
         
@@ -9811,17 +9895,19 @@ Ext.is.init();
         return style[styleName];
     },
     supportsVectors = {
-        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,1,1,0,0,1,0,1,0,0,0],
-        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,1,0,0,1,0,1,0,0,0],
-        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,1,0,1,0,0,1],
-        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0],
-        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1],
-        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1],
-        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1]
-    };
+        'IE6-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE6-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE7-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE8-strict':  [0,1,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,1,0,1,0,0,1,0,0],
+        'IE9-quirks':  [0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0],
+        'IE9-strict':  [0,1,0,0,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,0,0],
+        'IE10-quirks': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0],
+        'IE10-strict': [1,1,0,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,0,0,0,1,0,0]
+    },
+    doc = document,
+    div = doc.createElement('div');
 
 function getBrowserKey() {
     var browser = Ext.isIE6 ? 'IE6' : Ext.isIE7 ? 'IE7' : Ext.isIE8 ? 'IE8' :
@@ -9834,15 +9920,14 @@ Ext.supports = {
     
     init : function() {
         var me = this,
-            doc = document,
             toRun = me.toRun || me.tests,
             n = toRun.length,
-            div = n && Ext.isReady && doc.createElement('div'),
             notRun = [],
             browserKey = getBrowserKey(),
-            test, vector, value;
+            test, vector, value,
+            docReady = Ext.isReady;
 
-        if (div) {
+        if (docReady) {
             div.innerHTML = [
                 '<div style="height:30px;width:50px;">',
                     '<div style="height:20px;width:20px;"></div>',
@@ -9863,14 +9948,14 @@ Ext.supports = {
             value = vector && vector[n];
             if (value !== undefined) {
                 me[test.identity] = value;
-            } else if (div || test.early) {
+            } else if (docReady || test.early) {
                 me[test.identity] = test.fn.call(me, doc, div);
             } else {
                 notRun.push(test);
             }
         }
 
-        if (div) {
+        if (docReady) {
             doc.body.removeChild(div);
         }
 
@@ -9933,6 +10018,7 @@ Ext.supports = {
     tests: [
         
         {
+            
             identity: 'Transitions',
             fn: function(doc, div) {
                 var prefix = [
@@ -9968,6 +10054,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'RightMargin',
             fn: function(doc, div) {
                 var view = doc.defaultView;
@@ -9977,6 +10064,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'DisplayChangeInputSelectionBug',
             early: true,
             fn: function() {
@@ -9988,6 +10076,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'DisplayChangeTextAreaSelectionBug',
             early: true,
             fn: function() {
@@ -10000,6 +10089,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'TransparentColor',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -10009,6 +10099,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'ComputedStyle',
             fn: function(doc, div, view) {
                 view = doc.defaultView;
@@ -10018,6 +10109,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'Svg',
             fn: function(doc) {
                 return !!doc.createElementNS && !!doc.createElementNS( "http:/" + "/www.w3.org/2000/svg", "svg").createSVGRect;
@@ -10026,57 +10118,82 @@ Ext.supports = {
 
         
         {
+            
             identity: 'Canvas',
             fn: function(doc) {
                 return !!doc.createElement('canvas').getContext;
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'Vml',
             fn: function(doc) {
                 var d = doc.createElement("div");
                 d.innerHTML = "<!--[if vml]><br/><br/><![endif]-->";
                 return (d.childNodes.length == 2);
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'Float',
-            fn: function(doc, div) {
-                return !!div.lastChild.style.cssFloat;
-            }
+            fn: function(doc) {
+                return 'cssFloat' in doc.documentElement.style;
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'AudioTag',
             fn: function(doc) {
                 return !!doc.createElement('audio').canPlayType;
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'History',
             fn: function() {
                 var history = window.history;
                 return !!(history && history.pushState);
-            }
+            },
+            early: true
         },
 
         
         {
+            
+            identity: 'Hashchange',
+            fn: function() {
+                
+                var docMode = document.documentMode;
+                return 'onhashchange' in window && (docMode === undefined || docMode > 7);
+            },
+            early: true
+        },
+
+        
+        {
+            
             identity: 'CSS3DTransform',
             fn: function() {
                 return (typeof WebKitCSSMatrix != 'undefined' && new WebKitCSSMatrix().hasOwnProperty('m41'));
-            }
+            },
+            early: true
         },
 
 		
         {
+            
             identity: 'CSS3LinearGradient',
             fn: function(doc, div) {
                 var property = 'background-image:',
@@ -10090,88 +10207,106 @@ Ext.supports = {
                 div.style.cssText = options.join(';');
 
                 return (("" + div.style.backgroundImage).indexOf('gradient') !== -1) && !Ext.isIE9;
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'CSS3BorderRadius',
-            fn: function(doc, div) {
+            fn: function(doc) {
                 var domPrefixes = ['borderRadius', 'BorderRadius', 'MozBorderRadius', 'WebkitBorderRadius', 'OBorderRadius', 'KhtmlBorderRadius'],
-                    pass = false,
                     i;
                 for (i = 0; i < domPrefixes.length; i++) {
-                    if (document.body.style[domPrefixes[i]] !== undefined) {
+                    if (domPrefixes[i] in doc.documentElement.style) {
                         return true;
                     }
                 }
-                return pass;
-            }
+                return false;
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'GeoLocation',
             fn: function() {
                 
                 return (typeof navigator != 'undefined' && 'geolocation' in navigator) || (typeof google != 'undefined' && typeof google.gears != 'undefined');
-            }
+            },
+            early: true
         },
         
         {
+            
             identity: 'MouseEnterLeave',
-            fn: function(doc, div){
-                return ('onmouseenter' in div && 'onmouseleave' in div);
-            }
+            fn: function(doc){
+                return ('onmouseenter' in doc.documentElement && 'onmouseleave' in doc.documentElement);
+            },
+            early: true
         },
         
         {
+            
             identity: 'MouseWheel',
-            fn: function(doc, div) {
-                return ('onmousewheel' in div);
-            }
+            fn: function(doc) {
+                return ('onmousewheel' in doc.documentElement);
+            },
+            early: true
         },
         
         {
+            
             identity: 'Opacity',
             fn: function(doc, div){
                 
                 if (Ext.isIE6 || Ext.isIE7 || Ext.isIE8) {
                     return false;
                 }
-                div.firstChild.style.cssText = 'opacity:0.73';
-                return div.firstChild.style.opacity == '0.73';
-            }
+                div.style.cssText = 'opacity:0.73';
+                return div.style.opacity == '0.73';
+            },
+            early: true
         },
         
         {
+            
             identity: 'Placeholder',
             fn: function(doc) {
                 return 'placeholder' in doc.createElement('input');
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'Direct2DBug',
-            fn: function() {
-                return Ext.isString(document.body.style.msTransformOrigin) && Ext.isIE10m;
-            }
+            fn: function(doc) {
+                return Ext.isString(doc.documentElement.style.msTransformOrigin) && Ext.isIE10m;
+            },
+            early: true
         },
         
         {
+            
+            
             identity: 'BoundingClientRect',
-            fn: function(doc, div) {
-                return Ext.isFunction(div.getBoundingClientRect);
-            }
+            fn: function(doc) {
+                return !Ext.isIEQuirks && 'getBoundingClientRect' in doc.documentElement;
+            },
+            early: true
         },
         
         {
+            
             identity: 'RotatedBoundingClientRect',
-            fn: function() {
-                var body = document.body,
+            fn: function(doc) {
+                var body = doc.body,
                     supports = false,
-                    el = document.createElement('div'),
+                    el = doc.createElement('div'),
                     style = el.style;
 
                 if (el.getBoundingClientRect) {
@@ -10179,7 +10314,7 @@ Ext.supports = {
                         style.OTransform = style.transform = 'rotate(90deg)';
                     style.width = '100px';
                     style.height = '30px';
-                    body.appendChild(el)
+                    body.appendChild(el);
 
                     supports = el.getBoundingClientRect().height !== 100;
                     body.removeChild(el);
@@ -10189,12 +10324,14 @@ Ext.supports = {
             }
         },
         {
+            
             identity: 'IncludePaddingInWidthCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetWidth == 210;
             }
         },
         {
+            
             identity: 'IncludePaddingInHeightCalculation',
             fn: function(doc, div){
                 return div.childNodes[1].firstChild.offsetHeight == 210;
@@ -10203,49 +10340,60 @@ Ext.supports = {
 
         
         {
+            
             identity: 'ArraySort',
             fn: function() {
                 var a = [1,2,3,4,5].sort(function(){ return 0; });
                 return a[0] === 1 && a[1] === 2 && a[2] === 3 && a[3] === 4 && a[4] === 5;
-            }
+            },
+            early: true
         },
         
         {
+            
             identity: 'Range',
-            fn: function() {
-                return !!document.createRange;
-            }
+            fn: function(doc) {
+                return !!doc.createRange;
+            },
+            early: true
         },
         
         {
+            
             identity: 'CreateContextualFragment',
-            fn: function() {
-                var range = Ext.supports.Range ? document.createRange() : false;
+            fn: function(doc) {
+                var range = doc.createRange ? doc.createRange() : false;
 
                 return range && !!range.createContextualFragment;
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'WindowOnError',
             fn: function () {
                 
                 return Ext.isIE || Ext.isGecko || Ext.webKitVersion >= 534.16; 
-            }
+            },
+            early: true
         },
 
         
         {
+            
             identity: 'TextAreaMaxLength',
-            fn: function(){
-                var el = document.createElement('textarea');
+            fn: function(doc) {
+                var el = doc.createElement('textarea');
                 return ('maxlength' in el);
-            }
+            },
+            early: true
         },
         
         
         {
+            
             identity: 'GetPositionPercentage',
             fn: function(doc, div){
                return getStyle(div.childNodes[2], 'left') == '10%';
@@ -10253,6 +10401,7 @@ Ext.supports = {
         },
         
         {
+            
             identity: 'PercentageHeightOverflowBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -10287,6 +10436,7 @@ Ext.supports = {
         },
         
         {
+            
             identity: 'xOriginBug',
             fn: function(doc, div) {
                div.innerHTML = '<div id="b1" style="height:100px;width:100px;direction:rtl;position:relative;overflow:scroll">' +
@@ -10304,6 +10454,7 @@ Ext.supports = {
 
         
         {
+            
             identity: 'ScrollWidthInlinePaddingBug',
             fn: function(doc) {
                 var hasBug = false,
@@ -10326,6 +10477,37 @@ Ext.supports = {
                 doc.body.removeChild(el);
                 
                 return hasBug;
+            }
+        },
+
+        
+        {
+            identity: 'rtlVertScrollbarOnRight',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:scroll">' +
+                    '<div style="width:20px;height:200px;"></div>' +
+                '</div>';
+
+                var outerBox = div.firstChild,
+                    innerBox = outerBox.firstChild;
+
+                return (innerBox.offsetLeft + innerBox.offsetWidth !== outerBox.offsetLeft + outerBox.offsetWidth);
+            }
+        },
+
+        
+        {
+            identity: 'rtlVertScrollbarOverflowBug',
+            fn: function(doc, div) {
+               div.innerHTML = '<div style="height:100px;width:100px;direction:rtl;overflow:auto">' +
+                    '<div style="width:95px;height:200px;"></div>' +
+                '</div>';
+
+                
+                
+                
+                var outerBox = div.firstChild;
+                return outerBox.clientHeight === outerBox.offsetHeight;
             }
         }
     ]
@@ -10597,13 +10779,17 @@ Ext.define('Ext.util.Event', function() {
     },
 
     suspend: function() {
-        this.suspended += 1;
+        ++this.suspended;
     },
 
     resume: function() {
         if (this.suspended) {
-            this.suspended--;
+            --this.suspended;
         }
+    },
+    
+    isSuspended: function() {
+        return this.suspended > 0;
     },
 
     fire: function() {
@@ -10685,6 +10871,7 @@ Ext.EventManager = new function() {
     var EventManager = this,
         doc = document,
         win = window,
+        supports = Ext.supports,
         escapeRx = /\\/g,
         prefix = Ext.baseCSSPrefix,
         
@@ -10695,8 +10882,8 @@ Ext.EventManager = new function() {
             var bd = doc.body || doc.getElementsByTagName('body')[0],
                 cls = [],
                 htmlCls = [],
-                supportsLG = Ext.supports.CSS3LinearGradient,
-                supportsBR = Ext.supports.CSS3BorderRadius,
+                supportsLG = supports.CSS3LinearGradient,
+                supportsBR = supports.CSS3BorderRadius,
                 html;
 
             
@@ -10802,7 +10989,7 @@ Ext.EventManager = new function() {
                     add('safari5');
                 }
                 if (Ext.isSafari5_0) {
-                    add('safari5_0')
+                    add('safari5_0');
                 }
             }
             if (Ext.isChrome) {
@@ -10917,7 +11104,7 @@ Ext.EventManager = new function() {
                 Ext._readyTime = new Date().getTime();
                 Ext.isReady = true;
 
-                Ext.supports.init();
+                supports.init();
                 EventManager.onWindowUnload();
                 readyEvent.onReadyChain = EventManager.onReadyChain;    
 
@@ -10946,7 +11133,7 @@ Ext.EventManager = new function() {
             }
             EventManager.isFiring = false;
             EventManager.hasFiredReady = true;
-            Ext.EventManager.idleEvent.fire();
+            EventManager.idleEvent.fire();
         },
 
         
@@ -10981,8 +11168,12 @@ Ext.EventManager = new function() {
 
             element = Ext.getDom(element);
 
-            if (element === doc || element === win) {
-                id = element === doc ? Ext.documentId : Ext.windowId;
+            if (element === doc) {
+                id = Ext.documentId;
+
+            
+            } else if (element == win) {
+                id = Ext.windowId;
             }
             else {
                 id = Ext.id(element);
@@ -11030,12 +11221,12 @@ Ext.EventManager = new function() {
 
         
         normalizeEvent: function(eventName, fn) {
-            if (EventManager.mouseEnterLeaveRe.test(eventName) && !Ext.supports.MouseEnterLeave) {
+            if (EventManager.mouseEnterLeaveRe.test(eventName) && !supports.MouseEnterLeave) {
                 if (fn) {
                     fn = Ext.Function.createInterceptor(fn, EventManager.contains);
                 }
                 eventName = eventName == 'mouseenter' ? 'mouseover' : 'mouseout';
-            } else if (eventName == 'mousewheel' && !Ext.supports.MouseWheel && !Ext.isOpera) {
+            } else if (eventName == 'mousewheel' && !supports.MouseWheel && !Ext.isOpera) {
                 eventName = 'DOMMouseScroll';
             }
             return {
@@ -11153,9 +11344,10 @@ Ext.EventManager = new function() {
         
         normalizeId: function(dom, force) {
             var id;
-            if (dom === document) {
+            if (dom === doc) {
                 id = Ext.documentId;
-            } else if (dom === window) {
+            
+            } else if (dom == win) {
                 id = Ext.windowId;
             } else {
                 id = dom.id;
@@ -11765,9 +11957,9 @@ Ext.EventManager = new function() {
     Ext.onReady(initExtCss);
 };
 
-Ext.setVersion("ext-theme-base", "4.2.2");
-Ext.setVersion("ext-theme-neptune", "4.2.2");
-Ext.setVersion("ext-theme-neutral", "4.2.2");
+Ext.setVersion("ext-theme-base", "4.2.3.1477");
+Ext.setVersion("ext-theme-neptune", "4.2.3.1477");
+Ext.setVersion("ext-theme-neutral", "4.2.3.1477");
 Ext.setVersion("rapture-theme", "1.0.0");
 
 
@@ -12227,6 +12419,18 @@ Ext.define('Ext.util.Observable', function(Observable) {
         hasListener: function(ename) {
             return !!this.hasListeners[ename.toLowerCase()];
         },
+        
+        
+        isSuspended: function(event) {
+            var suspended = this.eventsSuspended > 0;
+            if (!suspended && event) {
+                event = this.events[event];
+                if (event && event.isEvent) {
+                    return event.isSuspended();
+                }
+            }
+            return suspended;
+        },
 
         
         suspendEvents: function(queueSuspended) {
@@ -12239,15 +12443,18 @@ Ext.define('Ext.util.Observable', function(Observable) {
         
         suspendEvent: function(eventName) {
             var len = arguments.length,
-                i, event;
+                events = this.events,
+                i, event, ename;
 
             for (i = 0; i < len; i++) {
-                event = this.events[arguments[i]];
+                ename = arguments[i];
+                event = events[ename];
+                if (!event || typeof event == 'boolean') {
+                    events[ename] = event = new ExtEvent(this, ename);
+                }
 
                 
-                if (event && event.suspend) {
-                    event.suspend();
-                }
+                event.suspend();
             }
         },
 
@@ -12791,7 +12998,7 @@ Ext.define('Ext.EventObjectImpl', {
         63275: 35 
     },
     
-    btnMap: Ext.isIE ? {
+    btnMap: Ext.isIE9m ? {
         1: 0,
         4: 1,
         2: 2
@@ -12804,6 +13011,10 @@ Ext.define('Ext.EventObjectImpl', {
     
     
     
+    
+
+    
+    isEvent: true,
 
     constructor: function(event, freezeEvent){
         if (event) {
@@ -13043,7 +13254,8 @@ Ext.define('Ext.EventObjectImpl', {
 
    
     hasModifier : function(){
-        return this.ctrlKey || this.altKey || this.shiftKey || this.metaKey;
+        var me = this;
+        return !!(me.ctrlKey || me.altKey || me.shiftKey || me.metaKey);
     },
 
     
@@ -13283,7 +13495,7 @@ Ext.define('Ext.dom.AbstractQuery', {
             root = document.getElementById(root);
         }
 
-        q = q.split(",");
+        q = Ext.splitAndUnescape(q, ",");
 
         for (i = 0,qlen = q.length; i < qlen; i++) {
             if (typeof q[i] == 'string') {
@@ -15162,6 +15374,7 @@ Ext.define('Ext.dom.AbstractElement', {
                 dom = el.dom || el;
 
             
+            
             return (dom === me.dom) || Ext.dom.AbstractElement.isAncestor(me.dom, dom);
         };
     }()),
@@ -15722,6 +15935,11 @@ Ext.define('Ext.Template', {
     },
 
     
+    
+    
+    useEval: Ext.isGecko,
+
+    
 
     
     constructor: function(html) {
@@ -15772,32 +15990,49 @@ Ext.define('Ext.Template', {
     
     disableFormats: false,
 
-    re: /\{([\w\-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
+    
+    re: /\{(?:(?:(\d*)|([\w\-]+))(?:\:([A-Za-z_\.]*)(?:\((.*?)?\))?)?)\}/g,
 
     
     apply: function(values) {
+        if (this.compiled) {
+            return this.compiled(values).join('');
+        }
+        return this.evaluate(values);
+    },
+
+    
+    
+    evaluate: function(values) {
         var me = this,
             useFormat = me.disableFormats !== true,
             fm = Ext.util.Format,
-            tpl = me,
-            ret;
+            tpl = me;
 
-        if (me.compiled) {
-            return me.compiled(values).join('');
-        }
-
-        function fn(m, name, format, args) {
-            if (format && useFormat) {
+        function fn(match, index, name, formatFn, args) {
+            
+            
+            if (name == null || name == '') {
+                name = index;
+            }
+            if (formatFn && useFormat) {
                 if (args) {
                     args = [values[name]].concat(Ext.functionFactory('return ['+ args +'];')());
                 } else {
                     args = [values[name]];
                 }
-                if (format.substr(0, 5) == "this.") {
-                    return tpl[format.substr(5)].apply(tpl, args);
+
+                
+                if (formatFn.substr(0, 5) === "this.") {
+                    return tpl[formatFn.substr(5)].apply(tpl, args);
                 }
+                
+                else if (fm[formatFn]) {
+                    return fm[formatFn].apply(fm, args);
+                }
+                
                 else {
-                    return fm[format].apply(fm, args);
+                    return match;
                 }
             }
             else {
@@ -15805,8 +16040,7 @@ Ext.define('Ext.Template', {
             }
         }
 
-        ret = me.html.replace(me.re, fn);
-        return ret;
+        return me.html.replace(me.re, fn);
     },
 
     
@@ -15845,31 +16079,59 @@ Ext.define('Ext.Template', {
      */
     compile: function() {
         var me = this,
-            fm = Ext.util.Format,
-            useFormat = me.disableFormats !== true,
-            body, bodyReturn;
+            code;
 
-        function fn(m, name, format, args) {
-            if (format && useFormat) {
-                args = args ? ',' + args: "";
-                if (format.substr(0, 5) != "this.") {
-                    format = "fm." + format + '(';
-                }
-                else {
-                    format = 'this.' + format.substr(5) + '(';
-                }
-            }
-            else {
-                args = '';
-                format = "(values['" + name + "'] == undefined ? '' : ";
-            }
-            return "'," + format + "values['" + name + "']" + args + ") ,'";
-        }
-
-        bodyReturn = me.html.replace(me.compileARe, '\\\\').replace(me.compileBRe, '\\n').replace(me.compileCRe, "\\'").replace(me.re, fn);
-        body = "this.compiled = function(values){ return ['" + bodyReturn + "'];};";
-        eval(body);
+        code = me.html.replace(me.compileARe, '\\\\').replace(me.compileBRe, '\\n').replace(me.compileCRe, "\\'").replace(me.re, Ext.Function.bind(me.regexReplaceFn, me));
+        code = (this.disableFormats !== true ? 'var fm=Ext.util.Format;' : '') +
+                (me.useEval ? '$=' : 'return') +
+                " function(v){return ['" + code + "'];};";
+        me.compiled = me.useEval ? me.evalCompiled(code) : (new Function('Ext', code))(Ext);
         return me;
+    },
+
+    // @private
+    evalCompiled: function($) {
+
+        // We have to use eval to realize the code block and capture the inner func we also
+        // don't want a deep scope chain. We only do this in Firefox and it is also unhappy
+        // with eval containing a return statement, so instead we assign to "$" and return
+        // that. Because we use "eval", we are automatically sandboxed properly.
+        eval($);
+        return $;
+    },
+
+    regexReplaceFn: function fn(match, index, name, formatFn, args) {
+        // Calculate the correct expression to use to index into the values object/array
+        // index may be a numeric string, or a quoted alphanumeric string.
+        // Certain browser pass unmatched parameters as undefined, some as an empty string.
+        if (index == null || index == '') {
+            index = '"' + name + '"';
+        }
+        // If we are being used as a formatter for Ext.String.format, we must skip the string itself in the argument list.
+        // Doing this enables String.format to omit the Array slice call.
+        else if (this.stringFormat) {
+            index = parseInt(index) + 1;
+        }
+        if (formatFn && this.disableFormats !== true) {
+            args = args ? ',' + args: "";
+
+            // Caller used '{0:this.bold}'. Create a call to member function
+            if (formatFn.substr(0, 5) === "this.") {
+                formatFn = formatFn + '(';
+            }
+            // Caller used '{0:number("0.00")}'. Create a call to Ext.util.Format function
+            else if (Ext.util.Format[formatFn]) {
+                formatFn = "fm." + formatFn + '(';
+            }
+            // Caller used '{0:someRandomText}'. We must pass it through unchanged
+            else {
+                return match;
+            }
+            return "'," + formatFn + "v[" + index + "]" + args + "),'";
+        }
+        else {
+            return "',v[" + index + "] == undefined ? '' : v[" + index + "],'";
+        }
     },
 
     /**
@@ -15944,7 +16206,7 @@ Ext.define('Ext.Template', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -15956,7 +16218,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag core
 /**
@@ -16100,7 +16362,7 @@ Ext.define('Ext.XTemplateParser', {
             topRe = me.topRe,
             actionsRe = me.actionsRe,
             index, stack, s, m, t, prev, frame, subMatch, begin, end, actions,
-            prop;
+            prop, expectTplNext;
 
         me.level = 0;
         me.stack = stack = [];
@@ -16118,8 +16380,16 @@ Ext.define('Ext.XTemplateParser', {
             end = topRe.lastIndex;
 
             if (index < begin) {
-                me.doText(str.substring(index, begin));
+                // In the case of a switch statement, we expect a tpl for each case.
+                // However, if we have spaces they will get matched as plaintext, so
+                // we want to skip over them here.
+                s = str.substring(index, begin);
+                if (!(expectTplNext && Ext.String.trim(s) === '')) {
+                    me.doText(s);
+                }
             }
+
+            expectTplNext = false;
 
             if (m[1]) {
                 end = str.indexOf('%}', begin+2);
@@ -16169,6 +16439,7 @@ Ext.define('Ext.XTemplateParser', {
                 else if (actions['switch']) {
                     me.doSwitch(actions['switch'], actions);
                     stack.push({ type: 'switch' });
+                    expectTplNext = true;
                 }
                 else if (actions['case']) {
                     me.doCase(actions['case'], actions);
@@ -16384,11 +16655,13 @@ Ext.define('Ext.XTemplateCompiler', {
     },
 
     doSwitch: function (action) {
-        var me = this;
+        var me = this,
+            key;
 
         
-        if (action === '.') {
-            me.body.push('switch (values) {\n');
+        if (action === '.' || action === '#') {
+            key = action === '.' ? 'values' : 'xindex';
+            me.body.push('switch (', key, ') {\n');
         } else if (me.propNameRe.test(action)) {
             me.body.push('switch (', me.parseTag(action), ') {\n');
         }
@@ -16681,7 +16954,7 @@ Ext.define('Ext.XTemplateCompiler', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -16693,7 +16966,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag core
 /**
@@ -17098,7 +17371,7 @@ Ext.define('Ext.XTemplate', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -17110,10 +17383,11 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // @tag dom,core
 // @require Helper.js
+
 // @define Ext.dom.Query
 // @define Ext.core.DomQuery
 // @define Ext.DomQuery
@@ -17218,9 +17492,7 @@ Ext.ns('Ext.core');
 Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
     var DQ,
         doc = document,
-        cache = {},
-        simpleCache = {},
-        valueCache = {},
+        cache, simpleCache, valueCache,
         useClassList = !!doc.documentElement.classList,
         useElementPointer = !!doc.documentElement.firstElementChild,
         useChildrenCollection = (function() {
@@ -17708,6 +17980,12 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
     }
 
     return DQ = {
+        clearCache: function () {
+            cache && cache.clear();
+            valueCache && valueCache.clear();
+            simpleCache && simpleCache.clear();
+        },
+
         getStyle: function(el, name) {
             return Ext.fly(el, '_DomQuery').getStyle(name);
         },
@@ -17801,36 +18079,44 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
 
         
         jsSelect: function(path, root, type) {
+            if (!cache) {
+                DQ._cache = cache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
             
             root = root || doc;
 
             if (typeof root == "string") {
                 root = doc.getElementById(root);
             }
-            var paths = path.split(","),
+            var paths = Ext.splitAndUnescape(path, ","),
                 results = [],
+                query,
                 i, len, subPath, result;
 
             
             for (i = 0, len = paths.length; i < len; i++) {
                 subPath = paths[i].replace(trimRe, "");
                 
-                if (!cache[subPath]) {
+                query = cache.get(subPath);
+                if (!query) {
                     
-                    cache[subPath] = DQ.compile(subPath, type);
-                    if (!cache[subPath]) {
+                    query = DQ.compile(subPath, type);
+                    if (!query) {
                         Ext.Error.raise({
                             sourceClass:'Ext.DomQuery',
                             sourceMethod:'jsSelect',
                             msg:subPath + ' is not a valid selector'
                         });
                     }
+                    cache.add(subPath, query);
                 } else {
                     
                     
                     setupEscapes(subPath);
                 }
-                result = cache[subPath](root);
+                result = query(root);
                 if (result && result !== doc) {
                     results = results.concat(result);
                 }
@@ -17877,15 +18163,23 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
 
         
         selectValue: function(path, root, defaultValue) {
+            if (!valueCache) {
+                DQ._valueCache = valueCache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
             path = path.replace(trimRe, "");
-            if (!valueCache[path]) {
-                valueCache[path] = DQ.compile(path, "select");
+            var query = valueCache.get(path),
+                n, v;
+
+            if (!query) {
+                query = DQ.compile(path, "select");
+                valueCache.add(path, query);
             } else {
                 setupEscapes(path);
             }
 
-            var n = valueCache[path](root),
-                v;
+            n = query(root);
 
             n = n[0] ? n[0] : n;
 
@@ -17920,13 +18214,22 @@ Ext.dom.Query = Ext.core.DomQuery = Ext.DomQuery = (function() {
         
         filter: function(els, ss, nonMatches) {
             ss = ss.replace(trimRe, "");
-            if (!simpleCache[ss]) {
-                simpleCache[ss] = DQ.compile(ss, "simple");
+            if (!simpleCache) {
+                DQ._simpleCache = simpleCache = new Ext.util.LruCache({
+                    maxSize: 200
+                });
+            }
+            var query = simpleCache.get(ss),
+                result;
+
+            if (!query) {
+                query = DQ.compile(ss, "simple");
+                simpleCache.add(ss, query);
             } else {
                 setupEscapes(ss);
             }
 
-            var result = simpleCache[ss](els);
+            result = query(els);
             return nonMatches ? quickDiff(result, els) : result;
         },
 
@@ -20894,8 +21197,8 @@ Ext.define('Ext.util.Positionable', {
         anchor = (anchor || "tl").toLowerCase();
         mySize = mySize || {};
 
-        myWidth = mySize.width || isViewport ? Ext.Element.getViewWidth() : me.getWidth();
-        myHeight = mySize.height || isViewport ? Ext.Element.getViewHeight() : me.getHeight();
+        myWidth = mySize.width || (isViewport ? Ext.Element.getViewWidth() : me.getWidth());
+        myHeight = mySize.height || (isViewport ? Ext.Element.getViewHeight() : me.getHeight());
 
         
         
@@ -20931,13 +21234,8 @@ Ext.define('Ext.util.Positionable', {
     
     getAlignToXY: function(alignToEl, posSpec, offset) {
         var me = this,
-            viewportWidth = Ext.Element.getViewWidth() - 10, 
-            viewportHeight = Ext.Element.getViewHeight() - 10, 
-            doc = document,
-            docElement = doc.documentElement,
-            docBody = doc.body,
-            scrollX = (docElement.scrollLeft || docBody.scrollLeft || 0),
-            scrollY = (docElement.scrollTop  || docBody.scrollTop  || 0),
+            constrainToEl,
+            constrainTo,
             alignMatch, myPosition, alignToElPosition, myWidth, myHeight,
             alignToElRegion, swapY, swapX, constrain, align1, align2,
             p1y, p1x, p2y, p2x, x, y;
@@ -20985,6 +21283,15 @@ Ext.define('Ext.util.Positionable', {
 
         
         if (constrain) {
+            
+            
+            
+            
+            constrainToEl = me.constrainTo || me.container || me.el.parent();
+            constrainToEl = Ext.get(constrainToEl.el || constrainToEl)
+            constrainTo = constrainToEl.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainToEl.el.dom.clientWidth;
+
             myWidth = me.getWidth();
             myHeight = me.getHeight();
             alignToElRegion = alignToEl.getRegion();
@@ -20996,20 +21303,40 @@ Ext.define('Ext.util.Positionable', {
             p1x = align1.charAt(align1.length - 1);
             p2y = align2.charAt(0);
             p2x = align2.charAt(align2.length - 1);
-            swapY = ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
-            swapX = ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
 
-            if (x + myWidth > viewportWidth + scrollX) {
-                x = swapX ? alignToElRegion.left - myWidth : viewportWidth + scrollX - myWidth;
+            
+            
+            swapY = (x < alignToElRegion.right && x + myWidth >= alignToElRegion.left) && ((p1y == "t" && p2y == "b") || (p1y == "b" && p2y == "t"));
+
+            
+            
+            swapX = (y < alignToElRegion.bottom && y + myHeight >= alignToElRegion.top) && ((p1x == "r" && p2x == "l") || (p1x == "l" && p2x == "r"));
+
+            if (x + myWidth > constrainTo.right) {
+                if (swapX) {
+                    x = alignToElRegion.left - myWidth;
+
+                    
+                    swapX = false;
+                } else {
+                    x = constrainTo.right - myWidth;
+                }
             }
-            if (x < scrollX) {
-                x = swapX ? alignToElRegion.right : scrollX;
+            if (x < constrainTo.left) {
+                x = swapX ? alignToElRegion.right : constrainTo.left;
             }
-            if (y + myHeight > viewportHeight + scrollY) {
-                y = swapY ? alignToElRegion.top - myHeight : viewportHeight + scrollY - myHeight;
+            if (y + myHeight > constrainTo.bottom) {
+                if (swapY) {
+                    y = alignToElRegion.top - myHeight;
+
+                    
+                    swapY = false;
+                } else {
+                    y = constrainTo.bottom - myHeight;
+                }
             }
-            if (y < scrollY) {
-                y = swapY ? alignToElRegion.bottom : scrollY;
+            if (y < constrainTo.top) {
+                y = swapY ? alignToElRegion.bottom : constrainTo.top;
             }
         }
         return [x,y];
@@ -21124,10 +21451,18 @@ Ext.define('Ext.util.Positionable', {
             vector = [0, 0],
             shadowSize = (this.shadow && this.constrainShadow && !this.shadowDisabled) ? this.shadow.getShadowSize() : undefined,
             overflowed = false,
+            constrainSize,
             constraintInsets = this.constraintInsets;
 
         if (!(constrainTo instanceof Ext.util.Region)) {
-            constrainTo = Ext.get(constrainTo.el || constrainTo).getViewRegion();
+            constrainTo = Ext.get(constrainTo.el || constrainTo);
+
+            
+            
+            constrainSize = constrainTo.getViewSize();
+            constrainTo = constrainTo.getViewRegion();
+            constrainTo.right = constrainTo.left + constrainSize.width;
+            constrainTo.bottom = constrainTo.top + constrainSize.height;
         }
 
         
@@ -21392,6 +21727,8 @@ Ext.define('Ext.dom.Element', function(Element) {
                                    
           
         
+        isElement: true,
+
         tableTagRe: /^(?:tr|td|table|tbody)$/i,
 
         mixins: [
@@ -21411,6 +21748,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 if (Number(defer)) {
                     Ext.defer(me.focus, defer, me, [null, dom]);
                 } else {
+                    Ext.globalEvents.fireEvent('beforefocus', dom);
                     dom.focus();
                 }
             } catch(e) {
@@ -21438,10 +21776,11 @@ Ext.define('Ext.dom.Element', function(Element) {
         
         isBorderBox: function() {
             var box = Ext.isBorderBox;
+
             
             
-            if (box && Ext.isIE7m) {
-                box = !((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
+            if (Ext.isIE7m && !box) {
+                box = ((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
             }
             return box;
         },
@@ -21565,7 +21904,7 @@ Ext.define('Ext.dom.Element', function(Element) {
         },
 
         
-        mask : function(msg, msgCls , elHeight) {
+        mask: function (msg, msgCls , elHeight) {
             var me            = this,
                 dom           = me.dom,
                 
@@ -21644,10 +21983,8 @@ Ext.define('Ext.dom.Element', function(Element) {
             
             
             
-            if (Ext.isStrict && !Ext.isIE6) {
-                if (dom === DOC.body) {
-                    maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
-                }
+            if (Ext.isStrict && !Ext.isIE6 && (dom === DOC.body)) {
+                maskEl.addCls(Ext.baseCSSPrefix + 'mask-fixed');
             }
 
             
@@ -22288,7 +22625,7 @@ Ext.define('Ext.dom.Element', function(Element) {
                 
                 
                 if (tabIndex == -1) { 
-                    canFocus = Ext.FocusManager && Ext.FocusManager.enabled && asFocusEl;
+                    canFocus = Ext.enableFocusManager && asFocusEl;
                 }
                 else {
                     
@@ -22892,6 +23229,9 @@ Ext.define('Ext.util.HashMap', {
     },
 
     
+
+    
+    
     clear: function( initial) {
         var me = this;
 
@@ -23028,7 +23368,8 @@ Ext.define('Ext.AbstractManager', {
 
     
     unregister: function(item) {
-        this.all.remove(item);
+        var all = this.all;
+        all.removeAtKey(all.getKey(item));
     },
 
     
@@ -23121,11 +23462,229 @@ function () {
 
 
 
+Ext.define('Ext.util.LruCache', {
+    extend:  Ext.util.HashMap ,
+
+    
+
+    constructor: function(config) {
+        Ext.apply(this, config);
+        this.callParent([config]);
+    },
+
+    
+    add: function(key, newValue) {
+        var me = this,
+            entry, last;
+
+        me.removeAtKey(key);
+        last = me.last;
+        entry = {
+            prev: last,
+            next: null,
+            key: key,
+            value: newValue
+        };
+
+        
+        if (last) {
+            
+            last.next = entry;
+        } else {
+            
+            me.first = entry;
+        }
+        me.last = entry;
+        me.callParent([key, entry]);
+        me.prune();
+        return newValue;
+    },
+
+    
+    insertBefore: function(key, newValue, sibling) {
+        var me = this,
+            existingKey,
+            entry;
+
+        
+        
+        if (sibling = this.map[this.findKey(sibling)]) {
+            existingKey = me.findKey(newValue);
+
+            
+            if (existingKey) {
+                me.unlinkEntry(entry = me.map[existingKey]);
+            }
+            
+            else {
+                entry = {
+                    prev: sibling.prev,
+                    next: sibling,
+                    key: key,
+                    value: newValue
+                };
+            }
+
+            if (sibling.prev) {
+                entry.prev.next = entry;
+            } else {
+                me.first = entry;
+            }
+            entry.next = sibling;
+            sibling.prev = entry;
+            me.prune();
+            return newValue;
+        }
+        
+        else {
+            return me.add(key, newValue);
+        }
+    },
+
+    
+    get: function(key) {
+        var entry = this.map[key];
+        if (entry) {
+
+            
+            if (entry.next) {
+                this.moveToEnd(entry);
+            }
+            return entry.value;
+        }
+    },
+
+    
+    removeAtKey: function(key) {
+        this.unlinkEntry(this.map[key]);
+        return this.callParent(arguments);
+    },
+
+    
+    clear: function( initial) {
+        this.first = this.last = null;
+        return this.callParent(arguments);
+    },
+
+    
+    unlinkEntry: function(entry) {
+        
+        if (entry) {
+            if (entry.next) {
+                entry.next.prev = entry.prev;
+            } else {
+                this.last = entry.prev;
+            }
+            if (entry.prev) {
+                entry.prev.next = entry.next;
+            } else {
+                this.first = entry.next;
+            }
+            entry.prev = entry.next = null;
+        }
+    },
+
+    
+    moveToEnd: function(entry) {
+        this.unlinkEntry(entry);
+
+        
+        
+        if (entry.prev = this.last) {
+            this.last.next = entry;
+        }
+        
+        else {
+            this.first = entry;
+        }
+        this.last = entry;
+    },
+
+    
+    getArray: function(isKey) {
+        var arr = [],
+            entry = this.first;
+
+        while (entry) {
+            arr.push(isKey ? entry.key: entry.value);
+            entry = entry.next;
+        }
+        return arr;
+    },
+
+    
+    each: function(fn, scope, reverse) {
+        var me = this,
+            entry = reverse ? me.last : me.first,
+            length = me.length;
+
+        scope = scope || me;
+        while (entry) {
+            if (fn.call(scope, entry.key, entry.value, length) === false) {
+                break;
+            }
+            entry = reverse ? entry.prev : entry.next;
+        }
+        return me;
+    },
+
+    
+    findKey: function(value) {
+        var key,
+            map = this.map;
+
+        for (key in map) {
+            
+            
+            if (map.hasOwnProperty(key) && map[key].value === value) {
+                return key;
+            }
+        }
+        return undefined;
+    },
+
+    
+    clone: function() {
+        var newCache = new this.self(this.initialConfig),
+            map = this.map,
+            key;
+
+        newCache.suspendEvents();
+        for (key in map) {
+            if (map.hasOwnProperty(key)) {
+                newCache.add(key, map[key].value);
+            }
+        }
+        newCache.resumeEvents();
+        return newCache;
+    },
+
+    
+    prune: function() {
+        var me = this,
+            purgeCount = me.maxSize ? (me.length - me.maxSize) : 0;
+
+        if (purgeCount > 0) {
+            for (; me.first && purgeCount; purgeCount--) {
+                me.removeAtKey(me.first.key);
+            }
+        }
+    }
+
+  
+  
+  
+  
+});
+
+
+
 Ext.define('Ext.ComponentQuery', {
     singleton: true 
                
                                
-                       
+                        
+                           
      
 }, function() {
 
@@ -23133,6 +23692,11 @@ Ext.define('Ext.ComponentQuery', {
         domQueryOperators = Ext.dom.Query.operators,
         nthRe = /(\d*)n\+?(\d*)/,
         nthRe2 = /\D/,
+        stripLeadingSpaceRe = /^(\s)+/,
+        unescapeRe = /\\(.)/g,
+        regexCache = new Ext.util.LruCache({
+            maxSize: 100
+        }),
 
         
         
@@ -23164,7 +23728,7 @@ Ext.define('Ext.ComponentQuery', {
                 length = items.length,
                 candidate,
                 deep = mode !== '>';
-                
+
             for (; i < length; i++) {
                 candidate = items[i];
                 if (candidate.getRefItems) {
@@ -23206,21 +23770,6 @@ Ext.define('Ext.ComponentQuery', {
                 }
                 return result;
             }
-        },
-
-        
-        filterByClassName = function(items, className) {
-            var result = [],
-                i = 0,
-                length = items.length,
-                candidate;
-            for (; i < length; i++) {
-                candidate = items[i];
-                if (candidate.hasCls(className)) {
-                    result.push(candidate);
-                }
-            }
-            return result;
         },
 
         
@@ -23271,6 +23820,11 @@ Ext.define('Ext.ComponentQuery', {
                                 }
                             }
                         }
+                    }
+                    else if (operator === '/=') {
+                        if (candidate[property] !== undefined && compareTo.test(candidate[property])) {
+                            result.push(candidate);
+                        }
                     } else if (!compareTo ? !!candidate[property] : domQueryOperators[operator](Ext.coerce(propValue, compareTo), compareTo)) {
                         result.push(candidate);
                     }
@@ -23304,12 +23858,23 @@ Ext.define('Ext.ComponentQuery', {
         modeRe = /^(\s?([>\^])\s?|\s|$)/,
 
         
-        tokenRe = /^(#)?([\w\-]+|\*)(?:\((true|false)\))?/,
+        tokenRe = /^(#)?((?:\\\.|[\w\-])+|\*)(?:\((true|false)\))?/,
 
         matchers = [{
             
-            re: /^\.([\w\-]+)(?:\((true|false)\))?/,
-            method: filterByXType
+            re: /^\.((?:\\\.|[\w\-])+)(?:\((true|false)\))?/,
+            method: filterByXType,
+            argTransform: function(args) {
+                var selector = args[0];
+                Ext.log.warn('"'+ selector +'" ComponentQuery selector style is deprecated,' +
+                             ' use "' + selector.replace(/^\./, '') + '" without the leading dot instead');
+
+                if (args[1] !== undefined) {
+                    args[1] = args[1].replace(unescapeRe, '$1');
+                }
+
+                return args.slice(1);
+            }
         }, {
             
             
@@ -23319,16 +23884,62 @@ Ext.define('Ext.ComponentQuery', {
             
             
             
-            re: /^(?:\[((?:[@?$])?[\w\-]*)\s*(?:([\^$*~%!]?=)\s*['"]?(.*?)["']?)?\])/,
-            method: filterByAttribute
+            re: /^(?:\[((?:[@?$])?[\w\-]*)\s*(?:([\^$*~%!\/]?=)\s*(['"])?((?:\\\]|.)*?)\3)?(?!\\)\])/,
+            method: filterByAttribute,
+            argTransform: function(args) {
+                var selector  = args[0],
+                    property  = args[1],
+                    operator  = args[2],
+                    quote     = args[3],
+                    compareTo = args[4],
+                    compareRe;
+
+                // Unescape the attribute value matcher first
+                if (compareTo !== undefined) {
+                    compareTo = compareTo.replace(unescapeRe, '$1');
+
+                    var format = Ext.String.format,
+                        msg = "ComponentQuery selector '{0}' has an unescaped ({1}) character at the {2} " +
+                              "of the attribute value pattern. Usually that indicates an error " +
+                              "where the opening quote is not followed by the closing quote. " +
+                              "If you need to match a ({1}) character at the {2} of the attribute " +
+                              "value, escape the quote character in your pattern: (\\{1})",
+                        match;
+
+                    if (match = /^(['"]).*?[^'"]$/.exec(compareTo)) {
+                        Ext.log.warn(format(msg, selector, match[1], 'beginning'));
+                    }
+                    else if (match = /^[^'"].*?(['"])$/.exec(compareTo)) {
+                        Ext.log.warn(format(msg, selector, match[1], 'end'));
+                    }
+                }
+
+                if (operator === '/=') {
+                    compareRe = regexCache.get(compareTo);
+                    if (compareRe) {
+                        compareTo = compareRe;
+                    } else {
+                        compareTo = regexCache.add(compareTo, new RegExp(compareTo));
+                    }
+                }
+
+                return [property, operator, compareTo];
+            }
         }, {
             
-            re: /^#([\w\-]+)/,
+            re: /^#((?:\\\.|[\w\-])+)/,
             method: filterById
         }, {
             
             re: /^\:([\w\-]+)(?:\(((?:\{[^\}]+\})|(?:(?!\{)[^\s>\/]*?(?!\})))\))?/,
-            method: filterByPseudo
+            method: filterByPseudo,
+            argTransform: function(args) {
+                if (args[2] !== undefined) {
+                    args[2] = args[2].replace(unescapeRe, '$1');
+                }
+
+                return args.slice(1);
+            }
         }, {
             
             re: /^(?:\{([^\}]+)\})/,
@@ -23350,9 +23961,22 @@ Ext.define('Ext.ComponentQuery', {
         
         
         
-        execute : function(root) {
+        execute: function(root) {
             var operations = this.operations,
-                i = 0,
+                result = [],
+                op, i, len;
+
+            for (i = 0, len = operations.length; i < len; i++) {
+                op = operations[i];
+
+                result = result.concat(this._execute(root, op));
+            }
+
+            return result;
+        },
+
+        _execute: function(root, operations) {
+            var i = 0,
                 length = operations.length,
                 operation,
                 workingItems;
@@ -23402,10 +24026,32 @@ Ext.define('Ext.ComponentQuery', {
 
         is: function(component) {
             var operations = this.operations,
+                result = false,
                 len = operations.length,
+                op, i;
+
+            if (len === 0) {
+                return true;
+            }
+
+            for (i = 0; i < len; i++) {
+                op = operations[i];
+
+                result = this._is(component, op);
+
+                if (result) {
+                    return result;
+                }
+            }
+
+            return false;
+        },
+
+        _is: function(component, operations) {
+            var len = operations.length,
                 active = [component],
                 operation, i, j, mode, matches, items, item;
-                
+
             
             for (i = len - 1; i >= 0; --i) {
                 operation = operations[i];
@@ -23426,12 +24072,12 @@ Ext.define('Ext.ComponentQuery', {
                     } else {
                         active = getAncestors(active);
                     }
-                    
+
                     
                     if (active.length === 0) {
                         return false;
                     }
-                    
+
                 } else {
                     active = filterItems(active, operation);
                     if (active.length === 0) {
@@ -23441,27 +24087,33 @@ Ext.define('Ext.ComponentQuery', {
             }
             return true;
         },
-        
+
         getMatches: function(components, operations) {
             var len = operations.length,
                 i;
-                
+
             for (i = 0; i < len; ++i) {
                 components = filterItems(components, operations[i]);
                 
                 
                 if (components.length === 0) {
                     break;
-                }  
+                }
             }
             return components;
+        },
+
+        isMultiMatch: function() {
+            return this.operations.length > 1;
         }
     });
 
     Ext.apply(this, {
 
         
-        cache: {},
+        cache: new Ext.util.LruCache({
+            maxSize: 100
+        }),
 
         
         pseudos: {
@@ -23472,7 +24124,7 @@ Ext.define('Ext.ComponentQuery', {
                     results = [],
                     index = -1,
                     component;
-                
+
                 for(; i < length; ++i) {
                     component = components[i];
                     if (!CQ.is(component, selector)) {
@@ -23483,16 +24135,16 @@ Ext.define('Ext.ComponentQuery', {
             },
             first: function(components) {
                 var ret = [];
-                    
+
                 if (components.length > 0) {
                     ret.push(components[0]);
                 }
-                return ret;       
+                return ret;
             },
             last: function(components) {
                 var len = components.length,
                     ret = [];
-                    
+
                 if (len > 0) {
                     ret.push(components[len - 1]);
                 }
@@ -23537,23 +24189,26 @@ Ext.define('Ext.ComponentQuery', {
 
         
         query: function(selector, root) {
-            var selectors = selector.split(','),
-                length = selectors.length,
-                i = 0,
-                results = [],
-                noDupResults = [], 
-                dupMatcher = {}, 
-                query, resultsLn, cmp;
-
-            for (; i < length; i++) {
-                selector = Ext.String.trim(selectors[i]);
-                query = this.cache[selector] || (this.cache[selector] = this.parse(selector));
-                results = results.concat(query.execute(root));
+            
+            if (!selector) {
+                return Ext.ComponentManager.all.getArray();
             }
 
+            var results = [],
+                noDupResults = [],
+                dupMatcher = {},
+                query = this.cache.get(selector),
+                resultsLn, cmp, i;
+
+            if (!query) {
+                query = this.cache.add(selector, this.parse(selector));
+            }
+
+            results = query.execute(root);
+
             
             
-            if (length > 1) {
+            if (query.isMultiMatch()) {
                 resultsLn = results.length;
                 for (i = 0; i < resultsLn; i++) {
                     cmp = results[i];
@@ -23568,34 +24223,114 @@ Ext.define('Ext.ComponentQuery', {
         },
 
         
+        visitPreOrder: function(selector, root, fn, scope, extraArgs) {
+            this._visit(true, selector, root, fn, scope, extraArgs);
+        },
+
+        
+        visitPostOrder: function(selector, root, fn, scope, extraArgs) {
+            this._visit(false, selector, root, fn, scope, extraArgs);
+        },
+
+        
+        
+        _visit: function(preOrder, selector, root, fn, scope, extraArgs) {
+            var me = this,
+                query = me.cache.get(selector),
+                callArgs = [root],
+                children,
+                len = 0,
+                i, rootMatch;
+
+            if (!query) {
+                query = me.cache.add(selector, me.parse(selector));
+            }
+
+            rootMatch = query.is(root);
+
+            if (root.getRefItems) {
+                children = root.getRefItems();
+                len = children.length;
+            }
+
+            
+            if (extraArgs) {
+                Ext.Array.push(callArgs, extraArgs);
+            }
+            if (preOrder) {
+                if (rootMatch) {
+                    if (fn.apply(scope || root, callArgs) === false) {
+                        return false;
+                    }
+                }
+            }
+            for (i = 0; i < len; i++) {
+                if (me._visit.call(me, preOrder, selector, children[i], fn, scope, extraArgs) === false) {
+                    return false;
+                }
+            }
+            if (!preOrder) {
+                if (rootMatch) {
+                    if (fn.apply(scope || root, callArgs) === false) {
+                        return false;
+                    }
+                }
+            }
+        },
+
+        
         is: function(component, selector) {
             if (!selector) {
                 return true;
             }
-            var selectors = selector.split(','),
-                length = selectors.length,
-                i = 0,
-                query;
 
-            for (; i < length; i++) {
-                selector = Ext.String.trim(selectors[i]);
-                query = this.cache[selector] || (this.cache[selector] = this.parse(selector));
-                if (query.is(component)) {
-                    return true;
-                }
+            var query = this.cache.get(selector);
+            if (!query) {
+                query = this.cache.add(selector, this.parse(selector));
             }
-            return false;
+
+            return query.is(component);
         },
 
         parse: function(selector) {
             var operations = [],
+                selectors, sel, i, len;
+
+            selectors = Ext.splitAndUnescape(selector, ',');
+
+            for (i = 0, len = selectors.length; i < len; i++) {
+                
+                sel = Ext.String.trim(selectors[i]);
+
+                
+                
+                
+                if (sel === '') {
+                    Ext.Error.raise('Invalid ComponentQuery selector: ""');
+                }
+
+                operations.push(this._parse(sel));
+            }
+
+            
+            
+            return new cq.Query({
+                operations: operations
+            });
+        },
+
+        _parse: function(selector) {
+            var operations = [],
+                trim = Ext.String.trim,
                 length = matchers.length,
                 lastSelector,
                 tokenMatch,
+                token,
                 matchedChar,
                 modeMatch,
                 selectorMatch,
-                i, matcher, method;
+                transform,
+                i, matcher, method, args;
 
             
             
@@ -23608,20 +24343,13 @@ Ext.define('Ext.ComponentQuery', {
 
                 if (tokenMatch) {
                     matchedChar = tokenMatch[1];
+                    token = trim(tokenMatch[2]).replace(unescapeRe, '$1');
 
                     
                     if (matchedChar === '#') {
                         operations.push({
                             method: filterById,
-                            args: [Ext.String.trim(tokenMatch[2])]
-                        });
-                    }
-                    
-                    
-                    else if (matchedChar === '.') {
-                        operations.push({
-                            method: filterByClassName,
-                            args: [Ext.String.trim(tokenMatch[2])]
+                            args: [token]
                         });
                     }
                     
@@ -23629,12 +24357,12 @@ Ext.define('Ext.ComponentQuery', {
                     else {
                         operations.push({
                             method: filterByXType,
-                            args: [Ext.String.trim(tokenMatch[2]), Boolean(tokenMatch[3])]
+                            args: [token, Boolean(tokenMatch[3])]
                         });
                     }
 
                     
-                    selector = selector.replace(tokenMatch[0], '');
+                    selector = selector.replace(tokenMatch[0], '').replace(stripLeadingSpaceRe, '$1');
                 }
 
                 
@@ -23647,11 +24375,20 @@ Ext.define('Ext.ComponentQuery', {
                         matcher = matchers[i];
                         selectorMatch = selector.match(matcher.re);
                         method = matcher.method;
+                        transform = matcher.argTransform;
 
                         
                         
                         
                         if (selectorMatch) {
+                            
+                            if (transform) {
+                                args = transform(selectorMatch);
+                            }
+                            else {
+                                args = selectorMatch.slice(1);
+                            }
+
                             operations.push({
                                 method: Ext.isString(matcher.method)
                                     
@@ -23659,9 +24396,10 @@ Ext.define('Ext.ComponentQuery', {
                                     
                                     ? Ext.functionFactory('items', Ext.String.format.apply(Ext.String, [method].concat(selectorMatch.slice(1))))
                                     : matcher.method,
-                                args: selectorMatch.slice(1)
+                                args: args
                             });
-                            selector = selector.replace(selectorMatch[0], '');
+
+                            selector = selector.replace(selectorMatch[0], '').replace(stripLeadingSpaceRe, '$1');
                             break; 
                         }
                         
@@ -23679,15 +24417,13 @@ Ext.define('Ext.ComponentQuery', {
                     operations.push({
                         mode: modeMatch[2]||modeMatch[1]
                     });
-                    selector = selector.replace(modeMatch[0], '');
+
+                    
+                    selector = selector.replace(modeMatch[0], '').replace(stripLeadingSpaceRe, '');
                 }
             }
 
-            
-            
-            return new cq.Query({
-                operations: operations
-            });
+            return operations;
         }
     });
 });
@@ -24211,13 +24947,14 @@ Ext.define('Ext.util.AbstractMixedCollection', {
         }
         return o;
     },
-    
+
     
     updateKey: function(oldKey, newKey) {
         var me = this,
             map = me.map,
-            indexMap = me.indexMap,
             index = me.indexOfKey(oldKey),
+            
+            indexMap = me.indexMap,
             item;
 
         if (index > -1) {
@@ -24899,6 +25636,9 @@ Ext.define('Ext.util.Sorter', {
         var me = this;
 
         Ext.apply(me, config);
+        if (me.direction) {
+            me.direction = me.direction.toUpperCase();
+        }
 
         if (me.property === undefined && me.sorterFn === undefined) {
             Ext.Error.raise("A Sorter requires either a property or a sorter function");
@@ -24911,7 +25651,7 @@ Ext.define('Ext.util.Sorter', {
     createSortFunction: function(sorterFn) {
         var me        = this,
             direction = me.direction || "ASC",
-            modifier  = direction.toUpperCase() == "DESC" ? -1 : 1;
+            modifier  = direction == "DESC" ? -1 : 1;
 
         
         
@@ -24983,6 +25723,11 @@ Ext.define("Ext.util.Sortable", {
                          
       
 
+    
+
+    
+    multiSortLimit: 3,
+
     statics: {
         
         createComparator: function(sorters) {
@@ -24992,8 +25737,9 @@ Ext.define("Ext.util.Sortable", {
                     i = 1;
 
                 
-                for (; i < length; i++) {
-                    result = result || sorters[i].sort.call(this, r1, r2);
+                
+                for (; !result && i < length; i++) {
+                    result = sorters[i].sort.call(this, r1, r2);
                 }
                 return result;
             }: function() {
@@ -25022,20 +25768,19 @@ Ext.define("Ext.util.Sortable", {
     },
 
     
-    sort: function(sorters, direction, where, doSort) {
+    sort: function(sorters, direction, insertionPosition, doSort) {
         var me = this,
             sorter,
-            newSorters;
+            overFlow;
 
         if (Ext.isArray(sorters)) {
-            doSort = where;
-            where = direction;
-            newSorters = sorters;
+            doSort = insertionPosition;
+            insertionPosition = direction;
         }
         else if (Ext.isObject(sorters)) {
-            doSort = where;
-            where = direction;
-            newSorters = [sorters];
+            sorters = [sorters];
+            doSort = insertionPosition;
+            insertionPosition = direction;
         }
         else if (Ext.isString(sorters)) {
             sorter = me.sorters.get(sorters);
@@ -25045,44 +25790,66 @@ Ext.define("Ext.util.Sortable", {
                     property : sorters,
                     direction: direction
                 };
-                newSorters = [sorter];
             }
-            else if (direction === undefined) {
+            else if (direction == null) {
                 sorter.toggle();
             }
             else {
                 sorter.setDirection(direction);
             }
+            sorters = [sorter];
         }
 
-        if (newSorters && newSorters.length) {
-            newSorters = me.decodeSorters(newSorters);
-            if (Ext.isString(where)) {
-                if (where === 'prepend') {
-                    me.sorters.insert(0, newSorters);
-                }
-                else {
-                    me.sorters.addAll(newSorters);
-                }
-            }
-            else {
-                me.sorters.clear();
-                me.sorters.addAll(newSorters);
+        if (sorters && sorters.length) {
+            sorters = me.decodeSorters(sorters);
+
+            switch (insertionPosition) {
+                
+                
+                
+                
+                case "multi":
+                    
+                    me.sorters.insert(0, sorters[0]);
+
+                    
+                    overFlow = me.sorters.getCount() - me.multiSortLimit;
+                    if (overFlow > 0) {
+                        me.sorters.removeRange(me.multiSortLimit, overFlow);
+                    }
+                    break;
+                case "prepend" :
+                    me.sorters.insert(0, sorters);
+                    break;
+                case "append" :
+                    me.sorters.addAll(sorters);
+                    break;
+                case undefined:
+                case null:
+                case "replace":
+                    me.sorters.clear();
+                    me.sorters.addAll(sorters);
+                    break;
+                default:
+                    Ext.Error.raise('Sorter insertion point must be "multi", "prepend", "append" or "replace"');
             }
         }
 
         if (doSort !== false) {
-            me.fireEvent('beforesort', me, newSorters);
-            me.onBeforeSort(newSorters);
-            
-            sorters = me.sorters.items;
-            if (sorters.length) {
+            me.fireEvent('beforesort', me, sorters);
+            me.onBeforeSort(sorters);
+            if (me.getSorterCount()) {
                 
                 me.doSort(me.generateComparator());
             }
         }
 
         return sorters;
+    },
+
+    
+    getSorterCount: function( ){
+        return this.sorters.items.length;
     },
 
     
@@ -29146,6 +29913,14 @@ Ext.define('Ext.util.Animate', {
             paused: true
         }, config);
     },
+    
+    
+    getAnimationProps: function() {
+        var me = this,
+            layout = me.layout;
+        
+        return layout && layout.animate ? layout.animate : {};
+    },
 
     
     stopFx: Ext.Function.alias(Ext.util.Animate, 'stopAnimation'),
@@ -29460,7 +30235,7 @@ Ext.define('Ext.util.Renderable', {
             item, pre, hide, contentEl;
 
         me.finishRenderChildren();
-        
+
         
         
         if (me.contentEl) {
@@ -29505,7 +30280,9 @@ Ext.define('Ext.util.Renderable', {
             y = me.y,
             hasX,
             hasY,
-            pos, xy;
+            pos, xy,
+            alignSpec = me.defaultAlign,
+            alignOffset = me.alignOffset;
 
         
         
@@ -29519,11 +30296,11 @@ Ext.define('Ext.util.Renderable', {
         if (me.floating && (!hasX || !hasY)) {
             if (me.floatParent) {
                 pos = me.floatParent.getTargetEl().getViewRegion();
-                xy = me.el.getAlignToXY(me.floatParent.getTargetEl(), 'c-c');
+                xy = me.el.getAlignToXY(me.alignTarget || me.floatParent.getTargetEl(), alignSpec, alignOffset);
                 pos.x = xy[0] - pos.x;
                 pos.y = xy[1] - pos.y;
             } else {
-                xy = me.el.getAlignToXY(me.container, 'c-c');
+                xy = me.el.getAlignToXY(me.alignTarget || me.container, alignSpec, alignOffset);
                 pos = me.container.translateXY(xy[0], xy[1]);
             }
             x = hasX ? x : pos.x;
@@ -29609,7 +30386,7 @@ Ext.define('Ext.util.Renderable', {
         var me = this;
         if (!me.rendered) {
             if (me.floating) {
-                me.render(document.body);
+                me.render(me.renderTo || document.body);
             } else {
                 me.render(Ext.isBoolean(me.autoRender) ? Ext.getBody() : me.autoRender);
             }
@@ -30430,7 +31207,7 @@ Ext.define('Ext.state.Provider', {
         } else if(typeof value == 'boolean') {
             enc = 'b:' + (value ? '1' : '0');
         } else if(Ext.isDate(value)) {
-            enc = 'd:' + value.toGMTString();
+            enc = 'd:' + value.toUTCString();
         } else if(Ext.isArray(value)) {
             for (len = value.length; i < len; i++) {
                 flat += this.encodeValue(value[i]);
@@ -30555,17 +31332,16 @@ Ext.define('Ext.state.Stateful', {
     
     addStateEvents: function (events) {
         var me = this,
-            i, event, stateEventsByName;
+            i, event, stateEventsByName,
+            eventArray;
 
         if (me.stateful && me.getStateId()) {
-            if (typeof events == 'string') {
-                events = Array.prototype.slice.call(arguments, 0);
-            }
+            eventArray =  (typeof events == 'string') ? arguments : events;
 
             stateEventsByName = me.stateEventsByName || (me.stateEventsByName = {});
 
-            for (i = events.length; i--; ) {
-                event = events[i];
+            for (i = eventArray.length; i--; ) {
+                event = eventArray[i];
 
                 if (!stateEventsByName[event]) {
                     stateEventsByName[event] = 1;
@@ -30764,6 +31540,46 @@ Ext.define('Ext.AbstractComponent', {
         },
 
         
+        findComponentByElement: function(node) {
+            var topmost = document.body,
+                target = node,
+                cmp;
+
+            while (target && target.nodeType === 1 && target !== topmost) {
+                cmp = Ext.getCmp(target.id);
+
+                if (cmp) {
+                    return cmp;
+                }
+
+                target = target.parentNode;
+            }
+
+            return null;
+       },
+
+        
+        getComponentByElement: function(el) {
+            var cmpIdAttr = Ext.Component.componentIdAttribute,
+                cmpId;
+
+            el = Ext.fly(el);
+
+            if (!el) {
+                return null;
+            }
+
+            cmpId = el.getAttribute(cmpIdAttr);
+
+            if (cmpId) {
+                return Ext.getCmp(cmpId);
+            }
+            else {
+                return Ext.Component.findComponentByElement(el.dom);
+            }
+        },
+
+        
         flushLayouts: function () {
             var me = this,
                 context = me.pendingLayouts;
@@ -30778,9 +31594,9 @@ Ext.define('Ext.AbstractComponent', {
                         
                         
                         me.runningLayoutContext = null;
-                         
+
                         var result = this.callParent(); 
-                        if (Ext.globalEvents.hasListeners.afterlayout) {                            
+                        if (Ext.globalEvents.hasListeners.afterlayout) {
                             Ext.globalEvents.fireEvent('afterlayout');
                         }
                         return result;
@@ -30861,6 +31677,9 @@ Ext.define('Ext.AbstractComponent', {
     
 
     
+    maskElement: null,
+
+    
 
     
 
@@ -30915,6 +31734,22 @@ Ext.define('Ext.AbstractComponent', {
     disabled: false,
 
     
+    disabledRe: /^(?:button|input|select|textarea|optgroup|option|fieldset)$/i,
+
+    nonMaskableRe: (function () {
+        var re = ['input', 'select', 'textarea', 'optgroup', 'option', 'table'];
+
+        
+        if (Ext.isIE9m && !(Ext.isIE9 && !Ext.isIEQuirks)) {
+            
+            
+            re.push('p');
+        }
+
+        return new RegExp('^(?:' + re.join('|') + ')$', 'i');
+    }()),
+
+    
 
     
     draggable: false,
@@ -30967,9 +31802,9 @@ Ext.define('Ext.AbstractComponent', {
     
     _isLayoutRoot: false,
 
-     
-    contentPaddingProperty: 'padding',
     
+    contentPaddingProperty: 'padding',
+
     horizontalPosProp: 'left',
 
     
@@ -31061,10 +31896,6 @@ Ext.define('Ext.AbstractComponent', {
 
         me.renderData = me.renderData || {};
         me.renderSelectors = me.renderSelectors || {};
-
-        if (me.plugins) {
-            me.plugins = me.constructPlugins();
-        }
 
         
         if (!me.hasListeners) {
@@ -31219,7 +32050,7 @@ Ext.define('Ext.AbstractComponent', {
 
             
             if (hasToHeight || hasToWidth) {
-                oldOverflow = me.el.getStyle('overtflow');
+                oldOverflow = me.el.getStyle('overflow');
                 if (oldOverflow !== 'hidden') {
                     me.el.setStyle('overflow', 'hidden');
                 }
@@ -31275,10 +32106,10 @@ Ext.define('Ext.AbstractComponent', {
         }
         return me.mixins.animate.animate.apply(me, arguments);
     },
-    
+
     setHiddenState: function(hidden){
         var hierarchyState = this.getHierarchyState();
-        
+
         this.hidden = hidden;
         if (hidden) {
             hierarchyState.hidden = true;
@@ -31301,7 +32132,7 @@ Ext.define('Ext.AbstractComponent', {
     
     constructPlugin: function(plugin) {
         var me = this;
-        
+
         
         if (typeof plugin == 'string') {
             plugin = Ext.PluginManager.create({}, plugin, me);
@@ -31418,7 +32249,7 @@ Ext.define('Ext.AbstractComponent', {
         if (!me.rendered) {
             return;
         }
-        if (++me.layoutSuspendCount == 1) {
+        if (++me.layoutSuspendCount === 1) {
             me.suspendLayout = true;
         }
     },
@@ -31428,7 +32259,10 @@ Ext.define('Ext.AbstractComponent', {
         if (!me.rendered) {
             return;
         }
-        if (! --me.layoutSuspendCount) {
+        if (!me.layoutSuspendCount) {
+            Ext.log.warn('Mismatched call to resumeLayouts - layouts are currently not suspended.');
+        }
+        if (me.layoutSuspendCount && !--me.layoutSuspendCount) {
             me.suspendLayout = false;
             if (flushOptions && !me.isLayoutSuspended()) {
                 me.updateLayout(flushOptions);
@@ -31796,19 +32630,19 @@ Ext.define('Ext.AbstractComponent', {
             }
         }
     },
-    
+
     parseBox: function(box) {
-        return Ext.dom.Element.parseBox(box);    
+        return Ext.dom.Element.parseBox(box);
     },
-    
+
     unitizeBox: function(box) {
-        return Ext.dom.Element.unitizeBox(box);    
+        return Ext.dom.Element.unitizeBox(box);
     },
-    
+
     
     setMargin: function(margin,  preventLayout) {
         var me = this;
-        
+
         if (me.rendered) {
             if (!margin && margin !== 0) {
                 margin = '';
@@ -31878,7 +32712,7 @@ Ext.define('Ext.AbstractComponent', {
             
             
             needsTabIndex = focusEl.needsTabIndex();
-            if (!me.focusListenerAdded && (!needsTabIndex || Ext.FocusManager.enabled)) {
+            if (!me.focusListenerAdded && (!needsTabIndex || Ext.enableFocusManager)) {
                 if (needsTabIndex) {
                     focusEl.dom.tabIndex = -1;
                 }
@@ -31955,6 +32789,26 @@ Ext.define('Ext.AbstractComponent', {
 
     
     postBlur : Ext.emptyFn,
+
+    
+    owns: function (element) {
+        var result = false,
+            cmp;
+
+        if (element.isEvent) {
+            element = element.target;
+        } else if (element.isElement) {
+            element = element.dom;
+        }
+
+        cmp = Ext.AbstractComponent.findComponentByElement(element);
+
+        if (cmp) {
+            result = (cmp === this) || (!!cmp.up(this));
+        }
+
+        return result;
+    },
 
     
     is: function(selector) {
@@ -32123,7 +32977,7 @@ Ext.define('Ext.AbstractComponent', {
     getTargetEl: function() {
         return this.frameBody || this.el;
     },
-    
+
     
     getOverflowEl: function(){
         return this.getTargetEl();
@@ -32158,7 +33012,7 @@ Ext.define('Ext.AbstractComponent', {
                 if (ox && ox === true) {
                     ox = 'auto';
                 }
-                
+
                 if (oy && oy === true) {
                     oy = 'auto';
                 }
@@ -32235,7 +33089,10 @@ Ext.define('Ext.AbstractComponent', {
     update : function(htmlOrData, loadScripts, cb) {
         var me = this,
             isData = (me.tpl && !Ext.isString(htmlOrData)),
-            el;
+            el,
+            sizeModel = me.getSizeModel(),
+            
+            doLayout = sizeModel.width.shrinkWrap || sizeModel.height.shrinkWrap;
 
         if (isData) {
             me.data = htmlOrData;
@@ -32244,13 +33101,23 @@ Ext.define('Ext.AbstractComponent', {
         }
 
         if (me.rendered) {
-            el = me.isContainer ? me.layout.getRenderTarget() : me.getTargetEl();
+            if (me.isContainer) {
+                el = me.layout.getRenderTarget();
+
+                
+                doLayout = doLayout || me.items.items.length > 0;
+            } else {
+                el = me.getTargetEl();
+            }
             if (isData) {
                 me.tpl[me.tplWriteMode](el, htmlOrData || {});
             } else {
                 el.update(me.html, loadScripts, cb);
             }
-            me.updateLayout();
+
+            if (doLayout) {
+                me.updateLayout();
+            }
         }
 
     },
@@ -32328,7 +33195,7 @@ Ext.define('Ext.AbstractComponent', {
         if (me.draggable) {
             me.initDraggable();
         }
-        
+
         if (me.hasListeners.boxready) {
             me.fireEvent('boxready', me, width, height);
         }
@@ -32380,31 +33247,55 @@ Ext.define('Ext.AbstractComponent', {
 
     
     onEnable: function() {
-        if (this.maskOnDisable) {
-            this.el.dom.disabled = false;
-            this.unmask();
+        var me = this,
+            dom, nodeName;
+
+        if (me.maskOnDisable) {
+            dom = me.el.dom;
+            nodeName = dom.nodeName;
+
+            if (me.disabledRe.test(nodeName)) {
+                dom.disabled = false;
+            }
+
+            if (!me.nonMaskableRe.test(nodeName)) {
+                me.unmask();
+            }
         }
     },
 
     
-    onDisable : function() {
+    onDisable: function() {
         var me = this,
             focusCls = me.focusCls,
-            focusEl = me.getFocusEl();
-            
+            focusEl = me.getFocusEl(),
+            dom, nodeName;
+
         if (focusCls && focusEl) {
             focusEl.removeCls(me.removeClsWithUI(focusCls, true));
         }
-        
+
         if (me.maskOnDisable) {
-            me.el.dom.disabled = true;
-            me.mask();
+            dom = me.el.dom;
+            nodeName = dom.nodeName;
+
+            if (me.disabledRe.test(nodeName)) {
+                dom.disabled = true;
+            }
+
+            if (!me.nonMaskableRe.test(nodeName)) {
+                me.mask();
+            }
         }
     },
 
+    
     mask: function (msg, msgCls, elHeight) {
         var box = this.lastBox,
-            target = this.getMaskTarget();
+            
+            
+            
+            target = this.getMaskTarget() || this.el;
 
         
         if (box) {
@@ -32413,12 +33304,14 @@ Ext.define('Ext.AbstractComponent', {
         target.mask(msg, msgCls, elHeight);
     },
 
+    
     unmask: function() {
-        this.getMaskTarget().unmask();
+        (this.getMaskTarget() || this.el).unmask();
     },
 
-    getMaskTarget: function(){
-        return this.el;
+    
+    getMaskTarget: function() {
+        return this.maskElement ? this[this.maskElement] : null;
     },
 
     
@@ -32634,7 +33527,7 @@ Ext.define('Ext.AbstractComponent', {
         } else if (width === null) {
             delete me.width;
         }
-        
+
         if (typeof height == 'number') {
             me.height = Ext.Number.constrain(height, me.minHeight, me.maxHeight);
         } else if (height === null) {
@@ -33080,10 +33973,6 @@ Ext.define('Ext.AbstractComponent', {
     onDestroy : function() {
         var me = this;
 
-        if (me.monitorResize && Ext.EventManager.resizeEvent) {
-            Ext.EventManager.resizeEvent.removeListener(me.setSize, me);
-        }
-
         
         Ext.destroy(
             me.componentLayout,
@@ -33151,6 +34040,7 @@ Ext.define('Ext.AbstractComponent', {
                     delete me.frameBody;
                     delete me.rendered;
                 }
+                delete me.initialConfig;
 
                 me.destroying = false;
                 me.isDestroyed = true;
@@ -33171,14 +34061,14 @@ Ext.define('Ext.AbstractComponent', {
             hierarchyState = (inner && me.hierarchyStateInner) || me.hierarchyState,
             ownerCt = me.ownerCt,
             parent, layout, hierarchyStateInner, getInner;
- 
+
         if (!hierarchyState || hierarchyState.invalid) {
             
             
             
             
             parent = me.getRefOwner();
-            
+
             if (ownerCt) {
                 
                 
@@ -33331,8 +34221,10 @@ Ext.define('Ext.AbstractPlugin', {
 
     
     constructor: function(config) {
-        this.pluginConfig = config;
-        Ext.apply(this, config);
+        if (config) {
+            this.pluginConfig = config;
+            Ext.apply(this, config);
+        }
     },
 
     
@@ -34072,15 +34964,15 @@ Ext.define('Ext.data.Connection', {
             
             
             if (doc) {
-                 if (Ext.isOpera && doc.location == 'about:blank') {
-                     return;
-                 }
+                if (Ext.isOpera && doc.location == 'about:blank') {
+                    return;
+                }
                 if (doc.body) {
 
                     
                     
                     if ((contentNode = doc.body.firstChild) && /pre/i.test(contentNode.tagName)) {
-                        response.responseText = contentNode.textContent;
+                        response.responseText = contentNode.textContent || contentNode.innerText;
                     }
 
                     
@@ -34777,7 +35669,7 @@ Ext.define('Ext.util.Floating', {
 
         
         
-        if (me.modal && !(Ext.FocusManager && Ext.FocusManager.enabled)) {
+        if (me.modal && !(Ext.enableFocusManager)) {
             me.mon(me.el, {
                 keydown: me.onKeyDown,
                 scope: me
@@ -34799,6 +35691,17 @@ Ext.define('Ext.util.Floating', {
         me.registerWithOwnerCt();
 
         me.initHierarchyEvents();
+    },
+
+    initFloatConstrain: function () {
+        var me = this,
+            floatParent = me.floatParent;
+
+        
+        
+        if ((me.constrain || me.constrainHeader) && !me.constrainTo) {
+            me.constrainTo = floatParent ? floatParent.getTargetEl() : me.container;
+        }
     },
 
     initHierarchyEvents: function() {
@@ -34834,7 +35737,8 @@ Ext.define('Ext.util.Floating', {
         
         
         
-        me.setFloatParent(ownerCt || zip);
+        me.floatParent = ownerCt || zip;
+        me.initFloatConstrain();
         delete me.ownerCt;
 
         if (zip) {
@@ -34879,7 +35783,7 @@ Ext.define('Ext.util.Floating', {
     
     onMouseDown: function (e) {
         var focusTask = this.focusTask;
-        
+
         if (this.floating &&
             
             
@@ -34890,32 +35794,20 @@ Ext.define('Ext.util.Floating', {
         }
     },
 
-    setFloatParent: function(floatParent) {
-        var me = this;
-
-        me.floatParent = floatParent;
-
-        
-        
-        if ((me.constrain || me.constrainHeader) && !me.constrainTo) {
-            me.constrainTo = floatParent ? floatParent.getTargetEl() : me.container;
-        }
-    },
-    
     
     syncShadow : function() {
         if (this.floating) {
             this.el.sync(true);
         }
     },
-    
+
     onBeforeFloatLayout: function(){
         this.el.preventSync = true;
     },
-    
+
     onAfterFloatLayout: function(){
         delete this.el.preventSync;
-        this.syncShadow();   
+        this.syncShadow();
     },
 
     
@@ -35000,6 +35892,9 @@ Ext.define('Ext.util.Floating', {
                 
                 
                 me.focus(false, true);
+            }
+            if (me.hasListeners.tofront) {
+                me.fireEvent('tofront', me, me.el.getZIndex());
             }
         }
         
@@ -35129,9 +36024,12 @@ Ext.define('Ext.Component', {
 
     
     floating: false,
+
+    
+    defaultAlign: 'c-c',
     
     
-    defaultAlign: 'tl-bl?',
+    alignTarget: null,
 
     
     toFrontOnShow: true,
@@ -35242,7 +36140,8 @@ Ext.define('Ext.Component', {
     
     setOverflowXY: function(overflowX, overflowY) {
         var me = this,
-            argCount = arguments.length;
+            argCount = arguments.length,
+            ownerCt = me.ownerCt;
 
         if (argCount) {
             me.overflowX = overflowX || '';
@@ -35257,7 +36156,10 @@ Ext.define('Ext.Component', {
         if (me.rendered) {
             me.getOverflowEl().setStyle(me.getOverflowStyle());
         }
-        me.updateLayout();
+
+        
+        
+        (ownerCt || me).updateLayout();
         return me;
     },
 
@@ -35358,30 +36260,47 @@ Ext.define('Ext.Component', {
     },
 
     
-    setLoading : function(load, targetEl) {
+    setLoading: function (load,  targetEl) {
         var me = this,
             config = {
                 target: me
             };
 
         if (me.rendered) {
-            Ext.destroy(me.loadMask);
-            me.loadMask = null;
-
-            if (load !== false && !me.collapsed) {
-                if (Ext.isObject(load)) {
-                    Ext.apply(config, load);
-                } else if (Ext.isString(load)) {
+            
+            if (load !== false) {
+                if (Ext.isString(load)) {
                     config.msg = load;
+                } else {
+                    Ext.apply(config, load);
                 }
                 
-                if (targetEl) {
-                    Ext.applyIf(config, {
-                        useTargetEl: true
-                    });
+                if (!me.loadMask || !me.loadMask.isLoadMask) {
+                    
+                    
+                    if (targetEl && config.useTargetEl == null) {
+                        config.useTargetEl = true;
+                    }
+                    me.loadMask = new Ext.LoadMask(config);
                 }
-                me.loadMask = new Ext.LoadMask(config);
-                me.loadMask.show();
+                
+                else {
+                    Ext.apply(me.loadMask, config);
+                }
+                
+                if (me.loadMask.isVisible()) {
+                    me.loadMask.afterShow();
+                }
+                
+                else {
+                    me.loadMask.show();
+                }
+            }
+            
+            else {
+                if (me.loadMask && me.loadMask.isLoadMask) {
+                    me.loadMask.hide();
+                }
             }
         }
         return me.loadMask;
@@ -35430,20 +36349,27 @@ Ext.define('Ext.Component', {
         
         if (!me.floating) {
             Ext.log.warn('Using showBy on a non-floating component');
-            return me;
         }
 
         if (me.floating && cmp) {
+            me.alignTarget = cmp;
+
+            if (pos) {
+                me.defaultAlign = pos;
+            }
+
+            if (off) {
+                me.alignOffset = off;
+            }
+
             me.show();
 
             
-            if (me.rendered && !me.hidden) {
-                
-                
-                
-                me.alignTo(cmp, pos || me.defaultAlign, off);
+            if (!me.hidden) {
+                me.alignTo(cmp, pos || me.defaultAlign, off || me.alignOffset);
             }
         }
+
         return me;
     },
 
@@ -35828,7 +36754,8 @@ Ext.define('Ext.Component', {
                 me.resizer,
                 me.proxy,
                 me.proxyWrap,
-                me.resizerComponent
+                me.resizerComponent,
+                me.loadMask
             );
         }
         delete me.focusTask;
@@ -35974,7 +36901,8 @@ Ext.define('Ext.Component', {
 
     
     getRefOwner: function() {
-        return this.ownerCt || this.floatParent;
+        
+        return this.ownerCt || this.ownerCmp || this.floatParent;
     },
 
     
@@ -37275,6 +38203,7 @@ Ext.define('Ext.layout.container.Container', {
         var me = this,
             itemCls = me.itemCls,
             ownerItemCls = me.owner.itemCls,
+            needsCopy,
             addClasses;
 
         
@@ -37282,10 +38211,19 @@ Ext.define('Ext.layout.container.Container', {
 
         if (itemCls) {
             
-            addClasses = typeof itemCls === 'string' ? [itemCls] : itemCls;
+            if (typeof itemCls === 'string') {
+                addClasses = [itemCls];
+            } else {
+                addClasses = itemCls;
+                needsCopy = !!addClasses;
+            }
         }
         if (ownerItemCls) {
-            addClasses = Ext.Array.push(addClasses||[], ownerItemCls);
+            
+            if (needsCopy) {
+                addClasses = Ext.Array.clone(addClasses);
+            }
+            addClasses = Ext.Array.push(addClasses || [], ownerItemCls);
         }
         if (addClasses) {
             item.addCls(addClasses);
@@ -38197,6 +39135,19 @@ Ext.define('Ext.layout.container.Auto', {
                 style.display = old;
             }    
         }
+
+        if (Ext.isSafari) {
+            
+            
+            
+            
+            
+            dom = this.outerCt.dom;
+            style = dom.style;
+            style.display = 'table-cell';
+            dom.offsetWidth;
+            dom.style.display = 'table';
+        }
         
         
         contentWidth = this.outerCt.getWidth();
@@ -38862,12 +39813,22 @@ Ext.define('Ext.Queryable', {
 
     
     child: function (selector) {
+        var children = this.getRefItems();
+
         if (selector && selector.isComponent) {
             selector = '#' + Ext.escapeId(selector.getItemId());
         }
 
-        selector = selector || '';
-        return this.query('> ' + selector)[0] || null;
+        
+        if (selector) {
+            children = Ext.ComponentQuery.query(selector, children);
+        }
+
+        
+        if (children.length) {
+            return children[0];
+        }
+        return null;
     },
     
     
@@ -38880,6 +39841,16 @@ Ext.define('Ext.Queryable', {
         return this.query(selector)[0] || null;
     },
     
+    
+    visitPreOrder: function(selector, fn, scope, extraArgs) {
+        Ext.ComponentQuery._visit(true, selector, this, fn, scope, extraArgs);
+    },
+
+    
+    visitPostOrder: function(selector, fn, scope, extraArgs) {
+        Ext.ComponentQuery._visit(false, selector, this, fn, scope, extraArgs);
+    },
+
     getRefItems: function(){
         return [];
     }
@@ -39279,13 +40250,16 @@ Ext.define('Ext.container.AbstractContainer', {
         if (fromIdx.isComponent) {
             fromIdx = items.indexOf(fromIdx);
         }
-        item = items.removeAt(fromIdx);
-        if (item === false) {
-            return false;
+        item = items.getAt(fromIdx);
+        if (fromIdx !== toIdx) {
+            item = items.removeAt(fromIdx);
+            if (item === false) {
+                return false;
+            }
+            items.insert(toIdx, item);
+            this.onMove(item, fromIdx, toIdx);
+            this.updateLayout();
         }
-        items.insert(toIdx, item);
-        this.onMove(item, fromIdx, toIdx);
-        this.updateLayout();
         return item;
     },
 
@@ -39294,8 +40268,9 @@ Ext.define('Ext.container.AbstractContainer', {
     
     onBeforeAdd : function(item) {
         
-        if (item.ownerCt && item.ownerCt !== this) {
-            item.ownerCt.remove(item, false);
+        var owner = item.ownerCt;
+        if (owner && owner !== this) {
+            owner.remove(item, false);
         }
     },
 
@@ -39446,7 +40421,7 @@ Ext.define('Ext.container.AbstractContainer', {
                     c.cascade(fn, scope, origArgs);
                 } else {
                     args[componentIndex] = c;
-                    fn.apply(scope || cs, args);
+                    fn.apply(scope || c, args);
                 }
             }
         }
@@ -39496,13 +40471,28 @@ Ext.define('Ext.container.AbstractContainer', {
         }
     },
 
+    
     nextChild: function(child, selector) {
         var me = this,
-            result,
-            childIndex = me.items.indexOf(child);
+            items = me.items,
+            childIndex = items.indexOf(child),
+            i = 0,
+            len = items.length,
+            result;
 
         if (childIndex !== -1) {
-            result = selector ? Ext.ComponentQuery(selector, me.items.items.slice(childIndex + 1)) : me.items.getAt(childIndex + 1);
+            if (selector) {
+                for (; i < len; i++) {
+                    result = items.getAt(childIndex + i);
+
+                    if (!result || Ext.ComponentQuery.is(result, selector)) {
+                        break;
+                    }
+                }
+            } else {
+                result = items.getAt(childIndex + 1);
+            }
+
             if (!result && me.ownerCt) {
                 result = me.ownerCt.nextChild(me, selector);
             }
@@ -39510,13 +40500,28 @@ Ext.define('Ext.container.AbstractContainer', {
         return result;
     },
 
+    
     prevChild: function(child, selector) {
         var me = this,
-            result,
-            childIndex = me.items.indexOf(child);
+            items = me.items,
+            childIndex = items.indexOf(child),
+            i = 0,
+            len = items.length,
+            result;
 
         if (childIndex !== -1) {
-            result = selector ? Ext.ComponentQuery(selector, me.items.items.slice(childIndex + 1)) : me.items.getAt(childIndex + 1);
+            if (selector) {
+                for (; i < len; i++) {
+                    result = items.getAt(childIndex - i);
+
+                    if (!result || Ext.ComponentQuery.is(result, selector)) {
+                        break;
+                    }
+                }
+            } else {
+                result = items.getAt(childIndex - 1);
+            }
+
             if (!result && me.ownerCt) {
                 result = me.ownerCt.nextChild(me, selector);
             }
@@ -39524,8 +40529,6 @@ Ext.define('Ext.container.AbstractContainer', {
         return result;
     },
 
-    
-    
     
     enable: function() {
         this.callParent(arguments);
@@ -39545,8 +40548,6 @@ Ext.define('Ext.container.AbstractContainer', {
         return this;
     },
 
-    
-    
     
     disable: function() {
         this.callParent(arguments);
@@ -39898,22 +40899,19 @@ Ext.define('Ext.Editor', {
     
     startEdit : function(el, value) {
         var me = this,
-            field = me.field;
+            field = me.field,
+            dom;
 
         me.completeEdit();
         me.boundEl = Ext.get(el);
-        value = Ext.isDefined(value) ? value : Ext.String.trim(me.boundEl.dom.innerText || me.boundEl.dom.innerHTML);
+        dom = me.boundEl.dom;
+        value = Ext.isDefined(value) ? value : Ext.String.trim(dom.textContent || dom.innerText || dom.innerHTML);
 
-        if (!me.rendered) {
-            
-            
-            
-            
-            if (me.ownerCt) {
-                me.parentEl = me.ownerCt.el;
-                me.parentEl.position();
-            }
-            me.render(me.parentEl || document.body);
+        
+        
+        
+        if (!me.rendered && !me.renderTo && me.ownerCt) {
+            (me.renderTo = me.ownerCt.el).position();
         }
 
         if (me.fireEvent('beforestartedit', me, me.boundEl, value) !== false) {
@@ -40077,7 +41075,6 @@ Ext.define('Ext.Editor', {
 
         Ext.destroy(me.field);
         delete me.field;
-        delete me.parentEl;
         delete me.boundEl;
 
         me.callParent(arguments);
@@ -40162,23 +41159,23 @@ Ext.define('Ext.util.KeyMap', {
             keyCode: me.processKeys(keyCode)
         }, binding));
     },
-    
+
     
     removeBinding: function(binding){
         var me = this,
             bindings = me.bindings,
             len = bindings.length,
             i, item, keys;
-            
+
         if (me.processing) {
             me.bindings = bindings.slice(0);
         }
-        
+
         keys = me.processKeys(binding.key);
         for (i = 0; i < len; ++i) {
             item = bindings[i];
-            if (item.fn === binding.fn && item.scope === binding.scope) {
-                if (binding.alt == item.alt && binding.crtl == item.crtl && binding.shift == item.shift) {
+            if ((item.fn || item.handler) === (binding.fn || binding.handler) && item.scope === binding.scope) {
+                if (binding.alt === item.alt && binding.crtl === item.crtl && binding.shift === item.shift) {
                     if (Ext.Array.equals(item.keyCode, keys)) {
                         Ext.Array.erase(me.bindings, i, 1);
                         return;
@@ -40187,7 +41184,7 @@ Ext.define('Ext.util.KeyMap', {
             }
         }
     },
-    
+
     processKeys: function(keyCode){
         var processed = false,
             key, keys, keyString, len, i;
@@ -40258,7 +41255,7 @@ Ext.define('Ext.util.KeyMap', {
                 }
                 me.processing = false;
             }
-        }
+        };
     }()),
 
     
@@ -40289,7 +41286,7 @@ Ext.define('Ext.util.KeyMap', {
     },
 
     
-    checkModifiers: function(binding, e) {
+    checkModifiers: function(binding, event) {
         var keys = ['shift', 'ctrl', 'alt'],
             i = 0,
             len = keys.length,
@@ -40298,7 +41295,7 @@ Ext.define('Ext.util.KeyMap', {
         for (; i < len; ++i){
             key = keys[i];
             val = binding[key];
-            if (!(val === undefined || (val === e[key + 'Key']))) {
+            if (!(val === undefined || (val === event[key + 'Key']))) {
                 return false;
             }
         }
@@ -40472,24 +41469,27 @@ Ext.define('Ext.util.KeyNav', {
         keyCodes = Ext.util.KeyNav.keyOptions;
         defaultScope = config.scope || me;
 
-        for (keyName in keyCodes) {
-            if (keyCodes.hasOwnProperty(keyName)) {
-
-                
-                
-                if (binding = config[keyName]) {
-                    if (typeof binding === 'function') {
-                        binding = {
-                            handler: binding,
-                            defaultEventAction: (config.defaultEventAction !== undefined) ? config.defaultEventAction : me.defaultEventAction
-                        };
-                    }
-                    map.addBinding({
-                        key: keyCodes[keyName],
-                        handler: Ext.Function.bind(me.handleEvent, binding.scope||defaultScope, binding.handler||binding.fn, true),
-                        defaultEventAction: (binding.defaultEventAction !== undefined) ? binding.defaultEventAction : me.defaultEventAction
-                    });
+        for (keyName in config) {
+            binding = config[keyName];
+            
+            
+            
+            
+            if (binding && (keyName.length === 1 || (keyName = keyCodes[keyName]) || (!isNaN(keyName = parseInt(keyName, 10))))) {
+                if (typeof binding === 'function') {
+                    binding = {
+                        handler: binding,
+                        defaultEventAction: (config.defaultEventAction !== undefined) ? config.defaultEventAction : me.defaultEventAction
+                    };
                 }
+                map.addBinding({
+                    key: keyName,
+                    ctrl: binding.ctrl,
+                    shift: binding.shift,
+                    alt: binding.alt,
+                    handler: Ext.Function.bind(me.handleEvent, binding.scope||defaultScope, binding.handler||binding.fn, true),
+                    defaultEventAction: (binding.defaultEventAction !== undefined) ? binding.defaultEventAction : me.defaultEventAction
+                });
             }
         }
 
@@ -40570,627 +41570,6 @@ Ext.define('Ext.util.KeyNav', {
 
 
 
-Ext.define('Ext.FocusManager', {
-    singleton: true,
-    alternateClassName: ['Ext.FocusMgr' ],
-
-    mixins: {
-        observable:  Ext.util.Observable 
-    },
-
-               
-                                
-                        
-                               
-                             
-                           
-                         
-      
-
-    
-    enabled: false,
-
-    
-
-    focusElementCls: Ext.baseCSSPrefix + 'focus-element',
-
-    focusFrameCls: Ext.baseCSSPrefix + 'focus-frame',
-
-    
-    whitelist: [
-        'textfield'
-    ],
-
-    constructor: function(config) {
-        var me = this,
-            CQ = Ext.ComponentQuery;
-
-        me.mixins.observable.constructor.call(me, config);
-
-        me.addEvents(
-            
-            'beforecomponentfocus',
-
-            
-            'componentfocus',
-
-            
-            'disable',
-
-            
-            'enable'
-        );
-
-        me.focusTask = new Ext.util.DelayedTask(me.handleComponentFocus, me);
-
-        
-        Ext.override(Ext.AbstractComponent, {
-            onFocus: function() {
-                this.callParent(arguments);
-                if (me.enabled && this.hasFocus) {
-                    Array.prototype.unshift.call(arguments, this);
-                    me.onComponentFocus.apply(me, arguments);
-                }
-            },
-            onBlur: function() {
-                this.callParent(arguments);
-                if (me.enabled && !this.hasFocus) {
-                    Array.prototype.unshift.call(arguments, this);
-                    me.onComponentBlur.apply(me, arguments);
-                }
-            },
-            onDestroy: function() {
-                this.callParent(arguments);
-                if (me.enabled) {
-                    Array.prototype.unshift.call(arguments, this);
-                    me.onComponentDestroy.apply(me, arguments);
-                }
-            }
-        });
-        Ext.override(Ext.Component, {
-            afterHide: function() {
-                this.callParent(arguments);
-                if (me.enabled) {
-                    Array.prototype.unshift.call(arguments, this);
-                    me.onComponentHide.apply(me, arguments);
-                }
-            }
-        });
-        
-        
-        me.keyNav = new Ext.util.KeyNav(Ext.getDoc(), {
-            disabled: true,
-            scope: me,
-
-            backspace: me.focusLast,
-            enter: me.navigateIn,
-            esc: me.navigateOut,
-            tab: me.navigateSiblings,
-            space: me.navigateIn,
-            del: me.focusLast,
-            left: me.navigateSiblings,
-            right: me.navigateSiblings,
-            down: me.navigateSiblings,
-            up: me.navigateSiblings
-        });
-
-        me.focusData = {};
-        me.subscribers = new Ext.util.HashMap();
-        me.focusChain = {};
-
-        
-        Ext.apply(CQ.pseudos, {
-            
-            nextFocus: function(cmps, idx, step) {
-                step = step || 1;
-                idx = parseInt(idx, 10);
-
-                var len = cmps.length,
-                    i = idx, c;
-
-                for (;;) {
-                    
-                    if ((i += step) >= len) {
-                        i = 0;
-                    } else if (i < 0) {
-                        i = len - 1;
-                    }
-
-                    
-                    if (i === idx) {
-                        return [];
-                    }
-
-                    
-                    if ((c = cmps[i]).isFocusable()) {
-                        return [c];
-                    }
-                }
-
-                return [];
-            },
-
-            prevFocus: function(cmps, idx) {
-                return this.nextFocus(cmps, idx, -1);
-            },
-
-            root: function(cmps) {
-                var len = cmps.length,
-                    results = [],
-                    i = 0,
-                    c;
-
-                for (; i < len; i++) {
-                    c = cmps[i];
-                    if (!c.ownerCt) {
-                        results.push(c);
-                    }
-                }
-
-                return results;
-            }
-        });
-    },
-
-    
-    addXTypeToWhitelist: function(xtype) {
-        var me = this;
-
-        if (Ext.isArray(xtype)) {
-            Ext.Array.forEach(xtype, me.addXTypeToWhitelist, me);
-            return;
-        }
-
-        if (!Ext.Array.contains(me.whitelist, xtype)) {
-            me.whitelist.push(xtype);
-        }
-    },
-
-    clearComponent: function(cmp) {
-        clearTimeout(this.cmpFocusDelay);
-        if (!cmp.isDestroyed) {
-            cmp.blur();
-        }
-    },
-
-    
-    disable: function() {
-        var me = this;
-
-        if (!me.enabled) {
-            return;
-        }
-
-        delete me.options;
-        me.enabled = false;
-
-        me.removeDOM();
-
-        
-        me.keyNav.disable();
-
-        me.fireEvent('disable', me);
-    },
-
-    
-    enable: function(options) {
-        var me = this;
-
-        if (options === true) {
-            options = { focusFrame: true };
-        }
-        me.options = options = options || {};
-
-        if (me.enabled) {
-            return;
-        }
-
-        
-        me.enabled = true;
-        me.initDOM(options);
-
-        
-        me.keyNav.enable();
-
-        
-        me.focusEl.focus();
-        delete me.focusedCmp;
-
-        me.fireEvent('enable', me);
-    },
-
-    focusLast: function(e) {
-        var me = this;
-
-        if (me.isWhitelisted(me.focusedCmp)) {
-            return true;
-        }
-
-        
-        if (me.previousFocusedCmp) {
-            me.previousFocusedCmp.focus();
-        }
-    },
-
-    getRootComponents: function() {
-        var CQ = Ext.ComponentQuery,
-            inline = CQ.query(':focusable:root:not([floating])'),
-            floating = CQ.query(':focusable:root[floating]');
-
-        
-        
-        floating.sort(function(a, b) {
-            return a.el.getZIndex() > b.el.getZIndex();
-        });
-
-        return floating.concat(inline);
-    },
-
-    initDOM: function(options) {
-        var me = this,
-            cls = me.focusFrameCls,
-            needListeners = Ext.ComponentQuery.query('{getFocusEl()}:not([focusListenerAdded])'),
-            i = 0, len = needListeners.length;
-
-        if (!Ext.isReady) {
-            return Ext.onReady(me.initDOM, me);
-        }
-
-        
-        
-        
-        for (; i < len; i++) {
-            needListeners[i].addFocusListener();
-        }
-
-        
-        if (!me.focusEl) {
-            me.focusEl = Ext.getBody();
-            me.focusEl.dom.tabIndex = -1;
-        }
-
-        
-        if (!me.focusFrame && options.focusFrame) {
-            me.focusFrame = Ext.getBody().createChild({
-                cls: cls,
-                children: [
-                    { cls: cls + '-top' },
-                    { cls: cls + '-bottom' },
-                    { cls: cls + '-left' },
-                    { cls: cls + '-right' }
-                ],
-                style: 'top: -100px; left: -100px;'
-            });
-            me.focusFrame.setVisibilityMode(Ext.Element.DISPLAY);
-            me.focusFrame.hide().setLocalXY(0, 0);
-        }
-    },
-
-    isWhitelisted: function(cmp) {
-        return cmp && Ext.Array.some(this.whitelist, function(x) {
-            return cmp.isXType(x);
-        });
-    },
-
-    navigateIn: function(e) {
-        var me = this,
-            focusedCmp = me.focusedCmp,
-            defaultRoot,
-            firstChild;
-
-        if (me.isWhitelisted(focusedCmp)) {
-            return true;
-        }
-
-        if (!focusedCmp) {
-            
-            defaultRoot = me.getRootComponents()[0];
-            if (defaultRoot) {
-                
-                
-                if (defaultRoot.getFocusEl() === me.focusEl) {
-                    me.focusEl.blur();
-                }
-                defaultRoot.focus();
-            }
-        } else {
-            
-            
-            firstChild = focusedCmp.hasFocus ? Ext.ComponentQuery.query('>:focusable', focusedCmp)[0] : focusedCmp;
-            if (firstChild) {
-                firstChild.focus();
-            } else {
-                
-                if (Ext.isFunction(focusedCmp.onClick)) {
-                    e.button = 0;
-                    focusedCmp.onClick(e);
-                    if (focusedCmp.isVisible(true)) {
-                        focusedCmp.focus();
-                    } else {
-                        me.navigateOut();
-                    }
-                }
-            }
-        }
-    },
-
-    navigateOut: function(e) {
-        var me = this,
-            parent;
-
-        if (!me.focusedCmp || !(parent = me.focusedCmp.up(':focusable'))) {
-            me.focusEl.focus();
-        } else {
-            parent.focus();
-        }
-
-        
-        
-        
-        return true;
-    },
-
-    navigateSiblings: function(e, source, parent) {
-        var me = this,
-            src = source || me,
-            key = e.getKey(),
-            EO = Ext.EventObject,
-            goBack = e.shiftKey || key == EO.LEFT || key == EO.UP,
-            checkWhitelist = key == EO.LEFT || key == EO.RIGHT || key == EO.UP || key == EO.DOWN,
-            nextSelector = goBack ? 'prev' : 'next',
-            idx, next, focusedCmp, siblings;
-
-        focusedCmp = (src.focusedCmp && src.focusedCmp.comp) || src.focusedCmp;
-        if (!focusedCmp && !parent) {
-            return true;
-        }
-
-        if (checkWhitelist && me.isWhitelisted(focusedCmp)) {
-            return true;
-        }
-
-        
-        if (!focusedCmp || focusedCmp.is(':root')) {
-            siblings = me.getRootComponents();
-        } else {
-            
-            parent = parent || focusedCmp.up();
-            if (parent) {
-                siblings = parent.getRefItems();
-            }
-        }
-
-
-        
-        if (siblings) {
-            idx = focusedCmp ? Ext.Array.indexOf(siblings, focusedCmp) : -1;
-            next = Ext.ComponentQuery.query(':' + nextSelector + 'Focus(' + idx + ')', siblings)[0];
-            if (next && focusedCmp !== next) {
-                next.focus();
-                return next;
-            }
-        }
-    },
-
-    onComponentBlur: function(cmp, e) {
-        var me = this;
-
-        if (me.focusedCmp === cmp) {
-            me.previousFocusedCmp = cmp;
-            delete me.focusedCmp;
-        }
-
-        if (me.focusFrame) {
-            me.focusFrame.hide();
-        }
-    },
-
-    onComponentFocus: function(cmp, e) {
-        var me = this,
-            chain = me.focusChain,
-            parent;
-
-        if (!cmp.isFocusable()) {
-            me.clearComponent(cmp);
-
-            
-            
-            
-            
-            if (chain[cmp.id]) {
-                return;
-            }
-
-            
-            parent = cmp.up();
-            if (parent) {
-                
-                
-                
-                chain[cmp.id] = true;
-                parent.focus();
-            }
-
-            return;
-        }
-        
-        me.focusChain = {};
-
-        
-        
-        
-        me.focusTask.delay(10, null, null, [cmp, cmp.getFocusEl()]);
-    },
-
-    handleComponentFocus: function(cmp, focusEl) {
-        var me = this,
-            cls,
-            ff,
-            box,
-            bt,
-            bl,
-            bw,
-            bh,
-            ft,
-            fb,
-            fl,
-            fr;
-
-        if (me.fireEvent('beforecomponentfocus', me, cmp, me.previousFocusedCmp) === false) {
-            me.clearComponent(cmp);
-            return;
-        }
-
-        me.focusedCmp = cmp;
-
-        
-        if (me.shouldShowFocusFrame(cmp)) {
-            cls = '.' + me.focusFrameCls + '-';
-            ff = me.focusFrame;
-            
-            
-            box = (focusEl.dom ? focusEl : focusEl.el).getBox();
-
-            
-            
-            
-            bt = box.top;
-            bl = box.left;
-            bw = box.width;
-            bh = box.height;
-            ft = ff.child(cls + 'top');
-            fb = ff.child(cls + 'bottom');
-            fl = ff.child(cls + 'left');
-            fr = ff.child(cls + 'right');
-
-            ft.setWidth(bw).setLocalXY(bl, bt);
-            fb.setWidth(bw).setLocalXY(bl, bt + bh - 2);
-            fl.setHeight(bh - 2).setLocalXY(bl, bt + 2);
-            fr.setHeight(bh - 2).setLocalXY(bl + bw - 2, bt + 2);
-
-            ff.show();
-        }
-
-        me.fireEvent('componentfocus', me, cmp, me.previousFocusedCmp);
-    },
-
-    onComponentHide: function(cmp) {
-        var me = this,
-            cmpHadFocus = false,
-            focusedCmp = me.focusedCmp,
-            parent;
-
-        if (focusedCmp) {
-            
-            
-            cmpHadFocus = cmp.hasFocus || (cmp.isContainer && cmp.isAncestor(me.focusedCmp));
-        }
-
-        me.clearComponent(cmp);
-
-        
-        if (cmpHadFocus && (parent = cmp.up(':focusable'))) {
-            parent.focus();
-        } else {
-            me.focusEl.focus();
-        }
-    },
-
-    onComponentDestroy: function() {
-
-    },
-
-    removeDOM: function() {
-        var me = this;
-
-        
-        
-        if (me.enabled || me.subscribers.length) {
-            return;
-        }
-
-        Ext.destroy(
-            me.focusFrame
-        );
-        delete me.focusEl;
-        delete me.focusFrame;
-    },
-
-    
-    removeXTypeFromWhitelist: function(xtype) {
-        var me = this;
-
-        if (Ext.isArray(xtype)) {
-            Ext.Array.forEach(xtype, me.removeXTypeFromWhitelist, me);
-            return;
-        }
-
-        Ext.Array.remove(me.whitelist, xtype);
-    },
-
-    setupSubscriberKeys: function(container, keys) {
-        var me = this,
-            el = container.getFocusEl(),
-            scope = keys.scope,
-            handlers = {
-                backspace: me.focusLast,
-                enter: me.navigateIn,
-                esc: me.navigateOut,
-                scope: me
-            },
-
-            navSiblings = function(e) {
-                if (me.focusedCmp === container) {
-                    
-                    
-                    
-                    return me.navigateSiblings(e, me, container);
-                } else {
-                    return me.navigateSiblings(e);
-                }
-            };
-
-        Ext.iterate(keys, function(key, cb) {
-            handlers[key] = function(e) {
-                var ret = navSiblings(e);
-
-                if (Ext.isFunction(cb) && cb.call(scope || container, e, ret) === true) {
-                    return true;
-                }
-
-                return ret;
-            };
-        }, me);
-
-        return new Ext.util.KeyNav(el, handlers);
-    },
-
-    shouldShowFocusFrame: function(cmp) {
-        var me = this,
-            opts = me.options || {};
-
-        
-        
-        
-        if (!me.focusFrame || !cmp) {
-            return false;
-        }
-
-        
-        if (opts.focusFrame) {
-            return true;
-        }
-
-        if (me.focusData[cmp.id].focusFrame) {
-            return true;
-        }
-
-        return false;
-    }
-});
-
-
-
 Ext.define('Ext.Img', {
     extend:  Ext.Component ,
     alias: ['widget.image', 'widget.imagecomponent'],
@@ -41214,6 +41593,8 @@ Ext.define('Ext.Img', {
     
 
     ariaRole: 'img',
+    
+    maskOnDisable: false,
 
     initComponent: function() {
         if (this.glyph) {
@@ -41408,7 +41789,6 @@ Ext.define('Ext.LoadMask', {
     
 
     mixins: {
-        floating:  Ext.util.Floating ,
         bindable:  Ext.util.Bindable 
     },
 
@@ -41417,28 +41797,30 @@ Ext.define('Ext.LoadMask', {
     
     
     
+    isLoadMask: true,
 
     
 
     
+
     
-    msg : 'Loading...',
+    
+    msg: 'Loading...',
     
 
     
-    msgCls : Ext.baseCSSPrefix + 'mask-loading',
+    msgCls: Ext.baseCSSPrefix + 'mask-loading',
 
     
     maskCls: Ext.baseCSSPrefix + 'mask',
 
+    cls: Ext.baseCSSPrefix + 'mask-msg',
     
     useMsg: true,
 
     
     useTargetEl: false,
 
-    baseCls: Ext.baseCSSPrefix + 'mask-msg',
-    
     ariaRole: 'presentation',
 
     childEls: [
@@ -41450,23 +41832,11 @@ Ext.define('Ext.LoadMask', {
         '<div id="{id}-msgEl" role="{role}"',
             '<tpl if="ariaAttr"> {ariaAttr}</tpl>',
             ' class="{[values.$comp.msgCls]} ',
-            Ext.baseCSSPrefix, 'mask-msg-inner{childElCls}">',
+            Ext.baseCSSPrefix, 'mask-msg-inner {childElCls}">',
             '<div id="{id}-msgTextEl" class="', Ext.baseCSSPrefix ,'mask-msg-text',
-                '{childElCls}"></div>',
+                '{childElCls}">{msg}</div>',
         '</div>'
     ],
-
-    
-    floating: {
-        shadow: 'frame'
-    },
-
-    
-    focusOnToFront: false,
-
-    
-    
-    bringParentToFront: false,
 
     
     constructor : function(config) {
@@ -41477,61 +41847,95 @@ Ext.define('Ext.LoadMask', {
             if (Ext.isDefined(Ext.global.console)) {
                 Ext.global.console.warn('Ext.LoadMask: LoadMask now uses a standard 1 arg constructor: use the target config');
             }
-            comp = config;
+            comp = me.target = config;
             config = arguments[1];
         } else {
             comp = config.target;
         }
 
+       
+       me.callParent([config]);
+
         
-        if (!comp.isComponent) {
+        if (comp.isComponent) {
+            me.ownerCt = comp;
+            me.hidden = true;
+
+            
+            
+            
+            me.renderTo = me.getMaskTarget();
+            me.external = me.renderTo === Ext.getBody();
+            me.bindComponent(comp);
+        }
+        
+        else {
             if (Ext.isDefined(Ext.global.console)) {
                 Ext.global.console.warn('Ext.LoadMask: LoadMask for elements has been deprecated, use Ext.dom.Element.mask & Ext.dom.Element.unmask');
             }
             comp = Ext.get(comp);
-            this.isElement = true;
+            me.isElement = true;
+            me.renderTo = me.target;
         }
-
-        me.ownerCt = comp;
-        if (!this.isElement) {
-            me.bindComponent(comp);
-        }
-        me.callParent([config]);
-
+        me.render(me.renderTo);
         if (me.store) {
             me.bindStore(me.store, true);
         }
+    },
+
+    
+    getRenderTree: function() {
+        return [
+            {
+                cls: this.maskCls,
+                style: 'display:none'
+            },
+            this.callParent()
+        ];
+    },
+
+    onRender: function() {
+        this.callParent(arguments);
+        this.maskEl = this.el.prev();
+    },
+
+    initRenderData: function() {
+        var result = this.callParent(arguments);
+        result.msg = this.msg || '';
+        return result;
     },
 
     bindComponent: function(comp) {
         var me = this,
             listeners = {
                 scope: this,
-                resize: me.sizeMask,
-                added: me.onComponentAdded,
-                removed: me.onComponentRemoved
+                resize: me.sizeMask
             };
-            
-        if (comp.floating) {
-            listeners.move = me.sizeMask;
-            me.activeOwner = comp;
-        } else if (comp.ownerCt) {
-            me.onComponentAdded(comp.ownerCt);
-        } else {
-            
-            me.preventBringToFront = true;
+
+        if (me.external) {
+            listeners.added = me.onComponentAdded;
+            listeners.removed = me.onComponentRemoved;
+            if (comp.floating) {
+                listeners.move = me.sizeMask;
+                me.activeOwner = comp;
+            } else if (comp.ownerCt) {
+                me.onComponentAdded(comp.ownerCt);
+            }
         }
 
         me.mon(comp, listeners);
         
         
-        me.mon(me.hierarchyEventSource, {
-            show: me.onContainerShow,
-            hide: me.onContainerHide,
-            expand: me.onContainerExpand,
-            collapse: me.onContainerCollapse,
-            scope: me
-        });
+        
+        if (me.external) {
+            me.mon(me.hierarchyEventSource, {
+                show: me.onContainerShow,
+                hide: me.onContainerHide,
+                expand: me.onContainerExpand,
+                collapse: me.onContainerCollapse,
+                scope: me
+            });
+        }
     },
 
     onComponentAdded: function(owner) {
@@ -41544,6 +41948,7 @@ Ext.define('Ext.LoadMask', {
         if (owner) {
             me.activeOwner = owner;
             me.mon(owner, 'move', me.sizeMask, me);
+            me.mon(owner, 'tofront', me.onOwnerToFront, me);
         } else {
             me.preventBringToFront = true;
         }
@@ -41561,6 +41966,7 @@ Ext.define('Ext.LoadMask', {
 
         if (activeOwner) {
             me.mun(activeOwner, 'move', me.sizeMask, me);
+            me.mun(activeOwner, 'tofront', me.onOwnerToFront, me);
         }
         if (floatOwner) {
             me.mun(floatOwner, 'afterlayout', me.sizeMask, me);
@@ -41571,35 +41977,40 @@ Ext.define('Ext.LoadMask', {
 
     afterRender: function() {
         this.callParent(arguments);
-            this.container = this.floatParent.getContentTarget();
+
+        
+        
+        this.el.$cache.skipGarbageCollection = true;
+        this.maskEl.$cache.skipGarbageCollection = true;
     },
 
+    onOwnerToFront: function(owner, zIndex) {
+        this.maskEl.setStyle('zIndex', zIndex + 1);
+        this.el.setStyle('zIndex', zIndex + 2);
+    },
+
+    
+    
     onContainerShow: function(container) {
-        if (this.isActiveContainer(container)) {
-            this.onComponentShow();
-        }
+        this.onComponentShow();
     },
 
+    
+    
     onContainerHide: function(container) {
-        if (this.isActiveContainer(container)) {
-            this.onComponentHide();
-        }
+        this.onComponentHide();
     },
 
+    
+    
     onContainerExpand: function(container) {
-        if (this.isActiveContainer(container)) {
-            this.onComponentShow();
-        }
+        this.onComponentShow();
     },
 
+    
+    
     onContainerCollapse: function(container) {
-        if (this.isActiveContainer(container)) {
-            this.onComponentHide();
-        }
-    },
-
-    isActiveContainer: function(container) {
-        return this.isDescendantOf(container);
+        this.onComponentHide();
     },
 
     onComponentHide: function() {
@@ -41621,14 +42032,21 @@ Ext.define('Ext.LoadMask', {
     
     sizeMask: function() {
         var me = this,
-            target;
+            target = me.target,
+            boxTarget = me.external ? me.getOwner().el : me.getMaskTarget();
 
         if (me.rendered && me.isVisible()) {
-            me.center();
-
-            target = me.getMaskTarget();
-            me.getMaskEl().show().setSize(target.getSize()).alignTo(target, 'tl-tl');
-
+            
+            
+            
+            if (me.external) {
+                if (!me.isElement && target.floating) {
+                    me.onOwnerToFront(target, target.el.getZIndex());
+                }
+                me.maskEl.setSize(boxTarget.getSize()).alignTo(boxTarget, 'tl-tl');
+            }
+            
+            me.el.center(me.maskEl);
         }
     },
 
@@ -41674,7 +42092,10 @@ Ext.define('Ext.LoadMask', {
 
     getMaskTarget: function() {
         var owner = this.getOwner();
-        return this.useTargetEl ? owner.getTargetEl() : owner.getEl();
+        if (this.isElement) {
+            return this.target;
+        }
+        return this.useTargetEl ? owner.getTargetEl() : (owner.getMaskTarget() || Ext.getBody());
     },
 
     
@@ -41713,32 +42134,6 @@ Ext.define('Ext.LoadMask', {
         }
     },
 
-    getMaskEl: function(){
-        var me = this;
-        return me.maskEl || (me.maskEl = me.el.insertSibling({
-            role: 'presentation',
-            cls: me.maskCls,
-            style: {
-                zIndex: me.el.getStyle('zIndex') - 2
-            }
-        }, 'before'));
-    },
-
-    onShow: function() {
-        var me = this,
-            msgEl = me.msgEl;
-
-        me.callParent(arguments);
-        me.loading = true;
-
-        if (me.useMsg) {
-            msgEl.show();
-            me.msgTextEl.update(me.msg);
-        } else {
-            msgEl.parent().hide();
-        }
-    },
-
     hide: function() {
         
         if (this.isElement) {
@@ -41747,12 +42142,8 @@ Ext.define('Ext.LoadMask', {
             return;
         }
         delete this.showNext;
+        this.maskEl.setDisplayed(false);
         return this.callParent(arguments);
-    },
-
-    onHide: function() {
-        this.callParent();
-        this.getMaskEl().hide();
     },
 
     show: function() {
@@ -41762,33 +42153,41 @@ Ext.define('Ext.LoadMask', {
             this.fireEvent('show', this);
             return;
         }
+        this.maskEl.setDisplayed(true);
         return this.callParent(arguments);
     },
 
     afterShow: function() {
-        this.callParent(arguments);
-        this.sizeMask();
-    },
+        var me = this;
 
-    setZIndex: function(index) {
-        var me = this,
-            owner = me.activeOwner;
-            
-        if (owner) {
-            
-            
-            
-            index = parseInt(owner.el.getStyle('zIndex'), 10) + 1;
+        me.loading = true;
+        me.callParent(arguments);
+
+        
+        if (me.hasOwnProperty('maskCls')) {
+            me.maskEl.dom.className = me.maskCls;
         }
 
-        me.getMaskEl().setStyle('zIndex', index - 1);
-        return me.mixins.floating.setZIndex.apply(me, arguments);
+        if (me.useMsg) {
+            me.msgTextEl.update(me.msg);
+        } else {
+            
+            me.el.hide();
+        }
+        me.sizeMask();
     },
 
     
     onLoad : function() {
         this.loading = false;
         this.hide();
+    },
+
+    beforeDestroy: function() {
+        
+        
+        this.ownerCt = null;
+        this.callParent();
     },
 
     onDestroy: function() {
@@ -42886,7 +43285,7 @@ Ext.define('Ext.ShadowPool', {
     pull: function() {
         var sh = this.shadows.shift();
         if (!sh) {
-            sh = Ext.get(Ext.DomHelper.insertHtml("beforeBegin", document.body.firstChild, this.markup));
+            sh = Ext.get(Ext.DomHelper.insertHtml("afterBegin", document.body, this.markup));
             sh.autoBoxAdjust = false;
             
             sh.dom.setAttribute('data-sticky', true);
@@ -43188,7 +43587,7 @@ Ext.define('Ext.app.EventDomain', {
     dispatch: function(target, ev, args) {
         var me = this,
             bus = me.bus,
-            selectors = bus[ev],
+            selectors = bus[ev.toLowerCase()],
             selector, controllers, id, events, event, i, ln;
 
         if (!selectors) {
@@ -43247,6 +43646,7 @@ Ext.define('Ext.app.EventDomain', {
                         options  = null;
                         listener = listeners[ev];
                         scope    = controller;
+                        ev       = ev.toLowerCase();
                         event    = new Ext.util.Event(controller, ev);
 
                         
@@ -43317,6 +43717,7 @@ Ext.define('Ext.app.EventDomain', {
             controllers, ev, selector, selectors;
 
         for (ev in bus) {
+            ev = ev.toLowerCase();
             if (bus.hasOwnProperty(ev) && (selectors = bus[ev])) {
                 for (selector in selectors) {
                     controllers = selectors[selector];
@@ -43395,125 +43796,6 @@ Ext.define('Ext.app.EventBus', {
         for (domain in domains) {
             domains[domain].unlisten(controllerId);
         }
-    }
-});
-
-
-
-Ext.define('Ext.data.StoreManager', {
-    extend:  Ext.util.MixedCollection ,
-    alternateClassName: ['Ext.StoreMgr', 'Ext.data.StoreMgr', 'Ext.StoreManager'],
-    singleton: true,
-                                  
-    
-    
-
-    
-    register : function() {
-        for (var i = 0, s; (s = arguments[i]); i++) {
-            this.add(s);
-        }
-    },
-
-    
-    unregister : function() {
-        for (var i = 0, s; (s = arguments[i]); i++) {
-            this.remove(this.lookup(s));
-        }
-    },
-
-    
-    lookup : function(store) {
-        
-        if (Ext.isArray(store)) {
-            var fields = ['field1'], 
-                expand = !Ext.isArray(store[0]),
-                data = store,
-                i,
-                len;
-                
-            if(expand){
-                data = [];
-                for (i = 0, len = store.length; i < len; ++i) {
-                    data.push([store[i]]);
-                }
-            } else {
-                for(i = 2, len = store[0].length; i <= len; ++i){
-                    fields.push('field' + i);
-                }
-            }
-            return new Ext.data.ArrayStore({
-                data  : data,
-                fields: fields,
-                autoDestroy: true,
-                autoCreated: true,
-                expanded: expand
-            });
-        }
-        
-        if (Ext.isString(store)) {
-            
-            return this.get(store);
-        } else {
-            
-            return Ext.data.AbstractStore.create(store);
-        }
-    },
-
-    
-    getKey : function(o) {
-         return o.storeId;
-    }
-}, function() {    
-    
-    Ext.regStore = function(name, config) {
-        var store;
-
-        if (Ext.isObject(name)) {
-            config = name;
-        } else {
-            config.storeId = name;
-        }
-
-        if (config instanceof Ext.data.Store) {
-            store = config;
-        } else {
-            store = new Ext.data.Store(config);
-        }
-
-        return Ext.data.StoreManager.register(store);
-    };
-
-    
-    Ext.getStore = function(name) {
-        return Ext.data.StoreManager.lookup(name);
-    };
-});
-
-
-
-Ext.define('Ext.app.domain.Global', {
-    extend:  Ext.app.EventDomain ,
-    singleton: true,
-
-    type: 'global',
-
-    constructor: function() {
-        var me = this;
-        
-        me.callParent();
-        me.monitor(Ext.globalEvents);
-    },
-    
-                  
-    listen: function(listeners, controller) {
-        
-        
-        this.callParent([{ global: listeners }, controller]);
-    },
-
-    match: function() {
-        return true;
     }
 });
 
@@ -43654,7 +43936,7 @@ Ext.define('Ext.data.reader.Reader', {
             total,
             value,
             message;
-        
+
         
         if (me.lastFieldGeneration !== me.model.prototype.fields.generation) {
             me.buildExtractors(true);
@@ -43716,9 +43998,10 @@ Ext.define('Ext.data.reader.Reader', {
     
     extractData : function(root) {
         var me = this,
-            Model   = me.model,
+            ModelClass = me.model,
             length  = root.length,
             records = new Array(length),
+            dataConverter,
             convertedValues, node, record, i;
 
         if (!root.length && Ext.isObject(root)) {
@@ -43733,10 +44016,11 @@ Ext.define('Ext.data.reader.Reader', {
                 
                 records[i] = node;
             } else {
+
                 
                 
                 
-                records[i] = record = new Model(undefined, me.getId(node), node, convertedValues = {});
+                records[i] = record = new ModelClass(undefined, me.getId(node), node, convertedValues = {});
 
                 
                 
@@ -43872,7 +44156,7 @@ Ext.define('Ext.data.reader.Reader', {
         
         if (me.convertRecordData) {
             return;
-        }   
+        }
 
         
         if (totalProp) {
@@ -43903,9 +44187,10 @@ Ext.define('Ext.data.reader.Reader', {
         me.lastFieldGeneration = me.model.prototype.fields.generation;
     },
 
+    
+    
     recordDataExtractorTemplate : [
         'var me = this\n',
-        '    ,fields = me.model.prototype.fields\n',
         '    ,value\n',
         '    ,internalId\n',
         '<tpl for="fields">',
@@ -43995,7 +44280,7 @@ Ext.define('Ext.data.reader.Reader', {
         
         
         
-        return Ext.functionFactory(me.recordDataExtractorTemplate.apply(templateData)).call(me);
+        return Ext.functionFactory('fields', me.recordDataExtractorTemplate.apply(templateData)).call(me, me.model.prototype.fields);
     },
 
     destroyReader: function() {
@@ -44262,7 +44547,7 @@ Ext.define('Ext.data.writer.Writer', {
                     this.writeValue(data, field, record);
                 }
             }
-        } else if (operation.action === 'destroy') {
+        } else if (operation && operation.action === 'destroy') {
             this.writeValue(data, record.idField, record);
         } else {
             
@@ -44690,6 +44975,129 @@ Ext.define('Ext.data.proxy.Proxy', {
 
 
 
+Ext.define('Ext.data.proxy.Client', {
+    extend:  Ext.data.proxy.Proxy ,
+    alternateClassName: 'Ext.data.ClientProxy',
+    
+    
+    isSynchronous: true,
+
+    
+    clear: function() {
+        Ext.Error.raise("The Ext.data.proxy.Client subclass that you are using has not defined a 'clear' function. See src/data/ClientProxy.js for details.");
+    }
+});
+
+
+
+Ext.define('Ext.data.proxy.Memory', {
+    extend:  Ext.data.proxy.Client ,
+    alias: 'proxy.memory',
+    alternateClassName: 'Ext.data.MemoryProxy',
+
+    
+
+    
+
+    constructor: function(config) {
+        this.callParent([config]);
+
+        
+        this.setReader(this.reader);
+    },
+    
+    
+    updateOperation: function(operation, callback, scope) {
+        var i = 0,
+            recs = operation.getRecords(),
+            len = recs.length;
+            
+        for (i; i < len; i++) {
+            recs[i].commit();
+        }
+        operation.setCompleted();
+        operation.setSuccessful();
+        
+        Ext.callback(callback, scope || this, [operation]);
+    },
+    
+    
+    create: function() {
+        this.updateOperation.apply(this, arguments);
+    },
+    
+    
+    update: function() {
+        this.updateOperation.apply(this, arguments);
+    },
+    
+    
+    destroy: function() {
+        this.updateOperation.apply(this, arguments);
+    },
+
+    
+    read: function(operation, callback, scope) {
+        var me = this,
+            resultSet = operation.resultSet = me.getReader().read(me.data),
+            records = resultSet.records,
+            sorters = operation.sorters,
+            groupers = operation.groupers,
+            filters = operation.filters;
+
+        operation.setCompleted();
+
+        
+        if (resultSet.success) {
+
+            
+            if (filters && filters.length) {
+                records = resultSet.records = Ext.Array.filter(records, Ext.util.Filter.createFilterFn(filters));
+                resultSet.total = records.length;
+            }
+
+            
+            if (groupers && groupers.length) {
+                
+                sorters = sorters ? sorters.concat(groupers) : sorters;
+            }
+
+            
+            if (sorters && sorters.length) {
+                resultSet.records = Ext.Array.sort(records, Ext.util.Sortable.createComparator(sorters));
+            }
+
+            
+            
+            if (me.enablePaging && operation.start !== undefined && operation.limit !== undefined) {
+
+                
+                if (operation.start >= resultSet.total) {
+                    resultSet.success = false;
+                    resultSet.count = 0;
+                    resultSet.records = [];
+                }
+                
+                else {
+                    resultSet.records = Ext.Array.slice(resultSet.records, operation.start, operation.start + operation.limit);
+                    resultSet.count = resultSet.records.length;
+                }
+            }
+        }
+
+        if (resultSet.success) {
+            operation.setSuccessful();
+        } else {
+            me.fireEvent('exception', me, null, operation);
+        }
+        Ext.callback(callback, scope || me, [operation]);
+    },
+
+    clear: Ext.emptyFn
+});
+
+
+
 Ext.define('Ext.data.Operation', {
     
     synchronous: true,
@@ -44938,6 +45346,7 @@ Ext.define('Ext.data.AbstractStore', {
                
                                    
                                
+                                
                              
                          
       
@@ -45023,6 +45432,8 @@ Ext.define('Ext.data.AbstractStore', {
 
     
 
+    
+
     sortRoot: 'data',
 
     
@@ -45071,7 +45482,7 @@ Ext.define('Ext.data.AbstractStore', {
 
         
         if (!me.model && me.fields) {
-            me.model = Ext.define('Ext.data.Store.ImplicitModel-' + (me.storeId || Ext.id()), {
+            me.model = Ext.define(null, {
                 extend: 'Ext.data.Model',
                 fields: me.fields,
                 proxy: me.proxy || me.defaultProxyType
@@ -45516,30 +45927,24 @@ Ext.define('Ext.data.AbstractStore', {
 
     
     destroyStore: function() {
-        var implicitModelName,
-            me = this;
+        var me = this;
 
         if (!me.isDestroyed) {
             me.clearListeners();
             if (me.storeId) {
                 Ext.data.StoreManager.unregister(me);
             }
-            me.clearData();
-            me.data = me.tree = me.sorters = me.filters = me.groupers = null;
+            me.destroyClear();
             if (me.reader) {
                 me.reader.destroyReader();
             }
-            me.proxy = me.reader = me.writer = null;
+            me.data = me.tree = me.sorters = me.filters = me.groupers = me.proxy = me.reader = me.writer = me.model = null;
             me.isDestroyed = true;
-
-            if (me.implicitModel) {
-                implicitModelName = Ext.getClassName(me.model);
-                Ext.undefine(implicitModelName);
-                Ext.ModelManager.unregisterType(implicitModelName);
-            } else {
-                me.model = null;
-            }
         }
+    },
+
+    destroyClear: function() {
+        this.clearData();
     },
     
     
@@ -45625,6 +46030,11 @@ Ext.define('Ext.data.AbstractStore', {
 
         
         if (me.autoLoad && (me.remoteSort || me.remoteGroup || me.remoteFilter)) {
+            if (me.autoLoadTask) {
+                me.autoLoadTask.cancel();
+                delete me.autoLoadTask;
+            }
+
             if (me.autoLoad === true) {
                 me.reload();
             } else {
@@ -45687,6 +46097,126 @@ Ext.define('Ext.data.AbstractStore', {
         this.autoSyncSuspended = false;
     }
 
+});
+
+
+
+Ext.define('Ext.data.StoreManager', {
+    extend:  Ext.util.MixedCollection ,
+    alternateClassName: ['Ext.StoreMgr', 'Ext.data.StoreMgr', 'Ext.StoreManager'],
+    singleton: true,
+                                         
+                                  
+    
+    
+
+    
+    register : function() {
+        for (var i = 0, s; (s = arguments[i]); i++) {
+            this.add(s);
+        }
+    },
+
+    
+    unregister : function() {
+        for (var i = 0, s; (s = arguments[i]); i++) {
+            this.remove(this.lookup(s));
+        }
+    },
+
+    
+    lookup : function(store) {
+        
+        if (Ext.isArray(store)) {
+            var fields = ['field1'], 
+                expand = !Ext.isArray(store[0]),
+                data = store,
+                i,
+                len;
+                
+            if(expand){
+                data = [];
+                for (i = 0, len = store.length; i < len; ++i) {
+                    data.push([store[i]]);
+                }
+            } else {
+                for(i = 2, len = store[0].length; i <= len; ++i){
+                    fields.push('field' + i);
+                }
+            }
+            return new Ext.data.ArrayStore({
+                data  : data,
+                fields: fields,
+                autoDestroy: true,
+                autoCreated: true,
+                expanded: expand
+            });
+        }
+        
+        if (Ext.isString(store)) {
+            
+            return this.get(store);
+        } else {
+            
+            return Ext.data.AbstractStore.create(store);
+        }
+    },
+
+    
+    getKey : function(o) {
+         return o.storeId;
+    }
+}, function() {    
+    
+    Ext.regStore = function(name, config) {
+        var store;
+
+        if (Ext.isObject(name)) {
+            config = name;
+        } else {
+            config.storeId = name;
+        }
+
+        if (config instanceof Ext.data.Store) {
+            store = config;
+        } else {
+            store = new Ext.data.Store(config);
+        }
+
+        return Ext.data.StoreManager.register(store);
+    };
+
+    
+    Ext.getStore = function(name) {
+        return Ext.data.StoreManager.lookup(name);
+    };
+});
+
+
+
+Ext.define('Ext.app.domain.Global', {
+    extend:  Ext.app.EventDomain ,
+    singleton: true,
+
+    type: 'global',
+
+    constructor: function() {
+        var me = this;
+        
+        me.callParent();
+        me.monitor(Ext.globalEvents);
+    },
+    
+                  
+    listen: function(listeners, controller) {
+        
+        
+        this.callParent([{ global: listeners }, controller]);
+    },
+
+    match: function() {
+        return true;
+    }
 });
 
 
@@ -48086,19 +48616,26 @@ Ext.define('Ext.menu.Manager', {
     onMouseDown: function(e) {
         var me = this,
             active = me.active,
+            activeMenuCount = active.length,
             lastShow = me.lastShow,
-            doHide = true;
+            i;
 
-        if (Ext.Date.getElapsed(lastShow) > 50 && active.length > 0 && !e.getTarget(me.menuSelector)) {
+        if (Ext.Date.getElapsed(lastShow) > 50 && activeMenuCount) {
             
             
             
             if (Ext.isIE9m && !Ext.getDoc().contains(e.target)) {
-                doHide = false;
+                return;
             }
-            if (doHide) {
-                me.hideAll();
+            else {
+                
+                for (i = 0; i < activeMenuCount; i++) {
+                    if (active.items[i].owns(e.target)) {
+                        return;
+                    }
+                }
             }
+            me.hideAll();
         }
     },
 
@@ -48427,16 +48964,32 @@ Ext.define('Ext.layout.component.Button', {
 
     beginLayoutCycle: function(ownerContext) {
         var owner = this.owner,
-            lastWidthModel = this.lastWidthModel;
+            lastWidthModel = this.lastWidthModel,
+            lastHeightModel = this.lastHeightModel,
+            btnInnerEl = owner.btnInnerEl,
+            table = owner.getFrameInfo().table;
 
         this.callParent(arguments);
+        
+        
+        
+        
+        
 
-        if (lastWidthModel && !this.lastWidthModel.shrinkWrap &&
+        if (lastWidthModel && !lastWidthModel.shrinkWrap &&
             ownerContext.widthModel.shrinkWrap) {
             
             owner.btnWrap.setStyle('height', '');
             owner.btnEl.setStyle('height', '');
-            owner.btnInnerEl.setStyle('line-height', '');
+            btnInnerEl.setStyle('line-height', '');
+            if (table) {
+                btnInnerEl.setStyle('width', '');
+            }
+        }
+        
+        if (table && lastHeightModel && !lastHeightModel.shrinkWrap &&
+            ownerContext.heightModel.shrinkWrap) {
+            btnInnerEl.setStyle('height', '');
         }
     },
 
@@ -48644,7 +49197,7 @@ Ext.define('Ext.util.TextMetrics', {
         
         me.el = Ext.get(el);
         me.measure.setStyle(
-            me.el.getStyles('font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing')
+            me.el.getStyles('font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing', 'word-break')
         );
     },
     
@@ -48797,6 +49350,7 @@ Ext.define('Ext.button.Button', {
      hrefTarget: '_blank',
 
      
+     destroyMenu: true,
 
     
 
@@ -48869,6 +49423,12 @@ Ext.define('Ext.button.Button', {
 
     frame: true,
 
+    autoEl: {
+        tag: 'a',
+        hidefocus: 'on',
+        unselectable: 'on'
+    },
+
     hasFrameTable: function () {
         
         
@@ -48884,27 +49444,19 @@ Ext.define('Ext.button.Button', {
     doNavigate: function () {
         
         
+        
         if (this.hrefTarget === '_blank') {
-            window.open(this.href, this.hrefTarget);
+            window.open(this.getHref(), this.hrefTarget);
         } else {
-            location.href = this.href;
+            location.href = this.getHref();
         }
     },
 
     
     _triggerRegion: {},
 
-    
     initComponent: function() {
         var me = this;
-
-        
-        
-        me.autoEl = {
-            tag: 'a',
-            hidefocus: 'on',
-            unselectable: 'on'
-        };
 
         
         me.addCls(Ext.baseCSSPrefix + 'unselectable');
@@ -48949,13 +49501,7 @@ Ext.define('Ext.button.Button', {
         if (me.menu) {
             
             me.split = true;
-
-            
-            me.menu = Ext.menu.Manager.get(me.menu);
-
-            
-            
-            me.menu.ownerButton = me;
+            me.setMenu(me.menu, false);
         }
 
         
@@ -48980,19 +49526,12 @@ Ext.define('Ext.button.Button', {
         me.glyphCls = me.baseCls + '-glyph';
     },
 
-    
     getActionEl: function() {
         return this.el;
     },
 
-    
     getFocusEl: function() {
         return this.el;
-    },
-
-    
-    onDisable: function(){
-        this.callParent(arguments);
     },
 
     
@@ -49028,22 +49567,28 @@ Ext.define('Ext.button.Button', {
         return cls;
     },
 
-    beforeRender: function () {
+    getElConfig: function() {
         var me = this,
-            autoEl = me.autoEl,
+            config = me.callParent(),
             href = me.getHref(),
             hrefTarget = me.hrefTarget;
 
-        if (!me.disabled) {
-            autoEl.tabIndex = me.tabIndex;
-        }
-
-        if (href) {
-            autoEl.href = href;
-            if (hrefTarget) {
-                autoEl.target = hrefTarget;
+        if (config.tag === 'a') {
+            if (!me.disabled) {
+                config.tabIndex = me.tabIndex;
+            }
+            if (href) {
+                config.href = href;
+                if (hrefTarget) {
+                    config.target = hrefTarget;
+                }
             }
         }
+        return config;
+    },
+
+    beforeRender: function () {
+        var me = this;
 
         me.callParent();
 
@@ -49053,6 +49598,54 @@ Ext.define('Ext.button.Button', {
 
         
         Ext.applyIf(me.renderData, me.getTemplateArgs());
+    },
+
+    
+    setMenu: function (menu, destroyMenu) {
+        var me = this,
+            oldMenu = me.menu;
+
+        if (oldMenu && destroyMenu !== false && me.destroyMenu) {
+            oldMenu.destroy();
+        }
+
+        if (oldMenu) {
+            oldMenu.ownerCmp = oldMenu.ownerButton = null;
+        }
+
+        if (menu) {
+            
+            menu = Ext.menu.Manager.get(menu);
+
+            
+            
+            menu.ownerCmp = menu.ownerButton = me;
+
+            me.mon(menu, {
+                scope: me,
+                show: me.onMenuShow,
+                hide: me.onMenuHide
+            });
+
+            
+            
+            if (!oldMenu) {
+                me.split = true;
+                if (me.rendered) {
+                    me.btnWrap.addCls(me.getSplitCls());
+                    me.updateLayout();
+                }
+            }
+
+            me.menu = menu;
+        } else {
+            if (me.rendered) {
+                me.btnWrap.removeCls(me.getSplitCls());
+                me.updateLayout();
+            }
+            me.split = false;
+            me.menu = null;
+        }
     },
 
     
@@ -49091,12 +49684,6 @@ Ext.define('Ext.button.Button', {
 
         
         if (me.menu) {
-            me.mon(me.menu, {
-                scope: me,
-                show: me.onMenuShow,
-                hide: me.onMenuHide
-            });
-
             me.keyMap = new Ext.util.KeyMap({
                 target: me.el,
                 key: Ext.EventObject.DOWN,
@@ -49337,8 +49924,8 @@ Ext.define('Ext.button.Button', {
         if (me.rendered) {
             me.clearTip();
         }
-        if (me.menu && me.destroyMenu !== false) {
-            Ext.destroy(me.menu);
+        if (me.menu && me.destroyMenu) {
+            me.menu.destroy();
         }
         Ext.destroy(me.btnInnerEl, me.repeater);
         me.callParent();
@@ -49625,7 +50212,6 @@ Ext.define('Ext.button.Button', {
         me.fireEvent('menutriggerout', me, me.menu, e);
     },
 
-    
     enable: function(silent) {
         var me = this;
 
@@ -49639,7 +50225,6 @@ Ext.define('Ext.button.Button', {
         return me;
     },
 
-    
     disable: function(silent) {
         var me = this;
 
@@ -49674,7 +50259,6 @@ Ext.define('Ext.button.Button', {
         me.setUI(ui);
     },
 
-    
     setUI: function(ui) {
         var me = this;
 
@@ -49991,20 +50575,19 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
     },
     
     
-    createMenuConfig : function(component, hideOnClick) {
-        var me = this,
-            config = Ext.apply({}, component.initialConfig),
+    createMenuConfig: function (component, hideOnClick) {
+        var config = Ext.apply({}, component.initialConfig),
             group  = component.toggleGroup;
 
         Ext.copyTo(config, component, [
             'iconCls', 'icon', 'itemId', 'disabled', 'handler', 'scope', 'menu', 'tabIndex'
         ]);
 
-        Ext.apply(config, {
-            text       : component.overflowText || component.text,
+        Ext.applyIf(config, {
+            text: component.overflowText || component.text,
             hideOnClick: hideOnClick,
             destroyMenu: false,
-            listeners  : {}
+            listeners: {}
         });
 
         
@@ -50018,16 +50601,16 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
             
             config.listeners.change = function(c, newVal, oldVal) {                            
                 component.setValue(newVal);
-            }
+            };
         }
 
         
         else if (group || component.enableToggle) {
             Ext.apply(config, {
                 hideOnClick: false,
-                group  : group,
+                group: group,
                 checked: component.pressed,
-                handler: function(item, e) {
+                handler: function (item, e) {
                     component.onClick(e);
                 }
             });
@@ -50036,9 +50619,9 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
         
         if (component.isButton && !component.changeListenersAdded) {
             component.on({
-                textchange: me.onButtonAttrChange,
-                iconchange: me.onButtonAttrChange,
-                toggle:     me.onButtonToggle
+                textchange: this.onButtonAttrChange,
+                iconchange: this.onButtonAttrChange,
+                toggle: this.onButtonToggle
             });
             component.changeListenersAdded = true;
         }
@@ -50075,9 +50658,16 @@ Ext.define('Ext.layout.container.boxOverflow.Menu', {
         var me = this,
         i, items, iLen;
 
-        if (component instanceof Ext.toolbar.Separator) {
+        
+        if (component instanceof Ext.toolbar.Fill) {
+            return;
+        }
+        
+        else if (component instanceof Ext.toolbar.Separator) {
             menu.add('-');
-        } else if (component.isComponent) {
+        }
+        
+        else if (component.isComponent) {
             if (component.isXType('splitbutton')) {
                 component.overflowClone = menu.add(me.createMenuConfig(component, true));
 
@@ -51043,16 +51633,21 @@ Ext.define('Ext.dd.DragDropManager', {
 
     
     _remove: function(oDD, clearGroup) {
-        
-        
-        if (this.clearingAll) {
-            return;
-        }
-        
-        var ids = this.ids,
+        var me = this,
+            ids = me.ids,
             groups = oDD.groups,
             g;
-            
+
+        
+        
+        if (me.clearingAll) {
+            return;
+        }
+
+        if (me.dragCurrent === oDD) {
+            me.dragCurrent = null;
+        }
+
         for (g in groups) {
             if (groups.hasOwnProperty(g)) {
                 if (clearGroup) {
@@ -51062,7 +51657,7 @@ Ext.define('Ext.dd.DragDropManager', {
                 }
             }
         }
-        delete this.handleIds[oDD.id];
+        delete me.handleIds[oDD.id];
     },
 
     
@@ -51331,9 +51926,12 @@ Ext.define('Ext.dd.DragDropManager', {
         if (!me.notifyOccluded && (!Ext.supports.PointerEvents || Ext.isIE10m || Ext.isOpera) && !(dragCurrent.deltaX < 0 || dragCurrent.deltaY < 0)) {
             dragEl = dragCurrent.getDragEl();
             oldDragElTop = dragEl.style.top;
-            dragEl.style.top = '-10000px';
+            
+            
+            dragEl.style.visibility = 'hidden';
             xy = e.getXY();
             e.target = document.elementFromPoint(xy[0], xy[1]);
+            dragEl.style.visibility = 'visible';
             dragEl.style.top = oldDragElTop;
         }
 
@@ -51342,8 +51940,10 @@ Ext.define('Ext.dd.DragDropManager', {
         for (i in me.dragOvers) {
 
             overTarget = me.dragOvers[i];
+            delete me.dragOvers[i];
 
-            if (!me.isTypeOfDD(overTarget)) {
+            
+            if (!me.isTypeOfDD(overTarget) || overTarget.isDestroyed) {
                 continue;
             }
 
@@ -51361,7 +51961,6 @@ Ext.define('Ext.dd.DragDropManager', {
             }
 
             oldOvers[i] = true;
-            delete me.dragOvers[i];
         }
 
         
@@ -52053,6 +52652,8 @@ Ext.define('Ext.layout.container.Box', {
             infiniteValue = Infinity,
             aTarget = a.target,
             bTarget = b.target,
+            aFlex = aTarget.flex,
+            bFlex = bTarget.flex,
             result = 0,
             aMin, bMin, aMax, bMax,
             hasMin, hasMax;
@@ -52075,6 +52676,15 @@ Ext.define('Ext.layout.container.Box', {
             
             if (result === 0 && hasMin) {
                 result = bMin - aMin;
+            }
+
+            
+            if (result === 0) {
+                if (hasMax) {
+                    result = bFlex - aFlex;
+                } else {
+                    result = aFlex - bFlex;
+                }
             }
         }
         return result;
@@ -52937,6 +53547,10 @@ Ext.define('Ext.layout.container.Box', {
             el = comp.getEl();
             el.setStyle(names.beforeY, '');
             el.setStyle(names.beforeX, '');
+
+            
+            
+            el.setStyle('margin', '');
         }
     },
 
@@ -53541,10 +54155,10 @@ Ext.define('Ext.panel.AbstractPanel', {
     
     
 
+        
+     border: true,
     
-    border: true,
-
-    
+     
     emptyArray: [],
 
     initComponent : function() {
@@ -54711,8 +55325,9 @@ Ext.define('Ext.dd.DragDrop', {
     },
 
     
-    destroy : function(){
+    destroy: function() {
         this.unreg();
+        this.isDestroyed = true;
     },
 
     
@@ -56236,7 +56851,7 @@ Ext.define('Ext.panel.Panel', {
     manageHeight: true,
 
     
-    
+
     
 
     
@@ -56250,7 +56865,10 @@ Ext.define('Ext.panel.Panel', {
     constrainHeader: false,
 
     
+
     
+    maskElement: 'el',
+
     initComponent: function() {
         var me = this;
 
@@ -56258,7 +56876,7 @@ Ext.define('Ext.panel.Panel', {
 
             
             'beforeclose',
-            
+
             
             'close',
 
@@ -56279,7 +56897,7 @@ Ext.define('Ext.panel.Panel', {
 
             
             'iconchange',
-            
+
             
             'iconclschange',
 
@@ -56391,7 +57009,7 @@ Ext.define('Ext.panel.Panel', {
 
         me.fireEvent('iconclschange', me, newIconCls, oldIconCls);
     },
-    
+
     
     setIcon: function(newIcon) {
         var me = this,
@@ -56510,7 +57128,7 @@ Ext.define('Ext.panel.Panel', {
                         
                         isButton = !config.xtype || config.isButton,
                         cls;
-                       
+
                     
                     
                     if (!isButton) {
@@ -56557,10 +57175,10 @@ Ext.define('Ext.panel.Panel', {
     },
 
     onBoxReady: function(){
-        this.callParent();
+        this.callParent(arguments);
         if (this.collapsed) {
             this.setHiddenDocked();
-        }    
+        }
     },
 
     beforeRender: function() {
@@ -56646,11 +57264,12 @@ Ext.define('Ext.panel.Panel', {
         
         if (me.closable) {
             me.addClsWithUI('closable');
-            me.addTool(Ext.widget({
+            me.addTool({
                 xtype : 'tool',
                 type: 'close',
-                handler: Ext.Function.bind(me.close, me, [])
-            }));
+                scope: me,
+                handler: me.close
+            });
         }
 
         
@@ -56665,7 +57284,7 @@ Ext.define('Ext.panel.Panel', {
     updateCollapseTool: function () {
         var me = this,
             collapseTool = me.collapseTool;
-    
+
         if (collapseTool) {
             if (me.collapsed && !me.isPlaceHolderCollapse()) {
                 collapseTool.setType('expand-' + me.getOppositeDirection(me.collapseDirection));
@@ -56774,7 +57393,7 @@ Ext.define('Ext.panel.Panel', {
     onHide: function() {
         var me = this,
             dd = me.dd;
-        
+
         if (me.floatedFromCollapse) {
             me.slideOutFloatedPanel(true);
         }
@@ -56831,7 +57450,7 @@ Ext.define('Ext.panel.Panel', {
         for (t = 0; t < tLen; t++) {
             tool = tools[t];
             tool.toolOwner = me;
-            
+
             if (header && header.isHeader) {
                 header.addTool(tool);
             } else {
@@ -56888,7 +57507,7 @@ Ext.define('Ext.panel.Panel', {
         var dir = this.collapseDirection;
         
         
-        return (dir === 'top' || dir === 'bottom') ? 'height' : 'width';    
+        return (dir === 'top' || dir === 'bottom') ? 'height' : 'width';
     },
 
     
@@ -56940,7 +57559,7 @@ Ext.define('Ext.panel.Panel', {
             dockedItems = me.dockedItems.items,
             dockedItemCount = dockedItems.length,
             comp, i;
-            
+
         
         if (me.collapseMode === 'mini') {
             return;
@@ -57029,7 +57648,7 @@ Ext.define('Ext.panel.Panel', {
                 ownerLayout: me.componentLayout,
                 margin: me.margin
             }, defaults);
-            
+
         
         
         if (me.collapseMode === 'mini') {
@@ -57208,7 +57827,7 @@ Ext.define('Ext.panel.Panel', {
         if (me.collapsed || me.fireEvent('beforecollapse', me, direction, animate) === false) {
             return me;
         }
-        
+
         if (layout && layout.onBeforeComponentCollapse) {
             if (layout.onBeforeComponentCollapse(me) === false) {
                 return me;
@@ -57280,7 +57899,7 @@ Ext.define('Ext.panel.Panel', {
         me.setHiddenDocked();
         me.fireEvent('collapse', me);
     },
-    
+
     setHiddenDocked: function(){
         
         
@@ -57290,11 +57909,11 @@ Ext.define('Ext.panel.Panel', {
             len = items.length,
             i = 0,
             item, reExpander;
-            
+
         if (me.header !== false) {
             reExpander = me.getReExpander();
         }
-            
+
         toHide.add(me.body);
         for (; i < len; i++) {
             item = items[i];
@@ -57304,7 +57923,7 @@ Ext.define('Ext.panel.Panel', {
         }
         toHide.setStyle('visibility', 'hidden');
     },
-    
+
     restoreHiddenDocked: function(){
         var toShow = this.hiddenOnCollapse;
         
@@ -57376,6 +57995,7 @@ Ext.define('Ext.panel.Panel', {
             }
 
             placeholder.hidden = false;
+            placeholder.setHiddenState(false);
             placeholder.el.show();
             ownerCt.updateLayout();
         } else {
@@ -57403,6 +58023,7 @@ Ext.define('Ext.panel.Panel', {
                                 listeners: {
                                     afteranimate: function() {
                                         placeholder.focus();
+                                        placeholder.setHiddenState(false);
                                         me.isCollapsingOrExpanding = 0;
                                         me.fireEvent('collapse', me);
                                     }
@@ -57413,6 +58034,7 @@ Ext.define('Ext.panel.Panel', {
                 });
             } else {
                 me.el.hide();
+                placeholder.setHiddenState(false);
                 me.isCollapsingOrExpanding = 0;
                 me.fireEvent('collapse', me);
             }
@@ -57608,11 +58230,11 @@ Ext.define('Ext.panel.Panel', {
             return me;
         }
 
-        
+
         if (me.fireEvent('beforeexpand', me, animate) === false) {
             return me;
         }
-        
+
         if (layout && layout.onBeforeComponentExpand) {
             if (layout.onBeforeComponentExpand(me) === false) {
                 return me;
@@ -57765,17 +58387,17 @@ Ext.define('Ext.panel.Panel', {
         me.fireEvent('expand', me);
         me.fireHierarchyEvent('expand');
     },
-    
+
     
     setBorder: function(border, targetEl) {
         if (targetEl) {
             
             return;
         }
-        
+
         var me = this,
             header = me.header;
-            
+
         if (!border) {
             border = 0;
         } else if (border === true) {
@@ -57783,7 +58405,7 @@ Ext.define('Ext.panel.Panel', {
         } else {
             border = me.unitizeBox(border);
         }
-        
+
         if (header) {
             if (header.isHeader) {
                 header.setBorder(border);
@@ -57791,12 +58413,12 @@ Ext.define('Ext.panel.Panel', {
                 header.border = border;
             }
         }
-        
+
         if (me.rendered && me.bodyBorder !== false) {
             me.body.setStyle('border-width', border);
         }
         me.updateLayout();
-        
+
         me.border = border;
     },
 
@@ -57857,7 +58479,7 @@ Ext.define('Ext.panel.Panel', {
             }
         }
     },
-    
+
     
     
     ghostTools : function() {
@@ -57903,8 +58525,10 @@ Ext.define('Ext.panel.Panel', {
         } else {
             ghostPanel.el.show();
         }
+
         ghostPanel.setHiddenState(false);
         ghostPanel.floatParent = me.floatParent;
+
         ghostPanel.toFront();
         if (header && !me.preventHeader) {
             ghostHeader = ghostPanel.header;
@@ -57925,7 +58549,7 @@ Ext.define('Ext.panel.Panel', {
             } else if (me.glyph) {
                 ghostPanel.setGlyph(me.glyph);
             }
-            
+
             ghostHeader.addCls(Ext.baseCSSPrefix + 'header-ghost');
             ghostHeader.resumeLayouts();
         }
@@ -57953,6 +58577,13 @@ Ext.define('Ext.panel.Panel', {
             
             
             resizable: false,
+
+            
+            draggable: false,
+
+            
+            closable: false,
+
             floating: {
                 shadow: false
             },
@@ -57961,6 +58592,9 @@ Ext.define('Ext.panel.Panel', {
             overlapHeader: me.overlapHeader,
             headerPosition: me.headerPosition,
             baseCls: me.baseCls,
+            getRefOwner: function () {
+                return me.getRefOwner();
+            },
             cls: me.baseCls + '-ghost ' + (cls || '')
         };
     },
@@ -57969,10 +58603,11 @@ Ext.define('Ext.panel.Panel', {
     unghost: function(show, matchPosition) {
         var me = this,
             ghostPanel = me.ghostPanel;
-            
+
         if (!ghostPanel) {
             return;
         }
+
         if (show !== false) {
             
             
@@ -57986,6 +58621,7 @@ Ext.define('Ext.panel.Panel', {
             }
             Ext.defer(me.focus, 10, me);
         }
+
         ghostPanel.el.hide();
         ghostPanel.setHiddenState(true);
     },
@@ -58012,6 +58648,20 @@ Ext.define('Ext.panel.Panel', {
     
     convertCollapseDir: function(collapseDir) {
         return collapseDir.substr(0, 1);
+    },
+
+    getAnimationProps: function() {
+        var me = this,
+            animCollapse = me.animCollapse,
+            props;
+
+        props = me.callParent();
+
+        if (typeof animCollapse === 'number') {
+            props.duration = animCollapse;
+        }
+
+        return props;
     }
 }, function() {
     this.prototype.animCollapse = Ext.enableFx;
@@ -58021,6 +58671,7 @@ Ext.define('Ext.panel.Panel', {
 
 Ext.define('Ext.tip.Tip', {
     extend:  Ext.panel.Panel ,
+    alias: 'widget.tip',
 
     alternateClassName: 'Ext.Tip',
 
@@ -58407,23 +59058,33 @@ Ext.define('Ext.tip.ToolTip', {
     },
 
     
-    delayShow: function() {
-        var me = this;
+    delayShow: function (trackMouse) {
+        
+        
+        
+        
+        
+        
+        
+        
+        var me = this,
+            xy = me.el && (trackMouse === false || !me.trackMouse) && me.getTargetXY();
+
         if (me.hidden && !me.showTimer) {
             if (Ext.Date.getElapsed(me.lastActive) < me.quickShowInterval) {
                 me.show();
             } else {
-                me.showTimer = Ext.defer(me.showFromDelay, me.showDelay, me);
+                me.showTimer = Ext.defer(me.showFromDelay, me.showDelay, me, [xy]);
             }
         }
         else if (!me.hidden && me.autoHide !== false) {
-            me.show();
+            me.show(xy);
         }
     },
     
-    showFromDelay: function(){
+    showFromDelay: function (xy) {
         this.fromDelayShow = true;
-        this.show();
+        this.show(xy);
         delete this.fromDelayShow;
     },
     
@@ -58476,7 +59137,7 @@ Ext.define('Ext.tip.ToolTip', {
     },
 
     
-    show: function() {
+    show: function (xy) {
         var me = this;
 
         
@@ -58490,7 +59151,8 @@ Ext.define('Ext.tip.ToolTip', {
             }
             
             if (!me.calledFromShowAt) {
-                me.showAt(me.getTargetXY());
+                
+                me.showAt(xy || me.getTargetXY());
             }
 
             if (me.anchor) {
@@ -58919,7 +59581,9 @@ Ext.define('Ext.tip.QuickTip', {
          if (target) {
              el = target.el;
              if (el) {
-                 text = el.getAttribute(cfg.namespace + cfg.attribute);
+                 
+                 
+                 text = el.getAttribute(cfg.namespace + cfg.attribute) || me.interceptTitles;
                  
                  
                  
@@ -59154,8 +59818,11 @@ Ext.define('Ext.app.Application', {
     extend:  Ext.app.Controller ,
 
                
-                                 
+                                  
+                                  
       
+
+    
 
     
 
@@ -61736,7 +62403,7 @@ Ext.define('Ext.chart.Navigation', {
                     y : zoomArea.y / yScale,
                     width : zoomArea.width / xScale,
                     height : zoomArea.height / yScale
-                }
+                };
                 ends = axis.calcEnds();
                 if (horizontal) {
                     from = (ends.to - ends.from) * zoomer.x + ends.from;
@@ -62623,9 +63290,9 @@ Ext.define('Ext.chart.theme.Base', {
             },
             colors: [ "#94ae0a", "#115fa6","#a61120", "#ff8809", "#ffd13e", "#a61187", "#24ad9a", "#7c7474", "#a66111"],
             seriesThemes: [{
-                fill: "#115fa6"
-            }, {
                 fill: "#94ae0a"
+            }, {
+                fill: "#115fa6"
             }, {
                 fill: "#a61120"
             }, {
@@ -63282,6 +63949,7 @@ Ext.define('Ext.chart.Chart', {
             config.axisTitleRightStyle = Ext.apply({}, themeAttrs.axisTitleRight);
             config.axisTitleTopStyle = Ext.apply({}, themeAttrs.axisTitleTop);
             config.axisTitleBottomStyle = Ext.apply({}, themeAttrs.axisTitleBottom);
+            me.configureAxisStyles(config);
         }
         
         switch (axis.position) {
@@ -63328,6 +63996,8 @@ Ext.define('Ext.chart.Chart', {
         }
         axis.initialized = true;
     },
+    
+    configureAxisStyles: Ext.emptyFn,
 
     
     getInsets: function() {
@@ -64050,7 +64720,7 @@ Ext.define('Ext.chart.Tip', {
         } else {
             tipConfig.renderer.call(tooltip, item.storeItem, item);
         }
-        tooltip.delayShow();
+        tooltip.delayShow(trackMouse);
         tooltip.trackMouse = trackMouse;
     },
 
@@ -64991,6 +65661,7 @@ Ext.define('Ext.chart.axis.Axis', {
     drawTitle: function (maxWidth, maxHeight) {
         var me = this,
             position = me.position,
+            titleAlign = me.titleAlign,
             surface = me.chart.surface,
             displaySprite = me.displaySprite,
             title = me.title,
@@ -65015,7 +65686,13 @@ Ext.define('Ext.chart.axis.Axis', {
         pad = me.dashSize + me.label.padding;
 
         if (rotate) {
-            y -= ((me.length / 2) - (bbox.height / 2));
+            if (titleAlign === 'end') {
+                y -= me.length - bbox.height;
+            }
+            else if (!titleAlign || titleAlign === 'center') {
+                y -= ((me.length / 2) - (bbox.height / 2));
+            }
+            
             if (position == 'left') {
                 x -= (maxWidth + pad + (bbox.width / 2));
             }
@@ -65025,7 +65702,13 @@ Ext.define('Ext.chart.axis.Axis', {
             me.bbox.width += bbox.width + 10;
         }
         else {
-            x += (me.length / 2) - (bbox.width * 0.5);
+            if (titleAlign === 'end' || (me.reverse && titleAlign === 'start')) {
+                x += me.length - bbox.width;
+            }
+            else if (!titleAlign || titleAlign === 'center') {
+                x += (me.length / 2) - (bbox.width * 0.5);
+            }
+            
             if (position == 'top') {
                 y -= (maxHeight + pad + (bbox.height * 0.3));
             }
@@ -65458,6 +66141,8 @@ Ext.define('Ext.chart.axis.Radial', {
 
     
 
+    
+
     drawAxis: function(init) {
         var chart = this.chart,
             surface = chart.surface,
@@ -65546,6 +66231,7 @@ Ext.define('Ext.chart.axis.Radial', {
             categories = [], xField,
             aggregate = !this.maximum,
             maxValue = this.maximum || 0,
+            minValue = this.minimum || 0,
             steps = this.steps, i = 0, j, dx, dy,
             pi2 = Math.PI * 2,
             cos = Math.cos, sin = Math.sin,
@@ -65619,7 +66305,7 @@ Ext.define('Ext.chart.axis.Radial', {
                 
                 for (i = 0; i < steps; i++) {
                     labelArray[i].setAttributes({
-                        text: round((i + 1) / steps * maxValue),
+                        text: round((i + 1) / steps * (maxValue - minValue) + minValue),
                         x: centerX,
                         y: centerY - rho * (i + 1) / steps,
                         'text-anchor': 'middle',
@@ -65646,12 +66332,6 @@ Ext.define('Ext.chart.axis.Radial', {
             }
         }
         this.labelArray = labelArray;
-    },
-
-    getRange: function () {
-        var range = this.callParent();
-        range.min = 0;  
-        return range;
     },
 
     processView: function() {
@@ -67739,6 +68419,7 @@ Ext.define('Ext.chart.series.Bar', {
                 if (!shadow) {
                     shadow = surface.add(Ext.apply({
                         type: 'rect',
+                        isShadow: true,
                         group: shadowGroups[shadowIndex]
                     }, Ext.apply({}, baseAttrs, shadowBarAttr)));
                 }
@@ -67762,7 +68443,7 @@ Ext.define('Ext.chart.series.Bar', {
                 rendererAttributes.hidden = !!barAttr.hidden;
                 if (animate) {
                     me.onAnimate(shadow, {
-                        zero: bounds.zero + bounds.bbox.width, 
+                        zero: bounds.zero + (reverse ? bounds.bbox.width : 0), 
                         to: rendererAttributes 
                     });
                 }
@@ -67852,7 +68533,7 @@ Ext.define('Ext.chart.series.Bar', {
                 rendererAttributes = me.renderer(sprite, store.getAt(i), barAttr, i, store);
                 sprite._to = rendererAttributes;
                 anim = me.onAnimate(sprite, {
-                    zero: bounds.zero + bounds.bbox.width,  
+                    zero: bounds.zero + (me.reverse ? bounds.bbox.width : 0),
                     to: Ext.apply(rendererAttributes, endSeriesStyle) 
                 });
                 if (enableShadows && stacked && (i % bounds.barsLen === 0)) {
@@ -68246,20 +68927,53 @@ Ext.define('Ext.chart.series.Bar', {
     
     onAnimate: function(sprite, attr) {
         var me = this,
-            to = attr.to;
+            to = attr.to,
+            stacked = me.stacked,
+            reverse = me.reverse,
+            width = 0,
+            isText, bbox, x, from;
             
         sprite.show();
         
-        if (me.reverse && !me.column) {
-            attr.from = {
-                x: (me.stacked || sprite.type == 'text') ? attr.zero : to.x + to.width,
-                width: 0
-            };
+        if (!me.column) {
+            if (reverse) {
+                bbox = sprite.getBBox();
+                isText = sprite.type == 'text';
+                
+                
+                if (!me.inHighlight) {
+                    if (!stacked) {
+                        if (isText) {
+                            
+                            x = bbox.x >= 5 ? x : attr.zero;
+                        } else {
+                            if (bbox.width) {
+                                width = bbox.width;
+                            }
+                            x = bbox.width ? bbox.x : to.x + to.width;
+                        }
+                    } else {
+                        x = attr.zero;
+                    }
+                }
+                attr.from = {
+                    x: x,
+                    width: width
+                };
+            }
             
-            
-            
-            if (me.inHighlight) {
-                delete attr.from.x;
+            if (stacked) {
+                from = attr.from;
+                if (!from) {
+                    from = attr.from = {};
+                }
+                from.y = to.y;
+                if (!reverse) {
+                    from.x = attr.zero;
+                    if (sprite.isShadow) {
+                        from.width = 0;
+                    }
+                }
             }
         }
         
@@ -68393,6 +69107,8 @@ Ext.define('Ext.chart.series.Gauge', {
     alias: 'series.gauge',
 
     rad: Math.PI / 180,
+
+    
 
     
     highlightDuration: 150,
@@ -69525,9 +70241,12 @@ Ext.define('Ext.chart.series.Line', {
                 x: x,
                 y: y
             }, true);
-            if (resizing && me.animation) {
-                me.animation.on('afteranimate', function() {
-                    label.show(true);
+            if (resizing && chart.animate) {
+                me.on({
+                    single: true,
+                    afterrender: function() {
+                        label.show(true);
+                    }
                 });
             } else {
                 label.show(true);
@@ -69813,18 +70532,31 @@ Ext.define('Ext.chart.series.Pie', {
     
     style: {},
 
+    
+    clockwise: false,
+
+    
+    rotation: undefined,
+
+
     constructor: function(config) {
         this.callParent(arguments);
         var me = this,
             chart = me.chart,
             surface = chart.surface,
             store = chart.store,
-            shadow = chart.shadow, i, l, cfg;
-        config.highlightCfg = Ext.merge({
-            segment: {
-                margin: 20
-            }
-        }, config.highlight);
+            shadow = chart.shadow,
+            highlight = config.highlight,
+            i, l, cfg;
+
+        if (highlight) {
+            config.highlightCfg = Ext.merge({
+                segment: {
+                    margin: 20
+                }
+            }, highlight, config.highlightCfg);
+        }
+
         Ext.apply(me, config, {
             shadowAttributes: [{
                 "stroke-width": 6,
@@ -70018,6 +70750,7 @@ Ext.define('Ext.chart.series.Pie', {
             totalField = 0,
             maxLenField = 0,
             angle = 0,
+            rotation = me.rotation,
             seriesStyle = me.seriesStyle,
             colorArrayStyle = me.colorArrayStyle,
             colorArrayLength = colorArrayStyle && colorArrayStyle.length || 0,
@@ -70102,21 +70835,32 @@ Ext.define('Ext.chart.series.Pie', {
             
             if (first == 1) {
                 first = 2;
-                me.firstAngle = angle = me.accuracy * value / totalField / 2;
+
+                if (Ext.isEmpty(rotation)) {
+                    me.firstAngle = angle = (me.clockwise ? -1 : 1) * (me.accuracy * value / totalField / 2);
+                } else {
+                    if (!Ext.isEmpty(rotation.degrees)) {
+                        rotation = Ext.draw.Draw.rad(rotation.degrees);
+                    } else if (!Ext.isEmpty(rotation.radians)) {
+                        rotation = rotation.radians;
+                    }
+                    me.firstAngle = angle = me.accuracy * rotation / (2 * Math.PI);
+                }
+
                 for (j = 0; j < i; j++) {
                     slices[j].startAngle = slices[j].endAngle = me.firstAngle;
                 }
             }
 
-            endAngle = angle - me.accuracy * value / totalField;
+            endAngle = angle + (me.clockwise ? 1 : -1) * (me.accuracy * value / totalField);
             slice = {
                 series: me,
                 value: value,
-                startAngle: angle,
-                endAngle: endAngle,
+                startAngle: (me.clockwise ? endAngle : angle),
+                endAngle: (me.clockwise ? angle : endAngle),
                 storeItem: record
             };
-            if (lenField[0]) {
+            if (lenField[0] && !(this.__excludes && this.__excludes[i])) {
                 lenValue = +layerTotals[i];
                 
                 slice.rho = Math.floor(me.radius / maxLenField * lenValue);
@@ -70135,9 +70879,18 @@ Ext.define('Ext.chart.series.Pie', {
             for (i = 0, ln = slices.length; i < ln; i++) {
                 slice = slices[i];
                 slice.shadowAttrs = [];
+                record = store.getAt(i);
+                
                 for (j = 0, rhoAcum = 0, shadows = []; j < layers; j++) {
                     sprite = group.getAt(i * layers + j);
-                    deltaRho = lenField[j] ? store.getAt(i).get(lenField[j]) / layerTotals[i] * slice.rho: slice.rho;
+                    
+                    if (lenField[j] && !(this.__excludes && this.__excludes[i])) {
+                        deltaRho = record.get(lenField[j]) / layerTotals[i] * slice.rho;
+                    }
+                    else {
+                        deltaRho = slice.rho;
+                    }
+                    
                     
                     rendererAttributes = {
                         segment: {
@@ -70161,7 +70914,7 @@ Ext.define('Ext.chart.series.Pie', {
                                 strokeLinejoin: "round"
                             }, rendererAttributes, shadowAttr));
                         }
-                        shadowAttr = me.renderer(shadow, store.getAt(i), Ext.apply({}, rendererAttributes, shadowAttr), i, store);
+                        shadowAttr = me.renderer(shadow, record, Ext.apply({}, rendererAttributes, shadowAttr), i, store);
                         if (animate) {
                             me.onAnimate(shadow, {
                                 to: shadowAttr
@@ -70178,9 +70931,18 @@ Ext.define('Ext.chart.series.Pie', {
         
         for (i = 0, ln = slices.length; i < ln; i++) {
             slice = slices[i];
+            record = store.getAt(i);
+            
             for (j = 0, rhoAcum = 0; j < layers; j++) {
                 sprite = group.getAt(i * layers + j);
-                deltaRho = lenField[j] ? store.getAt(i).get(lenField[j]) / layerTotals[i] * slice.rho: slice.rho;
+                
+                if (lenField[j] && !(this.__excludes && this.__excludes[i])) {
+                    deltaRho = record.get(lenField[j]) / layerTotals[i] * slice.rho;
+                }
+                else {
+                    deltaRho = slice.rho;
+                }
+                
                 
                 rendererAttributes = Ext.apply({
                     segment: {
@@ -70219,7 +70981,7 @@ Ext.define('Ext.chart.series.Pie', {
                 slice.sprite.push(sprite);
                 slice.point = [item.middle.x, item.middle.y];
                 if (animate) {
-                    rendererAttributes = me.renderer(sprite, store.getAt(i), rendererAttributes, i, store);
+                    rendererAttributes = me.renderer(sprite, record, rendererAttributes, i, store);
                     sprite._to = rendererAttributes;
                     sprite._animating = true;
                     me.onAnimate(sprite, {
@@ -70234,7 +70996,7 @@ Ext.define('Ext.chart.series.Pie', {
                         }
                     });
                 } else {
-                    rendererAttributes = me.renderer(sprite, store.getAt(i), Ext.apply(rendererAttributes, {
+                    rendererAttributes = me.renderer(sprite, record, Ext.apply(rendererAttributes, {
                         hidden: false
                     }), i, store);
                     sprite.setAttributes(rendererAttributes, true);
@@ -70280,14 +71042,15 @@ Ext.define('Ext.chart.series.Pie', {
         }
     },
 
-    createLabelLine: function(i) {
+    createLabelLine: function(i, hidden) {
         var me = this;
             calloutLine = me.label.calloutLine,
             line = me.chart.surface.add({
                 type: 'path',
                 stroke: (i === undefined ? '#555' : ((calloutLine && calloutLine.color) || me.getLegendColor(i))),
                 lineWidth: (calloutLine && calloutLine.width) || 2,
-                path: 'M0,0Z'
+                path: 'M0,0Z',
+                hidden: hidden
             });
         return line;
     },
@@ -70324,6 +71087,7 @@ Ext.define('Ext.chart.series.Pie', {
     
     onPlaceLabel: function(label, storeItem, item, i, display, animate, index) {
         var me = this,
+            rad = me.rad,
             chart = me.chart,
             resizing = chart.resizing,
             config = me.label,
@@ -70331,6 +71095,8 @@ Ext.define('Ext.chart.series.Pie', {
             field = config.field,
             centerX = me.centerX,
             centerY = me.centerY,
+            startAngle = item.startAngle,
+            endAngle = item.endAngle,
             middle = item.middle,
             opt = {
                 x: middle.x,
@@ -70347,12 +71113,23 @@ Ext.define('Ext.chart.series.Pie', {
             calloutLine = label.attr.calloutLine,
             lineWidth = (calloutLine && calloutLine.width) || 2,
             labelPadding = (label.attr.padding || 20) + (isOutside ? lineWidth/2 + 4 : 0),
-            labelPaddingX = 0, labelPaddingY = 0;
+            labelPaddingX = 0, labelPaddingY = 0,
+            a1, a2, seg;
 
         opt.hidden = false;
 
         if (this.__excludes && this.__excludes[i]) {
             opt.hidden = true;
+        }
+        
+        if (config.hideLessThan) {
+            a1 = Math.min(startAngle, endAngle) * rad;
+            a2 = Math.max(startAngle, endAngle) * rad;
+            seg = (a2 - a1) * item.rho;
+            
+            if (seg < config.hideLessThan) {
+                opt.hidden = label.showOnHighlight = true;
+            }
         }
 
         label.setAttributes({
@@ -70484,7 +71261,7 @@ Ext.define('Ext.chart.series.Pie', {
             }
 
             if (!line) {
-                line = label.lineSprite = me.createLabelLine(i);
+                line = label.lineSprite = me.createLabelLine(i, opt.hidden);
                 animateLine = false;
             }
             me.drawLabelLine(label, fromPoint, toPoint, animateLine);
@@ -70597,8 +71374,14 @@ Ext.define('Ext.chart.series.Pie', {
             angle = Math.atan2(y - cy, x - cx) / me.rad;
 
         
-        if (angle > me.firstAngle) {
-            angle -= me.accuracy;
+        if (me.clockwise) {
+            if (angle < me.firstAngle) {
+                angle += me.accuracy;
+            }
+        } else {
+            if (angle > me.firstAngle) {
+                angle -= me.accuracy;
+            }
         }
         return (angle <= startAngle && angle > endAngle
                 && rho >= item.startRho && rho <= item.endRho);
@@ -70675,10 +71458,13 @@ Ext.define('Ext.chart.series.Pie', {
         if (!item || me.animating || (item.sprite && item.sprite._animating)) {
             return;
         }
+        
         me.callParent([item]);
+        
         if (!me.highlight) {
             return;
         }
+        
         if ('segment' in me.highlightCfg) {
             highlightSegment = me.highlightCfg.segment;
             animate = me.chart.animate;
@@ -70703,12 +71489,24 @@ Ext.define('Ext.chart.series.Pie', {
                 if (Math.abs(y) < 1e-10) {
                     y = 0;
                 }
+                
+                attrs = {
+                    translate: {
+                        x: x,
+                        y: y
+                    }
+                };
+                
+                if (label.showOnHighlight) {
+                    attrs.opacity = 1;
+                    attrs.hidden = false;
+                }
 
-                me.setSpriteAttributes(label, { translate: {x:x, y:y}}, animate);
+                me.setSpriteAttributes(label, attrs, animate);
 
                 line = label.lineSprite;
                 if (line) {
-                    me.setSpriteAttributes(line, { translate: {x:x, y:y}}, animate);
+                    me.setSpriteAttributes(line, attrs, animate);
                 }
             }
             
@@ -70793,12 +71591,17 @@ Ext.define('Ext.chart.series.Pie', {
                                 degrees: label.attr.rotation.degrees
                             }
                         }: {});
+                        
+                        if (label.showOnHighlight) {
+                            attrs.opacity = 0;
+                            attrs.hidden = true;
+                        }
 
                         me.setSpriteAttributes(label, attrs, animate);
 
                         var line = label.lineSprite;
                         if (line) {
-                            me.setSpriteAttributes(line, { translate: {x:0, y:0}}, animate);
+                            me.setSpriteAttributes(line, attrs, animate);
                         }
                     }
                     if (shadowsEnabled) {
@@ -70891,6 +71694,7 @@ Ext.define('Ext.chart.series.Radar', {
             items,
             radius,
             maxValue = 0,
+            minValue = 0,
             fields = [],
             max = Math.max,
             cos = Math.cos,
@@ -70906,6 +71710,7 @@ Ext.define('Ext.chart.series.Radar', {
         me.setBBox();
         
         maxValue = aggregate? 0 : (axis.maximum || 0);
+        minValue = axis.minimum || 0;
         
         Ext.apply(seriesStyle, me.style || {});
 
@@ -70948,11 +71753,17 @@ Ext.define('Ext.chart.series.Radar', {
         }
         
         maxValue = maxValue || 1;
+        if (minValue >= maxValue) {
+            minValue = maxValue - 1;
+        }
         
         startPath = []; path = [];
         for (i = 0; i < l; i++) {
             record = data[i];
-            rho = radius * record.get(field) / maxValue;
+            rho = radius * (record.get(field) - minValue) / (maxValue - minValue);
+            if (rho < 0) {
+                rho = 0;
+            }
             x = rho * cos(i / l * pi2);
             y = rho * sin(i / l * pi2);
             if (i == 0) {
@@ -71519,8 +72330,14 @@ Ext.define('Ext.chart.series.Scatter', {
             lnsh = shadowGroups.length,
             sprite, attrs, attr, ln, i, endMarkerStyle, shindex, type, shadows,
             rendererAttributes, shadowAttribute;
+        
+        if (!store || !store.getCount() || me.seriesIsHidden) {
+            me.hide();
+            me.items = [];
+            return;
+        }
 
-        endMarkerStyle = Ext.apply(me.markerStyle, me.markerConfig);
+        endMarkerStyle = Ext.apply({}, me.markerStyle, me.markerConfig);
         type = endMarkerStyle.type || 'circle';
         delete endMarkerStyle.type;
 
@@ -71848,9 +72665,6 @@ Ext.define('Ext.layout.container.Table', {
     
 
     
-
-    
-    monitorResize:false,
 
     type: 'table',
     
@@ -72278,6 +73092,7 @@ Ext.define('Ext.container.Monitor', {
     scope: null,
     addHandler: null,
     removeHandler: null,
+    invalidateHandler: null,
     
     disabled: 0,
     
@@ -72405,7 +73220,7 @@ Ext.define('Ext.container.Monitor', {
     onContainerRemove: function(ct, comp){
         var me = this,
             items, i, len, item;
-            
+         
         
         
         if (!comp.isDestroyed && !comp.destroying && comp.isContainer) {
@@ -72423,7 +73238,7 @@ Ext.define('Ext.container.Monitor', {
             }
         } else {
             
-            me.invalidateItems();
+            me.invalidateItems(true);
         }
     },
     
@@ -72446,8 +73261,14 @@ Ext.define('Ext.container.Monitor', {
         return items;
     },
     
-    invalidateItems: function(){
-        this.items = null;
+    invalidateItems: function(triggerHandler) {
+        var me = this,
+            handler = me.invalidateHandler;
+            
+        if (triggerHandler && handler) {
+            handler.call(me.scope || me, me);
+        }
+        me.items = null;
     }
 });
 
@@ -72461,8 +73282,6 @@ Ext.define('Ext.container.Viewport', {
 
     
     
-    
-
     
 
     
@@ -72664,16 +73483,16 @@ Ext.define('Ext.data.SortTypes', {
 Ext.define('Ext.data.Types', {
     singleton: true 
                                     
-}, function() {
-    var st = Ext.data.SortTypes;
+}, function(Types) {
+    var SortTypes = Ext.data.SortTypes;
 
-    Ext.apply(Ext.data.Types, {
+    Ext.apply(Types, {
         
         stripRe: /[\$,%]/g,
 
         
         AUTO: {
-            sortType: st.none,
+            sortType: SortTypes.none,
             type: 'auto'
         },
 
@@ -72683,7 +73502,7 @@ Ext.define('Ext.data.Types', {
                 var defaultValue = this.useNull ? null : '';
                 return (v === undefined || v === null) ? defaultValue : String(v);
             },
-            sortType: st.asUCString,
+            sortType: SortTypes.asUCString,
             type: 'string'
         },
 
@@ -72697,9 +73516,9 @@ Ext.define('Ext.data.Types', {
                     return parseInt(v);
                 }
                 return v !== undefined && v !== null && v !== '' ?
-                    parseInt(String(v).replace(Ext.data.Types.stripRe, ''), 10) : (this.useNull ? null : 0);
+                    parseInt(String(v).replace(Types.stripRe, ''), 10) : (this.useNull ? null : 0);
             },
-            sortType: st.none,
+            sortType: SortTypes.none,
             type: 'int'
         },
 
@@ -72710,9 +73529,9 @@ Ext.define('Ext.data.Types', {
                     return v;
                 }
                 return v !== undefined && v !== null && v !== '' ?
-                    parseFloat(String(v).replace(Ext.data.Types.stripRe, ''), 10) : (this.useNull ? null : 0);
+                    parseFloat(String(v).replace(Types.stripRe, ''), 10) : (this.useNull ? null : 0);
             },
-            sortType: st.none,
+            sortType: SortTypes.none,
             type: 'float'
         },
 
@@ -72727,7 +73546,7 @@ Ext.define('Ext.data.Types', {
                 }
                 return v === 'true' || v == 1;
             },
-            sortType: st.none,
+            sortType: SortTypes.none,
             type: 'bool'
         },
 
@@ -72751,21 +73570,19 @@ Ext.define('Ext.data.Types', {
                 parsed = Date.parse(v);
                 return parsed ? new Date(parsed) : null;
             },
-            sortType: st.asDate,
+            sortType: SortTypes.asDate,
             type: 'date'
         }
     });
 
-    Ext.apply(Ext.data.Types, {
-        
-        BOOLEAN: this.BOOL,
+    
+    Types.BOOLEAN = Types.BOOL;
 
-        
-        INTEGER: this.INT,
+    
+    Types.INTEGER = Types.INT;
 
-        
-        NUMBER: this.FLOAT
-    });
+    
+    Types.NUMBER = Types.FLOAT;
 });
 
 
@@ -73147,6 +73964,24 @@ Ext.define('Ext.data.Model', {
             if (superAssociations) {
                 associationsConfigs = superAssociations.items.concat(associationsConfigs);
             }
+            
+            Ext.Array.forEach(Ext.ModelManager.associationStack, function(item) {           
+                var checkItem = function (item, Cls) {
+                    Cls = Cls;
+                    if (item.ownerModel === Cls.modelName) {
+                        return true;
+                    } else if (Cls.superclass) {
+                        return checkItem(item, Cls.superclass);
+                    }
+                    return false;                                          
+                }, newItem;
+            
+                if (checkItem(item, superCls)) {
+                    newItem = Ext.clone(item);
+                    newItem.ownerModel = this.modelName;
+                    associationsConfigs.push(newItem);
+                };            
+            }, this);
 
             for (i = 0, ln = associationsConfigs.length; i < ln; ++i) {
                 dependencies.push('association.' + associationsConfigs[i].type.toLowerCase());
@@ -73166,29 +74001,32 @@ Ext.define('Ext.data.Model', {
             }
 
             Ext.require(dependencies, function() {
-                Ext.ModelManager.registerType(name, cls);
 
-                for (i = 0, ln = associationsConfigs.length; i < ln; ++i) {
-                    associationConfig = associationsConfigs[i];
-                    if (associationConfig.isAssociation) {
-                        associationConfig = Ext.applyIf({
-                            ownerModel: name,
-                            associatedModel: associationConfig.model
-                        }, associationConfig.initialConfig);
-                    } else {
-                        Ext.apply(associationConfig, {
-                            ownerModel: name,
-                            associatedModel: associationConfig.model
-                        });
-                    }
+                
+                if (name) {
+                    Ext.ModelManager.registerType(name, cls);
 
-                    if (Ext.ModelManager.getModel(associationConfig.model) === undefined) {
-                        Ext.ModelManager.registerDeferredAssociation(associationConfig);
-                    } else {
-                        associationsMixedCollection.add(Ext.data.association.Association.create(associationConfig));
+                    for (i = 0, ln = associationsConfigs.length; i < ln; ++i) {
+                        associationConfig = associationsConfigs[i];
+                        if (associationConfig.isAssociation) {
+                            associationConfig = Ext.applyIf({
+                                ownerModel: name,
+                                associatedModel: associationConfig.model
+                            }, associationConfig.initialConfig);
+                        } else {
+                            Ext.apply(associationConfig, {
+                                ownerModel: name,
+                                associatedModel: associationConfig.model
+                            });
+                        }
+
+                        if (Ext.ModelManager.getModel(associationConfig.model) === undefined) {
+                            Ext.ModelManager.registerDeferredAssociation(associationConfig);
+                        } else {
+                            associationsMixedCollection.add(Ext.data.association.Association.create(associationConfig));
+                        }
                     }
                 }
-
                 data.associations = associationsMixedCollection;
 
                 
@@ -73204,7 +74042,9 @@ Ext.define('Ext.data.Model', {
                 }
 
                 
-                Ext.ModelManager.onModelDefined(cls);
+                if (name) {
+                    Ext.ModelManager.onModelDefined(cls);
+                }
             });
         };
     },
@@ -73532,7 +74372,7 @@ Ext.define('Ext.data.Model', {
         
         if (passedId) {
             hasId = true;
-            persistenceProperty[idProperty] = idField && idField.convert ? idField.convert(id) : id;
+            persistenceProperty[idProperty] = idField && idField.convert ? idField.convert(id, me) : id;
         }
 
         
@@ -74657,354 +75497,6 @@ Ext.define('Ext.data.proxy.Ajax', {
 
 
 
-Ext.define('Ext.data.proxy.Client', {
-    extend:  Ext.data.proxy.Proxy ,
-    alternateClassName: 'Ext.data.ClientProxy',
-    
-    
-    isSynchronous: true,
-
-    
-    clear: function() {
-        Ext.Error.raise("The Ext.data.proxy.Client subclass that you are using has not defined a 'clear' function. See src/data/ClientProxy.js for details.");
-    }
-});
-
-
-
-Ext.define('Ext.data.proxy.Memory', {
-    extend:  Ext.data.proxy.Client ,
-    alias: 'proxy.memory',
-    alternateClassName: 'Ext.data.MemoryProxy',
-
-    
-
-    
-
-    constructor: function(config) {
-        this.callParent([config]);
-
-        
-        this.setReader(this.reader);
-    },
-    
-    
-    updateOperation: function(operation, callback, scope) {
-        var i = 0,
-            recs = operation.getRecords(),
-            len = recs.length;
-            
-        for (i; i < len; i++) {
-            recs[i].commit();
-        }
-        operation.setCompleted();
-        operation.setSuccessful();
-        
-        Ext.callback(callback, scope || this, [operation]);
-    },
-    
-    
-    create: function() {
-        this.updateOperation.apply(this, arguments);
-    },
-    
-    
-    update: function() {
-        this.updateOperation.apply(this, arguments);
-    },
-    
-    
-    destroy: function() {
-        this.updateOperation.apply(this, arguments);
-    },
-
-    
-    read: function(operation, callback, scope) {
-        var me = this,
-            resultSet = operation.resultSet = me.getReader().read(me.data),
-            records = resultSet.records,
-            sorters = operation.sorters,
-            groupers = operation.groupers,
-            filters = operation.filters;
-
-        operation.setCompleted();
-
-        
-        if (resultSet.success) {
-
-            
-            if (filters && filters.length) {
-                records = resultSet.records = Ext.Array.filter(records, Ext.util.Filter.createFilterFn(filters));
-                resultSet.total = records.length;
-            }
-
-            
-            if (groupers && groupers.length) {
-                
-                sorters = sorters ? sorters.concat(groupers) : sorters;
-            }
-
-            
-            if (sorters && sorters.length) {
-                resultSet.records = Ext.Array.sort(records, Ext.util.Sortable.createComparator(sorters));
-            }
-
-            
-            
-            if (me.enablePaging && operation.start !== undefined && operation.limit !== undefined) {
-
-                
-                if (operation.start >= resultSet.total) {
-                    resultSet.success = false;
-                    resultSet.count = 0;
-                    resultSet.records = [];
-                }
-                
-                else {
-                    resultSet.records = Ext.Array.slice(resultSet.records, operation.start, operation.start + operation.limit);
-                    resultSet.count = resultSet.records.length;
-                }
-            }
-        }
-
-        if (resultSet.success) {
-            operation.setSuccessful();
-        } else {
-            me.fireEvent('exception', me, null, operation);
-        }
-        Ext.callback(callback, scope || me, [operation]);
-    },
-
-    clear: Ext.emptyFn
-});
-
-
-
-Ext.define('Ext.util.LruCache', {
-    extend:  Ext.util.HashMap ,
-
-    
-
-    constructor: function(config) {
-        Ext.apply(this, config);
-        this.callParent([config]);
-    },
-
-    
-    add: function(key, newValue) {
-        var me = this,
-            existingKey = me.findKey(newValue),
-            entry;
-
-        
-        if (existingKey) {
-            me.unlinkEntry(entry = me.map[existingKey]);
-            entry.prev = me.last;
-            entry.next = null;
-        }
-        
-        else {
-            entry = {
-                prev: me.last,
-                next: null,
-                key: key,
-                value: newValue
-            };
-        }
-
-        
-        if (me.last) {
-            me.last.next = entry;
-        }
-        
-        else {
-            me.first = entry;
-        }
-        me.last = entry;
-        me.callParent([key, entry]);
-        me.prune();
-        return newValue;
-    },
-
-    
-    insertBefore: function(key, newValue, sibling) {
-        var me = this,
-            existingKey,
-            entry;
-
-        
-        
-        if (sibling = this.map[this.findKey(sibling)]) {
-            existingKey = me.findKey(newValue);
-
-            
-            if (existingKey) {
-                me.unlinkEntry(entry = me.map[existingKey]);
-            }
-            
-            else {
-                entry = {
-                    prev: sibling.prev,
-                    next: sibling,
-                    key: key,
-                    value: newValue
-                };
-            }
-
-            if (sibling.prev) {
-                entry.prev.next = entry;
-            } else {
-                me.first = entry;
-            }
-            entry.next = sibling;
-            sibling.prev = entry;
-            me.prune();
-            return newValue;
-        }
-        
-        else {
-            return me.add(key, newValue);
-        }
-    },
-
-    
-    get: function(key) {
-        var entry = this.map[key];
-        if (entry) {
-
-            
-            if (entry.next) {
-                this.moveToEnd(entry);
-            }
-            return entry.value;
-        }
-    },
-
-    
-    removeAtKey: function(key) {
-        this.unlinkEntry(this.map[key]);
-        return this.callParent(arguments);
-    },
-
-    
-    clear: function( initial) {
-        this.first = this.last = null;
-        return this.callParent(arguments);
-    },
-
-    
-    unlinkEntry: function(entry) {
-        
-        if (entry) {
-            if (entry.next) {
-                entry.next.prev = entry.prev;
-            } else {
-                this.last = entry.prev;
-            }
-            if (entry.prev) {
-                entry.prev.next = entry.next;
-            } else {
-                this.first = entry.next;
-            }
-            entry.prev = entry.next = null;
-        }
-    },
-
-    
-    moveToEnd: function(entry) {
-        this.unlinkEntry(entry);
-
-        
-        
-        if (entry.prev = this.last) {
-            this.last.next = entry;
-        }
-        
-        else {
-            this.first = entry;
-        }
-        this.last = entry;
-    },
-
-    
-    getArray: function(isKey) {
-        var arr = [],
-            entry = this.first;
-
-        while (entry) {
-            arr.push(isKey ? entry.key: entry.value);
-            entry = entry.next;
-        }
-        return arr;
-    },
-
-    
-    each: function(fn, scope, reverse) {
-        var me = this,
-            entry = reverse ? me.last : me.first,
-            length = me.length;
-
-        scope = scope || me;
-        while (entry) {
-            if (fn.call(scope, entry.key, entry.value, length) === false) {
-                break;
-            }
-            entry = reverse ? entry.prev : entry.next;
-        }
-        return me;
-    },
-
-    
-    findKey: function(value) {
-        var key,
-            map = this.map;
-
-        for (key in map) {
-            
-            
-            if (map.hasOwnProperty(key) && map[key].value === value) {
-                return key;
-            }
-        }
-        return undefined;
-    },
-
-    
-    clone: function() {
-        var newCache = new this.self(this.initialConfig),
-            map = this.map,
-            key;
-
-        newCache.suspendEvents();
-        for (key in map) {
-            if (map.hasOwnProperty(key)) {
-                newCache.add(key, map[key].value);
-            }
-        }
-        newCache.resumeEvents();
-        return newCache;
-    },
-
-    
-    prune: function() {
-        var me = this,
-            purgeCount = me.maxSize ? (me.length - me.maxSize) : 0;
-
-        if (purgeCount > 0) {
-            for (; me.first && purgeCount; purgeCount--) {
-                me.removeAtKey(me.first.key);
-            }
-        }
-    }
-
-  
-  
-  
-  
-});
-
-
-
 Ext.define('Ext.data.PageMap', {
     extend:  Ext.util.LruCache ,
 
@@ -75025,9 +75517,11 @@ Ext.define('Ext.data.PageMap', {
             pageSize;
 
         for (i = 0; i < pageCount; i++) {
-            pageNumbers[i] = Number(pageNumbers[i]);
+            pageNumbers[i] = +pageNumbers[i];
         }
-        Ext.Array.sort(pageNumbers);
+        Ext.Array.sort(pageNumbers, function(a, b) {
+            return a - b;
+        });
         scope = scope || me;
         for (i = 0; i < pageCount; i++) {
             pageNumber = pageNumbers[i];
@@ -75277,7 +75771,6 @@ Ext.define('Ext.data.Store', {
                                 
                          
                               
-                                
                                
                                
                            
@@ -75308,7 +75801,7 @@ Ext.define('Ext.data.Store', {
     groupField: undefined,
 
     
-    groupDir: "ASC",
+    groupDir: 'ASC',
 
     
     trailingBufferZone: 25,
@@ -75397,7 +75890,7 @@ Ext.define('Ext.data.Store', {
             if (config.getGroupString || (me.getGroupString !== Ext.data.Store.prototype.getGroupString)) {
                 groupers[0].getGroupString = function(record) {
                     return me.getGroupString(record);
-                }
+                };
             }
         }
         delete config.groupers;
@@ -75445,9 +75938,6 @@ Ext.define('Ext.data.Store', {
             me.remoteSort = true;
         }
 
-        
-        me.sorters.insert(0, me.groupers.getRange());
-
         proxy = me.proxy;
         data = me.inlineData;
 
@@ -75458,6 +75948,8 @@ Ext.define('Ext.data.Store', {
         }
 
         
+        
+        
         if (data) {
             if (proxy instanceof Ext.data.proxy.Memory) {
                 proxy.data = data;
@@ -75465,25 +75957,13 @@ Ext.define('Ext.data.Store', {
             } else {
                 me.add.apply(me, [data]);
             }
-            
-            
-            
-            if (me.sorters.items.length && !me.remoteSort) {
-                me.group(null, null, true);
-            }
 
             delete me.inlineData;
         }
         else if (me.autoLoad) {
             
-            Ext.defer(me.load, 1, me, [ typeof me.autoLoad === 'object' ? me.autoLoad : undefined ]);
-        }
-    },
-
-    onBeforeSort: function() {
-        var groupers = this.groupers;
-        if (groupers.getCount() > 0) {
-            this.sort(groupers.items, 'prepend', false);
+            me.autoLoadTask = new Ext.util.DelayedTask(me.load, me, [ typeof me.autoLoad === 'object' ? me.autoLoad : undefined ]);
+            me.autoLoadTask.delay(1);
         }
     },
 
@@ -75559,7 +76039,7 @@ Ext.define('Ext.data.Store', {
                 if (!grouper) {
                     grouper = {
                         property : groupers,
-                        direction: direction || 'ASC'
+                        direction: direction || me.groupDir
                     };
                     newGroupers = [grouper];
                 } else if (direction === undefined) {
@@ -75944,7 +76424,7 @@ Ext.define('Ext.data.Store', {
         }
 
         length = records.length;
-        isSorted = !me.remoteSort && me.sorters && me.sorters.items.length;
+        isSorted = !me.remoteSort && me.getSorterCount();
 
         
         
@@ -76016,6 +76496,9 @@ Ext.define('Ext.data.Store', {
             info = [],
             allRecords = [],
             indexes = [],
+            
+            grouped = [],
+            groupsLn = me.groups.length,
             item,
             isNotPhantom,
             index,
@@ -76118,6 +76601,10 @@ Ext.define('Ext.data.Store', {
                 
                 record.removedFrom = index;
                 me.removed.push(record);
+            } else if (groupsLn) {
+                
+                
+                grouped.push(record);
             }
 
             record.unjoin(me);
@@ -76139,6 +76626,10 @@ Ext.define('Ext.data.Store', {
             }
         }
 
+        if (groupsLn) {
+            me.updateGroupsOnRemove(me.removed.concat(grouped));
+        }
+
         
         
         if (removeRange) {
@@ -76146,7 +76637,7 @@ Ext.define('Ext.data.Store', {
         }
 
         if (!silent) {
-            me.fireEvent('bulkremove', me, allRecords, indexes, !!isMove);
+            me.fireEvent('bulkremove', me, allRecords, indexes, !!isMove, removeRange);
             me.fireEvent('datachanged', me);
         }
         if (!isMove && me.autoSync && sync && !me.autoSyncSuspended) {
@@ -76158,6 +76649,9 @@ Ext.define('Ext.data.Store', {
     removeAt: function(index, count) {
         var me = this,
             storeCount = me.getCount();
+
+        
+        index = Math.max(index, 0);
 
         if (index <= storeCount) {
             if (arguments.length === 1) {
@@ -76609,7 +77103,7 @@ Ext.define('Ext.data.Store', {
         }
 
         if (me.sortOnLoad && !me.remoteSort) {
-            me.sort(undefined, undefined, undefined, true);
+            me.sort();
         }
 
         me.resumeEvents();
@@ -76655,18 +77149,20 @@ Ext.define('Ext.data.Store', {
     },
 
     
-    clearData: function(isLoad) {
+    clearData: function(isLoad, data) {
         var me = this,
             records,
             i;
+
+        data = data || me.data;
 
         
         
         
         
         
-        if (!me.buffered && me.data) {
-            records = me.data.items;
+        if (!me.buffered && data) {
+            records = data.items;
             i = records.length;
             while (i--) {
                 records[i].unjoin(me);
@@ -76674,13 +77170,19 @@ Ext.define('Ext.data.Store', {
         }
 
         
-        if (me.data) {
-            me.data.clear();
+        if (data) {
+            data.clear();
         }
         
         if (isLoad !== true || me.clearRemovedOnLoad) {
             me.removed.length = 0;
         }
+    },
+
+    destroyClear: function() {
+        
+        
+        this.clearData(null, this.snapshot);
     },
 
     loadToPrefetch: function(options) {
@@ -76733,6 +77235,12 @@ Ext.define('Ext.data.Store', {
             
         if (isNaN(me.pageSize) || !me.pageSize) {
             Ext.Error.raise('Buffered store configured without a pageSize', me);
+        }
+
+        
+        
+        if (me.purgePageCount) {
+            me.data.maxSize = me.purgePageCount = Math.max(me.purgePageCount, endPage - startPage + 1);
         }
 
         if (me.fireEvent('beforeload', me, options) !== false) {
@@ -77067,7 +77575,6 @@ Ext.define('Ext.data.Store', {
     },
 
     
-    
     sort: function(sorters) {
         var me = this;
 
@@ -77079,25 +77586,67 @@ Ext.define('Ext.data.Store', {
     },
 
     
+    generateComparator: function() {
+        var me = this,
+            sorters = me.sorters.items,
+            numSorters = sorters.length,
+            
+            groupers = numSorters ? me.groupers.getRange() : me.groupers.items,
+            i,
+            sorter, matchingGrouper;
+
+        
+        
+        if (groupers.length) {
+            for (i = 0; i < numSorters; i++) {
+                sorter = sorters[i];
+
+                
+                
+                if (sorter.property && (matchingGrouper = me.groupers.get(sorter.property))) {
+                    matchingGrouper.setDirection(sorter.direction);
+                }
+
+                
+                else {
+                    Ext.Array.push(groupers, sorter);
+                }
+            }
+            sorters = groupers;
+        }
+
+        return sorters.length ? this.createComparator(sorters) : this.emptyComparator;
+    },
+
     
+    getSorterCount: function() {
+        return this.groupers.items.length + this.sorters.items.length;
+    },
+
     
     doSort: function(sorterFn) {
         var me = this,
             range,
             ln,
-            i;
+            i,
+            afterSort = function () {
+                me.fireEvent('sort', me, me.sorters.getRange());
+            };
 
         if (me.remoteSort) {
-
             
             
             
             if (me.buffered) {
                 me.data.clear();
-                me.loadPage(1);
+                me.loadPage(1, {
+                    callback: afterSort
+                });
             } else {
                 
-                me.load();
+                me.load({
+                    callback: afterSort
+                });
             }
         } else {
             if (me.buffered) {
@@ -77115,6 +77664,7 @@ Ext.define('Ext.data.Store', {
             }
             me.fireEvent('datachanged', me);
             me.fireEvent('refresh', me);
+            afterSort();
         }
     },
 
@@ -77194,8 +77744,8 @@ Ext.define('Ext.data.Store', {
             requiredEnd,
             maxIndex = me.totalCount - 1,
             lastRequestStart = me.lastRequestStart,
-            pageAddHandler,
-            result;
+            result = [],
+            pageAddHandler;
 
         options = Ext.apply({
             prefetchStart: start,
@@ -78053,6 +78603,11 @@ Ext.define('Ext.data.proxy.Direct', {
         });
         args.push(me.createRequestCallback(request, operation, callback, scope), me);
         fn.apply(window, args);
+        
+        
+        
+        
+        return request;
     },
 
     
@@ -78537,14 +79092,14 @@ Ext.define('Ext.data.NodeInterface', {
         
         decorate: function(modelClass) {
             var idName, idField, idType;
-            
+
             
             if (typeof modelClass == 'string') {
                 modelClass = Ext.ModelManager.getModel(modelClass);
             } else if (modelClass.isModel) {
                 modelClass = Ext.ModelManager.getModel(modelClass.modelName);
             }
-            
+
             
             if (modelClass.prototype.isNode) {
                 return;
@@ -78578,10 +79133,11 @@ Ext.define('Ext.data.NodeInterface', {
                 { name : 'qtip',       type : 'string',  defaultValue : '',    persist : false          , convert: null },
                 { name : 'qtitle',     type : 'string',  defaultValue : '',    persist : false          , convert: null },
                 { name : 'qshowDelay', type : 'int',     defaultValue : 0,     persist : false          , convert: null },
-                { name : 'children',   type : 'auto',    defaultValue : null,  persist : false          , convert: null }
+                { name : 'children',   type : 'auto',    defaultValue : null,  persist : false          , convert: null },
+                { name : 'visible',    type : 'boolean', defaultValue : true,  persist : false          , convert: null }
             ]);
         },
-        
+
         applyFields: function(modelClass, addFields) {
             var modelPrototype = modelClass.prototype,
                 fields = modelPrototype.fields,
@@ -78620,7 +79176,7 @@ Ext.define('Ext.data.NodeInterface', {
             return {
                 
                 isNode: true,
-                
+
                 constructor: function() {
                     var me = this;
                     me.callParent(arguments);
@@ -78646,8 +79202,11 @@ Ext.define('Ext.data.NodeInterface', {
                 },
                 
                 createNode: function(node) {
+                    var me = this;
+
+                    
                     if (!node.isModel) {
-                        node = Ext.ModelManager.create(node, this.modelName);
+                        node = new this.self(node);
                     }
                     
                     
@@ -78791,15 +79350,15 @@ Ext.define('Ext.data.NodeInterface', {
                     }
                     return false;
                 },
-                
+
                 triggerUIUpdate: function() {
                     
                     
-                    this.afterEdit([]);    
+                    this.afterEdit([]);
                 },
 
                 
-                appendChild : function(node, suppressEvents, commit) {
+                appendChild: function(node, suppressEvents, commit) {
                     var me = this,
                         i, ln,
                         index,
@@ -78825,7 +79384,7 @@ Ext.define('Ext.data.NodeInterface', {
                         
                         node = me.createNode(node);
 
-                        if (suppressEvents !== true && me.fireEventArgs("beforeappend", [me, node]) === false) {
+                        if (suppressEvents !== true && me.fireEventArgs('beforeappend', [me, node]) === false) {
                             return false;
                         }
 
@@ -78834,14 +79393,16 @@ Ext.define('Ext.data.NodeInterface', {
 
                         
                         if (oldParent) {
-                            if (suppressEvents !== true && node.fireEventArgs("beforemove", [node, oldParent, me, index]) === false) {
+                            if (suppressEvents !== true && node.fireEventArgs('beforemove', [node, oldParent, me, index]) === false) {
                                 return false;
                             }
                             oldParent.removeChild(node, false, false, true);
                         }
 
                         
-                        Ext.suspendLayouts();
+                        if (Ext.suspendLayouts) {
+                            Ext.suspendLayouts();
+                        }
 
                         index = me.childNodes.length;
                         if (index === 0) {
@@ -78872,6 +79433,11 @@ Ext.define('Ext.data.NodeInterface', {
                         node.updateInfo(commit, childInfo);
 
                         
+                        if (me.isLeaf()) {
+                            me.set('leaf', false);
+                        }
+
+                        
                         if (!me.isLoaded()) {
                             me.set('loaded', true);
                         } else if (me.childNodes.length === 1) {
@@ -78883,20 +79449,21 @@ Ext.define('Ext.data.NodeInterface', {
                             me.childNodes[index - 1].cascadeBy(me.triggerUIUpdate);
                         }
 
-                        if(!node.isLeaf() && node.phantom) {
-                            node.set('loaded', true);
+                        
+                        if (Ext.resumeLayouts) {
+                            Ext.resumeLayouts(true);
+                        }
+
+                        if (suppressEvents !== true) {
+                            me.fireEventArgs('append', [me, node, index]);
+
+                            if (oldParent) {
+                                node.fireEventArgs('move', [node, oldParent, me, index]);
+                            }
                         }
 
                         
-                        Ext.resumeLayouts(true);
-
-                        if (suppressEvents !== true) {
-                            me.fireEventArgs("append", [me, node, index]);
-
-                            if (oldParent) {
-                                node.fireEventArgs("move", [node, oldParent, me, index]);
-                            }
-                        }
+                        me.callStore('onNodeAdded', node, index);
 
                         return node;
                     }
@@ -78906,7 +79473,7 @@ Ext.define('Ext.data.NodeInterface', {
                 getOwnerTree: function() {
                     var node = this,
                         store;
-                        
+
                     while (node.parentNode) {
                         node = node.parentNode;
                     }
@@ -78915,12 +79482,20 @@ Ext.define('Ext.data.NodeInterface', {
                         if (store.treeStore) {
                             store = store.treeStore;
                         }
-                        
+
                         if (store.tree) {
                             return store.ownerTree;
                         }
                     }
                     return undefined;
+                },
+
+                
+                getTreeStore: function() {
+                    var store = this.stores[0];
+
+                    
+                    return store.treeStore || store;
                 },
 
                 
@@ -78930,12 +79505,14 @@ Ext.define('Ext.data.NodeInterface', {
                         i, childCount,
                         previousSibling;
 
-                    if (index === -1 || (suppressEvents !== true && me.fireEventArgs("beforeremove", [me, node, !!isMove]) === false)) {
+                    if (index === -1 || (suppressEvents !== true && me.fireEventArgs('beforeremove', [me, node, !!isMove]) === false)) {
                         return false;
                     }
 
                     
-                    Ext.suspendLayouts();
+                    if (Ext.suspendLayouts) {
+                        Ext.suspendLayouts();
+                    }
 
                     
                     Ext.Array.erase(me.childNodes, index, 1);
@@ -78953,7 +79530,7 @@ Ext.define('Ext.data.NodeInterface', {
                     if (previousSibling) {
                         node.previousSibling.nextSibling = node.nextSibling;
                     }
-                    
+
                     
                     if (node.nextSibling) {
                         node.nextSibling.previousSibling = node.previousSibling;
@@ -78997,7 +79574,9 @@ Ext.define('Ext.data.NodeInterface', {
                     }
 
                     
-                    Ext.resumeLayouts(true);
+                    if (Ext.resumeLayouts) {
+                        Ext.resumeLayouts(true);
+                    }
 
                     if (suppressEvents !== true) {
                         
@@ -79008,7 +79587,11 @@ Ext.define('Ext.data.NodeInterface', {
                         };
 
                         node.previousSibling = node.nextSibling = node.parentNode = null;
+
                         me.fireEventArgs('remove', [me, node, !!isMove]);
+
+                        
+                        me.callStore('onNodeRemove', node, !!isMove);
 
                         
                         node.removeContext = null;
@@ -79079,7 +79662,7 @@ Ext.define('Ext.data.NodeInterface', {
                 },
 
                 
-                insertBefore : function(node, refNode, suppressEvents) {
+                insertBefore: function(node, refNode, suppressEvents) {
                     var me = this,
                         index     = me.indexOf(refNode),
                         oldParent = node.parentNode,
@@ -79098,7 +79681,7 @@ Ext.define('Ext.data.NodeInterface', {
                     
                     node = me.createNode(node);
 
-                    if (suppressEvents !== true && me.fireEventArgs("beforeinsert", [me, node, refNode]) === false) {
+                    if (suppressEvents !== true && me.fireEventArgs('beforeinsert', [me, node, refNode]) === false) {
                         return false;
                     }
 
@@ -79109,7 +79692,7 @@ Ext.define('Ext.data.NodeInterface', {
 
                     
                     if (oldParent) {
-                        if (suppressEvents !== true && node.fireEventArgs("beforemove", [node, oldParent, me, index, refNode]) === false) {
+                        if (suppressEvents !== true && node.fireEventArgs('beforemove', [node, oldParent, me, index, refNode]) === false) {
                             return false;
                         }
                         oldParent.removeChild(node, false, false, true);
@@ -79157,17 +79740,16 @@ Ext.define('Ext.data.NodeInterface', {
                         me.triggerUIUpdate();
                     }
 
-                    if(!node.isLeaf() && node.phantom) {
-                        node.set('loaded', true);
-                    }
-
                     if (suppressEvents !== true) {
-                        me.fireEventArgs("insert", [me, node, refNode]);
+                        me.fireEventArgs('insert', [me, node, refNode]);
 
                         if (oldParent) {
-                            node.fireEventArgs("move", [node, oldParent, me, refIndex, refNode]);
+                            node.fireEventArgs('move', [node, oldParent, me, refIndex, refNode]);
                         }
                     }
+
+                    
+                    me.callStore('onNodeAdded', node, refNode);
 
                     return node;
                 },
@@ -79219,7 +79801,7 @@ Ext.define('Ext.data.NodeInterface', {
 
                     for (; i < len; ++i) {
                         node = childNodes[i];
-                        
+
                         
                         node.removeContext = {
                             parentNode: node.parentNode,
@@ -79228,7 +79810,11 @@ Ext.define('Ext.data.NodeInterface', {
                         };
 
                         node.previousSibling = node.nextSibling = node.parentNode = null;
+
                         me.fireEventArgs('remove', [me, node, false]);
+
+                        
+                        me.callStore('onNodeRemove', node, false);
 
                         
                         node.removeContext = null;
@@ -79254,7 +79840,7 @@ Ext.define('Ext.data.NodeInterface', {
                         me.childNodes.length = 0;
                         me.triggerUIUpdate();
                     }
-                    
+
                     return me;
                 },
 
@@ -79276,17 +79862,17 @@ Ext.define('Ext.data.NodeInterface', {
                 indexOf : function(child) {
                     return Ext.Array.indexOf(this.childNodes, child);
                 },
-                
+
                 
                 indexOfId: function(id) {
                     var childNodes = this.childNodes,
                         len = childNodes.length,
                         i = 0;
-                        
+
                     for (; i < len; ++i) {
                         if (childNodes[i].getId() === id) {
                             return i;
-                        }    
+                        }
                     }
                     return -1;
                 },
@@ -79324,14 +79910,26 @@ Ext.define('Ext.data.NodeInterface', {
 
 
                 
-                cascadeBy : function(fn, scope, args) {
-                    if (fn.apply(scope || this, args || [this]) !== false) {
-                        var childNodes = this.childNodes,
+                cascadeBy : function(before, scope, args, after) {
+                    var me = this;
+
+                    if (arguments.length === 1 && !Ext.isFunction(before)) {
+                        after = before.after;
+                        scope = before.scope;
+                        args = before.args;
+                        before = before.before;
+                    }
+                    if (!before || before.apply(scope || me, args || [me]) !== false) {
+                        var childNodes = me.childNodes,
                             length     = childNodes.length,
                             i;
 
                         for (i = 0; i < length; i++) {
-                            childNodes[i].cascadeBy(fn, scope, args);
+                            childNodes[i].cascadeBy.call(childNodes[i], before, scope, args, after);
+                        }
+
+                        if (after) {
+                            after.apply(scope || me, args || [me]);
                         }
                     }
                 },
@@ -79396,23 +79994,27 @@ Ext.define('Ext.data.NodeInterface', {
                 },
 
                 
-                sort : function(sortFn, recursive, suppressEvent) {
-                    var cs  = this.childNodes,
-                        ln = cs.length,
+                sort: function(sortFn, recursive, suppressEvent) {
+                    var me = this,
+                        childNodes  = me.childNodes,
+                        ln = childNodes.length,
                         i, n, info = {
                             isFirst: true
                         };
 
                     if (ln > 0) {
-                        Ext.Array.sort(cs, sortFn);
-                        this.setFirstChild(cs[0]);
-                        this.setLastChild(cs[ln - 1]);
+                        if (!sortFn) {
+                            sortFn = me.getTreeStore().generateComparator();
+                        }
+                        Ext.Array.sort(childNodes, sortFn);
+                        me.setFirstChild(childNodes[0]);
+                        me.setLastChild(childNodes[ln - 1]);
 
                         for (i = 0; i < ln; i++) {
-                            n = cs[i];
-                            n.previousSibling = cs[i-1];
-                            n.nextSibling = cs[i+1];
-                            
+                            n = childNodes[i];
+                            n.previousSibling = childNodes[i-1];
+                            n.nextSibling = childNodes[i+1];
+
                             
                             info.isLast = (i === ln - 1);
                             info.index = i;
@@ -79424,8 +80026,12 @@ Ext.define('Ext.data.NodeInterface', {
                             }
                         }
 
+                        
                         if (suppressEvent !== true) {
-                            this.fireEventArgs('sort', [this, cs]);
+                            me.fireEventArgs('sort', [me, childNodes]);
+
+                            
+                            me.callStore('onNodeSort', childNodes);
                         }
                     }
                 },
@@ -79464,8 +80070,7 @@ Ext.define('Ext.data.NodeInterface', {
 
                 
                 expand: function(recursive, callback, scope) {
-                    var me = this,
-                        owner;
+                    var me = this;
 
                     
                     
@@ -79481,15 +80086,15 @@ Ext.define('Ext.data.NodeInterface', {
                             
                             if (!me.isExpanded()) {
 
+                                me.fireEventArgs('beforeexpand', [me]);
+
                                 
                                 
-                                
-                                
-                                me.fireEventArgs('beforeexpand', [me, me.onChildNodesAvailable, me, [recursive, callback, scope]]);
+                                me.callStore('onBeforeNodeExpand', me.onChildNodesAvailable, me, [recursive, callback, scope]);
+
                             } else if (recursive) {
                                 
-                                owner = me.getOwnerTree();
-                                me.expandChildren(true, owner ? owner.singleExpand : false, callback, scope);
+                                me.expandChildren(true, callback, scope);
                             } else {
                                 Ext.callback(callback, scope || me, [me.childNodes]);
                             }
@@ -79502,12 +80107,13 @@ Ext.define('Ext.data.NodeInterface', {
 
                 
                 onChildNodesAvailable: function(records, recursive, callback, scope) {
-                    var me = this,
-                        owner;
+                    var me = this;
 
                     
                     
-                    Ext.suspendLayouts();
+                    if (Ext.suspendLayouts) {
+                        Ext.suspendLayouts();
+                    }
 
                     
                     me.set('expanded', true);
@@ -79517,23 +80123,38 @@ Ext.define('Ext.data.NodeInterface', {
 
                     
                     if (recursive) {
-                        owner = me.getOwnerTree();
-                        me.expandChildren(true, owner ? owner.singleExpand : false, callback, scope);
+                        me.expandChildren(true, callback, scope);
                     } else {
                         Ext.callback(callback, scope || me, [me.childNodes]);
                     }
 
-                    Ext.resumeLayouts(true);
+                    if (Ext.resumeLayouts) {
+                        Ext.resumeLayouts(true);
+                    }
                 },
 
                 
-                expandChildren: function(recursive, singleExpand, callback, scope) {
+                expandChildren: function(recursive, callback, scope,  singleExpand) {
                     var me = this,
-                        i,
-                        allNodes = me.childNodes,
-                        expandNodes = [],
-                        ln = singleExpand ? Math.min(allNodes.length, 1) : allNodes.length,
-                        node;
+                        origCallback, i, allNodes, expandNodes, ln, node;
+
+                    
+                    
+                    
+                    
+                    if (Ext.isBoolean(callback)) {
+                        origCallback = callback;
+                        callback = scope;
+                        scope = singleExpand;
+                        singleExpand = origCallback;
+                    }
+
+                    if (singleExpand === undefined) {
+                        singleExpand = me.getTreeStore().singleExpand;
+                    }
+                    allNodes = me.childNodes;
+                    expandNodes = [];
+                    ln = singleExpand ? Math.min(allNodes.length, 1) : allNodes.length;
 
                     for (i = 0; i < ln; ++i) {
                         node = allNodes[i];
@@ -79567,11 +80188,13 @@ Ext.define('Ext.data.NodeInterface', {
 
                         
                         
-                        Ext.suspendLayouts();
+                        if (Ext.suspendLayouts) {
+                            Ext.suspendLayouts();
+                        }
 
                         
                         if (me.isExpanded()) {
-                            
+
                             
                             
                             
@@ -79612,7 +80235,9 @@ Ext.define('Ext.data.NodeInterface', {
                             }
                         }
 
-                        Ext.resumeLayouts(true);
+                        if (Ext.resumeLayouts) {
+                            Ext.resumeLayouts(true);
+                        }
                     }
 
                     
@@ -79803,6 +80428,7 @@ Ext.define('Ext.data.NodeStore', {
                 bulkremove: me.onBulkRemove,
                 remove: me.onNodeRemove,
                 sort: me.onNodeSort,
+                filterchange: me.onNodeFilter,
                 scope: me
             });
             me.node = null;
@@ -79825,6 +80451,7 @@ Ext.define('Ext.data.NodeStore', {
                 bulkremove: me.onBulkRemove,
                 remove: me.onNodeRemove,
                 sort: me.onNodeSort,
+                filterchange: me.onNodeFilter,
                 scope: me
             });
             me.node = node;
@@ -79833,7 +80460,17 @@ Ext.define('Ext.data.NodeStore', {
             }
         }
     },
- 
+
+    onNodeFilter: function(root, childNodes) {
+        var me = this,
+            toAdd = [];
+
+        this.data.clear();
+        me.handleNodeExpand(root, childNodes, toAdd);
+        this.data.addAll(toAdd);
+        this.fireEvent('refresh', this);
+    },
+
     onNodeSort: function(node, childNodes) {
         var me = this;
 
@@ -79895,19 +80532,22 @@ Ext.define('Ext.data.NodeStore', {
                 record = records[i];
 
                 
-                
-                
-                toAdd.push(record);
+                if (record.get('visible')) {
+                    
+                    
+                    
+                    toAdd.push(record);
 
-                if (record.isExpanded()) {
-                    if (record.isLoaded()) {
-                        
-                        me.handleNodeExpand(record, record.childNodes, toAdd);
-                    }
-                    else {
-                        
-                        record.set('expanded', false);
-                        record.expand();
+                    if (record.isExpanded()) {
+                        if (record.isLoaded()) {
+                            
+                            me.handleNodeExpand(record, record.childNodes, toAdd);
+                        }
+                        else {
+                            
+                            record.set('expanded', false);
+                            record.expand();
+                        }
                     }
                 }
             }
@@ -79929,6 +80569,10 @@ Ext.define('Ext.data.NodeStore', {
             return;
         }
 
+        if (parent.store.filterFn) {
+            records = Ext.Array.filter(records, me.filterVisible);
+        }
+
         
         
         
@@ -79948,7 +80592,8 @@ Ext.define('Ext.data.NodeStore', {
             
             node = parent;
             while (node.parentNode) {
-                sibling = node.nextSibling;
+                
+                for (sibling = node.nextSibling; sibling && !sibling.get('visible'); sibling = sibling.nextSibling);
                 if (sibling) {
                     found = true;
                     lastNodeIndexPlus = me.indexOf(sibling); 
@@ -79981,7 +80626,8 @@ Ext.define('Ext.data.NodeStore', {
             if (index === 0) {
                 refNode = parent;
             } else {
-                sibling = node.previousSibling;
+                
+                for (sibling = node.previousSibling; sibling && !sibling.get('visible'); sibling = sibling.previousSibling);
                 while (sibling.isExpanded() && sibling.lastChild) {
                     sibling = sibling.lastChild;
                 }
@@ -79998,6 +80644,7 @@ Ext.define('Ext.data.NodeStore', {
                     
                     
                     node.set('expanded', false);
+                    node.join(me.treeStore);
                     node.expand();
                 }
             }
@@ -80008,7 +80655,7 @@ Ext.define('Ext.data.NodeStore', {
         var me = this,
             index = this.indexOf(refNode);
 
-        if (index != -1 && me.isVisible(node)) {
+        if (index !== -1 && me.isVisible(node)) {
             me.insert(index, node);
             if (!node.isLeaf() && node.isExpanded()) {
                 if (node.isLoaded()) {
@@ -80017,6 +80664,7 @@ Ext.define('Ext.data.NodeStore', {
                 }
                 else {
                     node.set('expanded', false);
+                    node.join(me.treeStore);
                     node.expand();
                 }
             }
@@ -80044,20 +80692,26 @@ Ext.define('Ext.data.NodeStore', {
         }
     },
 
+    filterVisible: function(node) {
+        return node.get('visible');
+    },
+
     isVisible: function(node) {
-        var parent = node.parentNode;
-        while (parent) {
-            
-            if (parent === this.node && parent.data.expanded) {
-                return true;
-            }
+        if (node.get('visible')) {
+            var parent = node.parentNode;
+            while (parent) {
+                
+                if (parent === this.node && parent.data.expanded) {
+                    return true;
+                }
 
-            
-            if (!parent.data.expanded) {
-                return false;
-            }
+                
+                if (!parent.data.expanded) {
+                    return false;
+                }
 
-            parent = parent.parentNode;
+                parent = parent.parentNode;
+            }
         }
         
         return false;
@@ -80136,7 +80790,7 @@ Ext.define('Ext.data.Tree', {
         if (root) {
             me.setRootNode(root);
         }
-        
+
         
         me.on({
             scope: me,
@@ -80148,12 +80802,12 @@ Ext.define('Ext.data.Tree', {
     },
 
     
-    getRootNode : function() {
+    getRootNode: function() {
         return this.root;
     },
 
     
-    setRootNode : function(node) {
+    setRootNode: function(node) {
         var me = this;
 
         me.root = node;
@@ -80244,22 +80898,23 @@ Ext.define('Ext.data.Tree', {
     
     onNodeIdChanged: function(node, oldId, newId, oldInternalId) {
         var nodeHash = this.nodeHash;
-    
-        nodeHash[node.internalId] = node;
-        delete nodeHash[oldInternalId];
+
+        delete nodeHash[oldId || oldInternalId];
+        nodeHash[newId] = node;
     },
 
     
-    getNodeById : function(id) {
+    getNodeById: function(id) {
         return this.nodeHash[id];
     },
 
     
-    registerNode : function(node, includeChildren) {
+    registerNode: function(node, includeChildren) {
         var me = this,
             children, length, i;
 
-        me.nodeHash[node.internalId] = node;
+        
+        me.nodeHash[node.getId() || node.internalId] = node;
         if (includeChildren === true) {
             children = node.childNodes;
             length = children.length;
@@ -80270,11 +80925,11 @@ Ext.define('Ext.data.Tree', {
     },
 
     
-    unregisterNode : function(node, includeChildren) {
+    unregisterNode: function(node, includeChildren) {
         var me = this,
             children, length, i;
 
-        delete me.nodeHash[node.internalId];
+        delete me.nodeHash[node.getId() || node.internalId];
         if (includeChildren === true) {
             children = node.childNodes;
             length = children.length;
@@ -80298,10 +80953,22 @@ Ext.define('Ext.data.Tree', {
 
 
 Ext.define('Ext.data.TreeModel', {
-    extend:  Ext.data.Model  
+    extend:  Ext.data.Model ,
                
                                 
-     
+      
+
+    mixins: {
+        queryable:  Ext.Queryable 
+    },
+
+     getRefItems: function() {
+         return this.childNodes;
+     },
+
+     getRefOwner: function() {
+         return this.parentNode;
+     }
 },
 function () {
     Ext.data.NodeInterface.decorate(this);
@@ -80315,6 +80982,7 @@ Ext.define('Ext.data.TreeStore', {
                
                           
                         
+                             
                                 
       
 
@@ -80331,16 +80999,13 @@ Ext.define('Ext.data.TreeStore', {
 
     
     defaultRootId: 'root',
-    
+
     
     defaultRootText: 'Root',
 
     
     defaultRootProperty: 'children',
-    
-    
-    rootProperty: 'children',
-    
+
     fillCount: 0,
 
     
@@ -80350,32 +81015,45 @@ Ext.define('Ext.data.TreeStore', {
         var me = this,
             root,
             fields,
-            defaultRoot;
+            model;
 
         config = Ext.apply({}, config);
 
         
         fields = config.fields || me.fields;
-        if (!fields) {
-            config.fields = [
-                {name: 'text', type: 'string'}
-            ];
-            defaultRoot = config.defaultRootProperty || me.defaultRootProperty;
-            if (defaultRoot !== me.defaultRootProperty) {
-                config.fields.push({
-                    name: defaultRoot,   
-                    type: 'auto',   
-                    defaultValue: null, 
+        model = config.model || me.model;
+
+        
+        if (!model) {
+            if (!fields) {
+                fields = [{
+                    name: 'text', type: 'string'
+                }];
+            }
+            if (me.defaultRootProperty !== me.self.prototype.defaultRootProperty) {
+                fields.push({
+                    name: me.defaultRootProperty,
+                    type: 'auto',
+                    defaultValue: null,
                     persist: false
                 });
             }
+
+            
+            config.model = Ext.define(null, {
+                extend: 'Ext.data.TreeModel',
+                fields: fields,
+                proxy: me.proxy || me.defaultProxyType
+            });
+            delete me.fields;
+            me.implicitModel = true;
         }
 
         me.callParent([config]);
 
         
         me.tree = new Ext.data.Tree();
-        
+
         
         me.tree.treeStore = me;
 
@@ -80393,17 +81071,6 @@ Ext.define('Ext.data.TreeStore', {
         
         
         
-
-        me.tree.on({
-            scope: me,
-            remove: me.onNodeRemove,
-            
-            
-            beforeexpand: me.onBeforeNodeExpand,
-            append: me.onNodeAdded,
-            insert: me.onNodeAdded,
-            sort: me.onNodeSort
-        });
 
         me.onBeforeSort();
 
@@ -80448,6 +81115,66 @@ Ext.define('Ext.data.TreeStore', {
     },
 
     
+    filter: function(filters, value) {
+        if (Ext.isString(filters)) {
+            filters = {
+                property: filters,
+                value: value
+            };
+        }
+
+        var me = this,
+            decoded = me.decodeFilters(filters),
+            i,
+            length = decoded.length,
+            root = me.getRootNode(),
+            filteredNodes;
+
+        
+        for (i = 0; i < length; i++) {
+            me.filters.replace(decoded[i]);
+        }
+
+        filters = me.filters.items;
+
+        if (filters.length) {
+            filteredNodes = [];
+            me.filterFn = Ext.util.Filter.createFilterFn(filters);
+
+            root.cascadeBy({
+                after: function(node) {
+                    node.set('visible', me.filterFn(node));
+                }
+            });
+            for (i = 0, length = root.childNodes.length; i < length; i++) {
+                if (root.childNodes[i].get('visible')) {
+                    filteredNodes.push(root.childNodes[i]);
+                }
+            }
+
+            me.fireEvent('datachanged', me);
+            me.fireEvent('refresh', me);
+        } else {
+            filteredNodes = root.childNodes;
+        }
+        root.fireEvent('filterchange', root, filteredNodes);
+        me.fireEvent('filterchange', me, filters);
+    },
+
+    
+    clearFilter: function() {
+        var me = this,
+            root = me.getRootNode();
+
+        me.filters.clear();
+        me.filterFn = null;
+        root.cascadeBy(function(node) {
+            node.set('visible', true);
+        });
+        root.fireEvent('filterchange', root, root.childNodes);
+        me.fireEvent('filterchange', me, []);
+    },
+
     onBeforeSort: function() {
         if (this.folderSort) {
             this.sort({
@@ -80460,21 +81187,13 @@ Ext.define('Ext.data.TreeStore', {
     
     onBeforeNodeExpand: function(node, callback, scope, args) {
         var me = this,
-            reader, dataRoot, data,
+            reader = me.proxy.getReader(),
+            children,
             callbackArgs;
+
         
         
         if (node.isLoaded()) {
-            callbackArgs = [node.childNodes];
-            if (args) {
-                callbackArgs.push.apply(callbackArgs, args);
-            }
-            Ext.callback(callback, scope || node, callbackArgs);
-        }
-        
-        else if (dataRoot = (data = (node.raw || node[node.persistenceProperty])[(reader = me.getProxy().getReader()).root])) {
-            me.fillNode(node, reader.extractData(dataRoot));
-            delete data[reader.root];
             callbackArgs = [node.childNodes];
             if (args) {
                 callbackArgs.push.apply(callbackArgs, args);
@@ -80496,21 +81215,42 @@ Ext.define('Ext.data.TreeStore', {
         }
         
         else {
-            me.read({
-                node: node,
-                
-                
-                internalCallback: function() {
-                    
-                    
-                    delete me.lastOptions.internalCallback;
-                    callbackArgs = [node.childNodes];
-                    if (args) {
-                        callbackArgs.push.apply(callbackArgs, args);
-                    }
-                    Ext.callback(callback, scope || node, callbackArgs);
+            
+            
+            
+            children = reader.getRoot(node.raw || node[node.persistenceProperty]);
+
+            if (children || node.phantom) {
+                if (children) {
+                    me.fillNode(node, reader.extractData(children));
                 }
-            });
+
+                callbackArgs = [node.childNodes];
+
+                if (args) {
+                    callbackArgs.push.apply(callbackArgs, args);
+                }
+
+                Ext.callback(callback, scope || node, callbackArgs);
+            }
+            
+            else {
+                me.read({
+                    node: node,
+                    
+                    
+                    internalCallback: function() {
+                        
+                        
+                        delete me.lastOptions.internalCallback;
+                        callbackArgs = [node.childNodes];
+                        if (args) {
+                            callbackArgs.push.apply(callbackArgs, args);
+                        }
+                        Ext.callback(callback, scope || node, callbackArgs);
+                    }
+                });
+            }
         }
     },
 
@@ -80531,7 +81271,7 @@ Ext.define('Ext.data.TreeStore', {
         
         
         
-        if (!node.phantom && !isMove) {
+        if (!node.phantom && !isMove && !me.loading) {
             Ext.Array.include(me.removed, node);
         }
 
@@ -80542,20 +81282,28 @@ Ext.define('Ext.data.TreeStore', {
 
     onNodeAdded: function(parent, node) {
         var me = this,
-            proxy = me.getProxy(),
-            reader = proxy.getReader(),
+            reader = me.proxy.getReader(),
             data = node.raw || node[node.persistenceProperty],
-            dataRoot;
+            dataRoot,
+            isVisible;
+
+        if (me.filterFn) {
+            isVisible = me.filterFn(node);
+            node.set('visible', isVisible);
+
+            
+            if (isVisible) {
+                parent.set('visible', me.filterFn(parent));
+            }
+        }
 
         Ext.Array.remove(me.removed, node);
         node.join(me);
 
-        
-        if (!node.isLeaf() && !me.lazyFill) {
+        if (!node.isLeaf() && !node.isLoaded() && !me.lazyFill) {
             dataRoot = reader.getRoot(data);
             if (dataRoot) {
                 me.fillNode(node, reader.extractData(dataRoot));
-                delete data[reader.root];
             }
         }
 
@@ -80574,30 +81322,37 @@ Ext.define('Ext.data.TreeStore', {
     setRootNode: function(root,  preventLoad) {
         var me = this,
             model = me.model,
-            idProperty = model.prototype.idProperty
+            idProperty = model.prototype.idProperty;
 
-        root = root || {};
-        if (!root.isModel) {
-            root = Ext.apply({}, root);
-            
-            Ext.applyIf(root, {
-                id: me.defaultRootId,
-                text: me.defaultRootText,
-                allowDrag: false
-            });
-            if (root[idProperty] === undefined) {
-                root[idProperty] = me.defaultRootId;
-            }
-            Ext.data.NodeInterface.decorate(model);
-            root = Ext.ModelManager.create(root, model);
-        } else if (root.isModel && !root.isNode) {
+        
+        if (!model.prototype.isNode) {
             Ext.data.NodeInterface.decorate(model);
         }
 
+        
+        
+        
+        if (!root || !root.isNode) {
+            
+            root = Ext.apply({
+                id: me.defaultRootId,
+                text: me.defaultRootText,
+                allowDrag: false
+            }, root);
+            if (root[idProperty] === undefined) {
+                root[idProperty] = me.defaultRootId;
+            }
+
+            
+            root = Ext.ModelManager.create(root, model);
+        }
 
         
         
         me.getProxy().getReader().buildExtractors(true);
+
+        
+        me.onNodeAdded(null, root);
 
         
         me.tree.setRootNode(root);
@@ -80625,7 +81380,6 @@ Ext.define('Ext.data.TreeStore', {
         return this.tree.getNodeById(id);
     },
 
-    
     getById: function(id) {
         return this.getNodeById(id);
     },
@@ -80670,7 +81424,7 @@ Ext.define('Ext.data.TreeStore', {
 
                 
                 Ext.callback(callback, scope, arguments);
-            }
+            };
         }
 
         
@@ -80689,19 +81443,18 @@ Ext.define('Ext.data.TreeStore', {
         operation = new Ext.data.Operation(options);
 
         if (me.fireEvent('beforeload', me, operation) !== false) {
-             if (me.clearOnLoad) {
-                if(me.clearRemovedOnLoad) {
+
+            
+            
+            me.loading = true;
+            if (me.clearOnLoad) {
+                if (me.clearRemovedOnLoad) {
                     
                     me.clearRemoved(node);
                 }
                 
-                me.tree.un('remove', me.onNodeRemove, me);
-                
                 node.removeAll(false);
-                
-                me.tree.on('remove', me.onNodeRemove, me);
             }
-            me.loading = true;
             me.proxy.read(operation, me.onProxyLoad, me);
         }
 
@@ -80766,41 +81519,54 @@ Ext.define('Ext.data.TreeStore', {
     
     fillNode: function(node, newNodes) {
         var me = this,
-            ln = newNodes ? newNodes.length : 0,
+            newNodeCount = newNodes ? newNodes.length : 0,
             sorters = me.sorters,
             i, sortCollection,
             needsIndexSort = false,
-            performLocalSort = ln && me.sortOnLoad && !me.remoteSort && sorters && sorters.items && sorters.items.length,
+            performLocalSort = me.sortOnLoad && !me.remoteSort && sorters && sorters.items && sorters.items.length,
             node1, node2, rootFill;
 
-        
-        for (i = 1; i < ln; i++) {
-            node1 = newNodes[i];
-            node2 = newNodes[i - 1];
-            needsIndexSort = node1[node1.persistenceProperty].index != node2[node2.persistenceProperty].index;
-            if (needsIndexSort) {
-                break;
-            }
-        }
-
-        
-        if (performLocalSort) {
-            
-            if (needsIndexSort) {
-                me.sorters.insert(0, me.indexSorter);
-            }
-            sortCollection = new Ext.util.MixedCollection();
-            sortCollection.addAll(newNodes);
-            sortCollection.sort(me.sorters.items);
-            newNodes = sortCollection.items;
+        if (newNodeCount) {
 
             
-            me.sorters.remove(me.indexSorter);
-        } else if (needsIndexSort) {
-            Ext.Array.sort(newNodes, me.sortByIndex);
+            if (me.filterFn) {
+                newNodes[0].set('visible', me.filterFn(newNodes[0]));
+            }
+
+            
+            for (i = 1; !needsIndexSort && i < newNodeCount; i++) {
+
+                node1 = newNodes[i];
+                node2 = newNodes[i - 1];
+
+                
+                if (me.filterFn) {
+                    node1.set('visible', me.filterFn(node1));
+                }
+                needsIndexSort = node1[node1.persistenceProperty].index !== node2[node2.persistenceProperty].index;
+            }
+
+            
+            if (performLocalSort) {
+                
+                if (needsIndexSort) {
+                    me.sorters.insert(0, me.indexSorter);
+                }
+                sortCollection = new Ext.util.MixedCollection();
+                sortCollection.addAll(newNodes);
+                sortCollection.sort(me.sorters.items);
+                newNodes = sortCollection.items;
+
+                
+                me.sorters.remove(me.indexSorter);
+            } else if (needsIndexSort) {
+                Ext.Array.sort(newNodes, me.sortByIndex);
+            }
         }
 
         node.set('loaded', true);
+
+        
         
         
         
@@ -80816,13 +81582,13 @@ Ext.define('Ext.data.TreeStore', {
         if (newNodes.length) {
             node.appendChild(newNodes, undefined, true);
         }
-        
+
         if (rootFill) {
             
             me.fireEvent('fillcomplete', me, node, newNodes);
         }
         --me.fillCount;
-        
+
         return newNodes;
     },
 
@@ -80830,13 +81596,12 @@ Ext.define('Ext.data.TreeStore', {
     sortByIndex: function(node1, node2) {
         return node1[node1.persistenceProperty].index - node2[node2.persistenceProperty].index;
     },
-    
+
     onIdChanged: function(model, oldId, newId, oldInternalId){
         this.tree.onNodeIdChanged(model, oldId, newId, oldInternalId);
-        this.callParent(arguments);    
+        this.callParent(arguments);
     },
 
-    
     onProxyLoad: function(operation) {
         var me = this,
             successful = operation.wasSuccessful(),
@@ -80863,7 +81628,7 @@ Ext.define('Ext.data.TreeStore', {
         
         Ext.callback(operation.callback, scope, args);
     },
-    
+
     cleanRecords: function(node, records){
         var nodeHash = {},
             childNodes = node.childNodes,
@@ -80871,19 +81636,19 @@ Ext.define('Ext.data.TreeStore', {
             len  = childNodes.length,
             out = [],
             rec;
-            
+
         
         for (; i < len; ++i) {
             nodeHash[childNodes[i].getId()] = true;
         }
-        
+
         for (i = 0, len = records.length; i < len; ++i) {
             rec = records[i];
             if (!nodeHash[rec.getId()]) {
-                out.push(rec);    
+                out.push(rec);
             }
         }
-        
+
         return out;
     },
 
@@ -80896,7 +81661,6 @@ Ext.define('Ext.data.TreeStore', {
         this.fireEvent('clear', this);
     },
 
-    
     doSort: function(sorterFn) {
         var me = this;
         if (me.remoteSort) {
@@ -81370,6 +82134,10 @@ Ext.define('Ext.data.association.BelongsTo', {
                 args;
 
             if (options.reload === true || model[instanceName] === undefined) {
+                
+                if (Ext.isEmpty(foreignKeyId)) {
+                    return null;
+                }
                 instance = Ext.ModelManager.create({}, associatedName);
                 instance.set(primaryKey, foreignKeyId);
 
@@ -81401,10 +82169,11 @@ Ext.define('Ext.data.association.BelongsTo', {
                 
                 
                 
-                Ext.callback(options, scope, args);
-                Ext.callback(options.success, scope, args);
-                Ext.callback(options.failure, scope, args);
-                Ext.callback(options.callback, scope, args);
+                if (options) {
+                    Ext.callback(options, scope, args);
+                    Ext.callback(options.success, scope, args);
+                    Ext.callback(options.callback, scope, args);
+                }
 
                 return instance;
             }
@@ -81653,6 +82422,8 @@ Ext.define('Ext.data.association.HasMany', {
     
     
     
+    
+    
     constructor: function(config) {
         var me = this,
             ownerProto,
@@ -81682,6 +82453,7 @@ Ext.define('Ext.data.association.HasMany', {
             primaryKey      = that.primaryKey,
             filterProperty  = that.filterProperty,
             autoLoad        = that.autoLoad,
+            remoteFilter    = that.remoteFilter,
             storeConfig     = that.storeConfig || {};
         
         return function() {
@@ -81713,7 +82485,7 @@ Ext.define('Ext.data.association.HasMany', {
                 config = Ext.apply({}, storeConfig, {
                     model        : associatedModel,
                     filters      : filter ? [filter] : undefined,
-                    remoteFilter : false,
+                    remoteFilter : remoteFilter === true,
                     modelDefaults: modelDefaults,
                     disableMetaChangeEvent: true
                 });
@@ -81849,6 +82621,10 @@ Ext.define('Ext.data.association.HasOne', {
                 args;
 
             if (options.reload === true || model[instanceName] === undefined) {
+                
+                if (Ext.isEmpty(foreignKeyId)) {
+                    return null;
+                }
                 instance = Ext.ModelManager.create({}, associatedName);
                 instance.set(primaryKey, foreignKeyId);
 
@@ -81880,10 +82656,11 @@ Ext.define('Ext.data.association.HasOne', {
                 
                 
                 
-                Ext.callback(options, scope, args);
-                Ext.callback(options.success, scope, args);
-                Ext.callback(options.failure, scope, args);
-                Ext.callback(options.callback, scope, args);
+                if (options) {
+                    Ext.callback(options, scope, args);
+                    Ext.callback(options.success, scope, args);
+                    Ext.callback(options.callback, scope, args);
+                }
 
                 return instance;
             }
@@ -82617,7 +83394,6 @@ Ext.define('Ext.dd.DragTracker', {
         if (me.disabled) {
             me.disable();
         }
-
     },
 
     
@@ -82679,13 +83455,32 @@ Ext.define('Ext.dd.DragTracker', {
     
     
     onMouseOver: function(e, target) {
-        var me = this;
+        var me = this,
+            handleCls, el, i, len, cls;
+
         if (!me.disabled) {
-            if (Ext.EventManager.contains(e) || me.delegate) {
+            
+            
+            
+            
+            
+            if (e.within(target, true, true) || me.delegate) {
+                handleCls = me.handleCls;
                 me.mouseIsOut = false;
-                if (me.overCls) {
-                    me.el.addCls(me.overCls);
+
+                if (handleCls) {
+                    for (i = 0, len = me.handleEls.length; i < len; i++) {
+                        el = me.handleEls[i];
+                        cls = el.delegateCls;
+
+                        if (!cls) {
+                            cls = el.delegateCls = [handleCls, '-', el.region, '-over'].join('');
+                        }
+
+                        el.addCls([cls, me.overCls]);
+                    }
                 }
+
                 me.fireEvent('mouseover', me, e, me.delegate ? e.getTarget(me.delegate, target) : me.handle);
             }
         }
@@ -82694,14 +83489,19 @@ Ext.define('Ext.dd.DragTracker', {
     
     
     onMouseOut: function(e) {
-        var me = this;
+        var me = this,
+            el, i, len;
 
         if (me.mouseIsDown) {
             me.mouseIsOut = true;
         } else {
-            if (me.overCls) {
-                me.el.removeCls(me.overCls);
+            if (me.handleCls) {
+                for (i = 0, len = me.handleEls.length; i < len; i++) {
+                    el = me.handleEls[i];
+                    el.removeCls([el.delegateCls, me.overCls]);
+                }
             }
+
             me.fireEvent('mouseout', me, e);
         }
     },
@@ -82748,7 +83548,15 @@ Ext.define('Ext.dd.DragTracker', {
             mousemove: me.onMouseMove,
             selectstart: me.stopSelect
         });
-        if (me.autoStart) {
+
+        
+        
+        
+        me.dragEnded = false;
+
+        if (!me.tolerance) {
+            me.triggerStart();
+        } else if (me.autoStart) {
             me.timer =  Ext.defer(me.triggerStart, me.autoStart === true ? 1000 : me.autoStart, me, [e]);
         }
     },
@@ -82758,7 +83566,12 @@ Ext.define('Ext.dd.DragTracker', {
             xy = e.getXY(),
             s = me.startXY;
 
-        e.preventDefault();
+        
+        
+        
+        if (me.dragEnded) {
+            return;
+        }
 
         me.lastXY = xy;
         if (!me.active) {
@@ -82814,12 +83627,13 @@ Ext.define('Ext.dd.DragTracker', {
         me.clearStart();
         me.active = false;
         if (wasActive) {
+            me.dragEnded = true;
             me.onEnd(e);
             me.fireEvent('dragend', me, e);
         }
         
         
-        me._constrainRegion = Ext.EventObject.dragTracked = null
+        me._constrainRegion = Ext.EventObject.dragTracked = null;
     },
 
     triggerStart: function(e) {
@@ -84255,10 +85069,8 @@ Ext.define('Ext.layout.ContextItem', {
         
         if (animateFrom) {
             target = me.target;
-            targetAnim = target.layout && target.layout.animate;
-            if (targetAnim) {
-                duration = Ext.isNumber(targetAnim) ? targetAnim : targetAnim.duration;
-            }
+            targetAnim = target.getAnimationProps();
+            duration = targetAnim.duration;
             animateProps = Ext.Object.getKeys(me.animatePolicy);
 
             
@@ -86207,6 +87019,7 @@ Ext.define('Ext.direct.RemotingMethod', {
         }
         else {
             
+            me.strict = config.strict !== undefined ? config.strict : true;
             me.params = {};
 			pLen = params.length;
 
@@ -86250,6 +87063,7 @@ Ext.define('Ext.direct.RemotingMethod', {
             data = null,
             len  = me.len,
             params = me.params,
+            strict = me.strict,
             callback, scope, name, options;
 
         if (me.ordered) {
@@ -86268,9 +87082,11 @@ Ext.define('Ext.direct.RemotingMethod', {
             options  = args[3];
 
             
-            for (name in data) {
-                if (data.hasOwnProperty(name) && !params[name]) {
-                    delete data[name];
+            if (strict) {
+                for (name in data) {
+                    if (data.hasOwnProperty(name) && !params[name]) {
+                        delete data[name];
+                    }
                 }
             }
         }
@@ -86458,8 +87274,8 @@ Ext.define('Ext.direct.RemotingProvider', {
             };
         }
         else {
-            handler = function(form, callback, scope) {
-                me.configureFormRequest(action, method, form, callback, scope);
+            handler = function() {
+                me.configureFormRequest(action, method, slice.call(arguments, 0));
             };
         }
 
@@ -86707,8 +87523,11 @@ Ext.define('Ext.direct.RemotingProvider', {
     },
     
     
-    configureFormRequest: function(action, method, form, callback, scope) {
+    configureFormRequest: function(action, method, args) {
         var me = this,
+            form = args[0],
+            callback = args[1],
+            scope = args[2],
             transaction, isUpload, params;
             
         transaction = new Ext.direct.Transaction({
@@ -87817,8 +88636,11 @@ Ext.define('Ext.draw.Sprite', {
         return this.surface.getBBox(this);
     },
 
+    
     setText: function(text) {
-        return this.surface.setText(this, text);
+        this.attr.text = text; 
+        this.surface.applyAttrs(this);
+        return this;
     },
 
     
@@ -88355,7 +89177,7 @@ Ext.define('Ext.draw.engine.Svg', {
 
     render: function (container) {
         var me = this,
-            el, defs, bgRect, webkitRect;
+            cfg, el, defs, bgRect, webkitRect;
             
         if (!me.el) {
             cfg = {
@@ -89407,8 +90229,7 @@ Ext.define('Ext.draw.engine.Vml', {
                     Math.round((cy + ry) * me.zoom),
                     Math.round(cx * me.zoom));
                 sprite.dirtyPath = false;
-            }
-            else if (sprite.type !== "text" && sprite.type !== 'image') {
+            } else {
                 sprite.attr.path = scrubbedAttrs.path = me.setPaths(sprite, scrubbedAttrs) || scrubbedAttrs.path;
                 dom.path = me.path2vml(scrubbedAttrs.path);
                 sprite.dirtyPath = false;
@@ -90590,6 +91411,8 @@ Ext.define('Ext.window.Window', {
 
     
     closable: true,
+    
+    
 
     
     hidden: true,
@@ -90741,7 +91564,7 @@ Ext.define('Ext.window.Window', {
             me.maximized = false;
             me.maximize();
             if (header) {
-                header.removeCls(header.indicateDragCls)
+                header.removeCls(header.indicateDragCls);
             }
         }
 
@@ -90772,8 +91595,10 @@ Ext.define('Ext.window.Window', {
 
     
     onEsc: function(k, e) {
+        var mgr = Ext['FocusManager'];
         
-        if (!Ext.FocusManager || !Ext.FocusManager.enabled || Ext.FocusManager.focusedCmp === this) {
+        
+        if (!Ext.enableFocusManager || mgr.focusedCmp === this) {
             e.stopEvent();
             this.close();
         }
@@ -90783,7 +91608,7 @@ Ext.define('Ext.window.Window', {
     beforeDestroy: function() {
         var me = this;
         if (me.rendered) {
-            delete this.animateTarget;
+            delete me.animateTarget;
             me.hide();
             Ext.destroy(
                 me.keyMap
@@ -90794,26 +91619,23 @@ Ext.define('Ext.window.Window', {
 
     
     addTools: function() {
-        var me = this;
+        var me = this,
+            tools = me.tools,
+            noArgs = [];
 
         
         me.callParent();
 
         if (me.minimizable) {
-            me.addTool({
+            tools.push({
                 type: 'minimize',
-                handler: Ext.Function.bind(me.minimize, me, [])
+                handler: Ext.Function.bind(me.minimize, me, noArgs)
             });
         }
         if (me.maximizable) {
-            me.addTool({
+            tools.push({
                 type: 'maximize',
-                handler: Ext.Function.bind(me.maximize, me, [])
-            });
-            me.addTool({
-                type: 'restore',
-                handler: Ext.Function.bind(me.restore, me, []),
-                hidden: true
+                handler: Ext.Function.bind(me.toggleMaximize, me, noArgs)
             });
         }
     },
@@ -90862,7 +91684,7 @@ Ext.define('Ext.window.Window', {
             focusDescendant;
 
         
-        if ((Ext.FocusManager && Ext.FocusManager.enabled) || ((focusDescendant = me.getDefaultFocus()) === me)) {
+        if (Ext.enableFocusManager || ((focusDescendant = me.getDefaultFocus()) === me)) {
             me.callParent(arguments);
         } else {
             focusDescendant.focus();
@@ -90891,7 +91713,7 @@ Ext.define('Ext.window.Window', {
         if (me.hidden) {
             me.fireEvent('close', me);
             if (me.closeAction == 'destroy') {
-                this.destroy();
+                me.destroy();
             }
         } else {
             
@@ -90950,7 +91772,6 @@ Ext.define('Ext.window.Window', {
         if (header && me.maximizable) {
             header.suspendLayouts();
             tools.maximize.hide();
-            tools.restore.hide();
             this.resumeHeaderLayout(true);
         }
         if (me.resizer) {
@@ -90968,10 +91789,7 @@ Ext.define('Ext.window.Window', {
 
         if (header) {
             header.suspendLayouts();
-            if (me.maximized) {
-                tools.restore.show();
-                changed = true;
-            } else if (me.maximizable) {
+            if (me.maximizable) {
                 tools.maximize.show();
                 changed = true;
             }
@@ -91007,12 +91825,7 @@ Ext.define('Ext.window.Window', {
             if (header) {
                 header.suspendLayouts();
                 if (tools.maximize) {
-                    tools.maximize.hide();
-                    changed = true;
-                }
-                if (tools.restore) {
-                    tools.restore.show();
-                    changed = true;
+                    tools.maximize.setType('restore');
                 }
                 if (me.collapseTool) {
                     me.collapseTool.hide();
@@ -91026,7 +91839,7 @@ Ext.define('Ext.window.Window', {
             if (me.dd) {
                 me.dd.disable();
                 if (header) {
-                   header.removeCls(header.indicateDragCls)
+                   header.removeCls(header.indicateDragCls);
                 }
             }
             if (me.resizer) {
@@ -91066,13 +91879,8 @@ Ext.define('Ext.window.Window', {
             
             if (header) {
                 header.suspendLayouts();
-                if (tools.restore) {
-                    tools.restore.hide();
-                    changed = true;
-                }
                 if (tools.maximize) {
-                    tools.maximize.show();
-                    changed = true;
+                    tools.maximize.setType('maximize');
                 }
                 if (me.collapseTool) {
                     me.collapseTool.show();
@@ -91099,7 +91907,7 @@ Ext.define('Ext.window.Window', {
             if (me.dd) {
                 me.dd.enable();
                 if (header) {
-                    header.addCls(header.indicateDragCls)
+                    header.addCls(header.indicateDragCls);
                 }
             }
 
@@ -91134,7 +91942,7 @@ Ext.define('Ext.window.Window', {
             if (!currentlyMonitoring) {
                 
                 
-                Ext.EventManager.onWindowResize(me.onWindowResize, me, {delay: 1});
+                Ext.EventManager.onWindowResize(me.onWindowResize, me, {buffer: 1});
                 me._monitoringResize = true;
             }
         } else if (currentlyMonitoring) {
@@ -91617,23 +92425,31 @@ Ext.define("Ext.form.Labelable", {
     },
     
     
-    getLabelStyle: function(){
+    getLabelStyle: function () {
         var me = this,
             labelPad = me.labelPad,
+            labelWidth = me.labelWidth,
             labelStyle = '';
 
         
         
         if (me.labelAlign !== 'top') {
-            if (me.labelWidth) {
-                labelStyle = 'width:' + me.labelWidth + 'px;';
+            if (labelWidth) {
+                labelStyle = 'width:' + labelWidth + 'px;';
             }
             if (labelPad) {
-                labelStyle += 'margin-right:' + labelPad + 'px;';
+                labelStyle += me.getLabelStyleMarginProp() + labelPad + 'px;';
             }
+        } else if (labelPad) {
+            
+            labelStyle = 'margin-bottom:' + labelPad + 'px;';
         }
-        
+
         return labelStyle + (me.labelStyle || '');
+    },
+
+    getLabelStyleMarginProp: function () {
+        return 'margin-right:';
     },
 
     
@@ -91793,6 +92609,13 @@ Ext.define('Ext.form.field.Field', {
     transformOriginalValue: Ext.identityFn,
 
     
+    
+    
+    getFieldIdentifier: function () {
+        return this.isEditorComponent ? this.dataIndex : this.name;
+    },
+
+    
     getName: function() {
         return this.name;
     },
@@ -91840,7 +92663,7 @@ Ext.define('Ext.form.field.Field', {
         
         if (!me.disabled && (me.submitValue || !isSubmitting)) {
             data = {};
-            data[me.getName()] = me.getValue();
+            data[me.getFieldIdentifier()] = me.getValue();
         }
         return data;
     },
@@ -92382,6 +93205,8 @@ Ext.define('Ext.form.field.Base', {
     checkChangeEvents: Ext.isIE && (!document.documentMode || document.documentMode < 9) ?
                         ['change', 'propertychange', 'keyup'] :
                         ['change', 'input', 'textInput', 'keyup', 'dragdrop'],
+                        
+    ignoreChangeRe: /data\-errorqtip|style\.|className/,   
 
     
     checkChangeBuffer: 50,
@@ -92571,7 +93396,9 @@ Ext.define('Ext.form.field.Base', {
 
         
         if (me.inputEl) {
+            me.bindPropertyChange(false);
             me.inputEl.dom.value = value;
+            me.bindPropertyChange(true);
         }
         return value;
     },
@@ -92607,7 +93434,7 @@ Ext.define('Ext.form.field.Base', {
 
     onBoxReady: function() {
         var me = this;
-        me.callParent();
+        me.callParent(arguments);
         
         if (me.setReadOnlyOnBoxReady) {
             me.setReadOnly(me.readOnly);
@@ -92678,17 +93505,21 @@ Ext.define('Ext.form.field.Base', {
             onChangeTask,
             onChangeEvent,
             events = me.checkChangeEvents,
-            e,
-            eLen   = events.length,
-            event;
+            ignoreChangeRe = me.ignoreChangeRe,
+            eLen = events.length,
+            e, event;
 
         if (inputEl) {
             me.mon(inputEl, Ext.EventManager.getKeyEvent(), me.fireKey,  me);
 
             
             onChangeTask = new Ext.util.DelayedTask(me.checkChange, me);
-            me.onChangeEvent = onChangeEvent = function() {
-                onChangeTask.delay(me.checkChangeBuffer);
+            me.onChangeEvent = onChangeEvent = function(e) {
+                
+                
+                if (!(e.type == 'propertychange' && ignoreChangeRe.test(e.browserEvent.propertyName))) {
+                    onChangeTask.delay(me.checkChangeBuffer);
+                }
             };
 
             for (e = 0; e < eLen; e++) {
@@ -92705,21 +93536,21 @@ Ext.define('Ext.form.field.Base', {
     },
 
     doComponentLayout: function() {
+        
+        
+        
+        this.bindPropertyChange(false);
+        this.callParent(arguments);
+        this.bindPropertyChange(true);
+    },
+    
+    
+    bindPropertyChange: function(active) {
         var me = this,
-            inputEl = me.inputEl,
-            usesPropertychange = me.usesPropertychange,
-            ename = 'propertychange',
-            onChangeEvent = me.onChangeEvent;
-
-        
-        
-        
+            usesPropertychange = me.usesPropertychange;
+            
         if (usesPropertychange) {
-            me.mun(inputEl, ename, onChangeEvent);
-        }
-        me.callParent(arguments);
-        if (usesPropertychange) {
-            me.mon(inputEl, ename, onChangeEvent);
+            me[active ? 'mon' : 'mun'](me.inputEl, 'propertychange', me.onChangeEvent);
         }
     },
 
@@ -94286,7 +95117,7 @@ Ext.define('Ext.window.MessageBox', {
 
     hide: function() {
         var me = this,
-            cls = me.cfg.cls;
+            cls = me.cfg ? me.cfg.cls : '';
 
         me.progressBar.reset();
         if (cls) {
@@ -94313,7 +95144,9 @@ Ext.define('Ext.window.MessageBox', {
             baseId = me.id,
             i, button;
 
-        me.title = '&#160;';
+        
+        me.title = me.title || '&#160;';
+        me.iconCls = me.iconCls || '';
 
         me.topContainer = new Ext.container.Container({
             layout: 'hbox',
@@ -94411,8 +95244,10 @@ Ext.define('Ext.window.MessageBox', {
             hideToolbar = true,
             oldButtonText = me.buttonText,
             resizer = me.resizer,
-            resizeTracker, width, height, i, textArea, textField,
-            msg, progressBar, msgButtons;
+            header = me.header,
+            headerCfg = header && !header.isHeader,
+            resizeTracker, title, width, height, i, textArea,
+            textField, msg, progressBar, msgButtons;
 
         
         me.updateButtonText();
@@ -94453,8 +95288,12 @@ Ext.define('Ext.window.MessageBox', {
         me.modal = cfg.modal !== false;
 
         
-        me.setTitle(cfg.title || '');
-        me.setIconCls(cfg.iconCls || '');
+        
+        
+        
+        
+        me.setTitle(cfg.title || (headerCfg && header.title) || me.title);
+        me.setIconCls(cfg.iconCls || (headerCfg && header.iconCls) || me.iconCls);
 
         
         if (Ext.isObject(cfg.buttons)) {
@@ -94493,13 +95332,19 @@ Ext.define('Ext.window.MessageBox', {
 
         
         me.closable = cfg.closable !== false && !cfg.wait;
-        me.header.child('[type=close]').setVisible(me.closable);
 
         
-        if (!cfg.title && !me.closable && !cfg.iconCls) {
-            me.header.hide();
-        } else {
-            me.header.show();
+        header = me.header;
+
+        if (header) {
+            header.child('[type=close]').setVisible(me.closable);
+
+            
+            if (!cfg.title && !me.closable && !cfg.iconCls) {
+                header.hide();
+            } else {
+                header.show();
+            }
         }
 
         
@@ -94607,6 +95452,8 @@ Ext.define('Ext.window.MessageBox', {
     show: function(cfg) {
         var me = this,
             visibleFocusables;
+
+        cfg = cfg || {};
 
         
         if (Ext.AbstractComponent.layoutSuspendCount) {
@@ -94770,6 +95617,10 @@ Ext.define('Ext.form.Basic', {
     alternateClassName: 'Ext.form.BasicForm',
                                                                                             
                                                                                    
+               
+    
+    
+    taskDelay: 10,
 
     
     constructor: function(owner, config) {
@@ -94789,7 +95640,8 @@ Ext.define('Ext.form.Basic', {
             selector: '[isFormField]:not([excludeForm])',
             scope: me,
             addHandler: me.onFieldAdd,
-            removeHandler: me.onFieldRemove
+            removeHandler: me.onFieldRemove,
+            invalidateHandler: me.onMonitorInvalidate
         });
         me.monitor.bind(owner);
 
@@ -94901,9 +95753,7 @@ Ext.define('Ext.form.Basic', {
         
         me.mon(field, 'validitychange', me.checkValidityDelay, me);
         me.mon(field, 'dirtychange', me.checkDirtyDelay, me);
-        if (me.initialized) {
-            me.checkValidityDelay();
-        }
+        me.onMonitorInvalidate();
     },
     
     onFieldRemove: function(field){
@@ -94911,8 +95761,12 @@ Ext.define('Ext.form.Basic', {
         
         me.mun(field, 'validitychange', me.checkValidityDelay, me);
         me.mun(field, 'dirtychange', me.checkDirtyDelay, me);
-        if (me.initialized) {
-            me.checkValidityDelay();
+        me.onMonitorInvalidate();
+    },
+    
+    onMonitorInvalidate: function() {
+        if (this.initialized) {
+            this.checkValidityDelay();
         }
     },
     
@@ -94975,7 +95829,12 @@ Ext.define('Ext.form.Basic', {
     },
     
     checkValidityDelay: function(){
-        this.checkValidityTask.delay(10);
+        var timer = this.taskDelay;
+        if (timer) {
+            this.checkValidityTask.delay(timer);
+        } else {
+            this.checkValidity();
+        }
     },
 
     
@@ -95005,7 +95864,12 @@ Ext.define('Ext.form.Basic', {
     },
     
     checkDirtyDelay: function(){
-        this.checkDirtyTask.delay(10);
+        var timer = this.taskDelay;
+        if (timer) {
+            this.checkDirtyTask.delay(timer);
+        } else {
+            this.checkDirty();
+        }
     },
 
     
@@ -95181,9 +96045,9 @@ Ext.define('Ext.form.Basic', {
 
 
     
-    findField: function(id) {
-        return this.getFields().findBy(function(f) {
-            return f.id === id || f.getName() === id;
+    findField: function (id) {
+        return this.getFields().findBy(function (f) {
+            return f.id === id || f.name === id || f.dataIndex === id;
         });
     },
 
@@ -95527,7 +96391,7 @@ Ext.define('Ext.layout.component.field.FieldContainer', {
 
     publishInnerWidth: function (ownerContext, width) {
         var bodyContext = ownerContext.bodyCellContext,
-            innerWidth = bodyContext.el.getWidth();
+            innerWidth = bodyContext.el.getWidth() - bodyContext.getPaddingInfo().width;
 
         bodyContext.setWidth(innerWidth, false);
         ownerContext.containerElContext.setWidth(innerWidth, false);
@@ -95537,7 +96401,7 @@ Ext.define('Ext.layout.component.field.FieldContainer', {
         var bodyContext = ownerContext.bodyCellContext,
             containerElContext = ownerContext.containerElContext;
             
-        height -= this.measureLabelErrorHeight(ownerContext);
+        height -= this.measureLabelErrorHeight(ownerContext) + bodyContext.getPaddingInfo().height;
         bodyContext.setHeight(height);
         containerElContext.setHeight(height);
     }
@@ -96433,6 +97297,9 @@ Ext.define('Ext.form.field.Checkbox', {
         }
 
         me.checked = me.rawValue = checked;
+        if (!me.duringSetValue) {
+            me.lastValue = checked;
+        }
         return checked;
     },
 
@@ -96454,17 +97321,18 @@ Ext.define('Ext.form.field.Checkbox', {
                 box.setValue(Ext.Array.contains(checked, box.inputValue));
             }
         } else {
+            
+            
+            me.duringSetValue = true;
             me.callParent(arguments);
+            delete me.duringSetValue;
         }
 
         return me;
     },
 
     
-    valueToRaw: function(value) {
-        
-        return value;
-    },
+    valueToRaw: Ext.identityFn,
 
     
     onChange: function(newVal, oldVal) {
@@ -97769,15 +98637,13 @@ Ext.define('Ext.form.action.DirectSubmit', {
             form = me.form,
             api = form.api,
             fn = api.submit,
-            callback = Ext.Function.bind(me.onComplete, me),
-            formInfo = me.buildForm(),
+            callback, formInfo, options;
             options;
         
         if (typeof fn !== 'function') {
             var fnName = fn;
             
             api.submit = fn = Ext.direct.Manager.parseMethod(fn);
-            me.cleanup(formInfo);
 
             if (!Ext.isFunction(fn)) {
                 Ext.Error.raise('Cannot resolve Ext.Direct API method ' + fnName);
@@ -97790,7 +98656,9 @@ Ext.define('Ext.form.action.DirectSubmit', {
             };
         }
         
-        fn.call(window, formInfo.formEl, callback, me, options);
+        formInfo = me.buildForm();
+        
+        fn.call(window, formInfo.formEl, me.onComplete, me, options);
         me.cleanup(formInfo);
     },
 
@@ -98081,7 +98949,7 @@ Ext.define('Ext.form.field.Trigger', {
     mimicing: false,
     
     triggerIndexRe: /trigger-index-(\d+)/,
-    
+
     extraTriggerCls: '',
 
     componentLayout: 'triggerfield',
@@ -98089,6 +98957,20 @@ Ext.define('Ext.form.field.Trigger', {
     initComponent: function() {
         this.wrapFocusCls = this.triggerWrapCls + '-focus';
         this.callParent(arguments);
+    },
+
+    initEvents: function() {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        this.mon(Ext.globalEvents, 'beforefocus', this.onOtherFocus, this);
+        this.callParent();
     },
 
     getSubTplMarkup: function(values) {
@@ -98112,17 +98994,17 @@ Ext.define('Ext.form.field.Trigger', {
             '</table>'
         ].join('');
     },
-    
+
     getSubTplData: function(){
         var me = this,
             data = me.callParent(),
             readOnly = me.readOnly === true,
             editable = me.editable !== false;
-        
+
         return Ext.apply(data, {
             editableCls: (readOnly || !editable) ? ' ' + me.triggerNoEditCls : '',
             readOnly: !editable || readOnly
-        });  
+        });
     },
 
     getLabelableRenderData: function() {
@@ -98173,9 +99055,9 @@ Ext.define('Ext.form.field.Trigger', {
 
         return Ext.DomHelper.markup(triggerConfigs);
     },
-    
+
     disableCheck: function() {
-        return !this.disabled;    
+        return !this.disabled;
     },
 
     
@@ -98183,12 +99065,12 @@ Ext.define('Ext.form.field.Trigger', {
         var me = this,
             triggerBaseCls = me.triggerBaseCls,
             tempEl;
-            
+
         
         if (!me.triggerWidth) {
             tempEl = Ext.getBody().createChild({
                 role: 'presentation',
-                style: 'position: absolute;', 
+                style: 'position: absolute;',
                 cls: Ext.baseCSSPrefix + 'form-trigger'
             });
             Ext.form.field.Trigger.prototype.triggerWidth = tempEl.getWidth();
@@ -98197,7 +99079,7 @@ Ext.define('Ext.form.field.Trigger', {
 
         me.callParent();
 
-        if (triggerBaseCls != Ext.baseCSSPrefix + 'form-trigger') {
+        if (triggerBaseCls !== Ext.baseCSSPrefix + 'form-trigger') {
             
             
             me.addChildEls({ name: 'triggerEl', select: '.' + triggerBaseCls });
@@ -98246,7 +99128,7 @@ Ext.define('Ext.form.field.Trigger', {
     setReadOnly: function(readOnly) {
         var me = this,
             old = me.readOnly;
-            
+
         me.callParent(arguments);
         if (readOnly != old) {
             me.updateLayout();
@@ -98310,6 +99192,10 @@ Ext.define('Ext.form.field.Trigger', {
     
     onFocus: function() {
         var me = this;
+
+        
+        me.otherFocused = false;
+
         me.callParent(arguments);
         if (!me.mimicing) {
             me.bodyEl.addCls(me.wrapFocusCls);
@@ -98325,7 +99211,7 @@ Ext.define('Ext.form.field.Trigger', {
 
     
     checkTab: function(me, e) {
-        if (!this.ignoreMonitorTab && e.getKey() == e.TAB) {
+        if (!this.ignoreMonitorTab && e.getKey() === e.TAB) {
             this.triggerBlur();
         }
     },
@@ -98348,19 +99234,23 @@ Ext.define('Ext.form.field.Trigger', {
     },
 
     
+    
+    onOtherFocus: function(dom) {
+        this.otherFocused = (this.hasFocus && !this.bodyEl.contains(dom));
+    },
+
+    
     onBlur: function() {
-        var me = this,
-            blurTask = me.blurTask;
-            
         
-        if (me.blurring) {
-            me.triggerBlur();
+        if (this.blurring || this.otherFocused) {
+            this.triggerBlur();
+            this.otherFocused = false;
         }
     },
 
     
     mimicBlur: function(e) {
-        if (!this.isDestroyed && !this.bodyEl.contains(e.target) && this.validateBlur(e)) {
+        if (!this.isDestroyed && !this.bodyEl.contains(e.target)) {
             this.triggerBlur(e);
         }
     },
@@ -98377,12 +99267,6 @@ Ext.define('Ext.form.field.Trigger', {
         if (me.bodyEl) {
             me.bodyEl.removeCls(me.wrapFocusCls);
         }
-    },
-
-    
-    
-    validateBlur: function(e) {
-        return true;
     },
 
     
@@ -98497,7 +99381,7 @@ Ext.define('Ext.form.field.Picker', {
             
             e.preventDefault();
         }
-        
+
         if (this.isExpanded) {
             this.collapse();
             e.stopEvent();
@@ -98579,9 +99463,10 @@ Ext.define('Ext.form.field.Picker', {
 
     
     collapse: function() {
-        if (this.isExpanded && !this.isDestroyed) {
-            var me = this,
-                openCls = me.openCls,
+        var me = this;
+
+        if (me.isExpanded && !me.isDestroyed && !me.destroying) {
+            var openCls = me.openCls,
                 picker = me.picker,
                 doc = Ext.getDoc(),
                 collapseIf = me.collapseIf,
@@ -98611,15 +99496,35 @@ Ext.define('Ext.form.field.Picker', {
     collapseIf: function(e) {
         var me = this;
 
-        if (!me.isDestroyed && !e.within(me.bodyEl, false, true) && !e.within(me.picker.el, false, true) && !me.isEventWithinPickerLoadMask(e)) {
+        if (!me.isDestroyed && !e.within(me.bodyEl, false, true) && !me.owns(e.target)) {
             me.collapse();
         }
     },
 
     
     getPicker: function() {
-        var me = this;
-        return me.picker || (me.picker = me.createPicker());
+        var me = this,
+            picker = me.picker;
+
+        if (!picker) {
+            me.picker = picker = me.createPicker();
+            
+            picker.ownerCmp = me;
+        }
+
+        return picker;
+    },
+
+    
+    
+    
+    
+    getRefItems: function() {
+        var result = [];
+        if (this.picker) {
+            result[0] = this.picker;
+        }
+        return result;
     },
 
     
@@ -98637,22 +99542,31 @@ Ext.define('Ext.form.field.Picker', {
             me.inputEl.focus();
         }
     },
-    
+
+    onOtherFocus: function(dom) {
+        if (this.hasFocus && !this.owns(dom)) {
+            this.callParent([dom]);
+        }
+    },
+
     triggerBlur: function() {
         var picker = this.picker;
-            
+
         this.callParent(arguments);
-        if (picker && picker.isVisible()) {
-            picker.hide();
-        }
+
+        
+        this.collapse();
     },
 
     mimicBlur: function(e) {
         var me = this,
             picker = me.picker;
+
         
-        if (!picker || !e.within(picker.el, false, true) && !me.isEventWithinPickerLoadMask(e)) {
+        if (!picker || !me.owns(e.target)) {
             me.callParent(arguments);
+        } else {
+            me.inputEl.focus();
         }
     },
 
@@ -98661,23 +99575,14 @@ Ext.define('Ext.form.field.Picker', {
             picker = me.picker;
 
         Ext.EventManager.removeResizeListener(me.alignPicker, me);
-        Ext.destroy(me.keyNav);
+        Ext.destroy(me.keyNav, picker);
         if (picker) {
+            delete me.picker;
             delete picker.pickerField;
-            picker.destroy();
         }
         me.callParent();
-    },
-
-    
-    isEventWithinPickerLoadMask: function(e) {
-        var loadMask = this.picker.loadMask;
-
-        return loadMask ? e.within(loadMask.maskEl, false, true) || e.within(loadMask.el, false, true) : false;
     }
-
 });
-
 
 
 
@@ -98825,6 +99730,18 @@ Ext.define('Ext.selection.Model', {
         }
     },
 
+    getSelectionStart: function () {
+        if (!this.selectionStart) {
+            this.setSelectionStart(this.lastFocused);
+        }
+
+        return this.selectionStart;
+    },
+
+    setSelectionStart: function (selection) {
+        this.selectionStart = selection;
+    },
+
     
     
     
@@ -98833,7 +99750,7 @@ Ext.define('Ext.selection.Model', {
             isSelected = me.isSelected(record),
             shift = e.shiftKey,
             ctrl = e.ctrlKey,
-            start = me.selectionStart,
+            start = shift && me.getSelectionStart(),
             selected = me.getSelection(),
             len = selected.length,
             allowDeselect = me.allowDeselect,
@@ -98972,7 +99889,9 @@ Ext.define('Ext.selection.Model', {
                 break;
             case 'SIMPLE':
                 if (isSelected) {
-                    me.doDeselect(record);
+                    if (me.allowDeselect) {
+                        me.doDeselect(record);
+                    }
                 } else {
                     me.doSelect(record, true);
                 }
@@ -98981,8 +99900,10 @@ Ext.define('Ext.selection.Model', {
                 
                 if (isSpace) {
                     if (isSelected) {
-                        me.doDeselect(record);
-                        me.setLastFocused(record);
+                        if (me.allowDeselect) {
+                            me.doDeselect(record);
+                            me.setLastFocused(record);
+                        }
                     } else {
                         me.doSelect(record);
                     }
@@ -98994,13 +99915,20 @@ Ext.define('Ext.selection.Model', {
                 }
 
                 
-                else if (me.allowDeselect && isSelected) {
+                else if (isSpace && me.allowDeselect && isSelected) {
                     me.doDeselect(record);
                 }
 
                 
                 else {
                     me.doSelect(record, false);
+
+                    
+                    
+                    
+                    
+                    
+                    me.setLastFocused(record);
                 }
                 break;
         }
@@ -99057,7 +99985,11 @@ Ext.define('Ext.selection.Model', {
             me.resumeChanges();
         }
         
-        me.doMultiSelect(toSelect, true);
+        if (toSelect.length) {
+            me.doMultiSelect(toSelect, true);
+        } else {
+            me.maybeFireSelectionChange(toDeselect.length > 0);
+        }
     },
 
     
@@ -99081,7 +100013,9 @@ Ext.define('Ext.selection.Model', {
                 toDeselect.push(record);
             }
         }
-        me.doDeselect(toDeselect);
+        if (toDeselect.length) {
+            me.doDeselect(toDeselect);
+        }
     },
     
     normalizeRowRange: function(startRow, endRow) {
@@ -99115,7 +100049,7 @@ Ext.define('Ext.selection.Model', {
     
     select: function(records, keepExisting, suppressEvent) {
         
-        if (Ext.isDefined(records)) {
+        if (Ext.isDefined(records) && !(Ext.isArray(records) && !records.length)) {
             this.doSelect(records, keepExisting, suppressEvent);
         }
     },
@@ -99415,7 +100349,7 @@ Ext.define('Ext.selection.Model', {
         if (me.pruneRemoved) {
             for (i = 0; i < len; i++) {
                 item = selected.getAt(i);
-                if (!this.storeHasSelected(item)) {
+                if (!me.getStoreRecord(item)) {
                     toRemove.push(item);
                 }
             }
@@ -99431,25 +100365,27 @@ Ext.define('Ext.selection.Model', {
     
     
     
-    storeHasSelected: function(record) {
+    getStoreRecord: function(record) {
         var store = this.store,
-            records,
-            len, id, i;
+            records, rec, len, id, i;
+        
+        if (record) {
+            if (record.hasId()) {
+                return store.getById(record.getId());
+            } else {
+                records = store.data.items;
+                len = records.length;
+                id = record.internalId;
 
-        if (record.hasId() && store.getById(record.getId())) {
-            return true;
-        } else {
-            records = store.data.items;
-            len = records.length;
-            id = record.internalId;
-
-            for (i = 0; i < len; ++i) {
-                if (id === records[i].internalId) {
-                    return true;
+                for (i = 0; i < len; ++i) {
+                    rec = records[i];
+                    if (id === rec.internalId) {
+                        return rec;
+                    }
                 }
             }
         }
-        return false;
+        return null;
     },
 
     refresh: function() {
@@ -99608,7 +100544,35 @@ Ext.define('Ext.selection.Model', {
     
     onStoreUpdate: Ext.emptyFn,
 
-    onStoreRefresh: Ext.emptyFn,
+    onStoreRefresh: function(){
+        var me = this,
+            selected = me.selected,
+            items, length, i, rec, storeRec;
+            
+        if (me.store.buffered) {
+            return;
+        }
+            
+        items = selected.items;
+        length = items.length;
+         
+        me.lastSelected = me.getStoreRecord(me.lastSelected);
+        
+        for (i = 0; i < length; ++i) {
+            rec = items[i];
+            storeRec = me.getStoreRecord(rec);
+            if (storeRec) {
+                if (rec.hasId()) {
+                    
+                    
+                    me.selected.replace(storeRec);
+                }
+            } else {
+                
+                me.selected.remove(rec);
+            }
+        }   
+    },
 
     
     onStoreLoad: Ext.emptyFn,
@@ -99877,16 +100841,20 @@ Ext.define('Ext.view.AbstractView', {
 
     ariaRole: 'listbox',
     itemAriaRole: 'option',
-    
+
     
     last: false,
 
     triggerEvent: 'itemclick',
     triggerCtEvent: 'containerclick',
 
-    addCmpEvents: function() {
+    
+    
+    
+    
+    refreshNeeded: true,
 
-    },
+    addCmpEvents: Ext.emptyFn,
 
     
     initComponent : function(){
@@ -99944,7 +100912,7 @@ Ext.define('Ext.view.AbstractView', {
             delete me.selectedCls;
             delete me.selectedClass;
         }
-        
+
         if (me.overItemCls) {
             me.trackOver = true;
         }
@@ -99999,7 +100967,6 @@ Ext.define('Ext.view.AbstractView', {
             cfg = {
                 target: me,
                 msg: me.loadingText,
-                msgCls: me.loadingCls,
                 useMsg: me.loadingUseMsg,
                 
                 
@@ -100009,6 +100976,10 @@ Ext.define('Ext.view.AbstractView', {
         me.callParent(arguments);
 
         if (mask && !maskStore.proxy.isSynchronous) {
+            
+            if (me.loadingCls) {
+                cfg.msgCls = me.loadingCls;
+            }
             
             if (Ext.isObject(mask)) {
                 cfg = Ext.apply(cfg, mask);
@@ -100025,31 +100996,28 @@ Ext.define('Ext.view.AbstractView', {
             });
         }
     },
-    
-    finishRender: function() {
-        var me = this;
-        me.callParent(arguments);
-        
-        
-        if (!me.up('[collapsed],[hidden]')) {
-            me.doFirstRefresh(me.dataSource);
-        }
-    },
 
-    onBoxReady: function() {
+    beforeLayout: function() {
         var me = this;
 
         me.callParent(arguments);
 
         
         
-        if (!me.firstRefreshDone) {
-            me.doFirstRefresh(me.dataSource);
+        if (me.refreshNeeded && !me.pendingRefresh) {
+            
+            if (me.refreshCounter) {
+                me.refresh();
+            }
+            
+            else {
+                me.doFirstRefresh(me.dataSource);
+            }
         }
     },
 
     getMaskStore: function(){
-        return this.store;    
+        return this.store;
     },
 
     onMaskBeforeShow: function(){
@@ -100131,7 +101099,8 @@ Ext.define('Ext.view.AbstractView', {
             oldDisplay,
             nextSibling,
             dom,
-            records;
+            records,
+            hasFirstRefresh;
 
         if (!me.rendered || me.isDestroyed) {
             return;
@@ -100153,6 +101122,7 @@ Ext.define('Ext.view.AbstractView', {
             }
 
             if (me.refreshCounter) {
+                hasFirstRefresh = true;
                 me.clearViewEl();
             } else {
                 me.fixedNodes = targetEl.dom.childNodes.length;
@@ -100163,13 +101133,19 @@ Ext.define('Ext.view.AbstractView', {
             
             
             
-            me.tpl.append(targetEl, me.collectData(records, me.all.startIndex));
+            me.tpl.append(targetEl, me.collectData(records, me.all.startIndex || 0));
+
+            
+            if (!me.preserveScrollOnRefresh) {
+                targetParent.insertBefore(dom, nextSibling);
+                dom.style.display = oldDisplay;
+            }
 
             
             
             if (records.length < 1) {
                 
-                if (!this.store.loading && (!me.deferEmptyText || me.hasFirstRefresh)) {
+                if (!this.store.loading && (!me.deferEmptyText || hasFirstRefresh)) {
                     Ext.core.DomHelper.insertHtml('beforeEnd', targetEl.dom, me.emptyText);
                 }
                 me.all.clear();
@@ -100179,7 +101155,7 @@ Ext.define('Ext.view.AbstractView', {
             }
 
             
-            if (me.hasFirstRefresh) {
+            if (hasFirstRefresh) {
                 
                 if (me.refreshSelmodelOnRefresh !== false) {
                     me.selModel.refresh();
@@ -100189,12 +101165,7 @@ Ext.define('Ext.view.AbstractView', {
                 }
             }
 
-            me.hasFirstRefresh = true;
-
-            if (!me.preserveScrollOnRefresh) {
-                targetParent.insertBefore(dom, nextSibling);
-                dom.style.display = oldDisplay;
-            }
+            me.refreshNeeded = false;
 
             
             this.refreshSize();
@@ -100215,7 +101186,8 @@ Ext.define('Ext.view.AbstractView', {
     
     
     collectNodes: function(targetEl) {
-        this.all.fill(Ext.query(this.getItemSelector(), Ext.getDom(targetEl)), this.all.startIndex);
+        var all = this.all;
+        all.fill(Ext.query(this.getItemSelector(), Ext.getDom(targetEl)), all.startIndex || 0);
     },
 
     getViewRange: function() {
@@ -100254,7 +101226,7 @@ Ext.define('Ext.view.AbstractView', {
 
     
     onViewScroll: Ext.emptyFn,
-    
+
     onIdChanged: Ext.emptyFn,
 
     
@@ -100271,7 +101243,7 @@ Ext.define('Ext.view.AbstractView', {
     
     restoreScrollState: function() {
         if (this.rendered) {
-            var dom = this.el.dom, 
+            var dom = this.el.dom,
                 state = this.scrollState;
 
             dom.scrollLeft = state.left;
@@ -100323,7 +101295,7 @@ Ext.define('Ext.view.AbstractView', {
         me.tpl.overwrite(div, me.collectData(records, index));
         return  Ext.DomQuery.select(me.getItemSelector(), div);
     },
-    
+
     getNodeContainer: function() {
         return this.getTargetEl();
     },
@@ -100352,6 +101324,58 @@ Ext.define('Ext.view.AbstractView', {
             }
         }
 
+    },
+
+    
+    
+    
+    onReplace: function(store, startIndex, oldRecords, newRecords) {
+        var me = this,
+            endIndex,
+            rows = me.all,
+            nodes, item,
+            i, j;
+
+        if (me.rendered) {
+
+            
+            nodes = me.bufferRender(newRecords, startIndex, true);
+            item = rows.item(startIndex);
+            if (item) {
+                rows.item(startIndex).insertSibling(nodes, 'before', true);
+            } else {
+                me.appendNodes(nodes);
+            }
+            rows.insert(startIndex, nodes);
+
+            startIndex += newRecords.length;
+            endIndex = startIndex + oldRecords.length - 1;
+
+            
+            rows.removeRange(startIndex, endIndex, true);
+
+            
+            if (me.refreshSelmodelOnRefresh !== false) {
+                me.selModel.refresh();
+            }
+
+            
+            me.updateIndexes(startIndex);
+
+            
+            me.refreshSize();
+
+            
+            if (me.hasListeners.itemremove) {
+                for (i = oldRecords.length, j = endIndex; i >= 0; --i, --j) {
+                    me.fireEvent('itemremove', oldRecords[i], j);
+                }
+            }
+
+            if (me.hasListeners.itemadd) {
+                me.fireEvent('itemadd', newRecords, startIndex, nodes);
+            }
+        }
     },
 
     
@@ -100384,29 +101408,38 @@ Ext.define('Ext.view.AbstractView', {
 
     },
 
+    appendNodes: function(nodes) {
+        var fragment = document.createDocumentFragment(),
+            len = nodes.length,
+            i;
+
+        for (i = 0; i < len; ++i) {
+            fragment.appendChild(nodes[i]);
+        }
+        this.getNodeContainer().appendChild(fragment);
+    },
+
     doAdd: function(records, index) {
         var me = this,
             nodes = me.bufferRender(records, index, true),
             all = me.all,
             count = all.getCount(),
-            i, l, nodeContainer, fragment;
+            firstRowIndex = all.startIndex || 0,
+            lastRowIndex = all.endIndex || count - 1;
 
-        if (count === 0) {
-            nodeContainer = this.getNodeContainer();
-            fragment = document.createDocumentFragment();
+        
+        if (count === 0 || index > lastRowIndex) {
+            me.appendNodes(nodes);
+        }
 
-            for (i = 0, l = nodes.length; i < l; i++) {
-                fragment.appendChild(nodes[i]);
-            }
-            nodeContainer.appendChild(fragment);
-        } else if (index < count) {
-            if (index === 0) {
-                all.item(index).insertSibling(nodes, 'before', true);
-            } else {
-                all.item(index - 1).insertSibling(nodes, 'after', true);
-            }
-        } else {
-            all.last().insertSibling(nodes, 'after', true);
+        
+        else if (index <= firstRowIndex) {
+            all.item(firstRowIndex).insertSibling(nodes, 'before', true);
+        }
+
+        
+        else {
+            all.item(index).insertSibling(nodes, 'before', true);
         }
 
         all.insert(index, nodes);
@@ -100414,7 +101447,7 @@ Ext.define('Ext.view.AbstractView', {
     },
 
     
-    onRemove : function(ds, records, indexes) {
+    onRemove : function(ds, records, indices) {
         var me = this,
             fireItemRemove = me.hasListeners.itemremove,
             i,
@@ -100425,23 +101458,27 @@ Ext.define('Ext.view.AbstractView', {
             if (me.dataSource.getCount() === 0) {
                 
                 if (fireItemRemove) {
-                    for (i = indexes.length - 1; i >= 0; --i) {
-                        me.fireEvent('itemremove', records[i], indexes[i]);
+                    for (i = indices.length - 1; i >= 0; --i) {
+                        me.fireEvent('itemremove', records[i], indices[i]);
                     }
                 }
                 me.refresh();
             } else {
                 
                 
-                for (i = indexes.length - 1; i >= 0; --i) {
+                for (i = indices.length - 1; i >= 0; --i) {
                     record = records[i];
-                    index = indexes[i];
-                    me.doRemove(record, index);
-                    if (fireItemRemove) {
-                        me.fireEvent('itemremove', record, index);
+                    index = indices[i];
+
+                    
+                    if (me.all.item(index)) {
+                        me.doRemove(record, index);
+                        if (fireItemRemove) {
+                            me.fireEvent('itemremove', record, index);
+                        }
                     }
                 }
-                me.updateIndexes(indexes[0]);
+                me.updateIndexes(indices[0]);
             }
 
             
@@ -100456,7 +101493,7 @@ Ext.define('Ext.view.AbstractView', {
 
     
     refreshNode : function(index) {
-        this.onUpdate(this.dataSource, this.dataSource.getAt(index));
+        this.onUpdate(this.dataSource, this.store.getAt(index));
     },
 
     
@@ -100482,7 +101519,7 @@ Ext.define('Ext.view.AbstractView', {
     },
 
     
-    bindStore : function(store, initial, propName) {
+    bindStore: function(store, initial, propName) {
         var me = this;
         me.mixins.bindable.bindStore.apply(me, arguments);
 
@@ -100505,9 +101542,6 @@ Ext.define('Ext.view.AbstractView', {
         var me = this;
 
         
-        me.firstRefreshDone = true;
-
-        
         
         
         
@@ -100520,13 +101554,14 @@ Ext.define('Ext.view.AbstractView', {
             }
         }
     },
-    
+
     applyFirstRefresh: function(){
         var me = this;
         if (me.isDestroyed) {
             return;
         }
-        
+        me.pendingRefresh = 0;
+
         
         
         
@@ -100536,9 +101571,10 @@ Ext.define('Ext.view.AbstractView', {
         
         
         if (me.up('[isCollapsingOrExpanding]')) {
-            Ext.Function.defer(me.applyFirstRefresh, 100, me);
+            me.pendingRefresh = Ext.Function.defer(me.applyFirstRefresh, 100, me);
         } else {
-            Ext.Function.defer(function () {
+            me.pendingRefresh = Ext.Function.defer(function () {
+                me.pendingRefresh = 0;
                 if (!me.isDestroyed) {
                     me.refresh();
                 }
@@ -100572,6 +101608,7 @@ Ext.define('Ext.view.AbstractView', {
         return {
             idchanged: me.onIdChanged,
             refresh: me.onDataRefresh,
+            replace: me.onReplace,
             add: me.onAdd,
             bulkremove: me.onRemove,
             update: me.onUpdate,
@@ -100583,21 +101620,19 @@ Ext.define('Ext.view.AbstractView', {
     onDataRefresh: function() {
         this.refreshView();
     },
-    
+
     refreshView: function() {
         var me = this,
             
             
-            blockedByAncestor = !me.firstRefreshDone && (!me.rendered || me.up('[collapsed],[isCollapsingOrExpanding],[hidden]'));
+            blocked = me.blockRefresh || !me.rendered || me.up('[collapsed],[isCollapsingOrExpanding],[hidden]');
 
         
         
-        
-        
-        if (blockedByAncestor) {
+        if (blocked) {
+            me.refreshNeeded = true;
             me.deferInitialRefresh = false;
-        } else if (me.blockRefresh !== true) {
-            me.firstRefreshDone = true;
+        } else {
             me.refresh();
         }
     },
@@ -100904,6 +101939,8 @@ Ext.define('Ext.view.View', {
             
             'beforecontainerkeydown',
             
+            'containermousedown',
+            
             'containermouseup',
             
             'containermouseover',
@@ -100945,8 +101982,7 @@ Ext.define('Ext.view.View', {
 
     
     afterRender: function() {
-        var me = this,
-            buffer = me.mouseOverOutBuffer;
+        var me = this;
 
         me.callParent();
         me.mon(me.getTargetEl(), {
@@ -100959,8 +101995,8 @@ Ext.define('Ext.view.View', {
             dblclick: me.handleEvent,
             contextmenu: me.handleEvent,
             keydown: me.handleEvent,
-            mouseover: buffer ? me.onMouseOver : me.handleMouseOver,
-            mouseout:  buffer ? me.onMouseOut : me.handleMouseOut
+            mouseover: me.onMouseOver,
+            mouseout: me.onMouseOut
         });
     },
 
@@ -100969,25 +102005,53 @@ Ext.define('Ext.view.View', {
 
         
         
-        me.lastMouseOverEvent.setEvent(e.browserEvent, true);
-        me.handleMouseOver(me.lastMouseOverEvent);
+        if (me.mouseOverOutBuffer) {
+            e = me.lastMouseOverEvent.setEvent(e.browserEvent, true);
+        }
+
+        me.handleMouseOver(e);
     },
 
-    onMouseOut: function(e) {
-        var me = this;
+    onMouseOut: function (e) {
+        var me = this,
+            
+            itemSelector = me.getTargetSelector(),
+            item = e.getTarget(itemSelector),
+            computedRelatedTarget = e.getRelatedTarget(itemSelector);
 
         
         
-        if (!me._mouseOutPending) {
-            me._mouseOutPending = true;
-            me.lastMouseOutEvent.setEvent(e.browserEvent, true);
-            me.handleMouseOut(me.lastMouseOutEvent);
+        if ((item === computedRelatedTarget) && !(item === null && computedRelatedTarget === null)) {
+            return;
         }
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        if (me.mouseOverOutBuffer) {
+            e = me.lastMouseOutEvent.setEvent(e.browserEvent, true);
+        }
+
+        me.handleMouseOut(e, item);
+    },
+
+    
+    getTargetSelector: function () {
+        return this.dataRowSelector || this.itemSelector;
     },
 
     handleMouseOver: function(e) {
         var me = this,
-            itemSelector = me.dataRowSelector || me.itemSelector,
+            
+            itemSelector = me.getTargetSelector(),
             item = e.getTarget(itemSelector);
 
         
@@ -101000,44 +102064,34 @@ Ext.define('Ext.view.View', {
                 }
             } else {
                 
-                e.item = e.newType = null;
                 me.handleEvent(e);
             }
         }
     },
 
-    handleMouseOut: function(e) {
+    handleMouseOut: function (e, item) {
         var me = this,
-            itemSelector = me.dataRowSelector || me.itemSelector,
-            item = e.getTarget(itemSelector),
             sourceView;
 
         
+        
         if (!me.isDestroyed) {
-            me._mouseOutPending = false;
-
-            if (item) {
-                if (e.getRelatedTarget(itemSelector) !== item && me.mouseOverItem === item) {
-                    sourceView = me.self.getBoundView(item);
-                    e.item = item;
-                    e.newType = 'mouseleave';
-                    sourceView.handleEvent(e);
-                    sourceView.mouseOverItem = null;
-                }
+            
+            if (item && (sourceView = me.self.getBoundView(item))) {
+                e.item = item;
+                e.newType = 'mouseleave';
+                sourceView.handleEvent(e);
+                sourceView.mouseOverItem = null;
             } else {
                 
-                e.item = e.newType = null;
                 me.handleEvent(e);
             }
         }
-
-        
-        e.newType = e.item = null;
     },
 
     handleEvent: function(e) {
         var me = this,
-            key = e.type == 'keydown' && e.getKey();
+            key = e.type === 'keydown' && e.getKey();
 
         if (me.processUIEvent(e) !== false) {
             me.processSpecialEvent(e);
@@ -101067,11 +102121,12 @@ Ext.define('Ext.view.View', {
         }
 
         var me = this,
-            item = e.getTarget(me.dataRowSelector || me.itemSelector, me.getTargetEl()),
+            
+            item = e.getTarget(me.getTargetSelector(), me.getTargetEl()),
             map = me.statics().EventMap,
             index, record,
             type = e.type,
-            newType = e.type,
+            newType = type,
             sm;
 
         
@@ -101079,6 +102134,8 @@ Ext.define('Ext.view.View', {
         if (e.newType) {
             newType = e.newType;
             item = e.item;
+            
+            e.newType = e.item = null;
         }
 
         
@@ -101282,7 +102339,13 @@ Ext.define('Ext.view.View', {
             if (adjustmentX || adjustmentY) {
                 me.scrollBy(adjustmentX, adjustmentY, false);
             }
-            el.focus();
+
+            
+            Ext.fly(node).set({
+                tabIndex: -1
+            });
+
+            node.focus();
         }
     },
 
@@ -101872,7 +102935,7 @@ Ext.define('Ext.form.field.Number', {
 
     beforeBlur : function() {
         var me = this,
-            v = me.parseValue(me.getRawValue());
+            v = me.rawToValue(me.getRawValue());
 
         if (!Ext.isEmpty(v)) {
             me.setValue(v);
@@ -101996,7 +103059,14 @@ Ext.define('Ext.toolbar.Paging', {
 
     
     getPagingItems: function() {
-        var me = this;
+        var me = this,
+            inputListeners = {
+                scope: me,
+                blur: me.onPagingBlur
+            };
+        
+        inputListeners[Ext.EventManager.getKeyEvent()] = me.onPagingKeyDown;
+        
         return [{
             itemId: 'first',
             tooltip: me.firstText,
@@ -102032,11 +103102,7 @@ Ext.define('Ext.toolbar.Paging', {
             isFormField: false,
             width: me.inputItemWidth,
             margins: '-1 2 3 2',
-            listeners: {
-                scope: me,
-                keydown: me.onPagingKeyDown,
-                blur: me.onPagingBlur
-            }
+            listeners: inputListeners
         },{
             xtype: 'tbtext',
             itemId: 'afterTextItem',
@@ -102103,9 +103169,13 @@ Ext.define('Ext.toolbar.Paging', {
     },
     
     beforeRender: function() {
-        this.callParent(arguments);
-        if (!this.store.isLoading()) {
-            this.onLoad();    
+        var me = this;
+        
+        me.callParent(arguments);
+        if (!me.store.isLoading()) {
+            me.calledFromRender = true;
+            me.onLoad();    
+            delete me.calledFromRender;
         }    
     },
     
@@ -102181,7 +103251,9 @@ Ext.define('Ext.toolbar.Paging', {
         me.updateInfo();
         Ext.resumeLayouts(true);
 
-        me.fireEvent('change', me, pageData);
+        if (!me.calledFromRender) {
+            me.fireEvent('change', me, pageData);
+        }
     },
     
     setChildDisabled: function(selector, disabled){
@@ -102385,7 +103457,7 @@ Ext.define('Ext.view.BoundList', {
     alias: 'widget.boundlist',
     alternateClassName: 'Ext.BoundList',
                                                                        
-    
+
     mixins: {
         queryable:  Ext.Queryable 
     },
@@ -102404,6 +103476,8 @@ Ext.define('Ext.view.BoundList', {
     shadow: false,
     trackOver: true,
     refreshed: 0,
+
+    preserveScrollOnRefresh: true,
 
     
     deferInitialRefresh: false,
@@ -102464,24 +103538,21 @@ Ext.define('Ext.view.BoundList', {
         me.callParent();
     },
 
-    beforeRender: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        
-        
-        if (me.up('menu')) {
-            me.addCls(Ext.baseCSSPrefix + 'menu');
-        }
-    },
-
     getRefOwner: function() {
         return this.pickerField || this.callParent();
     },
 
     getRefItems: function() {
-        return this.pagingToolbar ? [ this.pagingToolbar ] : [];
+        var me = this,
+            result = [];
+
+        if (me.pagingToolbar) {
+            result.push(me.pagingToolbar);
+        }
+        if (me.loadMask) {
+            result.push(me.loadMask);
+        }
+        return result;
     },
 
     createPagingToolbar: function() {
@@ -102532,7 +103603,7 @@ Ext.define('Ext.view.BoundList', {
         }
     },
 
-    bindStore : function(store, initial) {
+    bindStore: function(store, initial) {
         var toolbar = this.pagingToolbar;
 
         this.callParent(arguments);
@@ -102543,6 +103614,11 @@ Ext.define('Ext.view.BoundList', {
 
     getTargetEl: function() {
         return this.listEl || this.el;
+    },
+
+    
+    getNodeContainer: function() {
+        return Ext.get(this.listEl.dom.firstChild);
     },
 
     
@@ -102703,7 +103779,7 @@ Ext.define('Ext.form.field.ComboBox', {
     alternateClassName: 'Ext.form.ComboBox',
     alias: ['widget.combobox', 'widget.combo'],
     mixins: {
-        bindable:  Ext.util.Bindable     
+        bindable:  Ext.util.Bindable 
     },
 
     componentLayout: 'combobox',
@@ -102712,15 +103788,15 @@ Ext.define('Ext.form.field.ComboBox', {
 
     
     triggerCls: Ext.baseCSSPrefix + 'form-arrow-trigger',
-    
+
     
     hiddenName: '',
-    
+
     
 
     
     hiddenDataCls: Ext.baseCSSPrefix + 'hide-display ' + Ext.baseCSSPrefix + 'form-data-hidden',
-    
+
     ariaRole: 'combobox',
 
     
@@ -102817,10 +103893,10 @@ Ext.define('Ext.form.field.ComboBox', {
 
     
     growToLongestValue: true,
-    
+
     
     clearFilterOnBlur: true,
-    
+
     
 
     
@@ -102836,7 +103912,7 @@ Ext.define('Ext.form.field.ComboBox', {
     },
 
     
-    
+
     
     transformInPlace: true,
 
@@ -102865,7 +103941,7 @@ Ext.define('Ext.form.field.ComboBox', {
         Ext.applyIf(me.renderSelectors, {
             hiddenDataEl: '.' + me.hiddenDataCls.split(' ').join('.')
         });
-        
+
         if (me.typeAhead && me.multiSelect) {
             Ext.Error.raise('typeAhead and multiSelect are mutually exclusive options -- please remove one of them.');
         }
@@ -102908,7 +103984,7 @@ Ext.define('Ext.form.field.ComboBox', {
             }
         }
 
-        me.bindStore(store || 'ext-empty-store', true);
+        me.bindStore(store || 'ext-empty-store', true, true);
         store = me.store;
         if (store.autoCreated) {
             me.queryMode = 'local';
@@ -102968,21 +104044,21 @@ Ext.define('Ext.form.field.ComboBox', {
     beforeBlur: function() {
         var me = this,
             filter = me.queryFilter;
-            
+
         me.doQueryTask.cancel();
         me.assertValue();
-        
+
         if (filter && !filter.disabled && me.queryMode === 'local' && me.clearFilterOnBlur) {
             filter.disabled = true;
             me.store.filter();
         }
     },
-    
+
     onFocus: function() {
         var me = this,
             filter = me.queryFilter;
-        
-        me.callParent(arguments);    
+
+        me.callParent(arguments);
         if (!me.duringTriggerClick && me.triggerAction !== 'all' && filter && filter.disabled && me.queryMode === 'local' && me.clearFilterOnBlur) {
             delete me.lastQuery;
             me.doRawQuery();
@@ -103048,7 +104124,7 @@ Ext.define('Ext.form.field.ComboBox', {
 
     beforeReset: function() {
         var filter = this.queryFilter;
-        
+
         this.callParent();
 
         
@@ -103067,19 +104143,33 @@ Ext.define('Ext.form.field.ComboBox', {
         if (filter) {
             me.store.removeFilter(filter);
         }
-        if (!store && picker) {
+        if (picker) {
             picker.bindStore(null);
         }
     },
 
     onBindStore: function(store, initial) {
         var picker = this.picker;
+
         if (!initial) {
             this.resetToDefault();
         }
 
         if (picker) {
             picker.bindStore(store);
+        }
+    },
+
+    
+    bindStore: function(store, preventFilter,  initial) {
+        var me = this,
+            filter = me.queryFilter;
+
+        me.mixins.bindable.bindStore.call(me, store, initial);
+        store = me.getStore();
+        if (store && filter) {
+            filter.disabled = !!preventFilter;
+            store.addFilter(filter);
         }
     },
 
@@ -103093,14 +104183,14 @@ Ext.define('Ext.form.field.ComboBox', {
             load: me.onLoad,
             exception: me.onException,
             remove: me.onRemove
-        }; 
+        };
     },
 
     onBeforeLoad: function(){
         
         
         
-        ++this.ignoreSelection;    
+        ++this.ignoreSelection;
     },
 
     onDataChanged: function() {
@@ -103132,7 +104222,7 @@ Ext.define('Ext.form.field.ComboBox', {
         if (this.ignoreSelection > 0) {
             --this.ignoreSelection;
         }
-        this.collapse();    
+        this.collapse();
     },
 
     onLoad: function(store, records, success) {
@@ -103191,7 +104281,7 @@ Ext.define('Ext.form.field.ComboBox', {
                 me.doAutoSelect();
             }
         }
-        
+
         
         else {
             me.lastQuery = queryPlan.query;
@@ -103259,7 +104349,7 @@ Ext.define('Ext.form.field.ComboBox', {
         me.store.filter();
 
         
-        if (me.store.getCount()) {
+        if (me.store.getCount() || me.getPicker().emptyText) {
             me.expand();
         } else {
             me.collapse();
@@ -103372,7 +104462,7 @@ Ext.define('Ext.form.field.ComboBox', {
 
     onTriggerClick: function() {
         var me = this;
-        
+
         me.duringTriggerClick = true;
         if (!me.readOnly && !me.disabled) {
             if (me.isExpanded) {
@@ -103394,7 +104484,7 @@ Ext.define('Ext.form.field.ComboBox', {
 
     onPaste: function(){
         var me = this;
-        
+
         if (!me.readOnly && !me.disabled && me.editable) {
             me.doQueryTask.delay(me.queryDelay);
         }
@@ -103434,12 +104524,12 @@ Ext.define('Ext.form.field.ComboBox', {
 
     onDestroy: function() {
         var me = this
-        
+
         if (me.typeAheadTask) {
             me.typeAheadTask.cancel();
             me.typeAheadTask = null;
         }
-        
+
         Ext.destroy(me.listKeyNav);
         me.bindStore(null);
         me.callParent();
@@ -103592,9 +104682,9 @@ Ext.define('Ext.form.field.ComboBox', {
                 enter: function(e){
                     var selModel = picker.getSelectionModel(),
                         count = selModel.getCount();
-                        
+
                     this.selectHighlighted(e);
-                    
+
                     
                     
                     if (!me.multiSelect && count === selModel.getCount()) {
@@ -103628,11 +104718,11 @@ Ext.define('Ext.form.field.ComboBox', {
         var me = this,
             picker = me.picker,
             fireSelect;
-        
+
         if (r && r.isModel && assert === true && picker) {
             fireSelect = !picker.getSelectionModel().isSelected(r);
         }
-        
+
         me.setValue(r, true);
         
         
@@ -103738,10 +104828,10 @@ Ext.define('Ext.form.field.ComboBox', {
     
     setHiddenValue: function(values){
         var me = this,
-            name = me.hiddenName, 
+            name = me.hiddenName,
             i,
             dom, childNodes, input, valueCount, childrenCount;
-            
+
         if (!me.hiddenDataEl || !name) {
             return;
         }
@@ -103751,11 +104841,11 @@ Ext.define('Ext.form.field.ComboBox', {
         input = childNodes[0];
         valueCount = values.length;
         childrenCount = childNodes.length;
-        
+
         if (!input && valueCount > 0) {
             me.hiddenDataEl.update(Ext.DomHelper.markup({
-                tag: 'input', 
-                type: 'hidden', 
+                tag: 'input',
+                type: 'hidden',
                 name: name
             }));
             childrenCount = 1;
@@ -103866,10 +104956,10 @@ Ext.define('Ext.form.field.ComboBox', {
             me.ignoreSelection--;
         }
     },
-    
+
     onEditorTab: function(e){
         var keyNav = this.listKeyNav;
-        
+
         if (this.selectOnTab && keyNav) {
             keyNav.selectHighlighted(e);
         }
@@ -103898,7 +104988,7 @@ Ext.define('Ext.picker.Month', {
     alternateClassName: 'Ext.MonthPicker',
 
     childEls: [
-        'bodyEl', 'prevEl', 'nextEl', 'buttonsEl', 'monthEl', 'yearEl'
+        'bodyEl', 'prevEl', 'nextEl', 'monthEl', 'yearEl'
     ],
 
     renderTpl: [
@@ -103931,7 +105021,7 @@ Ext.define('Ext.picker.Month', {
           '</div>',
           '<div class="' + Ext.baseCSSPrefix + 'clear"></div>',
           '<tpl if="showButtons">',
-              '<div id="{id}-buttonsEl" class="{baseCls}-buttons">{%',
+              '<div class="{baseCls}-buttons">{%',
                   'var me=values.$comp, okBtn=me.okBtn, cancelBtn=me.cancelBtn;',
                   'okBtn.ownerLayout = cancelBtn.ownerLayout = me.componentLayout;',
                   'okBtn.ownerCt = cancelBtn.ownerCt = me;',
@@ -104073,8 +105163,7 @@ Ext.define('Ext.picker.Month', {
     
     afterRender: function(){
         var me = this,
-            body = me.bodyEl,
-            buttonsEl = me.buttonsEl;
+            body = me.bodyEl;
 
         me.callParent();
 
@@ -104553,17 +105642,31 @@ Ext.define('Ext.picker.Date', {
         me.initDisabledDays();
     },
 
+    
+    getRefOwner: function() {
+        return this.pickerField || this.callParent();
+    },
+
+    getRefItems: function() {
+        var results = [],
+            monthBtn = this.monthBtn,
+            todayBtn = this.todayBtn;
+
+        if (monthBtn) {
+            results.push(monthBtn);
+        }
+
+        if (todayBtn) {
+            results.push(todayBtn);
+        }
+        return results;
+    },
+
     beforeRender: function () {
         
         var me = this,
             days = new Array(me.numDays),
             today = Ext.Date.format(new Date(), me.format);
-
-        
-        
-        if (me.up('menu')) {
-            me.addCls(Ext.baseCSSPrefix + 'menu');
-        }
 
         if (me.padding && !me.width) {
             me.cacheWidth();
@@ -104643,7 +105746,7 @@ Ext.define('Ext.picker.Date', {
 
         me.cells = me.eventEl.select('tbody td');
         me.textNodes = me.eventEl.query('tbody td a');
-        
+
         me.mon(me.eventEl, {
             scope: me,
             mousewheel: me.handleMouseWheel,
@@ -104764,7 +105867,16 @@ Ext.define('Ext.picker.Date', {
 
         
         if (!me.disabled && t.dateValue && !Ext.fly(t.parentNode).hasCls(me.disabledCellCls)) {
-            me.doCancelFocus = me.focusOnSelect === false;
+
+            
+            
+            
+            if (me.pickerField) {
+                e.stopEvent();
+            }
+
+            
+            me.doCancelFocus = true;
             me.setValue(new Date(t.dateValue));
             delete me.doCancelFocus;
             me.fireEvent('select', me, me.value);
@@ -104918,14 +106030,10 @@ Ext.define('Ext.picker.Date', {
         var picker = this.monthPicker,
             options = {
                 duration: 200,
-                callback: function(){
-                    if (isHide) {
-                        picker.hide();
-                    } else {
-                        picker.show();
-                    }
+                callback: function() {
+                    picker.setVisible(!isHide);
                 }
-            };
+            }, visible = picker.isVisible();
 
         if (isHide) {
             picker.el.slideOut('t', options);
@@ -104939,7 +106047,7 @@ Ext.define('Ext.picker.Date', {
         var me = this,
             picker = me.monthPicker;
 
-        if (picker) {
+        if (picker && picker.isVisible()) {
             if (me.shouldAnimate(animate)) {
                 me.runAnimation(true);
             } else {
@@ -104954,6 +106062,12 @@ Ext.define('Ext.picker.Date', {
         
         this.showMonthPicker();
     },
+    
+    doHideMonthPicker: function() {
+        
+        
+        this.hideMonthPicker();
+    },
 
     
     showMonthPicker : function(animate){
@@ -104962,14 +106076,16 @@ Ext.define('Ext.picker.Date', {
             picker;
         
         if (me.rendered && !me.disabled) {
-            picker = me.createMonthPicker();
-            picker.setValue(me.getActive());
-            picker.setSize(el.getSize());
-            picker.setPosition(-el.getBorderWidth('l'), -el.getBorderWidth('t'));
-            if (me.shouldAnimate(animate)) {
-                me.runAnimation(false);
-            } else {
-                picker.show();
+            picker = me.createMonthPicker();            
+            if (!picker.isVisible()) {
+                picker.setValue(me.getActive());
+                picker.setSize(el.getSize());
+                picker.setPosition(-el.getBorderWidth('l'), -el.getBorderWidth('t'));
+                if (me.shouldAnimate(animate)) {
+                    me.runAnimation(false);
+                } else {
+                    picker.show();
+                }
             }
         }
         return me;
@@ -105004,7 +106120,8 @@ Ext.define('Ext.picker.Date', {
                 
                 picker.el.setStyle('display', 'none');
             }
-            me.on('beforehide', Ext.Function.bind(me.hideMonthPicker, me, [false]));
+            picker.hide();
+            me.on('beforehide', me.doHideMonthPicker, me);
         }
         return picker;
     },
@@ -105590,7 +106707,7 @@ Ext.define('Ext.form.field.Date', {
     },
 
     
-    formatDate : function(date){
+    formatDate: function(date){
         return Ext.isDate(date) ? Ext.Date.dateFormat(date, this.format) : date;
     },
 
@@ -105598,9 +106715,11 @@ Ext.define('Ext.form.field.Date', {
         var me = this,
             format = Ext.String.format;
 
+        
+        
+        
         return new Ext.picker.Date({
             pickerField: me,
-            ownerCt: me.ownerCt,
             renderTo: document.body,
             floating: true,
             hidden: true,
@@ -105623,6 +106742,7 @@ Ext.define('Ext.form.field.Date', {
             keyNavConfig: {
                 esc: function() {
                     me.collapse();
+                    me.focus();
                 }
             }
         });
@@ -105641,6 +106761,7 @@ Ext.define('Ext.form.field.Date', {
         me.setValue(d);
         me.fireEvent('select', me, d);
         me.collapse();
+        me.focus(false, 50);
     },
 
     
@@ -105650,21 +106771,11 @@ Ext.define('Ext.form.field.Date', {
     },
 
     
-    onCollapse: function() {
-        this.focus(false, 60);
-    },
-
-    
-    beforeBlur : function(){
+    beforeBlur: function(){
         var me = this,
-            v = me.parseDate(me.getRawValue()),
-            focusTask = me.focusTask;
+            v = me.rawToValue(me.getRawValue());
 
-        if (focusTask) {
-            focusTask.cancel();
-        }
-
-        if (v) {
+        if (Ext.isDate(v)) {
             me.setValue(v);
         }
     }
@@ -105707,6 +106818,11 @@ Ext.define('Ext.form.field.FileButton', {
     
     preventDefault: false,
 
+    autoEl: {
+        tag: 'div',
+        unselectable: 'on'
+    },
+
     renderTpl: [
         '<span id="{id}-btnWrap" role="presentation" class="{baseCls}-wrap',
             '<tpl if="splitCls"> {splitCls}</tpl>',
@@ -105724,13 +106840,14 @@ Ext.define('Ext.form.field.FileButton', {
                 '</span>',
             '</span>',
         '</span>',
-        '<input id="{id}-fileInputEl" class="{childElCls} {inputCls}" type="file" size="1" name="{inputName}" role="{role}">'
+        '<input id="{id}-fileInputEl" class="{childElCls} {inputCls}" type="file" size="1" name="{inputName}" role="{role}" tabIndex="{tabIndex}">'
     ],
     
     getTemplateArgs: function(){
         var args = this.callParent();
         args.inputCls = this.inputCls;
         args.inputName = this.inputName;
+        args.tabIndex = this.ownerCt.tabIndex;
         return args;
     },
     
@@ -105753,7 +106870,8 @@ Ext.define('Ext.form.field.FileButton', {
             cls: me.inputCls,
             tag: 'input',
             type: 'file',
-            size: 1
+            size: 1,
+            role: 'button'
         });
         me.fileInputEl.on('change', me.fireChange, me);  
     },
@@ -105866,6 +106984,7 @@ Ext.define('Ext.form.field.File', {
 
         if (me.buttonOnly) {
             me.inputCell.setDisplayed(false);
+            me.shrinkWrap = 3;
         }
 
         
@@ -106773,7 +107892,7 @@ Ext.define('Ext.form.field.HtmlEditor', {
         return Ext.String.format(
             (oldIE ? '' : '<!DOCTYPE html>')                        
             + '<html><head><style type="text/css">' 
-            + (Ext.isOpera ? 'p{margin:0}' : '')
+            + (Ext.isOpera ? 'p{margin:0;}' : '')
             + 'body{border:0;margin:0;padding:{0}px;direction:' + (me.rtl ? 'rtl;' : 'ltr;')
             + (oldIE ? Ext.emptyString : 'min-')
             + 'height:{1}px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:text;background-color:white;' 
@@ -107571,7 +108690,9 @@ Ext.define('Ext.form.field.HtmlEditor', {
     },
 
     // @private
-    fixKeys: (function() { // load time branching for fastest keydown performance
+    fixKeys: (function () { // load time branching for fastest keydown performance
+        var tag;
+
         if (Ext.isIE) {
             return function(e){
                 var me = this,
@@ -107593,17 +108714,27 @@ Ext.define('Ext.form.field.HtmlEditor', {
                             me.deferFocus();
                         }
                     }
-                }
-                else if (k === e.ENTER) {
+                } else if (k === e.ENTER) {
                     if (!readOnly) {
-                        range = doc.selection.createRange();
-                        if (range) {
-                            target = range.parentElement();
-                            if(!target || target.tagName.toLowerCase() !== 'li'){
+                        if (Ext.isIE10m) {
+                            range = doc.selection.createRange();
+                            if (range) {
+                                target = range.parentElement();
+                                if (!target || target.tagName.toLowerCase() !== 'li') {
+                                    e.stopEvent();
+                                    range.pasteHTML('<br />');
+                                    range.collapse(false);
+                                    range.select();
+                                }
+                            }
+                        } else {
+                            // IE 11
+                            range = doc.getSelection().getRangeAt(0);
+                            if (range && range.commonAncestorContainer.parentNode.tagName.toLowerCase() !== 'li') {
+                                // Use divs so it doesn't double-space.
                                 e.stopEvent();
-                                range.pasteHTML('<br />');
-                                range.collapse(false);
-                                range.select();
+                                tag = doc.createElement('div');
+                                range.insertNode(tag);
                             }
                         }
                     }
@@ -107806,15 +108937,7 @@ Ext.define('Ext.form.field.HtmlEditor', {
      * @private
      */
     /**
-     * @cfg {String} msgFx
-     * @private
-     */
-    /**
      * @cfg {Boolean} allowDomMove
-     * @private
-     */
-    /**
-     * @cfg {String} applyTo
      * @private
      */
     /**
@@ -107834,7 +108957,7 @@ Ext.define('Ext.form.field.HtmlEditor', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -107846,7 +108969,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('ExtThemeNeptune.form.field.HtmlEditor', {
     override: 'Ext.form.field.HtmlEditor',
@@ -107856,7 +108979,7 @@ Ext.define('ExtThemeNeptune.form.field.HtmlEditor', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -107868,7 +108991,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A time picker which provides a list of times from which to choose. This is used by the Ext.form.field.Time
@@ -108038,7 +109161,8 @@ Ext.define('Ext.picker.Time', {
         }
 
         return new Ext.data.Store({
-            fields: ['disp', 'date'],
+            model: me.modelType,
+            autoDestroy: true,
             data: times
         });
     },
@@ -108048,13 +109172,17 @@ Ext.define('Ext.picker.Time', {
         // so this is here to prevent focus of the boundlist view. See EXTJSIV-7319.
         return false;
     }
-
+}, function() {
+    this.prototype.modelType = Ext.define(null, {
+        extend: 'Ext.data.Model',
+        fields: ['disp', 'date']
+    });
 });
 
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -108066,7 +109194,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Provides a time input field with a time dropdown and automatic time validation.
@@ -108186,8 +109314,13 @@ Ext.define('Ext.form.field.Time', {
     //</locale>
 
     /**
-     * @cfg {Number} increment
+     * @cfg {Number} [increment=15]
      * The number of minutes between each time value in the list.
+     *
+     * Note that this only affects the *list of suggested times.*
+     *
+     * To enforce that only times on the list are valid, use {@link #snapToIncrement}. That will coerce
+     * any typed values to the nearest increment point upon blur.
      */
     increment: 15,
 
@@ -108202,10 +109335,12 @@ Ext.define('Ext.form.field.Time', {
      * Whether the Tab key should select the currently highlighted item.
      */
     selectOnTab: true,
-    
+
     /**
      * @cfg {Boolean} [snapToIncrement=false]
      * Specify as `true` to enforce that only values on the {@link #increment} boundary are accepted.
+     *
+     * Typed values will be coerced to the nearest {@link #increment} point on blur.
      */
     snapToIncrement: false,
 
@@ -108231,12 +109366,16 @@ Ext.define('Ext.form.field.Time', {
         var me = this,
             min = me.minValue,
             max = me.maxValue;
+        
         if (min) {
             me.setMinValue(min);
         }
         if (max) {
             me.setMaxValue(max);
         }
+        // Forcibly create the picker, since we need the store it creates
+        me.store = me.getPicker().store;
+        
         me.displayTpl = new Ext.XTemplate(
             '<tpl for=".">' +
                 '{[typeof values === "string" ? values : this.formatDate(values["' + me.displayField + '"])]}' +
@@ -108244,7 +109383,7 @@ Ext.define('Ext.form.field.Time', {
             '</tpl>', {
             formatDate: Ext.Function.bind(me.formatDate, me)
         });
-        this.callParent();
+        me.callParent();
     },
 
     /**
@@ -108333,9 +109472,10 @@ Ext.define('Ext.form.field.Time', {
         me[isMin ? 'minValue' : 'maxValue'] = val;
     },
     
-    getInitDate: function(hours, minutes) {
+    getInitDate: function (hours, minutes, seconds) {
         var parts = this.initDateParts;
-        return new Date(parts[0], parts[1], parts[2], hours || 0, minutes || 0, 0, 0);    
+
+        return new Date(parts[0], parts[1], parts[2], hours || 0, minutes || 0, seconds || 0, 0);    
     },
 
     valueToRaw: function(value) {
@@ -108480,7 +109620,6 @@ Ext.define('Ext.form.field.Time', {
             maxHeight: me.pickerMaxHeight
         }, me.listConfig);
         picker = me.callParent();
-        me.bindStore(picker.store);
         return picker;
     },
     
@@ -108539,7 +109678,10 @@ Ext.define('Ext.form.field.Time', {
                                }
                            }
                         }
-                        selModel.select(toSelect);
+
+                        if (toSelect.length) {
+                            selModel.select(toSelect);
+                        }
                     }
                 }
             }
@@ -108589,11 +109731,12 @@ Ext.define('Ext.form.field.Time', {
         return me.parseDate(item);
     },
 
-    setValue: function(v) {
-        // Store MUST be created for parent setValue to function
+    setValue: function (v) {
+        // Store MUST be created for parent setValue to function.
         this.getPicker();
+
         if (Ext.isDate(v)) {
-            v = this.getInitDate(v.getHours(), v.getMinutes());
+            v = this.getInitDate(v.getHours(), v.getMinutes(), v.getSeconds());
         }
 
         return this.callParent([v]);
@@ -108607,7 +109750,7 @@ Ext.define('Ext.form.field.Time', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -108619,7 +109762,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Internal utility class that provides a unique cell context.
@@ -108703,7 +109846,7 @@ Ext.define('Ext.grid.CellContext', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -108715,7 +109858,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Internal utility class that provides default configuration for cell editing.
@@ -108723,6 +109866,10 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  */
 Ext.define('Ext.grid.CellEditor', {
     extend:  Ext.Editor ,
+
+    // Editor must appear at the top so that it does not contribute to scrollbars
+    y: 0,
+
     constructor: function(config) {
         config = Ext.apply({}, config);
         
@@ -108731,14 +109878,103 @@ Ext.define('Ext.grid.CellEditor', {
         }
         this.callParent([config]);
     },
-    
+
+    // Set the grid that owns this editor.
+    // Usually this will only *change* once, and the renderTo will cause
+    // rendering into the owning grid.
+    // However in a Lockable assembly the editor has to swap sides if the column is moved across.
+    // Called by CellEditing#getEditor
+    setGrid: function(grid) {
+        var me = this,
+            oldGrid = me.grid,
+            view,
+            viewListeners;
+
+        if (grid != oldGrid) {
+            viewListeners = {
+                beforerefresh: me.beforeViewRefresh,
+                refresh: me.onViewRefresh,
+                scope: me
+            };
+            // Remove previous refresh listener
+            if (oldGrid) {
+                oldGrid.getView().un(viewListeners);
+            }
+
+            // Set the renderTo target to reflect new grid view ownership
+            // TODO: In Sencha-5.0.x use view.getScrollerEl() if Ext.touchScroll
+            view = grid.getView(),
+            me.renderTo = view.getTargetEl().dom;
+            me.grid = me.ownerCt = grid;
+
+            // On view refresh, we need to copy our DOM into the detached body to prevent it from being garbage collected.
+            view.on(viewListeners);
+        }
+    },
+
+    // @private
+    // @override
+    // Final position is decided upon by the Editor's realign() call which syncs position over the edited element.
+    adjustPosition: function() {
+        return {x:0,y:0};
+    },
+
+    beforeViewRefresh: function() {
+        var me = this,
+            dom = me.el && me.el.dom;
+
+        if (dom && dom.parentNode) {
+            if (me.editing && !me.field.column.sorting) {
+                // Set the Editor.allowBlur setting so that it does not process the upcoming field blur event and terminate the edit
+                me.wasAllowBlur = me.allowBlur;
+                me.allowBlur = false;
+            }
+
+            // Remove the editor from the view to protect it from anihilation: https://sencha.jira.com/browse/EXTJSIV-11713
+            dom.parentNode.removeChild(dom);
+        }
+    },
+
+    onViewRefresh: function() {
+        var me = this,
+            dom = me.el && me.el.dom,
+            sorting;
+
+        if (dom) {
+            sorting = me.field.column.sorting;
+
+            // If the view was refreshed while we were editing, replace it.
+            if (me.editing && !sorting) {
+                me.allowBlur = me.wasAllowBlur;
+                me.renderTo.appendChild(dom);
+                me.field.focus();
+            } else if (!sorting) {
+                Ext.getDetachedBody().dom.appendChild(dom);
+            }
+
+            // If the column was sorted while editing, we must detect that and complete the edit
+            // because the view will be refreshed and the editor will be removed from the dom.
+            if (me.editing && sorting) {
+                me.completeEdit();
+            }
+        }
+    },
+
     /**
      * @private
+     * Shows the editor, end ensures that it is rendered into the correct view
      * Hides the grid cell inner element when a cell editor is shown.
      */
     onShow: function() {
         var me = this,
             innerCell = me.boundEl.first();
+
+        // If we have had our owning grid changed (by a column switching sides in a Lockable assembly)
+        // or, if a view refresh has removed us from the DOM
+        // append this component into its renderTo target.
+        if (me.el.dom.parentNode !== me.renderTo) {
+            me.renderTo.appendChild(me.el.dom);
+        }
 
         if (innerCell) {
             if (me.isForTree) {
@@ -108777,6 +110013,7 @@ Ext.define('Ext.grid.CellEditor', {
             field = me.field;
 
         me.callParent(arguments);
+
         if (field.isCheckbox) {
             field.mon(field.inputEl, {
                 mousedown: me.onCheckBoxMouseDown,
@@ -108883,7 +110120,7 @@ Ext.define('Ext.grid.CellEditor', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -108895,7 +110132,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Component layout for grid column headers which have a title element at the top followed by content.
@@ -108933,20 +110170,21 @@ Ext.define('Ext.grid.ColumnComponentLayout', {
 
     // If not shrink wrapping, push height info down into child items
     publishInnerHeight: function(ownerContext, outerHeight) {
-        // TreePanels (and grids with hideHeaders: true) set their column container height to zero ti hide them.
-        // This is because they need to lay out in order to calculate widths for the columns (eg flexes).
-        // If there is no height to lay out, bail out early.
-        if (!outerHeight) {
-            return;
-        }
-
         var me = this,
             owner = me.owner,
-            innerHeight = outerHeight - ownerContext.getBorderInfo().height,
-            availableHeight = innerHeight,
-            textHeight,
-            titleHeight,
-            pt, pb;
+            innerHeight, availableHeight,
+            textHeight, titleHeight, paddingTop, paddingBottom;
+            
+        // TreePanels (and grids with hideHeaders: true) set their column container height to zero to hide them.
+        // This is because they need to lay out in order to calculate widths for the columns (eg flexes).
+        // If there is no height to lay out, bail out early.
+        if (owner.getOwnerHeaderCt().hiddenHeaders) {
+            ownerContext.setProp('innerHeight', 0);
+            return;
+        }
+        
+        innerHeight = outerHeight - ownerContext.getBorderInfo().height;
+        availableHeight = innerHeight;
 
         // We do not have enough information to get the height of the titleEl
         if (!owner.noWrap && !ownerContext.hasDomProp('width')) {
@@ -108963,10 +110201,10 @@ Ext.define('Ext.grid.ColumnComponentLayout', {
             if (textHeight) {
                 availableHeight -= textHeight;
                 if (availableHeight > 0) {
-                    pt = Math.floor(availableHeight / 2);
-                    pb = availableHeight - pt;
-                    ownerContext.titleContext.setProp('padding-top', pt);
-                    ownerContext.titleContext.setProp('padding-bottom', pb);
+                    paddingTop = Math.floor(availableHeight / 2);
+                    paddingBottom = availableHeight - paddingTop;
+                    ownerContext.titleContext.setProp('padding-top', paddingTop);
+                    ownerContext.titleContext.setProp('padding-bottom', paddingBottom);
                 }
             }
         }
@@ -109057,7 +110295,7 @@ Ext.define('Ext.grid.ColumnComponentLayout', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -109069,7 +110307,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -109097,7 +110335,14 @@ Ext.define('Ext.grid.ColumnLayout', {
         if (me.scrollbarWidth === undefined) {
             me.self.prototype.scrollbarWidth = Ext.getScrollbarSize().width;
         }
-        me.grid = this.owner.up('[scrollerOwner]');
+
+        // The grid which owns this HeaderContainer
+        me.grid = me.owner.up('tablepanel');
+
+        // The grid which was configured by the user and which controls
+        // collapsed state and visible state.
+        // When this view is one side of a lockable assembly, this will be the lockable grid.
+        me.controllingGrid = me.owner.up('[scrollerOwner]');
         me.callParent();
     },
 
@@ -109105,8 +110350,8 @@ Ext.define('Ext.grid.ColumnLayout', {
     beginLayout: function (ownerContext) {
         var me = this,
             owner = me.owner,
-            grid = me.grid,
-            view = grid.view,
+            grid = me.controllingGrid,
+            view = me.grid.view,
             items = me.getVisibleItems(),
             len = items.length,
             firstCls = me.firstHeaderCls, 
@@ -109114,19 +110359,19 @@ Ext.define('Ext.grid.ColumnLayout', {
             removeCls = [firstCls, lastCls],
             i, item;
 
-        // If we are one side of a locking grid, then if we are on the "normal" side, we have to grab the normal view
-        // for use in determining whether to subtract scrollbar width from available width.
-        // The locked side does not have scrollbars, so it should not look at the view.
-        if (grid.lockable) {
-            if (owner.up('tablepanel') === view.normalGrid) {
-                view = view.normalGrid.getView();
-            } else {
-                view = null;
-            }
+        // If the associated view is not configured to do vertical scrolling, then
+        // The scrollbar we accommodate in container size calculations will not be present.
+        if (!view.scrollFlags.y) {
+            me.scrollbarWidth = 0;
+        }
+        // In case they change the scroll config dynamically, delete any instance property
+        else {
+            delete me.scrollbarWidth;
         }
 
         for (i = 0; i < len; i++) {
             item = items[i];
+            item.margin = null;
             item.removeCls(removeCls);
             if (i === 0) {
                 item.addCls(firstCls);
@@ -109137,12 +110382,39 @@ Ext.define('Ext.grid.ColumnLayout', {
             }
         }
 
+        // The grid header container usually needs an extra <scrollbarWidth> pixels of left/right scrollability
+        // because if there is vertical overflow in the table view, the appearance of the vertical scrollbar gives
+        // the table view that extra <scrollbarWidth> of left/right scrollability, and the header container and the
+        // view need to have exactly the same left/right scroll range so they can be kept in sync.
+        // This property is the adjustment value.
+        //
+        // There are bugs in certain browsers which necessitate setting this value to zero in some RTL situations.
+        //
+        // Chrome has a bug which means that in RTL mode the vertical scrollbar does NOT add extra left/right scrolling.
+        // https://code.google.com/p/chromium/issues/detail?id=179332
+        // TODO: Remove the Ext.supports.rtlVertScrollbarOnRight test and the test for it when all supported Chrome versions are fixed.
+        //
+        // Safari keeps the scrollbar on the right in RTL mode so the extra width comes from padding added to the header container.
+        //
+        // See Ext.rtl.grid.ColumnLayout for further information. That class sets scrollbarAdjustment to
+        // zero for an RTL grid when those bugs are present
+        me.scrollbarAdjustment = me.scrollbarWidth;
+
         me.callParent(arguments);
 
         // If the owner is the grid's HeaderContainer, and the UI displays old fashioned scrollbars and there is a rendered View with data in it,
         // collect the View context to interrogate it for overflow, and possibly invalidate it if there is overflow
-        if (!owner.isColumn && me.scrollbarWidth && !grid.collapsed && view &&
-                view.rendered && (ownerContext.viewTable = view.body.dom)) {
+        if (!owner.isColumn && !grid.collapsed && view && view.rendered && (ownerContext.viewTable = view.body.dom) && me.scrollbarWidth) {
+            ownerContext.viewContext = ownerContext.context.getCmp(view);
+        }
+    },
+
+    // TableView performs its non-deferred initial refresh during its render layout run.
+    // Because the ColumnLayout has already been through its beginLayout phase at that point,
+    // a viewContext will not have been captured. This method allows the TableView
+    // to inject a ViewContext at the time of initial refresh.
+    injectViewContext: function(ownerContext, view) {
+        if (!this.controllingGrid.collapsed && view.rendered && (ownerContext.viewTable = view.body.dom) && this.scrollbarWidth) {
             ownerContext.viewContext = ownerContext.context.getCmp(view);
         }
     },
@@ -109154,9 +110426,7 @@ Ext.define('Ext.grid.ColumnLayout', {
     calculate: function(ownerContext) {
         this.callParent(arguments);
 
-        if (ownerContext.state.parallelDone) {
-            // TODO: auto width columns aren't necessarily done here.
-            // see view.TableLayout, there is a work around for that there 
+        if (ownerContext.state.parallelDone && !(this.owner.forceFit && !ownerContext.state.flexesCalculated)) {
             ownerContext.setProp('columnWidthsDone', true);
         }
 
@@ -109173,22 +110443,41 @@ Ext.define('Ext.grid.ColumnLayout', {
 
         me.callParent(arguments);
 
-        // If we have not been through this already, and the owning Container is configured
-        // forceFit, is not a group column and and there is a valid width, then convert
-        // widths to flexes, and loop back.
-        if (!ownerContext.flexedItems.length && !state.flexesCalculated && owner.forceFit &&
+        // If there is a table neeeding possible resize and we have not been through this already
+        // and the owning Container is configured forceFit and the conversion of widths to flexes
+        // tells us that the width does not already match the container width, then loop back
+        // and recalculate with every column flexed.
+        if (ownerContext.viewTable && !state.flexesCalculated && !ownerContext.flexedItems.length && owner.forceFit &&
 
             // Recalculate based upon all columns now being flexed instead of sized.
             // Set flag, so that we do not do this infinitely
             me.convertWidthsToFlexes(ownerContext)) {
             me.cacheFlexes(ownerContext);
+
+            // Next time round, the *new* tableHeight needs to be known for the *first* run of getContainerSize to
+            // be able to assess new vertical overflow status.
             ownerContext.invalidate({
                 state: {
-                    flexesCalculated: true
+                    flexesCalculated: true,
+                    tableHeight: ownerContext.viewTable.offsetHeight
                 }
             });
         } else {
             ownerContext.setProp('columnWidthsDone', true);
+        }
+    },
+
+    finishedLayout: function(ownerContext) {
+        var view = this.grid.getView();
+
+        this.callParent(arguments);
+
+        // Keep the HeaderContainer's horizontal scroll position synced with where the user has scrolled the view to (it will reset during a layout)
+        // IF this is a top lever grid HeaderContainer and the view is doing horizontal scrolling and the HeaderContainer overflows.
+        // Only do this after the initial layout where scroll position will be at default.
+        // TODO: In sencha-5.0.x, use scroll setting API
+        if (!this.owner.isColumn && view.scrollFlags.x && this.owner.tooNarrow && this.owner.componentLayoutCounter) {
+            this.owner.el.dom.scrollLeft = view.el.dom.scrollLeft;
         }
     },
 
@@ -109230,7 +110519,9 @@ Ext.define('Ext.grid.ColumnLayout', {
         var me = this,
             result,
             viewContext = ownerContext.viewContext,
-            viewHeight;
+            viewHeight,
+            viewLayoutContext,
+            shrinkWrapHeight = viewContext && viewContext.heightModel.shrinkWrap;
 
         // Column, NOT the main grid's HeaderContainer
         if (me.owner.isColumn) {
@@ -109241,24 +110532,30 @@ Ext.define('Ext.grid.ColumnLayout', {
         else {
             result = me.callParent(arguments);
 
-            // If we've collected a viewContext and we're not shrinkwrapping the height
-            // then we see if we have to narrow the width slightly to account for scrollbar
-            if (viewContext && !viewContext.heightModel.shrinkWrap &&
-                    viewContext.target.componentLayout.ownerContext) { // if (its layout is running)
-                viewHeight = viewContext.getProp('height');
-                if (isNaN(viewHeight)) {
-                    me.done = false;
-                } else if (ownerContext.state.tableHeight > viewHeight) {
-                    result.width -= me.scrollbarWidth;
-                    ownerContext.state.parallelDone = false;
-                    viewContext.invalidate();
+            // If scrollbars take up a width and our grid is not configured to ALWAYS leave space for a scrollbar
+            // and we've collected a viewContext and we're not shrinkwrapping the height, and there is vertical scrolling
+            // and (there's at least one flexed column or we are force fitting - all flexed) which has to clear the vertical scrollbar
+            // then we see if we have to increase the width slightly to eat the space we initially left for the scrollbar
+            if (me.scrollbarWidth && !me.controllingGrid.reserveScrollbar && viewContext) {
+                viewLayoutContext = viewContext.target.componentLayout.ownerContext;
+                if (!shrinkWrapHeight && viewContext.target.scrollFlags.y &&
+                    (ownerContext.flexedItems && ownerContext.flexedItems.length || me.owner.forceFit) && viewLayoutContext) { // if (its layout is running)
+                    viewHeight = viewContext.getProp('height');
+                    if (isNaN(viewHeight)) {
+                        me.done = false;
+                    } else if (ownerContext.state.tableHeight <= viewHeight && viewContext.target.scrollFlags.y) {
+                        ownerContext.state.parallelDone = false;
+                        viewLayoutContext.invalidate();
+                        return result;
+                    }
                 }
             }
         }
 
-// TODO - flip the initial assumption to "we have a vscroll" to avoid the invalidate in most
-// cases (and the expensive ones to boot)
-
+        // Initially assume that we need to account for a scrollbar unless the height shrinkwraps content
+        if (!shrinkWrapHeight) {
+            result.width -= me.scrollbarWidth;
+        }
         return result;
     },
 
@@ -109313,25 +110610,35 @@ Ext.define('Ext.grid.ColumnLayout', {
         };
     },
 
-    // FIX: when flexing we actually don't have enough space as we would
-    // typically because of the scrollOffset on the GridView, must reserve this
     publishInnerCtSize: function(ownerContext) {
         var me = this,
+            owner = me.owner,
             size = ownerContext.state.boxPlan.targetSize,
-            cw = ownerContext.peek('contentWidth'),
-            view;
+            cw = ownerContext.peek('contentWidth');
 
         // Allow the other co-operating objects to know whether the columns overflow the available width.
         me.owner.tooNarrow = ownerContext.state.boxPlan.tooNarrow;
 
-        // InnerCt MUST stretch to accommodate all columns so that left/right scrolling is enabled in the header container.
-        if ((cw != null) && !me.owner.isColumn) {
+        if ((cw != null) && !owner.isColumn) {
             size.width = cw;
 
-            // innerCt must also encompass any vertical scrollbar width if there may be one
-            view = me.owner.ownerCt.view;
-            if (view.scrollFlags.y) {
-                size.width += me.scrollbarWidth;
+            // The grid header container usually needs an extra <scrollbarWidth> pixels of left/right scrollability
+            // because if there is vertical overflow in the table view, the appearance of the vertical scrollbar gives
+            // the table view that extra <scrollbarWidth> of left/right scrollability, and the header container and the
+            // view need to have exactly the same left/right scroll range so they can be kept in sync.
+            //
+            // There are bugs in certain browsers which necessitate setting this value to zero in some RTL situations.
+            //
+            // Chrome has a bug which means that in RTL mode the vertical scrollbar does NOT add extra left/right scrolling.
+            // https://code.google.com/p/chromium/issues/detail?id=179332
+            // TODO: Remove the Ext.supports.rtlVertScrollbarOnRight test and the test for it when all supported Chrome versions are fixed.
+            //
+            // Safari keeps the scrollbar on the right in RTL mode so the extra width comes from padding added to the header container.
+            //
+            // See Ext.rtl.grid.ColumnLayout for further information. That class sets scrollbarAdjustment to
+            // zero for an RTL grid when those bugs are present
+            if (owner.ownerCt.view.scrollFlags.y) {
+                size.width += me.scrollbarAdjustment;
             }
         }
 
@@ -109342,7 +110649,7 @@ Ext.define('Ext.grid.ColumnLayout', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -109354,7 +110661,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -109538,7 +110845,7 @@ Ext.define('Ext.grid.ColumnManager', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -109550,7 +110857,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This is a base class for layouts that contain a single item that automatically expands to fill the layout's
@@ -109760,10 +111067,15 @@ Ext.define('Ext.layout.container.Fit', {
             }
         }
 
-        // Size the child items to the container (if non-shrinkWrap):
-        for (i = 0; i < length; ++i) {
-            info.index = i;
-            me.fitItem(childItems[i], info);
+        // If length === 0, it means we either have no child items, or the children are hidden
+        if (length > 0) {
+            // Size the child items to the container (if non-shrinkWrap):
+            for (i = 0; i < length; ++i) {
+                info.index = i;
+                me.fitItem(childItems[i], info);
+            }
+        } else {
+            info.contentWidth = info.contentHeight = 0;
         }
         
         if (shrinkWrapHeight || shrinkWrapWidth) {
@@ -109920,7 +111232,7 @@ Ext.define('Ext.layout.container.Fit', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -109932,7 +111244,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Nicolas Ferrero
@@ -109999,8 +111311,8 @@ Ext.define('Ext.panel.Table', {
      */
 
     /**
-     * @cfg {String} selType
-     * An xtype of selection model to use. Defaults to 'rowmodel'. This is used to create selection model if just
+     * @cfg {String} [selType]
+     * An xtype of selection model to use. This is used to create selection model if just
      * a config object or nothing at all given in {@link #selModel} config.
      */
     selType: 'rowmodel',
@@ -110036,19 +111348,19 @@ Ext.define('Ext.panel.Table', {
     scroll: true,
 
     /**
-     * @cfg {Ext.grid.column.Column[]/Object} columns
+     * @cfg {Ext.grid.column.Column[]/Object} columns (required)
      * An array of {@link Ext.grid.column.Column column} definition objects which define all columns that appear in this
      * grid. Each column definition provides the header text for the column, and a definition of where the data for that
      * column comes from.
      *
-     * This can also be a configuration object for a {Ext.grid.header.Container HeaderContainer} which may override
+     * This can also be a configuration object for a {@link Ext.grid.header.Container HeaderContainer} which may override
      * certain default configurations if necessary. For example, the special layout may be overridden to use a simpler
      * layout, or one can set default values shared by all columns:
      * 
      *     columns: {
      *         items: [
      *             {
-     *                 text: "Column A"
+     *                 text: "Column A",
      *                 dataIndex: "field_A"
      *             },{
      *                 text: "Column B",
@@ -110096,7 +111408,7 @@ Ext.define('Ext.panel.Table', {
      */
 
     /**
-     * @cfg {Boolean} deferRowRender
+     * @cfg {Boolean} [deferRowRender=true]
      * Defaults to true to enable deferred row rendering.
      *
      * This allows the View to execute a refresh quickly, with the expensive update of the row structure deferred so
@@ -110115,10 +111427,20 @@ Ext.define('Ext.panel.Table', {
     deferRowRender: true,
      
     /**
-     * @cfg {Boolean} sortableColumns
+     * @cfg {Boolean} [sortableColumns=true]
      * False to disable column sorting via clicking the header and via the Sorting menu items.
      */
     sortableColumns: true,
+
+    /**
+     * @cfg {Boolean} [multiColumnSort=false]
+     * Configure as `true` to have columns remember their sorted state after other columns have been clicked upon to sort.
+     *
+     * As subsequent columns are clicked upon, they become the new primary sort key.
+     *
+     * The maximum number of sorters allowed in a Store is configurable. See {@link Ext.data.Store#multiSortLimit}
+     */
+    multiColumnSort: false,
 
     /**
      * @cfg {Boolean} [enableLocking=false]
@@ -110190,8 +111512,12 @@ Ext.define('Ext.panel.Table', {
      */
 
     /**
-     * @cfg {String} emptyText Default text (html tags are accepted) to display in the Panel body when the Store
-     * is empty. When specified, and the Store is empty, the text will be rendered inside a DIV with the CSS class "x-grid-empty".
+     * @cfg {String} emptyText Default text (HTML tags are accepted) to display in the 
+     * Panel body when the Store is empty. When specified, and the Store is empty, the 
+     * text will be rendered inside a DIV with the CSS class "x-grid-empty". The emptyText 
+     * will not display until the first load of the associated store by default. If you 
+     * want the text to be displayed prior to the first store load use the 
+     * {@link Ext.view.Table#deferEmptyText deferEmptyText} config in the {@link #viewConfig} config.
      */
     
     /**
@@ -110232,6 +111558,18 @@ Ext.define('Ext.panel.Table', {
             store       = me.store = Ext.data.StoreManager.lookup(me.store || 'ext-empty-store'),
             columns;
 
+        // Construct the plugins now rather than in the constructor of AbstractComponent because the component may have a subclass
+        // that has overridden initComponent and defined plugins in it. For plugins like RowExpander that rely upon a grid feature,
+        // this is a problem because the view needs to know about all its features before it's constructed. Constructing the plugins
+        // now ensures that plugins defined in the instance config or in initComponent are all constructed before the view.
+        // See EXTJSIV-11927.
+        //
+        // Note that any components that do not inherit from this class will still have their plugins constructed in
+        // AbstractComponent:initComponent.
+        if (me.plugins) {
+            me.plugins = me.constructPlugins();
+        }
+
         // Add the row/column line classes to the body element so that the settings are not inherited by docked grids (https://sencha.jira.com/browse/EXTJSIV-9263).
         if (me.columnLines) {
             me.addBodyCls(me.colLinesCls);
@@ -110245,7 +111583,6 @@ Ext.define('Ext.panel.Table', {
         }
 
         // The columns/colModel config may be either a fully instantiated HeaderContainer, or an array of Column definitions, or a config object of a HeaderContainer
-        // Either way, we extract a columns property referencing an array of Column definitions.
         if (headerCtCfg.isRootHeader) {
             me.headerCt = headerCtCfg;
 
@@ -110254,6 +111591,16 @@ Ext.define('Ext.panel.Table', {
             // If it's an instance then the column managers were already created and bound to the headerCt.
             me.columnManager = headerCtCfg.columnManager;
             me.visibleColumnManager = headerCtCfg.visibleColumnManager;
+            
+            // All HeaderContainers (including group headers) needs to know this so that leaf headers can return correct cell width
+            // adjusted for border width and box model.
+            if (me.columnLines) {
+                me.headerCt.cascade(function(h) {
+                    if (!h.isColumn) {
+                        h.columnLines = true;
+                    }
+                });
+            }
         } else {
 
             // If any of the Column objects contain a locked property, and are not processed, this is a lockable TablePanel, a
@@ -110275,6 +111622,7 @@ Ext.define('Ext.panel.Table', {
                     sortable: me.sortableColumns,
                     enableColumnMove: me.enableColumnMove,
                     enableColumnResize: me.enableColumnResize,
+                    columnLines: me.columnLines,
                     sealed: me.sealedColumns
                 });
 
@@ -110282,7 +111630,7 @@ Ext.define('Ext.panel.Table', {
                     headerCtCfg.enableColumnHide = me.enableColumnHide;
                 }
 
-                // Create our HeaderCOntainer from the generated configuration
+                // Create our HeaderContainer from the generated configuration
                 if (!me.headerCt) {
                     me.headerCt = new Ext.grid.header.Container(headerCtCfg);
                 }
@@ -110305,7 +111653,7 @@ Ext.define('Ext.panel.Table', {
             'viewready'
         );
 
-        me.cls = me.cls || '' + (' ' + me.extraBaseCls);
+        me.cls = (me.cls || '') + (' ' + me.extraBaseCls);
 
         // autoScroll is not a valid configuration
         delete me.autoScroll;
@@ -110527,11 +111875,6 @@ Ext.define('Ext.panel.Table', {
              */
             'beforecontainermouseup',
             /**
-             * @event beforecontainermousedown
-             * @inheritdoc Ext.view.View#beforecontainermousedown
-             */
-            'beforecontainermousedown',
-            /**
              * @event beforecontainermouseover
              * @inheritdoc Ext.view.View#beforecontainermouseover
              */
@@ -110630,11 +111973,6 @@ Ext.define('Ext.panel.Table', {
 
         me.callParent(arguments);
         me.addStateEvents(['columnresize', 'columnmove', 'columnhide', 'columnshow', 'sortchange', 'filterchange', 'groupchange']);
-
-        // If lockable, the headerCt is just a collection of Columns, not a Container
-        if (!me.lockable && me.headerCt) {
-            me.headerCt.on('afterlayout', me.onRestoreHorzScroll, me);
-        }
     },
 
     // Private. Determine if there are any columns with a locked configuration option
@@ -110809,6 +112147,11 @@ Ext.define('Ext.panel.Table', {
             });
             sm.view = me.view;
             me.headerCt.view = me.view;
+
+            // Plugins and features may need to access the view as soon as it is created.
+            if (me.hasListeners.viewcreated) {
+                me.fireEvent('viewcreated', me, me.view);
+            }
         }
         return me.view;
     },
@@ -110899,9 +112242,7 @@ Ext.define('Ext.panel.Table', {
 
     restoreScrollPos: Ext.emptyFn,
     
-    onHeaderResize: function(){
-        this.delayScroll();
-    },
+    onHeaderResize: Ext.emptyFn,
 
     // Update the view when a header moves
     onHeaderMove: function(headerCt, header, colsToMove, fromIdx, toIdx) {
@@ -110910,7 +112251,7 @@ Ext.define('Ext.panel.Table', {
         // If there are Features or Plugins which create DOM which must match column order, they set the optimizedColumnMove flag to false.
         // In this case we must refresh the view on column move.
         if (me.optimizedColumnMove === false) {
-            me.view.refresh();
+            me.view.refreshView();
         }
 
         // Simplest case for default DOM structure is just to swap the columns round in the view.
@@ -110922,20 +112263,22 @@ Ext.define('Ext.panel.Table', {
 
     // Section onHeaderHide is invoked after view.
     onHeaderHide: function(headerCt, header) {
-        this.view.refresh();
-        this.delayScroll();
+        if (this.view.refreshCounter) {
+            this.view.refreshView();
+        }
     },
 
     onHeaderShow: function(headerCt, header) {
-        this.view.refresh();
-        this.delayScroll();
+        if (this.view.refreshCounter) {
+            this.view.refreshView();
+        }
     },
-    
+
     // To be triggered on add/remove/move for a leaf header
     onHeadersChanged: function(headerCt, header) {
         var me = this;
         if (me.rendered && !me.reconfiguring) {
-            me.view.refresh();
+            me.view.refreshView();
             me.delayScroll();
         }
     },
@@ -110943,7 +112286,9 @@ Ext.define('Ext.panel.Table', {
     delayScroll: function(){
         var target = this.getScrollTarget().el;
         if (target) {
-            this.scrollTask.delay(10, null, null, [target.dom.scrollLeft]);
+            // Do not cause a layout by reading scrollLeft now.
+            // It must be read from the target when the task finally executes.
+            this.scrollTask.delay(10, null, null, [target.dom]);
         }
     },
 
@@ -110960,10 +112305,10 @@ Ext.define('Ext.panel.Table', {
      * Tracks when things happen to the view and preserves the horizontal scroll position.
      */
     onRestoreHorzScroll: function() {
-        var left = this.scrollLeftPos;
+        var left = this.scrollLeft;
         if (left) {
             // We need to restore the body scroll position here
-            this.syncHorizontalScroll(left, true);
+            this.syncHorizontalScroll(this, true);
         }
     },
 
@@ -111059,25 +112404,28 @@ Ext.define('Ext.panel.Table', {
     },
 
     onHorizontalScroll: function(event, target) {
-        this.syncHorizontalScroll(target.scrollLeft);
+        this.syncHorizontalScroll(target);
     },
     
-    syncHorizontalScroll: function(left, setBody) {
+    syncHorizontalScroll: function(target, setBody) {
         var me = this,
+            left = target.scrollLeft,
             scrollTarget;
             
         setBody = setBody === true;
         // Only set the horizontal scroll if we've changed position,
         // so that we don't set this on vertical scrolls
-        if (me.rendered && (setBody || left !== me.scrollLeftPos)) {
+        if (me.rendered && (setBody || left !== me.scrollLeft)) {
             // Only set the body position if we're reacting to a refresh, otherwise
             // we just need to set the header.
             if (setBody) {   
                 scrollTarget = me.getScrollTarget();
+                // TODO: In sencha-5.0.x, use scroll setting API
                 scrollTarget.el.dom.scrollLeft = left;
             }
+            // TODO: In sencha-5.0.x, use scroll setting API
             me.headerCt.el.dom.scrollLeft = left;
-            me.scrollLeftPos = left;
+            me.scrollLeft = left;
         }
     },
 
@@ -111094,65 +112442,73 @@ Ext.define('Ext.panel.Table', {
             bufferedStore = store && store.buffered,
             bufferedRenderer;
 
-        // Bind to store immediately because subsequent processing looks for grid's store property
-        me.store = store;
+        // Normally, this method will always be called with a valid store (because there is a symmetric
+        // .unbindStore method), but there are cases where this method will be called and passed a null
+        // value, i.e., a panel is used as a pickerfield. See EXTJS-13089.
+        if (store) {
+            // Bind to store immediately because subsequent processing looks for grid's store property
+            me.store = store;
 
-        // If the Store is buffered, create a BufferedRenderer to monitor the View's scroll progress
-        // and scroll rows on/off when it detects we are nearing an edge.
-        // MUST be done before store is bound to the view so that the BufferedRenderer may inject its getViewRange implementation
-        // before the view tries to refresh.
-        bufferedRenderer = me.findPlugin('bufferedrenderer');
-        if (bufferedRenderer) {
-            me.verticalScroller = bufferedRenderer;
-            // If we're in a reconfigure rebind the BufferedRenderer
-            if (bufferedRenderer.store) {
-                bufferedRenderer.bindStore(store);
+            // If the Store is buffered, create a BufferedRenderer to monitor the View's scroll progress
+            // and scroll rows on/off when it detects we are nearing an edge.
+            // MUST be done before store is bound to the view so that the BufferedRenderer may inject its getViewRange implementation
+            // before the view tries to refresh.
+            bufferedRenderer = me.findPlugin('bufferedrenderer');
+            if (bufferedRenderer) {
+                me.verticalScroller = bufferedRenderer;
+                // If we're in a reconfigure rebind the BufferedRenderer
+                if (bufferedRenderer.store) {
+                    bufferedRenderer.bindStore(store);
+                }
+            } else if (bufferedStore) {
+                me.verticalScroller = bufferedRenderer = me.addPlugin(Ext.apply({
+                    ptype: 'bufferedrenderer'
+                }, me.initialConfig.verticalScroller));
             }
-        } else if (bufferedStore) {
-            me.verticalScroller = bufferedRenderer = me.addPlugin(Ext.apply({
-                ptype: 'bufferedrenderer'
-            }, me.initialConfig.verticalScroller));
-        }
 
-        if (view.store !== store) {
-            // If coming from a reconfigure, we need to set the actual store property on the view. Setting the
-            // store will then also set the dataSource.
-            // 
-            // Note that if it's a grid feature then this is sorted out in view.bindStore(), and it's own
-            // implementation of .bindStore() will be called.
-            view.bindStore(store, false);
-        }
+            if (view.store !== store) {
+                // If coming from a reconfigure, we need to set the actual store property on the view. Setting the
+                // store will then also set the dataSource.
+                //
+                // Note that if it's a grid feature then this is sorted out in view.bindStore(), and it's own
+                // implementation of .bindStore() will be called.
+                view.bindStore(store, false);
+            }
 
-        me.mon(store, {
-            load: me.onStoreLoad,
-            scope: me
-        });
-        me.storeRelayers = me.relayEvents(store, [
-            /**
-             * @event filterchange
-             * @inheritdoc Ext.data.Store#filterchange
-             */
-            'filterchange',
-            /**
-             * @event groupchange
-             * @inheritdoc Ext.data.Store#groupchange
-             */
-            'groupchange'
-        ]);
+            me.mon(store, {
+                load: me.onStoreLoad,
+                scope: me
+            });
+            me.storeRelayers = me.relayEvents(store, [
+                /**
+                 * @event filterchange
+                 * @inheritdoc Ext.data.Store#filterchange
+                 */
+                'filterchange',
+                /**
+                 * @event groupchange
+                 * @inheritdoc Ext.data.Store#groupchange
+                 */
+                'groupchange'
+            ]);
 
-        // If buffered rendering is being used, scroll position must be preserved across refreshes
-        if (bufferedRenderer) {
-            me.invalidateScrollerOnRefresh = false;
-        }
+            // If buffered rendering is being used, scroll position must be preserved across refreshes
+            if (bufferedRenderer) {
+                me.invalidateScrollerOnRefresh = false;
+            }
 
-        if (me.invalidateScrollerOnRefresh !== undefined) {
-            view.preserveScrollOnRefresh = !me.invalidateScrollerOnRefresh;
+            if (me.invalidateScrollerOnRefresh !== undefined) {
+                view.preserveScrollOnRefresh = !me.invalidateScrollerOnRefresh;
+            }
+        } else {
+            me.unbindStore();
         }
     },
 
     unbindStore: function() {
         var me = this,
-            store = me.store;
+            store = me.store,
+            view;
 
         if (store) {
             me.store = null;
@@ -111161,10 +112517,25 @@ Ext.define('Ext.panel.Table', {
                 scope: me
             });
             Ext.destroy(me.storeRelayers);
+
+            view = me.view;
+            if (view.store) {
+                view.bindStore(null);
+            }
         }
     },
 
-    // documented on GridPanel
+    /**
+     * @method reconfigure
+     * Reconfigures the grid / tree with a new store/columns. Either the store or the 
+     * columns can be omitted if you don't wish to change them.
+     *
+     * The {@link #enableLocking} config should be set to `true` before the reconfigure 
+     * method is executed if locked columns are intended to be used.
+     *
+     * @param {Ext.data.Store} [store] The new store. You can pass `null` if no new store.
+     * @param {Object[]} [columns] An array of column configs
+     */
     reconfigure: function(store, columns) {
         var me = this,
             view = me.getView(),
@@ -111172,6 +112543,12 @@ Ext.define('Ext.panel.Table', {
             oldStore = me.store,
             headerCt = me.headerCt,
             oldColumns = headerCt ? headerCt.items.getRange() : me.columns;
+
+        // Allow optional store argument to be fully omitted, and the columns argument to be solo
+        if (arguments.length === 1 && Ext.isArray(store)) {
+            columns = store;
+            store = null;
+        }
 
         // Make copy in case the beforereconfigure listener mutates it.
         if (columns) {
@@ -111186,7 +112563,7 @@ Ext.define('Ext.panel.Table', {
             Ext.suspendLayouts();
             if (columns) {
                 // new columns, delete scroll pos
-                delete me.scrollLeftPos;
+                delete me.scrollLeft;
                 headerCt.removeAll();
                 headerCt.add(columns);
             }
@@ -111204,7 +112581,7 @@ Ext.define('Ext.panel.Table', {
                 me.bindStore(store);
                 view.deferInitialRefresh = originalDeferinitialRefresh;
             } else {
-                me.getView().refresh();
+                me.getView().refreshView();
             }
             headerCt.setSortState();
             Ext.resumeLayouts(true);
@@ -111244,7 +112621,7 @@ Ext.define('Ext.panel.Table', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -111256,7 +112633,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Utility class for manipulating CSS rules
@@ -111289,29 +112666,27 @@ Ext.define('Ext.util.CSS', function() {
          * @param {String} id An id to add to the stylesheet for later removal
          * @return {CSSStyleSheet}
          */
-        createStyleSheet : function(cssText, id) {
+        createStyleSheet: function (cssText, id) {
             var ss,
-                head = doc.getElementsByTagName("head")[0],
-                styleEl = doc.createElement("style");
+                head = doc.getElementsByTagName('head')[0],
+                styleEl = doc.createElement('style');
 
-            styleEl.setAttribute("type", "text/css");
+            styleEl.setAttribute('type', 'text/css');
+
             if (id) {
-               styleEl.setAttribute("id", id);
+               styleEl.setAttribute('id', id);
             }
 
-            if (Ext.isIE) {
-               head.appendChild(styleEl);
-               ss = styleEl.styleSheet;
-               ss.cssText = cssText;
-            } else {
-                try{
-                    styleEl.appendChild(doc.createTextNode(cssText));
-                } catch(e) {
-                   styleEl.cssText = cssText;
-                }
+            ss = styleEl.styleSheet;
+            if (ss) {
                 head.appendChild(styleEl);
-                ss = styleEl.styleSheet ? styleEl.styleSheet : (styleEl.sheet || doc.styleSheets[doc.styleSheets.length-1]);
+                ss.cssText = cssText;
+            } else {
+                styleEl.appendChild(doc.createTextNode(cssText));
+                head.appendChild(styleEl);
+                ss = styleEl.sheet;
             }
+
             CSS.cacheStyleSheet(ss);
             return ss;
         },
@@ -111341,14 +112716,6 @@ Ext.define('Ext.util.CSS', function() {
             ss.setAttribute("id", id);
             ss.setAttribute("href", url);
             doc.getElementsByTagName("head")[0].appendChild(ss);
-        },
-
-        /**
-         * Refresh the rule cache if you have dynamically added stylesheets
-         * @return {Object} An object (hash) of rules indexed by selector
-         */
-        refreshCache : function() {
-            return CSS.getRules(true);
         },
 
         // @private
@@ -111400,7 +112767,7 @@ Ext.define('Ext.util.CSS', function() {
                         parentStyleSheet: styleSheet,
                         cssRule: cssRule
                     };
-                };
+                }
             }
         },
 
@@ -111422,6 +112789,10 @@ Ext.define('Ext.util.CSS', function() {
             return result;
         },
         
+        /**
+         * Refresh the rule cache if you have dynamically added stylesheets
+         * @return {Object} An object (hash) of rules indexed by selector
+         */
         refreshCache: function() {
             var ds = doc.styleSheets,
                 i = 0,
@@ -111498,7 +112869,7 @@ Ext.define('Ext.util.CSS', function() {
                 rule = CSS.getRule(selector);
                 if (rule) {
                     // 2 arg form means cssText sent, so parse it and update each style
-                    if (arguments.length == 2) {
+                    if (arguments.length === 2) {
                         styles = Ext.Element.parseStyles(property);
                         for (property in styles) {
                             rule.style[property.replace(camelRe, camelFn)] = styles[property];
@@ -111539,7 +112910,7 @@ Ext.define('Ext.util.CSS', function() {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -111551,7 +112922,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  *  Component layout for {@link Ext.view.Table}
@@ -111650,61 +113021,98 @@ Ext.define('Ext.view.TableLayout', {
     },
 
     setColumnWidths: function(ownerContext) {
+        // No content to size. We're done
+        if (!this.owner.body.dom) {
+            return true;
+        }
+
         var me = this,
             owner = me.owner,
             context = ownerContext.context,
             columns = me.headerCt.getVisibleGridColumns(),
             column,
-            i = 0, len = columns.length,
+            i,
+            len = columns.length,
             tableWidth = 0,
             columnLineWidth = 0,
             childContext,
             colWidth,
-            isContentBox = !Ext.isBorderBox;
+            isContentBox = !Ext.isBorderBox,
+            colGroup = owner.body.dom.firstChild,
+            isColGroup = colGroup.tagName.toUpperCase() === 'COLGROUP',
+            changedColumns = [];
 
         // So that the setProp can trigger this layout.
         if (context) {
             context.currentLayout = me;
         }
 
-        // Set column width corresponding to each header
+        // Collect columns which have a changed width
         for (i = 0; i < len; i++) {
             column = columns[i];
             childContext = context.getCmp(column);
-            colWidth = childContext.props.width;
-            if (isNaN(colWidth)) {
-                // We don't have a width set, so we need to trigger when this child
-                // actually gets a width assigned so we can continue. Technically this
-                // shouldn't happen however we have a bug inside ColumnLayout where
-                // columnWidthsDone is set incorrectly. This is just a workaround.
-                childContext.getProp('width');
-                return false;
+
+            // Only bother with columns with changed width since last fluch of ColumnLayout, or since last setColumnWidths call.
+            if (!column.lastBox || column.lastBox.invalid || childContext.props.width !== column.lastBox.width || (childContext.cellWidth && childContext.cellWidth != childContext.props.width)) {
+                colWidth = childContext.props.width;
+                if (isNaN(colWidth)) {
+                    // We don't have a width set, so we need to trigger when this child
+                    // actually gets a width assigned so we can continue. Technically this
+                    // shouldn't happen however we have a bug inside ColumnLayout where
+                    // columnWidthsDone is set incorrectly. This is just a workaround.
+                    childContext.getProp('width');
+                    return false;
+                }
+                tableWidth += colWidth;
+                childContext.columnIndex = i;
+                changedColumns.push(childContext);
+            } else {
+                tableWidth += column.lastBox.width;
             }
-            tableWidth += colWidth;
+
+            // Track flushed cell width so we can check for changes.
+            childContext.cellWidth = childContext.props.width;
+        }
+
+        // If no columns need changing, we're done
+        len = changedColumns.length;
+        if (!len) {
+            return true;
+        }
+
+        // Set width of main table
+        owner.body.setWidth(tableWidth);
+
+        // Set column width corresponding to each header
+        for (i = 0; i < len; i++) {
+            childContext = changedColumns[i];
+            colWidth = childContext.props.width;
+
             // https://sencha.jira.com/browse/EXTJSIV-9263 - Browsers which cannot be switched to border box when doctype present (IE6 & IE7) - must subtract borders width from width of cells.
+            // TODO: Remove this when IE7 & IE7 are dropped.
             if (isContentBox && owner.columnLines) {
-                // https://sencha.jira.com/browse/EXTJSIV-9744 - default border width to 1 because
-                // We are looking at the *header* border widths and Neptune, being a borderless theme
-                // omits the border from the last column *HEADER*. But we are interrogating that to
-                // know the width of border lines between cells which are not omitted.
                 if (!columnLineWidth) {
-                    columnLineWidth = context.getCmp(column).borderInfo.width || 1;
+                    columnLineWidth = ownerContext.headerContext.childItems[0].borderInfo.width;
                 }
                 colWidth -= columnLineWidth;
             }
 
-            // Select column sizing <col> elements within every <table> within the grid.
-            // 90% of the time, there will be only one table.
-            // The RowWrap and Summary Features embed tables within colspanning cells, and these also
-            // get <colgroup><col></colgroup> sizers which need updating.
+            // Resize the <col> elements within the single <colgroup> element which is at the top of a grid's <table>
+            // WHEN IT IS NOT USING RowWrap.
             // On IE8, sizing <col> elements to control column width was about 2.25 times
             // faster than selecting all the cells in the column to be resized.
             // Column sizing using dynamic CSS rules is *extremely* expensive on IE.
-            owner.body.select(owner.getColumnSizerSelector(column)).setWidth(colWidth);
+            if (isColGroup) {
+                colGroup.childNodes[childContext.columnIndex].style.width = colWidth + 'px';
+            }
 
+            // This will be the slow bit.
+            // Sizing changed columns using DomQuery.
+            if (owner.features.length) {
+                owner.body.select(owner.getColumnSizerSelector(childContext.target)).setWidth(colWidth);
+            }
         }
-        // Set widths of all tables (includes tables embedded in RowWrap and Summary rows)
-        owner.el.select(owner.getBodySelector()).setWidth(tableWidth);
+
         return true;
     },
 
@@ -111729,7 +113137,7 @@ Ext.define('Ext.view.TableLayout', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -111741,7 +113149,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -111922,16 +113330,16 @@ Ext.define('Ext.view.NodeCache', {
             el,
             i, removeCount, fromPos;
 
-        if (end === undefined) {
-            end = me.count;
+        if (end == null) {
+            end = me.endIndex + 1;
         } else {
             end = Math.min(me.endIndex + 1, end + 1);
         }
-        if (!start) {
-            start = 0;
+        if (start == null) {
+            start = me.startIndex;
         }
         removeCount = end - start;
-        for (i = start, fromPos = end; i < me.endIndex; i++, fromPos++) {
+        for (i = start, fromPos = end; i <= me.endIndex; i++, fromPos++) {
             // Within removal range and we are removing from DOM
             if (removeDom && i < end) {
                 Ext.removeNode(elements[i]);
@@ -112081,7 +113489,7 @@ Ext.define('Ext.view.NodeCache', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -112093,7 +113501,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This class encapsulates the user interface for a tabular data set.
@@ -112151,7 +113559,7 @@ Ext.define('Ext.view.Table', {
     tableOverFirstCls: Ext.baseCSSPrefix + 'grid-table-over-first',
     overItemCls: Ext.baseCSSPrefix + 'grid-row-over',
     beforeOverItemCls: Ext.baseCSSPrefix + 'grid-row-before-over',
-    altRowCls:   Ext.baseCSSPrefix + 'grid-row-alt',
+    altRowCls: Ext.baseCSSPrefix + 'grid-row-alt',
     dirtyCls: Ext.baseCSSPrefix + 'grid-dirty-cell',
     rowClsRe: new RegExp('(?:^|\\s*)' + Ext.baseCSSPrefix + 'grid-row-(first|last|alt)(?:\\s+|$)', 'g'),
     cellRe: new RegExp(Ext.baseCSSPrefix + 'grid-cell-headerId-([^\\s]+)(?:\\s|$)', ''),
@@ -112215,6 +113623,7 @@ Ext.define('Ext.view.Table', {
     tableTpl: [
         '{%',
             'var view=values.view,tableCls="' + Ext.baseCSSPrefix + '" + view.id + "-table ' + Ext.baseCSSPrefix + 'grid-table";',
+            'values.fullWidth',
         '%}',
         '<table id="{view.id}-table" class="{[tableCls]}" border="0" cellspacing="0" cellpadding="0" style="{tableStyle}" {ariaTableAttr}>',
             '{[view.renderColumnSizer(out)]}',
@@ -112492,6 +113901,20 @@ Ext.define('Ext.view.Table', {
 
     },
 
+    beforeLayout: function() {
+        var me = this,
+            needsContextInjection = !me.firstRefreshDone && me.headerCt.layout.running;
+
+        me.callParent(arguments);
+
+        // We're doing the first refresh inside of a layout run.
+        // The ColumnLayout will not have acquired a ViewContext because at its initilization time
+        // there was no view to lay out. We inject the viewContext now IF we have a table to lay out.
+        if (needsContextInjection && me.body.dom) {
+            me.headerCt.layout.injectViewContext(me.headerCt.layout.ownerContext, me);
+        }
+    },
+
     /**
      * @private
      * Move a grid column from one position to another
@@ -112519,7 +113942,7 @@ Ext.define('Ext.view.Table', {
             rows = me.el.query(me.getDataRowSelector());
 
             if (toIdx > fromIdx && fragment) {
-                destinationCellIdx -= colsToMove;
+                destinationCellIdx -= 1;
             }
 
             for (i = 0, len = rows.length; i < len; i++) {
@@ -112560,17 +113983,19 @@ Ext.define('Ext.view.Table', {
                 }
             }
 
-            // Shuffle the <colgroup> elements at the ta=op of all <tables> in the grid
+            // Shuffle the <col> elements within the <colgroup>s at the top of all <tables> in the grid
             tables = me.el.query(me.getBodySelector());
             for (i = 0, len = tables.length; i < len; i++) {
-                tr = tables[i];
-                if (fragment) {
-                    for (j = 0; j < colsToMove; j++) {
-                        fragment.appendChild(tr.childNodes[fromIdx]);
+                tr = tables[i].firstChild;
+                if (tr.tagName.toUpperCase() === 'COLGROUP') {
+                    if (fragment) {
+                        for (j = 0; j < colsToMove; j++) {
+                            fragment.appendChild(tr.childNodes[fromIdx]);
+                        }
+                        tr.insertBefore(fragment, tr.childNodes[destinationCellIdx] || null);
+                    } else {
+                        tr.insertBefore(tr.childNodes[fromIdx], tr.childNodes[destinationCellIdx] || null);
                     }
-                    tr.insertBefore(fragment, tr.childNodes[destinationCellIdx] || null);
-                } else {
-                    tr.insertBefore(tr.childNodes[fromIdx], tr.childNodes[destinationCellIdx] || null);
                 }
             }
         }
@@ -112847,7 +114272,7 @@ Ext.define('Ext.view.Table', {
             view: this,
             rows: records,
             viewStartIndex: startIndex,
-            tableStyle: this.bufferedRenderer ? ('position:absolute;top:' + this.bufferedRenderer.bodyTop) : ''
+            tableStyle: 'width:' + this.headerCt.getTableWidth() + 'px' + (this.bufferedRenderer ? (';position:absolute;top:' + this.bufferedRenderer.bodyTop + 'px') : '')
         };
     },
 
@@ -112885,11 +114310,22 @@ Ext.define('Ext.view.Table', {
             me.callParent();
 
             // Since columns and tables are not sized by generated CSS rules any more, EVERY table refresh
-            // has to be followed by a layout to ensure correct table and column sizing.
-            grid.updateLayout();
+            // when there are rows containing columns to size has to be followed by a layout to ensure correct table and column sizing.
+            if (me.dataSource.getCount()) {
+                grid.updateLayout();
+            }
 
             Ext.resumeLayouts(true);
         }
+    },
+
+    // Masking a TableView masks its owning GridPanel
+    getMaskTarget: function() {
+        var grid = this.ownerCt;
+        if (grid.ownerLockable) {
+            grid = grid.ownerLockable;
+        }
+        return grid.getMaskTarget();
     },
 
     statics: {
@@ -112909,9 +114345,8 @@ Ext.define('Ext.view.Table', {
 
         node = me.getNode(node);
         if (node) {
-            // If we're grouping, the indexes may be off
-            // because of collapsed groups, so just grab it by id
-            if (!me.hasActiveGrouping()) {
+            // The indices may be off because of collapsed groups (if we're grouping) or row wrapping, so just grab it by id.
+            if (!me.hasActiveFeature()) {
                 recordIndex = node.getAttribute('data-recordIndex');
                 if (recordIndex) {
                     recordIndex = parseInt(recordIndex, 10);
@@ -112922,7 +114357,8 @@ Ext.define('Ext.view.Table', {
                     }
                 }
             }
-            return me.store.getByInternalId(node.getAttribute('data-recordId'));
+
+            return me.dataSource.getByInternalId(node.getAttribute('data-recordId'));
         }
     },
 
@@ -112935,14 +114371,8 @@ Ext.define('Ext.view.Table', {
     },
 
     indexInStore: function(node) {
-        node = node.isCollapsedPlaceholder ? this.getNode(node) : this.getNode(node, false);
-        if (!node && node !== 0) {
-            return -1;
-        }
-        var recordIndex = node.getAttribute('data-recordIndex');
-        if (recordIndex) {
-            return parseInt(recordIndex, 10);
-        }
+        // We cannot use the stamped in data-recordindex because that is the index in the original configured store
+        // NOT the index in the dataSource that is being used - that may be a GroupStore.
         return this.dataSource.indexOf(this.getRecord(node));
     },
 
@@ -112982,13 +114412,14 @@ Ext.define('Ext.view.Table', {
     renderColumnSizer: function(out) {
         var columns = this.getGridColumns(),
             len = columns.length, i,
-            column, width;
+            column;
 
+        out.push('<colgroup role="presentation">');
         for (i = 0; i < len; i++) {
             column = columns[i];
-            width = column.hidden ? 0 : (column.lastBox ? column.lastBox.width : Ext.grid.header.Container.prototype.defaultWidth);
-            out.push('<colgroup role="presentation"><col role="presentation" class="', columns[i].getCellId(), '" style="width:' + width + 'px"></colgroup>');
+            out.push('<col role="presentation" class="', columns[i].getCellId(), '" style="width:' + column.getCellWidth() + 'px">');
         }
+        out.push('</colgroup>');
     },
 
     /**
@@ -113010,6 +114441,17 @@ Ext.define('Ext.view.Table', {
             rowClasses = rowValues.rowClasses,
             cls,
             rowTpl = me.rowTpl;
+
+        // Define the rowAttr object now. We don't want to do it in the treeview treeRowTpl because anything
+        // this is processed in a deferred callback (such as deferring initial view refresh in gridview) could
+        // poke rowAttr that are then shared in tableview.rowTpl. See EXTJSIV-9341.
+        //
+        // For example, the following shows the shared ref between a treeview's rowTpl nextTpl and the superclass
+        // tableview.rowTpl:
+        //
+        //      tree.view.rowTpl.nextTpl === grid.view.rowTpl
+        //
+        rowValues.rowAttr = {};
 
         // Set up mandatory properties on rowValues
         rowValues.record = record;
@@ -113048,7 +114490,7 @@ Ext.define('Ext.view.Table', {
             }
 
             if (me.stripeRows && rowIdx % 2 !== 0) {
-                rowClasses.push(me.altRowCls);
+                itemClasses.push(me.altRowCls);
             }
 
             if (me.getRowClass) {
@@ -113076,7 +114518,7 @@ Ext.define('Ext.view.Table', {
      * @param {Number} columnIndex The column index (zero based) for which to render the cell.
      * @param {String[]} out The output stream into which the HTML strings are appended.
      */
-    renderCell: function(column, record, recordIndex, rowIndex, columnIndex, out) {
+    renderCell: function (column, record, recordIndex, rowIndex, columnIndex, out) {
         var me = this,
             selModel = me.selModel,
             cellValues = me.cellValues,
@@ -113099,7 +114541,7 @@ Ext.define('Ext.view.Table', {
 
         if (column.renderer && column.renderer.call) {
             fullIndex = me.ownerCt.columnManager.getHeaderIndex(column);
-            value = column.renderer.call(column.scope || me.ownerCt, fieldValue, cellValues, record, recordIndex, fullIndex, me.dataSource, me);
+            value = column.renderer.call(column.usingDefaultRenderer ? column : column.scope || me.ownerCt, fieldValue, cellValues, record, recordIndex, fullIndex, me.dataSource, me);
             if (cellValues.css) {
                 // This warning attribute is used by the compat layer
                 // TODO: remove when compat layer becomes deprecated
@@ -113110,7 +114552,8 @@ Ext.define('Ext.view.Table', {
         } else {
             value = fieldValue;
         }
-        cellValues.value = (value == null || value === '') ? '&#160;' : value;
+
+        cellValues.value = (value == null || value === '') ? column.emptyCellText : value;
 
         // Calculate classes to add to cell
         classes[1] = column.getCellId();
@@ -113137,7 +114580,7 @@ Ext.define('Ext.view.Table', {
         if (cellValues.tdCls) {
             classes[clsInsertPoint++] = cellValues.tdCls;
         }
-        if (selModel && selModel.isCellModel && selModel.isCellSelected(me, recordIndex, columnIndex)) {
+        if (selModel && selModel.isCellModel && selModel.isCellSelected(me, recordIndex, column)) {
             classes[clsInsertPoint++] = (me.selectedCellCls);
         }
 
@@ -113490,7 +114933,10 @@ Ext.define('Ext.view.Table', {
         // the assignment of the cell var is embedded inside the condition expression.
         if (me.isVisible(true) && (cell = me.getCellByPosition(position))) {
             me.scrollCellIntoView(cell);
-            me.doFocus(me.getNode(position.row));
+
+            // Focus a focusable data row.
+            // TODO: in Sencha 5, use getRow()
+            me.doFocus(me.getNode(position.row, true));
             me.fireEvent('cellfocus', position.record, cell, position);
         }
     },
@@ -113522,7 +114968,7 @@ Ext.define('Ext.view.Table', {
             cell = this.getCellByPosition(cell);
         }
         if (cell) {
-            Ext.fly(cell).scrollIntoView(this.el, true);
+            Ext.fly(cell).scrollIntoView(this.el);
         }
     },
 
@@ -113621,7 +115067,6 @@ Ext.define('Ext.view.Table', {
     onUpdate: function(store, record, operation, changedFieldNames) {
         var me = this,
             rowTpl = me.rowTpl,
-            index,
             oldRow, oldRowDom, oldDataRow,
             newRowDom,
             newAttrs, attLen, attName, attrIndex,
@@ -113643,9 +115088,8 @@ Ext.define('Ext.view.Table', {
                 selectedItemCls = me.selectedItemCls;
                 beforeSelectedItemCls = me.beforeSelectedItemCls;
 
-                index = me.indexInStore(record);
                 oldRow = Ext.fly(oldRowDom, '_internal');
-                newRowDom = me.createRowElement(record, index);
+                newRowDom = me.createRowElement(record, me.dataSource.data.indexOf(record));
                 if (oldRow.hasCls(overItemCls)) {
                     Ext.fly(newRowDom).addCls(overItemCls);
                 }
@@ -113701,7 +115145,7 @@ Ext.define('Ext.view.Table', {
 
                 // Since we don't actually replace the row, we need to fire the event with the old row
                 // because it's the thing that is still in the DOM
-                me.fireEvent('itemupdate', record, index, oldRowDom);
+                me.fireEvent('itemupdate', record, me.store.indexOf(record), oldRowDom);
                 me.refreshSize();
             }
         }
@@ -113803,10 +115247,10 @@ Ext.define('Ext.view.Table', {
 
         // Create horizontal stretcher element if no records in view and there is overflow of the header container.
         // Element will be transient and destroyed by the next refresh.
-        if (me.el && !me.all.getCount() && me.headerCt && me.headerCt.tooNarrow) {
+        if (me.el && me.headerCt && !me.ownerCt.hideHeaders && me.headerCt.tooNarrow && !me.all.getCount()) {
             me.el.createChild({
                 role: 'presentation',
-                style:'position:absolute;height:1px;width:1px;left:' + (me.headerCt.getFullWidth() - 1) + 'px'
+                style:'position:absolute;height:1px;width:1px;left:' + (me.headerCt.getTableWidth() - 1) + 'px'
             });
         }
 
@@ -113829,9 +115273,18 @@ Ext.define('Ext.view.Table', {
     },
 
     processItemEvent: function(record, row, rowIndex, e) {
+        me = this;
+
+        // IE has a bug whereby if you mousedown in a cell editor in one side of a locking grid and then
+        // drag out of that, and mouseup in *the other side*, the mousedowned side still receives the event!
+        // Even though the mouseup target is *not* within it! Ignore the mouseup in this case.
+        if (Ext.isIE && e.type === 'mouseup' && !e.within(me.el)) {
+            return false;
+        }
+
         // Only process the event if it occurred within a row which maps to a record in the store
         if (this.indexInStore(row) !== -1) {
-            var me = this,
+            var me,
                 cell = e.getTarget(me.getCellSelector(), row),
                 cellIndex,
                 map = me.statics().EventMap,
@@ -113865,8 +115318,13 @@ Ext.define('Ext.view.Table', {
 
             result = me.fireEvent('uievent', type, me, cell, rowIndex, cellIndex, e, record, row);
 
-            if ((result === false || me.callParent(arguments) === false) && selModel.onVetoUIEvent) {
-                selModel.onVetoUIEvent(type, me, cell, rowIndex, cellIndex, e, record, row);
+            // If the event has been stopped by a handler, tell the selModel (if it is interested) and return early.
+            // For example, action columns by default will stop event propagation by returning `false` from its
+            // 'uievent' event handler.
+            if ((result === false || me.callParent(arguments) === false)) {
+                if (selModel.onVetoUIEvent) {
+                    selModel.onVetoUIEvent(type, me, cell, rowIndex, cellIndex, e, record, row);
+                }
                 return false;
             }
 
@@ -114214,17 +115672,17 @@ Ext.define('Ext.view.Table', {
         // Note that we use the **dataSource** here because row indices mean view row indices
         // so records in collapsed groups must be omitted.
         var me = this,
+            store = me.dataSource,
             moved = 0,
             lastValid = startRow,
             node,
-            last = (me.dataSource.buffered ? me.dataSource.getTotalCount() : me.dataSource.getCount()) - 1,
-            limit = (distance < 0) ? 0 : last,
+            limit = (distance < 0) ? 0 : (store.buffered ? store.getTotalCount() : store.getCount()) - 1,
             increment = limit ? 1 : -1,
             result = startRow;
 
         do {
             // Walked off the end: return the last encountered valid row
-            if (limit ? result >= limit : result <= 0) {
+            if (limit ? result >= limit : result <= limit) {
                 return lastValid || limit;
             }
 
@@ -114254,18 +115712,18 @@ Ext.define('Ext.view.Table', {
         // Note that we use the **store** to access the records by index because the dataSource omits records in collapsed groups.
         // This is used by selection models which use the **store**
         var me = this,
+            store = me.dataSource,
             moved = 0,
             lastValid = startRec,
             node,
-            last = (me.store.buffered ? me.store.getTotalCount() : me.store.getCount()) - 1,
-            limit = (distance < 0) ? 0 : last,
+            limit = (distance < 0) ? 0 : (store.buffered ? store.getTotalCount() : store.getCount()) - 1,
             increment = limit ? 1 : -1,
-            testIndex = me.store.indexOf(startRec),
+            testIndex = store.indexOf(startRec),
             rec;
 
         do {
             // Walked off the end: return the last encountered valid record
-            if (limit ? testIndex >= limit : testIndex <= 0) {
+            if (limit ? testIndex >= limit : testIndex <= limit) {
                 return lastValid;
             }
 
@@ -114274,8 +115732,8 @@ Ext.define('Ext.view.Table', {
 
             // Stepped onto VISIBLE record: Increment the moved count.
             // We must not count stepping onto a non-rendered record as a move.
-            rec = me.store.getAt(testIndex);
-            if ((node = Ext.fly(me.getNodeByRecord(rec, true))) && node.isVisible(true)) {
+            rec = store.getAt(testIndex);
+            if (!rec.isCollapsedPlaceholder && (node = Ext.fly(me.getNodeByRecord(rec, true))) && node.isVisible(true)) {
                 moved += increment;
                 lastValid = rec;
             }
@@ -114340,6 +115798,36 @@ Ext.define('Ext.view.Table', {
         }
         me.featuresMC = null;
         this.callParent(arguments);
+    },
+
+    // Private.
+    // Respond to store replace event which is fired by GroupStore group expand/collapse operations.
+    // This saves a layout because a remove and add operation are coalesced in this operation.
+    onReplace: function(store, startIndex, oldRecords, newRecords) {
+        var me = this,
+            selModel = me.selModel,
+            nextIndex, isNextRowSelected, isNextRowFocused;
+
+        me.callParent(arguments);
+        me.doStripeRows(startIndex);
+
+        if (me.rendered && selModel.isRowModel && !newRecords[0].isCollapsedPlaceholder) {
+            nextIndex = startIndex + newRecords.length;
+            isNextRowSelected = selModel.isRowSelected(nextIndex);
+            isNextRowFocused = me.indexOf(selModel.lastFocused) === (nextIndex);
+            if (isNextRowSelected || isNextRowFocused) {
+                // calling onRowDeselect ensures before focus/selected border gets removed from
+                // previous row if the row previously at this index was selected or focused.
+                me.onRowDeselect(startIndex);
+            }
+            if (isNextRowSelected) {
+                me.onRowSelect(nextIndex);
+            }
+            if (selModel.isRowSelected(startIndex)) {
+                me.onRowSelect(startIndex);
+            }
+        }
+        me.selModel.onLastFocusChanged(null, me.selModel.lastFocused, true);
     },
 
     // after adding a row stripe rows from then on
@@ -114453,7 +115941,7 @@ Ext.define('Ext.view.Table', {
         if (!item.tagName) {
             item = this.getNode(item);
         }
-        return (me.hasActiveGrouping() ? Ext.fly(item) : this.el).down('table.' + Ext.baseCSSPrefix + 'grid-table');
+        return (me.hasActiveFeature() ? Ext.fly(item) : this.el).down('table.' + Ext.baseCSSPrefix + 'grid-table');
     },
 
     // private
@@ -114499,11 +115987,11 @@ Ext.define('Ext.view.Table', {
             index = me.indexOf(item);
         }
 
-        return (!index || me.hasActiveGrouping() && item && Ext.fly(item).hasCls(Ext.baseCSSPrefix + 'grid-group-row'));
+        return (!index || me.hasActiveFeature() && item && Ext.fly(item).hasCls(Ext.baseCSSPrefix + 'grid-group-row'));
     },
 
-    hasActiveGrouping: function(){
-        return this.isGrouping && this.store.isGrouped();
+    hasActiveFeature: function(){
+        return (this.isGrouping && this.store.isGrouped()) || this.isRowWrapped;
     },
 
     getCellPaddingAfter: function(cell) {
@@ -114531,7 +116019,7 @@ Ext.define('Ext.view.Table', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -114543,7 +116031,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * The grid View class provides extra {@link Ext.grid.Panel} specific functionality to the
@@ -114593,7 +116081,7 @@ Ext.define('Ext.grid.View', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -114605,7 +116093,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @author Aaron Conran
@@ -114625,7 +116113,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *         data:{'items':[
  *             { 'name': 'Lisa',  "email":"lisa@simpsons.com",  "phone":"555-111-1224"  },
  *             { 'name': 'Bart',  "email":"bart@simpsons.com",  "phone":"555-222-1234" },
- *             { 'name': 'Homer', "email":"home@simpsons.com",  "phone":"555-222-1244"  },
+ *             { 'name': 'Homer', "email":"homer@simpsons.com",  "phone":"555-222-1244"  },
  *             { 'name': 'Marge', "email":"marge@simpsons.com", "phone":"555-222-1254"  }
  *         ]},
  *         proxy: {
@@ -114809,7 +116297,7 @@ Ext.define('Ext.grid.Panel', {
      * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
      * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
      * @param {Ext.data.Store} oldStore The store that will be replaced
-     * @param {Ext.grid.column.Column[]} The column headers that will be replaced.
+     * @param {Ext.grid.column.Column[]} oldColumns The column headers that will be replaced.
      */
 
     /**
@@ -114819,22 +116307,14 @@ Ext.define('Ext.grid.Panel', {
      * @param {Ext.data.Store} store The store that was passed to the {@link #method-reconfigure} method
      * @param {Object[]} columns The column configs that were passed to the {@link #method-reconfigure} method
      * @param {Ext.data.Store} oldStore The store that was replaced
-     * @param {Ext.grid.column.Column[]} The column headers that were replaced.
-     */
-
-    /**
-     * @method reconfigure
-     * Reconfigures the grid with a new store/columns. Either the store or the columns can be omitted if you don't wish
-     * to change them.
-     * @param {Ext.data.Store} store (Optional) The new store.
-     * @param {Object[]} columns (Optional) An array of column configs
+     * @param {Ext.grid.column.Column[]} oldColumns The column headers that were replaced.
      */
 });
 
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -114846,7 +116326,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -114858,58 +116338,50 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
 Ext.define('Ext.grid.plugin.BufferedRendererTableView', {
     override: 'Ext.view.Table',
 
+    onReplace: function(store, startIndex, oldRecords, newRecords) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
+
+        // If there's a buffered renderer and the removal range falls inside the current view...
+        if (me.rendered && bufferedRenderer) {
+            bufferedRenderer.onReplace(store, startIndex, oldRecords, newRecords);
+        } else {
+            me.callParent(arguments);
+        }
+    },
+
     // Listener function for the Store's add event
     onAdd: function(store, records, index) {
         var me = this,
-            bufferedRenderer = me.bufferedRenderer,
-            rows = me.all;
+            bufferedRenderer = me.bufferedRenderer;
 
-        // The newly added records will put us over the buffered view size, so we cannot just add as normal.
-        if (me.rendered && bufferedRenderer && (rows.getCount() + records.length) > bufferedRenderer.viewSize) {
-
-            // Index puts the new row(s) in the visible area, then we have to refresh the view
-            if (index < rows.startIndex + bufferedRenderer.viewSize && (index + records.length) > rows.startIndex) {
-                me.refreshView();
-            }
-            // New rows outside of visible area, just ensure that the scroll range is updated
-            else {
-                bufferedRenderer.stretchView(me, bufferedRenderer.getScrollHeight());
-            }
+        if (me.rendered && bufferedRenderer) {
+             bufferedRenderer.onReplace(store, index, [], records);
         }
         // No BufferedRenderer present
-        // or
-        // View has not yet reached the viewSize: we can add as normal.
         else {
             me.callParent([store, records, index]);
         }
     },
 
-    onRemove: function(store, records, indices) {
+    onRemove: function(store, records, indices, isMove, removeRange) {
         var me = this,
-            bufferedRenderer = me.bufferedRenderer,
-            storeSize, all, startIndex;
+            bufferedRenderer = me.bufferedRenderer;
 
-        // Ensure all records are removed from the view
-        me.callParent([store, records, indices]);
-
-        // If there's a BufferedRenderer, the view must refresh to keep the view correct.
-        // Removing *may* have removed all of the rendered rows, leaving whitespace below the group header, 
-        // so the buffered renderer will be needed to keep the buffer rendered zone valid - to pull records up from
-        // below the removed zone into visibility.
+        // If there's a BufferedRenderer...
         if (me.rendered && bufferedRenderer) {
-            storeSize = me.dataSource.getCount();
-            all = me.all;
-            // If that remove left a gap below the rendered range, ask the buffered renderer to render its
-            // current view size. This will do the minimum work required, and *append* rows to the table only
-            // if necessary
-            if (storeSize > all.getCount()) {
-                startIndex = all.startIndex;
-                bufferedRenderer.renderRange(startIndex, Math.min(startIndex + bufferedRenderer.viewSize, storeSize) - 1);
+
+            // If it's a contiguous range, the replace processing can handle it.
+            if (removeRange) {
+                bufferedRenderer.onReplace(store, indices[0], records, []);
             }
-            // No overflow, still we have to ensure the scroll range is updated
+
+            // Otherwise it's a refresh
             else {
-                bufferedRenderer.stretchView(me, bufferedRenderer.getScrollHeight());
+                bufferedRenderer.refreshView();
             }
+        } else {
+            me.callParent([store, records, indices]);
         }
     },
 
@@ -114929,7 +116401,7 @@ Ext.define('Ext.grid.plugin.BufferedRendererTableView', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -114941,7 +116413,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('ExtThemeNeptune.panel.Table', {
     override: 'Ext.panel.Table',
@@ -114951,7 +116423,7 @@ Ext.define('ExtThemeNeptune.panel.Table', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -114963,7 +116435,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -115000,6 +116472,7 @@ Ext.define('Ext.grid.RowEditorButtons', {
                 disabled: rowEditor.updateButtonDisabled
             }, {
                 cls: cssPrefix + 'row-editor-cancel-button',
+                itemId: 'cancel',
                 handler: plugin.cancelEdit,
                 text: rowEditor.cancelBtnText
             }]
@@ -115056,7 +116529,7 @@ Ext.define('Ext.grid.RowEditorButtons', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -115068,7 +116541,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 // Currently has the following issues:
 // - Does not handle postEditValue
@@ -115173,7 +116646,7 @@ Ext.define('Ext.grid.RowEditor', {
             scope: me,
             show: me.repositionIfVisible
         });
-        
+
         form = me.getForm();
         form.trackResetOnLoad = true;
         form.on('validitychange', me.onValidityChange, me);
@@ -115191,11 +116664,11 @@ Ext.define('Ext.grid.RowEditor', {
             btns = me.getFloatingButtons();
 
         me.setLocalX(gridBody.getOffsetsTo(grid)[0] + gridBody.getBorderWidth('l') - grid.el.getBorderWidth('l'));
-        
+
         me.setWidth(clientWidth);
         btns.setLocalX((clientWidth - btns.getWidth()) / 2);
     },
-    
+
     syncAllFieldWidths: function() {
         var me = this;
         // In a locked grid, a RowEditor uses 2 inner containers, so need to use CQ to retrieve
@@ -115204,12 +116677,13 @@ Ext.define('Ext.grid.RowEditor', {
             if (editorComponent.column.isVisible()) {
                 me.onColumnShow(editorComponent.column);
             }
-        }, me);    
+        }, me);
     },
 
     syncFieldWidth: function(column) {
         var field = column.getEditor(),
             width;
+
         field._marginWidth = (field._marginWidth || field.el.getMargin('lr'));
         width = column.getWidth() - field._marginWidth;
         field.setWidth(width);
@@ -115221,7 +116695,7 @@ Ext.define('Ext.grid.RowEditor', {
 
     onValidityChange: function(form, valid) {
         var me = this;
-            
+
         if (me.errorSummary && me.isVisible()) {
             me[valid ? 'hideToolTip' : 'showToolTip']();
         }
@@ -115230,7 +116704,7 @@ Ext.define('Ext.grid.RowEditor', {
     },
 
     updateButton: function(valid){
-        var buttons = this.floatingButtons; 
+        var buttons = this.floatingButtons;
         if (buttons) {
             buttons.child('#update').setDisabled(!valid);
         } else {
@@ -115275,7 +116749,7 @@ Ext.define('Ext.grid.RowEditor', {
             scroll: me.onFieldContainerScroll,
             scope: me
         });
-        
+
         me.initKeyNav();
 
         me.mon(plugin.view, {
@@ -115288,15 +116762,15 @@ Ext.define('Ext.grid.RowEditor', {
         // Prevent trying to reposition while we set everything up
         me.preventReposition = true;
         me.syncAllFieldWidths();
-        delete me.preventReposition;    
+        delete me.preventReposition;
     },
-    
+
     initKeyNav: function() {
         var me = this,
             plugin = me.editingPlugin;
-        
+
         me.keyNav = new Ext.util.KeyNav(me.el, {
-            enter: plugin.onEnterKey,
+            enter: plugin.onEnter,
             esc: plugin.onEscKey,
             scope: plugin
         });
@@ -115423,50 +116897,36 @@ Ext.define('Ext.grid.RowEditor', {
 
     onColumnMove: function(column, fromIdx, toIdx) {
         var me = this,
-            i, incr = 1, len, field, fieldIdx,
-            fieldContainer = column.isLocked() ? me.lockedColumnContainer : me.normalColumnContainer;
+            locked = column.isLocked(),
+            grid = me.editingPlugin.grid,
+            mgr = locked ? grid.lockedGrid.getColumnManager() : grid.getColumnManager(),
+            fieldContainer = locked ? me.lockedColumnContainer : me.normalColumnContainer,
+            columns, i, len, after, offset;
 
         // If moving a group, move each leaf header
         if (column.isGroupHeader) {
             Ext.suspendLayouts();
-            column = column.getGridColumns();
-
-            if (toIdx > fromIdx) {
-                toIdx--;
-                incr = 0;
-            }
-
-            this.addFieldsForColumn(column);
-            for (i = 0, len = column.length; i < len; i++, fromIdx += incr, toIdx += incr) {
-                field = column[i].getEditor();
-                fieldIdx = fieldContainer.items.indexOf(field);
-
-                // If the field is not in the container (moved from the main headerCt, INTO a group header)
-                // then insert it into the correct place
-                if (fieldIdx === -1) {
-                    fieldContainer.insert(toIdx, field);
+            after = toIdx > fromIdx;
+            offset = after ? 1 : 0;
+            columns = column.getGridColumns();
+            for (i = 0, len = columns.length; i < len; ++i) {
+                column = columns[i];
+                toIdx = mgr.getHeaderIndex(column);
+                if (after) {
+                    ++offset;
                 }
-
-                // If the field has not already been processed by an onColumnAdd (move from a group header INTO the main headerCt), then move it
-                else if (fieldIdx != toIdx) {
-                    fieldContainer.move(fromIdx, toIdx);
-                }
+                this.setColumnEditor(column, toIdx + offset, fieldContainer);
             }
             Ext.resumeLayouts(true);
         } else {
-            if (toIdx > fromIdx) {
-                toIdx--;
-            }
-            this.addFieldsForColumn(column);
-            field = column.getEditor();
-            fieldIdx = fieldContainer.items.indexOf(field);
-            if (fieldIdx === -1) {
-                fieldContainer.insert(toIdx, field);
-            }
-            else if (fieldIdx != toIdx) {
-                fieldContainer.move(fromIdx, toIdx);
-            }
+            toIdx = mgr.getHeaderIndex(column);
+            this.setColumnEditor(column, toIdx, fieldContainer);
         }
+    },
+
+    setColumnEditor: function(column, idx, fieldContainer) {
+        this.addFieldsForColumn(column);
+        fieldContainer.insert(idx, column.getEditor());
     },
 
     onColumnAdd: function(column) {
@@ -115500,26 +116960,14 @@ Ext.define('Ext.grid.RowEditor', {
             return;
         }
 
-        if (column.isLocked()) {
-            fieldContainer = me.lockedColumnContainer; 
-            grid = grid.lockedGrid;
-        } else {
-            fieldContainer = me.normalColumnContainer;
-            if (lockable) {
-                grid = grid.normalGrid;
-            }
-        }
+        fieldContainer = column.isLocked() ? me.lockedColumnContainer : me.normalColumnContainer;
 
         // Insert the column's field into the editor panel.
         fieldContainer.insert(grid.getColumnManager().getHeaderIndex(column), column.getEditor());
+        me.needsSyncFieldWidths = true;
     },
 
-    onColumnRemove: function(ct, column) {
-        column = column.isGroupHeader ? column.getGridColumns() : column;
-        this.removeColumnEditor(column);
-    },
-
-    removeColumnEditor: function(column, destroy) {
+    destroyColumnEditor: function(column) {
         var me = this,
             field,
             len, i;
@@ -115531,24 +116979,9 @@ Ext.define('Ext.grid.RowEditor', {
             return;
         }
 
-        if (column.hasEditor() && column.field.isComponent) {
-            field = column.getEditor();
-            if (field) {
-
-                // If the column is removed and destroyed (or we are being told to destroy), destroy the field.
-                if (destroy || column.isDestroyed) {
-                    field.destroy();
-                }
-                // Otherwise, just remove the field but preserve it for use when the column is reinserted.
-                else if (field.ownerCt) {
-                    field.ownerCt.remove(field, false);
-                }
-            }
+        if (column.hasEditor() && (field = column.getEditor())) {
+            field.destroy();
         }
-    },
-
-    onColumnReplace: function(map, fieldId, column, oldColumn) {
-        this.onColumnRemove(oldColumn.ownerCt, oldColumn);
     },
 
     getFloatingButtons: function() {
@@ -115582,15 +117015,16 @@ Ext.define('Ext.grid.RowEditor', {
         return this.editingPlugin.grid;
     },
 
-    // Lie to the CQ system about our nesting structure.
-    // Pretend all the fields are always immediate children.
-    // Include the two buttons.
     getRefItems: function(deep) {
         var me = this,
             result;
 
         if (me.lockable) {
-            result = me.lockedColumnContainer.getRefItems(deep);
+            // refItems must include ALL children. Must include the two containers
+            // because we don't know what is being searched for.
+            result = [me.lockedColumnContainer];
+            result.push.apply(result, me.lockedColumnContainer.getRefItems(deep));
+            result.push(me.normalColumnContainer);
             result.push.apply(result, me.normalColumnContainer.getRefItems(deep));
         } else {
             result = me.callParent(arguments);
@@ -115614,9 +117048,9 @@ Ext.define('Ext.grid.RowEditor', {
 
             deltaY = me.syncButtonPosition(me.getScrollDelta());
 
-            if (!me.editingPlugin.grid.rowLines) { 
+            if (!me.editingPlugin.grid.rowLines) {
                 // When the grid does not have rowLines we add a bottom border to the previous
-                // row when the row is focused, but subtract the border width from the 
+                // row when the row is focused, but subtract the border width from the
                 // top padding to keep the row from changing size.  This adjusts the top offset
                 // of the cell edtor to account for the added border.
                 yOffset = -parseInt(row.first().getStyle('border-bottom-width'), 10);
@@ -115634,7 +117068,7 @@ Ext.define('Ext.grid.RowEditor', {
                         me.scrollingViewEl.scrollBy(0, deltaY, true);
                     }
                     me.focusContextCell();
-                }
+                };
             }
 
             me.syncEditorClip();
@@ -115724,7 +117158,7 @@ Ext.define('Ext.grid.RowEditor', {
         } else if (fieldInfo.isHeader && !fieldInfo.isGroupHeader) {
             return fieldInfo.getEditor();
         }
-    },    
+    },
 
     addFieldsForColumn: function(column, initial) {
         var me = this,
@@ -115747,7 +117181,7 @@ Ext.define('Ext.grid.RowEditor', {
             }
 
             if (column.xtype === 'actioncolumn') {
-                field.fieldCls += ' ' + Ext.baseCSSPrefix + 'form-action-col-field'
+                field.fieldCls += ' ' + Ext.baseCSSPrefix + 'form-action-col-field';
             }
 
             if (me.isVisible() && me.context) {
@@ -115767,7 +117201,7 @@ Ext.define('Ext.grid.RowEditor', {
             }
         }
     },
-    
+
     getDefaultFieldCfg: function() {
         return {
             xtype: 'displayfield',
@@ -115799,6 +117233,11 @@ Ext.define('Ext.grid.RowEditor', {
             items[i].resumeEvents();
         }
 
+        // Because we suspend the events, none of the field events will get propagated to
+        // the form, so the valid state won't be correct.
+        if (form.hasInvalidField() === form.wasValid) {
+            delete form.wasValid;
+        }
         isValid = form.isValid();
         if (me.errorSummary) {
             if (isValid) {
@@ -115862,7 +117301,7 @@ Ext.define('Ext.grid.RowEditor', {
             // Scroll the visible RowEditor that is in error state back into view
             scrollDelta = me.getScrollDelta();
             if (scrollDelta) {
-                me.scrollingViewEl.scrollBy(0, scrollDelta, true)
+                me.scrollingViewEl.scrollBy(0, scrollDelta, true);
             }
             me.showToolTip();
             return false;
@@ -115889,7 +117328,7 @@ Ext.define('Ext.grid.RowEditor', {
         } else {
             me.syncFieldsHorizontalScroll();
         }
-        
+
         // Select the record before showing the editor, since
         // selecting will steal focus
         context.grid.getSelectionModel().select(record);
@@ -115962,8 +117401,8 @@ Ext.define('Ext.grid.RowEditor', {
     focusContextCell: function() {
         var column = this.context.column,
             field;
-        
-        if (!column.isDestroyed) {   
+
+        if (!column.isDestroyed) {
             field = this.getEditor(column);
             if (field && field.focus) {
                 field.focus();
@@ -116009,7 +117448,7 @@ Ext.define('Ext.grid.RowEditor', {
 
     onShow: function() {
         var me = this;
-        
+
         me.callParent(arguments);
         if (me.needsSyncFieldWidths) {
             me.suspendLayouts();
@@ -116120,7 +117559,7 @@ Ext.define('Ext.grid.RowEditor', {
 
     beforeDestroy: function(){
         Ext.destroy(this.floatingButtons, this.tooltip);
-        this.callParent();    
+        this.callParent();
     },
 
     clipBottom: function(value) {
@@ -116142,7 +117581,7 @@ Ext.define('Ext.grid.RowEditor', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116154,7 +117593,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('ExtThemeNeptune.grid.RowEditor', {
     override: 'Ext.grid.RowEditor',
@@ -116165,7 +117604,7 @@ Ext.define('ExtThemeNeptune.grid.RowEditor', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116177,7 +117616,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('Ext.grid.Scroller', {
     constructor: Ext.deprecated()
@@ -116186,7 +117625,7 @@ Ext.define('Ext.grid.Scroller', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116198,7 +117637,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -116447,7 +117886,7 @@ Ext.define('Ext.view.DropZone', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116459,7 +117898,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -116513,7 +117952,7 @@ Ext.define('Ext.grid.ViewDropZone', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116525,7 +117964,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Plugin to add header resizing functionality to a HeaderContainer.
@@ -116580,17 +118019,22 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
     },
 
     afterHeaderRender: function() {
-        var headerCt = this.headerCt,
+        var me = this,
+            headerCt = this.headerCt,
             el = headerCt.el;
 
         headerCt.mon(el, 'mousemove', this.onHeaderCtMouseMove, this);
+        me.markerOwner = me.ownerGrid = me.headerCt.up('tablepanel');
+        if (me.markerOwner.ownerLockable) {
+            me.markerOwner = me.markerOwner.ownerLockable;
+        }
 
-        this.tracker = new Ext.dd.DragTracker({
-            disabled: this.disabled,
-            onBeforeStart: Ext.Function.bind(this.onBeforeStart, this),
-            onStart: Ext.Function.bind(this.onStart, this),
-            onDrag: Ext.Function.bind(this.onDrag, this),
-            onEnd: Ext.Function.bind(this.onEnd, this),
+        me.tracker = new Ext.dd.DragTracker({
+            disabled: me.disabled,
+            onBeforeStart: Ext.Function.bind(me.onBeforeStart, me),
+            onStart: Ext.Function.bind(me.onStart, me),
+            onDrag: Ext.Function.bind(me.onDrag, me),
+            onEnd: Ext.Function.bind(me.onEnd, me),
             tolerance: 3,
             autoStart: 300,
             el: el
@@ -116600,12 +118044,12 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
     // As we mouse over individual headers, change the cursor to indicate
     // that resizing is available, and cache the resize target header for use
     // if/when they mousedown.
-    onHeaderCtMouseMove: function(e, t) {
+    onHeaderCtMouseMove: function(e) {
         var me = this,
-            prevSiblings,
-            headerEl, overHeader, resizeHeader, resizeHeaderOwnerGrid, ownerGrid;
+            headerEl, overHeader, resizeHeader,
+            headers;
 
-        if (me.headerCt.dragging) {
+        if (me.headerCt.dragging || me.disabled) {
             if (me.activeHd) {
                 me.activeHd.el.dom.style.cursor = '';
                 delete me.activeHd;
@@ -116613,48 +118057,46 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
         } else {
             headerEl = e.getTarget('.' + me.colHeaderCls, 3, true);
 
-            if (headerEl){
+            if (headerEl) {
                 overHeader = Ext.getCmp(headerEl.id);
 
-                // On left edge, go back to the previous non-hidden header.
-                if (overHeader.isOnLeftEdge(e)) {
-                    resizeHeader = overHeader.previousNode('gridcolumn:not([hidden]):not([isGroupHeader])')
-                    // There may not *be* a previous non-hidden header.
-                    if (resizeHeader) {
-
-                        ownerGrid = me.headerCt.up('tablepanel');
-                        resizeHeaderOwnerGrid = resizeHeader.up('tablepanel');
-
-                        // Need to check that previousNode didn't go outside the current grid/tree
-                        // But in the case of a Grid which contains a locked and normal grid, allow previousNode to jump
-                        // from the first column of the normalGrid to the last column of the lockedGrid
-                        if (!((resizeHeaderOwnerGrid === ownerGrid) || ((ownerGrid.ownerCt.isXType('tablepanel')) && ownerGrid.ownerCt.view.lockedGrid === resizeHeaderOwnerGrid))) {
-                            resizeHeader = null;
-                        }
+                // If near the right edge, we're resizing the column we are over.
+                if (overHeader.isOnRightEdge(e)) {
+                    
+                    // Cannot resize the only column in a forceFit grid.
+                    if (me.headerCt.visibleColumnManager.getColumns().length === 1 && me.headerCt.forceFit) {
+                        return;
                     }
-                }
-                // Else, if on the right edge, we're resizing the column we are over
-                else if (overHeader.isOnRightEdge(e)) {
+
                     resizeHeader = overHeader;
                 }
-                // Between the edges: we are not resizing
-                else {
-                    resizeHeader = null;
-                }
+                // Else... we might be near the right edge
+                else if (overHeader.isOnLeftEdge(e)) {
+                    // Extract previous visible leaf header
+                    headers = me.headerCt.visibleColumnManager.getColumns();
+                    resizeHeader = headers[Ext.Array.indexOf(headers, overHeader) - 1];
 
+                    // If there wasn't one, and we are the normal side of a lockable assembly then
+                    // use the last visible leaf header of the locked side.
+                    if (!resizeHeader && me.ownerGrid.ownerLockable && !me.ownerGrid.isLocked) {
+                        headers = me.ownerGrid.ownerLockable.lockedGrid.headerCt.visibleColumnManager.getColumns();
+                        resizeHeader = headers[headers.length - 1];
+                    }
+                }
                 // We *are* resizing
                 if (resizeHeader) {
+
                     // If we're attempting to resize a group header, that cannot be resized,
                     // so find its last visible leaf header; Group headers are sized
                     // by the size of their child headers.
                     if (resizeHeader.isGroupHeader) {
-                        prevSiblings = resizeHeader.getGridColumns();
-                        resizeHeader = prevSiblings[prevSiblings.length - 1];
+                        headers = resizeHeader.getGridColumns();
+                        resizeHeader = headers[headers.length - 1];
                     }
 
                     // Check if the header is resizable. Continue checking the old "fixed" property, bug also
                     // check whether the resizable property is set to false.
-                    if (resizeHeader && !(resizeHeader.fixed || (resizeHeader.resizable === false) || me.disabled)) {
+                    if (resizeHeader && !(resizeHeader.fixed || (resizeHeader.resizable === false))) {
                         me.activeHd = resizeHeader;
                         overHeader.el.dom.style.cursor = me.eResizeCursor;
                         if (overHeader.triggerEl) {
@@ -116675,14 +118117,20 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
 
     // only start when there is an activeHd
     onBeforeStart : function(e) {
-        // cache the activeHd because it will be cleared.
-        this.dragHd = this.activeHd;
+        var me = this;
 
-        if (!!this.dragHd && !this.headerCt.dragging) {
+        // cache the activeHd because it will be cleared.
+        me.dragHd = me.activeHd;
+
+        if (!!me.dragHd && !me.headerCt.dragging) {
+
+            // Calculate how far off the right marker line the mouse pointer is.
+            // This will be the xDelta during the following drag operation.
+            me.xDelta = me.dragHd.getX() + me.dragHd.getWidth() - me.tracker.getXY()[0];
             this.tracker.constrainTo = this.getConstrainRegion();
             return true;
         } else {
-            this.headerCt.dragging = false;
+            me.headerCt.dragging = false;
             return false;
         }
     },
@@ -116693,36 +118141,34 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
             dragHdEl = me.dragHd.el,
             rightAdjust = 0,
             nextHd,
-            lockedGrid;
+            lockedGrid,
+            maxColWidth = me.headerCt.getWidth() - me.headerCt.visibleColumnManager.getColumns().length * me.minColWidth;
 
         // If forceFit, then right constraint is based upon not being able to force the next header
         // beyond the minColWidth. If there is no next header, then the header may not be expanded.
         if (me.headerCt.forceFit) {
             nextHd = me.dragHd.nextNode('gridcolumn:not([hidden]):not([isGroupHeader])');
-            if (nextHd) {
-                if (!me.headerInSameGrid(nextHd)) {
-                    nextHd = null;
-                }
+            if (nextHd && me.headerInSameGrid(nextHd)) {
                 rightAdjust = nextHd.getWidth() - me.minColWidth;
             }
         }
 
         // If resize header is in a locked grid, the maxWidth has to be 30px within the available locking grid's width
         else if ((lockedGrid = me.dragHd.up('tablepanel')).isLocked) {
-            rightAdjust = me.dragHd.up('[scrollerOwner]').getWidth() - lockedGrid.getWidth() - 30;
+            rightAdjust = me.dragHd.up('[scrollerOwner]').getTargetEl().getWidth() - lockedGrid.getWidth() - (lockedGrid.ownerLockable.normalGrid.visibleColumnManager.getColumns().length * me.minColWidth + Ext.getScrollbarSize().width);
         }
 
         // Else ue our default max width
         else {
-            rightAdjust = me.maxColWidth - dragHdEl.getWidth();
+            rightAdjust = maxColWidth - dragHdEl.getWidth();
         }
 
         return me.adjustConstrainRegion(
             dragHdEl.getRegion(),
             0,
-            rightAdjust,
+            rightAdjust - me.xDelta,
             0,
-            me.minColWidth
+            me.minColWidth - me.xDelta
         );
     },
 
@@ -116733,22 +118179,28 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
             dragHd   = me.dragHd,
             width    = dragHd.el.getWidth(),
             headerCt = dragHd.getOwnerHeaderCt(),
-            x, y, gridSection, markerOwner, lhsMarker, rhsMarker, markerHeight;
+            x, y, markerOwner, lhsMarker, rhsMarker, markerHeight;
 
         me.headerCt.dragging = true;
         me.origWidth = width;
 
         // setup marker proxies
         if (!me.dynamic) {
-            gridSection  = markerOwner = headerCt.up('tablepanel');
-            if (gridSection.ownerLockable) {
-                markerOwner = gridSection.ownerLockable;
+            markerOwner = me.markerOwner;
+
+            // https://sencha.jira.com/browse/EXTJSIV-11299
+            // In Neptune (and other themes with wide frame borders), resize handles are embedded in borders,
+            // *outside* of the outer element's content area, therefore the outer element is set to overflow:visible.
+            // During column resize, we should not see the resize markers outside the grid, so set to overflow:hidden.
+            if (markerOwner.frame && markerOwner.resizable) {
+                me.gridOverflowSetting = markerOwner.el.dom.style.overflow;
+                markerOwner.el.dom.style.overflow = 'hidden';
             }
             x            = me.getLeftMarkerX(markerOwner);
             lhsMarker    = markerOwner.getLhsMarker();
             rhsMarker    = markerOwner.getRhsMarker();
-            markerHeight = gridSection.body.getHeight() + headerCt.getHeight();
-            y            = headerCt.getOffsetsTo(markerOwner)[1];
+            markerHeight = me.ownerGrid.body.getHeight() + headerCt.getHeight();
+            y            = headerCt.getOffsetsTo(markerOwner)[1] - markerOwner.el.getBorderWidth('t');
 
             lhsMarker.setLocalY(y);
             rhsMarker.setLocalY(y);
@@ -116761,17 +118213,12 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
 
     // synchronize the rhsMarker with the mouse movement
     onDrag: function(e){
-        var me = this,
-            markerOwner;
+        var me = this;
             
         if (me.dynamic) {
             me.doResize();
         } else {
-            markerOwner = this.headerCt.up('tablepanel');
-            if (markerOwner.ownerLockable) {
-                markerOwner = markerOwner.ownerLockable;
-            }
-            this.setMarkerX(this.getMovingMarker(markerOwner), this.calculateDragX(markerOwner));
+            me.setMarkerX(me.getMovingMarker(me.markerOwner), me.calculateDragX(me.markerOwner));
         }
     },
     
@@ -116789,22 +118236,28 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
                 if (markerOwner.ownerLockable) {
                     markerOwner = markerOwner.ownerLockable;
                 }
+                // If we had saved the gridOverflowSetting, restore it
+                if ('gridOverflowSetting' in this) {
+                    markerOwner.el.dom.style.overflow = this.gridOverflowSetting;
+                }
+
                 this.setMarkerX(markerOwner.getLhsMarker(), -9999);
                 this.setMarkerX(markerOwner.getRhsMarker(), -9999);
             }
             this.doResize();
         }
+        // If the mouse is still within the handleWidth, then we must be ready to drag again
+        this.onHeaderCtMouseMove(e);
     },
 
     doResize: function() {
         var me = this,
             dragHd = me.dragHd,
             nextHd,
-            offset;
-            
-        if (dragHd) {
             offset = me.tracker.getOffset('point');
 
+        // Only resize if we have dragged any distance in the X dimension...
+        if (dragHd && offset[0]) {
             // resize the dragHd
             if (dragHd.flex) {
                 delete dragHd.flex;
@@ -116855,7 +118308,7 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
     },
 
     calculateDragX: function(markerOwner) {
-        return this.tracker.getXY('point')[0] - markerOwner.getX() - markerOwner.el.getBorderWidth('l');
+        return this.tracker.getXY('point')[0] + this.xDelta - markerOwner.getX() - markerOwner.el.getBorderWidth('l');
     },
 
     getLeftMarkerX: function(markerOwner) {
@@ -116878,7 +118331,7 @@ Ext.define('Ext.grid.plugin.HeaderResizer', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116890,7 +118343,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -116972,7 +118425,7 @@ Ext.define('Ext.grid.header.DragZone', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -116984,7 +118437,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -117003,6 +118456,11 @@ Ext.define('Ext.grid.header.DropZone', {
         me.callParent([headerCt.el]);
     },
 
+    destroy: function () {
+        this.callParent();
+        Ext.destroy(this.topIndicator, this.bottomIndicator);
+    },
+
     getDDGroup: function() {
         return 'header-dd-zone-' + this.headerCt.up('[scrollerOwner]').id;
     },
@@ -117013,21 +118471,25 @@ Ext.define('Ext.grid.header.DropZone', {
 
     getTopIndicator: function() {
         if (!this.topIndicator) {
-            this.self.prototype.topIndicator = Ext.DomHelper.append(Ext.getBody(), {
+            this.topIndicator = Ext.DomHelper.append(Ext.getBody(), {
                 role: 'presentation',
                 cls: "col-move-top",
+                // tell the spec runner to ignore this element when checking if the dom is clean
+                "data-sticky": true,
                 html: "&#160;"
             }, true);
-            this.self.prototype.indicatorXOffset = Math.floor((this.topIndicator.dom.offsetWidth + 1) / 2);
+            this.indicatorXOffset = Math.floor((this.topIndicator.dom.offsetWidth + 1) / 2);
         }
         return this.topIndicator;
     },
 
     getBottomIndicator: function() {
         if (!this.bottomIndicator) {
-            this.self.prototype.bottomIndicator = Ext.DomHelper.append(Ext.getBody(), {
+            this.bottomIndicator = Ext.DomHelper.append(Ext.getBody(), {
                 role: 'presentation',
                 cls: "col-move-bottom",
+                // tell the spec runner to ignore this element when checking if the dom is clean
+                "data-sticky": true,
                 html: "&#160;"
             }, true);
         }
@@ -117149,9 +118611,9 @@ Ext.define('Ext.grid.header.DropZone', {
         if (data.header.el.dom === node) {
             doPosition = false;
         } else {
-            data.isLock = data.isUnlock = false;
+            data.isLock = data.isUnlock = data.crossPanel = false;
             to = me.getLocation(e, node).header;
-            
+
             // Dragging within the same container - always valid
             doPosition = (from.ownerCt === to.ownerCt);
 
@@ -117161,12 +118623,15 @@ Ext.define('Ext.grid.header.DropZone', {
                 doPosition = true;
                 fromPanel = from.up('tablepanel');
                 toPanel = to.up('tablepanel');
+                if (fromPanel !== toPanel) {
+                    data.crossPanel = true;
 
-                // If it's a lock operation, check that it's allowable.
-                data.isLock   = toPanel.isLocked && !fromPanel.isLocked;
-                data.isUnlock = !toPanel.isLocked && fromPanel.isLocked;
-                if ((data.isUnlock && from.lockable === false) || (data.isLock && !from.isLockable())) {
-                    doPosition = false;
+                    // If it's a lock operation, check that it's allowable.
+                    data.isLock   = toPanel.isLocked && !fromPanel.isLocked;
+                    data.isUnlock = !toPanel.isLocked && fromPanel.isLocked;
+                    if ((data.isUnlock && from.lockable === false) || (data.isLock && !from.isLockable())) {
+                        doPosition = false;
+                    }
                 }
             }
         }
@@ -117185,7 +118650,6 @@ Ext.define('Ext.grid.header.DropZone', {
         me.getTopIndicator().hide();
         me.getBottomIndicator().hide();
         me.lastTargetHeader = me.lastDropPos = null;
-
     },
 
     onNodeOut: function() {
@@ -117193,28 +118657,41 @@ Ext.define('Ext.grid.header.DropZone', {
     },
 
     onNodeDrop: function(node, dragZone, e, data) {
+        // Note that dropLocation.pos refers to whether to drop the header before or after the target node!
         if (this.valid) {
             var dragHeader     = data.header,
                 dropLocation   = data.dropLocation,
                 targetHeader   = dropLocation.header,
                 fromCt         = dragHeader.ownerCt,
-                localFromIdx   = fromCt.items.indexOf(dragHeader), // Container.items is a MixedCollection
                 toCt           = targetHeader.ownerCt,
+                sameCt         = fromCt === toCt,
+                // Use the items collection here, the indices we want are for moving the actual items in the container.
+                // The HeaderContainer translates this to visible columns for informing the view and firing events.
+                localFromIdx   = fromCt.items.indexOf(data.header),
                 localToIdx     = toCt.items.indexOf(targetHeader),
                 headerCt       = this.headerCt,
-                // Use the visible column manager here, the indexes we want are for moving
-                // the actual cells in the grid, which is only visible items
+                // Use the full column manager here, the indices we want are for moving the actual items in the container.
+                // The HeaderContainer translates this to visible columns for informing the view and firing events.
                 columns        = headerCt.visibleColumnManager,
-                fromIdx        = columns.getHeaderIndex(dragHeader),
-                toIdx          = columns.getHeaderIndex(targetHeader),
+                visibleFromIdx = columns.getHeaderIndex(dragHeader),
+                // Group headers need to lookup the column index in the items collection NOT the leaf-only full column manager!
+                visibleToIdx   = targetHeader.isGroupHeader ? toCt.items.indexOf(targetHeader) : columns.getHeaderIndex(targetHeader),
                 colsToMove     = dragHeader.isGroupHeader ? dragHeader.query(':not([hidden]):not([isGroupHeader])').length : 1,
-                sameCt         = fromCt === toCt,
+                // We really only need to know the direction for when dragging the last header of a group out of its grouping.
+                // `true` === dragged to the right, `false` === dragged to the left.
+                // Also, the direction is considered `true` (to the right) if the header is dropped directly adjacent to the group
+                // in the 'after' position.
+                direction      = targetHeader.isGroupHeader ? (dropLocation.pos === 'after') : columns.getHeaderIndex(targetHeader) > columns.getHeaderIndex(dragHeader),
                 scrollerOwner, savedWidth;
 
-            // Drop position is to the right of the targetHeader, increment the toIdx correctly
+            // Drop position is to the right of the targetHeader, increment the toIdx correctly. This is important
+            // to allow the drop after the last header, for instance, else it would not be possible.
             if (dropLocation.pos === 'after') {
                 localToIdx++;
-                toIdx += targetHeader.isGroupHeader ? targetHeader.query(':not([hidden]):not([isGroupHeader])').length : 1;
+
+                // Always increment the visibleToIdx index as this is used to swap the columns. Since the column swap uses
+                // the inserBefore dom method, it must be incremented so it's one more than the slot for the new column.
+                visibleToIdx += targetHeader.isGroupHeader ? targetHeader.query(':not([hidden]):not([isGroupHeader])').length : 1;
             }
 
             // If we are dragging in between two HeaderContainers that have had the lockable
@@ -117245,7 +118722,7 @@ Ext.define('Ext.grid.header.DropZone', {
                     // desired position (lock places at end, unlock places at beginning) then we're done.
                     if (localToIdx === localFromIdx) {
                         // We still need to inform the rest of the components so that events can be fired.
-                        headerCt.onHeaderMoved(dragHeader, colsToMove, fromIdx, toIdx);
+                        headerCt.onHeaderMoved(dragHeader, colsToMove, visibleFromIdx, visibleToIdx);
                         return;
                     }
                 }
@@ -117253,16 +118730,31 @@ Ext.define('Ext.grid.header.DropZone', {
                 // Suspend layouts while we sort all this out.
                 Ext.suspendLayouts();
 
-                dragHeader.dropMoving = true;
                 if (sameCt) {
                     toCt.move(localFromIdx, localToIdx);
                 } else {
+                    // Do a sanity!
+                    //
+                    // After the offsets are calculated, the visibleToIdx and the localToIdx indices should not be equal
+                    // for when the header is dragged to the right. This can happen, however, when the header that is moved
+                    // is the last in a grouped header and it's moved directly to the right of the group in which it's
+                    // contained (the drag position doesn't matter, either 'before' or 'after'). Therefore, we must decrement
+                    // the localToIdx index otherwise the header will be +1 offset from its data column.
+                    if (direction && (visibleToIdx === localToIdx)) {
+                        localToIdx -= 1;
+                    }
+
+                    // When removing and then adding, the owning gridpanel will be informed of column mutation twice
+                    // Both remove and add handling inform the owning grid.
+                    // The isDDMoveInGrid flag will prevent the remove operation from doing this.
+                    // See Ext.grid.header.Container#onRemove
+                    fromCt.isDDMoveInGrid = toCt.isDDMoveInGrid = !data.crossPanel;
                     fromCt.remove(dragHeader, false);
                     toCt.insert(localToIdx, dragHeader);
+                    fromCt.isDDMoveInGrid = toCt.isDDMoveInGrid = false;
                 }
-                delete dragHeader.dropMoving;
 
-                // Group headers acquire the aggregate width of their child headers
+                // Group headers skrinkwrap their child headers.
                 // Therefore a child header may not flex; it must contribute a fixed width.
                 // But we restore the flex value when moving back into the main header container
                 if (toCt.isGroupHeader) {
@@ -117279,10 +118771,13 @@ Ext.define('Ext.grid.header.DropZone', {
                     }
                 }
 
-                // Refresh columns cache in case we remove an emptied group column
-                headerCt.purgeCache();
                 Ext.resumeLayouts(true);
-                headerCt.onHeaderMoved(dragHeader, colsToMove, fromIdx, toIdx);
+
+                // If moving within the same container, the container's onMove method will have ensured that the top level
+                // headerCt's onHeaderMoved.
+                if (!sameCt) {
+                    headerCt.onHeaderMoved(dragHeader, colsToMove, visibleFromIdx, visibleToIdx);
+                }
 
                 // Ext.grid.header.Container will handle the removal of empty groups, don't handle it here
             }
@@ -117293,7 +118788,7 @@ Ext.define('Ext.grid.header.DropZone', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -117305,7 +118800,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * @private
@@ -117360,7 +118855,7 @@ Ext.define('Ext.grid.plugin.HeaderReorderer', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -117372,7 +118867,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Container which holds headers and is docked at the top or bottom of a TablePanel.
@@ -117399,6 +118894,7 @@ Ext.define('Ext.grid.header.Container', {
     alias: 'widget.headercontainer',
 
     baseCls: Ext.baseCSSPrefix + 'grid-header-ct',
+
     dock: 'top',
 
     /**
@@ -117458,9 +118954,6 @@ Ext.define('Ext.grid.header.Container', {
 
     menuColsIcon: Ext.baseCSSPrefix + 'cols-icon',
 
-    // private; will probably be removed by 4.0
-    triStateSort: false,
-
     ddLock: false,
 
     dragging: false,
@@ -117490,6 +118983,7 @@ Ext.define('Ext.grid.header.Container', {
 
         me.headerCounter = 0;
         me.plugins = me.plugins || [];
+        me.defaults = me.defaults || {};
 
         // TODO: Pass in configurations to turn on/off dynamic
         //       resizing and disable resizing all together
@@ -117526,6 +119020,9 @@ Ext.define('Ext.grid.header.Container', {
                 align: 'stretch'
             }, me.initialConfig.layout);
 
+            // All HeaderContainers need to know this so that leaf Columns can adjust for cell border width if using content box model
+            me.defaults.columnLines = me.columnLines;
+
             // If the header isn't a column ([isColumn] or [isGroupHeader]), then it's the root header.
             if (!me.isGroupHeader) {
                 me.isRootHeader = true;
@@ -117551,9 +119048,7 @@ Ext.define('Ext.grid.header.Container', {
             }
         }
 
-        me.defaults = me.defaults || {};
         Ext.applyIf(me.defaults, {
-            triStateSort: me.triStateSort,
             sortable: me.sortable
         });
 
@@ -117639,6 +119134,99 @@ Ext.define('Ext.grid.header.Container', {
         );
     },
 
+    initEvents: function() {
+        var me = this;
+
+        me.callParent();
+
+        // If this is top level, listen for events to delegate to descendant headers.
+        if (!me.isColumn && !me.isGroupHeader) {
+            me.mon(me.el, {
+                click:          me.onHeaderCtEvent,
+                dblclick:       me.onHeaderCtEvent,
+                contextmenu:    me.onHeaderCtEvent,
+                mouseover:      me.onHeaderCtMouseOver,
+                mouseout:       me.onHeaderCtMouseOut,
+                scope:          me
+            });
+        }
+    },
+
+    onHeaderCtEvent: function(e, t) {
+        var me = this,
+            headerEl = e.getTarget('.' + Ext.grid.column.Column.prototype.baseCls),
+            header,
+            targetEl,
+            isTriggerClick;
+
+        if (headerEl && !me.ddLock) {
+            header = Ext.getCmp(headerEl.id);
+            if (header) {
+                targetEl = header[header.clickTargetName];
+                if (e.within(targetEl)) {
+                    if (e.type === 'click') {
+                        isTriggerClick = header.onTitleElClick(e, targetEl);
+                        if (isTriggerClick) {
+                            me.onHeaderTriggerClick(header, e, t);
+                        } else {
+                            me.onHeaderClick(header, e, t);
+                        }
+                    }
+                    else if (e.type === 'contextmenu') {
+                        me.onHeaderContextMenu(header, e, t);
+                    } else if (e.type === 'dblclick' && header.resizable) {
+                        header.onTitleElDblClick(e, targetEl.dom);
+                    }
+                }
+            }
+        }
+    },
+
+    onHeaderCtMouseOver: function(e, t) {
+        var headerEl,
+            header,
+            targetEl;
+
+        // Only proces the mouse entering this HeaderContainer.
+        // From header to header, and exiting this HeaderContainer we track using mouseout events.
+        if (!e.within(this.el, true)) {
+            headerEl = e.getTarget('.' + Ext.grid.column.Column.prototype.baseCls);
+            header = headerEl && Ext.getCmp(headerEl.id);
+            if (header) {
+                targetEl = header[header.clickTargetName];
+                if (e.within(targetEl)) {
+                    header.onTitleMouseOver(e, targetEl.dom);
+                }
+            }
+        }
+    },
+
+    onHeaderCtMouseOut: function(e, t) {
+        var headerSelector = '.' + Ext.grid.column.Column.prototype.baseCls,
+            outHeaderEl = e.getTarget(headerSelector),
+            inHeaderEl = e.getRelatedTarget(headerSelector),
+            header,
+            targetEl;
+
+        // It's a mouseenter/leave, not an internal element change within a Header
+        if (outHeaderEl !== inHeaderEl) {
+            if (outHeaderEl) {
+                header = Ext.getCmp(outHeaderEl.id);
+                if (header) {
+                    targetEl = header[header.clickTargetName];
+                    header.onTitleMouseOut(e, targetEl.dom);
+                }
+            }
+            if (inHeaderEl) {
+                header = Ext.getCmp(inHeaderEl.id);
+                if (header) {
+                    targetEl = header[header.clickTargetName];
+                    header.onTitleMouseOver(e, targetEl.dom);
+                }
+            }
+        }
+    },
+
     isLayoutRoot: function(){
         // Since we're docked, the width is always calculated
         // If we're hidden, the height is explicitly 0, which
@@ -117665,7 +119253,7 @@ Ext.define('Ext.grid.header.Container', {
         }
         me.menuTask.cancel();
         me.callParent();
-        Ext.destroy(me.resizer, me.reorderer, me.visibleColumnManager, me.columnManager, me.menu);
+        Ext.destroy(me.visibleColumnManager, me.columnManager, me.menu);
         me.columnManager = me.visibleColumnManager = null;
     },
 
@@ -117679,7 +119267,8 @@ Ext.define('Ext.grid.header.Container', {
             count  = items.length,
             i      = 0,
             length = columns.length,
-            c, col, columnState, index;
+            c, col, columnState, index,
+            moved = false;
 
         for (c = 0; c < length; c++) {
             columnState = columns[c];
@@ -117691,8 +119280,10 @@ Ext.define('Ext.grid.header.Container', {
                     // Ensure that the column is restored to the state order.
                     // i is incremented upon every column match, so all persistent
                     // columns are ordered before any new columns.
+                    // Do not call Container method to move the column. We are not rendered yet.
                     if (i !== index) {
-                        me.moveHeader(index, i);
+                        this.items.insert(i, this.items.getAt(index));
+                        moved = true;
                     }
 
                     if (col.applyColumnState) {
@@ -117702,6 +119293,11 @@ Ext.define('Ext.grid.header.Container', {
                     break;
                 }
             }
+        }
+
+        // Because we did not call the container method to move the column, the cached columns needs to be purged.
+        if (moved) {
+            me.purgeCache();
         }
     },
 
@@ -117749,22 +119345,44 @@ Ext.define('Ext.grid.header.Container', {
             me._usedIDs[c.headerId] = true;
         }
         me.callParent(arguments);
-        me.onColumnsChanged();
-        me.checkMoveNotify(c);
+        me.onHeadersChanged(c, me.isDDMoveInGrid);
     },
 
-    onMove: function(c, fromIdx, toIdx) {
-        var me = this;
-        
+    move: function(fromIdx, toIdx) {
+        var me = this,
+            headerToMove = me.items.items[fromIdx];
+
+        // Take real grid column index of column being moved
+        headerToMove.visibleFromIdx = me.getOwnerHeaderCt().visibleColumnManager.indexOf(headerToMove);
+
         me.callParent(arguments);
-        me.onColumnsChanged();
-        if (!c.dropMoving) {
-            // The drop code will take care of updating the view
-            me.checkMoveNotify(c);
-            me.fireEvent('columnmove', me, c, fromIdx, toIdx);
-        }
     },
-    
+
+    onMove: function(headerToMove, fromIdx, toIdx) {
+        var me = this,
+            gridHeaderCt = me.getOwnerHeaderCt(),
+            gridVisibleColumnManager = gridHeaderCt.visibleColumnManager,
+            numColsToMove = 1,
+            visibleToIdx;
+
+        // Purges cache so that indexOf returns new position of header
+        me.onHeadersChanged(headerToMove, true);
+
+        visibleToIdx = gridVisibleColumnManager.indexOf(headerToMove);
+        if (visibleToIdx >= headerToMove.visibleFromIdx) {
+            visibleToIdx++;
+        }
+
+        me.callParent(arguments);
+
+        // If what is being moved is a group header, then pass the correct column count
+        if (headerToMove.isGroupHeader) {
+            numColsToMove = headerToMove.visibleColumnManager.getColumns().length;
+        }
+
+        gridHeaderCt.onHeaderMoved(headerToMove, numColsToMove, headerToMove.visibleFromIdx, visibleToIdx);
+    },
+
     // Invalidate column cache on remove
     // We cannot refresh the View on every remove because this method is called
     // when the HeaderDropZone moves Headers around, that will also refresh the view
@@ -117780,8 +119398,11 @@ Ext.define('Ext.grid.header.Container', {
         delete me._usedIDs[c.headerId];
 
         if (!me.destroying) {
-            me.onColumnsChanged();
-            me.checkMoveNotify(c);
+            // isDDMoveInGrid flag set by Ext.grid.header.DropZone when moving into another container *within the same grid*.
+            // This stops header change processing from being executed twice, once on remove and then on the subsequent add.
+            if (!me.isDDMoveInGrid) {
+                me.onHeadersChanged(c, false);
+            }
             if (me.isGroupHeader && !me.items.getCount() && ownerCt) {
                 // Detach the header from the DOM here. Since we're removing and destroying the container,
                 // the inner DOM may get overwritten, since Container::deatchOnRemove gets processed after
@@ -117795,38 +119416,69 @@ Ext.define('Ext.grid.header.Container', {
             }
         }
     },
-    
-    checkMoveNotify: function(c) {
-        var owner, root;
-        if (!c.isGroupHeader) {
-            // Get the root header
-            root = this.getOwnerHeaderCt();
-            if (root) {
-                // Reference the panel.Table
-                owner = root.ownerCt;
-                if (owner) {
-                    owner.onHeadersChanged(root, c);
+
+    // Private
+    // Called to clear all caches of columns whenever columns are added, removed to just moved.
+    // We need to be informed if it's just a move operation so that we don't call the heavier
+    // grid.onHeadersChanged which refreshes the view.
+    // The onMove handler ensures that grid.inHeaderMove is called which just swaps cells.
+    onHeadersChanged: function(c, isMove) {
+        var gridPanel,
+            gridHeaderCt = this.getOwnerHeaderCt();
+
+        // Each HeaderContainer up the chain must have its cache purged so that its getGridColumns method will return correct results.
+        this.purgeHeaderCtCache(this);
+
+        if (gridHeaderCt) {
+            gridHeaderCt.onColumnsChanged();
+            if (!c.isGroupHeader) {
+                gridPanel = gridHeaderCt.ownerCt;
+
+                // If it an add or remove operation causing this header change call, then inform the grid which refreshes.
+                // Moving calls the onHeaderMoved method of the grid which just swaps cells.
+                if (gridPanel && !isMove) {
+                    gridPanel.onHeadersChanged(gridHeaderCt, c);
                 }
             }
         }
     },
 
-    onShow: function() {
-        this.callParent(arguments);
-        this.onColumnsChanged();
+    // Private
+    onHeaderMoved: function(header, colsToMove, fromIdx, toIdx) {
+        var me = this,
+            gridSection = me.ownerCt;
+
+        if (me.rendered) {
+            if (gridSection && gridSection.onHeaderMove) {
+                gridSection.onHeaderMove(me, header, colsToMove, fromIdx, toIdx);
+            }
+            me.fireEvent('columnmove', me, header, fromIdx, toIdx);
+        }
     },
 
     // Private
-    // Called whenever a column is added or removed or moved.
+    // Only called on the grid's headerCt.
+    // Called whenever a column is added or removed or moved at any level below.
     // Ensures that the gridColumns caches are cleared.
     onColumnsChanged: function() {
-        var headerCt = this;
+        var me = this,
+            menu = me.menu,
+            columnItemSeparator,
+            columnItem;
 
-        // Each HeaderContainer up the chain must have its cache purged so that its getGridColumns method will return correct results.
-        this.purgeHeaderCtCache(headerCt);
+        if (me.rendered) {
+            me.fireEvent('columnschanged', me);
 
-        if (headerCt && headerCt.rendered) {
-            headerCt.fireEvent('columnschanged', headerCt);
+            // Column item (and its associated menu) menu has to be destroyed (if it exits) when columns are changed.
+            // It will be recreated just before the main container menu is next shown.
+            if (menu && (columnItemSeparator = menu.child('#columnItemSeparator'))) {
+                columnItem = menu.child('#columnItem'),
+
+                // Destroy the column visibility items
+                // They will be recreated before the next show
+                columnItemSeparator.destroy();
+                columnItem.destroy();
+            }
         }
     },
     
@@ -117853,20 +119505,18 @@ Ext.define('Ext.grid.header.Container', {
         return ret;
     },
 
-    setSortState: function(){
+    // Private
+    // Synchronize column UI visible sort state with Store's sorters.
+    setSortState: function() {
         var store   = this.up('[store]').store,
-            // grab the first sorter, since there may also be groupers
-            // in this collection
-            first = store.getFirstSorter(),
-            hd;
+            columns = this.visibleColumnManager.getColumns(),
+            len = columns.length, i,
+            header, sorter;
 
-        if (first) {
-            hd = this.down('gridcolumn[dataIndex=' + first.property  +']');
-            if (hd) {
-                hd.setSortState(first.direction, false, true);
-            }
-        } else {
-            this.clearOtherSortStates(null);
+        for (i = 0; i < len; i++) {
+            header = columns[i];
+            sorter = store.sorters.get(header.getSortParam());
+            header.setSortState(sorter);
         }
     },
 
@@ -117989,19 +119639,14 @@ Ext.define('Ext.grid.header.Container', {
         }, 200, this);
     },
 
-    onHeaderResize: function(header, w, suppressFocus) {
+    onHeaderResize: function(header, w) {
         var me = this,
-            view = me.view,
             gridSection = me.ownerCt;
 
-        // Do not react to header sizing during initial Panel layout when there is no view content to size.
-        if (view && view.body.dom) {
-            me.tempLock();
-            if (gridSection) {
-                gridSection.onHeaderResize(me, header, w);
-            }
+        if (gridSection) {
+            gridSection.onHeaderResize(me, header, w);
         }
-        me.fireEvent('columnresize', this, header, w);
+        me.fireEvent('columnresize', me, header, w);
     },
 
     onHeaderClick: function(header, e, t) {
@@ -118022,15 +119667,24 @@ Ext.define('Ext.grid.header.Container', {
         }
     },
 
+    /**
+     * @private
+     *
+     * Shows the column menu under the target element passed. This method is used when the trigger element on the column
+     * header is clicked on and rarely should be used otherwise.
+     *
+     * @param {HTMLElement/Ext.Element} t The target to show the menu by
+     * @param {Ext.grid.header.Container} header The header container that the trigger was clicked on.
+     */
     showMenuBy: function(t, header) {
         var menu = this.getMenu(),
             ascItem  = menu.down('#ascItem'),
             descItem = menu.down('#descItem'),
             sortableMth;
 
-        // Use ownerButton as the upward link. Menus *must have no ownerCt* - they are global floaters.
+        // Use ownerCmp as the upward link. Menus *must have no ownerCt* - they are global floaters.
         // Upward navigation is done using the up() method.
-        menu.activeHeader = menu.ownerButton = header;
+        menu.activeHeader = menu.ownerCmp = menu.ownerButton = header;
         header.setMenuActive(true);
 
         // enable or disable asc & desc menu items based on header being sortable
@@ -118041,7 +119695,7 @@ Ext.define('Ext.grid.header.Container', {
         if (descItem) {
             descItem[sortableMth]();
         }
-        menu.showBy(t);
+        menu.showBy(t, 'tl-bl?');
     },
 
     // remove the trigger open class when the menu is hidden
@@ -118052,7 +119706,7 @@ Ext.define('Ext.grid.header.Container', {
     moveHeader: function(fromIdx, toIdx) {
         // An automatically expiring lock
         this.tempLock();
-        this.onHeaderMoved(this.move(fromIdx, toIdx), 1, fromIdx, toIdx);
+        this.move(fromIdx, toIdx);
     },
 
     purgeHeaderCtCache: function (headerCt) {
@@ -118067,7 +119721,6 @@ Ext.define('Ext.grid.header.Container', {
 
     purgeCache: function() {
         var me = this,
-            menu = me.menu,
             visibleColumnManager = me.visibleColumnManager,
             columnManager = me.columnManager;
             
@@ -118078,27 +119731,6 @@ Ext.define('Ext.grid.header.Container', {
         if (visibleColumnManager) {
             visibleColumnManager.invalidate();
             columnManager.invalidate();
-        }
-
-        // Menu changes when columns are moved. It will be recreated.
-        // Menu does not change when columns are hidden or shown (which is all that happens when menu is visible)
-        if (menu && menu.hidden) {
-            // Must hide before destroy so that trigger el is deactivated
-            menu.hide();
-            menu.destroy();
-            me.menu = null;
-        }
-    },
-
-    onHeaderMoved: function (header, colsToMove, fromIdx, toIdx) {
-        var me = this,
-            gridSection = me.ownerCt;
-
-        if (me.rendered) {
-            if (gridSection && gridSection.onHeaderMove) {
-                gridSection.onHeaderMove(me, header, colsToMove, fromIdx, toIdx);
-            }
-            me.fireEvent('columnmove', me, header, fromIdx, toIdx);
         }
     },
 
@@ -118114,14 +119746,53 @@ Ext.define('Ext.grid.header.Container', {
                 hideOnParentHide: false,  // Persists when owning ColumnHeader is hidden
                 items: me.getMenuItems(),
                 listeners: {
+                    beforeshow: me.beforeMenuShow,
                     hide: me.onMenuHide,
                     scope: me
                 }
             });
             me.fireEvent('menucreate', me, me.menu);
         }
-        me.updateMenuDisabledState(me.menu);
         return me.menu;
+    },
+
+    // Render our menus to the first enclosing scrolling element so that they scroll with the grid
+    beforeMenuShow: function(menu) {
+        var me = this,
+            columnItem = menu.child('#columnItem'),
+            hideableColumns,
+            insertPoint,
+            menu;
+
+        // If a change of column structure caused destruction of the column menu item
+        // or the main menu was created without the column menu item because it began with no hideable headers
+        // Then create it and its menu now.
+        if (!columnItem) {
+            hideableColumns = me.enableColumnHide ? me.getColumnMenu(me) : null;
+
+            // Insert after the "Sort Ascending", "Sort Descending" menu items if they are present.
+            insertPoint = me.sortable ? 2 : 0;
+
+            if (hideableColumns && hideableColumns.length) {
+                menu.insert(insertPoint, [{
+                    itemId: 'columnItemSeparator',
+                    xtype: 'menuseparator'
+                }, {
+                    itemId: 'columnItem',
+                    text: me.columnsText,
+                    iconCls: me.menuColsIcon,
+                    menu: {
+                        items: hideableColumns
+                    },
+                    hideOnClick: false
+                }]);
+            }
+        }
+
+        me.updateMenuDisabledState(me.menu);
+        if (!menu.rendered) {
+            menu.render(this.el.up('{overflow=auto}') || document.body);
+        }
     },
 
     /**
@@ -118151,7 +119822,10 @@ Ext.define('Ext.grid.header.Container', {
         }
         if (hideableColumns && hideableColumns.length) {
             if (me.sortable) {
-                menuItems.push('-');
+                menuItems.push({
+                    itemId: 'columnItemSeparator',
+                    xtype: 'menuseparator'
+                });
             }
             menuItems.push({
                 itemId: 'columnItem',
@@ -118169,7 +119843,7 @@ Ext.define('Ext.grid.header.Container', {
         var menu = this.getMenu(),
             activeHeader = menu.activeHeader;
 
-        activeHeader.setSortState('ASC');
+        activeHeader.sort('ASC');
     },
 
     // sort desc when clicking on item in menu
@@ -118177,7 +119851,7 @@ Ext.define('Ext.grid.header.Container', {
         var menu = this.getMenu(),
             activeHeader = menu.activeHeader;
 
-        activeHeader.setSortState('DESC');
+        activeHeader.sort('DESC');
     },
 
     /**
@@ -118204,19 +119878,18 @@ Ext.define('Ext.grid.header.Container', {
                 scope: this
             });
             menuItems.push(menuItem);
-
-            // If the header is ever destroyed - for instance by dragging out the last remaining sub header,
-            // then the associated menu item must also be destroyed.
-            item.on({
-                destroy: Ext.Function.bind(menuItem.destroy, menuItem)
-            });
         }
         return menuItems;
     },
 
     onColumnCheckChange: function(checkItem, checked) {
         var header = Ext.getCmp(checkItem.headerId);
-        header[checked ? 'show' : 'hide']();
+
+        if (header.rendered) {
+            header[checked ? 'show' : 'hide']();
+        } else {
+            header.hidden = !checked;
+        }
     },
 
     /**
@@ -118228,41 +119901,18 @@ Ext.define('Ext.grid.header.Container', {
     },
 
     /**
-     * Gets the full width of all columns that are visible.
+     * Gets the full width of all columns that are visible for setting width of tables.
      */
-    getFullWidth: function() {
+    getTableWidth: function() {
         var fullWidth = 0,
             headers = this.getVisibleGridColumns(),
             headersLn = headers.length,
-            i = 0,
-            header;
-           
+            i;
 
-        for (; i < headersLn; i++) {
-            header = headers[i];
-            // use headers getDesiredWidth if its there
-            if (header.getDesiredWidth) {
-                fullWidth += header.getDesiredWidth() || 0;
-            // if injected a diff cmp use getWidth
-            } else {
-                fullWidth += header.getWidth();
-            }
+        for (i = 0; i < headersLn; i++) {
+            fullWidth += headers[i].getCellWidth() || 0;
         }
         return fullWidth;
-    },
-
-    // invoked internally by a header when not using triStateSorting
-    clearOtherSortStates: function(activeHeader) {
-        var headers   = this.getGridColumns(),
-            headersLn = headers.length,
-            i         = 0;
-
-        for (; i < headersLn; i++) {
-            if (headers[i] !== activeHeader) {
-                // unset the sortstate and dont recurse
-                headers[i].setSortState(null, true);
-            }
-        }
     },
 
     /**
@@ -118296,7 +119946,7 @@ Ext.define('Ext.grid.header.Container', {
      *
      * It includes hidden headers even though they are not rendered. This is for collection of menu items for the column hide/show menu.
      *
-     * Headers which have a hidden ancestor have a `hiddenAncestor: true` property injected so that they can also be rendered at zero width without interrogating
+     * Headers which have a hidden ancestor have a `hiddenAncestor: true` property injected so that descendants are known to be hidden without interrogating
      * that header's ownerCt axis for a hidden ancestor.
      * @returns {Array}
      */
@@ -118524,7 +120174,7 @@ Ext.define('Ext.grid.header.Container', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -118536,7 +120186,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * This class specifies the definition for a column inside a {@link Ext.grid.Panel}. It encompasses
@@ -118776,6 +120426,53 @@ Ext.define('Ext.grid.column.Column', {
      * @cfg {Object} renderer.value The data value for the current cell
      * @cfg {Object} renderer.metaData A collection of metadata about the current cell; can be used or modified
      * by the renderer. Recognized properties are: tdCls, tdAttr, and style.
+     *
+     * You can see an example of using the metaData parameter below.
+     * 
+     *      Ext.create('Ext.data.Store', {
+     *           storeId: 'simpsonsStore',
+     *           fields: ['class', 'attr', 'style'],
+     *           data: {
+     *               'class': 'red-bg',
+     *               "attr": "lightyellow",
+     *               "style": "red"
+     *           }
+     *      });
+     *
+     *      Ext.create('Ext.grid.Panel', {
+     *           title: 'Simpsons',
+     *           store: Ext.data.StoreManager.lookup('simpsonsStore'),
+     *           columns: [
+     *           {
+     *               text: 'Name',
+     *               dataIndex: 'class',
+     *               renderer: function (value, metaData) {
+     *                   metaData.tdCls = value;
+     *                   return value;
+     *               }
+     *           }, 
+     *           {
+     *               text: 'Email',
+     *               dataIndex: 'attr',
+     *               flex: 1,
+     *               renderer: function (value, metaData) {
+     *                   metaData.tdAttr = 'bgcolor=' + value;
+     *                   return value;
+     *               }
+     *           }, 
+     *           {
+     *               text: 'Phone',
+     *               dataIndex: 'style',
+     *               renderer: function (value, metaData) {
+     *                   metaData.style = 'color:' + value;
+     *                   return value;
+     *               }
+     *           }],
+     *           height: 200,
+     *           width: 400,
+     *           renderTo: Ext.getBody()
+     *       });
+     * 
      * @cfg {Ext.data.Model} renderer.record The record for the current row
      * @cfg {Number} renderer.rowIndex The index of the current row
      * @cfg {Number} renderer.colIndex The index of the current column
@@ -118896,16 +120593,11 @@ Ext.define('Ext.grid.column.Column', {
 
     initComponent: function() {
         var me = this,
-            renderer,
-            listeners;
+            renderer;
 
         if (me.header != null) {
             me.text = me.header;
             me.header = null;
-        }
-
-        if (!me.triStateSort) {
-            me.possibleSortStates.length = 2;
         }
 
         // A group header; It contains items which are themselves Headers
@@ -118946,25 +120638,12 @@ Ext.define('Ext.grid.column.Column', {
             }
             me.hasCustomRenderer = true;
         } else if (me.defaultRenderer) {
-            me.scope = me;
             me.renderer = me.defaultRenderer;
+            me.usingDefaultRenderer = true;
         }
 
         // Initialize as a HeaderContainer
         me.callParent(arguments);
-
-        listeners = {
-            element:        me.clickTargetName,
-            click:          me.onTitleElClick,
-            contextmenu:    me.onTitleElContextMenu,
-            mouseenter:     me.onTitleMouseOver,
-            mouseleave:     me.onTitleMouseOut,
-            scope:          me
-        };
-        if (me.resizable) {
-            listeners.dblclick = me.onTitleElDblClick;
-        }
-        me.on(listeners);
     },
     
     initItems: function() {
@@ -118973,19 +120652,20 @@ Ext.define('Ext.grid.column.Column', {
         me.callParent(arguments);
         
         if (me.isGroupHeader) {
-            if (!me.hasVisibleChildren()) {
+            if (!me.hasVisibleChildColumns()) {
                 me.hide();
             }
         }
     },
     
-    hasVisibleChildren: function() {
+    hasVisibleChildColumns: function() {
         var items = this.items.items,
             len = items.length,
-            i;
+            i, item;
             
         for (i = 0; i < len; ++i) {
-            if (!items[i].hidden) {
+            item = items[i];
+            if (item.isColumn && !item.hidden) {
                 return true;
             }
         }   
@@ -119001,7 +120681,7 @@ Ext.define('Ext.grid.column.Column', {
             child.addCls(this.groupSubHeaderCls);
         }
         
-        if (me.hidden) {
+        if (me.hidden && child.isColumn) {
             // Only hide automatically during construction time (no header)
             if (!ownerHeaderCt) {
                 child.hide();
@@ -119022,7 +120702,7 @@ Ext.define('Ext.grid.column.Column', {
         me.callParent(arguments);
         
         // By this point, the component will be removed from the items collection
-        if (me.isGroupHeader && !me.hasVisibleChildren()) {
+        if (me.isGroupHeader && !me.hasVisibleChildColumns()) {
             me.hide();
         }
     },
@@ -119160,27 +120840,11 @@ Ext.define('Ext.grid.column.Column', {
 
         me.callParent(arguments);
 
-        // BrowserBug: Ie8 Strict Mode, this will break the focus for this browser,
-        // must be fixed when focus management will be implemented.
-        if (!Ext.isIE8 || !Ext.isStrict) {
-            me.mon(me.getFocusEl(), {
-                focus: me.onTitleMouseOver,
-                blur: me.onTitleMouseOut,
-                scope: me
-            });
-        }
-        
         if (triggerEl && me.self.triggerElWidth === undefined) {
             triggerEl.setStyle('display', 'block');
             me.self.triggerElWidth = triggerEl.getWidth();
             triggerEl.setStyle('display', '');
         }
-
-        me.keyNav = new Ext.util.KeyNav(me.el, {
-            enter: me.onEnterKey,
-            down: me.onDownKey,
-            scope: me
-        });
     },
 
     // private
@@ -119192,7 +120856,7 @@ Ext.define('Ext.grid.column.Column', {
         me.callParent(arguments);
 
         if (ownerHeaderCt && (oldWidth != null || me.flex) && width !== oldWidth) {
-            ownerHeaderCt.onHeaderResize(me, width, true);
+            ownerHeaderCt.onHeaderResize(me, width);
         }
     },
 
@@ -119230,7 +120894,8 @@ Ext.define('Ext.grid.column.Column', {
     onTitleElDblClick: function(e, t) {
         var me = this,
             prev,
-            leafColumns;
+            leafColumns,
+            headerCt;
 
         // On left edge, resize previous *leaf* column in the grid
         if (me.isOnLeftEdge(e)) {
@@ -119250,8 +120915,15 @@ Ext.define('Ext.grid.column.Column', {
             // Click on right but in child container - autosize last leaf column
             if (me.isGroupHeader && e.getPoint().isContainedBy(me.layout.innerCt)) {
                 leafColumns = me.query('gridcolumn:not([hidden]):not([isGroupHeader])');
-                this.getOwnerHeaderCt().autoSizeColumn(leafColumns[leafColumns.length - 1]);
+                me.getOwnerHeaderCt().autoSizeColumn(leafColumns[leafColumns.length - 1]);
                 return;
+            } else {
+                headerCt = me.getOwnerHeaderCt();
+
+                // Cannot resize the only column in a forceFit grid.
+                if (headerCt.visibleColumnManager.getColumns().length === 1 && headerCt.forceFit) {
+                    return;
+                }
             }
             me.autoSize();
         }
@@ -119261,7 +120933,6 @@ Ext.define('Ext.grid.column.Column', {
      * Sizes this Column to fit the max content width.
      * *Note that group columns shrinkwrap around the size of leaf columns. Auto sizing a group column
      * autosizes descendant leaf columns.*
-     * @param {Ext.grid.column.Column/Number} The header (or index of header) to auto size.
      */
     autoSize: function() {
         var me = this,
@@ -119285,32 +120956,18 @@ Ext.define('Ext.grid.column.Column', {
     },
 
     onTitleElClick: function(e, t) {
-
-        // The grid's docked HeaderContainer.
         var me = this,
-            ownerHeaderCt = me.getOwnerHeaderCt();
+            isTriggerClick;
 
-        if (ownerHeaderCt && !ownerHeaderCt.ddLock) {
-            // Firefox doesn't check the current target in a within check.
-            // Therefore we check the target directly and then within (ancestors)
-            if (me.triggerEl && (e.target === me.triggerEl.dom || t === me.triggerEl.dom || e.within(me.triggerEl))) {
-                ownerHeaderCt.onHeaderTriggerClick(me, e, t);
-            // if its not on the left hand edge, sort
-            } else if (e.getKey() || (!me.isOnLeftEdge(e) && !me.isOnRightEdge(e))) {
-                me.toggleSortState();
-                ownerHeaderCt.onHeaderClick(me, e, t);
-            }
+        // Firefox doesn't check the current target in a within check.
+        // Therefore we check the target directly and then within (ancestors)
+        isTriggerClick = me.triggerEl && (e.target === me.triggerEl.dom || t === me.triggerEl.dom || e.within(me.triggerEl));
+
+        // If it's not a click on the trigger or extreme edges. Or if we are called from a key handler, sort this column.
+        if (!isTriggerClick && !me.isOnLeftEdge(e) && !me.isOnRightEdge(e) || e.getKey()) {
+            me.toggleSortState();
         }
-    },
-
-    onTitleElContextMenu: function(e, t) {
-        // The grid's docked HeaderContainer.
-        var me = this,
-            ownerHeaderCt = me.getOwnerHeaderCt();
-
-        if (ownerHeaderCt && !ownerHeaderCt.ddLock) {
-            ownerHeaderCt.onHeaderContextMenu(me, e, t);
-        }
+        return isTriggerClick;
     },
 
     /**
@@ -119336,24 +120993,28 @@ Ext.define('Ext.grid.column.Column', {
             idx = Ext.Array.indexOf(me.possibleSortStates, me.sortState);
 
             nextIdx = (idx + 1) % me.possibleSortStates.length;
-            me.setSortState(me.possibleSortStates[nextIdx]);
+            me.sort();
         }
     },
 
-    doSort: function(state) {
-        var tablePanel = this.up('tablepanel'),
-            store = tablePanel.store;
+    sort: function(direction) {
+        var me = this,
+            grid = me.up('tablepanel'),
+            store = grid.store;
 
         // If the owning Panel's store is a NodeStore, this means that we are the unlocked side
         // of a locked TreeGrid. We must use the TreeStore's sort method because we cannot
         // reorder the NodeStore - that would break the tree.
-        if (tablePanel.ownerLockable && store.isNodeStore) {
-            store = tablePanel.ownerLockable.lockedGrid.store;
+        if (grid.ownerLockable && store.isNodeStore) {
+            store = grid.ownerLockable.lockedGrid.store;
         }
-        store.sort({
-            property: this.getSortParam(),
-            direction: state
-        });
+
+        // Maintain backward compatibility.
+        // If the grid is NOT configured with multi column sorting, then specify "replace".
+        // Only if we are doing multi column sorting do we insert it as one of a multi set.
+        me.sorting = true;
+        store.sort(me.getSortParam(), direction, grid.multiColumnSort ? 'multi' : 'replace');
+        delete me.sorting;
     },
 
     /**
@@ -119365,44 +121026,31 @@ Ext.define('Ext.grid.column.Column', {
         return this.dataIndex;
     },
 
-    setSortState: function(state, skipClear, initial) {
+    // Private
+    // Set the UI state to reflect the state of any passed Sorter
+    // Called by the grid's HeaderContainer on view refresh
+    setSortState: function(sorter) {
         var me = this,
+            direction = sorter && sorter.direction,
             ascCls = me.ascSortCls,
             descCls = me.descSortCls,
-            ownerHeaderCt = me.getOwnerHeaderCt(),
-            oldSortState = me.sortState;
+            ownerHeaderCt = me.getOwnerHeaderCt();
 
-         state = state || null;
-
-        if (!me.sorting && oldSortState !== state && (me.getSortParam() != null)) {
-            // don't trigger a sort on the first time, we just want to update the UI
-            if (state && !initial) {
-                // when sorting, it will call setSortState on the header again once
-                // refresh is called
-                me.sorting = true;
-                me.doSort(state);
-                me.sorting = false;
-            }
-            switch (state) {
-                case 'DESC':
-                    me.addCls(descCls);
-                    me.removeCls(ascCls);
-                    break;
-                case 'ASC':
-                    me.addCls(ascCls);
-                    me.removeCls(descCls);
-                    break;
-                default:
-                    me.removeCls([ascCls, descCls]);
-            }
-            if (ownerHeaderCt && !me.triStateSort && !skipClear) {
-                ownerHeaderCt.clearOtherSortStates(me);
-            }
-            me.sortState = state;
-            // we only want to fire the event if we have a null state when using triStateSort
-            if (me.triStateSort || state != null) {
-                ownerHeaderCt.fireEvent('sortchange', ownerHeaderCt, me, state);
-            }
+        switch (direction) {
+            case 'DESC':
+                me.addCls(descCls);
+                me.removeCls(ascCls);
+                break;
+            case 'ASC':
+                me.addCls(ascCls);
+                me.removeCls(descCls);
+                break;
+            default:
+                me.removeCls([ascCls, descCls]);
+        }
+        // we only want to fire the event if we have actually sorted
+        if (direction) {
+            ownerHeaderCt.fireEvent('sortchange', ownerHeaderCt, me, direction);
         }
     },
 
@@ -119502,14 +121150,14 @@ Ext.define('Ext.grid.column.Column', {
             owner = me.ownerCt,
             ownerIsGroup,
             item, items, len, i;
-            
+
         // If we have no ownerHeaderCt, it's during object construction, so
         // just set the hidden flag and jump out
         if (!ownerHeaderCt) {
             me.callParent();
             return me;
         }
-            
+
         if (me.rendered && !me.isVisible()) {
             // Already hidden
             return me;
@@ -119532,7 +121180,7 @@ Ext.define('Ext.grid.column.Column', {
         if (ownerIsGroup && !fromOwner) {
             items = owner.query('>:not([hidden])');
             // The owner only has one item that isn't hidden and it's me; hide the owner.
-            if (items.length === 1 && items[0] == me) {
+            if (items.length === 1 && items[0] === me) {
                 me.ownerCt.hide();
                 return;
             }
@@ -119551,7 +121199,8 @@ Ext.define('Ext.grid.column.Column', {
         }
 
         me.callParent();
-        // Notify owning HeaderContainer
+
+        // Notify owning HeaderContainer. Will trigger a layout and a view refresh.
         ownerHeaderCt.onHeaderHide(me);
 
         Ext.resumeLayouts(true);
@@ -119597,17 +121246,22 @@ Ext.define('Ext.grid.column.Column', {
             }
         }
 
-        Ext.resumeLayouts(true);
-
-        // Notify owning HeaderContainer AFTER layout has been flushed so that header and headerCt widths are all correct
+        // Notify owning HeaderContainer. Will trigger a layout and a view refresh.
         ownerCt = me.getOwnerHeaderCt();
         if (ownerCt) {
             ownerCt.onHeaderShow(me);
         }
+
+        Ext.resumeLayouts(true);
+        return me;
+
     },
 
-    getDesiredWidth: function() {
-        var me = this;
+    getCellWidth: function() {
+        var me = this,
+            result,
+            checkBorderBox = true;
+
         if (me.rendered && me.componentLayout && me.componentLayout.lastComponentSize) {
             // headers always have either a width or a flex
             // because HeaderContainer sets a defaults width
@@ -119615,18 +121269,29 @@ Ext.define('Ext.grid.column.Column', {
             // we use the componentLayout's tracked width so that
             // we can calculate the desired width when rendered
             // but not visible because its being obscured by a layout
-            return me.componentLayout.lastComponentSize.width;
-        // Flexed but yet to be rendered this could be the case
-        // where a HeaderContainer and Headers are simply used as data
-        // structures and not rendered.
+            result = me.componentLayout.lastComponentSize.width;
+        } else if (me.width) {
+            result = me.width;
         }
-        else if (me.flex) {
-            // this is going to be wrong, the defaultWidth
-            return me.width;
+        
+        // This is a group header.
+        // Use getTableWidth and remember that getTableWidth adjusts for column lines and box model
+        else if (!me.isColumn) {
+            result = me.getTableWidth();
+            checkBorderBox = false;
         }
-        else {
-            return me.width;
+
+        // https://sencha.jira.com/browse/EXTJSIV-9263 - Browsers which cannot be switched to border box when doctype present (IE6 & IE7) - must subtract borders width from width of cells.
+        // TODO: Remove this when IE7 & IE7 are dropped.
+        if (checkBorderBox && !Ext.isBorderBox && me.ownerCt.columnLines) {
+
+            // Ensure we only read our border width once
+            if (me.columnBorderWidth == null && me.rendered) {
+                me.self.prototype.columnBorderWidth = me.el.getBorderWidth('lr');
+            }
+            result -= me.columnBorderWidth;
         }
+        return result;
     },
     
     getCellId: function() {
@@ -119642,7 +121307,7 @@ Ext.define('Ext.grid.column.Column', {
     },
 
     isOnLeftEdge: function(e) {
-        return (e.getXY()[0] - this.getX() <= this.handleWidth);
+        return (e.getXY()[0] - this.getX() < this.handleWidth);
     },
 
     isOnRightEdge: function(e) {
@@ -119679,7 +121344,7 @@ Ext.define('Ext.grid.column.Column', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -119691,7 +121356,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Grid header type which renders an icon, or a series of icons in a grid cell, and offers a scoped click
@@ -119752,12 +121417,16 @@ Ext.define('Ext.grid.column.Action', {
      * @cfg {String} icon
      * The URL of an image to display as the clickable element in the column.
      *
+     * There are no default icons that come with Ext JS.
+     *
      * Defaults to `{@link Ext#BLANK_IMAGE_URL}`.
      */
     /**
      * @cfg {String} iconCls
      * A CSS class to apply to the icon image. To determine the class dynamically, configure the Column with
      * a `{@link #getClass}` function.
+     *
+     * There are no default icon classes that come with Ext JS.
      */
     /**
      * @cfg {Function} handler
@@ -119790,8 +121459,12 @@ Ext.define('Ext.grid.column.Action', {
      */
     /**
      * @cfg {Boolean} [stopSelection=true]
-     * Prevent grid selection upon mousedown.
+     * Prevent grid selection upon click.
+     * Beware that if you allow for the selection to happen then the selection model will steal focus from
+     * any possible floating window (like a message box) raised in the handler. This will prevent closing the
+     * window when pressing the Escape button since it will no longer contain a focused component.
      */
+     stopSelection: true,
     /**
      * @cfg {Function} getClass
      * A function which returns the CSS class to apply to the icon image.
@@ -119910,6 +121583,8 @@ Ext.define('Ext.grid.column.Action', {
 
     innerCls: Ext.baseCSSPrefix + 'grid-cell-inner-action-col',
 
+    actionIconCls: Ext.baseCSSPrefix + 'action-col-icon',
+
     constructor: function(config) {
         var me = this,
             cfg = Ext.apply({}, config),
@@ -119979,11 +121654,11 @@ Ext.define('Ext.grid.column.Action', {
             }
 
             ret += '<img role="button" alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
-                '" class="' + prefix + 'action-col-icon ' + prefix + 'action-col-' + String(i) + ' ' + (disabled ? prefix + 'item-disabled' : ' ') +
-                ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope || scope, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
+                '" class="' + me.actionIconCls + ' ' + prefix + 'action-col-' + String(i) + ' ' + (disabled ? prefix + 'item-disabled' : ' ') +
+                (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope || scope, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
                 (tooltip ? ' data-qtip="' + tooltip + '"' : '') + ' />';
         }
-        return ret;    
+        return ret;
     },
 
     /**
@@ -120043,8 +121718,13 @@ Ext.define('Ext.grid.column.Action', {
             target = e.getTarget(),
             match,
             item, fn,
-            key = type == 'keydown' && e.getKey(),
+            key = (type === 'keydown' && e.getKey()),
             disabled;
+
+        // Don't process mousedown events anymore!
+        if (type === 'mousedown') {
+            return false;
+        }
 
         // If the target was not within a cell (ie it's a keydown event from the View), then
         // rely on the selection data injected by View.processUIEvent to grab the
@@ -120063,11 +121743,16 @@ Ext.define('Ext.grid.column.Action', {
                     if (fn) {
                         fn.call(item.scope || me.origScope || me, view, recordIndex, cellIndex, item, e, record, row);
                     }
-                } else if (type == 'mousedown' && item.stopSelection !== false) {
-                    return false;
+
+                    // The default is to stop the event from propagating (thus preventing the selection model from
+                    // selecting and focusing the grid row). See EXTJSIV-11177.
+                    if (item.stopSelection !== false) {
+                        return false;
+                    }
                 }
             }
         }
+
         return me.callParent(arguments);
     },
 
@@ -120084,7 +121769,7 @@ Ext.define('Ext.grid.column.Action', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120096,7 +121781,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column definition class which renders boolean data fields.  See the {@link Ext.grid.column.Column#xtype xtype}
@@ -120194,7 +121879,7 @@ Ext.define('Ext.grid.column.Boolean', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120206,7 +121891,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column subclass which renders a checkbox in each column cell which toggles the truthiness of the associated data field on click.
@@ -120220,7 +121905,7 @@ Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
  *             items : [
  *                 { name : 'Lisa',  email : 'lisa@simpsons.com',  phone : '555-111-1224', active : true  },
  *                 { name : 'Bart',  email : 'bart@simpsons.com',  phone : '555-222-1234', active : true  },
- *                 { name : 'Homer', email : 'home@simpsons.com',  phone : '555-222-1244', active : false },
+ *                 { name : 'Homer', email : 'homer@simpsons.com',  phone : '555-222-1244', active : false },
  *                 { name : 'Marge', email : 'marge@simpsons.com', phone : '555-222-1254', active : true  }
  *             ]
  *         },
@@ -120387,7 +122072,7 @@ Ext.define('Ext.grid.column.Check', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120399,7 +122084,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column definition class which renders a passed date according to the default locale, or a configured
@@ -120478,7 +122163,7 @@ Ext.define('Ext.grid.column.Date', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120490,7 +122175,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column definition class which renders a numeric data field according to a {@link #format} string.
@@ -120558,7 +122243,7 @@ Ext.define('Ext.grid.column.Number', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120570,7 +122255,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A special type of Grid {@link Ext.grid.column.Column} that provides automatic
@@ -120625,7 +122310,7 @@ Ext.define('Ext.grid.column.RowNumberer', {
 
     align: 'right',
 
-    constructor : function(config){
+    constructor: function (config) {
         var me = this;
 
         // Copy the prototype's default width setting into an instance property to provide
@@ -120636,8 +122321,8 @@ Ext.define('Ext.grid.column.RowNumberer', {
         me.scope = me;
     },
 
-    beforeRender: function() {
-        var rowBody = this.up('gridpanel').view.findFeature('rowbody');
+    beforeRender: function () {
+        var rowBody = this.up('tablepanel').view.findFeature('rowbody');
 
         this.callParent(arguments);
 
@@ -120679,7 +122364,7 @@ Ext.define('Ext.grid.column.RowNumberer', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120691,7 +122376,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 Ext.define('ExtThemeNeptune.grid.column.RowNumberer', {
     override: 'Ext.grid.column.RowNumberer',
@@ -120701,7 +122386,7 @@ Ext.define('ExtThemeNeptune.grid.column.RowNumberer', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120713,7 +122398,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A Column definition class which renders a value by processing a {@link Ext.data.Model Model}'s
@@ -120787,7 +122472,7 @@ Ext.define('Ext.grid.column.Template', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120799,7 +122484,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A feature is a type of plugin that is specific to the {@link Ext.grid.Panel}. It provides several
@@ -120980,7 +122665,7 @@ Ext.define('Ext.grid.feature.Feature', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -120992,7 +122677,7 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * A small abstract class that contains the shared behaviour for any summary
@@ -121037,6 +122722,9 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
         // Add a high priority interceptor which renders summary records simply
         // This will only see action ona bufferedRender situation where summary records are updated.
         me.view.addRowTpl(me.summaryRowTpl).summaryFeature = me;
+
+        // Define on the instance to store info needed by summary renderers.
+        me.summaryData = {};
     },
 
     /**
@@ -121045,6 +122733,21 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
      */
     toggleSummaryRow: function(visible) {
         this.showSummaryRow = !!visible;
+    },
+
+    createRenderer: function (column, record) {
+        var me = this,
+            ownerGroup = record.ownerGroup,
+            summaryData = ownerGroup ? me.summaryData[ownerGroup] : me.summaryData,
+            // Use the column.id for columns without a dataIndex. The populateRecord method does the same.
+            dataIndex = column.dataIndex || column.id;
+
+        return function () {
+             return column.summaryRenderer ?
+                column.summaryRenderer(record.get(dataIndex), summaryData, dataIndex) :
+                // For no summaryRenderer, return the field value in the Feature record.
+                record.get(dataIndex);
+        };
     },
 
     outputSummaryRecord: function(summaryRecord, contextValues, out) {
@@ -121069,15 +122772,11 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
         for (i = 0; i < colCount; i++) {
             column = columns[i];
             column.savedRenderer = column.renderer;
-            if (column.summaryRenderer) {
-                column.renderer = column.summaryRenderer;
-            } else if (!column.summaryType) {
-                column.renderer = Ext.emptyFn;
-            }
 
-            // Summary records may contain values based upon the column's ID if the column is not mapped from a field
-            if (!column.dataIndex) {
-                column.dataIndex = column.id;
+            if (column.summaryType || column.summaryRenderer) {
+                column.renderer = this.createRenderer(column, summaryRecord);
+            } else {
+                column.renderer = Ext.emptyFn;
             }
         }
 
@@ -121106,7 +122805,8 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
      * if the group parameter is `true` An object is returned with a property named for each group who's
      * value is the summary value.
      */
-    getSummary: function(store, type, field, group){
+    getSummary: function (store, type, field, group) {
+        // Note `group` will either be an instance of Ext.data.Group or a list of records.
         var records = group.records;
 
         if (type) {
@@ -121189,11 +122889,8 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
             group = groups[i];
             // Something has changed or it doesn't exist, populate it
             if (hasRemote || group.isDirty() || !group.hasAggregate()) {
-                if (hasRemote) {
-                    record = me.populateRemoteRecord(group, remoteData);
-                } else {
-                    record = me.populateRecord(group);
-                }
+                record = me.populateRecord(group, remoteData);
+
                 // Clear the dirty state of the group if this is the only Summary, or this is the right hand (normal grid's) summary
                 if (!lockingPartner || (me.view.ownerCt === me.view.ownerCt.ownerLockable.normalGrid)) {
                     group.commit();
@@ -121201,32 +122898,25 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
             } else {
                 record = group.getAggregateRecord();
             }
+
             data[group.key] = record;
         }
 
         return data;
     },
 
-    populateRemoteRecord: function(group, data) {
-        var record = group.getAggregateRecord(true),
-            groupData = data[group.key],
-            field;
-
-        record.beginEdit();
-        for (field in groupData) {
-            if (groupData.hasOwnProperty(field)) {
-                if (field !== record.idProperty) {
-                    record.set(field, groupData[field]);
-                }
+    setSummaryData: function (record, colId, summaryValue, groupName) {
+        if (groupName) {
+            if (!this.summaryData[groupName]) {
+                this.summaryData[groupName] = {};
             }
+            this.summaryData[groupName][colId] = summaryValue;
+        } else {
+            this.summaryData[colId] = summaryValue;
         }
-        record.endEdit(true);
-        record.commit(true);
-
-        return record;
     },
 
-    populateRecord: function(group){
+    populateRecord: function (group, remoteData) {
         var me = this,
             view = me.grid.ownerLockable ? me.grid.ownerLockable.view : me.view,
             store = me.view.store,
@@ -121234,15 +122924,52 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
             // Use the full column set, regardless of locking
             columns = view.headerCt.getGridColumns(),
             len = columns.length,
-            i, column, fieldName;
+            groupName = group.key,
+            groupData, field, i, column, fieldName, summaryValue;
 
         record.beginEdit();
+
+        if (remoteData) {
+            // Remote summary grouping provides the grouping totals so there's no need to
+            // iterate throught the columns to map the column's dataIndex to the field name.
+            // Instead, enumerate the grouping record and set the field in the aggregate
+            // record for each one.
+            groupData = remoteData[groupName];
+            for (field in groupData) {
+                if (groupData.hasOwnProperty(field)) {
+                    if (field !== record.idProperty) {
+                        record.set(field, groupData[field]);
+                    }
+                }
+            }
+        }
+
+        // Here we iterate through the columns with two objectives:
+        //    1. For local grouping, get the summary for each column and update the record.
+        //    2. For both local and remote grouping, set the summary data object
+        //       which is passed to the summaryRenderer (if defined).
         for (i = 0; i < len; ++i) {
             column = columns[i];
-            // Use the column id if there's no mapping, could be a calculated field
+            // Use the column id if there's no mapping, could be a calculated field.
             fieldName = column.dataIndex || column.id;
-            record.set(fieldName, me.getSummary(store, column.summaryType, fieldName, group));
+
+            // We need to capture the summary value because it could get overwritten when
+            // setting on the model if there is a convert() method on the model.
+            if (!remoteData) {
+                summaryValue = me.getSummary(store, column.summaryType, fieldName, group);
+                record.set(fieldName, summaryValue);
+            } else {
+                // For remote groupings, just get the value from the model.
+                summaryValue = record.get(fieldName);
+            }
+
+            // Capture the columnId:value for the summaryRenderer in the summaryData object.
+            me.setSummaryData(record, column.id, summaryValue, groupName);
         }
+
+        // Poke on the owner group for easy lookup in this.createRenderer().
+        record.ownerGroup = groupName;
+
         record.endEdit(true);
         record.commit();
 
@@ -121253,7 +122980,7 @@ Ext.define('Ext.grid.feature.AbstractSummary', {
 /*
 This file is part of Ext JS 4.2
 
-Copyright (c) 2011-2013 Sencha Inc
+Copyright (c) 2011-2014 Sencha Inc
 
 Contact:  http://www.sencha.com/contact
 
@@ -121265,14 +122992,14 @@ terms contained in a written agreement between you and Sencha.
 If you are unsure which license is appropriate for your use, please contact the sales department
 at http://www.sencha.com/contact.
 
-Build date: 2013-09-18 17:18:59 (940c324ac822b840618a3a8b2b4b873f83a1a9b1)
+Build date: 2014-09-02 11:12:40 (ef1fa70924f51a26dacbe29644ca3f31501a5fce)
 */
 /**
  * Private record store class which takes the place of the view's data store to provide a grouped
  * view of the data when the Grouping feature is used.
- * 
+ *
  * Relays granular mutation events from the underlying store as refresh events to the view.
- * 
+ *
  * On mutation events from the underlying store, updates the summary rows by firing update events on the corresponding
  * summary records.
  * @private
@@ -121371,7 +123098,7 @@ Ext.define('Ext.grid.feature.GroupStore', {
     },
 
     isCollapsed: function(name) {
-        return this.groupingFeature.groupCache[name].isCollapsed; 
+        return this.groupingFeature.groupCache[name].isCollapsed;
     },
 
     isInCollapsedGroup: function(record) {
@@ -121414,6 +123141,12 @@ Ext.define('Ext.grid.feature.GroupStore', {
         return this.store.getById(id);
     },
 
+    getByInternalId: function(internalId) {
+        
+        
+        return (this.store.snapshot || this.data).get(internalId) || null;
+    },
+
     expandGroup: function(group) {
         var me = this,
             startIdx;
@@ -121422,19 +123155,20 @@ Ext.define('Ext.grid.feature.GroupStore', {
             group = me.groupingFeature.groupCache[group];
         }
 
-        if (group && group.children.length && (startIdx = me.indexOf(group.children[0], true, true)) !== -1) {
+        if (group && group.children.length && (startIdx = me.data.indexOf(group.placeholder)) !== -1) {
 
             
             group.isCollapsed = false;
             me.isExpandingOrCollapsing = 1;
-            
+
             
             me.data.removeAt(startIdx);
-            me.fireEvent('bulkremove', me, [me.getGroupPlaceholder(group)], [startIdx]);
 
             
             me.data.insert(startIdx, group.children);
-            me.fireEvent('add', me, group.children, startIdx);
+
+            
+            me.fireEvent('replace', me, startIdx, [group.placeholder], group.children);
 
             me.fireEvent('groupexpand', me, group);
             me.isExpandingOrCollapsing = 0;
@@ -121445,14 +123179,13 @@ Ext.define('Ext.grid.feature.GroupStore', {
         var me = this,
             startIdx,
             placeholder,
-            i, j, len,
-            removeIndices;
+            len;
 
         if (typeof group === 'string') {
             group = me.groupingFeature.groupCache[group];
         }
 
-        if (group && (len = group.children.length) && (startIdx = me.indexOf(group.children[0], true)) !== -1) {
+        if (group && (len = group.children.length) && (startIdx = me.data.indexOf(group.children[0])) !== -1) {
 
             
             group.isCollapsed = true;
@@ -121462,15 +123195,10 @@ Ext.define('Ext.grid.feature.GroupStore', {
             me.data.removeRange(startIdx, len);
 
             
-            removeIndices = new Array(len);
-            for (i = 0, j = startIdx; i < len; i++, j++) {
-                removeIndices[i] = j;
-            }
-            me.fireEvent('bulkremove', me, group.children, removeIndices);
+            me.data.insert(startIdx, placeholder = me.getGroupPlaceholder(group));
 
             
-            me.data.insert(startIdx, placeholder = me.getGroupPlaceholder(group));
-            me.fireEvent('add', me, [placeholder], startIdx);
+            me.fireEvent('replace', me, startIdx, group.children, [placeholder]);
 
             me.fireEvent('groupcollapse', me, group);
             me.isExpandingOrCollapsing = 0;
@@ -121489,31 +123217,9 @@ Ext.define('Ext.grid.feature.GroupStore', {
 
     
     
-    
-    indexOf: function(record, viewOnly, includeCollapsed) {
-        var me = this,
-            groups,
-            groupCount,
-            i,
-            group,
-            groupIndex,
-            result = 0;
-
-        if (record && (includeCollapsed || !me.isInCollapsedGroup(record))) {
-            groups = me.store.getGroups();
-            groupCount = groups.length;
-            for (i = 0; i < groupCount; i++) {
-
-                
-                
-                group = groups[i];
-                if (group.name === this.store.getGroupString(record)) {
-                    groupIndex = Ext.Array.indexOf(group.children, record);
-                    return result + groupIndex;
-                }
-
-                result += (viewOnly && me.isCollapsed(group.name)) ? 1 : group.children.length;
-            }
+    indexOf: function(record) {
+        if (!record.isCollapsedPlaceholder) {
+            return this.data.indexOf(record);
         }
         return -1;
     },
@@ -121528,9 +123234,17 @@ Ext.define('Ext.grid.feature.GroupStore', {
         this.fireEvent('refresh', this);
     },
 
-    onBulkRemove: function(store, records, indices) {
+    onBulkRemove: function(store, records, indices, isMove, removeRange) {
         this.processStore(this.store);
-        this.fireEvent('refresh', this);
+
+        
+        
+        
+        if (removeRange) {
+            this.fireEvent('replace', this, this.indexOf(records[0]), records, []);
+        } else {
+            this.fireEvent('refresh', this);
+        }
     },
 
     onClear: function(store, records, startIndex) {
@@ -121540,7 +123254,10 @@ Ext.define('Ext.grid.feature.GroupStore', {
 
     onAdd: function(store, records, startIndex) {
         this.processStore(this.store);
-        this.fireEvent('refresh', this);
+
+        
+        
+        this.fireEvent('replace', this, this.indexOf(records[0]), [], records);
     },
 
     onUpdate: function(store, record, operation, modifiedFieldNames) {
@@ -121807,9 +123524,10 @@ Ext.define('Ext.grid.feature.Grouping', {
 
     init: function(grid) {
         var me = this,
-            view = me.view;
+            view = me.view,
+            store = view.store;
 
-        if (view.store.groupField) {
+        if (store.isGrouped()) {
             view.isGrouping = true;
         }
 
@@ -121837,7 +123555,7 @@ Ext.define('Ext.grid.feature.Grouping', {
         view.preserveScrollOnRefresh = true;
 
         
-        if (view.store.buffered) {
+        if (store.buffered) {
             me.collapsible = false;
         }
         
@@ -121847,7 +123565,7 @@ Ext.define('Ext.grid.feature.Grouping', {
             if (this.lockingPartner && this.lockingPartner.dataSource) {
                 me.dataSource = view.dataSource = this.lockingPartner.dataSource;
             } else {
-                me.dataSource = view.dataSource = new Ext.grid.feature.GroupStore(me, view.store);
+                me.dataSource = view.dataSource = new Ext.grid.feature.GroupStore(me, store);
             }
         }
 
@@ -121862,38 +123580,7 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     indexOf: function(record) {
-        var me = this,
-            store = me.view.store,
-            recordIdx = record.isModel ? store.indexOf(record) : Math.min(Math.max(record, 0), store.getCount() - 1),
-            storeGroups,
-            i, length, storeGroup, myGroup, groupStart,
-            nextGroupStart = 0,
-            skippedRecords = 0;
-
-        storeGroups = store.getGroups();
-
-        
-        for (i = 0, length = storeGroups.length; i < length; i++) {
-            storeGroup = storeGroups[i];
-            myGroup = me.getGroup(storeGroup.name);
-
-            groupStart = nextGroupStart;
-
-            
-            nextGroupStart = groupStart + storeGroup.children.length;
-
-            
-            if (recordIdx < nextGroupStart) {
-                return recordIdx - skippedRecords;
-            }
-
-            
-            
-            if (myGroup.isCollapsed) {
-                skippedRecords += storeGroup.children.length;
-                skippedRecords -= 1;
-            }
-        }
+        return this.dataSource.indexOf(record);
     },
 
     isInCollapsedGroup: function(record) {
@@ -122023,19 +123710,18 @@ Ext.define('Ext.grid.feature.Grouping', {
         var view = this.view,
             headerCt = view.headerCt,
             menu = headerCt.getMenu(),
-            groupToggleMenuItem  = menu.down('#groupMenuItem'),
+            activeHeader = menu.activeHeader,
+            groupMenuItem  = menu.down('#groupMenuItem'),
+            groupMenuMeth,
             colCount = this.grid.getVisibleColumnManager().getColumns().length,
             items,
             len,
             i;
 
         
-        if (groupToggleMenuItem) {
-            if (headerCt.getVisibleGridColumns().length > 1) {
-                groupToggleMenuItem.enable();
-            } else {
-                groupToggleMenuItem.disable();
-            }
+        if (activeHeader && groupMenuItem) {
+            groupMenuMeth = activeHeader.groupable === false || activeHeader.dataIndex == null || this.view.headerCt.getVisibleGridColumns().length < 2 ?  'disable' : 'enable';
+            groupMenuItem[groupMenuMeth]();
         }
 
         
@@ -122058,6 +123744,7 @@ Ext.define('Ext.grid.feature.Grouping', {
 
         if (store.isGrouped()) {
             groups = me.groupCache;
+            Ext.suspendLayouts();
             for (groupName in groups) {
                 if (groups.hasOwnProperty(groupName)) {
                     group = groups[groupName];
@@ -122072,6 +123759,7 @@ Ext.define('Ext.grid.feature.Grouping', {
                     }
                 }
             }
+            Ext.resumeLayouts(true);
         }
     },
 
@@ -122317,7 +124005,7 @@ Ext.define('Ext.grid.feature.Grouping', {
             group = me.groupCache[groupName];
 
         
-        if (group.isCollapsed != collapsed) {
+        if (group.isCollapsed !== collapsed) {
 
             
             
@@ -122357,13 +124045,14 @@ Ext.define('Ext.grid.feature.Grouping', {
             field = me.getGroupField(),
             menuItem,
             visibleGridColumns,
-            groupingByLastVisibleColumn;
+            groupingByLastVisibleColumn,
+            newChecked;
 
         if (me.hideGroupedHeader) {
             if (me.lastGroupers && me.lastGroupers.length) {
                 menuItem = me.getMenuItem(me.lastGroupers[0].property);
                 if (menuItem) {
-                    menuItem.setChecked(true);
+                    newChecked = true;
                 }
             }
             if (field) {
@@ -122371,11 +124060,16 @@ Ext.define('Ext.grid.feature.Grouping', {
 
                 
                 
-                groupingByLastVisibleColumn = ((visibleGridColumns.length === 1) && (visibleGridColumns[0].dataIndex == field));
+                groupingByLastVisibleColumn = ((visibleGridColumns.length === 1) && (visibleGridColumns[0].dataIndex === field));
                 menuItem = me.getMenuItem(field);
                 if (menuItem && !groupingByLastVisibleColumn) {
-                    menuItem.setChecked(false);
+                    newChecked = false;
                 }
+            }
+
+            
+            if (menuItem && menuItem.checked !== newChecked) {
+                menuItem.setChecked(newChecked);
             }
         }
         me.refreshIf();
@@ -122417,7 +124111,7 @@ Ext.define('Ext.grid.feature.Grouping', {
                         if (groupIsCollapsed) {
                             me.expand(groupName);
                         }
-                    } else {
+                    } else if (!groupCache[g].isCollapsed) {
                         me.doCollapseExpand(true, g, false);
                     }
                 }
@@ -122435,10 +124129,12 @@ Ext.define('Ext.grid.feature.Grouping', {
 
     setupRowData: function(record, idx, rowValues) {
         var me = this,
+            recordIndex = rowValues.recordIndex,
             data = me.refreshData,
             groupInfo = me.groupInfo,
             header = data.header,
             groupField = data.groupField,
+            store = me.view.store,
             dataSource = me.view.dataSource,
             grouper, groupName, prev, next;
 
@@ -122480,9 +124176,9 @@ Ext.define('Ext.grid.feature.Grouping', {
 
             else {
                 
-                rowValues.isFirstRow = idx === 0;
+                rowValues.isFirstRow = recordIndex === 0;
                 if (!rowValues.isFirstRow) {
-                    prev = dataSource.getAt(idx - 1);
+                    prev = store.getAt(recordIndex - 1);
                     
                     if (prev) {
                         
@@ -122491,9 +124187,9 @@ Ext.define('Ext.grid.feature.Grouping', {
                 }
 
                 
-                rowValues.isLastRow = idx == dataSource.getTotalCount() - 1;
+                rowValues.isLastRow = recordIndex == (store.buffered ? store.getTotalCount() : store.getCount()) - 1;
                 if (!rowValues.isLastRow) {
-                    next = dataSource.getAt(idx + 1);
+                    next = store.getAt(recordIndex + 1);
                     if (next) {
                         
                         rowValues.isLastRow = !next.isEqual(grouper.getGroupString(next), groupName);
@@ -122536,8 +124232,8 @@ Ext.define('Ext.grid.feature.Grouping', {
     setup: function(rows, rowValues) {
         var me = this,
             data = me.refreshData,
-            isGrouping = !me.disabled && me.view.store.isGrouped();
-            
+            isGrouping = !me.disabled && me.view.isGrouping;
+
         me.skippedRows = 0;
         if (rowValues.view.bufferedRenderer) {
             rowValues.view.bufferedRenderer.variableRowHeight = true;
@@ -122599,7 +124295,7 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     createGroupCls: function(group) {
-        return this.view.id + '-' + Ext.htmlEncode(group) + '-item';    
+        return this.view.id + '-' + Ext.htmlEncode(group) + '-item';
     },
 
     getGroupField: function(){
@@ -122641,16 +124337,19 @@ Ext.define('Ext.grid.feature.Grouping', {
     },
 
     onReconfigure: function(grid, store, columns, oldStore, oldColumns) {
-        var me = grid;
+        var bufferedStore;
 
         if (store && store !== oldStore) {
+            bufferedStore = store.buffered;
+
             
-            if (store.buffered !== oldStore.buffered) {
+            if (bufferedStore !== oldStore.buffered) {
                 Ext.Error.raise('Cannot reconfigure grouping switching between buffered and non-buffered stores');
             }
-            if (store.buffered) {
-                me.bindStore(store);
-                me.dataSource.processStore(store);
+
+            if (bufferedStore || grid.findPlugin('bufferedrenderer')) {
+                
+                grid.view.dataSource.bindStore(store);
             }
         }
     }
@@ -122679,8 +124378,65 @@ Ext.define('Ext.grid.feature.GroupingSummary', {
 
 
 
-Ext.define('Ext.grid.feature.RowBody', {
+Ext.define('Ext.grid.feature.RowWrap', {
     extend:  Ext.grid.feature.Feature ,
+    alias: 'feature.rowwrap',
+    
+    rowWrapTd: 'td.' + Ext.baseCSSPrefix + 'grid-rowwrap',
+    
+    
+    hasFeatureEvent: false,
+    
+    tableTpl: {
+        before: function(values, out) {
+            if (values.view.bufferedRenderer) {
+                values.view.bufferedRenderer.variableRowHeight = true;
+            }
+        },
+        priority: 200
+    },
+
+    wrapTpl: [
+        '<tr data-boundView="{view.id}" data-recordId="{record.internalId}" data-recordIndex="{recordIndex}" class="{[values.itemClasses.join(" ")]} ', Ext.baseCSSPrefix, 'grid-wrap-row" {ariaRowAttr}>',
+            '<td class="', Ext.baseCSSPrefix, 'grid-rowwrap ', Ext.baseCSSPrefix, 'grid-td" colspan="{columns.length}" {ariaCellAttr}>',
+                '<table class="', Ext.baseCSSPrefix, '{view.id}-table ', Ext.baseCSSPrefix, 'grid-table" border="0" cellspacing="0" cellpadding="0" style="width:100%" {ariaCellInnerTableAttr}>',
+                    '{[values.view.renderRowWrapColumnSizer(out)]}',
+                    '{%',
+                        'values.itemClasses.length = 0;',
+                        'this.nextTpl.applyOut(values, out, parent)',
+                    '%}',
+                '</table>',
+            '</td>',
+        '</tr>', {
+            priority: 200
+        }
+    ],
+
+    getTargetSelector: function () {
+        return this.itemSelector;
+    },
+
+    init: function(grid) {
+        var me = this,
+            view = me.view;
+
+        view.addTableTpl(me.tableTpl);
+        view.addRowTpl(Ext.XTemplate.getTpl(me, 'wrapTpl'));
+        view.renderRowWrapColumnSizer = me.view.renderColumnSizer;
+        view.renderColumnSizer = Ext.emptyFn;
+
+        
+        
+        view.isRowWrapped = true;
+
+        
+        view.getTargetSelector = me.getTargetSelector;
+    }});
+
+
+
+Ext.define('Ext.grid.feature.RowBody', {
+    extend:  Ext.grid.feature.RowWrap ,
     alias: 'feature.rowbody',
 
     rowBodyCls: Ext.baseCSSPrefix + 'grid-row-body',
@@ -122689,16 +124445,29 @@ Ext.define('Ext.grid.feature.RowBody', {
     eventPrefix: 'rowbody',
     eventSelector: 'tr.' + Ext.baseCSSPrefix + 'grid-rowbody-tr',
 
+    
+    hasFeatureEvent: true,
+
     colSpanDecrement: 0,
 
     tableTpl: {
         before: function(values, out) {
+            
+            if (!this.rowBody) {
+                return;
+            }
+
             var view = values.view,
                 rowValues = view.rowValues;
 
             this.rowBody.setup(values.rows, rowValues);
         },
         after: function(values, out) {
+            
+            if (!this.rowBody) {
+                return;
+            }
+
             var view = values.view,
                 rowValues = view.rowValues;
 
@@ -122751,28 +124520,24 @@ Ext.define('Ext.grid.feature.RowBody', {
 
     init: function(grid) {
         var me = this,
-            view = me.view;
+            view = me.view = grid.getView();
 
         view.rowBodyFeature = me;
 
         
-        
-        if (!view.findFeature('rowwrap')) {
-            grid.mon(view, {
-                element: 'el',
-                mousedown: me.onMouseDown,
-                scope: me
-            });
-            
-            me.mon(grid.getStore(), 'remove', me.onStoreRemove, me);
-        }
+        me.mon(grid.getStore(), 'remove', me.onStoreRemove, me);
 
         view.headerCt.on({
             columnschanged: me.onColumnsChanged,
             scope: me
         });
+
         view.addTableTpl(me.tableTpl).rowBody = me;
         view.addRowTpl(Ext.XTemplate.getTpl(this, 'extraRowTpl'));
+
+        
+        view.mouseOverOutBuffer = 0;
+
         me.callParent(arguments);
     },
     
@@ -122788,18 +124553,6 @@ Ext.define('Ext.grid.feature.RowBody', {
                     node.remove();
                 }
             }
-        }
-    },
-
-    
-    onMouseDown: function(e) {
-        var me = this,
-            tableRow = e.getTarget(me.eventSelector);
-
-        
-        if (tableRow && Ext.fly(tableRow = tableRow.previousSibling).is(me.view.getItemSelector())) {
-            e.target = tableRow;
-            me.view.handleEvent(e);
         }
     },
 
@@ -122842,67 +124595,6 @@ Ext.define('Ext.grid.feature.RowBody', {
 
 
 
-Ext.define('Ext.grid.feature.RowWrap', {
-    extend:  Ext.grid.feature.Feature ,
-    alias: 'feature.rowwrap',
-    
-    rowWrapTd: 'td.' + Ext.baseCSSPrefix + 'grid-rowwrap',
-    
-    
-    hasFeatureEvent: false,
-    
-    tableTpl: {
-        before: function(values, out) {
-            if (values.view.bufferedRenderer) {
-                values.view.bufferedRenderer.variableRowHeight = true;
-            }
-        },
-        priority: 200
-    },
-
-    wrapTpl: [
-        '<tr data-boundView="{view.id}" data-recordId="{record.internalId}" data-recordIndex="{recordIndex}" class="{[values.itemClasses.join(" ")]} ', Ext.baseCSSPrefix, 'grid-wrap-row" {ariaRowAttr}>',
-            '<td class="', Ext.baseCSSPrefix, 'grid-rowwrap ', Ext.baseCSSPrefix, 'grid-td" colSpan="{columns.length}" {ariaCellAttr}>',
-                '<table class="', Ext.baseCSSPrefix, '{view.id}-table ', Ext.baseCSSPrefix, 'grid-table" border="0" cellspacing="0" cellpadding="0" style="width:100%" {ariaCellInnerTableAttr}>',
-                    '{[values.view.renderColumnSizer(out)]}',
-                    '{%',
-                        'values.itemClasses.length = 0;',
-                        'this.nextTpl.applyOut(values, out, parent)',
-                    '%}',
-                '</table>',
-            '</td>',
-        '</tr>', {
-            priority: 200
-        }
-    ],
-
-    init: function(grid) {
-        var me = this;
-        me.view.addTableTpl(me.tableTpl);
-        me.view.addRowTpl(Ext.XTemplate.getTpl(me, 'wrapTpl'));
-        me.view.headerCt.on({
-            columnhide: me.onColumnHideShow,
-            columnshow: me.onColumnHideShow,
-            scope: me
-        });
-    },
-
-    
-    onColumnHideShow: function() {
-        var view = this.view,
-            items = view.el.query(this.rowWrapTd),
-            colspan = view.headerCt.getVisibleGridColumns().length,
-            len = items.length,
-            i;
-            
-        for (i = 0; i < len; ++i) {
-            items[i].colSpan = colspan;
-        }
-    }
-});
-
-
-
 Ext.define('Ext.grid.feature.Summary', {
 
     
@@ -122920,6 +124612,9 @@ Ext.define('Ext.grid.feature.Summary', {
     
     scrollPadProperty: 'padding-right',
 
+    
+    hasFeatureEvent: false,
+
     init: function(grid) {
         var me = this,
             view = me.view;
@@ -122928,6 +124623,7 @@ Ext.define('Ext.grid.feature.Summary', {
 
         if (me.dock) {
             grid.headerCt.on({
+                add: me.onStoreUpdate,
                 afterlayout: me.onStoreUpdate,
                 scope: me
             });
@@ -122967,7 +124663,7 @@ Ext.define('Ext.grid.feature.Summary', {
 
             
             grid.headerCt.afterComponentLayout = Ext.Function.createSequence(grid.headerCt.afterComponentLayout, function() {
-                var width = this.getFullWidth(),
+                var width = this.getTableWidth(),
                     innerCt = me.summaryBar.innerCt,
                     scrollWidth;
                     
@@ -123025,13 +124721,14 @@ Ext.define('Ext.grid.feature.Summary', {
         this.summaryBar.el.dom.scrollLeft = this.view.el.dom.scrollLeft;
     },
 
-    createSummaryRecord: function(view) {
+    createSummaryRecord: function (view) {
         var columns = view.headerCt.getVisibleGridColumns(),
             info = {
                 records: view.store.getRange()
             },
             colCount = columns.length, i, column,
-            summaryRecord = this.summaryRecord || (this.summaryRecord = new view.store.model(null, view.id + '-summary-record'));
+            summaryRecord = this.summaryRecord || (this.summaryRecord = new view.store.model(null, view.id + '-summary-record')),
+            dataIndex, summaryValue;
 
         
         summaryRecord.beginEdit();
@@ -123040,12 +124737,17 @@ Ext.define('Ext.grid.feature.Summary', {
 
             
             
-            if (!column.dataIndex) {
-                column.dataIndex = column.id;
-            }
+            dataIndex = column.dataIndex || column.id;
 
-            summaryRecord.set(column.dataIndex, this.getSummary(view.store, column.summaryType, column.dataIndex, info));
+            
+            
+            summaryValue = this.getSummary(view.store, column.summaryType, dataIndex, info);
+            summaryRecord.set(dataIndex, summaryValue);
+
+            
+            this.setSummaryData(summaryRecord, column.id, summaryValue);
         }
+
         summaryRecord.endEdit(true);
         
         summaryRecord.commit(true);
@@ -123059,7 +124761,7 @@ Ext.define('Ext.grid.feature.Summary', {
             view = me.view,
             record = me.createSummaryRecord(view),
             newRowDom = view.createRowElement(record, -1),
-            oldRowDom, partner,
+            oldRowDom,
             p;
 
         if (!view.rendered) {
@@ -123080,15 +124782,6 @@ Ext.define('Ext.grid.feature.Summary', {
             p = oldRowDom.parentNode;
             p.insertBefore(newRowDom, oldRowDom);
             p.removeChild(oldRowDom);
-
-            partner = me.lockingPartner;
-            
-            
-            if (partner && partner.grid.rendered && !me.calledFromLockingPartner) {
-                partner.calledFromLockingPartner = true;
-                partner.onStoreUpdate();
-                partner.calledFromLockingPartner = false;
-            }
         }
         
         if (me.dock) {
@@ -123237,13 +124930,19 @@ Ext.define('Ext.grid.locking.HeaderContainer', {
 
 Ext.define('Ext.grid.locking.View', {
     alternateClassName: 'Ext.grid.LockingView',
+               
+                               
+      
 
     mixins: {
-        observable:  Ext.util.Observable 
+        observable:  Ext.util.Observable ,
+        bindable:  Ext.util.Bindable 
     },
 
     
     isLockingView: true,
+
+    loadMask: true,
 
     eventRelayRe: /^(beforeitem|beforecontainer|item|container|cell|refresh)/,
 
@@ -123251,37 +124950,73 @@ Ext.define('Ext.grid.locking.View', {
         var me = this,
             eventNames = [],
             eventRe = me.eventRelayRe,
-            locked = config.locked.getView(),
-            normal = config.normal.getView(),
+            lockedView,
+            normalView,
             events,
             event;
 
-        Ext.apply(me, {
-            lockedView: locked,
-            normalView: normal,
-            lockedGrid: config.locked,
-            normalGrid: config.normal,
-            panel: config.panel
-        });
-        me.mixins.observable.constructor.call(me, config);
+        me.panel = config.panel;
 
         
-        events = locked.events;
+        
+        
+        
+        config.locked.viewConfig.bindStore = config.normal.viewConfig.bindStore = Ext.emptyFn;
+
+        
+        
+        
+        config.locked.viewConfig.beforeLayout = config.normal.viewConfig.beforeLayout = me.beforeLayout;
+
+        me.lockedGrid = me.panel.lockedGrid = Ext.ComponentManager.create(config.locked);
+        me.lockedView = lockedView = me.lockedGrid.getView();
+
+        if (me.lockedGrid.isTree) {
+            
+            me.lockedView.animate = false;
+
+            
+            config.normal.store = lockedView.store;
+
+            
+            config.normal.viewConfig.stripeRows = me.lockedView.stripeRows;
+            config.normal.rowLines = me.lockedGrid.rowLines;
+        }
+
+        
+        
+        
+        
+        me.normalGrid = me.panel.normalGrid = Ext.ComponentManager.create(config.normal);
+        lockedView.lockingPartner = normalView = me.normalView = me.normalGrid.getView();
+        normalView.lockingPartner = lockedView;
+
+        
+        
+        
+        me.deferInitialRefresh = normalView.deferInitialRefresh && lockedView.deferInitialRefresh;
+
+        me.loadMask = (config.loadMask !== undefined) ? config.loadMask : me.loadMask;
+
+        me.mixins.observable.constructor.call(me);
+
+        
+        events = lockedView.events;
         for (event in events) {
             if (events.hasOwnProperty(event) && eventRe.test(event)) {
                 eventNames.push(event);
             }
         }
-        me.relayEvents(locked, eventNames);
-        me.relayEvents(normal, eventNames);
+        me.relayEvents(lockedView, eventNames);
+        me.relayEvents(normalView, eventNames);
 
-        normal.on({
+        normalView.on({
             scope: me,
             itemmouseleave: me.onItemMouseLeave,
             itemmouseenter: me.onItemMouseEnter
         });
 
-        locked.on({
+        lockedView.on({
             scope: me,
             itemmouseleave: me.onItemMouseLeave,
             itemmouseenter: me.onItemMouseEnter
@@ -123291,6 +125026,34 @@ Ext.define('Ext.grid.locking.View', {
             render: me.onPanelRender,
             scope: me
         });
+
+        me.loadingText = normalView.loadingText;
+        me.loadingCls = normalView.loadingCls;
+        me.loadingUseMsg = normalView.loadingUseMsg;
+
+        
+        
+        
+        me.bindStore(normalView.dataSource, true, 'dataSource');
+    },
+
+    
+    beforeLayout: function() {
+        
+        var me = this.ownerCt.ownerLockable.view,
+            lockedView = me.lockedGrid.view,
+            normalView = me.normalGrid.view;
+
+        
+        
+        if (me.lockedGrid.isVisible()) {
+            if (lockedView.refreshNeeded) {
+                lockedView.doFirstRefresh(lockedView.dataSource);
+            }
+        }
+        if (normalView.refreshNeeded) {
+            normalView.doFirstRefresh(normalView.dataSource);
+        }
     },
 
     onPanelRender: function() {
@@ -123320,6 +125083,10 @@ Ext.define('Ext.grid.locking.View', {
             
             me.loadMask = new Ext.LoadMask(cfg);
         }
+    },
+
+    getRefOwner: function() {
+        return this.panel;
     },
 
     getGridColumns: function() {
@@ -123388,6 +125155,69 @@ Ext.define('Ext.grid.locking.View', {
 
     getStore: function(){
         return this.panel.store;
+    },
+
+    
+    bindStore : function(store, initial, propName) {
+        var me = this;
+        me.mixins.bindable.bindStore.apply(me, arguments);
+
+        
+        
+        if (!initial) {
+            me.getSelectionModel().bindStore(store);
+        }
+
+        
+        
+        
+        if (me.componentLayoutCounter) {
+            Ext.suspendLayouts();
+            me.normalView.doFirstRefresh(store);
+            me.lockedView.doFirstRefresh(store);
+            Ext.resumeLayouts(true);
+        }
+    },
+
+    getStoreListeners: function() {
+        var me = this;
+        return {
+            idchanged: me.onIdChanged,
+            refresh: me.onDataRefresh,
+            replace: me.onReplace,
+            add: me.onAdd,
+            bulkremove: me.onRemove,
+            update: me.onUpdate,
+            clear: me.refresh
+        };
+    },
+
+    onIdChanged: function(eventName, fn, scope){
+        this.relayFn('onIdChanged', arguments);
+    },
+
+    onDataRefresh: function(eventName, fn, scope){
+        this.relayFn('onDataRefresh', arguments);
+    },
+
+    onReplace: function(eventName, fn, scope){
+        this.relayFn('onReplace', arguments);
+    },
+
+    onAdd: function(eventName, fn, scope){
+        this.relayFn('onAdd', arguments);
+    },
+
+    onRemove: function(eventName, fn, scope){
+        this.relayFn('onRemove', arguments);
+    },
+
+    onUpdate: function(eventName, fn, scope){
+        this.relayFn('onUpdate', arguments);
+    },
+
+    refresh: function(eventName, fn, scope){
+        this.relayFn('refresh', arguments);
     },
 
     getNode: function(nodeInfo, dataRow) {
@@ -123465,14 +125295,6 @@ Ext.define('Ext.grid.locking.View', {
         this.relayFn('refreshNode', arguments);
     },
 
-    refresh: function(){
-        this.relayFn('refresh', arguments);
-    },
-
-    bindStore: function(){
-        this.relayFn('bindStore', arguments);
-    },
-
     addRowCls: function(){
         this.relayFn('addRowCls', arguments);
     },
@@ -123486,6 +125308,9 @@ Ext.define('Ext.grid.locking.View', {
             mask = me.loadMask;
             
         
+        this.isDestroyed = true;
+
+        
         
         me.clearListeners();
         if (mask && mask.bindStore) {
@@ -123493,6 +125318,9 @@ Ext.define('Ext.grid.locking.View', {
         }
     }
 
+}, function() {
+    this.borrow(Ext.AbstractComponent, ['up']);
+    this.borrow(Ext.view.AbstractView, ['doFirstRefresh', 'applyFirstRefresh']);
 });
 
 
@@ -123506,6 +125334,8 @@ Ext.define('Ext.grid.locking.Lockable', {
                                            
                         
       
+
+    supportsOverflowX: 'overflow-x' in document.documentElement.style,
 
     
     syncRowHeight: true,
@@ -123522,10 +125352,15 @@ Ext.define('Ext.grid.locking.Lockable', {
     scrollDelta: 40,
     
     
+
     
+
     
+
     
+
     lockedGridCls: Ext.baseCSSPrefix + 'grid-inner-locked',
+    normalGridCls: Ext.baseCSSPrefix + 'grid-inner-normal',
 
     
     
@@ -123544,8 +125379,10 @@ Ext.define('Ext.grid.locking.Lockable', {
         'enableColumnMove',
         'enableColumnResize',
         'sortableColumns',
+        'multiColumnSort',
         'columnLines',
-        'rowLines'
+        'rowLines',
+        'deferRowRender'
     ],
     normalCfgCopy: [ 
         'verticalScroller', 
@@ -123614,7 +125451,10 @@ Ext.define('Ext.grid.locking.Lockable', {
             lockedView,
             normalView,
             listeners,
-            loadMask = me.viewConfig && me.viewConfig.loadMask,
+            viewConfig = me.viewConfig,
+            
+            loadMaskCfg = viewConfig && viewConfig.loadMask,
+            loadMask = (loadMaskCfg !== undefined) ? loadMaskCfg : me.loadMask,
             bufferedRenderer = me.findPlugin('bufferedrenderer');
 
         allFeatures = me.constructLockableFeatures();
@@ -123643,8 +125483,13 @@ Ext.define('Ext.grid.locking.Lockable', {
             selModel: selModel,
             border: false,
             cls: me.lockedGridCls,
+
+            
+            
+            
+            
             isLayoutRoot: function() {
-                return false;
+                return this.floatedFromCollapse || me.normalGrid.floatedFromCollapse;
             },
             features: allFeatures.lockedFeatures,
             plugins: allPlugins.lockedPlugins
@@ -123659,8 +125504,11 @@ Ext.define('Ext.grid.locking.Lockable', {
             scrollerOwner: false,
             selModel: selModel,
             border: false,
+            cls: me.normalGridCls,
+
+            
             isLayoutRoot: function() {
-                return false;
+                return this.floatedFromCollapse || me.lockedGrid.floatedFromCollapse;
             },
             features: allFeatures.normalFeatures,
             plugins: allPlugins.normalPlugins
@@ -123695,17 +125543,21 @@ Ext.define('Ext.grid.locking.Lockable', {
 
         me.addStateEvents(['lockcolumn', 'unlockcolumn']);
 
-        columns = me.processColumns(me.columns);
+        columns = me.processColumns(me.columns, lockedGrid);
+
+        lockedGrid.columns = columns.locked;
 
         
-        
-        lockedGrid.width = columns.lockedWidth + Ext.num(selModel.headerWidth, 0) + (columns.locked.items.length ? 1 : 0);
-        lockedGrid.columns = columns.locked;
+        if (!lockedGrid.columns.items.length) {
+            lockedGrid.hidden = true;
+        }
+
         normalGrid.columns = columns.normal;
 
         
         normalGrid.flex = 1;
         lockedGrid.viewConfig = me.lockedViewConfig || {};
+        normalGrid.viewConfig = me.normalViewConfig || {};
         lockedGrid.viewConfig.loadingUseMsg = false;
         lockedGrid.viewConfig.loadMask = false;
 
@@ -123713,54 +125565,69 @@ Ext.define('Ext.grid.locking.Lockable', {
         
         
         
-        if (scrollbarHeight) {
+        
+        if (scrollbarHeight && !me.supportsOverflowX) {
             lockedGrid.viewConfig.style = 'border-bottom:' + scrollbarHeight +
+                'px solid #f6f6f6;' + (lockedGrid.viewConfig.style || '');
+            normalGrid.viewConfig.style = 'border-bottom:' + scrollbarHeight +
                 'px solid #f6f6f6;' + (lockedGrid.viewConfig.style || '');
         }
 
-        normalGrid.viewConfig = me.normalViewConfig || {};
         normalGrid.viewConfig.loadMask = false;
 
-        if (me.viewConfig && me.viewConfig.id) {
-            Ext.log.warn('id specified on Lockable viewConfig, it will be shared between both views: "' + me.viewConfig.id + '"');
+        if (viewConfig && viewConfig.id) {
+            Ext.log.warn('id specified on Lockable viewConfig, it will be shared between both views: "' + viewConfig.id + '"');
         }
 
-        Ext.applyIf(lockedGrid.viewConfig, me.viewConfig);
-        Ext.applyIf(normalGrid.viewConfig, me.viewConfig);
+        Ext.applyIf(lockedGrid.viewConfig, viewConfig);
+        Ext.applyIf(normalGrid.viewConfig, viewConfig);
 
-        me.lockedGrid = Ext.ComponentManager.create(lockedGrid);
+        
+        
+        if (!me.initialConfig.layout) {
+            me.layout = {
+                type: 'hbox',
+                align: 'stretch'
+            };
+        }
+        me.getLayout();
 
-        if (me.isTree) {
-            
-            me.lockedGrid.getView().animate = false;
-
-            
-            normalGrid.store = me.lockedGrid.view.store;
-
-            
-            normalGrid.deferRowRender = false;
-
-            
-            normalGrid.viewConfig.stripeRows = me.lockedGrid.view.stripeRows;
-            normalGrid.rowLines = me.lockedGrid.rowLines;
+        
+        
+        if (me.layout.type === 'border') {
+            if (me.split) {
+                lockedGrid.split = true;
+            }
+            if (!normalGrid.title) {
+                lockedGrid.header = false;
+            }
+            if (!lockedGrid.region) {
+                lockedGrid.region = 'west';
+            }
+            if (!normalGrid.region) {
+                normalGrid.region = 'center';
+            }
+            me.addCls(Ext.baseCSSPrefix + 'grid-locked-split');
+        }
+        if (!(me.layout instanceof Ext.layout.container.Box)) {
+            me.split = false;
         }
 
         
-        lockedView = me.lockedGrid.getView();
-        normalGrid.viewConfig.lockingPartner = lockedView;
-        me.normalGrid = Ext.ComponentManager.create(normalGrid);
-        lockedView.lockingPartner = normalView = me.normalGrid.getView();
-
+        
         me.view = new Ext.grid.locking.View({
-            loadingText: normalView.loadingText,
-            loadingCls: normalView.loadingCls,
-            loadingUseMsg: normalView.loadingUseMsg,
-            
-            loadMask: loadMask === undefined ? me.loadMask : loadMask,
-            locked: me.lockedGrid,
-            normal: me.normalGrid,
+            loadMask: loadMask,
+            locked: lockedGrid,
+            normal: normalGrid,
             panel: me
         });
+
+        
+        
+        
+        
+        lockedView = me.lockedGrid.getView();
+        normalView = me.normalGrid.getView();
 
         
         listeners = bufferedRenderer ? {} : {
@@ -123841,7 +125708,14 @@ Ext.define('Ext.grid.locking.Lockable', {
         });
 
         me.modifyHeaderCt();
-        me.items = [me.lockedGrid, me.normalGrid];
+        me.items = [me.lockedGrid];
+        if (me.split) {
+            me.addCls(Ext.baseCSSPrefix + 'grid-locked-split');
+            me.items[1] = {
+                xtype: 'splitter'
+            };
+        }
+        me.items.push(me.normalGrid);
 
         me.relayHeaderCtEvents(lockedHeaderCt);
         me.relayHeaderCtEvents(normalHeaderCt);
@@ -123855,10 +125729,12 @@ Ext.define('Ext.grid.locking.Lockable', {
             'groupchange'
         ]);
 
-        me.layout = {
-            type: 'hbox',
-            align: 'stretch'
-        };
+        
+        
+        me.gridRelayers = me.relayEvents(me.normalGrid, [
+            
+            'viewready'
+        ]);
     },
 
     getLockingViewConfig: function(){
@@ -123870,9 +125746,10 @@ Ext.define('Ext.grid.locking.Lockable', {
         };
     },
 
-    processColumns: function(columns) {
+    processColumns: function (columns, lockedGrid) {
         
-        var i,
+        var me = this,
+            i,
             len,
             column,
             cp = new Ext.grid.header.Container(),
@@ -123889,16 +125766,20 @@ Ext.define('Ext.grid.locking.Lockable', {
                 items: normalHeaders
             },
             result = {
-                lockedWidth: 0,
+                lockedWidth: lockedGrid.width || 0,
                 locked: lockedHeaderCt,
                 normal: normalHeaderCt
-            };
+            },
+            shrinkWrapLocked = me.shrinkWrapLocked = !(lockedGrid.width || lockedGrid.flex),
+            copy;
 
         
         if (Ext.isObject(columns)) {
             Ext.applyIf(lockedHeaderCt, columns);
             Ext.applyIf(normalHeaderCt, columns);
-            Ext.apply(cp, columns);
+            copy = Ext.apply({}, columns);
+            delete copy.items;
+            Ext.apply(cp, copy);
             columns = columns.items;
         }
 
@@ -123916,19 +125797,29 @@ Ext.define('Ext.grid.locking.Lockable', {
             
             column.processed = true;
             if (column.locked || column.autoLock) {
-                if (!column.hidden) {
-                    result.lockedWidth += this.getColumnWidth(column) || cp.defaultWidth;
+                
+                
+                if (shrinkWrapLocked && !column.hidden) {
+                    result.lockedWidth += me.getColumnWidth(column) || cp.defaultWidth;
                 }
                 lockedHeaders.push(column);
             } else {
                 normalHeaders.push(column);
             }
             if (!column.headerId) {
-                column.headerId = (column.initialConfig || column).id || ('h' + (++this.headerCounter));
+                column.headerId = (column.initialConfig || column).id || ('h' + (++me.headerCounter));
             }
         }
-        this.fireEvent('processcolumns', this, lockedHeaders, normalHeaders);
+        me.fireEvent('processcolumns', me, lockedHeaders, normalHeaders);
         cp.destroy();
+
+        
+        
+        
+        
+        if (shrinkWrapLocked) {
+            lockedGrid.width = (result.lockedWidth += Ext.num(me.getSelectionModel().headerWidth, 0) + (lockedHeaders.length ? 1 : 0));
+        }
         return result;
     },
 
@@ -123939,7 +125830,7 @@ Ext.define('Ext.grid.locking.Lockable', {
             subcols, len, i;
 
         if (column.flex) {
-            Ext.Error.raise("Columns which are locked do NOT support a flex width. You must set a width on the " + column.text + "column.");
+            Ext.Error.raise("Locked columns in an unsized locked side do NOT support a flex width. You must set a width on the " + column.text + "column.");
         }
         if (!result && column.isGroupHeader) {
             subcols = column.items.items;
@@ -123954,31 +125845,56 @@ Ext.define('Ext.grid.locking.Lockable', {
     
     
     
+    
     afterLockedViewLayout: function() {
         var me = this,
             lockedView = me.lockedGrid.getView(),
-            lockedViewEl = lockedView.el.dom,
-            spacerHeight = (me.normalGrid.headerCt.tooNarrow ? Ext.getScrollbarSize().height : 0);
+            normalView = me.normalGrid.getView(),
+            lockedViewEl = lockedView.el,
+            normalViewEl = normalView.el,
+            spacerHeight = Ext.getScrollbarSize().height,
+            lockedViewHorizScrollBar = (lockedView.scrollFlags.x && me.lockedGrid.headerCt.tooNarrow ? spacerHeight : 0),
+            normalViewHorizScrollBar = (normalView.scrollFlags.x && me.normalGrid.headerCt.tooNarrow ? spacerHeight : 0);
 
-        
-        if (lockedView.scrollFlags.x && lockedViewEl.scrollWidth > lockedViewEl.clientWidth) {
-            spacerHeight = 0;
+        if (lockedViewHorizScrollBar !== normalViewHorizScrollBar) {
+            if (lockedViewHorizScrollBar) {
+                if (me.supportsOverflowX) {
+                    normalViewEl.dom.style.overflowX = 'scroll';
+                    lockedView.getOverflowEl().setStyle(lockedView.getOverflowStyle());
+                } else {
+                    normalViewEl.dom.style.borderBottomWidth = lockedViewHorizScrollBar + 'px';
+                    lockedViewEl.dom.style.borderBottomWidth = '0px';
+                }
+            } else {
+                if (me.supportsOverflowX) {
+                    lockedViewEl.dom.style.overflowX = 'scroll';
+                    normalView.getOverflowEl().setStyle(normalView.getOverflowStyle());
+                } else {
+                    lockedViewEl.dom.style.borderBottomWidth = normalViewHorizScrollBar + 'px';
+                    normalViewEl.dom.style.borderBottomWidth = '0px';
+                }
+            }
+        } else {
+            if (me.supportsOverflowX) {
+                lockedView.getOverflowEl().dom.style.overflowX = normalViewHorizScrollBar ? 'scroll' : '';
+                normalView.getOverflowEl().setStyle(normalView.getOverflowStyle());
+            } else {
+                normalViewEl.dom.style.borderBottomWidth = lockedViewEl.dom.style.borderBottomWidth = '0px';
+            }
         }
 
-        lockedView.el.dom.style.borderBottomWidth = spacerHeight + 'px';
-
         
         
-        if (!Ext.isBorderBox) {
-            lockedView.el.setHeight(lockedView.lastBox.height);
+        if (!Ext.isBorderBox && !me.supportsOverflowX) {
+            lockedViewEl.setHeight(lockedView.lastBox.height);
+            normalViewEl.setHeight(normalView.lastBox.height);
         }
     },
 
     
     onLockedViewMouseWheel: function(e) {
         var me = this,
-            scrollDelta = -me.scrollDelta,
-            deltaY = scrollDelta * e.getWheelDeltas().y,
+            deltaY = -me.scrollDelta * e.getWheelDeltas().y,
             vertScrollerEl = me.lockedGrid.getView().el.dom,
             verticalCanScrollDown, verticalCanScrollUp;
 
@@ -124005,56 +125921,21 @@ Ext.define('Ext.grid.locking.Lockable', {
 
     onLockedViewScroll: function() {
         var me = this,
-            lockedView = me.lockedGrid.getView(),
-            normalView = me.normalGrid.getView(),
-            normalDom = normalView.el.dom,
-            lockedDom = lockedView.el.dom,
-            normalTable,
-            lockedTable;
+            normalDom = me.normalGrid.getView().el.dom,
+            lockedDom = me.lockedGrid.getView().el.dom;
 
-        
         if (normalDom.scrollTop !== lockedDom.scrollTop) {
             normalDom.scrollTop = lockedDom.scrollTop;
-    
-            
-            if (me.store.buffered) {
-                lockedTable = lockedView.el.child('table', true);
-                normalTable = normalView.el.child('table', true);
-                normalTable.style.position = 'absolute';
-                normalTable.style.top = lockedTable.style.top;
-            }
         }
     },
     
     onNormalViewScroll: function() {
         var me = this,
-            lockedView = me.lockedGrid.getView(),
-            normalView = me.normalGrid.getView(),
-            normalDom = normalView.el.dom,
-            lockedDom = lockedView.el.dom,
-            normalTable,
-            lockedTable;
+            normalDom = me.normalGrid.getView().el.dom,
+            lockedDom = me.lockedGrid.getView().el.dom;
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if (normalDom.scrollTop !== lockedDom.scrollTop) {
             lockedDom.scrollTop = normalDom.scrollTop;
-    
-            
-            if (me.store.buffered) {
-                lockedTable = lockedView.el.child('table', true);
-                normalTable = normalView.el.child('table', true);
-                lockedTable.style.position = 'absolute';
-                lockedTable.style.top = normalTable.style.top;
-            }
         }
     },
 
@@ -124178,19 +126059,25 @@ Ext.define('Ext.grid.locking.Lockable', {
 
                 
                 
-                if (!locked.headerCt.forceFit) {
+                if (me.shrinkWrapLocked && !locked.headerCt.forceFit) {
                     delete locked.flex;
                     
-                    locked.setWidth(locked.headerCt.getFullWidth());
+                    locked.setWidth(locked.headerCt.getTableWidth() + locked.el.getBorderWidth('lr'));
                 }
                 locked.addCls(me.lockedGridCls);
                 locked.show();
+                if (me.split) {
+                    me.child('splitter').show();
+                }
             } else {
                 
                 
                 
-                locked.getView().refresh();
+                locked.getView().clearViewEl();
                 locked.hide();
+                if (me.split) {
+                    me.child('splitter').hide();
+                }
             }
 
             
@@ -124243,21 +126130,9 @@ Ext.define('Ext.grid.locking.Lockable', {
         this.syncLockedWidth();
     },
 
-    onLockedHeaderSortChange: function(headerCt, header, sortState) {
-        if (sortState) {
-            
-            
-            this.normalGrid.headerCt.clearOtherSortStates(null, true);
-        }
-    },
+    onLockedHeaderSortChange: Ext.emptyFn,
 
-    onNormalHeaderSortChange: function(headerCt, header, sortState) {
-        if (sortState) {
-            
-            
-            this.lockedGrid.headerCt.clearOtherSortStates(null, true);
-        }
-    },
+    onNormalHeaderSortChange: Ext.emptyFn,
 
     
     
@@ -124265,12 +126140,14 @@ Ext.define('Ext.grid.locking.Lockable', {
         var me         = this,
             normalGrid = me.normalGrid,
             lockedGrid = me.lockedGrid,
+            normalView = normalGrid.view,
+            lockedView = lockedGrid.view,
             normalHCt  = normalGrid.headerCt,
             refreshFlags,
             ownerCt;
 
         activeHd = activeHd || normalHCt.getMenu().activeHeader;
-        toCt = toCt || lockedGrid.headerCt,
+        toCt = toCt || lockedGrid.headerCt;
         ownerCt = activeHd.ownerCt;
 
         
@@ -124286,6 +126163,9 @@ Ext.define('Ext.grid.locking.Lockable', {
         }
 
         Ext.suspendLayouts();
+
+        
+        normalView.blockRefresh = lockedView.blockRefresh = true;
         ownerCt.remove(activeHd, false);
         activeHd.locked = true;
 
@@ -124297,6 +126177,7 @@ Ext.define('Ext.grid.locking.Lockable', {
             toCt.add(activeHd);
         }
         me.ignoreAddLockedColumn = false;
+        normalView.blockRefresh = lockedView.blockRefresh = false;
 
         refreshFlags = me.syncLockedWidth();
         if (refreshFlags[0]) {
@@ -124316,6 +126197,8 @@ Ext.define('Ext.grid.locking.Lockable', {
         var me         = this,
             normalGrid = me.normalGrid,
             lockedGrid = me.lockedGrid,
+            normalView = normalGrid.view,
+            lockedView = lockedGrid.view,
             lockedHCt  = lockedGrid.headerCt,
             refreshFlags;
 
@@ -124327,9 +126210,13 @@ Ext.define('Ext.grid.locking.Lockable', {
         toCt = toCt || normalGrid.headerCt;
 
         Ext.suspendLayouts();
+
+        
+        normalView.blockRefresh = lockedView.blockRefresh = true;
         activeHd.ownerCt.remove(activeHd, false);
         activeHd.locked = false;
         toCt.insert(toIdx, activeHd);
+        normalView.blockRefresh = lockedView.blockRefresh = false;
 
         
         
@@ -124358,7 +126245,7 @@ Ext.define('Ext.grid.locking.Lockable', {
             lockedGrid.headerCt.removeAll();
             normalGrid.headerCt.removeAll();
 
-            columns = me.processColumns(columns);
+            columns = me.processColumns(columns, lockedGrid);
 
             
             me.ignoreAddLockedColumn = true;
@@ -124529,8 +126416,6 @@ Ext.define('Ext.tree.View', {
     
     ariaRole: 'tree',
 
-    blockRefresh: true,
-
     
     loadMask: false,
 
@@ -124563,7 +126448,6 @@ Ext.define('Ext.tree.View', {
                 var record = rowValues.record,
                     view = rowValues.view;
 
-                rowValues.rowAttr = {};
                 
                 
                 
@@ -124748,7 +126632,8 @@ Ext.define('Ext.tree.View', {
     
     createAnimWrap: function(record, index) {
         var me = this,
-            node = me.getNode(record),
+            
+            node = me.getNode(record, !me.isRowWrapped),
             tmpEl, nodeEl,
             columnSizer = [];
 
@@ -125067,7 +126952,11 @@ Ext.define('Ext.tree.View', {
                 afteranimate: function() {
                     
                     animWrap.el.remove();
-                    me.refreshSize();
+                    
+                    if (!me.isDestroyed) {
+                        me.refreshSize();
+                    }
+                    
                     delete me.animWraps[animWrap.record.internalId];
                     delete queue[id];
                 }
@@ -125274,18 +127163,26 @@ Ext.define('Ext.tree.View', {
 Ext.define('Ext.grid.plugin.BufferedRendererTreeView', {
     override: 'Ext.tree.View',
 
-    onRemove: function(store, records, indices) {
-        var me = this;
+    onRemove: function(store, records, indices, isMove, removeRange) {
+        var me = this,
+            bufferedRenderer = me.bufferedRenderer;
+
         
-        
-        if (me.rendered && me.bufferedRenderer) {
-            me.refreshView();
-        }
-        
-        else {
+        if (me.rendered && bufferedRenderer) {
+
+            
+            if (removeRange) {
+                bufferedRenderer.onReplace(store, indices[0], records, []);
+            }
+
+            
+            else {
+                bufferedRenderer.refreshView();
+            }
+        } else {
             me.callParent([store, records, indices]);
         }
-    }    
+    }
 });
 
 
@@ -125344,7 +127241,8 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
                 refresh: me.onViewRefresh,
                 scope: me,
                 destroyable: true
-            };
+            },
+            initialConfig = view.initialConfig;
 
         
         if (!me.variableRowHeight && grid.ownerLockable) {
@@ -125353,17 +127251,25 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
 
         
         
-        if (grid.isTree || grid.ownerLockable && grid.ownerLockable.isTree) {
+        if (grid.isTree || (grid.ownerLockable && grid.ownerLockable.isTree)) {
             view.blockRefresh = false;
-            view.loadMask = true;
+
+            
+            if (initialConfig && initialConfig.loadMask === undefined) {
+                view.loadMask = true;
+            }
         }
+
         if (view.positionBody) {
             viewListeners.refresh = me.onViewRefresh;
         }
+
         me.grid = grid;
         me.view = view;
+        me.isRTL = view.getHierarchyState().rtl;
         view.bufferedRenderer = me;
         view.preserveScrollOnRefresh = true;
+        view.animate = false;
 
         me.bindStore(view.dataSource);
         view.getViewRange = function() {
@@ -125376,17 +127282,30 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
         me.viewListeners = view.on(viewListeners);
     },
 
-    bindStore: function(store) {
-        var me = this;
-        if (me.store) {
-            me.unbindStore();
+    bindStore: function (store) {
+        var me = this,
+            view = me.view,
+            dataSource = view.dataSource,
+            hasFeatureStore = dataSource && dataSource.isFeatureStore;
+
+        
+        
+        
+        
+        
+        
+        
+        if (hasFeatureStore === store.isFeatureStore) {
+            if (me.store) {
+                me.unbindStore();
+            }
+            me.storeListeners = store.on({
+                scope: me,
+                clear: me.onStoreClear,
+                destroyable: true
+            });
+            me.store = store;
         }
-        me.storeListeners = store.on({
-            scope: me,
-            clear: me.onStoreClear,
-            destroyable: true
-        });
-        me.store = store;
 
         
         if (me.view.componentLayout.layoutCount) {
@@ -125452,6 +127371,11 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             
             me.onViewScroll();    
         } else {
+            if (!me.hasOwnProperty('bodyTop')) {
+                me.bodyTop = view.all.startIndex * me.rowHeight;
+                view.el.dom.scrollTop = me.bodyTop;
+                
+            }
             me.setBodyTop(me.bodyTop);
 
             
@@ -125463,10 +127387,14 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
     },
 
     onViewResize: function(view, width, height, oldWidth, oldHeight) {
+        var me = this,
+            newViewSize;
+
+        
+        me.tableTopBorderWidth = view.body.getBorderWidth('t');
+
         
         if (!oldHeight || height !== oldHeight) {
-            var me = this,
-                newViewSize;
 
             
             newViewSize = Math.ceil(height / me.rowHeight) + me.trailingBufferZone + me.leadingBufferZone;
@@ -125476,12 +127404,14 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
  
     stretchView: function(view, scrollRange) {
         var me = this,
-            recordCount = (me.store.buffered ? me.store.getTotalCount() : me.store.getCount());
+            recordCount = (me.store.buffered ? me.store.getTotalCount() : me.store.getCount()),
+            stretcherSpec,
+            el;
 
         if (me.stretcher) {
-            me.stretcher.dom.style.marginTop = (scrollRange - 1) + 'px';
+            me.stretcher.dom.style.marginTop = (recordCount <= me.viewSize ? 0 : (scrollRange - 1)) + 'px';
         } else {
-            var el = view.el;
+            el = view.el;
 
             
             
@@ -125493,15 +127423,16 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             if (recordCount && (me.view.all.endIndex === recordCount - 1)) {
                 scrollRange = me.bodyTop + view.body.dom.offsetHeight;
             }
-            this.stretcher = el.createChild({
+            stretcherSpec = {
                 style: {
                     width: '1px',
                     height: '1px',
                     'marginTop': (scrollRange - 1) + 'px',
-                    left: 0,
                     position: 'absolute'
                 }
-            }, el.dom.firstChild);
+            };
+            stretcherSpec.style[me.isRTL ? 'right' : 'left'] = 0;
+            this.stretcher = el.createChild(stretcherSpec, el.dom.firstChild);
         }
     },
 
@@ -125541,13 +127472,113 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
     getViewRange: function() {
         var me = this,
             rows = me.view.all,
-            store = me.store;
+            store = me.store,
+            startIndex = rows.getCount() ? rows.startIndex : rows.startIndex = (store.currentPage - 1) * store.pageSize;
+
+        
+        if (rows.getCount()) {
+            startIndex = rows.startIndex;
+        }
+        
+        
+        
+        else {
+            if (!store.currentPage) {
+                store.currentPage = 1;
+            }
+            startIndex = rows.startIndex = (store.currentPage - 1) * (store.pageSize || 1);
+
+            
+            store.currentPage = 1;
+        }
 
         if (store.data.getCount()) {
-            return store.getRange(rows.startIndex, rows.startIndex + (me.viewSize || store.defaultViewSize) - 1);
+            return store.getRange(startIndex, startIndex + (me.viewSize || store.defaultViewSize) - 1);
         } else {
             return [];
         }
+    },
+
+    
+    onReplace: function(store, startIndex, oldRecords, newRecords) {
+        var me = this,
+            view = me.view,
+            rows = view.all,
+            viewSize = me.viewSize,
+            overflow,
+            shortfall,
+            endIndex;
+
+        
+        
+        
+        
+        me.position = view.el.dom.scrollTop;
+
+        
+        endIndex = startIndex + ((oldRecords && oldRecords.length) ? (oldRecords.length - 1) : 0);
+
+        
+        if (endIndex < rows.startIndex || startIndex > (rows.startIndex + viewSize - 1)) {
+            
+            me.stretchView(view, me.getScrollHeight());
+            return;
+        }
+
+        
+        if (startIndex <= rows.startIndex && endIndex >= rows.endIndex) {
+            me.refreshView();
+        }
+
+        
+        else if (startIndex < rows.startIndex) {
+
+            
+            shortfall = endIndex - rows.startIndex + 1;
+
+            
+            if (shortfall <= 0) {
+                me.refreshView();
+            }
+
+            
+            else {
+                startIndex = Math.max(startIndex - shortfall - me.trailingBufferZone, 0);
+                endIndex = Math.min(startIndex + viewSize, store.getCount()) - 1;
+
+                
+                
+                
+                me.setBodyTop(startIndex * me.rowHeight);
+
+                me.renderRange(startIndex, endIndex);
+            }
+        }
+
+        
+        else {
+
+            
+            overflow = startIndex + newRecords.length - 1 - rows.endIndex;
+
+            
+            if (overflow > 0) {
+                startIndex = Math.max(me.getFirstVisibleRowIndex() - me.trailingBufferZone, 0);
+                endIndex = Math.min(startIndex + viewSize, store.getCount() - 1);
+                rows.removeRange(null, null, true);
+                me.renderRange(startIndex, endIndex);
+                view.selModel.onLastFocusChanged(null, view.selModel.lastFocused, true);
+            }
+
+            
+            else {
+                
+                me.refreshView();
+            }
+        }
+
+        
+        me.stretchView(view, me.getScrollHeight());
     },
 
     
@@ -125573,13 +127604,15 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             
             recordIdx = Math.min(Math.max(recordIdx, 0), view.store.getCount() - 1);
             record = view.store.getAt(recordIdx);
-            recordIdx = groupingFeature.indexOf(recordIdx);
             group = groupingFeature.getGroup(record);
 
             if (group.isCollapsed) {
                 groupingFeature.expand(group.name);
                 total = store.buffered ? store.getTotalCount() : store.getCount();
             }
+
+            
+            recordIdx = groupingFeature.indexOf(record);
 
         } else {
 
@@ -125588,8 +127621,8 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
         }
 
         
-        startIdx = Math.max(Math.min(recordIdx - ((me.leadingBufferZone + me.trailingBufferZone) / 2), total - me.viewSize + 1), 0);
-        tableTop = startIdx * me.rowHeight;
+        startIdx = Math.max(Math.min(recordIdx - (Math.floor((me.leadingBufferZone + me.trailingBufferZone) / 2)), total - me.viewSize + 1), 0);
+        tableTop = Math.max(startIdx * me.rowHeight - me.tableTopBorderWidth, 0);
         endIdx = Math.min(startIdx + me.viewSize - 1, total - 1);
 
         store.getRange(startIdx, endIdx, {
@@ -125702,6 +127735,27 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
         }
     },
 
+    
+    refreshView: function() {
+        var me = this,
+            selModel = me.view.selModel,
+            rows = me.view.all,
+            store = me.store,
+            maxIndex = store.getCount() - 1,
+
+            
+            
+            
+            startIndex = Math.max(0, Math.min(rows.startIndex, maxIndex - me.viewSize + 1)),
+
+            
+            endIndex = Math.min(rows.startIndex + me.viewSize - 1, maxIndex);
+
+        rows.removeRange(null, null, true);
+        me.renderRange(startIndex, endIndex, true);
+        selModel.onLastFocusChanged(null, selModel.lastFocused, true);
+    },
+
     renderRange: function(start, end, forceSynchronous) {
         var me = this,
             rows = me.view.all,
@@ -125744,9 +127798,14 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             rows = view.all,
             removeCount,
             increment = 0,
-            calculatedTop = start * me.rowHeight,
+
+            
+            calculatedTop = start * me.rowHeight - me.tableTopBorderWidth,
             top,
-            lockingPartner = me.lockingPartner;
+            lockingPartner = me.lockingPartner,
+            newRows,
+            topAdditionSize,
+            i;
 
         
         if (view.isDestroyed) {
@@ -125761,6 +127820,23 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             if (!range) {
                 return;
             }
+        }
+
+        
+        if (start < rows.startIndex && end > rows.endIndex) {
+
+            
+            topAdditionSize = rows.startIndex - start;
+            rows.clear(true);
+            newRows = Ext.Array.slice(view.doAdd(range, start), 0, topAdditionSize);
+
+            for (i = 0; i < newRows.length; i++) {
+                increment -= newRows[i].offsetHeight;
+            }
+
+            
+            me.setBodyTop(me.bodyTop + increment);
+            return;
         }
 
         
@@ -125841,7 +127917,10 @@ Ext.define('Ext.grid.plugin.BufferedRenderer', {
             bodyTop = calculatedTop;
         }
         body.style.position = 'absolute';
-        body.style.top = (me.bodyTop = bodyTop) + 'px';
+        body.style.top = (me.bodyTop = Math.max(bodyTop, 0)) + 'px';
+        if (me.isRTL && Ext.supports.xOriginBug && view.scrollFlags.y) {
+            body.style.right = -Ext.getScrollbarSize().width + 'px';
+        }
 
         
         
@@ -126188,8 +128267,7 @@ Ext.define('Ext.grid.plugin.Editing', {
 
         for (c = 0; c < cLen; c++) {
             column = columns[c];
-
-            column.getEditor = column.hasEditor = column.setEditor = null;
+            column.getEditor = column.hasEditor = column.setEditor = column.field = column.editor = null;
         }
     },
 
@@ -126206,7 +128284,7 @@ Ext.define('Ext.grid.plugin.Editing', {
     
     
     hasColumnField: function(columnHeader) {
-        return !!columnHeader.field;
+        return !!(columnHeader.field && columnHeader.field.isComponent);
     },
 
     
@@ -126216,8 +128294,9 @@ Ext.define('Ext.grid.plugin.Editing', {
         columnHeader.field = this.createColumnField(columnHeader);
     },
 
-    createColumnField:  function(columnHeader, defaultField) {
-        var field = columnHeader.field;
+    createColumnField: function (columnHeader, defaultField) {
+        var field = columnHeader.field,
+            dataIndex;
 
         if (!field && columnHeader.editor) {
             field = columnHeader.editor;
@@ -126229,26 +128308,32 @@ Ext.define('Ext.grid.plugin.Editing', {
         }
 
         if (field) {
+            dataIndex = columnHeader.dataIndex;
+
             if (field.isComponent) {
                 field.column = columnHeader;
-                field.isEditorComponent = true;
             } else {
                 if (Ext.isString(field)) {
                     field = {
-                        name: columnHeader.dataIndex,
+                        name: dataIndex,
                         xtype: field,
-                        column: columnHeader,
-                        isEditorComponent: true
+                        column: columnHeader
                     };
                 } else {
                     field = Ext.apply({
-                        name: columnHeader.dataIndex,
-                        column: columnHeader,
-                        isEditorComponent: true
+                        name: dataIndex,
+                        column: columnHeader
                     }, field);
                 }
                 field = Ext.ComponentManager.create(field, this.defaultFieldXType);
             }
+
+            
+            
+            
+            field.dataIndex = dataIndex;
+
+            field.isEditorComponent = true;
             columnHeader.field = field;
         }
         return field;
@@ -126258,7 +128343,6 @@ Ext.define('Ext.grid.plugin.Editing', {
     initEvents: function() {
         var me = this;
         me.initEditTriggers();
-        me.initLockableEvents();
         me.initCancelTriggers();
     },
 
@@ -126298,19 +128382,6 @@ Ext.define('Ext.grid.plugin.Editing', {
         view.on('render', me.initKeyNavHeaderEvents, me, {single: true});
     },
 
-    initLockableEvents: function() {
-        var me = this,
-            grid = me.grid.ownerLockable;
-
-        if (grid) {
-            grid.on({
-                lockcolumn: me.onColumnLockUnlock,
-                unlockcolumn: me.onColumnLockUnlock,
-                scope: me
-            });
-        }
-    },
-
     
     beforeViewCellFocus: function(position) {
         
@@ -126340,18 +128411,20 @@ Ext.define('Ext.grid.plugin.Editing', {
             columnHeader = view.ownerCt.getColumnManager().getHeaderAtIndex(colIdx),
             editor = columnHeader.getEditor(record);
 
-        if (editor && !expanderSelector || !e.getTarget(expanderSelector)) {
+        if (this.shouldStartEdit(editor) && (!expanderSelector || !e.getTarget(expanderSelector))) {
             this.startEdit(record, columnHeader);
         }
     },
 
     initAddRemoveHeaderEvents: function(){
-        var me = this;
-        me.mon(me.grid.headerCt, {
+        var me = this,
+            headerCt = me.grid.headerCt;
+
+        me.mon(headerCt, {
             scope: me,
             add: me.onColumnAdd,
-            remove: me.onColumnRemove,
-            columnmove: me.onColumnMove
+            columnmove: me.onColumnMove,
+            beforedestroy: me.beforeGridHeaderDestroy
         });
     },
 
@@ -126371,20 +128444,7 @@ Ext.define('Ext.grid.plugin.Editing', {
     },
 
     
-    onColumnRemove: function(ct, column) {
-        this.removeFieldAccessors(column);
-    },
-
-    
-    
-    
-    onColumnMove: function(headerCt, column, fromIdx, toIdx) {
-        this.initFieldAccessors(column);
-    },
-
-    onColumnLockUnlock: function(view, column) {
-        this.initFieldAccessors(column);
-    },
+    onColumnMove: Ext.emptyFn,
 
     
     onEnterKey: function(e) {
@@ -126420,6 +128480,10 @@ Ext.define('Ext.grid.plugin.Editing', {
 
     
     beforeEdit: Ext.emptyFn,
+
+    shouldStartEdit: function(editor) {
+        return !!editor;
+    },
 
     
     startEdit: function(record, columnHeader) {
@@ -126460,7 +128524,7 @@ Ext.define('Ext.grid.plugin.Editing', {
     getEditingContext: function(record, columnHeader) {
         var me = this,
             grid = me.grid,
-            colMgr = grid.getColumnManager(),
+            colMgr = grid.columnManager,
             view,
             gridRow,
             rowIdx, colIdx;
@@ -126472,13 +128536,13 @@ Ext.define('Ext.grid.plugin.Editing', {
         }
 
         
-        if (columnHeader.hidden) {
-            columnHeader = columnHeader.next(':not([hidden])') || columnHeader.prev(':not([hidden])');
+        if (!columnHeader) {
+            return;
         }
 
         
-        if (!columnHeader) {
-            return;
+        if (columnHeader.hidden) {
+            columnHeader = columnHeader.next(':not([hidden])') || columnHeader.prev(':not([hidden])');
         }
 
         
@@ -126585,6 +128649,32 @@ Ext.define('Ext.grid.plugin.CellEditing', {
         }
     },
 
+    
+    beforeGridHeaderDestroy: function(headerCt) {
+        var me = this,
+            columns = me.grid.getColumnManager().getColumns(),
+            len = columns.length,
+            i,
+            column,
+            editor;
+
+        for (i = 0; i < len; i++) {
+            column = columns[i];
+
+            
+            editor = me.editors.getByKey(column.getItemId());
+
+            
+            if (!editor && column.hasEditor && column.hasEditor()) {
+                editor = column.getEditor();
+            }
+
+            
+            Ext.destroy(editor);
+            me.removeFieldAccessors(column);
+        }
+    },
+
     onReconfigure: function(grid, store, columns){
         
         if (columns) {
@@ -126603,32 +128693,6 @@ Ext.define('Ext.grid.plugin.CellEditing', {
         me.callParent(arguments);
     },
 
-    onBodyScroll: function() {
-        var me = this,
-            ed = me.getActiveEditor(),
-            scroll = me.view.el.getScroll();
-
-        
-        
-        if (ed && ed.editing && ed.editingPlugin === me) {
-            
-            if (scroll.top !== me.scroll.top) {
-                if (ed.field) {
-                    if (ed.field.triggerBlur) {
-                        ed.field.triggerBlur();
-                    } else {
-                        ed.field.blur();
-                    }
-                }
-            }
-            
-            else {
-                ed.realign();
-            }
-        }
-        me.scroll = scroll;
-    },
-
     
     
     initCancelTriggers: function() {
@@ -126636,7 +128700,6 @@ Ext.define('Ext.grid.plugin.CellEditing', {
             grid = me.grid,
             view = grid.view;
 
-        me.mon(view, 'bodyscroll', me.onBodyScroll, me);
         me.mon(grid, {
             columnresize: me.cancelEdit,
             columnmove: me.cancelEdit,
@@ -126678,6 +128741,8 @@ Ext.define('Ext.grid.plugin.CellEditing', {
             record = context.record;
             columnHeader = context.column;
 
+            context.originalValue = context.value = record.get(columnHeader.dataIndex);
+
             
             
             isFieldEditable = (columnHeader && columnHeader.getEditor(record)) && !(me.beforeEdit(context) === false || me.fireEvent('beforeedit', me, context) === false || context.cancel);
@@ -126685,21 +128750,16 @@ Ext.define('Ext.grid.plugin.CellEditing', {
             if (isFieldEditable) {
                 ed = me.getEditor(record, columnHeader);
                 isEditorEditing = ed.editing;
-            }
-
-            
-            
-            
-            me.completeEdit();
-
-            if (!isFieldEditable) {
+            } else {
                 return false;
             }
 
             
-            me.context = context;
+            
+            me.completeEdit(isEditorEditing);
 
-            context.originalValue = context.value = record.get(columnHeader.dataIndex);
+            
+            me.context = context;
 
             
             me.grid.view.cancelFocus();
@@ -126745,11 +128805,12 @@ Ext.define('Ext.grid.plugin.CellEditing', {
         
         if (!selection || !sm.isCellSelected(me.view, record, columnHeader)) {
             sm.preventFocus = true;
+            
             sm.selectByPosition({
                 row: record,
                 column: columnHeader,
                 view: me.view
-            });
+            }, true);
             sm.preventFocus = preventFocus;
         }
 
@@ -126763,10 +128824,10 @@ Ext.define('Ext.grid.plugin.CellEditing', {
         me.scroll = me.view.el.getScroll();
     },
 
-    completeEdit: function() {
+    completeEdit: function(remainVisible) {
         var activeEd = this.getActiveEditor();
         if (activeEd) {
-            activeEd.completeEdit();
+            activeEd.completeEdit(remainVisible);
             this.editing = false;
         }
     },
@@ -126857,8 +128918,12 @@ Ext.define('Ext.grid.plugin.CellEditing', {
             editor.isForTree = column.isTreeColumn;
             editor.addCls(Ext.baseCSSPrefix + 'tree-cell-editor');
         }
-        editor.grid = me.grid;
+
         
+        
+        
+        editor.setGrid(me.grid);
+
         
         editor.editingPlugin = me;
         return editor;
@@ -127103,6 +129168,14 @@ Ext.define('Ext.grid.plugin.DragDrop', {
     
     containerScroll: false,
 
+    
+
+    
+
+    
+
+    
+
     init : function(view) {
         view.on('render', this.onViewRender, this, {single: true});
     },
@@ -127142,21 +129215,21 @@ Ext.define('Ext.grid.plugin.DragDrop', {
             if (me.containerScroll) {
                 scrollEl = view.getEl();
             }
-            
-            me.dragZone = new Ext.view.DragZone({
+
+            me.dragZone = new Ext.view.DragZone(Ext.apply({
                 view: view,
                 ddGroup: me.dragGroup || me.ddGroup,
                 dragText: me.dragText,
                 containerScroll: me.containerScroll,
                 scrollEl: scrollEl
-            });
+            }, me.dragZone));
         }
 
         if (me.enableDrop) {
-            me.dropZone = new Ext.grid.ViewDropZone({
+            me.dropZone = new Ext.grid.ViewDropZone(Ext.apply({
                 view: view,
                 ddGroup: me.dropGroup || me.ddGroup
-            });
+            }, me.dropZone));
         }
     }
 });
@@ -127200,12 +129273,12 @@ Ext.define('Ext.grid.plugin.RowEditing', {
         Ext.destroy(this.editor);
         this.callParent(arguments);
     },
-    
+
     onBeforeReconfigure: function() {
         this.callParent(arguments);
         this.cancelEdit();
     },
-    
+
     onReconfigure: function(grid, store, columns) {
         var ed = this.editor;
         this.callParent(arguments);
@@ -127215,12 +129288,16 @@ Ext.define('Ext.grid.plugin.RowEditing', {
         }
     },
 
+    shouldStartEdit: function(editor) {
+        return true;
+    },
+
     
     startEdit: function(record, columnHeader) {
         var me = this,
             editor = me.getEditor(),
             context;
-            
+
         if (Ext.isEmpty(columnHeader)) {
             columnHeader = me.grid.getTopLevelVisibleColumnManager().getHeaderAtIndex(0);
         }
@@ -127242,7 +129319,6 @@ Ext.define('Ext.grid.plugin.RowEditing', {
         return false;
     },
 
-    
     cancelEdit: function() {
         var me = this;
 
@@ -127256,7 +129332,14 @@ Ext.define('Ext.grid.plugin.RowEditing', {
         return true;
     },
 
-    
+    onEnter: function (e) {
+        if (this.editor.down('#cancel').owns(e)) {
+            return this.cancelEdit();
+        } else {
+            this.completeEdit();
+        }
+    },
+
     completeEdit: function() {
         var me = this;
 
@@ -127265,21 +129348,12 @@ Ext.define('Ext.grid.plugin.RowEditing', {
             me.fireEvent('edit', me, me.context);
         }
     },
-    
-    onEnterKey: function() {
-        if (this.getEditor().getForm().isValid()) {
-            this.completeEdit();
-        }    
-    },
 
-    
     validateEdit: function() {
         this.getContextFieldValues();
-        this.editing = this.callParent(arguments) && this.getEditor().completeEdit();
-        return this.editing;
+        return this.callParent(arguments) && this.getEditor().completeEdit();
     },
 
-    
     getEditor: function() {
         var me = this;
 
@@ -127301,7 +129375,7 @@ Ext.define('Ext.grid.plugin.RowEditing', {
 
         for (i = 0; i < len; i++) {
             item = editors[i];
-            name = item.name;
+            name = item.dataIndex;
 
             newValues[name]      = item.getValue();
             originalValues[name] = record.get(name);
@@ -127317,7 +129391,7 @@ Ext.define('Ext.grid.plugin.RowEditing', {
     initEditor: function() {
         return new Ext.grid.RowEditor(this.initEditorConfig());
     },
-    
+
     initEditorConfig: function(){
         var me       = this,
             grid     = me.grid,
@@ -127344,7 +129418,7 @@ Ext.define('Ext.grid.plugin.RowEditing', {
                 cfg[item] = me[item];
             }
         }
-        return cfg;    
+        return cfg;
     },
 
     
@@ -127385,7 +129459,7 @@ Ext.define('Ext.grid.plugin.RowEditing', {
             me.superclass.onCellClick.apply(me, arguments);
         }
     },
-    
+
     
     onColumnAdd: function(ct, column) {
         if (column.isHeader) {
@@ -127404,15 +129478,23 @@ Ext.define('Ext.grid.plugin.RowEditing', {
     },
 
     
-    onColumnRemove: function(ct, column) {
-        if (column.isHeader) {
-            var me = this,
-                editor = me.getEditor();
+    beforeGridHeaderDestroy: function(headerCt) {
+        var columns = this.grid.getColumnManager().getColumns(),
+            len = columns.length,
+            i,
+            column,
+            field;
 
-            if (editor) {
-                editor.onColumnRemove(ct, column);
+        for (i = 0; i < len; i++) {
+            column = columns[i];
+
+            
+            if (column.hasEditor) {
+                if (column.hasEditor() && (field = column.getEditor())) {
+                    field.destroy();
+                }
+                this.removeFieldAccessors(column);
             }
-            me.removeFieldAccessors(column);
         }
     },
 
@@ -127474,7 +129556,7 @@ Ext.define('Ext.grid.plugin.RowEditing', {
 
         if (editor) {
             
-            editor.removeColumnEditor(column, true);
+            editor.destroyColumnEditor(column);
         }
 
         me.callParent(arguments);
@@ -127506,14 +129588,18 @@ Ext.define('Ext.grid.plugin.RowExpander', {
     extend:  Ext.AbstractPlugin ,
     lockableScope: 'normal',
 
-               
-                                   
-                                  
-      
+                                         
 
     alias: 'plugin.rowexpander',
 
+    
+    columnWidth: 24,
+
+    
     rowBodyTpl: null,
+
+    
+    lockedTpl: null,
 
     
     expandOnEnter: true,
@@ -127543,8 +129629,8 @@ Ext.define('Ext.grid.plugin.RowExpander', {
 
     setCmp: function(grid) {
         var me = this,
-            rowBodyTpl,
-            features;
+            features = [],
+            featuresCfg, rowBodyTpl;
 
         me.callParent(arguments);
 
@@ -127553,23 +129639,32 @@ Ext.define('Ext.grid.plugin.RowExpander', {
             Ext.Error.raise("The 'rowBodyTpl' config is required and is not defined.");
         }
 
-        me.rowBodyTpl = Ext.XTemplate.getTpl(me, 'rowBodyTpl');
-        rowBodyTpl = this.rowBodyTpl;
-        features = [{
+        rowBodyTpl = me.rowBodyTpl = Ext.XTemplate.getTpl(me, 'rowBodyTpl');
+
+        featuresCfg = {
             ftype: 'rowbody',
-            lockableScope: 'normal',
             recordsExpanded: me.recordsExpanded,
             rowBodyHiddenCls: me.rowBodyHiddenCls,
             rowCollapsedCls: me.rowCollapsedCls,
             setupRowData: me.getRowBodyFeatureData,
-            setup: me.setup,
-            getRowBodyContents: function(record) {
+            setup: me.setup
+        };
+
+        features.push(Ext.apply({
+            lockableScope: 'normal',
+            getRowBodyContents: function (record) {
                 return rowBodyTpl.applyTemplate(record.getData());
             }
-        },{
-            ftype: 'rowwrap',
-            lockableScope: 'normal'
-        }];
+        }, featuresCfg));
+
+        if (me.lockedTpl) {
+            features.push(Ext.apply({
+                lockableScope: 'locked',
+                getRowBodyContents: function (record) {
+                    return me.lockedTpl.applyTemplate(record.getData());
+                }
+            }, featuresCfg));
+        }
  
         if (grid.features) {
             grid.features = Ext.Array.push(features, grid.features);
@@ -127619,14 +129714,6 @@ Ext.define('Ext.grid.plugin.RowExpander', {
             reconfigurable.mon(reconfigurable.store, 'datachanged', me.refreshRowHeights, me);
         }
         reconfigurable.on('beforereconfigure', me.beforeReconfigure, me);
-
-        if (grid.ownerLockable && !grid.rowLines) {
-            
-            
-            
-            
-            view.on('rowfocus', me.refreshRowHeights, me);
-        }
     },
     
     beforeReconfigure: function(grid, store, columns, oldStore, oldColumns) {
@@ -127645,7 +129732,14 @@ Ext.define('Ext.grid.plugin.RowExpander', {
         if (expanderGrid.ownerLockable) {
             expanderGrid = expanderGrid.ownerLockable.lockedGrid;
             expanderGrid.width += expanderHeader.width;
+            
+            
+            
+            
+            
+            expanderGrid.hidden = false;
         }
+
         expanderGrid.headerCt.insert(0, expanderHeader);
 
         
@@ -127701,38 +129795,68 @@ Ext.define('Ext.grid.plugin.RowExpander', {
         var me = this,
             view = me.view,
             rowNode = view.getNode(rowIdx),
-            row = Ext.fly(rowNode, '_rowExpander'),
-            nextBd = row.down(me.rowBodyTrSelector, true),
-            isCollapsed = row.hasCls(me.rowCollapsedCls),
-            addOrRemoveCls = isCollapsed ? 'removeCls' : 'addCls',
-            ownerLock, rowHeight, fireView;
+            normalRow = Ext.fly(rowNode, '_rowExpander'),
+            lockedRow,
+            nextBd = normalRow.down(me.rowBodyTrSelector, true),
+            wasCollapsed = normalRow.hasCls(me.rowCollapsedCls),
+            addOrRemoveCls = wasCollapsed ? 'removeCls' : 'addCls',
+            ownerLockable, fireView,
+            needsRefresh = view.getSizeModel().height.shrinkWrap,
+            lockedRowHeight,
+            normalRowHeight;
 
         
         Ext.suspendLayouts();
-        row[addOrRemoveCls](me.rowCollapsedCls);
+        normalRow[addOrRemoveCls](me.rowCollapsedCls);
         Ext.fly(nextBd)[addOrRemoveCls](me.rowBodyHiddenCls);
-        me.recordsExpanded[record.internalId] = isCollapsed;
-        view.refreshSize();
+        me.recordsExpanded[record.internalId] = wasCollapsed;
+
+        
+        if (needsRefresh) {
+            view.refreshSize();
+        }
 
         
         if (me.grid.ownerLockable) {
-            ownerLock = me.grid.ownerLockable;
-            fireView = ownerLock.getView();
-            view = ownerLock.lockedGrid.view;
-            rowHeight = row.getHeight();
+            normalRow.setHeight('');
+            normalRowHeight = normalRow.getHeight();
+            ownerLockable = me.grid.ownerLockable;
+            fireView = ownerLockable.getView();
+            view = ownerLockable.lockedGrid.view;
             
             
             
             
-            row.setHeight(isCollapsed ? rowHeight : '');
-            row = Ext.fly(view.getNode(rowIdx), '_rowExpander');
-            row.setHeight(isCollapsed ? rowHeight : '');
-            row[addOrRemoveCls](me.rowCollapsedCls);
-            view.refreshSize();
+            normalRow.setHeight(wasCollapsed ? normalRowHeight : '');
+
+            
+            lockedRow = Ext.fly(view.getNode(rowIdx), '_rowExpander');
+            lockedRow[addOrRemoveCls](me.rowCollapsedCls);
+
+            
+            if (me.lockedTpl) {
+                nextBd = lockedRow.down(me.rowBodyTrSelector, true);
+                Ext.fly(nextBd)[addOrRemoveCls](me.rowBodyHiddenCls);
+                lockedRowHeight = lockedRow.getHeight();
+                if (wasCollapsed) {
+                    if (lockedRowHeight > normalRowHeight) {
+                        normalRow.setHeight(lockedRowHeight);
+                    } else {
+                        lockedRow.setHeight(normalRowHeight);
+                    }
+                } else {
+                    lockedRow.setHeight('');
+                }
+            } else {
+                lockedRow.setHeight(wasCollapsed ? normalRowHeight : '');
+            }
+            if (needsRefresh) {
+                view.refreshSize();
+            }
         } else {
             fireView = view;
         }
-        fireView.fireEvent(isCollapsed ? 'expandbody' : 'collapsebody', row.dom, record, nextBd);
+        fireView.fireEvent(wasCollapsed ? 'expandbody' : 'collapsebody', normalRow.dom, record, nextBd);
         
         Ext.resumeLayouts(true);
     },
@@ -127783,7 +129907,7 @@ Ext.define('Ext.grid.plugin.RowExpander', {
         var me = this;
 
         return {
-            width: 24,
+            width: me.columnWidth,
             lockable: false,
             sortable: false,
             resizable: false,
@@ -127800,9 +129924,11 @@ Ext.define('Ext.grid.plugin.RowExpander', {
                 return '<div class="' + Ext.baseCSSPrefix + 'grid-row-expander" role="presentation"></div>';
             },
             processEvent: function(type, view, cell, rowIndex, cellIndex, e, record) {
-                if (type == "mousedown" && e.getTarget('.' + Ext.baseCSSPrefix + 'grid-row-expander')) {
-                    me.toggleRow(rowIndex, record);
-                    return me.selectRowOnExpand;
+                if (e.getTarget('.' + Ext.baseCSSPrefix + 'grid-row-expander')) {
+                    if (type == "click") {
+                        me.toggleRow(rowIndex, record);
+                        return me.selectRowOnExpand;
+                    }
                 }
             }
         };
@@ -129060,15 +131186,18 @@ Ext.define('Ext.resizer.Splitter', {
     
     size: 5,
     
+    
+    tracker: null,
+    
     ariaRole: 'separator',
 
     
     getTrackerConfig: function () {
-        return {
+        return Ext.apply({
             xclass: 'Ext.resizer.SplitterTracker',
             el: this.el,
             splitter: this
-        };
+        }, this.tracker);
     },
 
     beforeRender: function() {
@@ -129094,7 +131223,8 @@ Ext.define('Ext.resizer.Splitter', {
 
     onRender: function() {
         var me = this,
-            collapseEl;
+            collapseEl,
+            cfg;
 
         me.callParent(arguments);
 
@@ -129863,6 +131993,7 @@ Ext.define('Ext.layout.container.Border', {
         var me = this,
             placeholderFor = item.placeholderFor,
             region = item.region,
+            isCenter,
             split,
             hidden,
             cfg;
@@ -129878,7 +132009,8 @@ Ext.define('Ext.layout.container.Border', {
                 item.initBorderRegion();
             }
 
-            if (region === 'center') {
+            isCenter = region === 'center';
+            if (isCenter) {
                 if (me.centerRegion) {
                     Ext.Error.raise("Cannot have multiple center regions in a BorderLayout.");
                 }
@@ -129897,7 +132029,7 @@ Ext.define('Ext.layout.container.Border', {
                 }
             }
 
-            if (!item.hasOwnProperty('collapseMode')) {
+            if (!isCenter && !item.hasOwnProperty('collapseMode')) {
                 item.collapseMode = me.panelCollapseMode;
             }
 
@@ -131023,7 +133155,7 @@ Ext.define('Ext.menu.Item', {
             '{text}',
         '<tpl else>',
             '<a id="{id}-itemEl"',
-                ' class="{linkCls} {indentCls}{childElCls}"',
+                ' class="{linkCls} {childElCls}"',
                 ' href="{href}" role="presentation" ',
                 '<tpl if="hrefTarget"> target="{hrefTarget}"</tpl>',
                 ' hidefocus="true"',
@@ -131033,7 +133165,7 @@ Ext.define('Ext.menu.Item', {
                     ' tabIndex="{tabIndex}"',
                 '</tpl>',
             '>',
-                '<span id="{id}-textEl" class="{textCls}{childElCls}" unselectable="on">{text}</span>',
+                '<span id="{id}-textEl" class="{textCls} {indentCls}{childElCls}" unselectable="on">{text}</span>',
                 '<tpl if="hasIcon">',
                     '<div role="presentation" id="{id}-iconEl" class="{baseIconCls}',
                         '{[values.rightIcon ? "-right" : ""]} {iconCls}',
@@ -131151,8 +133283,9 @@ Ext.define('Ext.menu.Item', {
 
         if (me.activated && (!menu.rendered || !menu.isVisible())) {
             me.parentMenu.activeChild = menu;
-            menu.parentItem = me;
+            menu.ownerCmp = menu.ownerItem = me;
             menu.parentMenu = me.parentMenu;
+            menu.constrainTo = document.body;
             menu.showBy(me, me.menuAlign);
         }
     },
@@ -131219,15 +133352,17 @@ Ext.define('Ext.menu.Item', {
         me.callParent(arguments);
     },
 
-    onClick: function(e) {
+    onClick: function (e) {
         var me = this,
-            clickHideDelay = me.clickHideDelay;
+            clickHideDelay = me.clickHideDelay,
+            browserEvent = e.browserEvent,
+            preventDefault;
 
-        if (!me.href) {
+        if (!me.href || me.disabled) {
             e.stopEvent();
         }
 
-        if (me.disabled) {
+        if (me.disabled || me.handlingClick) {
             return;
         }
 
@@ -131242,6 +133377,27 @@ Ext.define('Ext.menu.Item', {
         Ext.callback(me.handler, me.scope || me, [me, e]);
         me.fireEvent('click', me, e);
 
+        
+        
+        
+        
+        
+        
+        
+        
+        if (Ext.isIE9m || Ext.isIEQuirks) {
+            
+            preventDefault = (browserEvent.returnValue === false) ? true : false;
+        } else {
+            preventDefault = !!browserEvent.defaultPrevented;
+        }
+
+        if (me.href && !preventDefault) {
+            me.handlingClick = true;
+            me.itemEl.dom.click();
+            delete me.handlingClick;
+        }
+
         if (!me.hideOnClick) {
             me.focus();
         }
@@ -131255,7 +133411,7 @@ Ext.define('Ext.menu.Item', {
             me.parentMenu.deactivateActiveItem();
         }
         me.callParent(arguments);
-        me.parentMenu = me.ownerButton = null;
+        me.parentMenu = me.ownerCmp = me.ownerButton = null;
     },
 
     
@@ -131355,29 +133511,27 @@ Ext.define('Ext.menu.Item', {
             me.setTooltip(me.tooltip, true);
         }
     },
-    
+
     
     setMenu: function(menu, destroyMenu) {
         var me = this,
             oldMenu = me.menu,
             arrowEl = me.arrowEl;
-            
+
         if (oldMenu) {
-            delete oldMenu.parentItem;
-            delete oldMenu.parentMenu;
-            delete oldMenu.ownerItem;
-            
+            oldMenu.ownerCmp = oldMenu.ownerItem = oldMenu.parentMenu = null;
+
             if (destroyMenu === true || (destroyMenu !== false && me.destroyMenu)) {
                 Ext.destroy(oldMenu);
             }
         }
         if (menu) {
             me.menu = Ext.menu.Manager.get(menu);
-            me.menu.ownerItem = me;
+            me.menu.ownerCmp = me.menu.ownerItem = me;
         } else {
             me.menu = null;
         }
-        
+
         if (me.rendered && !me.destroying && arrowEl) {
             arrowEl[me.menu ? 'addCls' : 'removeCls'](me.arrowCls);
         }
@@ -131628,8 +133782,6 @@ Ext.define('Ext.menu.CheckItem', {
 
 Ext.define('Ext.menu.KeyNav', {
     extend:  Ext.util.KeyNav ,
-
-                                   
     
     constructor: function(config) {
         var me = this;
@@ -131702,7 +133854,9 @@ Ext.define('Ext.menu.KeyNav', {
     },
 
     isWhitelisted: function(item) {
-        return Ext.FocusManager.isWhitelisted(item);
+        var mgr = Ext['FocusManager'];
+        
+        return mgr && mgr.isWhitelisted(item);
     },
 
     left: function(e) {
@@ -131713,8 +133867,8 @@ Ext.define('Ext.menu.KeyNav', {
             return true;
         }
 
-        menu.hide();
         if (menu.parentMenu) {
+            menu.hide();
             menu.parentMenu.focus();
         }
     },
@@ -131872,6 +134026,9 @@ Ext.define('Ext.menu.Menu', {
     defaultMinWidth: 120,
 
     
+    defaultAlign: 'tl-bl?',
+
+    
 
     initComponent: function() {
         var me = this,
@@ -131930,25 +134087,22 @@ Ext.define('Ext.menu.Menu', {
         }
 
         me.callParent(arguments);
+
+        
+        
+        Ext.override(me.getLayout(), {
+            configureItem: me.configureItem
+        });
     },
 
     
     
-    registerWithOwnerCt: function() {
-        if (this.floating) {
-            this.ownerCt = null;
-            Ext.WindowManager.register(this);
-        }
-    },
+    
+    initFloatConstrain: Ext.emptyFn,
 
     
     
     initHierarchyEvents: Ext.emptyFn,
-
-    
-    isVisible: function() {
-        return this.callParent();
-    },
 
     
     
@@ -131998,13 +134152,6 @@ Ext.define('Ext.menu.Menu', {
         }
     },
 
-    getRefOwner: function() {
-        
-        
-        
-        return this.parentMenu || this.ownerButton || this.callParent(arguments);
-    },
-
     
     canActivateItem: function(item) {
         return item && !item.isDisabled() && item.isVisible() && (item.canActivate || !item.isMenuItem);
@@ -132033,7 +134180,7 @@ Ext.define('Ext.menu.Menu', {
 
     
     getFocusEl: function() {
-        return this.focusedItem || this.el;
+        return this.focusedItem || this.items.items[0];
     },
 
     
@@ -132076,9 +134223,7 @@ Ext.define('Ext.menu.Menu', {
 
     
     lookupItemFromObject: function(cmp) {
-        var me = this,
-            prefix = Ext.baseCSSPrefix,
-            cls;
+        var me = this;
 
         if (!cmp.isComponent) {
             if (!cmp.xtype) {
@@ -132092,22 +134237,6 @@ Ext.define('Ext.menu.Menu', {
             cmp.parentMenu = me;
         }
 
-        if (!cmp.isMenuItem && !cmp.dock) {
-            cls = [prefix + 'menu-item-cmp'];
-
-            
-            
-            
-            if (!me.plain && (cmp.indent !== false || cmp.iconCls === 'no-icon')) {
-                cls.push(prefix + 'menu-item-indent');
-            }
-
-            if (cmp.rendered) {
-                cmp.el.addCls(cls);
-            } else {
-                cmp.cls = (cmp.cls || '') + ' ' + cls.join(' ');
-            }
-        }
         return cmp;
     },
 
@@ -132121,6 +134250,35 @@ Ext.define('Ext.menu.Menu', {
                 plain: true,
                 text: cmp
             });
+    },
+
+    
+    
+    
+    
+    configureItem: function(cmp) {
+        var me = this,
+            owner = me.owner,
+            prefix = Ext.baseCSSPrefix,
+            cls;
+
+        if (me.owner.items.getCount() > 1 && !cmp.rendered && !cmp.isMenuItem && !cmp.dock) {
+            cls = [prefix + 'menu-item-cmp'];
+
+            
+            
+            
+            if (!owner.plain && (cmp.indent !== false || cmp.iconCls === 'no-icon')) {
+                cls.push(prefix + 'menu-item-indent');
+            }
+
+            if (cmp.rendered) {
+                cmp.el.addCls(cls);
+            } else {
+                cmp.cls = (cmp.cls || '') + ' ' + cls.join(' ');
+            }
+        }
+        this.callParent(arguments);
     },
 
     onClick: function(e) {
@@ -132151,7 +134309,7 @@ Ext.define('Ext.menu.Menu', {
         var me = this;
 
         Ext.menu.Manager.unregister(me);
-        me.parentMenu = me.ownerButton = null;
+        me.parentMenu = me.ownerCmp = me.ownerButton = null;
         if (me.rendered) {
             me.el.un(me.mouseMonitor);
             Ext.destroy(me.keyNav);
@@ -132178,11 +134336,11 @@ Ext.define('Ext.menu.Menu', {
             mouseEnter = !me.el.contains(fromEl),
             item = me.getItemFromEvent(e),
             parentMenu = me.parentMenu,
-            parentItem = me.parentItem;
+            ownerCmp = me.ownerCmp;
 
         if (mouseEnter && parentMenu) {
-            parentMenu.setActiveItem(parentItem);
-            parentItem.cancelDeferHide();
+            parentMenu.setActiveItem(ownerCmp);
+            ownerCmp.cancelDeferHide();
             parentMenu.mouseMonitor.mouseenter();
         }
 
@@ -132225,17 +134383,6 @@ Ext.define('Ext.menu.Menu', {
         }
     },
 
-    showBy: function(cmp, pos, off) {
-        var me = this;
-
-        me.callParent(arguments);
-        if (!me.hidden) {
-            
-            me.setVerticalPosition();
-        }
-        return me;
-    },
-
     beforeShow: function() {
         var me = this,
             viewHeight;
@@ -132259,35 +134406,6 @@ Ext.define('Ext.menu.Menu', {
         if (me.floating) {
             me.maxHeight = me.savedMaxHeight;
         }
-    },
-
-    
-    
-    
-    setVerticalPosition: function() {
-        var me = this,
-            max,
-            y = me.getY(),
-            returnY = y,
-            height = me.getHeight(),
-            viewportHeight = Ext.Element.getViewportHeight().height,
-            parentEl = me.el.parent(),
-            viewHeight = parentEl.getViewSize().height,
-            normalY = y - parentEl.getScroll().top; 
-
-        parentEl = null;
-
-        if (me.floating) {
-            max = me.maxHeight ? me.maxHeight : viewHeight - normalY;
-            if (height > viewHeight) {
-                returnY = y - normalY;
-            } else if (max < height) {
-                returnY = y - (height - max);
-            } else if((y + height) > viewportHeight){ 
-                returnY = viewportHeight - height;
-            }
-        }
-        me.setY(returnY);
     }
 });
 
@@ -132610,7 +134728,7 @@ Ext.define('Ext.panel.Tool', {
         if (me.keyMap) {
             me.keyMap.destroy();
         }
-        
+        delete me.toolOwner;
         me.callParent();
     },
 
@@ -133205,17 +135323,20 @@ Ext.define('Ext.resizer.ResizeTracker', {
     },
 
     
-    getDynamicTarget: function() {
-        var me = this,
-            target = me.target;
+    getProxy: function() {
+        var me = this;
+
+        if (!me.dynamic && !me.proxy) {
+            me.proxy = me.createProxy(me.target || me.el);
+
             
-        if (me.dynamic) {
-            return target;
-        } else if (!me.proxy) {
-            me.proxy = me.createProxy(target);
+            
+            me.hideProxy = true;
         }
-        me.proxy.show();
-        return me.proxy;
+        if (me.proxy) {
+            me.proxy.show();
+            return me.proxy;
+        }
     },
 
     
@@ -133243,10 +135364,7 @@ Ext.define('Ext.resizer.ResizeTracker', {
 
         
         if (!this.dynamic) {
-            this.resize(this.startBox, {
-                horizontal: 'none',
-                vertical: 'none'
-            });
+            this.resize(this.startBox);
         }
     },
 
@@ -133270,8 +135388,6 @@ Ext.define('Ext.resizer.ResizeTracker', {
             adjustX = 0,
             adjustY = 0,
             dragRatio,
-            horizDir = offset[0] < 0 ? 'right' : 'left',
-            vertDir = offset[1] < 0 ? 'down' : 'up',
             oppositeCorner,
             axis, 
             newBox,
@@ -133425,37 +135541,43 @@ Ext.define('Ext.resizer.ResizeTracker', {
             }
         }
 
-        if (heightAdjust === 0) {
-            vertDir = 'none';
-        }
-        if (widthAdjust === 0) {
-            horizDir = 'none';
-        }
-        me.resize(newBox, {
-            horizontal: horizDir,
-            vertical: vertDir
-        }, atEnd);
+        
+        me.setPosition = newBox.x !== me.startBox.x || newBox.y !== me.startBox.y;
+        me.resize(newBox, atEnd);
     },
 
-    getResizeTarget: function(atEnd) {
-        return atEnd ? this.target : this.getDynamicTarget();
-    },
-
-    resize: function(box, direction, atEnd) {
+    resize: function(box, atEnd) {
         var me = this,
-            target = me.getResizeTarget(atEnd);
-
-        target.setBox(box);
+            target,
+            setPosition = me.setPosition;
 
         
-        if (me.originalTarget && (me.dynamic || atEnd)) {
-            me.originalTarget.setBox(box);
+        if (me.dynamic || (!me.dynamic && atEnd)) {
+            
+            if (setPosition) {
+                me.target.setBox(box);
+            } else {
+                me.target.setSize(box.width, box.height);
+            }
+
+        }
+
+        
+        if (!atEnd) {
+            target = me.getProxy();
+            if (target && target !== me.target) {
+                if (setPosition || me.hideProxy) {
+                    target.setBox(box);
+                } else {
+                    target.setSize(box.width, box.height);
+                }
+            }
         }
     },
 
     onEnd: function(e) {
         this.updateDimensions(e, true);
-        if (this.proxy) {
+        if (this.proxy && this.hideProxy) {
             this.proxy.hide();
         }
     },
@@ -133475,10 +135597,11 @@ Ext.define('Ext.resizer.Resizer', {
 
     alternateClassName: 'Ext.Resizable',
 
-    handleCls: Ext.baseCSSPrefix + 'resizable-handle',
-    pinnedCls: Ext.baseCSSPrefix + 'resizable-pinned',
-    overCls:   Ext.baseCSSPrefix + 'resizable-over',
-    wrapCls:   Ext.baseCSSPrefix + 'resizable-wrap',
+    handleCls:  Ext.baseCSSPrefix + 'resizable-handle',
+    overCls:  Ext.baseCSSPrefix + 'resizable-handle-over',
+    pinnedCls:  Ext.baseCSSPrefix + 'resizable-pinned',
+    wrapCls:    Ext.baseCSSPrefix + 'resizable-wrap',
+    wrappedCls: Ext.baseCSSPrefix + 'resizable-wrapped',
     delimiterRe: /(?:\s*[,;]\s*)|\s+/,
 
     
@@ -133536,23 +135659,23 @@ Ext.define('Ext.resizer.Resizer', {
     
 
     
-    
+
     ariaRole: 'presentation',
 
     constructor: function(config) {
         var me = this,
-            target,
-            targetEl,
+            resizeTarget,
             tag,
             handles = me.handles,
             handleCls,
             possibles,
             len,
             i = 0,
-            pos, 
+            pos,
+            el,
             handleEls = [],
             eastWestStyle, style,
-            box, targetBaseCls,
+            targetBaseCls, wrapTarget,
             unselectableCls = Ext.dom.Element.unselectableCls;
 
         me.addEvents(
@@ -133565,74 +135688,95 @@ Ext.define('Ext.resizer.Resizer', {
         );
 
         if (Ext.isString(config) || Ext.isElement(config) || config.dom) {
-            target = config;
+            resizeTarget = config;
             config = arguments[1] || {};
-            config.target = target;
+            config.target = resizeTarget;
         }
         
         me.mixins.observable.constructor.call(me, config);
 
         
         
-        target = me.target;
-        if (target) {
-            if (target.isComponent) {
+        resizeTarget = me.target;
+        if (resizeTarget) {
+            if (resizeTarget.isComponent) {
 
                 
                 
                 
-                target.addClsWithUI('resizable');
+                resizeTarget.addClsWithUI('resizable');
 
-                me.el = target.getEl();
-                if (target.minWidth) {
-                    me.minWidth = target.minWidth;
+                if (resizeTarget.minWidth) {
+                    me.minWidth = resizeTarget.minWidth;
                 }
-                if (target.minHeight) {
-                    me.minHeight = target.minHeight;
+                if (resizeTarget.minHeight) {
+                    me.minHeight = resizeTarget.minHeight;
                 }
-                if (target.maxWidth) {
-                    me.maxWidth = target.maxWidth;
+                if (resizeTarget.maxWidth) {
+                    me.maxWidth = resizeTarget.maxWidth;
                 }
-                if (target.maxHeight) {
-                    me.maxHeight = target.maxHeight;
+                if (resizeTarget.maxHeight) {
+                    me.maxHeight = resizeTarget.maxHeight;
                 }
-                if (target.floating) {
+                if (resizeTarget.floating) {
                     if (!me.hasOwnProperty('handles')) {
                         me.handles = 'n ne e se s sw w nw';
                     }
                 }
+                me.el = resizeTarget.getEl();
             } else {
-                me.el = me.target = Ext.get(target);
+                resizeTarget = me.el = me.target = Ext.get(resizeTarget);
             }
         }
         
         else {
-            me.target = me.el = Ext.get(me.el);
+            resizeTarget = me.target = me.el = Ext.get(me.el);
         }
 
         
         
+        me.el.addCls(Ext.AbstractComponent.prototype.borderBoxCls);
+
+        
+        if (Ext.isNumber(me.width)) {
+            me.width = Ext.Number.constrain(me.width, me.minWidth, me.maxWidth);
+        }
+        if (Ext.isNumber(me.height)) {
+            me.height = Ext.Number.constrain(me.height, me.minHeight, me.maxHeight);
+        }
+
+        
+        if (me.width !== null || me.height !== null) {
+            me.target.setSize(me.width, me.height);
+        }
+
         
         tag = me.el.dom.tagName.toUpperCase();
-        if (tag == 'TEXTAREA' || tag == 'IMG' || tag == 'TABLE') {
+        if (tag === 'TEXTAREA' || tag === 'IMG' || tag === 'TABLE') {
             
             me.originalTarget = me.target;
-            targetEl = me.el;
-            box = targetEl.getBox();
+
+            wrapTarget = resizeTarget.isComponent ? resizeTarget.getEl() : resizeTarget;
+
+            
+            me.el.addCls(me.wrappedCls);
+
             me.target = me.el = me.el.wrap({
                 role: 'presentation',
                 cls: me.wrapCls,
                 id: me.el.id + '-rzwrap',
-                style: targetEl.getStyles('margin-top', 'margin-bottom')
+                style: wrapTarget.getStyles('margin-top', 'margin-bottom')
             });
 
             
-            me.el.setPositioning(targetEl.getPositioning());
-            targetEl.clearPositioning();
-            me.el.setBox(box);
+            me.el.setPositioning(wrapTarget.getPositioning());
+            wrapTarget.clearPositioning();
+            me.el.setBox(wrapTarget.getBox());
 
             
-            targetEl.setStyle('position', 'absolute');
+            wrapTarget.setStyle('position', 'absolute');
+
+            me.isTargetWrapped = true;
         }
 
         
@@ -133645,13 +135789,20 @@ Ext.define('Ext.resizer.Resizer', {
         
         me.resizeTracker = new Ext.resizer.ResizeTracker({
             disabled: me.disabled,
-            target: me.target,
+            target: resizeTarget,
+            el: me.el,
             constrainTo: me.constrainTo,
+            handleCls: me.handleCls,
             overCls: me.overCls,
             throttle: me.throttle,
+
+            
+            
+            proxy: me.originalTarget ? me.el : null,
+            dynamic: me.originalTarget ? true : me.dynamic,
+
             originalTarget: me.originalTarget,
             delegate: '.' + me.handleCls,
-            dynamic: me.dynamic,
             preserveRatio: me.preserveRatio,
             heightIncrement: me.heightIncrement,
             widthIncrement: me.widthIncrement,
@@ -133679,7 +135830,7 @@ Ext.define('Ext.resizer.Resizer', {
 
         handleCls = me.handleCls + ' ' + me.handleCls + '-{0}';
         if (me.target.isComponent) {
-            targetBaseCls = me.target.baseCls
+            targetBaseCls = me.target.baseCls;
             handleCls += ' ' + targetBaseCls + '-handle ' + targetBaseCls + '-handle-{0}';
             if (Ext.supports.CSS3BorderRadius) {
                 handleCls += ' ' + targetBaseCls + '-handle-{0}-br';
@@ -133700,9 +135851,8 @@ Ext.define('Ext.resizer.Resizer', {
                 }
 
                 handleEls.push(
-                    '<div id="', me.el.id, '-', pos, '-handle"',
-                        ' class="', Ext.String.format(handleCls, pos), ' ', unselectableCls, '"',
-                        ' unselectable="on" role="presentation"',
+                    '<div id="', me.el.id, '-', pos, '-handle" class="', Ext.String.format(handleCls, pos), ' ', unselectableCls,
+                        '" unselectable="on" role="presentation"',
                         style,
                     '></div>'
                 );
@@ -133711,35 +135861,24 @@ Ext.define('Ext.resizer.Resizer', {
         Ext.DomHelper.append(me.el, handleEls.join(''));
 
         
+        handleEls.length = 0;
+
+        
         for (i = 0; i < len; i++){
             
             if (handles[i] && possibles[handles[i]]) {
                 pos = possibles[handles[i]];
-                me[pos] = me.el.getById(me.el.id + '-' + pos + '-handle');
-                me[pos].region = pos;
+                el = me[pos] = me.el.getById(me.el.id + '-' + pos + '-handle');
+                handleEls.push(el);
+                el.region = pos;
 
                 if (me.transparent) {
-                    me[pos].setOpacity(0);
+                    el.setOpacity(0);
                 }
             }
         }
 
-        
-        if (Ext.isNumber(me.width)) {
-            me.width = Ext.Number.constrain(me.width, me.minWidth, me.maxWidth);
-        }
-        if (Ext.isNumber(me.height)) {
-            me.height = Ext.Number.constrain(me.height, me.minHeight, me.maxHeight);
-        }
-
-        
-        if (me.width !== null || me.height !== null) {
-            if (me.originalTarget) {
-                me.originalTarget.setWidth(me.width);
-                me.originalTarget.setHeight(me.height);
-            }
-            me.resizeTo(me.width, me.height);
-        }
+        me.resizeTracker.handleEls = handleEls;
 
         me.forceHandlesHeight();
     },
@@ -133761,17 +135900,20 @@ Ext.define('Ext.resizer.Resizer', {
     
     onResize: function(tracker, e) {
         var me = this,
-            box = me.el.getBox();
-            
+            box;
+
         me.forceHandlesHeight();
-        return me.fireEvent('resizedrag', me, box.width, box.height, e);
+        if (me.hasListeners.resizeDrag) {
+            box = tracker.getResizeTarget().getBox();
+            return me.fireEvent('resizedrag', me, box.width, box.height, e);
+        }
     },
 
     
     onResizeEnd: function(tracker, e) {
         var me = this,
             box = me.el.getBox();
-            
+
         me.forceHandlesHeight();
         return me.fireEvent('resize', me, box.width, box.height, e);
     },
@@ -133802,6 +135944,12 @@ Ext.define('Ext.resizer.Resizer', {
             handle;
 
         me.resizeTracker.destroy();
+
+        
+        if (me.isTargetWrapped) {
+            me.target.destroy();
+        }
+
         for (i = 0; i < len; i++) {
             if (handle = me[positions[handles[i]]]) {
                 handle.remove();
@@ -133940,6 +136088,10 @@ Ext.define('Ext.selection.CellModel', {
         this.keyNavigation = true;
         this.move(direction, e);
         this.keyNavigation = false;
+    },
+
+    selectWithEvent: function(record, e) {
+        this.select(record);
     },
 
     select: function(pos, keepExisting, suppressEvent) {
@@ -134162,7 +136314,7 @@ Ext.define('Ext.selection.CellModel', {
             editingPlugin = pos.view.editingPlugin;
             
             if (editingPlugin && me.wasEditing) {
-                me.onEditorTab(editingPlugin, e)
+                me.onEditorTab(editingPlugin, e);
             } else {
                 me.move(e.shiftKey ? 'left' : 'right', e);
             }
@@ -134172,7 +136324,8 @@ Ext.define('Ext.selection.CellModel', {
     onEditorTab: function(editingPlugin, e) {
         var me = this,
             direction = e.shiftKey ? 'left' : 'right',
-            position  = me.move(direction, e);
+            pos = me.getCurrentPosition(),
+            position  = pos.view.walkCells(pos, direction, e, me.preventWrap);
 
         
         if (position) {
@@ -134184,7 +136337,7 @@ Ext.define('Ext.selection.CellModel', {
             
             
             else {
-                position.view.scrollCellIntoView(position);
+                me.setCurrentPosition(position);
                 me.wasEditing = true;
             }
         }
@@ -134351,6 +136504,10 @@ Ext.define('Ext.selection.RowModel', {
             end: me.onKeyEnd,
             space: me.onKeySpace,
             enter: me.onKeyEnter,
+            A: {
+                ctrl: true,
+                handler: me.selectAll
+            },
             scope: me
         });
     },
@@ -134397,10 +136554,11 @@ Ext.define('Ext.selection.RowModel', {
             
             
             view.bufferedRenderer.scrollTo(me.store.getCount() - 1, false, function(newIdx, newRecord) {
-                me.afterKeyNavigate(e, newRecord)
+                me.afterKeyNavigate(e, newRecord);
             });
         } else {
-            me.afterKeyNavigate(e, view.getRecord(view.all.getCount() - 1))
+            
+            me.afterKeyNavigate(e, view.walkRecs(e.record, view.dataSource.getCount() - 1 - view.dataSource.indexOf(e.record)));
         }
     },
 
@@ -134414,10 +136572,11 @@ Ext.define('Ext.selection.RowModel', {
             
             
             view.bufferedRenderer.scrollTo(0, false, function(newIdx, newRecord) {
-                me.afterKeyNavigate(e, newRecord)
+                me.afterKeyNavigate(e, newRecord);
             });
         } else {
-            me.afterKeyNavigate(e, view.getRecord(0));
+            
+            me.afterKeyNavigate(e, view.walkRecs(e.record, -view.dataSource.indexOf(e.record)));
         }
     },
 
@@ -134469,7 +136628,8 @@ Ext.define('Ext.selection.RowModel', {
 
     
     onKeySpace: function(e) {
-        var record = this.lastFocused;
+        
+        var record = e.record || this.lastFocused;
 
         if (record) {
             this.afterKeyNavigate(e, record);
@@ -134503,7 +136663,7 @@ Ext.define('Ext.selection.RowModel', {
     },
 
     afterBufferedScrollTo: function(newIdx, newRecord) {
-        this.afterKeyNavigate(this.lastKeyEvent, newRecord)
+        this.afterKeyNavigate(this.lastKeyEvent, newRecord);
     },
 
     scrollByDeltaX: function(delta) {
@@ -134526,16 +136686,17 @@ Ext.define('Ext.selection.RowModel', {
 
     
     
-    onRowClick: function(view, record, item, index, e) {
-        var me = this;
-
+    onRowClick: function (view, record, item, index, e) {
         
         if (index !== -1) {
-            if (!me.allowRightMouseSelection(e)) {
+            if (!this.allowRightMouseSelection(e)) {
                 return;
             }
 
-            me.processSelection(view, record, item, index, e);
+            
+            if (!(e.type === 'contextmenu' && this.isSelected(record))) {
+                this.processSelection(view, record, item, index, e);
+            }
         }
     },
 
@@ -134590,7 +136751,7 @@ Ext.define('Ext.selection.RowModel', {
 
         if (oldFocused) {
             rowIdx = views[0].indexOf(oldFocused);
-            if (rowIdx != -1) {
+            if (rowIdx !== -1) {
                 for (; i < viewsLn; i++) {
                     views[i].onRowFocus(rowIdx, false, true);
                 }
@@ -134599,7 +136760,7 @@ Ext.define('Ext.selection.RowModel', {
 
         if (newFocused) {
             rowIdx = views[0].indexOf(newFocused);
-            if (rowIdx != -1) {
+            if (rowIdx !== -1) {
                 for (i = 0; i < viewsLn; i++) {
                     views[i].onRowFocus(rowIdx, true, supressFocus);
                 }
@@ -134642,11 +136803,11 @@ Ext.define('Ext.selection.RowModel', {
         }
     },
 
-    selectByPosition: function(position) {
+    selectByPosition: function (position, keepExisting) {
         var context = new Ext.grid.CellContext(this.view);
             
         context.setPosition(position.row, position.column);
-        this.select(context.record);
+        this.select(context.record, keepExisting);
     },
 
     
@@ -134739,15 +136900,16 @@ Ext.define('Ext.selection.TreeModel', {
     },
     
     navExpand: function(e, t) {
-        var focused = this.getLastFocused(),
-            view    = this.view;
+        var me      = this,
+            focused = me.getLastFocused(),
+            view    = me.view;
 
         if (focused) {
             
             
             
             if (focused.isExpanded()) {
-                this.onKeyDown(e, t);
+                me.onKeyDown(e, t);
             
             } else if (focused.isExpandable()) {
                 
@@ -134756,6 +136918,9 @@ Ext.define('Ext.selection.TreeModel', {
                 }
 
                 view.expand(focused);
+                if (focused) {
+                    me.onLastFocusChanged(null, focused);
+                }
             }
         }
     },
@@ -134766,8 +136931,8 @@ Ext.define('Ext.selection.TreeModel', {
     
     navCollapse: function(e, t) {
         var me = this,
-            focused = this.getLastFocused(),
-            view    = this.view,
+            focused = me.getLastFocused(),
+            view    = me.view,
             parentNode;
 
         if (focused) {
@@ -134780,6 +136945,7 @@ Ext.define('Ext.selection.TreeModel', {
                 }
 
                 view.collapse(focused);
+                me.onLastFocusChanged(null, focused);
             
             
             } else if (parentNode && !parentNode.isRoot()) {
@@ -134795,6 +136961,7 @@ Ext.define('Ext.selection.TreeModel', {
                     me.select(parentNode);
                 }
             }
+            this.onLastFocusChanged(null, focused);
         }
     },
 
@@ -134834,8 +137001,6 @@ Ext.define('Ext.selection.TreeModel', {
 
 Ext.define('Ext.slider.Thumb', {
                                                         
-    
-    topZIndex: 10000,
 
     
 
@@ -134913,16 +137078,6 @@ Ext.define('Ext.slider.Thumb', {
     },
 
     
-    bringToFront: function() {
-        this.el.setStyle('zIndex', this.topZIndex);
-    },
-
-    
-    sendToBack: function() {
-        this.el.setStyle('zIndex', '');
-    },
-
-    
     enable: function() {
         var me = this;
 
@@ -134962,10 +137117,20 @@ Ext.define('Ext.slider.Thumb', {
 
     
     onBeforeDragStart : function(e) {
-        if (this.disabled) {
+        var me = this,
+            el = me.el,
+            trackerXY = me.tracker.getXY(),
+            delta = me.pointerOffset = el.getXY();
+
+        if (me.disabled) {
             return false;
         } else {
-            this.slider.promoteThumb(this);
+            
+            
+            
+            delta[0] += Math.floor(el.getWidth() / 2) - trackerXY[0];
+            delta[1] += Math.floor(el.getHeight() / 2) - trackerXY[1];
+            me.slider.promoteThumb(me);
             return true;
         }
     },
@@ -135013,7 +137178,12 @@ Ext.define('Ext.slider.Thumb', {
 
     getValueFromTracker: function() {
         var slider = this.slider,
-            trackPoint = slider.getTrackpoint(this.tracker.getXY());
+            trackerXY = this.tracker.getXY(),
+            trackPoint;
+
+        trackerXY[0] += this.pointerOffset[0];
+        trackerXY[1] += this.pointerOffset[1];
+        trackPoint = slider.getTrackpoint(trackerXY);
 
         
         if (trackPoint !== undefined) {
@@ -135240,7 +137410,7 @@ Ext.define('Ext.slider.Multi', {
 
         
         for (; i < len; i++) {
-            me.addThumb(values[i]);
+            me.addThumb(me.normalizeValue(values[i]));
         }
     },
 
@@ -135327,18 +137497,20 @@ Ext.define('Ext.slider.Multi', {
 
     
     promoteThumb: function(topThumb) {
-        var thumbs = this.thumbs,
+        var thumbs = this.thumbStack || (this.thumbStack = Ext.Array.slice(this.thumbs)),
             ln = thumbs.length,
-            zIndex, thumb, i;
+            zIndex = 10000, i;
 
+        
+        if (thumbs[0] !== topThumb) {
+            Ext.Array.remove(thumbs, topThumb);
+            thumbs.unshift(topThumb);
+        }
+
+        
         for (i = 0; i < ln; i++) {
-            thumb = thumbs[i];
-
-            if (thumb == topThumb) {
-                thumb.bringToFront();
-            } else {
-                thumb.sendToBack();
-            }
+            thumbs[i].el.setStyle('zIndex', zIndex);
+            zIndex -= 1000;
         }
     },
 
@@ -136089,6 +138261,13 @@ Ext.define('Ext.tab.Tab', {
             this.onCloseClick();
         }
     },
+    
+    
+    afterClick: function(isCloseClick) {
+        if (!isCloseClick) {
+            this.focus();
+        }
+    },
 
     
     activate : function(supressEvent) {
@@ -136397,8 +138576,9 @@ Ext.define('Ext.tab.Bar', {
                 } else {
                     me.setActiveTab(tab);
                 }
-                tab.focus();
             }
+            
+            tab.afterClick(isCloseClick);
         }
     },
 
@@ -136771,6 +138951,8 @@ Ext.define('Ext.selection.CheckboxModel', {
     
     checkerOnCls: Ext.baseCSSPrefix + 'grid-hd-checker-on',
     
+    tdCls: Ext.baseCSSPrefix + 'grid-cell-special ' + Ext.baseCSSPrefix + 'grid-cell-row-checker',
+    
     constructor: function(){
         var me = this;
         me.callParent(arguments);   
@@ -136905,6 +139087,7 @@ Ext.define('Ext.selection.CheckboxModel', {
             hideable: false,
             menuDisabled: true,
             dataIndex: '',
+            tdCls: me.tdCls,
             cls: showCheck ? Ext.baseCSSPrefix + 'column-header-checkbox ' : '',
             renderer: Ext.Function.bind(me.renderer, me),
             editRenderer: me.editRenderer || me.renderEmpty,
@@ -136924,9 +139107,7 @@ Ext.define('Ext.selection.CheckboxModel', {
 
     
     renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
-        var baseCSSPrefix = Ext.baseCSSPrefix;
-        metaData.tdCls = baseCSSPrefix + 'grid-cell-special ' + baseCSSPrefix + 'grid-cell-row-checker';
-        return '<div class="' + baseCSSPrefix + 'grid-row-checker" role="presentation">&#160;</div>';
+        return '<div class="' + Ext.baseCSSPrefix + 'grid-row-checker" role="presentation">&#160;</div>';
     },
     
     processSelection: function(view, record, item, index, e){
@@ -137011,7 +139192,7 @@ Ext.define('Ext.selection.CheckboxModel', {
             selected = me.selected;
             hdSelectStatus = true;
             for (i = 0, len = selected.getCount(); i < len; ++i) {
-                if (!me.storeHasSelected(selected.getAt(i))) {
+                if (!me.getStoreRecord(selected.getAt(i))) {
                     break;
                 }
                 ++selectedCount;
@@ -137128,7 +139309,7 @@ Ext.define('Ext.state.CookieProvider', {
         var me = this;
 
         document.cookie = me.prefix + name + "=" + me.encodeValue(value) +
-           ((me.expires == null) ? "" : ("; expires=" + me.expires.toGMTString())) +
+           ((me.expires == null) ? "" : ("; expires=" + me.expires.toUTCString())) +
            ((me.path == null) ? "" : ("; path=" + me.path)) +
            ((me.domain == null) ? "" : ("; domain=" + me.domain)) +
            ((me.secure == true) ? "; secure" : "");
@@ -137138,7 +139319,7 @@ Ext.define('Ext.state.CookieProvider', {
     clearCookie : function(name){
         var me = this;
 
-        document.cookie = me.prefix + name + "=null; expires=Thu, 01-Jan-70 00:00:01 GMT" +
+        document.cookie = me.prefix + name + "=null; expires=Thu, 01-Jan-1970 00:00:01 GMT" +
            ((me.path == null) ? "" : ("; path=" + me.path)) +
            ((me.domain == null) ? "" : ("; domain=" + me.domain)) +
            ((me.secure == true) ? "; secure" : "");
@@ -137883,6 +140064,7 @@ Ext.define('Ext.tree.Panel', {
 
     treeCls: Ext.baseCSSPrefix + 'tree-panel',
 
+    
     deferRowRender: false,
 
     
@@ -137978,6 +140160,10 @@ Ext.define('Ext.tree.Panel', {
                 store.sort();
             }
         }
+
+        
+        
+        me.store.singleExpand = me.singleExpand;
 
         
         
@@ -138353,7 +140539,7 @@ Ext.define('Ext.view.DragZone', {
     },
 
     
-    isPreventDrag: function(e) {
+    isPreventDrag: function(e, record, item, index) {
         return false;
     },
 
@@ -138396,7 +140582,7 @@ Ext.define('Ext.view.DragZone', {
 
     getDragText: function() {
         var count = this.dragData.records.length;
-        return Ext.String.format(this.dragText, count, count == 1 ? '' : 's');
+        return Ext.String.format(this.dragText, count, count === 1 ? '' : 's');
     },
 
     getRepairXY : function(e, data){
@@ -138826,10 +141012,17 @@ Ext.define('Ext.tree.plugin.TreeViewDragDrop', {
     nodeHighlightOnDrop: Ext.enableFx,
 
     
-    nodeHighlightOnRepair: Ext.enableFx,
-    
+
     
     displayField: 'text',
+
+    
+
+    
+
+    
+
+    
 
     init : function(view) {
         view.on('render', this.onViewRender, this, {single: true});
@@ -138848,7 +141041,7 @@ Ext.define('Ext.tree.plugin.TreeViewDragDrop', {
             if (me.containerScroll) {
                 scrollEl = view.getEl();
             }
-            me.dragZone = new Ext.tree.ViewDragZone({
+            me.dragZone = new Ext.tree.ViewDragZone(Ext.apply({
                 view: view,
                 ddGroup: me.dragGroup || me.ddGroup,
                 dragText: me.dragText,
@@ -138856,11 +141049,11 @@ Ext.define('Ext.tree.plugin.TreeViewDragDrop', {
                 repairHighlightColor: me.nodeHighlightColor,
                 repairHighlight: me.nodeHighlightOnRepair,
                 scrollEl: scrollEl
-            });
+            }, me.dragZone));
         }
 
         if (me.enableDrop) {
-            me.dropZone = new Ext.tree.ViewDropZone({
+            me.dropZone = new Ext.tree.ViewDropZone(Ext.apply({
                 view: view,
                 ddGroup: me.dropGroup || me.ddGroup,
                 allowContainerDrops: me.allowContainerDrops,
@@ -138871,7 +141064,7 @@ Ext.define('Ext.tree.plugin.TreeViewDragDrop', {
                 dropHighlight: me.nodeHighlightOnDrop,
                 sortOnDrop: me.sortOnDrop,
                 containerScroll: me.containerScroll
-            });
+            }, me.dropZone));
         }
     }
 }, function(){
@@ -138893,25 +141086,25 @@ Ext.define('Ext.util.Cookies', {
             domain = (argc > 4) ? argv[4] : null,
             secure = (argc > 5) ? argv[5] : false;
             
-        document.cookie = name + "=" + escape(value) + ((expires === null) ? "" : ("; expires=" + expires.toGMTString())) + ((path === null) ? "" : ("; path=" + path)) + ((domain === null) ? "" : ("; domain=" + domain)) + ((secure === true) ? "; secure" : "");
+        document.cookie = name + "=" + escape(value) + ((expires === null) ? "" : ("; expires=" + expires.toUTCString())) + ((path === null) ? "" : ("; path=" + path)) + ((domain === null) ? "" : ("; domain=" + domain)) + ((secure === true) ? "; secure" : "");
     },
 
     
-    get : function(name){
-        var arg = name + "=",
-            alen = arg.length,
-            clen = document.cookie.length,
-            i = 0,
-            j = 0;
-            
-        while(i < clen){
-            j = i + alen;
-            if(document.cookie.substring(i, j) == arg){
-                return this.getCookieVal(j);
-            }
-            i = document.cookie.indexOf(" ", i) + 1;
-            if(i === 0){
-                break;
+    get : function(name) {
+        var parts = document.cookie.split('; '),
+            len = parts.length,
+            item, i, ret;
+
+        
+        
+        
+        
+        
+        for (i = 0; i < len; ++i) {
+            item = parts[i].split('=');
+            if (item[0] === name) {
+                ret = item[1];
+                return ret ? unescape(ret) : '';
             }
         }
         return null;
@@ -138919,19 +141112,21 @@ Ext.define('Ext.util.Cookies', {
 
     
     clear : function(name, path){
-        if(this.get(name)){
+        if (this.get(name)) {
             path = path || '/';
-            document.cookie = name + '=' + '; expires=Thu, 01-Jan-70 00:00:01 GMT; path=' + path;
+            document.cookie = name + '=' + '; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=' + path;
         }
     },
     
     
     getCookieVal : function(offset){
-        var endstr = document.cookie.indexOf(";", offset);
-        if(endstr == -1){
-            endstr = document.cookie.length;
+        var cookie = document.cookie,
+            endstr = cookie.indexOf(";", offset);
+
+        if (endstr == -1) {
+            endstr = cookie.length;
         }
-        return unescape(document.cookie.substring(offset, endstr));
+        return unescape(cookie.substring(offset, endstr));
     }
 });
 
@@ -138967,84 +141162,71 @@ Ext.define('Ext.util.History', {
     useTopWindow: true,
 
     
-    fieldId: Ext.baseCSSPrefix + 'history-field',
-    
     iframeId: Ext.baseCSSPrefix + 'history-frame',
 
     constructor: function() {
-        var me = this;
-        me.oldIEMode = Ext.isIE7m || !Ext.isStrict && Ext.isIE8;
+        var me = this,
+            hash,
+            newHash;
+
+        
+        me.oldIEMode = Ext.isIE7m || Ext.isIEQuirks && (Ext.isIE8 || Ext.isIE9);
         me.iframe = null;
         me.hiddenField = null;
         me.ready = false;
         me.currentToken = null;
         me.mixins.observable.constructor.call(me);
+        me.onHashChange = function () {
+            newHash = me.getHash();
+            if (newHash !== hash) {
+                hash = newHash;
+                me.handleStateChange(hash);
+            }
+        };
     },
 
     getHash: function() {
-        var href = window.location.href,
-            i = href.indexOf("#");
-
-        return i >= 0 ? href.substr(i + 1) : null;
+        return this.win.location.hash.substr(1);
     },
 
     setHash: function (hash) {
-        var me = this,
-            win = me.useTopWindow ? window.top : window;
         try {
-            win.location.hash = hash;
+            this.win.location.hash = hash;
         } catch (e) {
             
         }
     },
-
-    doSave: function() {
-        this.hiddenField.value = this.currentToken;
-    },
-
 
     handleStateChange: function(token) {
         this.currentToken = token;
         this.fireEvent('change', token);
     },
 
-    updateIFrame: function(token) {
-        var html = '<html><body><div id="state" role="presentation">' +
-                    Ext.util.Format.htmlEncode(token) +
-                    '</div></body></html>',
-            doc;
+    updateIFrame: function(hash) {
+        var iframe = this.iframe,
+            doc = iframe && iframe.contentWindow && iframe.contentWindow.document;
 
-        try {
-            doc = this.iframe.contentWindow.document;
-            doc.open();
-            doc.write(html);
-            doc.close();
-            return true;
-        } catch (e) {
-            return false;
-        }
+        doc.open().close();
+        doc.location.hash = hash;
+        return true;
     },
 
     checkIFrame: function () {
         var me = this,
             contentWindow = me.iframe.contentWindow,
-            doc, elem, oldToken, oldHash;
+            oldToken, oldHash;
 
         if (!contentWindow || !contentWindow.document) {
-            Ext.Function.defer(this.checkIFrame, 10, this);
+            Ext.Function.defer(me.checkIFrame, 10, me);
             return;
         }
 
-        doc = contentWindow.document;
-        elem = doc.getElementById("state");
-        oldToken = elem ? elem.innerText : null;
+        oldToken = contentWindow.location.hash.substr(1);
         oldHash = me.getHash();
 
         Ext.TaskManager.start({
             run: function () {
-                var doc = contentWindow.document,
-                    elem = doc.getElementById("state"),
-                    newToken = elem ? elem.innerText : null,
+                var newToken = contentWindow.location.hash.substr(1),
                     newHash = me.getHash();
 
                 if (newToken !== oldToken) {
@@ -139052,7 +141234,6 @@ Ext.define('Ext.util.History', {
                     me.handleStateChange(newToken);
                     me.setHash(newToken);
                     oldHash = newToken;
-                    me.doSave();
                 } else if (newHash !== oldHash) {
                     oldHash = newHash;
                     me.updateIFrame(newHash);
@@ -139066,37 +141247,30 @@ Ext.define('Ext.util.History', {
     },
 
     startUp: function () {
-        var me = this,
-            hash;
+        var me = this;
 
-        me.currentToken = me.hiddenField.value || this.getHash();
+        me.currentToken = me.getHash();
 
         if (me.oldIEMode) {
             me.checkIFrame();
         } else {
-            hash = me.getHash();
-            Ext.TaskManager.start({
-                run: function () {
-                    var newHash = me.getHash();
-                    if (newHash !== hash) {
-                        hash = newHash;
-                        me.handleStateChange(hash);
-                        me.doSave();
-                    }
-                },
-                interval: 50,
-                scope: me
-            });
+            if (Ext.supports.Hashchange) {
+                Ext.EventManager.on(me.win, 'hashchange', me.onHashChange);
+            }
+            else {
+                Ext.TaskManager.start({
+                    run: me.onHashChange,
+                    interval: 50
+                });
+            }
             me.ready = true;
             me.fireEvent('ready', me);
         }
-
     },
 
     
     init: function (onReady, scope) {
-        var me = this,
-            DomHelper = Ext.DomHelper;
+        var me = this;
 
         if (me.ready) {
             Ext.callback(onReady, scope, [me]);
@@ -139110,29 +141284,15 @@ Ext.define('Ext.util.History', {
             return;
         }
 
-        
-        me.hiddenField = Ext.getDom(me.fieldId);
-        if (!me.hiddenField) {
-            me.hiddenField = Ext.getBody().createChild({
-                id: Ext.id(),
-                tag: 'form',
-                role: 'presentation',
-                cls: Ext.baseCSSPrefix + 'hide-display',
-                children: [{
-                    tag: 'input',
-                    type: 'hidden',
-                    id: me.fieldId
-                }]
-            }, false, true).firstChild;
-        }
-
+        me.win = me.useTopWindow ? window.top : window;
         if (me.oldIEMode) {
             me.iframe = Ext.getDom(me.iframeId);
             if (!me.iframe) {
-                me.iframe = DomHelper.append(me.hiddenField.parentNode, {
+                me.iframe = Ext.DomHelper.append(document.body, {
                     tag: 'iframe',
                     role: 'presentation',
                     id: me.iframeId,
+                    style: 'display:none;',
                     src: Ext.SSL_SECURE_URL
                 });
             }
@@ -139152,10 +141312,10 @@ Ext.define('Ext.util.History', {
     },
 
     
-    add: function (token, preventDup) {
+    add: function (token, preventDuplicates) {
         var me = this;
 
-        if (preventDup !== false) {
+        if (preventDuplicates !== false) {
             if (me.getToken() === token) {
                 return true;
             }
@@ -139171,12 +141331,14 @@ Ext.define('Ext.util.History', {
 
     
     back: function() {
-        window.history.go(-1);
+        var win = this.useTopWindow ? window.top : window;
+        win.history.go(-1);
     },
 
     
     forward: function(){
-        window.history.go(1);
+        var win = this.useTopWindow ? window.top : window;
+        win.history.go(1);
     },
 
     
