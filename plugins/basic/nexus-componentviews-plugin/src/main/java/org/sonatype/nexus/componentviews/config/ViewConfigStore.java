@@ -34,7 +34,7 @@ public interface ViewConfigStore
    * @param item to be added
    * @throws IOException IOException If any problem encountered while read/store of config storage
    */
-  public ViewConfigId add(ViewConfig item) throws IOException;
+  ViewConfigId add(ViewConfig item) throws IOException;
 
   /**
    * Updates stored config if exists.
@@ -42,7 +42,7 @@ public interface ViewConfigStore
    * @param item to be updated
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public void update(ViewConfigId id, ViewConfig item) throws IOException;
+  void update(ViewConfigId id, ViewConfig item) throws IOException;
 
   /**
    * Deletes stored config if exists.
@@ -51,7 +51,7 @@ public interface ViewConfigStore
    * @return false if config to be deleted does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public void remove(ViewConfigId id) throws IOException;
+  void remove(ViewConfigId id) throws IOException;
 
   /**
    * Retrieves stored configs.
@@ -59,7 +59,7 @@ public interface ViewConfigStore
    * @return configs (never null)
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  public Map<ViewConfigId, ViewConfig> getAll() throws IOException;
+  Map<ViewConfigId, ViewConfig> getAll() throws IOException;
 
 
   /**

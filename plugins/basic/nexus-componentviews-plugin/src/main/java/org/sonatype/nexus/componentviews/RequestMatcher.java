@@ -24,10 +24,10 @@ public interface RequestMatcher
    * Returns {@code true} if the handler indicated by {@link #getHandlerName()} should process the request, {@code
    * false} otherwise.
    */
-  public boolean matches(ViewRequest request);
+  boolean matches(ViewRequest request);
 
   /**
    * The return value must uniquely identify one of the view's handlers.
    */
-  public String getHandlerName();
+  String getHandlerName();
 }

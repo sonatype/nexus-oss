@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
 import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.RequestMatcher;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
@@ -29,6 +30,8 @@ import org.sonatype.nexus.componentviews.config.ViewFactory;
 import com.google.common.collect.ImmutableMap;
 
 /**
+ * A factory for constructing {@link View}s that expose the {@link ExamplePathListHandler} out of {@link ViewConfig}s.
+ *
  * @since 3.0
  */
 @Named

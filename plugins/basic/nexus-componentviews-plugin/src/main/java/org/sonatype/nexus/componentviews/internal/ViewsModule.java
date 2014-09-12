@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Guice servlet module for exposing the {@link ComponentViewServlet} to the servlet container.
+ *
  * @since 3.0
  */
 @Named
