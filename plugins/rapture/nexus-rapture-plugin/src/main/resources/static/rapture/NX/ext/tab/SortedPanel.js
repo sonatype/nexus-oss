@@ -21,6 +21,11 @@ Ext.define('NX.ext.tab.SortedPanel', {
   extend: 'Ext.tab.Panel',
   alias: 'widget.nx-sorted-tabpanel',
 
+  /**
+   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
+   */
+  autoHideTabHeader: true,
+
   listeners: {
     /**
      * @private
@@ -30,7 +35,7 @@ Ext.define('NX.ext.tab.SortedPanel', {
      * @param me this tab panel
      * @param component added tab
      */
-    add: function(me, component) {
+    add: function (me, component) {
       var thisTitle = component.title || '',
           thisWeight = component.weight || 1000,
           position = 0;
@@ -38,7 +43,7 @@ Ext.define('NX.ext.tab.SortedPanel', {
       me.suspendEvents();
       me.remove(component, false);
 
-      me.items.each(function(item) {
+      me.items.each(function (item) {
         var thatTitle = item.title || '',
             thatWeight = item.weight || 1000;
 
@@ -51,8 +56,10 @@ Ext.define('NX.ext.tab.SortedPanel', {
       });
 
       me.insert(position, component);
-      if (me.rendered && me.items.length > 1) {
-        me.getTabBar().show();
+      if (me.autoHideTabHeader) {
+        if (me.rendered && me.items.length > 1) {
+          me.getTabBar().show();
+        }
       }
       me.resumeEvents();
     },
@@ -61,11 +68,13 @@ Ext.define('NX.ext.tab.SortedPanel', {
      * @private
      * Hide tab bar in case of one or less tabs.
      */
-    remove: function() {
+    remove: function () {
       var me = this;
 
-      if (me.rendered && me.items.length <= 1) {
-        me.getTabBar().hide();
+      if (me.autoHideTabHeader) {
+        if (me.rendered && me.items.length <= 1) {
+          me.getTabBar().hide();
+        }
       }
     },
 
@@ -73,14 +82,16 @@ Ext.define('NX.ext.tab.SortedPanel', {
      * @private
      * Hide/Show tab bar based on number of tabs (no tab bar for one or less tabs).
      */
-    afterrender: function() {
+    afterrender: function () {
       var me = this;
 
-      if (me.items.length > 1) {
-        me.getTabBar().show();
-      }
-      else {
-        me.getTabBar().hide();
+      if (me.autoHideTabHeader) {
+        if (me.items.length > 1) {
+          me.getTabBar().show();
+        }
+        else {
+          me.getTabBar().hide();
+        }
       }
     }
   }

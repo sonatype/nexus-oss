@@ -30,6 +30,11 @@ Ext.define('NX.view.masterdetail.Tabs', {
   //ui: 'feature-detail',
 
   /**
+   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
+   */
+  autoHideTabHeader: true,
+
+  /**
    * @override
    */
   initComponent: function() {
@@ -54,7 +59,8 @@ Ext.define('NX.view.masterdetail.Tabs', {
         activeTab: 0,
         layoutOnTabChange: true,
         flex: 1,
-        items: me.tabs
+        items: me.tabs,
+        autoHideTabHeader: me.autoHideTabHeader
       }
     ];
 
