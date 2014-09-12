@@ -38,9 +38,12 @@ public class RawBinaryViewFactory
 
   private final RawBinaryStore binaryStore;
 
+  private final NotFoundHandler notFoundHandler;
+
   @Inject
-  public RawBinaryViewFactory(final RawBinaryStore binaryStore) {
+  public RawBinaryViewFactory(final RawBinaryStore binaryStore, final NotFoundHandler notFoundHandler) {
     this.binaryStore = binaryStore;
+    this.notFoundHandler = notFoundHandler;
   }
 
   @Override
@@ -57,6 +60,6 @@ public class RawBinaryViewFactory
     final Router router = new Router();
     router.addRoute(binariesRequestMatcher, new RawBinariesHandler(binaryStore));
 
-    return new View(config, router, new NotFoundHandler());
+    return new View(config, router, notFoundHandler);
   }
 }

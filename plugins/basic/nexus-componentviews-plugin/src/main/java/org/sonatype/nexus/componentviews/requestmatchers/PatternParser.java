@@ -29,6 +29,16 @@ public class PatternParser
 {
   public static final String DEFAULT_VARIABLE_REGEXP = "[^/]+";
 
+  private static final List<Character> ESCAPE_CHARS = asList('\\');
+
+  private static final List<Character> VARNAME_DISALLOWED_CHARS = asList(' ', '}');
+
+  private static final List<Character> VARIABLE_NAME_TERMINATORS = asList(':', '}');
+
+  private static final List<Character> END_OF_LITERAL = asList('{');
+
+  private static final List<Character> END_OF_VARIABLE_DECLARATION = asList('}');
+
   private List<Token> tokens = new ArrayList<>();
 
   private static final List<Character> NONE = Collections.<Character>emptyList();
@@ -45,12 +55,11 @@ public class PatternParser
 
   private void parseTemplate(final CharacterIterator iterator) {
     while (true) {
-      final char chr = iterator.current();
-      switch (chr) {
+      final char ch = iterator.current();
+      switch (ch) {
         case CharacterIterator.DONE:
           return;
         case '{':
-          iterator.next();
           parseVariable(iterator);
           break;
         default:
@@ -60,14 +69,16 @@ public class PatternParser
   }
 
   private void parseVariable(CharacterIterator iterator) {
-    final String varName = readFragment(iterator, asList(':', '}'), asList('\\'), asList(' ', '}'));
-    // Consume the final '}' character
+    // Consume the starting '{' character
+    iterator.next();
+
+    final String varName = readFragment(iterator, VARIABLE_NAME_TERMINATORS, ESCAPE_CHARS, VARNAME_DISALLOWED_CHARS);
 
     // The iterator is currently pointing to the end character.
     if (iterator.current() == ':') {
       // Skip the ':' character
       iterator.next();
-      final String regexp = readFragment(iterator, asList('}'), asList('\\'), NONE);
+      final String regexp = readFragment(iterator, END_OF_VARIABLE_DECLARATION, ESCAPE_CHARS, NONE);
       tokens.add(new VariableToken(varName, regexp));
     }
     else {
@@ -81,7 +92,7 @@ public class PatternParser
   }
 
   private void parseLiteral(CharacterIterator iterator) {
-    final String literal = readFragment(iterator, asList('{'), asList('\\'), NONE);
+    final String literal = readFragment(iterator, END_OF_LITERAL, ESCAPE_CHARS, NONE);
     tokens.add(new LiteralToken(literal));
   }
 
@@ -98,12 +109,12 @@ public class PatternParser
     StringBuilder b = new StringBuilder();
     boolean escaping = false;
     while (true) {
-      final char cha = iterator.current();
+      final char ch = iterator.current();
 
-      if (cha == CharacterIterator.DONE) {
+      if (ch == CharacterIterator.DONE) {
         if (escaping) {
           throw new IllegalArgumentException(
-              "Unexpected end after escape character '" + cha + "' at position " + iterator.getIndex());
+              "Unexpected end after escape character '" + ch + "' at position " + iterator.getIndex());
         }
         if (b.length() < 1) {
           throw new IllegalArgumentException("Zero-length fragment at position " + iterator.getIndex());
@@ -113,18 +124,18 @@ public class PatternParser
 
       if (escaping) {
         checkAllowed(iterator, disallowed);
-        b.append(cha);
+        b.append(ch);
         escaping = false;
       }
-      else if (escapeChars.contains(cha)) {
+      else if (escapeChars.contains(ch)) {
         escaping = true;
       }
-      else if (stopChars.contains(cha)) {
+      else if (stopChars.contains(ch)) {
         return b.toString();
       }
       else {
         checkAllowed(iterator, disallowed);
-        b.append(cha);
+        b.append(ch);
       }
 
       iterator.next();

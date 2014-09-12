@@ -17,6 +17,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -35,7 +36,7 @@ public class TokenMatcherTest
     final Map<String, String> tokens = matcher.matchTokens("/yes/no/false");
 
     assertThat(tokens, is(notNullValue()));
-    assertThat(tokens.size(), is(equalTo(3)));
+    assertThat(tokens.entrySet(), hasSize(3));
 
     assertThat(tokens.get("a"), is(equalTo("yes")));
     assertThat(tokens.get("b"), is(equalTo("no")));
@@ -49,7 +50,7 @@ public class TokenMatcherTest
     final Map<String, String> tokens = tokenMatcher.matchTokens("/foo/bar/1234/bar-1234.zip");
 
     assertThat(tokens, is(notNullValue()));
-    assertThat(tokens.size(), is(equalTo(5)));
+    assertThat(tokens.entrySet(), hasSize(5));
 
     assertThat(tokens.get("group"), is(equalTo("foo")));
     assertThat(tokens.get("module"), is(equalTo("bar")));
@@ -65,7 +66,7 @@ public class TokenMatcherTest
     final Map<String, String> tokens = tokenMatcher.matchTokens("/org/sonatype/nexus/components/1234/bar-1234.zip");
 
     assertThat(tokens, is(notNullValue()));
-    assertThat(tokens.size(), is(equalTo(5)));
+    assertThat(tokens.entrySet(), hasSize(5));
 
     assertThat(tokens.get("group"), is(equalTo("org/sonatype/nexus")));
     assertThat(tokens.get("module"), is(equalTo("components")));
@@ -81,7 +82,7 @@ public class TokenMatcherTest
     final Map<String, String> tokens = tokenMatcher.matchTokens("/1/2/3/4/5");
 
     assertThat(tokens, is(notNullValue()));
-    assertThat(tokens.size(), is(equalTo(2)));
+    assertThat(tokens.entrySet(), hasSize(2));
 
     assertThat(tokens.get("singleSegment"), is(equalTo("1")));
     assertThat(tokens.get("manySegments"), is(equalTo("2/3/4/5")));

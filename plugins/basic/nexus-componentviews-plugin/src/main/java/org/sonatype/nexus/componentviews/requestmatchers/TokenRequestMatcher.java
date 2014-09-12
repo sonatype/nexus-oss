@@ -29,7 +29,9 @@ public class TokenRequestMatcher
 {
   private final TokenMatcher tokenMatcher;
 
-  public TokenRequestMatcher(final TokenMatcher tokenMatcher) {this.tokenMatcher = tokenMatcher;}
+  public TokenRequestMatcher(final TokenMatcher tokenMatcher) {
+    this.tokenMatcher = tokenMatcher;
+  }
 
   public static final String PATH_TOKENS = "TokenRequestMatcher.pathTokens";
 
