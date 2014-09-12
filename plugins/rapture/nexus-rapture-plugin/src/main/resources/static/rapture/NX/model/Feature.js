@@ -36,6 +36,7 @@ Ext.define('NX.model.Feature', {
     { name: 'view', defaultValue: undefined },
     { name: 'href', defaultValue: undefined },
     { name: 'hrefTarget', defaultValue: '_blank' },
+    { name: 'helpKeyword' },
     { name: 'visible', defaultValue: true },
     { name: 'expanded', defaultValue: true },
     { name: 'bookmark', defaultValue: undefined },

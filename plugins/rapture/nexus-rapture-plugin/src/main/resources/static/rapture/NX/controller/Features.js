@@ -88,6 +88,11 @@ Ext.define('NX.controller.Features', {
           feature.bookmark = NX.Bookmarks.encode(path).toLowerCase();
         }
 
+        // generate default context-help keyword
+        if (!feature.helpKeyword) {
+          feature.helpKeyword = path.replace('/', '_');
+        }
+
         if (Ext.isDefined(feature.visible)) {
           if (!Ext.isFunction(feature.visible)) {
             if (feature.visible) {
