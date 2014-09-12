@@ -141348,6 +141348,181 @@ Ext.define('Ext.util.History', {
 });
 
 
+
+
+Ext.define('Ext.ux.IFrame', {
+    extend:  Ext.Component ,
+
+    alias: 'widget.uxiframe',
+
+    loadMask: 'Loading...',
+
+    src: 'about:blank',
+
+    renderTpl: [
+        '<iframe src="{src}" name="{frameName}" width="100%" height="100%" frameborder="0"></iframe>'
+    ],
+
+    initComponent: function () {
+        this.callParent();
+
+        this.frameName = this.frameName || this.id + '-frame';
+
+        this.addEvents(
+            'beforeload',
+            'load'
+        );
+
+        Ext.apply(this.renderSelectors, {
+            iframeEl: 'iframe'
+        });
+    },
+
+    initEvents : function() {
+        var me = this;
+        me.callParent();
+        me.iframeEl.on('load', me.onLoad, me);
+    },
+
+    initRenderData: function() {
+        return Ext.apply(this.callParent(), {
+            src: this.src,
+            frameName: this.frameName
+        });
+    },
+
+    getBody: function() {
+        var doc = this.getDoc();
+        return doc.body || doc.documentElement;
+    },
+
+    getDoc: function() {
+        try {
+            return this.getWin().document;
+        } catch (ex) {
+            return null;
+        }
+    },
+
+    getWin: function() {
+        var me = this,
+            name = me.frameName,
+            win = Ext.isIE
+                ? me.iframeEl.dom.contentWindow
+                : window.frames[name];
+        return win;
+    },
+
+    getFrame: function() {
+        var me = this;
+        return me.iframeEl.dom;
+    },
+
+    beforeDestroy: function () {
+        this.cleanupListeners(true);
+        this.callParent();
+    },
+    
+    cleanupListeners: function(destroying){
+        var doc, prop;
+
+        if (this.rendered) {
+            try {
+                doc = this.getDoc();
+                if (doc) {
+                    Ext.EventManager.removeAll(doc);
+                    if (destroying) {
+                        for (prop in doc) {
+                            if (doc.hasOwnProperty && doc.hasOwnProperty(prop)) {
+                                delete doc[prop];
+                            }
+                        }
+                    }
+                }
+            } catch(e) { }
+        }
+    },
+
+    onLoad: function() {
+        var me = this,
+            doc = me.getDoc(),
+            fn = me.onRelayedEvent;
+
+        if (doc) {
+            try {
+                Ext.EventManager.removeAll(doc);
+
+                
+                
+                
+                
+                
+                Ext.EventManager.on(doc, {
+                    mousedown: fn, 
+                    mousemove: fn, 
+                    mouseup: fn,   
+                    click: fn,     
+                    dblclick: fn,  
+                    scope: me
+                });
+            } catch(e) {
+                
+            }
+
+            
+            Ext.EventManager.on(this.getWin(), 'beforeunload', me.cleanupListeners, me);
+
+            this.el.unmask();
+            this.fireEvent('load', this);
+
+        } else if(me.src && me.src != '') {
+
+            this.el.unmask();
+            this.fireEvent('error', this);
+        }
+
+
+    },
+
+    onRelayedEvent: function (event) {
+        
+
+        var iframeEl = this.iframeEl,
+
+            
+            iframeXY = Ext.Element.getTrueXY(iframeEl),
+            originalEventXY = event.getXY(),
+
+            
+            
+            
+            eventXY = Ext.EventManager.getPageXY(event.browserEvent);
+
+        
+        
+        event.xy = [iframeXY[0] + eventXY[0], iframeXY[1] + eventXY[1]];
+
+        event.injectEvent(iframeEl); 
+
+        event.xy = originalEventXY; 
+    },
+
+    load: function (src) {
+        var me = this,
+            text = me.loadMask,
+            frame = me.getFrame();
+
+        if (me.fireEvent('beforeload', me, src) !== false) {
+            if (text && me.el) {
+                me.el.mask(text);
+            }
+
+            frame.src = me.src = (src || me.src);
+        }
+    }
+});
+
+
 Ext.define('Ext.ux.data.PagingMemoryProxy', {
     extend:  Ext.data.proxy.Memory ,
     alias: 'proxy.pagingmemory',

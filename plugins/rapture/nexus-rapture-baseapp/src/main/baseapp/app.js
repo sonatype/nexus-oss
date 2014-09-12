@@ -31,6 +31,7 @@ Ext.require([
   'Ext.view.*',
   'Ext.window.*',
   'Ext.Action',
+  'Ext.ux.IFrame',
   'Ext.ux.form.MultiSelect',
   'Ext.ux.form.ItemSelector'
 ]);
