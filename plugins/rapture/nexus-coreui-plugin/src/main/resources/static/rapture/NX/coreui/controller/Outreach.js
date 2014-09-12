@@ -24,6 +24,9 @@ Ext.define('NX.coreui.controller.Outreach', {
     'NX.State',
     'NX.Permissions'
   ],
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   refs: [
     { ref: 'welcomePage', selector: 'nx-dashboard-welcome' }
@@ -70,7 +73,8 @@ Ext.define('NX.coreui.controller.Outreach', {
         if (Ext.isObject(response) && response.success) {
           var status = NX.State.getValue('status'),
               user = NX.State.getUser(),
-              usertype;
+              usertype,
+              url;
 
           if (user) {
             usertype = user.administrator ? 'admin' : 'normal';
@@ -79,19 +83,28 @@ Ext.define('NX.coreui.controller.Outreach', {
             usertype = 'anonymous';
           }
 
+          url = NX.util.Url.urlOf('service/outreach/?version=' + status.version +
+              '&edition=' + status.edition +
+              '&usertype=' + usertype);
+
           welcomePage.add({
-            xtype: 'box',
+            xtype: 'uxiframe',
             itemId: 'outreach',
             anchor: '100%',
             flex: 1,
             border: false,
             frame: false,
-            autoEl: {
-              tag: 'iframe',
-              // include version and edition for iframe request to allow for client-side content templates
-              src: NX.util.Url.urlOf('service/outreach/?version=' + status.version +
-                  '&edition=' + status.edition +
-                  '&usertype=' + usertype)
+            hidden: true,
+            src: url,
+            listeners: {
+              load: function () {
+                if (this.getWin().iframeLoaded) {
+                  this.show();
+                }
+                else {
+                  me.logWarn('Outreach iframe did not load: ' + url);
+                }
+              }
             }
           });
         }
