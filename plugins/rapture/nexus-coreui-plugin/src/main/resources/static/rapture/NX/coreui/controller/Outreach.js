@@ -87,6 +87,7 @@ Ext.define('NX.coreui.controller.Outreach', {
               '&edition=' + status.edition +
               '&usertype=' + usertype);
 
+          // add the outreach iframe to the welcome view
           welcomePage.add({
             xtype: 'uxiframe',
             itemId: 'outreach',
@@ -98,10 +99,12 @@ Ext.define('NX.coreui.controller.Outreach', {
             src: url,
             listeners: {
               load: function () {
+                // if the outreach content has loaded properly, show it
                 if (this.getWin().iframeLoaded) {
                   this.show();
                 }
                 else {
+                  // else complain and leave it hidden
                   me.logWarn('Outreach iframe did not load: ' + url);
                 }
               }
