@@ -118,7 +118,7 @@ Ext.define('NX.controller.Menu', {
       component: {
         'nx-feature-menu': {
           select: me.onSelection,
-          afterrender: me.refreshMenu
+          afterrender: me.onAfterRender
         },
         'nx-header-panel button[mode]': {
           click: me.onModeChanged
@@ -143,6 +143,27 @@ Ext.define('NX.controller.Menu', {
          */
         'featureselected'
     );
+  },
+
+  /**
+   * Unregister Application listener.
+   */
+  destroy: function(){
+    var me = this;
+
+    me.getApplication().un('controllerschanged', me.refreshMenu, me);
+
+    me.callParent(arguments);
+  },
+
+  /**
+   * Register as Application listener && rebuild menu.
+   */
+  onAfterRender: function () {
+    var me = this;
+
+    me.getApplication().on('controllerschanged', me.refreshMenu, me);
+    me.refreshMenu();
   },
 
   /**

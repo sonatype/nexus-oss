@@ -360,6 +360,7 @@ Ext.define('NX.app.Application', {
     if (changes) {
       // TODO shall we do this on each refresh?
       me.getIconController().installStylesheet();
+      me.fireEvent('controllerschanged');
     }
   }
 });
