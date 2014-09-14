@@ -89,6 +89,16 @@ Ext.define('NX.coreui.app.PluginConfig', {
     },
     'NX.coreui.controller.MavenUpload',
     'NX.coreui.controller.Metrics',
+    { id: 'NX.coreui.controller.NuGetRepositorySettings',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-nuget-plugin');
+      }
+    },
+    { id: 'NX.coreui.controller.NuGetUpload',
+      active: function () {
+        return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-nuget-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.Outreach',
       active: function () {
