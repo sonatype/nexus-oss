@@ -71,8 +71,8 @@ Ext.define('NX.controller.Features', {
           // TODO: Maybe raise an error instead?
         }
 
-        if (clonedFeature.href && !clonedFeature.hrefTarget) {
-          clonedFeature.hrefTarget = clonedFeature.href;
+        if (clonedFeature.href) {
+          clonedFeature.url = clonedFeature.href;
         }
 
         path = clonedFeature.path;

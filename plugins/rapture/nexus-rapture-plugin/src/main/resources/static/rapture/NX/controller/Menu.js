@@ -25,7 +25,8 @@ Ext.define('NX.controller.Menu', {
     'NX.controller.Features',
     'NX.Permissions',
     'NX.Security',
-    'NX.State'
+    'NX.State',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -170,7 +171,10 @@ Ext.define('NX.controller.Menu', {
       me.logDebug('Selected feature: ' + path);
       //</if>
 
-      if (!featureMenuModel.get('href')) {
+      if (featureMenuModel.get('url')) {
+        NX.Windows.open(featureMenuModel.get('url'));
+      }
+      else {
         me.selectFeature(me.getFeatureStore().getById(featureMenuModel.get('path')));
         me.populateFeatureGroupStore(featureMenuModel);
         if (me.bookmarkingEnabled) {

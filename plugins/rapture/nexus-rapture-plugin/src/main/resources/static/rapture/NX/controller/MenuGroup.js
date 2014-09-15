@@ -58,7 +58,12 @@ Ext.define('NX.controller.MenuGroup', {
 
     if (records.length > 0) {
       feature = records[0];
-      NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken(feature.get('bookmark')), me);
+      if (feature.get('url')) {
+        NX.Windows.open(feature.get('url'));
+      }
+      else {
+        NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken(feature.get('bookmark')), me);
+      }
     }
   }
 
