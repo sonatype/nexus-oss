@@ -25,9 +25,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.componentviews.requestmatchers.PatternParser.readFragment;
 
-/**
- * @since 3.0
- */
 public class PatternParserFragmentReadingTest
 {
   public static final String WILD = ".+";

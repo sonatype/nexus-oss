@@ -13,6 +13,8 @@
 package org.sonatype.nexus.componentviews.requestmatchers;
 
 /**
+ * A token representing an unchanging portion of a path.
+ *
  * @since 3.0
  */
 public class LiteralToken

@@ -15,6 +15,8 @@ package org.sonatype.nexus.componentviews;
 import org.sonatype.nexus.events.AbstractEvent;
 
 /**
+ * Abstract parent for events fired by the {@link ViewRegistry}.
+ *
  * @since 3.0
  */
 public abstract class ViewRegistryEvent

@@ -21,9 +21,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-/**
- * @since 3.0
- */
 public class PatternParserTest
 {
   public static final String DEFAULT = PatternParser.DEFAULT_VARIABLE_REGEXP;

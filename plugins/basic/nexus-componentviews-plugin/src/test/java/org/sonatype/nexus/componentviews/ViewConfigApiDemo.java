@@ -12,40 +12,19 @@
  */
 package org.sonatype.nexus.componentviews;
 
-import java.io.IOException;
-
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
 import org.sonatype.nexus.componentviews.config.ViewFactorySource;
-import org.sonatype.nexus.componentviews.config.ViewConfigStore;
-
-import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
 
 /**
- * @since 3.0
+ * Mock tests that demonstrate the ViewConfig API.
  */
 public class ViewConfigApiDemo
 {
-  /**
-   * Turn all the view configs in the config store into views, as happens when Nexus starts.
-   */
-  @Test
-  public void instantiateAndRegisterAllViews() throws IOException {
-    ViewConfigStore usvcStore = mock(ViewConfigStore.class);
-    ViewFactorySource factorySource = mock(ViewFactorySource.class);
-    ViewRegistry viewRegistry = mock(ViewRegistry.class);
-
-    for (ViewConfig config : usvcStore.getAll().values()) {
-      final ViewFactory factory = factorySource.getFactory(config.getFactoryName());
-      final View view = factory.createView(config);
-      viewRegistry.registerView(view);
-    }
-  }
-
   /**
    * Reloading a view in response to a configuration change.
    */
@@ -59,11 +38,12 @@ public class ViewConfigApiDemo
     final ViewFactory factory = factorySource.getFactory(config.getFactoryName());
     final View newView = factory.createView(config);
 
-    // If there's an existing view, we need to wait until it's safely unregistered.
+    // De-register the existing view
     final View existingView = viewRegistry.findViewByName(config.getViewName());
     if (existingView != null) {
       viewRegistry.unregisterView(existingView);
     }
+    // Register its replacement
     viewRegistry.registerView(newView);
   }
 }

@@ -17,12 +17,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
+import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
 
 /**
+ * A factory for constructing {@link View}s that expose the {@link ExamplePathListHandler} out of {@link ViewConfig}s.
+ *
  * @since 3.0
  */
 @Named

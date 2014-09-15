@@ -73,9 +73,6 @@ Ext.define('NX.controller.dev.Developer', {
         },
         'nx-dev-tests button[action=testMessages]': {
           click: me.testMessages
-        },
-        'nx-dev-tests button[action=toggleBranding]': {
-          click: me.toggleBranding
         }
       }
     });
@@ -141,21 +138,6 @@ Ext.define('NX.controller.dev.Developer', {
         text: 'test of ' + type
       });
     });
-  },
-
-  /**
-   * @private
-   */
-  toggleBranding: function () {
-    var me = this,
-        branding = me.getBranding();
-
-    if (branding.isVisible()) {
-      branding.hide();
-    }
-    else {
-      branding.show();
-    }
   }
 
 });

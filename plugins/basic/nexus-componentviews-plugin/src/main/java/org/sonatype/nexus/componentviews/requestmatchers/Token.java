@@ -20,6 +20,8 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * A portion of a parsed pattern template.
+ *
  * @since 3.0
  */
 public abstract class Token

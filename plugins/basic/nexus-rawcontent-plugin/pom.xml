@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Raw Content View Plugin</pluginName>
     <pluginDescription>Example view.</pluginDescription>
   </properties>
 

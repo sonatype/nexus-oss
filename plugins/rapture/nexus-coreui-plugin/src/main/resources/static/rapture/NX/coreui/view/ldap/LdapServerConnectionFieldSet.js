@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       queryMode: 'local',
       useTrustStore: function (combo) {
         var form = combo.up('form');
-        if (combo.getValue() === 'ldaps') {
+        if (combo.getValue() === 'ldaps' && form.down('#host').getValue() && form.down('#port').getValue()) {
           return {
             name: 'useTrustStore',
             host: form.down('#host'),
@@ -80,7 +80,13 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       minValue: 1,
       maxValue: 65535,
       allowDecimals: false,
-      allowExponential: false
+      allowExponential: false,
+      listeners: {
+        change: function(){
+          var protocol = this.up('form').down('#protocol');
+          protocol.fireEvent('change', protocol, protocol.getValue(), protocol.getValue());
+        }
+      }
     },
     {
       name: 'searchBase',

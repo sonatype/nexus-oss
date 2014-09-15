@@ -75,7 +75,7 @@
 
     ## Load all scripts
     #foreach($uri in $scripts)
-      #message("Loading ${helper.fileName($uri)}...")
+      #message("Loading ${helper.fileName($uri)}")
       #script("$uri")
     #end
 

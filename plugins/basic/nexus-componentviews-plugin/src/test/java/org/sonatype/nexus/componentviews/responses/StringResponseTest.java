@@ -27,9 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * @since 3.0
- */
 public class StringResponseTest
 {
   @Test

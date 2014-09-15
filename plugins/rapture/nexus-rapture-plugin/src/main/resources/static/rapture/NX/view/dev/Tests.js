@@ -32,7 +32,6 @@ Ext.define('NX.view.dev.Tests', {
   items: [
     { xtype: 'button', text: 'javascript error', action: 'testError' },
     { xtype: 'button', text: 'ext error', action: 'testExtError' },
-    { xtype: 'button', text: 'message types', action: 'testMessages' },
-    { xtype: 'button', text: 'toggle branding', action: 'toggleBranding' }
+    { xtype: 'button', text: 'message types', action: 'testMessages' }
   ]
 });

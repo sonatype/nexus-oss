@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 
 /**
- * The request
+ * A simplified abstraction of the request coming from the client.
  *
  * @since 3.0
  */

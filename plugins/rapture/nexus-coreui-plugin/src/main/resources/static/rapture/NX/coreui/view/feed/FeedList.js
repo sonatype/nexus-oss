@@ -37,7 +37,10 @@ Ext.define('NX.coreui.view.feed.FeedList', {
     { header: 'URL', dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
   ],
 
-  emptyText: 'No feeds defined',
+  viewConfig: {
+    emptyText: 'No feeds defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     {

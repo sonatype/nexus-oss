@@ -32,7 +32,6 @@ import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -44,6 +43,9 @@ import org.joda.time.DateTime;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * An implementation of {@link RawBinaryStore} that delegates artifact storage to a private {@link BlobStore}, and
+ * stores artifact metadata in an Orient database.
+ *
  * @since 3.0
  */
 @Named

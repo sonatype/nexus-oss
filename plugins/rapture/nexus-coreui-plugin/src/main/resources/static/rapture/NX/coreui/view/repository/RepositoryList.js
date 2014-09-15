@@ -49,7 +49,10 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     me.callParent(arguments);
   },
 
-  emptyText: 'No repositories defined',
+  viewConfig: {
+    emptyText: 'No repositories defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },

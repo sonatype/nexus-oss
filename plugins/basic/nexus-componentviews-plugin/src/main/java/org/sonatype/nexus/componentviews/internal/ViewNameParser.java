@@ -15,6 +15,7 @@ package org.sonatype.nexus.componentviews.internal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
@@ -36,9 +37,7 @@ public class ViewNameParser
   public ViewNameParser(final String path) {
     final Matcher matcher = PATTERN.matcher(nullToEmpty(path));
 
-    if (!matcher.matches()) {
-      throw new IllegalArgumentException("View name can't be parsed from this path.");
-    }
+    checkArgument(matcher.matches(), "View name can't be parsed from this path.");
 
     viewName = matcher.group(1);
     remainingPath = matcher.group(2);

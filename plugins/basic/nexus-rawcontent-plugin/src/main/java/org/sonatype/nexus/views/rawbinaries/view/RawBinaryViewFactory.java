@@ -21,7 +21,7 @@ import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
-import org.sonatype.nexus.componentviews.example.NotFoundHandler;
+import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
 import static com.google.common.base.Preconditions.checkNotNull;

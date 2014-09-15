@@ -20,9 +20,12 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
+ * Parses a template pattern (see {@link TokenMatcher} for syntax) into a series of {@link Token}s.
+ *
  * @since 3.0
  */
 public class PatternParser
@@ -112,13 +115,11 @@ public class PatternParser
       final char ch = iterator.current();
 
       if (ch == CharacterIterator.DONE) {
-        if (escaping) {
-          throw new IllegalArgumentException(
-              "Unexpected end after escape character '" + ch + "' at position " + iterator.getIndex());
-        }
-        if (b.length() < 1) {
-          throw new IllegalArgumentException("Zero-length fragment at position " + iterator.getIndex());
-        }
+        checkArgument(!escaping,
+            format("Unexpected end after escape character '%s' at position %s.", ch, iterator.getIndex()));
+
+        checkArgument(b.length() >= 1, format("Zero-length fragment at position %s.", iterator.getIndex()));
+
         return b.toString();
       }
 

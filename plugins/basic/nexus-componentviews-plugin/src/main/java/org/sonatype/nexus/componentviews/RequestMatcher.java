@@ -23,5 +23,5 @@ public interface RequestMatcher
   /**
    * Returns {@code true} if the request matches {@code false} otherwise.
    */
-  public boolean matches(ViewRequest request);
+  boolean matches(ViewRequest request);
 }

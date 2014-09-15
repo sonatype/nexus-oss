@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <pluginName>Nexus Component Views Plugin</pluginName>
     <pluginDescription>Framework for format-specific component views.</pluginDescription>
   </properties>
 

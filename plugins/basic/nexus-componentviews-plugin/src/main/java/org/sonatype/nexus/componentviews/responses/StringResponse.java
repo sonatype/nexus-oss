@@ -33,6 +33,10 @@ public class StringResponse
 
   private ContentType parsedContentType;
 
+  /**
+   * If the contentType includes a charset, the content will be encoded using that character set (presuming it's
+   * available on the platform).
+   */
   public StringResponse(final String content, final String contentType) {
     super(contentType, null);
     this.content = content;

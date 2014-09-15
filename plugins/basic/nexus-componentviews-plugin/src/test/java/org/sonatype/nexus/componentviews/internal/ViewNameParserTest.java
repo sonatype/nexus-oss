@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 /**
- * @since 3.0
+ * Ensures that the {@link ViewNameParser} handles typical scenarios.
  */
 public class ViewNameParserTest
 {

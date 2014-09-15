@@ -25,23 +25,21 @@ import static com.google.common.base.Preconditions.checkState;
 
 
 /**
- * <p>Parses path-like strings against a template pattern, a literal string with embedded variables.</p>
+ * Parses path-like strings against a template pattern, a literal string with embedded variables. e.g. {@code
+ * "/{binName}/{bucketName}"} would match {@code "/bin12/overages"}.
  *
- * <p>e.g. {@code "/{binName}/{bucketName}"} would match {@code "/bin12/overages"}.</p>
+ * By default, variables are matched against the regexp {@link PatternParser#DEFAULT_VARIABLE_REGEXP}, which
+ * excludes the path separator ({@code '/'}). To override this, specify the regexp explicitly:
  *
- * <p>By default, variables are matched against the regexp {@link PatternParser#DEFAULT_VARIABLE_REGEXP}, which
- * excludes the path separator ({@code '/'}). To override this, specify the regexp explicitly:</p>
+ * e.g. {@code "/{group:.+}/{artifact}/{version}/{name}-{version}.{ext}"}
  *
- * <p>e.g. {@code "/{group:.+}/{artifact}/{version}/{name}-{version}.{ext}"}</p>
+ * {@code "{letterCode:[A-Za-z]}"}<
  *
- * <p>{@code "{letterCode:[A-Za-z]}"}</p>
+ * The backslash ({@code '\'}) serves as an escape character, if (say) it is necessary to use curly braces in the
+ * regular expression.  If escape characters appear in regular expressions, these must be double-escaped.
  *
- * <p>The backslash ({@code '\'}) serves as an escape character, if (say) it is necessary to use curly braces in the
- * regular expression.  If escape characters appear in regular expressions, these must be double-escaped.</p>
- *
- * <p><b>Caveat:</b> the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause
- * parsing
- * errors.</p>
+ * Caveat: the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause
+ * parsing errors.
  *
  * @since 3.0
  */

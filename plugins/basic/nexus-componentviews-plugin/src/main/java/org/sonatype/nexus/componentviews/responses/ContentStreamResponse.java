@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.util.Date;
 
 /**
+ * A response whose body is provided by an {@link InputStream}.
+ *
  * @since 3.0
  */
 public class ContentStreamResponse
@@ -32,6 +34,4 @@ public class ContentStreamResponse
   protected InputStream getInputStream() {
     return inputStream;
   }
-
-
 }

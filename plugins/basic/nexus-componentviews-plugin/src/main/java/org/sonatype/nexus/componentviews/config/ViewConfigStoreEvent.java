@@ -15,6 +15,8 @@ package org.sonatype.nexus.componentviews.config;
 import org.sonatype.nexus.events.AbstractEvent;
 
 /**
+ * Abstract parent for {@link ViewConfigStore} events.
+ *
  * @since 3.0
  */
 public abstract class ViewConfigStoreEvent
