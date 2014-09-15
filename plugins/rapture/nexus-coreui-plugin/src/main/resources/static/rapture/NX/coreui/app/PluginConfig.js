@@ -54,12 +54,7 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
       }
     },
-    {
-      id: 'NX.coreui.controller.FeatureGroups',
-      active: function () {
-        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
-      }
-    },
+    'NX.coreui.controller.FeatureGroups',
     {
       id: 'NX.coreui.controller.Feeds',
       active: function () {
