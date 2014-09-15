@@ -66,13 +66,9 @@ Ext.define('NX.controller.Features', {
         }
 
         // complain if there is no view configuration
-        if (!clonedFeature.view && !clonedFeature.href) {
+        if (!clonedFeature.view && !clonedFeature.url) {
           me.logError('Missing view configuration for feature at path: ' + clonedFeature.path);
           // TODO: Maybe raise an error instead?
-        }
-
-        if (clonedFeature.href) {
-          clonedFeature.url = clonedFeature.href;
         }
 
         path = clonedFeature.path;
