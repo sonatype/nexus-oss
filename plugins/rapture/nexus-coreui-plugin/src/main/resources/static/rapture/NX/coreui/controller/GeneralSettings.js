@@ -57,6 +57,20 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/System/General'
+      }
+    ]);
+  },
+
+  /**
    * @private
    * Enables force base URL if base url is set.
    */

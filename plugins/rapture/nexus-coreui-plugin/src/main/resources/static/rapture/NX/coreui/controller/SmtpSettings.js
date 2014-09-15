@@ -76,6 +76,20 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/System/Email Server'
+      }
+    ]);
+  },
+
+  /**
    * @private
    */
   showVerifyConnectionWindow: function (button) {

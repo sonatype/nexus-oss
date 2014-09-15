@@ -104,6 +104,20 @@ Ext.define('NX.coreui.controller.Feeds', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'browse',
+        path: '/Feeds'
+      }
+    ]);
+  },
+
+  /**
    * @private
    * Loads feeds store.
    */

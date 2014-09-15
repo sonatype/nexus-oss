@@ -68,6 +68,20 @@ Ext.define('NX.coreui.controller.MavenUpload', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'browse',
+        path: '/Upload/Maven'
+      }
+    ]);
+  },
+
+  /**
    * @private
    * Loads repositories if upload panel is active.
    */

@@ -81,6 +81,20 @@ Ext.define('NX.coreui.controller.SysInfo', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/Support/System Information'
+      }
+    ]);
+  },
+
+  /**
    * Load system information panel.
    *
    * @private

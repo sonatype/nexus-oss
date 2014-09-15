@@ -61,6 +61,20 @@ Ext.define('NX.coreui.controller.SupportRequest', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/Support/Support Request'
+      }
+    ]);
+  },
+
+  /**
    * @private
    * Open sonatype support in a new browser window/tab.
    */

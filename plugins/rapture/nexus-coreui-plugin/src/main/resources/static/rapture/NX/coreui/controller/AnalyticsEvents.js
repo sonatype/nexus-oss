@@ -111,6 +111,20 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/Support/Analytics/Events'
+      }
+    ]);
+  },
+
+  /**
    * @private
    * Load analytics event store.
    */

@@ -82,6 +82,20 @@ Ext.define('NX.coreui.controller.Metrics', {
   },
 
   /**
+   * Unregister registered features.
+   */
+  onDestroy: function() {
+    var me = this;
+
+    me.getApplication().getFeaturesController().unregisterFeature([
+      {
+        mode: 'admin',
+        path: '/Support/Metrics'
+      }
+    ]);
+  },
+
+  /**
    * Load metrics information and update charts.
    *
    * @private
