@@ -25,6 +25,7 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
   ],
 
   title: '',
+  autoHideTabHeader: false,
 
   // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
   // FIXME: This will NOT works, since this is a 'Ext.tab.Panel' impl, not a 'Ext.panel.Panel'

@@ -53,7 +53,10 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     }
   ],
 
-  emptyText: 'No loggers defined',
+  viewConfig: {
+    emptyText: 'No loggers defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     {

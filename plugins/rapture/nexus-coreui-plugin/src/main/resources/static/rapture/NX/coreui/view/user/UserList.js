@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.user.UserList', {
         return 'user-default';
       }
     },
-    {header: 'User Id', dataIndex: 'id'},
+    {header: 'User Id', dataIndex: 'userId'},
     {header: 'Realm', dataIndex: 'realm'},
     {header: 'First name', dataIndex: 'firstName'},
     {header: 'Last name', dataIndex: 'lastName', width: 300},
@@ -40,7 +40,10 @@ Ext.define('NX.coreui.view.user.UserList', {
     {header: 'Status', dataIndex: 'status'}
   ],
 
-  emptyText: 'No users defined',
+  viewConfig: {
+    emptyText: 'No users defined',
+    deferEmptyText: false
+  },
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },

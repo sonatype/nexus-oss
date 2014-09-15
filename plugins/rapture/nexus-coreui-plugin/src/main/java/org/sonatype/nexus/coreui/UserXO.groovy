@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull
 class UserXO
 {
   @NotEmpty
-  String id
+  String userId
 
   String realm
 
@@ -51,4 +51,8 @@ class UserXO
 
   @NotEmpty
   Set<String> roles
+
+  Boolean external
+
+  Set<String> externalRoles
 }

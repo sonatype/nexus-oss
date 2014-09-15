@@ -59,8 +59,8 @@ Ext.define('NX.view.message.Panel', {
         { dataIndex: 'text', flex: 1 }
       ],
       hideHeaders: true,
-      emptyText: 'No messages',
       viewConfig: {
+        emptyText: 'No messages',
         deferEmptyText: false
       }
     }

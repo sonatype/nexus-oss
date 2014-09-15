@@ -23,7 +23,10 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
 
   store: 'SearchResult',
 
-  emptyText: 'No results',
+  viewConfig: {
+    emptyText: 'No results',
+    deferEmptyText: false
+  },
 
   columns: [
     {

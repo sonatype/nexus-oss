@@ -19,13 +19,16 @@
  */
 Ext.define('NX.coreui.model.User', {
   extend: 'Ext.data.Model',
+  idProperty: 'userId',
   fields: [
-    'id',
+    'userId',
     'realm',
     'firstName',
     'lastName',
     'email',
     'status',
-    'roles'
+    'roles',
+    'external',
+    'externalRoles'
   ]
 });

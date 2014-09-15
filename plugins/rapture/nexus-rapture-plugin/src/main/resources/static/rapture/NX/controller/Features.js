@@ -46,63 +46,65 @@ Ext.define('NX.controller.Features', {
    * @param {Array/Object} features to be registered
    */
   registerFeature: function (features) {
-    var me = this,
-        path;
+    var me = this;
 
     if (features) {
       Ext.each(Ext.Array.from(features), function (feature) {
-        if (!feature.path) {
+        var clonedFeature = Ext.clone(feature),
+            path;
+
+        if (!clonedFeature.path) {
           throw Ext.Error.raise('Feature missing path');
         }
 
-        if (!feature.mode) {
-          feature.mode = 'admin';
+        if (!clonedFeature.mode) {
+          clonedFeature.mode = 'admin';
         }
 
-        if (!feature.view && feature.group === true) {
-          feature.view = 'NX.view.feature.Group';
+        if (!clonedFeature.view && clonedFeature.group === true) {
+          clonedFeature.view = 'NX.view.feature.Group';
         }
 
         // complain if there is no view configuration
-        if (!feature.view && !feature.href) {
-          me.logError('Missing view configuration for feature at path: ' + feature.path);
+        if (!clonedFeature.view && !clonedFeature.href) {
+          me.logError('Missing view configuration for feature at path: ' + clonedFeature.path);
           // TODO: Maybe raise an error instead?
         }
 
-        if (feature.href && !feature.hrefTarget) {
-          feature.hrefTarget = feature.href;
+        if (clonedFeature.href && !clonedFeature.hrefTarget) {
+          clonedFeature.hrefTarget = clonedFeature.href;
         }
 
-        path = feature.path;
+        path = clonedFeature.path;
         if (path.charAt(0) === '/') {
           path = path.substr(1, path.length);
         }
 
-        me.configureIcon(path, feature);
+        me.configureIcon(path, clonedFeature);
 
-        path = feature.mode + '/' + path;
-        feature.path = '/' + path;
+        path = clonedFeature.mode + '/' + path;
+        clonedFeature.path = '/' + path;
 
         // auto-set bookmark
-        if (!feature.bookmark) {
-          feature.bookmark = NX.Bookmarks.encode(path).toLowerCase();
+        if (!clonedFeature.bookmark) {
+          clonedFeature.bookmark = NX.Bookmarks.encode(path).toLowerCase();
         }
 
-        if (Ext.isDefined(feature.visible)) {
-          if (!Ext.isFunction(feature.visible)) {
-            if (feature.visible) {
-              feature.visible = NX.controller.Features.alwaysVisible;
+        if (Ext.isDefined(clonedFeature.visible)) {
+          if (!Ext.isFunction(clonedFeature.visible)) {
+            if (clonedFeature.visible) {
+              clonedFeature.visible = NX.controller.Features.alwaysVisible;
             }
             else {
-              feature.visible = NX.controller.Features.alwaysHidden;
+              clonedFeature.visible = NX.controller.Features.alwaysHidden;
             }
           }
         }
         else {
-          feature.visible = NX.controller.Features.alwaysVisible;
+          clonedFeature.visible = NX.controller.Features.alwaysVisible;
         }
 
-        me.getFeatureStore().addSorted(me.getFeatureModel().create(feature));
+        me.getFeatureStore().addSorted(me.getFeatureModel().create(clonedFeature));
       });
     }
   },
@@ -116,19 +118,20 @@ Ext.define('NX.controller.Features', {
 
     if (features) {
       Ext.each(Ext.Array.from(features), function (feature) {
-        var path, model;
+        var clonedFeature = Ext.clone(feature),
+            path, model;
 
-        if (!feature.mode) {
-          feature.mode = 'admin';
+        if (!clonedFeature.mode) {
+          clonedFeature.mode = 'admin';
         }
-        path = feature.path;
+        path = clonedFeature.path;
         if (path.charAt(0) === '/') {
           path = path.substr(1, path.length);
         }
-        path = feature.mode + '/' + path;
-        feature.path = '/' + path;
+        path = clonedFeature.mode + '/' + path;
+        clonedFeature.path = '/' + path;
 
-        model = me.getFeatureStore().getById(feature.path);
+        model = me.getFeatureStore().getById(clonedFeature.path);
         if (model) {
           me.getFeatureStore().remove(model);
         }
