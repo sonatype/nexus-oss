@@ -34,6 +34,7 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
   init: function () {
     var me = this;
 
+    // preload icon to avoid a grey icon when nuget upload feature will be registered
     me.getApplication().getIconController().addIcons({
       'feature-nuget-upload': {
         file: 'upload.png',
@@ -91,6 +92,7 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
         path: '/Upload/NuGet',
         description: 'Upload packages to Nuget Hosted Repositories',
         view: { xtype: 'nx-coreui-nuget-upload' },
+        // use preloaded icon to avoid a grey icon
         iconName: 'feature-nuget-upload',
         visible: function () {
           return NX.Permissions.check('nexus:artifact', 'create');
