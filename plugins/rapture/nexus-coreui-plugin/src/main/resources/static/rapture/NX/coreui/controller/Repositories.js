@@ -48,7 +48,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository.RepositoryFeature',
     'repository.RepositoryList',
     'repository.RepositorySelectTemplate',
-    'repository.RepositorySettingsTab',
     'repository.RepositorySettingsCommon',
     'repository.RepositorySettingsGroup',
     'repository.RepositorySettingsHosted',
@@ -60,7 +59,8 @@ Ext.define('NX.coreui.controller.Repositories', {
   ],
   refs: [
     { ref: 'list', selector: 'nx-coreui-repository-list' },
-    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-coreui-repository-settings-tab' },
+    { ref: 'feature', selector: 'nx-coreui-repository-feature' },
+    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-settingsform[repositorySettingsForm]' },
     { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' }
   ],
   icons: {
@@ -141,24 +141,34 @@ Ext.define('NX.coreui.controller.Repositories', {
   onSelection: function(list, model) {
     var me = this,
         moreButton = list.down('button[action=more]'),
-        settingsTab, settingsForm;
+        settingsPanel = me.getSettings(),
+        settingsPanelToRemove = settingsPanel,
+        settingsPanelClass, template;
 
     if (Ext.isDefined(model)) {
+      Ext.suspendLayouts();
       me.fillMoreButtonMenu(moreButton, model);
-      settingsForm = me.createComponent(
-          'settings',
-          {
-            type: model.get('type').toLowerCase(),
-            provider: model.get('provider'),
-            format: model.get('format')
-          }
-      );
-      settingsTab = me.getSettings();
-      settingsTab.removeAll();
-      if (settingsForm) {
-        settingsTab.add(settingsForm);
-        settingsForm.loadRecord(model);
+      settingsPanelClass = me.findComponent('settings', template = {
+        type: model.get('type').toLowerCase(),
+        provider: model.get('provider'),
+        format: model.get('format')
+      });
+      if (settingsPanel && settingsPanelClass === Ext.getClass(settingsPanel)) {
+        settingsPanelToRemove = undefined;
       }
+      else {
+        settingsPanel = settingsPanelClass.create({
+          title: 'Settings', template: template, repositorySettingsForm: true, weight: 10
+        });
+        me.getFeature().addTab(settingsPanel);
+      }
+      if (settingsPanelToRemove) {
+        me.getFeature().removeTab(settingsPanelToRemove);
+      }
+      if (settingsPanel) {
+        settingsPanel.loadRecord(model);
+      }
+      Ext.resumeLayouts(true);
     }
   },
 
@@ -281,10 +291,14 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @private
    */
   showAddWindow: function(selectionModel, selected) {
-    var me = this;
+    var me = this,
+        template = Ext.apply({}, selected[0].data),
+        cmpClass = me.findComponent('add', template);
 
     me.getSelectTemplate().close();
-    me.createComponent('add', Ext.apply({}, selected[0].data));
+    if (cmpClass) {
+      cmpClass.create({ template: template });
+    }
   },
 
   /**
@@ -292,6 +306,21 @@ Ext.define('NX.coreui.controller.Repositories', {
    * Creates a component specific to action / template.
    */
   createComponent: function(action, template) {
+    var me = this,
+        cmpClass = me.findComponent(action, template);
+
+    if (cmpClass) {
+      return cmpClass.create({ template: template });
+    }
+    return undefined;
+  },
+
+  /**
+   * @private
+   * Finds a component specific to action / template.
+   * @return {Ext.Class|*} class specific to action / template or undefined if none found
+   */
+  findComponent: function(action, template) {
     var me = this,
         cmpName = 'widget.nx-repository-' + action + '-' + template.type + '-' + template.provider,
         cmpClass;
@@ -301,9 +330,9 @@ Ext.define('NX.coreui.controller.Repositories', {
       cmpClass = Ext.ClassManager.getByAlias('widget.nx-repository-' + action + '-' + template.type);
     }
     if (cmpClass) {
-      return cmpClass.create({ template: template });
+      return cmpClass;
     }
-    me.logWarn('Could not create component for: ' + cmpName);
+    me.logWarn('Could not find component for: ' + cmpName);
     return undefined;
   },
 
