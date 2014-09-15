@@ -21,9 +21,7 @@ import org.sonatype.nexus.componentviews.config.ViewFactorySource;
 import static org.mockito.Mockito.mock;
 
 /**
- * Mock tests that demonstrate
- *
- * @since 3.0
+ * Mock tests that demonstrate the ViewConfig API.
  */
 public class ViewConfigApiDemo
 {

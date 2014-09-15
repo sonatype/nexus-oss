@@ -36,7 +36,7 @@ public class ViewConfig
   {
     this.viewName = checkNotNull(viewName);
     this.factoryName = checkNotNull(factoryName);
-    this.configuration = Collections.unmodifiableMap(new HashMap<>(checkNotNull(configuration)));
+    this.configuration = ImmutableMap.copyOf(checkNotNull(configuration));
   }
 
   public String getViewName() {

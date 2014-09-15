@@ -22,8 +22,7 @@ import static org.hamcrest.Matchers.is;
 
 /**
  * Ensures that the {@link ViewNameParser} handles typical scenarios.
- *
- * @since 3.0
+
  */
 public class ViewNameParserTest
 {

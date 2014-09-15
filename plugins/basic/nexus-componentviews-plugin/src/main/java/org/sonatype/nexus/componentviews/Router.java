@@ -12,10 +12,11 @@
  */
 package org.sonatype.nexus.componentviews;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,7 +30,7 @@ public class Router
   private final List<RequestMatcher> requestMatchers;
 
   public Router(final List<RequestMatcher> requestMatchers) {
-    this.requestMatchers = new ArrayList<>(checkNotNull(requestMatchers));
+    this.requestMatchers = ImmutableList.copyOf(checkNotNull(requestMatchers));
   }
 
   @Nullable
