@@ -34,6 +34,13 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
   init: function () {
     var me = this;
 
+    me.getApplication().getIconController().addIcons({
+      'feature-nuget-upload': {
+        file: 'upload.png',
+        variants: ['x16', 'x32']
+      }
+    });
+
     me.onNuGetUploadStateChanged(NX.State.getValue('nuGetUpload'), undefined, true);
 
     me.listen({
@@ -84,10 +91,7 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
         path: '/Upload/NuGet',
         description: 'Upload packages to Nuget Hosted Repositories',
         view: { xtype: 'nx-coreui-nuget-upload' },
-        iconConfig: {
-          file: 'upload.png',
-          variants: ['x16', 'x32']
-        },
+        iconName: 'feature-nuget-upload',
         visible: function () {
           return NX.Permissions.check('nexus:artifact', 'create');
         }
