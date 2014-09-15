@@ -36,18 +36,48 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('com.sonatype.nexus.plugins:nexus-analytics-plugin');
       }
     },
-    'NX.coreui.controller.AnonymousSettings',
+    {
+      id: 'NX.coreui.controller.AnonymousSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.Capabilities',
       active: function () {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-capabilities-plugin');
       }
     },
-    'NX.coreui.controller.BrowseRepositories',
-    'NX.coreui.controller.FeatureGroups',
-    'NX.coreui.controller.Feeds',
-    'NX.coreui.controller.HttpSettings',
-    'NX.coreui.controller.GeneralSettings',
+    {
+      id: 'NX.coreui.controller.BrowseRepositories',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.FeatureGroups',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Feeds',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.HttpSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.GeneralSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.HealthCheckRepositorySettings',
       active: function () {
@@ -87,8 +117,18 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-logging-plugin');
       }
     },
-    'NX.coreui.controller.MavenUpload',
-    'NX.coreui.controller.Metrics',
+    {
+      id: 'NX.coreui.controller.MavenUpload',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Metrics',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.Outreach',
       active: function () {
@@ -101,16 +141,66 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-plugin-console-plugin');
       }
     },
-    'NX.coreui.controller.Repositories',
-    'NX.coreui.controller.RepositoryTargets',
-    'NX.coreui.controller.RepositoryRoutes',
-    'NX.coreui.controller.Privileges',
-    'NX.coreui.controller.RealmSettings',
-    'NX.coreui.controller.RoutingRepositorySettings',
-    'NX.coreui.controller.Roles',
-    'NX.coreui.controller.StorageFileContainer',
-    'NX.coreui.controller.Search',
-    'NX.coreui.controller.SmtpSettings',
+    {
+      id: 'NX.coreui.controller.Repositories',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.RepositoryTargets',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.RepositoryRoutes',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Privileges',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.RealmSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.RoutingRepositorySettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Roles',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.StorageFileContainer',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Search',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.SmtpSettings',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.SslCertificates',
       active: function () {
@@ -123,9 +213,24 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-ssl-plugin');
       }
     },
-    'NX.coreui.controller.StorageFileInfo',
-    'NX.coreui.controller.StorageFileMavenInfo',
-    'NX.coreui.controller.SupportRequest',
+    {
+      id: 'NX.coreui.controller.StorageFileInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.StorageFileMavenInfo',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.SupportRequest',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
     {
       id: 'NX.coreui.controller.SupportZip',
       active: function () {
@@ -138,9 +243,29 @@ Ext.define('NX.coreui.app.PluginConfig', {
         return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-atlas-plugin');
       }
     },
-    'NX.coreui.controller.Tasks',
-    'NX.coreui.controller.UploadArtifact',
-    'NX.coreui.controller.UploadFile',
-    'NX.coreui.controller.Users'
+    {
+      id: 'NX.coreui.controller.Tasks',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.UploadArtifact',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.UploadFile',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    },
+    {
+      id: 'NX.coreui.controller.Users',
+      active: function () {
+        return NX.app.Application.pluginActive('org.sonatype.nexus.plugins:nexus-coreui-plugin');
+      }
+    }
   ]
 });
