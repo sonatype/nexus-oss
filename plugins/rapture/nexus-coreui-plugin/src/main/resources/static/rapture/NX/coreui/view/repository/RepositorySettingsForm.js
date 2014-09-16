@@ -13,12 +13,39 @@
 /*global Ext, NX*/
 
 /**
- * Repository "Settings" panel.
+ * Repository "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettings', {
-  extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-repository-settings'
+Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
+  extend: 'NX.view.SettingsForm',
+  alias: 'widget.nx-coreui-repository-settings-form',
+  requires: [
+    'NX.Conditions'
+  ],
+
+  /**
+   * @cfg template repository template object
+   */
+
+  editableMarker: 'You do not have permission to update repositories',
+
+  initComponent: function() {
+    var me = this;
+
+    me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'update');
+
+    me.items = me.items || [];
+    Ext.Array.insert(me.items, 0, [
+      {
+        xtype: 'nx-coreui-repository-settings-common'
+      }
+    ]);
+
+    me.callParent(arguments);
+
+    me.down('#providerName').setValue(me.template.providerName);
+    me.down('#formatName').setValue(me.template.formatName);
+  }
 
 });

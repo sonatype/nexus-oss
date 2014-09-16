@@ -13,83 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * Capability "Settings" form.
+ * Capability "Settings" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.CapabilitySettings', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-settings',
 
-  items: [
-    {
-      xtype: 'hiddenfield',
-      name: 'id'
-    },
-    {
-      xtype: 'hiddenfield',
-      name: 'typeId'
-    },
-    {
-      xtype: 'hiddenfield',
-      name: 'notes'
-    },
-    {
-      xtype: 'checkbox',
-      fieldLabel: 'Enabled',
-      helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
-      name: 'enabled',
-      allowBlank: false,
-      checked: true,
-      editable: true
-    },
-    { xtype: 'nx-coreui-formfield-settingsfieldset' }
-  ],
-
-  /**
-   * @override
-   * Imports capability into settings field set.
-   * @param {NX.model.Capability} model capability model
-   */
-  loadRecord: function (model) {
-    var me = this,
-        capabilityTypeModel = NX.getApplication().getStore('CapabilityType').getById(model.get('typeId')),
-        settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
-
-    me.callParent(arguments);
-    if (capabilityTypeModel) {
-      settingsFieldSet.importProperties(model.get('properties'), capabilityTypeModel.get('formFields'));
-    }
-  },
-
-  /**
-   * @override
-   * Exports capability from settings field set.
-   * @returns {Object} form values
-   */
-  getValues: function () {
-    var me = this,
-        values = me.getForm().getFieldValues(),
-        capability = {
-          id: values.id,
-          typeId: values.typeId,
-          notes: values.notes,
-          enabled: values.enabled,
-          properties: {}
-        };
-
-    Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values));
-    return capability;
-  },
-
-  /**
-   * Mark fields in this form invalid in bulk.
-   * @param {Object/Object[]/Ext.data.Errors} errors
-   * Either an array in the form `[{id:'fieldId', msg:'The message'}, ...]`,
-   * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
-   */
-  markInvalid: function (errors) {
-    this.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
-  }
+  items: { xtype: 'nx-coreui-capability-settings-form' }
 
 });

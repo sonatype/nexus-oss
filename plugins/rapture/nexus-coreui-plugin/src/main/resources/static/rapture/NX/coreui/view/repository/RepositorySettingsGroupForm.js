@@ -13,40 +13,34 @@
 /*global Ext, NX*/
 
 /**
- * Hosted repository settings form.
+ * Repository group "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettingsHosted', {
-  extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: 'widget.nx-repository-settings-hosted',
+Ext.define('NX.coreui.view.repository.RepositorySettingsGroupForm', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-repository-settings-group-form',
+  requires: [
+    'NX.coreui.store.RepositoryReference'
+  ],
 
   api: {
-    submit: 'NX.direct.coreui_Repository.updateHosted'
+    submit: 'NX.direct.coreui_Repository.updateGroup'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
+    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.repositoryStore.filter([
+      { property: 'format', value: me.template.format },
+      { property: 'includeNexusManaged', value: 'true' }
+    ]);
+
     me.items = [
-      { xtype: 'nx-coreui-repository-settings-localstorage' },
-      {
-        xtype: 'combo',
-        name: 'writePolicy',
-        fieldLabel: 'Deployment Policy',
-        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
-        emptyText: 'select a policy',
-        editable: false,
-        store: [
-          ['ALLOW_WRITE', 'Allow Redeploy'],
-          ['ALLOW_WRITE_ONCE', 'Disable Redeploy'],
-          ['READ_ONLY', 'Read Only']
-        ],
-        queryMode: 'local'
-      },
       {
         xtype: 'checkbox',
         name: 'browseable',
@@ -60,6 +54,19 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHosted', {
         fieldLabel: 'Publish URL',
         helpText: 'Expose the URL of the repository to users.',
         value: true
+      },
+      {
+        xtype: 'nx-itemselector',
+        name: 'memberRepositoryIds',
+        fieldLabel: 'Member Repositories',
+        helpText: 'Select the repositories that are member of the group.',
+        buttons: ['up', 'add', 'remove', 'down'],
+        fromTitle: 'Available Repositories',
+        toTitle: 'Ordered Member Repositories',
+        store: me.repositoryStore,
+        valueField: 'id',
+        displayField: 'name',
+        delimiter: null
       }
     ];
 

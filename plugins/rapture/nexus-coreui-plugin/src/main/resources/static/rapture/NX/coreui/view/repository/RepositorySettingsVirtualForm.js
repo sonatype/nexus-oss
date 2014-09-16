@@ -13,32 +13,34 @@
 /*global Ext, NX*/
 
 /**
- * Repository group settings form.
+ * Virtual repository "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
-  extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: 'widget.nx-repository-settings-group',
+Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-repository-settings-virtual-form',
   requires: [
     'NX.coreui.store.RepositoryReference'
   ],
 
   api: {
-    submit: 'NX.direct.coreui_Repository.updateGroup'
+    submit: 'NX.direct.coreui_Repository.updateVirtual'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
-    me.repositoryStore.filter([
-      { property: 'format', value: me.template.format },
-      { property: 'includeNexusManaged', value: 'true' }
-    ]);
+    if (me.template['masterFormat']) {
+      me.repositoryStore.filter({ property: 'format', value: me.template['masterFormat'] });
+    }
+    else {
+      me.repositoryStore.filter({ property: 'format', value: '!' + me.template['format'] });
+    }
 
     me.items = [
       {
@@ -56,17 +58,25 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroup', {
         value: true
       },
       {
-        xtype: 'nx-itemselector',
-        name: 'memberRepositoryIds',
-        fieldLabel: 'Member Repositories',
-        helpText: 'Select the repositories that are member of the group.',
-        buttons: ['up', 'add', 'remove', 'down'],
-        fromTitle: 'Available Repositories',
-        toTitle: 'Ordered Member Repositories',
+        xtype: 'combo',
+        name: 'shadowOf',
+        itemId: 'shadowOf',
+        fieldLabel: 'Source repository',
+        helpText: 'Physical repository being presented as a logical view by the repository.',
+        emptyText: 'select a repository',
+        editable: false,
+        readOnly: true,
         store: me.repositoryStore,
-        valueField: 'id',
+        queryMode: 'local',
         displayField: 'name',
-        delimiter: null
+        valueField: 'id'
+      },
+      {
+        xtype: 'checkbox',
+        name: 'synchronizeAtStartup',
+        fieldLabel: 'Synchronize on Startup',
+        helpText: 'Rebuild virtual links when the server starts.',
+        value: true
       }
     ];
 

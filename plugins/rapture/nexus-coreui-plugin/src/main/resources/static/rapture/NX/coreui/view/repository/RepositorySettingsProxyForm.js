@@ -13,52 +13,29 @@
 /*global Ext, NX*/
 
 /**
- * Maven proxy repository settings form.
+ * Proxy repository "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
-  extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: [
-    'widget.nx-repository-settings-proxy-maven1',
-    'widget.nx-repository-settings-proxy-maven2'
-  ],
+Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-repository-settings-proxy-form',
   requires: [
     'NX.coreui.view.AuthenticationSettings',
     'NX.coreui.view.HttpRequestSettings'
   ],
 
   api: {
-    submit: 'NX.direct.coreui_Repository.updateProxyMaven'
+    submit: 'NX.direct.coreui_Repository.updateProxy'
   },
   settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
-  /**
-   * @override
-   */
   initComponent: function() {
     var me = this;
 
     me.items = [
-      {
-        xtype: 'combo',
-        name: 'repositoryPolicy',
-        itemId: 'repositoryPolicy',
-        fieldLabel: 'Repository Policy',
-        helpText: 'Maven repositories can store either release or snapshot artifacts.',
-        emptyText: 'select a policy',
-        editable: false,
-        store: [
-          ['RELEASE', 'Release'],
-          ['SNAPSHOT', 'Snapshots']
-        ],
-        queryMode: 'local',
-        readOnly: true,
-        allowBlank: true,
-        submitValue: false
-      },
       { xtype: 'nx-coreui-repository-settings-localstorage' },
       {
         xtype: 'nx-url',
@@ -66,13 +43,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         fieldLabel: 'Remote Storage Location',
         helpText: 'Location of the remote repository being proxied.',
         emptyText: 'enter an URL'
-      },
-      {
-        xtype: 'checkbox',
-        name: 'downloadRemoteIndexes',
-        fieldLabel: 'Download Remote Indexes',
-        helpText: 'Allow downloading of remote repository indexes.',
-        value: true
       },
       {
         xtype: 'checkbox',
@@ -87,21 +57,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         fieldLabel: 'File Content Validation',
         helpText: 'Enable content validation for remote contents.',
         value: true
-      },
-      {
-        xtype: 'combo',
-        name: 'checksumPolicy',
-        fieldLabel: 'Checksum Policy',
-        helpText: 'Repository checksum policy.',
-        emptyText: 'select a policy',
-        editable: false,
-        store: [
-          ['IGNORE', 'Ignore'],
-          ['WARN', 'Warn'],
-          ['STRICT_IF_EXISTS', 'Strict If Exists'],
-          ['STRICT', 'Strict']
-        ],
-        queryMode: 'local'
       },
       {
         xtype: 'checkbox',
@@ -127,29 +82,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMaven', {
         allowDecimals: false,
         allowExponential: false,
         allowBlank: true
-      },
-      {
-        xtype: 'numberfield',
-        name: 'artifactMaxAge',
-        fieldLabel: 'Artifact Max Age',
-        helpText: 'How long to cache the artifacts in the repository before rechecking the remote repository.  Release repositories should use -1.',
-        minValue: -1,
-        maxValue: 511000,
-        allowDecimals: false,
-        allowExponential: false,
-        allowBlank: true
-      },
-      {
-        xtype: 'numberfield',
-        name: 'metadataMaxAge',
-        fieldLabel: 'Metadata Max Age',
-        helpText: 'How long to cache the metadata in the repository before rechecking the remote repository.',
-        minValue: -1,
-        maxValue: 511000,
-        allowDecimals: false,
-        allowExponential: false,
-        allowBlank: true
-      },
+      }
+      ,
       {
         xtype: 'numberfield',
         name: 'itemMaxAge',

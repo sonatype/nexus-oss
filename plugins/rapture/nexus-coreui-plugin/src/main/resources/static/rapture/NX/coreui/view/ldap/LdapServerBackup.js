@@ -13,51 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * LDAP Server "Backup" form.
+ * LDAP Server "Backup" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ldap.LdapServerBackup', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-ldapserver-backup',
-  requires: [
-    'NX.Conditions'
-  ],
 
-  api: {
-    submit: 'NX.direct.ldap_LdapServer.update'
-  },
-  settingsFormSuccessMessage: function (data) {
-    return 'LDAP server updated: ' + data['name'];
-  },
-  editableMarker: 'You do not have permission to update LDAP servers',
+  items: { xtype: 'nx-coreui-ldapserver-backup-form' }
 
-  items: { xtype: 'nx-coreui-ldapserver-backup-fieldset' },
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.editableCondition = NX.Conditions.isPermitted('security:ldapconfig', 'update');
-
-    me.callParent(arguments);
-
-    Ext.override(me.getForm(), {
-      /**
-       * @override
-       * Override model with form values.
-       */
-      getValues: function () {
-        var me = this,
-            modelData = me.getRecord().getData(false);
-
-        me.getFields().each(function (field) {
-          delete modelData[field.getName()];
-        });
-        return Ext.apply(modelData, me.callParent(arguments));
-      }
-    });
-  }
 });

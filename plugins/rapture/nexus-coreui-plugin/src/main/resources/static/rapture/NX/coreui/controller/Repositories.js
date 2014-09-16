@@ -48,19 +48,20 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository.RepositoryFeature',
     'repository.RepositoryList',
     'repository.RepositorySelectTemplate',
+    'repository.RepositorySettings',
     'repository.RepositorySettingsCommon',
-    'repository.RepositorySettingsGroup',
-    'repository.RepositorySettingsHosted',
-    'repository.RepositorySettingsHostedMaven',
+    'repository.RepositorySettingsGroupForm',
+    'repository.RepositorySettingsHostedForm',
+    'repository.RepositorySettingsHostedMavenForm',
     'repository.RepositorySettingsLocalStorage',
-    'repository.RepositorySettingsProxy',
-    'repository.RepositorySettingsProxyMaven',
-    'repository.RepositorySettingsVirtual'
+    'repository.RepositorySettingsProxyForm',
+    'repository.RepositorySettingsProxyMavenForm',
+    'repository.RepositorySettingsVirtualForm'
   ],
   refs: [
     { ref: 'list', selector: 'nx-coreui-repository-list' },
     { ref: 'feature', selector: 'nx-coreui-repository-feature' },
-    { ref: 'settings', selector: 'nx-coreui-repository-feature nx-settingsform[repositorySettingsForm]' },
+    { ref: 'settings', selector: 'nx-coreui-repository-settings' },
     { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' }
   ],
   icons: {
@@ -117,7 +118,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-list button[action=more]': {
           afterrender: me.bindMoreButton
         },
-        'nx-coreui-repository-settings': {
+        'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repository-selecttemplate grid': {
@@ -142,32 +143,23 @@ Ext.define('NX.coreui.controller.Repositories', {
     var me = this,
         moreButton = list.down('button[action=more]'),
         settingsPanel = me.getSettings(),
-        settingsPanelToRemove = settingsPanel,
-        settingsPanelClass, template;
+        settingsForm = settingsPanel.down('nx-settingsform'),
+        settingsFormClass, template;
 
     if (Ext.isDefined(model)) {
       Ext.suspendLayouts();
       me.fillMoreButtonMenu(moreButton, model);
-      settingsPanelClass = me.findComponent('settings', template = {
+      template = {
         type: model.get('type').toLowerCase(),
         provider: model.get('provider'),
         format: model.get('format')
-      });
-      if (settingsPanel && settingsPanelClass === Ext.getClass(settingsPanel)) {
-        settingsPanelToRemove = undefined;
+      };
+      settingsFormClass = me.findComponent('settings', template, true);
+      if (!settingsForm || settingsFormClass.xtype !== settingsForm.xtype) {
+        settingsPanel.removeAll();
+        settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
       }
-      else {
-        settingsPanel = settingsPanelClass.create({
-          title: 'Settings', template: template, repositorySettingsForm: true, weight: 10
-        });
-        me.getFeature().addTab(settingsPanel);
-      }
-      if (settingsPanelToRemove) {
-        me.getFeature().removeTab(settingsPanelToRemove);
-      }
-      if (settingsPanel) {
-        settingsPanel.loadRecord(model);
-      }
+      settingsPanel.loadRecord(model);
       Ext.resumeLayouts(true);
     }
   },
@@ -293,7 +285,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   showAddWindow: function(selectionModel, selected) {
     var me = this,
         template = Ext.apply({}, selected[0].data),
-        cmpClass = me.findComponent('add', template);
+        cmpClass = me.findComponent('add', template, false);
 
     me.getSelectTemplate().close();
     if (cmpClass) {
@@ -303,31 +295,18 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
-   * Creates a component specific to action / template.
-   */
-  createComponent: function(action, template) {
-    var me = this,
-        cmpClass = me.findComponent(action, template);
-
-    if (cmpClass) {
-      return cmpClass.create({ template: template });
-    }
-    return undefined;
-  },
-
-  /**
-   * @private
    * Finds a component specific to action / template.
    * @return {Ext.Class|*} class specific to action / template or undefined if none found
    */
-  findComponent: function(action, template) {
+  findComponent: function(action, template, findForm) {
     var me = this,
-        cmpName = 'widget.nx-repository-' + action + '-' + template.type + '-' + template.provider,
+        suffix = findForm ? '-form' : '',
+        cmpName = 'widget.nx-repository-' + action + '-' + template.type + '-' + template.provider + suffix,
         cmpClass;
 
     cmpClass = Ext.ClassManager.getByAlias(cmpName);
     if (!cmpClass) {
-      cmpClass = Ext.ClassManager.getByAlias('widget.nx-repository-' + action + '-' + template.type);
+      cmpClass = Ext.ClassManager.getByAlias('widget.nx-repository-' + action + '-' + template.type + suffix);
     }
     if (cmpClass) {
       return cmpClass;

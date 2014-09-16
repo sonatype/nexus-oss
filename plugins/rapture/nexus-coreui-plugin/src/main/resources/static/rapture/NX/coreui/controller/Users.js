@@ -47,7 +47,9 @@ Ext.define('NX.coreui.controller.Users', {
     'user.UserFeature',
     'user.UserList',
     'user.UserSettings',
-    'user.UserSettingsExternal'
+    'user.UserSettingsForm',
+    'user.UserSettingsExternal',
+    'user.UserSettingsExternalForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-user-feature' },
@@ -128,10 +130,10 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-user-settings': {
+        'nx-coreui-user-settings-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-user-settings-external': {
+        'nx-coreui-user-settings-external-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-user-list menuitem[action=filter]': {
@@ -384,7 +386,7 @@ Ext.define('NX.coreui.controller.Users', {
 
     if (win) {
       win.close();
-      me.loadStoreAndSelect(action.result.data.id);
+      me.loadStoreAndSelect(action.result.data.userId);
     }
     else {
       me.loadStore();
