@@ -40,6 +40,7 @@ Ext.define('NX.coreui.controller.Roles', {
     'role.RoleFeature',
     'role.RoleList',
     'role.RoleSettings',
+    'role.RoleSettingsForm',
     'role.RoleTree'
   ],
   refs: [
@@ -79,7 +80,7 @@ Ext.define('NX.coreui.controller.Roles', {
       file: 'user_policeman.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('security:roles', 'read');
     },
     weight: 20
@@ -89,7 +90,7 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -115,7 +116,7 @@ Ext.define('NX.coreui.controller.Roles', {
         'nx-coreui-role-list menuitem[action=newmapping]': {
           click: me.showAddWindowMapping
         },
-        'nx-coreui-role-settings': {
+        'nx-coreui-role-settings-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-role-feature nx-coreui-privilege-trace': {
@@ -128,11 +129,11 @@ Ext.define('NX.coreui.controller.Roles', {
     });
   },
 
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('name');
   },
 
-  onSelection: function (list, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {
@@ -145,14 +146,14 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  showAddWindowRole: function () {
+  showAddWindowRole: function() {
     Ext.widget('nx-coreui-role-add');
   },
 
   /**
    * @private
    */
-  showAddWindowMapping: function (menuItem) {
+  showAddWindowMapping: function(menuItem) {
     var me = this;
     me.getRoleBySourceStore().load({
       params: {
@@ -166,7 +167,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    * (Re)load related stores.
    */
-  loadRelatedStores: function () {
+  loadRelatedStores: function() {
     var me = this,
         list = me.getList();
 
@@ -181,7 +182,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    * (Re)create external role mapping entries.
    */
-  onRoleSourceLoad: function (store) {
+  onRoleSourceLoad: function(store) {
     var me = this,
         list = me.getList(),
         newButton, menuItems = [];
@@ -191,7 +192,7 @@ Ext.define('NX.coreui.controller.Roles', {
       if (newButton.menu.items.length > 1) {
         newButton.menu.remove(1);
       }
-      store.each(function (source) {
+      store.each(function(source) {
         menuItems.push({
           text: source.get('name'),
           iconCls: NX.Icons.cls(source.getId().toLowerCase() + '-security-source', 'x16'),
@@ -211,12 +212,12 @@ Ext.define('NX.coreui.controller.Roles', {
    * @protected
    * Enable 'Delete' when user has 'delete' permission and role is not read only.
    */
-  bindDeleteButton: function (button) {
+  bindDeleteButton: function(button) {
     var me = this;
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list, function (model) {
+            NX.Conditions.gridHasSelection(me.list, function(model) {
               return !model.get('readOnly');
             })
         ),
@@ -231,7 +232,7 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  onPrivilegeTraceActivate: function (panel) {
+  onPrivilegeTraceActivate: function(panel) {
     var me = this;
 
     panel.loadRecord({
@@ -243,7 +244,7 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  onRoleTreeActivate: function (panel) {
+  onRoleTreeActivate: function(panel) {
     var me = this;
 
     panel.loadRecord({
@@ -255,7 +256,7 @@ Ext.define('NX.coreui.controller.Roles', {
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-role-add');
 
@@ -274,11 +275,11 @@ Ext.define('NX.coreui.controller.Roles', {
    * Deletes a role.
    * @param model role to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_Role.delete_(model.getId(), function (response) {
+    NX.direct.coreui_Role.delete_(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

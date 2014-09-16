@@ -26,6 +26,8 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
   iconName: 'repository-default',
 
   autoHideTabHeader: false,
-  tabs: { xtype: 'nx-coreui-repository-settings-tab', weight: 10 }
+  tabs: [
+    { xtype: 'nx-coreui-repository-settings', title: 'Settings', weight: 10 }
+  ]
 
 });

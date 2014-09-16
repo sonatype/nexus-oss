@@ -30,15 +30,15 @@ Ext.define('NX.coreui.view.user.UserAdd', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-coreui-user-settings',
+      xtype: 'nx-coreui-user-settings-form',
       api: {
         submit: 'NX.direct.coreui_User.create'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'User created: ' + data['userId'];
       },
       editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         fieldLabel: 'Confirm Password',
         emptyText: 'confirm above password',
         submitValue: false,
-        validator: function () {
+        validator: function() {
           var me = this;
           return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
         }

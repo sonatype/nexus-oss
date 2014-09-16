@@ -13,19 +13,16 @@
 /*global Ext, NX*/
 
 /**
- * Virtual repository settings form.
+ * Hosted repository "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
-  extend: 'NX.coreui.view.repository.RepositorySettings',
-  alias: 'widget.nx-repository-settings-virtual',
-  requires: [
-    'NX.coreui.store.RepositoryReference'
-  ],
+Ext.define('NX.coreui.view.repository.RepositorySettingsHostedForm', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-repository-settings-hosted-form',
 
   api: {
-    submit: 'NX.direct.coreui_Repository.updateVirtual'
+    submit: 'NX.direct.coreui_Repository.updateHosted'
   },
   settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
@@ -34,15 +31,22 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
   initComponent: function() {
     var me = this;
 
-    me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
-    if (me.template['masterFormat']) {
-      me.repositoryStore.filter({ property: 'format', value: me.template['masterFormat'] });
-    }
-    else {
-      me.repositoryStore.filter({ property: 'format', value: '!' + me.template['format'] });
-    }
-
     me.items = [
+      { xtype: 'nx-coreui-repository-settings-localstorage' },
+      {
+        xtype: 'combo',
+        name: 'writePolicy',
+        fieldLabel: 'Deployment Policy',
+        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
+        emptyText: 'select a policy',
+        editable: false,
+        store: [
+          ['ALLOW_WRITE', 'Allow Redeploy'],
+          ['ALLOW_WRITE_ONCE', 'Disable Redeploy'],
+          ['READ_ONLY', 'Read Only']
+        ],
+        queryMode: 'local'
+      },
       {
         xtype: 'checkbox',
         name: 'browseable',
@@ -55,27 +59,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtual', {
         name: 'exposed',
         fieldLabel: 'Publish URL',
         helpText: 'Expose the URL of the repository to users.',
-        value: true
-      },
-      {
-        xtype: 'combo',
-        name: 'shadowOf',
-        itemId: 'shadowOf',
-        fieldLabel: 'Source repository',
-        helpText: 'Physical repository being presented as a logical view by the repository.',
-        emptyText: 'select a repository',
-        editable: false,
-        readOnly: true,
-        store: me.repositoryStore,
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id'
-      },
-      {
-        xtype: 'checkbox',
-        name: 'synchronizeAtStartup',
-        fieldLabel: 'Synchronize on Startup',
-        helpText: 'Rebuild virtual links when the server starts.',
         value: true
       }
     ];

@@ -13,28 +13,28 @@
 /*global Ext, NX*/
 
 /**
- * Maven hosted repository settings form.
+ * Maven hosted repository "Settings" form.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMaven', {
-  extend: 'NX.coreui.view.repository.RepositorySettings',
+Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: [
-    'widget.nx-repository-settings-hosted-maven1',
-    'widget.nx-repository-settings-hosted-maven2'
+    'widget.nx-repository-settings-hosted-maven1-form',
+    'widget.nx-repository-settings-hosted-maven2-form'
   ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateHostedMaven'
   },
-  settingsFormSuccessMessage: function (data) {
+  settingsFormSuccessMessage: function(data) {
     return 'Repository updated: ' + data['id'];
   },
 
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = [

@@ -13,70 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * Repository target settings form.
+ * Repository target "Settings" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-repositorytarget-settings',
-  requires: [
-    'NX.Conditions'
-  ],
 
-  api: {
-    submit: 'NX.direct.coreui_RepositoryTarget.update'
-  },
-  settingsFormSuccessMessage: function (data) {
-    return 'Repository target updated: ' + data['name'];
-  },
+  items: { xtype: 'nx-coreui-repositorytarget-settings-form' }
 
-  editableMarker: 'You do not have permission to update targets',
-
-  initComponent: function () {
-    var me = this;
-
-    me.editableCondition = NX.Conditions.isPermitted('nexus:targets', 'update');
-
-    me.items = [
-      {
-        xtype: 'hiddenfield',
-        name: 'id'
-      },
-      {
-        xtype: 'textfield',
-        name: 'name',
-        itemId: 'name',
-        fieldLabel: 'Name',
-        helpText: 'The name of the repository target.',
-        emptyText: 'enter a target name'
-      },
-      {
-        xtype: 'combo',
-        name: 'format',
-        fieldLabel: 'Repository Type',
-        helpText: 'The content class of the repository target. It will be matched only against repositories with the same content class.',
-        emptyText: 'select a repository type',
-        editable: false,
-        store: 'RepositoryFormat',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id'
-      },
-      {
-        xtype: 'nx-valueset',
-        name: 'patterns',
-        itemId: 'patterns',
-        fieldLabel: 'Patterns',
-        helpText: 'Enter a pattern expression and click "Add" to add it to the list. Regular expressions are used to match the artifact path. ".*" is used to specify all paths. ".*/com/some/company/.*" will match any artifact with "com.some.company" as the group id or artifact id. "^/com/some/company/.*" will match any artifact starting with com/some/company.',
-        emptyText: 'enter a pattern expression',
-        input: {
-          xtype: 'nx-regexp'
-        },
-        sorted: true
-      }
-    ];
-
-    me.callParent(arguments);
-  }
 });
