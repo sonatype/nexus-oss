@@ -96,6 +96,9 @@ Ext.define('NX.controller.Content', {
     // install new feature view
     content.add(cmp);
 
+    // fire activate event to view component
+    cmp.fireEvent('activate', cmp);
+
     me.logDebug('Content changed to: ' + text + ' (' + cmp.self.getName() + ')');
   }
 
