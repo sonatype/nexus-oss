@@ -38,6 +38,7 @@ Ext.define('NX.coreui.controller.Roles', {
   views: [
     'role.RoleAdd',
     'role.RoleFeature',
+    'role.RoleForm',
     'role.RoleList',
     'role.RoleSettings',
     'role.RoleTree'

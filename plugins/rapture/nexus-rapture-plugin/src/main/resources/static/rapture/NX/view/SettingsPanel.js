@@ -35,6 +35,11 @@ Ext.define('NX.view.SettingsPanel', {
     style: {
       margin: '0px 0px 20px 0px'
     }
+  },
+
+  loadRecord: function(model) {
+    var me = this;
+    me.down('nx-settingsform').loadRecord(model);
   }
 
 });
