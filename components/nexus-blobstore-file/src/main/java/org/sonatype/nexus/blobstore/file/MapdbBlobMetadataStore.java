@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.blobstore.file.internal;
+package org.sonatype.nexus.blobstore.file;
 
 import java.io.File;
 import java.io.Serializable;

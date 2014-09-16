@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.blobstore.file.internal;
+package org.sonatype.nexus.blobstore.file;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.sonatype.nexus.blobstore.file.FileOperations;
+import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -30,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A simple {@code java.nio} implementation of {@link FileOperations}.
+ *
+ * TODO: Move this and MapdbBlobMetadataStore back into .internal, with a parameterizable provider
  *
  * @since 3.0
  */
