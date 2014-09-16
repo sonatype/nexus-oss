@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.componentviews;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 
 import org.slf4j.Logger;
@@ -32,18 +29,13 @@ public class View
 
   private final Router router;
 
-  private final Map<String, Handler> handlers;
-
   private final Handler noRouteHandler;
 
   private final ViewConfig config;
 
-  public View(final ViewConfig config, final Router router, final Map<String, Handler> handlers,
-              final Handler noRouteHandler)
-  {
+  public View(final ViewConfig config, final Router router, final Handler noRouteHandler) {
     this.router = router;
     this.config = config;
-    this.handlers = new HashMap<>(handlers);
     this.noRouteHandler = noRouteHandler;
   }
 
@@ -52,20 +44,10 @@ public class View
   }
 
   public ViewResponse dispatch(final ViewRequest request) {
-    final RequestMatcher requestMatcher = router.findRoute(request);
+    final Handler handler = router.findHandler(request);
 
-    if (requestMatcher == null) {
-      return noRouteHandler.handle(request);
-    }
-
-    final String handlerChainName = requestMatcher.getHandlerName();
-
-    final Handler handler = handlers.get(handlerChainName);
     if (handler == null) {
-      log.error(
-          "View {} route dispatched path {} to missing handler {}.referenced missing handler {} in response to path {}.",
-          config.getViewName(), request.getPath(), handlerChainName);
-      throw new IllegalStateException();
+      return noRouteHandler.handle(request);
     }
 
     // No exception handling here presumes that these will get caught by a global filter and nicely reported as

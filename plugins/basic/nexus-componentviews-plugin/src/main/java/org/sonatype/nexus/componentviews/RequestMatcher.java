@@ -21,13 +21,7 @@ package org.sonatype.nexus.componentviews;
 public interface RequestMatcher
 {
   /**
-   * Returns {@code true} if the handler indicated by {@link #getHandlerName()} should process the request, {@code
-   * false} otherwise.
+   * Returns {@code true} if the request matches {@code false} otherwise.
    */
   boolean matches(ViewRequest request);
-
-  /**
-   * The return value must uniquely identify one of the view's handlers.
-   */
-  String getHandlerName();
 }

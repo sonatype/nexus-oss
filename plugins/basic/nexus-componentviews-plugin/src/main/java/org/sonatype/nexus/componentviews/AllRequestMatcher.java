@@ -20,19 +20,8 @@ package org.sonatype.nexus.componentviews;
 public class AllRequestMatcher
     implements RequestMatcher
 {
-  private final String handlerName;
-
-  public AllRequestMatcher(final String handlerName) {
-    this.handlerName = handlerName;
-  }
-
   @Override
   public boolean matches(final ViewRequest request) {
     return true;
-  }
-
-  @Override
-  public String getHandlerName() {
-    return handlerName;
   }
 }

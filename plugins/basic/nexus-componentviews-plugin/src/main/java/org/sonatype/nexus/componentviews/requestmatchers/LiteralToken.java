@@ -10,18 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.componentviews.config;
+package org.sonatype.nexus.componentviews.requestmatchers;
 
 /**
- * This is an event chiefly designed to facilitate example view plugins, so they can register configurations.  (There is
- * currently no way to do this in the absence of a view config UI.)
+ * A token representing an unchanging portion of a path.
  *
  * @since 3.0
  */
-public class ViewConfigStoreStartedEvent
-    extends ViewConfigStoreEvent
+public class LiteralToken
+    extends Token
 {
-  public ViewConfigStoreStartedEvent(final ViewConfigStore component) {
-    super(component);
+  public LiteralToken(final String value) {
+    super(value);
+  }
+
+  @Override
+  public String toRegexp() {
+    return escapeRegexpChars(value);
+  }
+
+  public String toString() {
+    return String.format("lit(%s))", value);
   }
 }

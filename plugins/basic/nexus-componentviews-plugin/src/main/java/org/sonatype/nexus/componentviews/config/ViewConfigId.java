@@ -38,11 +38,7 @@ public class ViewConfigId
 
     ViewConfigId that = (ViewConfigId) o;
 
-    if (!value.equals(that.value)) {
-      return false;
-    }
-
-    return true;
+    return value.equals(that.value);
   }
 
   @Override
