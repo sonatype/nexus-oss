@@ -13,74 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * Task schedule form.
+ * Task "Schedule" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.task.TaskSchedule', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-task-schedule',
-  requires: [
-    'NX.Conditions'
-  ],
 
-  api: {
-    submit: 'NX.direct.coreui_Task.updateSchedule'
-  },
-  settingsFormSuccessMessage: function (data) {
-    return 'Task rescheduled: ' + data['name'] + ' (' + data['typeName'] + ')';
-  },
-
-  editableMarker: 'You do not have permission to update tasks',
-
-  items: [
-    {
-      xtype: 'hiddenfield',
-      name: 'id'
-    },
-    { xtype: 'nx-coreui-task-schedulefieldset' }
-  ],
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.editableCondition = NX.Conditions.isPermitted('nexus:tasks', 'update');
-
-    me.callParent(arguments);
-
-    Ext.override(me.getForm(), {
-      /**
-       * @override
-       * Additionally, gets value of start timestamp and recurring days checkboxes (if any).
-       */
-      getValues: function () {
-        var values = this.callParent(arguments);
-
-        values.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
-        values.startDate = me.down('nx-coreui-task-schedulefieldset').getStartDate();
-        return values;
-      },
-
-      /**
-       * @override
-       * Additionally, sets values of recurring days checkboxes (if any).
-       */
-      setValues: function (values) {
-        values.startTime = values['startDate'];
-        this.callParent(arguments);
-        if (values['recurringDays']) {
-          Ext.Array.each(values['recurringDays'], function (day) {
-            var checkbox = me.down('checkbox[name=recurringDay-' + day + ']');
-            if (checkbox) {
-              checkbox.setValue(true);
-            }
-          });
-        }
-      }
-    });
-  }
+  items: { xtype: 'nx-coreui-task-schedule-form' }
 
 });

@@ -23,16 +23,16 @@ Ext.define('NX.coreui.view.repository.RepositoryAddHosted', {
 
   title: 'Create new hosted repository',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-repository-settings-hosted',
+      xtype: 'nx-repository-settings-hosted-form',
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createHosted'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Hosted repository created: ' + data['id'];
       }
     };

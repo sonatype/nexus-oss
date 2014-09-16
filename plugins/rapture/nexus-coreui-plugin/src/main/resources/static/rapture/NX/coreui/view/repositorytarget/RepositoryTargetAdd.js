@@ -30,15 +30,15 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-coreui-repositorytarget-settings',
+      xtype: 'nx-coreui-repositorytarget-settings-form',
       api: {
         submit: 'NX.direct.coreui_RepositoryTarget.create'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Repository target created: ' + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:targets', 'create'),

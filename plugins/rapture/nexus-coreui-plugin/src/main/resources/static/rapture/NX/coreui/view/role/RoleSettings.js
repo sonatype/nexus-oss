@@ -13,120 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * Role settings form.
+ * Role "Settings" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleSettings', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-role-settings',
-  requires: [
-    'NX.Conditions',
-    'NX.coreui.store.Role'
-  ],
 
-  api: {
-    submit: 'NX.direct.coreui_Role.update'
-  },
-  settingsFormSuccessMessage: function (data) {
-    return 'Role updated: ' + data['name'];
-  },
-
-  editableMarker: 'You do not have permission to update roles or role is readonly',
-
-  initComponent: function () {
-    var me = this,
-        idField,
-        roleStore = Ext.create('NX.coreui.store.Role');
-
-    me.editableCondition = me.editableCondition || NX.Conditions.and(
-        NX.Conditions.isPermitted('security:roles', 'update'),
-        NX.Conditions.formHasRecord('nx-coreui-role-settings', function (model) {
-          return !model.get('readOnly');
-        })
-    );
-
-    roleStore.load();
-
-    if (me.source) {
-      idField = {
-        xtype: 'combo',
-        name: 'id',
-        itemId: 'id',
-        fieldLabel: 'Mapped Role',
-        helpText: 'The mapped role.',
-        emptyText: 'select a role',
-        editable: false,
-        store: 'RoleBySource',
-        queryMode: 'local',
-        displayField: 'name',
-        valueField: 'id'
-      };
-    }
-    else {
-      idField = {
-        name: 'id',
-        itemId: 'id',
-        readOnly: true,
-        fieldLabel: 'ID',
-        helpText: 'The id of this role.',
-        emptyText: 'enter a role id'
-      };
-    }
-
-    me.items = [
-      {
-        xtype: 'hiddenfield',
-        name: 'source',
-        value: me.source || 'default'
-      },
-      idField,
-      {
-        name: 'name',
-        fieldLabel: 'Name',
-        helpText: 'The name of this role.',
-        emptyText: 'enter a name'
-      },
-      {
-        name: 'description',
-        allowBlank: true,
-        fieldLabel: 'Description',
-        helpText: 'The description of this role.',
-        emptyText: 'enter a description'
-      },
-      {
-        xtype: 'nx-itemselector',
-        name: 'privileges',
-        itemId: 'privileges',
-        fieldLabel: 'Privileges',
-        helpText: 'Privileges contained in this Role.',
-        allowBlank: true,
-        buttons: ['add', 'remove'],
-        fromTitle: 'Privileges',
-        toTitle: 'Given',
-        store: 'Privilege',
-        valueField: 'id',
-        displayField: 'name',
-        delimiter: null
-      },
-      {
-        xtype: 'nx-itemselector',
-        name: 'roles',
-        itemId: 'roles',
-        fieldLabel: 'Roles',
-        helpText: 'Roles contained in this Role.',
-        allowBlank: true,
-        buttons: ['add', 'remove'],
-        fromTitle: 'Roles',
-        toTitle: 'Contained',
-        store: roleStore,
-        valueField: 'id',
-        displayField: 'name',
-        delimiter: null
-      }
-    ];
-
-    me.callParent(arguments);
-  }
+  items: { xtype: 'nx-coreui-role-settings-form' }
 
 });

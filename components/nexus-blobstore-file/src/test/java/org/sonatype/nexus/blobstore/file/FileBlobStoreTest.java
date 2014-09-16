@@ -26,6 +26,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +64,12 @@ public class FileBlobStoreTest
 
     root = util.createTempDir().toPath();
     underTest = new FileBlobStore(root, locationStrategy, fileOps, metadataStore);
+    underTest.start();
+  }
+
+  @After
+  public void shutdown() throws Exception {
+    underTest.stop();
   }
 
   @Test(expected = IllegalArgumentException.class)

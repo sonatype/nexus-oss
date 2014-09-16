@@ -29,10 +29,12 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>nexus-componentviews-plugin</module>
     <module>nexus-content-plugin</module>
     <module>nexus-groovy-plugin</module>
     <module>nexus-logging-plugin</module>
     <module>nexus-plugin-console-plugin</module>
+    <module>nexus-rawcontent-plugin</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-siesta-plugin</module>
     <module>nexus-site-repository-client</module>

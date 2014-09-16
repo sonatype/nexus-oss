@@ -38,7 +38,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     'repositoryroute.RepositoryRouteAdd',
     'repositoryroute.RepositoryRouteFeature',
     'repositoryroute.RepositoryRouteList',
-    'repositoryroute.RepositoryRouteSettings'
+    'repositoryroute.RepositoryRouteSettings',
+    'repositoryroute.RepositoryRouteSettingsForm',
   ],
   refs: [
     {
@@ -65,7 +66,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
       file: 'arrow_branch.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('nexus:routes', 'read');
     }
   },
@@ -74,7 +75,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -89,7 +90,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
         'nx-coreui-repositoryroute-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-repositoryroute-settings': {
+        'nx-coreui-repositoryroute-settings-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repositoryroute-settings #mappingType': {
@@ -102,14 +103,14 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   /**
    * @override
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('pattern');
   },
 
   /**
    * @override
    */
-  onSelection: function (list, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {
@@ -120,7 +121,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-repositoryroute-add');
   },
 
@@ -128,7 +129,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
    * @private
    * Reload stores used in settings.
    */
-  onRefresh: function () {
+  onRefresh: function() {
     var me = this,
         settings = me.getSettings();
 
@@ -142,7 +143,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
    * @private
    * Hides mapped repositories if mapping type = 'BLOCKING'.
    */
-  onMappingTypeChanged: function (mappingTypeCombo, newValue) {
+  onMappingTypeChanged: function(mappingTypeCombo, newValue) {
     var mappedRepositories = mappingTypeCombo.up('form').down('#mappedRepositoriesIds');
 
     if (newValue === 'BLOCKING') {
@@ -159,7 +160,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-repositoryroute-add');
 
@@ -178,11 +179,11 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
    * Deletes a repository route.
    * @param {NX.coreui.model.RepositoryRoute} model repository route to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_RepositoryRoute.delete_(model.getId(), function (response) {
+    NX.direct.coreui_RepositoryRoute.delete_(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Route deleted: ' + description, type: 'success' });

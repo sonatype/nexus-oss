@@ -23,16 +23,16 @@ Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
 
   title: 'Create new virtual repository',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-repository-settings-virtual',
+      xtype: 'nx-repository-settings-virtual-form',
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createVirtual'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Shadow repository created: ' + data['id'];
       }
     };

@@ -27,15 +27,15 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
   title: 'Create new role',
   defaultFocus: 'id',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-coreui-role-settings',
+      xtype: 'nx-coreui-role-settings-form',
       api: {
         submit: 'NX.direct.coreui_Role.create'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Role created: ' + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),

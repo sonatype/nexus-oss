@@ -23,16 +23,16 @@ Ext.define('NX.coreui.view.repository.RepositoryAddGroup', {
 
   title: 'Create new repository group',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-repository-settings-group',
+      xtype: 'nx-repository-settings-group-form',
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createGroup'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Group repository created: ' + data['id'];
       }
     };

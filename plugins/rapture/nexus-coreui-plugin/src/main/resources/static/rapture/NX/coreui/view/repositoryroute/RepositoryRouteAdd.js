@@ -30,15 +30,15 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   /**
    * @override
    */
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-coreui-repositoryroute-settings',
+      xtype: 'nx-coreui-repositoryroute-settings-form',
       api: {
         submit: 'NX.direct.coreui_RepositoryRoute.create'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Repository route created: ' + data['pattern'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),

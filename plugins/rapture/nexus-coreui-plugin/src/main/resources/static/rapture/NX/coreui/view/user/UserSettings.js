@@ -13,95 +13,14 @@
 /*global Ext, NX*/
 
 /**
- * User settings form.
+ * User "Settings" panel.
  *
  * @since 3.0
  */
 Ext.define('NX.coreui.view.user.UserSettings', {
-  extend: 'NX.view.SettingsForm',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-user-settings',
-  requires: [
-    'NX.Conditions'
-  ],
 
-  api: {
-    submit: 'NX.direct.coreui_User.update'
-  },
-  settingsFormSuccessMessage: function (data) {
-    return 'User updated: ' + data['userId'];
-  },
-
-  editableMarker: 'You do not have permission to update users or is an external user',
-
-  initComponent: function () {
-    var me = this;
-
-    me.editableCondition = me.editableCondition || NX.Conditions.and(
-        NX.Conditions.isPermitted('security:users', 'update'),
-        NX.Conditions.formHasRecord('nx-coreui-user-settings', function (model) {
-          return !model.get('external');
-        })
-    );
-
-    me.items = [
-      {
-        name: 'userId',
-        itemId: 'userId',
-        readOnly: true,
-        fieldLabel: 'ID',
-        helpText: 'The ID assigned to this user, will be used as the username.',
-        emptyText: 'enter a user id'
-      },
-      {
-        name: 'firstName',
-        fieldLabel: 'First Name',
-        helpText: 'The first name of the user.',
-        emptyText: 'enter first name'
-      },
-      {
-        name: 'lastName',
-        fieldLabel: 'Last Name',
-        helpText: 'The last name of the user.',
-        emptyText: 'enter last name'
-      },
-      {
-        xtype: 'nx-email',
-        name: 'email',
-        fieldLabel: 'Email',
-        helpText: 'Email address, to notify user when necessary.',
-        emptyText: 'enter an email address'
-      },
-      {
-        xtype: 'combo',
-        name: 'status',
-        fieldLabel: 'Status',
-        helpText: 'The current status of the user.',
-        emptyText: 'select status',
-        allowBlank: false,
-        editable: false,
-        store: [
-          ['active', 'Active'],
-          ['disabled', 'Disabled']
-        ],
-        queryMode: 'local'
-      },
-      {
-        xtype: 'nx-itemselector',
-        name: 'roles',
-        itemId: 'roles',
-        fieldLabel: 'Roles',
-        helpText: 'The roles assigned to this user.',
-        buttons: ['add', 'remove'],
-        fromTitle: 'Roles',
-        toTitle: 'Given',
-        store: 'Role',
-        valueField: 'id',
-        displayField: 'name',
-        delimiter: null
-      }
-    ];
-
-    me.callParent(arguments);
-  }
+  items: { xtype: 'nx-coreui-user-settings-form' }
 
 });

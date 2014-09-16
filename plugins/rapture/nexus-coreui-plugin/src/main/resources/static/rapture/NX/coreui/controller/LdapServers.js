@@ -41,10 +41,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'ldap.LdapServerList',
     'ldap.LdapServerBackup',
     'ldap.LdapServerBackupFieldSet',
+    'ldap.LdapServerBackupForm',
     'ldap.LdapServerConnection',
     'ldap.LdapServerConnectionFieldSet',
+    'ldap.LdapServerConnectionForm',
     'ldap.LdapServerUserAndGroup',
     'ldap.LdapServerUserAndGroupFieldSet',
+    'ldap.LdapServerUserAndGroupForm',
     'ldap.LdapServerUserAndGroupLoginCredentials',
     'ldap.LdapServerUserAndGroupMappingTestResults'
   ],
@@ -73,7 +76,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       file: 'book_addresses.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('security:ldapconfig', 'read');
     }
   },
@@ -82,7 +85,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -103,13 +106,13 @@ Ext.define('NX.coreui.controller.LdapServers', {
         'nx-coreui-ldapserver-add form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-ldapserver-connection': {
+        'nx-coreui-ldapserver-connection-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-ldapserver-backup': {
+        'nx-coreui-ldapserver-backup-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-ldapserver-userandgroup': {
+        'nx-coreui-ldapserver-userandgroup-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-ldapserver-list button[action=changeorder]': {
@@ -151,14 +154,14 @@ Ext.define('NX.coreui.controller.LdapServers', {
   /**
    * @override
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('name');
   },
 
   /**
    * @override
    */
-  onSelection: function (list, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {
@@ -171,14 +174,14 @@ Ext.define('NX.coreui.controller.LdapServers', {
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-ldapserver-add');
   },
 
   /**
    * @private
    */
-  showChangeOrder: function () {
+  showChangeOrder: function() {
     Ext.widget('nx-coreui-ldapserver-changeorder');
   },
 
@@ -186,7 +189,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Reload store after add/update.
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-ldapserver-add');
 
@@ -203,7 +206,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Load LDAP schema templates store.
    */
-  loadTemplates: function () {
+  loadTemplates: function() {
     var me = this,
         list = me.getList();
 
@@ -216,7 +219,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Enable 'Change Order' when user has 'update' permission.
    */
-  bindChangeOrderButton: function (button) {
+  bindChangeOrderButton: function(button) {
     var me = this;
 
     button.mon(
@@ -233,7 +236,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Enable 'ClearCache' when user has 'delete' permission and there is at least one LDAP server configured.
    */
-  bindClearCacheButton: function (button) {
+  bindClearCacheButton: function(button) {
     var me = this;
     button.mon(
         NX.Conditions.and(
@@ -254,11 +257,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * Deletes a LDAP server.
    * @param {NX.coreui.model.LdapServer} model to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.ldap_LdapServer.delete_(model.getId(), function (response) {
+    NX.direct.ldap_LdapServer.delete_(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP server deleted: ' + description, type: 'success' });
@@ -270,12 +273,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Change LDAP servers order.
    */
-  changeOrder: function (button) {
+  changeOrder: function(button) {
     var me = this,
         win = button.up('window'),
         order = button.up('form').down('nx-itemorderer').getValue();
 
-    NX.direct.ldap_LdapServer.changeOrder(order, function (response) {
+    NX.direct.ldap_LdapServer.changeOrder(order, function(response) {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         win.close();
@@ -288,8 +291,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Clear LDAP cache.
    */
-  clearCache: function (button) {
-    NX.direct.ldap_LdapServer.clearCache(function (response) {
+  clearCache: function(button) {
+    NX.direct.ldap_LdapServer.clearCache(function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP cache has been cleared', type: 'success' });
       }
@@ -300,14 +303,14 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Verify LDAP server connection.
    */
-  verifyConnection: function (button) {
+  verifyConnection: function(button) {
     var form = button.up('form'),
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
     form.getEl().mask('Checking connection to ' + url);
 
-    NX.direct.ldap_LdapServer.verifyConnection(values, function (response) {
+    NX.direct.ldap_LdapServer.verifyConnection(values, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Connection to LDAP server verified: ' + url, type: 'success' });
@@ -319,14 +322,14 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Verify LDAP user mapping.
    */
-  verifyUserMapping: function (button) {
+  verifyUserMapping: function(button) {
     var form = button.up('form'),
         values = form.getForm().getFieldValues(),
         url = values.protocol + '://' + values.host + ':' + values.port;
 
     form.getEl().mask('Checking user mapping on ' + url);
 
-    NX.direct.ldap_LdapServer.verifyUserMapping(values, function (response) {
+    NX.direct.ldap_LdapServer.verifyUserMapping(values, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP server user mapping verified: ' + url, type: 'success' });
@@ -338,7 +341,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
   /**
    * @private
    */
-  showLoginCredentialsWindow: function (button) {
+  showLoginCredentialsWindow: function(button) {
     var form = button.up('form'),
         values = form.getForm().getFieldValues();
 
@@ -349,7 +352,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    * Verify LDAP login.
    */
-  verifyLogin: function (button) {
+  verifyLogin: function(button) {
     var win = button.up('window'),
         form = button.up('form'),
         loginValues = form.getForm().getFieldValues(),
@@ -360,7 +363,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
 
     form.getEl().mask('Checking login on ' + url);
 
-    NX.direct.ldap_LdapServer.verifyLogin(values, userName, userPass, function (response) {
+    NX.direct.ldap_LdapServer.verifyLogin(values, userName, userPass, function(response) {
       form.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
