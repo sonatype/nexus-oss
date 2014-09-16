@@ -17,6 +17,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
  * A generic storage bin for binary objects of all sizes.
  *
@@ -26,6 +28,7 @@ import javax.annotation.Nullable;
  * @since 3.0
  */
 public interface BlobStore
+    extends Lifecycle
 {
   /**
    * An identifying name for disaster recovery purposes (which isn't required to be strictly unique)

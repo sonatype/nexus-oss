@@ -23,16 +23,16 @@ Ext.define('NX.coreui.view.repository.RepositoryAddProxy', {
 
   title: 'Create new proxy repository',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-repository-settings-proxy',
+      xtype: 'nx-repository-settings-proxy-form',
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createProxy'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Proxy repository created: ' + data['id'];
       }
     };

@@ -36,11 +36,12 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'Capability'
   ],
   views: [
-    'capability.CapabilityFeature',
     'capability.CapabilityAdd',
+    'capability.CapabilityFeature',
     'capability.CapabilityList',
     'capability.CapabilitySummary',
     'capability.CapabilitySettings',
+    'capability.CapabilitySettingsForm',
     'capability.CapabilityStatus',
     'capability.CapabilityAbout',
     'formfield.SettingsFieldSet'
@@ -84,7 +85,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       file: 'brick.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('nexus:capabilities', 'read');
     }
   },
@@ -93,7 +94,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -149,7 +150,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Returns a description of capability suitable to be displayed.
    * @param {NX.coreui.model.Capability} model selected model
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     var description = model.get('typeName');
     if (model.get('description')) {
       description += ' - ' + model.get('description');
@@ -163,7 +164,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.view.capability.CapabilityList} list capability grid
    * @param {NX.coreui.model.Capability} model selected model
    */
-  onSelection: function (list, model) {
+  onSelection: function(list, model) {
     var me = this,
         capabilityTypeModel;
 
@@ -185,7 +186,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Displays a warning message if capability is enabled but is not active.
    * @param {NX.coreui.model.Capability} model capability model
    */
-  eventuallyShowWarning: function (model) {
+  eventuallyShowWarning: function(model) {
     var masterdetail = this.getList().up('nx-masterdetail-panel');
 
     if (model.get('enabled') && !model.get('active')) {
@@ -201,7 +202,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Displays capability summary.
    * @param {NX.coreui.model.Capability} model capability model
    */
-  showSummary: function (model) {
+  showSummary: function(model) {
     var summary = this.getSummary(),
         info = {
           'Type': model.get('typeName'),
@@ -222,7 +223,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Displays capability settings.
    * @param {NX.coreui.model.Capability} model capability model
    */
-  showSettings: function (model) {
+  showSettings: function(model) {
     this.getSettings().loadRecord(model);
   },
 
@@ -231,7 +232,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Displays capability status.
    * @param {NX.coreui.model.Capability} model capability model
    */
-  showStatus: function (model) {
+  showStatus: function(model) {
     this.getStatus().showStatus(model.get('status'));
   },
 
@@ -240,14 +241,14 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Displays capability about.
    * @param {NX.coreui.model.CapabilityType} capabilityTypeModel capability type model
    */
-  showAbout: function (capabilityTypeModel) {
+  showAbout: function(capabilityTypeModel) {
     this.getAbout().showAbout(capabilityTypeModel ? capabilityTypeModel.get('about') : undefined);
   },
 
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-capability-add', {
       capabilityTypeStore: this.getCapabilityTypeStore()
     });
@@ -258,7 +259,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Change about text and settings according to selected capability type (in add window).
    * @combo {Ext.form.field.ComboBox} combobox capability type combobox
    */
-  changeCapabilityType: function (combobox) {
+  changeCapabilityType: function(combobox) {
     var win = combobox.up('window'),
         capabilityTypeModel;
 
@@ -271,7 +272,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * (Re)load capability type store && reset all cached combo stores.
    */
-  onRefresh: function () {
+  onRefresh: function() {
     var me = this,
         list = me.getList();
 
@@ -284,7 +285,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * When capability type store re-loads, reselect current selected capability if any.
    */
-  onCapabilityTypeLoad: function () {
+  onCapabilityTypeLoad: function() {
     var me = this;
     me.reselect();
   },
@@ -294,7 +295,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Synchronize tags from loaded capabilities with capability/model and grid columns.
    * @param {NX.coreui.store.Capability} store capability store
    */
-  onCapabilityLoad: function (store) {
+  onCapabilityLoad: function(store) {
     var me = this,
         list = me.getList(),
         tagTypes = [],
@@ -304,8 +305,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
         tagColumns = [];
 
     if (list) {
-      store.each(function (model) {
-        Ext.Object.each(model.get('tags'), function (key) {
+      store.each(function(model) {
+        Ext.Object.each(model.get('tags'), function(key) {
           if (tagTypes.indexOf(key) === -1) {
             tagTypes.push(key);
           }
@@ -313,7 +314,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       });
       Ext.Array.sort(tagTypes);
       if (!Ext.Array.equals(tagTypes, capabilityModel.tagTypes || [])) {
-        Ext.Array.each(tagTypes, function (entry) {
+        Ext.Array.each(tagTypes, function(entry) {
           fields.push({
             name: 'tag$' + entry
           });
@@ -328,8 +329,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
         Ext.Array.insert(columns, 2, tagColumns);
         list.reconfigure(store, columns);
       }
-      store.each(function (model) {
-        Ext.Array.each(tagTypes, function (entry) {
+      store.each(function(model) {
+        Ext.Array.each(tagTypes, function(entry) {
           var tags = model.get('tags') || {};
           model.set('tag$' + entry, tags[entry] || '');
         });
@@ -343,7 +344,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @protected
    * Enable 'New' button when user has 'create' permission and there is at least one capability type.
    */
-  bindNewButton: function (button) {
+  bindNewButton: function(button) {
     var me = this;
     button.mon(
         NX.Conditions.and(
@@ -362,11 +363,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Enable 'Enable' button when user has 'update' permission and capability is not enabled.
    */
-  bindEnableButton: function (button) {
+  bindEnableButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-            NX.Conditions.gridHasSelection('nx-coreui-capability-list', function (model) {
+            NX.Conditions.gridHasSelection('nx-coreui-capability-list', function(model) {
               return !model.get('enabled');
             })
         ),
@@ -382,11 +383,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Enable 'Disable' button when user has 'update' permission and capability is enabled.
    */
-  bindDisableButton: function (button) {
+  bindDisableButton: function(button) {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-            NX.Conditions.gridHasSelection('nx-coreui-capability-list', function (model) {
+            NX.Conditions.gridHasSelection('nx-coreui-capability-list', function(model) {
               return model.get('enabled');
             })
         ),
@@ -402,13 +403,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Creates a capability.
    */
-  createCapability: function (button) {
+  createCapability: function(button) {
     var me = this,
         win = button.up('window'),
         form = button.up('form'),
         values = form.getValues();
 
-    NX.direct.capability_Capability.create(values, function (response) {
+    NX.direct.capability_Capability.create(values, function(response) {
       if (Ext.isObject(response)) {
         if (response.success) {
           win.close();
@@ -429,12 +430,12 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Updates capability.
    */
-  updateCapability: function (button) {
+  updateCapability: function(button) {
     var me = this,
         form = button.up('form'),
         values = form.getValues();
 
-    NX.direct.capability_Capability.update(values, function (response) {
+    NX.direct.capability_Capability.update(values, function(response) {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
@@ -455,11 +456,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Delete capability.
    * @param {NX.coreui.model.CapabilityType} model capability to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.capability_Capability.delete_(model.getId(), function (response) {
+    NX.direct.capability_Capability.delete_(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
@@ -473,13 +474,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Enables selected capability.
    */
-  enableCapability: function (button) {
+  enableCapability: function(button) {
     var me = this,
         list = button.up('grid'),
         model = list.getSelectionModel().getSelection()[0],
         description = me.getDescription(model);
 
-    NX.direct.capability_Capability.enable(model.getId(), function (response) {
+    NX.direct.capability_Capability.enable(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
@@ -493,13 +494,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Disables selected capability.
    */
-  disableCapability: function (button) {
+  disableCapability: function(button) {
     var me = this,
         list = button.up('grid'),
         model = list.getSelectionModel().getSelection()[0],
         description = me.getDescription(model);
 
-    NX.direct.capability_Capability.disable(model.getId(), function (response) {
+    NX.direct.capability_Capability.disable(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

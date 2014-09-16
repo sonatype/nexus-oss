@@ -30,7 +30,7 @@ import org.sonatype.nexus.blobstore.api.BlobStoreException;
 import org.sonatype.nexus.blobstore.api.BlobStoreListener;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.base.Throwables;
 import org.joda.time.DateTime;
@@ -44,7 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class FileBlobStore
-    extends ComponentSupport
+    extends LifecycleSupport
     implements BlobStore
 {
   public static final String BLOB_CONTENT_SUFFIX = ".blob";
@@ -68,6 +68,16 @@ public class FileBlobStore
     this.locationStrategy = checkNotNull(locationStrategy);
     this.fileOperations = checkNotNull(fileOperations);
     this.metadataStore = checkNotNull(metadataStore);
+  }
+
+  @Override
+  protected void doStart() throws Exception {
+    metadataStore.start();
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    metadataStore.stop();
   }
 
   @Override

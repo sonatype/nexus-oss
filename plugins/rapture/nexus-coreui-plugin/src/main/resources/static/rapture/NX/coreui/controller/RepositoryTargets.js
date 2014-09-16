@@ -38,7 +38,8 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     'repositorytarget.RepositoryTargetAdd',
     'repositorytarget.RepositoryTargetFeature',
     'repositorytarget.RepositoryTargetList',
-    'repositorytarget.RepositoryTargetSettings'
+    'repositorytarget.RepositoryTargetSettings',
+    'repositorytarget.RepositoryTargetSettingsForm',
   ],
   refs: [
     {
@@ -69,7 +70,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
       file: 'target.png',
       variants: ['x16', 'x32']
     },
-    visible: function () {
+    visible: function() {
       return NX.Permissions.check('nexus:targets', 'read');
     }
   },
@@ -78,7 +79,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   /**
    * @override
    */
-  init: function () {
+  init: function() {
     var me = this;
 
     me.callParent();
@@ -101,7 +102,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
         'nx-coreui-repositorytarget-list button[action=new]': {
           click: me.showAddWindow
         },
-        'nx-coreui-repositorytarget-settings': {
+        'nx-coreui-repositorytarget-settings-form': {
           submitted: me.onSettingsSubmitted
         }
       }
@@ -111,14 +112,14 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   /**
    * @override
    */
-  getDescription: function (model) {
+  getDescription: function(model) {
     return model.get('name');
   },
 
   /**
    * @override
    */
-  onSelection: function (list, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {
@@ -129,7 +130,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   /**
    * @private
    */
-  showAddWindow: function () {
+  showAddWindow: function() {
     Ext.widget('nx-coreui-repositorytarget-add');
   },
 
@@ -137,7 +138,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
    * @private
    * (Re)load repository format store.
    */
-  loadRepositoryFormat: function () {
+  loadRepositoryFormat: function() {
     var me = this,
         list = me.getList();
 
@@ -149,7 +150,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   /**
    * @private
    */
-  onSettingsSubmitted: function (form, action) {
+  onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-repositorytarget-add');
 
@@ -168,11 +169,11 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
    * Deletes a repository target.
    * @param {NX.coreui.model.RepositoryTarget} model repository target to be deleted
    */
-  deleteModel: function (model) {
+  deleteModel: function(model) {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.coreui_RepositoryTarget.delete_(model.getId(), function (response) {
+    NX.direct.coreui_RepositoryTarget.delete_(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'Target deleted: ' + description, type: 'success' });

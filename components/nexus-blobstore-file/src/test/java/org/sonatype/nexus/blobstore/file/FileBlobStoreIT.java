@@ -21,8 +21,6 @@ import java.util.Random;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.api.BlobStoreMetrics;
-import org.sonatype.nexus.blobstore.file.internal.MapdbBlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.internal.SimpleFileOperations;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
@@ -63,14 +61,14 @@ public class FileBlobStoreIT
     Path metadata = root.resolve("metadata");
 
     this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
-    metadataStore.start();
-
-    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
+    this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(),
+        metadataStore);
+    underTest.start();
   }
 
   @After
   public void tearDown() throws Exception {
-    metadataStore.stop();
+    underTest.stop();
   }
 
   @Test

@@ -38,6 +38,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     'task.TaskList',
     'task.TaskSchedule',
     'task.TaskScheduleFieldSet',
+    'task.TaskScheduleForm',
     'task.TaskScheduleAdvanced',
     'task.TaskScheduleDaily',
     'task.TaskScheduleHourly',
@@ -46,6 +47,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     'task.TaskScheduleOnce',
     'task.TaskScheduleWeekly',
     'task.TaskSettings',
+    'task.TaskSettingsForm',
     'formfield.SettingsFieldSet'
   ],
   refs: [
@@ -100,10 +102,10 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-add form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-task-settings': {
+        'nx-coreui-task-settings-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-task-schedule': {
+        'nx-coreui-task-schedule-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-task-list button[action=run]': {

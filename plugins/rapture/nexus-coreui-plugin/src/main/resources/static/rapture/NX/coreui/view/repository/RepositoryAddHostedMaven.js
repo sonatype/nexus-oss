@@ -23,16 +23,16 @@ Ext.define('NX.coreui.view.repository.RepositoryAddHostedMaven', {
 
   title: 'Create new Maven hosted repository',
 
-  initComponent: function () {
+  initComponent: function() {
     var me = this;
 
     me.items = {
-      xtype: 'nx-repository-settings-hosted-maven2',
+      xtype: 'nx-repository-settings-hosted-maven2-form',
       template: me.template,
       api: {
         submit: 'NX.direct.coreui_Repository.createHostedMaven'
       },
-      settingsFormSuccessMessage: function (data) {
+      settingsFormSuccessMessage: function(data) {
         return 'Maven Hosted repository created: ' + data['id'];
       }
     };
