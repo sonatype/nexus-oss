@@ -106,10 +106,9 @@ Ext.define('NX.controller.Help', {
    */
   onFeatureHelp: function() {
     var me = this,
-        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/3.0?q=', // FIXME: put version constant location
-        url = baseUrl + me.selectedFeature.get('helpKeyword');
-
-    console.log(me.selectedFeature.$className);
+        versionMajorMinor = '3.0', // FIXME: put version constant location, or parse from status.version?
+        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/' + versionMajorMinor,
+        url = baseUrl + '/' + me.selectedFeature.get('helpKeyword');
 
     NX.Windows.open(url);
   },

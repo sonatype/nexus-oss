@@ -88,7 +88,7 @@ Ext.define('NX.controller.Features', {
 
         // generate default context-help keyword
         if (!clonedFeature.helpKeyword) {
-          clonedFeature.helpKeyword = path.replace('/', '_').toLowerCase();
+          clonedFeature.helpKeyword = path.replace(/\//g, '_').toLowerCase();
         }
 
         if (Ext.isDefined(clonedFeature.visible)) {
