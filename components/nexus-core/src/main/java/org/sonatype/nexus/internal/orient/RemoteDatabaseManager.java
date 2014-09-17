@@ -14,8 +14,6 @@
 package org.sonatype.nexus.internal.orient;
 
 import javax.annotation.Nullable;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseManager;
 
@@ -26,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Named("remote")
-@Singleton
+//@Named("remote")
+//@Singleton
 public class RemoteDatabaseManager
     extends DatabaseManagerSupport
 {
