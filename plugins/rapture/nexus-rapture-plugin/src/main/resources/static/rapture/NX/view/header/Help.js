@@ -35,7 +35,7 @@ Ext.define('NX.view.header.Help', {
    */
   initComponent: function () {
     var me = this,
-        edition = NX.State.getEdition(),
+        edition = NX.State.getEdition().toLowerCase(),
         manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + NX.State.getVersionMajorMinor(),
         linkBase = 'http://links.sonatype.com/products/nexus/' + edition,
         issuesUrl = linkBase + '/issues',
