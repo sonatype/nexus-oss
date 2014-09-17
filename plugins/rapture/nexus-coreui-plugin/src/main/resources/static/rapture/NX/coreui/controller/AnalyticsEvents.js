@@ -80,7 +80,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
         var analyticsState = NX.State.getValue('analytics');
         return NX.Permissions.check('nexus:analytics', 'read') && analyticsState && analyticsState.enabled;
       }
-    });
+    }, me);
 
     me.listen({
       controller: {

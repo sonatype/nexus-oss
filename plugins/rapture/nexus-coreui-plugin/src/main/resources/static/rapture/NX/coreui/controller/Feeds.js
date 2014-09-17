@@ -74,7 +74,7 @@ Ext.define('NX.coreui.controller.Feeds', {
       visible: function () {
         return NX.Permissions.check('nexus:feeds', 'read');
       }
-    });
+    }, me);
 
     me.listen({
       controller: {

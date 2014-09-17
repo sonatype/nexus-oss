@@ -46,7 +46,7 @@ Ext.define('NX.coreui.controller.AnalyticsSettings', {
       visible: function () {
         return NX.Permissions.check('nexus:analytics', 'read');
       }
-    });
+    }, me);
 
     me.listen({
       component: {

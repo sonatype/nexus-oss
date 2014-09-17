@@ -45,7 +45,7 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }
-    });
+    }, me);
   }
 
 });

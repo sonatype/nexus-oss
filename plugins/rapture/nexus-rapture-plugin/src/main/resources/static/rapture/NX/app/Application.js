@@ -317,6 +317,7 @@ Ext.define('NX.app.Application', {
           me.logDebug('Destroying controller: ' + key);
           //</if>
 
+          ref.controller.fireEvent('destroy', ref.controller);
           ref.controller.eventbus.unlisten(ref.controller.id);
           if (Ext.isFunction(ref.controller.onDestroy)) {
             ref.controller.onDestroy();
@@ -360,6 +361,7 @@ Ext.define('NX.app.Application', {
     if (changes) {
       // TODO shall we do this on each refresh?
       me.getIconController().installStylesheet();
+      me.fireEvent('controllerschanged');
     }
   }
 });

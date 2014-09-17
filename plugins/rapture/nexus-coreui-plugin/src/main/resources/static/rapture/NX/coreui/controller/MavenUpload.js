@@ -51,7 +51,7 @@ Ext.define('NX.coreui.controller.MavenUpload', {
       visible: function() {
         return NX.Permissions.check('nexus:artifact', 'create');
       }
-    });
+    }, me);
 
     me.listen({
       controller: {

@@ -59,7 +59,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       visible: function () {
         return NX.Permissions.check('nexus:metrics-endpoints');
       }
-    });
+    }, me);
 
     me.listen({
       controller: {

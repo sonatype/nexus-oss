@@ -49,7 +49,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
         return NX.State.getValue('status')['edition'] !== 'OSS' &&
             NX.Permissions.check('nexus:atlas', 'create');
       }
-    });
+    }, me);
 
     me.listen({
       component: {

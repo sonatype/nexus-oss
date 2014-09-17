@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
       visible: function () {
         return NX.Permissions.check('nexus:atlas', 'create');
       }
-    });
+    }, me);
 
     me.listen({
       component: {
