@@ -13,4 +13,29 @@
 
 body {
   font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  background-color: #EEEEEE;
+  margin: 0;
+  padding: 0;
 }
+
+.nexus-describe-message {
+  background-color: darkblue;
+  color: #EFEFEF;
+  padding: 10px;
+  font-size: larger;
+}
+
+.nexus-describe-detail {
+  padding: 10px;
+}
+
+.nexus-describe-detail table {
+  border: 1px #999999;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.nexus-describe-detail table th {
+  background-color: #CCCCCC;
+}
+

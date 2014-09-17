@@ -13,7 +13,7 @@
 <html>
   <head>
     <title>${statusCode} - ${statusName}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
     <!--[if IE]>
@@ -23,7 +23,14 @@
     <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
   </head>
   <body>
-    <h1>${statusCode} - ${statusName}</h1>
-    <p>${errorDescription}</p>
+    <div class="nexus-error-message">
+      <img src="$nexusRoot/static/rapture/resources/icons/x32/nexus.png"/>
+      Error
+      <span class="nexus-error-message-code">$statusCode</span>
+      <span class="nexus-error-message-name">$statusName</span>
+    </div>
+    <div class="nexus-error-detail">
+      $errorDescription
+    </div>
   </body>
 </html>

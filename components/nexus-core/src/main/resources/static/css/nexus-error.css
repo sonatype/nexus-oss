@@ -13,4 +13,18 @@
 
 body {
   font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  background-color: #EEEEEE;
+  margin: 0;
+  padding: 0;
+}
+
+.nexus-error-message {
+  background-color: darkred;
+  color: #EFEFEF;
+  padding: 10px;
+  font-size: larger;
+}
+
+.nexus-error-detail {
+  padding: 10px;
 }

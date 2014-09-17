@@ -13,4 +13,31 @@
 
 body {
   font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  background-color: #EEEEEE;
+  margin: 0;
+  padding: 0;
+}
+
+.nexus-content-message {
+  background-color: #000000;
+  color: #EFEFEF;
+  padding: 10px;
+  font-size: larger;
+}
+
+.nexus-content-browser {
+  padding: 10px;
+}
+
+.nexus-content-parent {
+  padding: 0 0 10px 0;
+}
+
+.nexus-content-children {
+  width: 100%;
+}
+
+.nexus-content-browser th,
+.nexus-content-browser td {
+  text-align: left;
 }
