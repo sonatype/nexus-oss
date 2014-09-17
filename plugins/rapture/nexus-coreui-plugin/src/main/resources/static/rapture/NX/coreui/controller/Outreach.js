@@ -71,8 +71,7 @@ Ext.define('NX.coreui.controller.Outreach', {
       }
       NX.direct.outreach_Outreach.readStatus(function (response) {
         if (Ext.isObject(response) && response.success) {
-          var status = NX.State.getValue('status'),
-              user = NX.State.getUser(),
+          var user = NX.State.getUser(),
               usertype,
               url;
 
@@ -83,8 +82,9 @@ Ext.define('NX.coreui.controller.Outreach', {
             usertype = 'anonymous';
           }
 
-          url = NX.util.Url.urlOf('service/outreach/?version=' + status.version +
-              '&edition=' + status.edition +
+          url = NX.util.Url.urlOf('service/outreach/?version=' + NX.State.getVersion() +
+              '&versionMm=' + NX.State.getVersionMajorMinor() +
+              '&edition=' + NX.State.getEdition() +
               '&usertype=' + usertype);
 
           // add the outreach iframe to the welcome view
@@ -105,7 +105,7 @@ Ext.define('NX.coreui.controller.Outreach', {
                 }
                 else {
                   // else complain and leave it hidden
-                  me.logWarn('Outreach iframe did not load: ' + url);
+                  me.logDebug('Outreach iframe did not load: ' + url);
                 }
               }
             }
