@@ -106,8 +106,7 @@ Ext.define('NX.controller.Help', {
    */
   onFeatureHelp: function() {
     var me = this,
-        versionMajorMinor = '3.0', // FIXME: put version constant location, or parse from status.version?
-        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/' + versionMajorMinor,
+        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/' + NX.State.getVersionMajorMinor(),
         url = baseUrl + '/' + me.selectedFeature.get('helpKeyword');
 
     NX.Windows.open(url);
