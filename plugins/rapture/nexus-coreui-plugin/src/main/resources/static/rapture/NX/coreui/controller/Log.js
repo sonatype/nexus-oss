@@ -57,7 +57,7 @@ Ext.define('NX.coreui.controller.Log', {
       visible: function () {
         return NX.Permissions.check('nexus:logs', 'read');
       }
-    });
+    }, me);
 
     me.listen({
       controller: {
