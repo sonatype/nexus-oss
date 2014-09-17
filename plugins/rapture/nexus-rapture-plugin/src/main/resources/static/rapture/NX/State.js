@@ -19,6 +19,9 @@
  */
 Ext.define('NX.State', {
   singleton: true,
+  requires: [
+    'Ext.Version'
+  ],
   mixins: {
     observable: 'Ext.util.Observable',
     logAware: 'NX.LogAware'
@@ -93,6 +96,38 @@ Ext.define('NX.State', {
   setUser: function (user) {
     var me = this;
     me.setValue('user', user);
+  },
+
+  /**
+   * Return status.version
+   *
+   * @public
+   * @returns {string}
+   */
+  getVersion: function() {
+    return this.getValue('status')['version'];
+  },
+
+  /**
+   * Returns major.minor parts of status.version.
+   *
+   * @public
+   * @returns {string}
+   */
+  getVersionMajorMinor: function() {
+    // Ext.Version doesn't fully support our version scheme, but the major.minor bits it handles fine
+    var v = Ext.create('Ext.Version', this.getVersion());
+    return v.getMajor() + '.' + v.getMinor();
+  },
+
+  /**
+   * Return status.edition
+   *
+   * @public
+   * @returns {string}
+   */
+  getEdition: function() {
+    return this.getValue('status')['edition'];
   },
 
   getValue: function (key, defaultValue) {

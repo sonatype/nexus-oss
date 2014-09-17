@@ -60,10 +60,7 @@ Ext.define('NX.view.dashboard.Welcome', {
       },
       {
         xtype: 'label',
-        html: '<code>' +
-            'Nexus <em>' + NX.State.getValue('status')['edition'] + '</em> ' +
-            NX.State.getValue('status')['version'] +
-            '</code>',
+        html: '<code>' + 'Nexus <em>' + NX.State.getEdition() + '</em> ' + NX.State.getVersion() + '</code>',
 
         style: {
           'color': '#000000',

@@ -35,9 +35,8 @@ Ext.define('NX.view.header.Help', {
    */
   initComponent: function () {
     var me = this,
-        edition = NX.State.getValue('status')['edition'].toLowerCase(),
-        versionMajorMinor = '3.0', // FIXME: put version constant location, or parse from status.version?
-        manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + versionMajorMinor,
+        edition = NX.State.getEdition(),
+        manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + NX.State.getVersionMajorMinor(),
         linkBase = 'http://links.sonatype.com/products/nexus/' + edition,
         issuesUrl = linkBase + '/issues',
         supportUrl = linkBase + '/support';
