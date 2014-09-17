@@ -34,6 +34,11 @@ body {
   padding: 10px;
 }
 
+.nexus-content-browser th,
+.nexus-content-browser td {
+  text-align: left;
+}
+
 .nexus-content-parent {
   padding: 0 0 10px 0;
 }
@@ -42,7 +47,17 @@ body {
   width: 100%;
 }
 
-.nexus-content-browser th,
-.nexus-content-browser td {
-  text-align: left;
+.nexus-content-parent a {
+  background: transparent url('../images/arrow_up.png') left top no-repeat;
+  padding-left: 24px;
+}
+
+.nexus-content-directory a {
+  background: transparent url('../images/folder.png') left top no-repeat;
+  padding-left: 24px;
+}
+
+.nexus-content-file a {
+  background: transparent url('../images/page_white.png') left top no-repeat;
+  padding-left: 24px;
 }

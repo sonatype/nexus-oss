@@ -41,15 +41,19 @@
       <th>Size</th>
       <th>Description</th>
     </tr>
-    #foreach( $listItem in $listItems )
-      <tr class="nexus-content-item">
+    #foreach ($listItem in $listItems)
+      #if ($listItem.collection)
+        <tr class="nexus-content-directory">
+      #else
+        <tr class="nexus-content-file">
+      #end
         <td>
           <a href="$listItem.resourceUri">$listItem.name</a>
         </td>
         <td>$listItem.lastModified</td>
         <td>
-          #if( $listItem.collection )
-            &nbsp;
+          #if ($listItem.collection)
+            n/a
           #else
             $listItem.size
           #end
