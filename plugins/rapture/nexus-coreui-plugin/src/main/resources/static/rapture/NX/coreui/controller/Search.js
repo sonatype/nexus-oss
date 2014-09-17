@@ -54,11 +54,6 @@ Ext.define('NX.coreui.controller.Search', {
   ],
 
   /**
-   * @private Array of registered features
-   */
-  featuresToUnregister: [],
-
-  /**
    * @override
    */
   init: function() {
@@ -97,10 +92,6 @@ Ext.define('NX.coreui.controller.Search', {
         return NX.Permissions.check('nexus:repositories', 'read');
       }
     });
-    me.featuresToUnregister.push({
-      mode: 'browse',
-      path: '/Search/Saved'
-    });
 
     me.getSearchFilterStore().each(function(model) {
       if (model.getId() === 'keyword') {
@@ -117,10 +108,6 @@ Ext.define('NX.coreui.controller.Search', {
             return NX.Permissions.check('nexus:repositories', 'read');
           }
         });
-        me.featuresToUnregister.push({
-          mode: 'browse',
-          path: '/Search'
-        });
       }
       else {
         me.getApplication().getFeaturesController().registerFeature({
@@ -133,10 +120,6 @@ Ext.define('NX.coreui.controller.Search', {
           visible: function() {
             return NX.Permissions.check('nexus:repositories', 'read');
           }
-        });
-        me.featuresToUnregister.push({
-          mode: 'browse',
-          path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name')
         });
       }
     });
@@ -181,15 +164,6 @@ Ext.define('NX.coreui.controller.Search', {
         }
       }
     });
-  },
-
-  /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature(me.featuresToUnregister);
   },
 
   /**

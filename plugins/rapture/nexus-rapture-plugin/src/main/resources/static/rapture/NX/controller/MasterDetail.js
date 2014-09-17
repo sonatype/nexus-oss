@@ -105,15 +105,6 @@ Ext.define('NX.controller.MasterDetail', {
     }
   },
 
-  /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature(me.features);
-  },
-
   loadStore: function () {
     var me = this,
         list = me.getList();

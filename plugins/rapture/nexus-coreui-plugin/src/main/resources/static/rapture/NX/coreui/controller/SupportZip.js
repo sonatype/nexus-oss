@@ -80,20 +80,6 @@ Ext.define('NX.coreui.controller.SupportZip', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Support/Support ZIP'
-      }
-    ]);
-  },
-
-  /**
    * @private
    */
   showSupportZipCreatedWindow: function (form, action) {

@@ -115,24 +115,6 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'browse',
-        path: '/Repository/Standard'
-      },
-      {
-        mode: 'browse',
-        path: '/Repository/Managed'
-      }
-    ]);
-  },
-
-  /**
    * @private
    * Show 'Admin' when user has 'update' permission.
    */

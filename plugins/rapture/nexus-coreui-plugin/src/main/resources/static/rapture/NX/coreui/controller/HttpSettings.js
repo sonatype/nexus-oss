@@ -57,20 +57,6 @@ Ext.define('NX.coreui.controller.HttpSettings', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/System/HTTP'
-      }
-    ]);
-  },
-
-  /**
    * @private
    * Enable HTTPS proxy settings only when HTTP proxy settings are enabled.
    */

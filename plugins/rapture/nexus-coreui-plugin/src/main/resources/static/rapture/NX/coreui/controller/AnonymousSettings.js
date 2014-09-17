@@ -46,20 +46,6 @@ Ext.define('NX.coreui.controller.AnonymousSettings', {
         return NX.Permissions.check('nexus:settings', 'read');
       }
     });
-  },
-
-  /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Security/Anonymous'
-      }
-    ]);
   }
 
 });

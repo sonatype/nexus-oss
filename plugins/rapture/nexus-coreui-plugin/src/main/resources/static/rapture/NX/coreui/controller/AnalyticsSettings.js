@@ -58,20 +58,6 @@ Ext.define('NX.coreui.controller.AnalyticsSettings', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Support/Analytics'
-      }
-    ]);
-  },
-
-  /**
    * @private
    * Set "analytics" state on save.
    */

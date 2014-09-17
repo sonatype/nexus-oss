@@ -91,20 +91,6 @@ Ext.define('NX.coreui.controller.Log', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Support/Logging/Log Viewer'
-      }
-    ]);
-  },
-
-  /**
    * @private
    * Shows mark log window.
    */

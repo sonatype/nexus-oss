@@ -103,20 +103,6 @@ Ext.define('NX.coreui.controller.Loggers', {
   },
 
   /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Support/Logging'
-      }
-    ]);
-  },
-
-  /**
    * @private
    * Loads logger store.
    */

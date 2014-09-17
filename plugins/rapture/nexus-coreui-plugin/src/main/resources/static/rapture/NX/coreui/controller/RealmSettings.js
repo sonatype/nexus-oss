@@ -76,20 +76,6 @@ Ext.define('NX.coreui.controller.RealmSettings', {
     });
   },
 
-  /**
-   * Unregister registered features.
-   */
-  onDestroy: function() {
-    var me = this;
-
-    me.getApplication().getFeaturesController().unregisterFeature([
-      {
-        mode: 'admin',
-        path: '/Security/Realms'
-      }
-    ]);
-  },
-
   loadRealmTypes: function () {
     var me = this,
         panel = me.getPanel();
