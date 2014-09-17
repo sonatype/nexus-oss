@@ -36,10 +36,11 @@ Ext.define('NX.view.header.Help', {
   initComponent: function () {
     var me = this,
         edition = NX.State.getValue('status')['edition'].toLowerCase(),
-        linkBase = 'http://links.sonatype.com/products/nexus/',
-        issuesUrl = linkBase + edition + '/issues',
-        manualUrl = linkBase + edition + '/docs',
-        supportUrl = linkBase + edition + '/support';
+        versionMajorMinor = '3.0', // FIXME: put version constant location, or parse from status.version?
+        manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + versionMajorMinor,
+        linkBase = 'http://links.sonatype.com/products/nexus/' + edition,
+        issuesUrl = linkBase + '/issues',
+        supportUrl = linkBase + '/support';
 
     me.menu = [
       { text: 'Feature', action: 'feature' },

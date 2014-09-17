@@ -28,11 +28,12 @@ Ext.define('NX.view.dev.Features', {
   columns: [
     { text: 'mode', dataIndex: 'mode', editor: 'textfield' },
     { text: 'path', dataIndex: 'path', editor: 'textfield', flex: 1 },
-    { text: 'bookmark', dataIndex: 'bookmark', editor: 'textfield' },
+    { text: 'bookmark', dataIndex: 'bookmark', editor: 'textfield', flex: 1 },
     { text: 'weight', dataIndex: 'weight', width: 80, editor: 'textfield' },
-    { text: 'view', dataIndex: 'view', editor: 'textfield' },
+    { text: 'view', dataIndex: 'view', editor: 'textfield', hidden: true },
+    { text: 'help keyword', dataIndex: 'helpKeyword', editor: 'textfield', flex: 1 },
+    { text: 'description', dataIndex: 'description', editor: 'textfield', flex: 1 },
     { text: 'iconName', dataIndex: 'iconName', editor: 'textfield' },
-    { text: 'description', dataIndex: 'description', editor: 'textfield' },
     {
       xtype: 'nx-iconcolumn',
       dataIndex: 'iconName',
