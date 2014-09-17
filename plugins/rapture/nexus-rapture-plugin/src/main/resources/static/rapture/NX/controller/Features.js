@@ -44,11 +44,15 @@ Ext.define('NX.controller.Features', {
   /**
    * Registers features.
    * @param {Array/Object} features to be registered
+   * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the features if owner is destroyed
    */
-  registerFeature: function (features) {
+  registerFeature: function (features, owner) {
     var me = this;
 
     if (features) {
+      if (owner) {
+        owner.on('destroy', Ext.pass(me.unregisterFeature, [features], me), me);
+      }
       Ext.each(Ext.Array.from(features), function (feature) {
         var clonedFeature = Ext.clone(feature),
             path;
