@@ -99,9 +99,10 @@ Ext.define('NX.coreui.controller.Outreach', {
             src: url,
             listeners: {
               load: function () {
+                var iframe = this;
                 // if the outreach content has loaded properly, show it
-                if (this.getWin().iframeLoaded) {
-                  this.show();
+                if (iframe.getWin().iframeLoaded) {
+                  iframe.show();
                 }
                 else {
                   // else complain and leave it hidden
