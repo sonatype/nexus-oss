@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>Index of ${requestPath}</title>
+  <title>INDEX $requestPath</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
   <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
@@ -25,8 +25,8 @@
 <body>
 
 <div class="nexus-content-message">
-  <img src="$nexusRoot/static/rapture/resources/icons/x32/nexus.png"/>
-  <span>Browse $requestPath</span>
+  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
+  <span>INDEX $requestPath</span>
 </div>
 
 <div class="nexus-content-browser">

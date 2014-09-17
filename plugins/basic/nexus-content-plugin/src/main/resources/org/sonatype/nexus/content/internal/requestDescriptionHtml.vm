@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>Description of request processing of $req.requestPath</title>
+  <title>DESCRIBE $req.requestPath</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
   <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
@@ -67,8 +67,8 @@
 <body>
 
 <div class="nexus-describe-message">
-  <img src="$nexusRoot/static/rapture/resources/icons/x32/nexus.png"/>
-  <span>Describe $req.requestPath</span>
+  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
+  <span>DESCRIBE $req.requestPath</span>
 </div>
 
 <div class="nexus-describe-detail">
