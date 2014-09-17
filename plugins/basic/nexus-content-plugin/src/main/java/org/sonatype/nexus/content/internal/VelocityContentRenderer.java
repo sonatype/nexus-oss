@@ -46,10 +46,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Iso8601Date;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -306,6 +308,10 @@ public class VelocityContentRenderer
 
     public Date getLastModified() {
       return lastModified;
+    }
+
+    public String getLastModifiedIso8601() {
+      return Iso8601Date.format(getLastModified());
     }
 
     public long getSize() {

@@ -49,12 +49,12 @@
         <td>
           <a href="$listItem.resourceUri">$listItem.name</a>
         </td>
-        <td>$listItem.lastModified</td>
+        <td>$listItem.lastModifiedIso8601</td>
         <td>
           #if ($listItem.collection)
             n/a
           #else
-            $listItem.size
+            $listItem.size bytes
           #end
         </td>
       </tr>
