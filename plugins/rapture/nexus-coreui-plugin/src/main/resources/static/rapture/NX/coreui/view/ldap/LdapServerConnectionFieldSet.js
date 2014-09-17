@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
 
   defaults: {
     xtype: 'textfield',
-    allowBlank: false
+    allowBlank: false,
+    bindGroup: 'connection'
   },
 
   items: [
