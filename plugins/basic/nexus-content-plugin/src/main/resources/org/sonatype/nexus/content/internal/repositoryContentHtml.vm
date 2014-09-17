@@ -39,7 +39,6 @@
       <th>Name</th>
       <th>Last Modified</th>
       <th>Size</th>
-      <th>Description</th>
     </tr>
     #foreach ($listItem in $listItems)
       #if ($listItem.collection)
@@ -58,7 +57,6 @@
             $listItem.size
           #end
         </td>
-        <td>$listItem.description</td>
       </tr>
     #end
   </table>
