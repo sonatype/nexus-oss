@@ -62,12 +62,12 @@ Ext.define('NX.Security', {
   },
 
   /**
-   * @see {@link NX.controller.User#logout}
+   * @see {@link NX.controller.User#signOut}
    */
-  logout: function () {
+  signOut: function () {
     var me = this;
     if (me.controller()) {
-      me.controller().logout();
+      me.controller().signOut();
     }
   }
 

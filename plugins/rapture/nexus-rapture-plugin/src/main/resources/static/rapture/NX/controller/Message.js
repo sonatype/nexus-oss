@@ -88,7 +88,7 @@ Ext.define('NX.controller.Message', {
     me.listen({
       controller: {
         '#User': {
-          logout: me.clearMessages
+          signout: me.clearMessages
         }
       },
       component: {

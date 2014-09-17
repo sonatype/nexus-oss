@@ -112,7 +112,7 @@ Ext.define('NX.controller.Menu', {
           navigate: me.navigateTo
         },
         '#User': {
-          logout: me.onLogout
+          signout: me.onSignOut
         }
       },
       component: {
@@ -282,7 +282,7 @@ Ext.define('NX.controller.Menu', {
     }
   },
 
-  onLogout: function () {
+  onSignOut: function () {
     var me = this;
     me.navigateToFirstFeature = true;
   },

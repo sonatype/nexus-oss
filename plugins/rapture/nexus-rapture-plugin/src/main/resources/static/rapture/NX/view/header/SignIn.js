@@ -13,13 +13,13 @@
 /*global Ext*/
 
 /**
- * Login button.
+ * Sign-in button.
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.Login', {
+Ext.define('NX.view.header.SignIn', {
   extend: 'Ext.button.Button',
-  alias: 'widget.nx-header-login',
+  alias: 'widget.nx-header-signin',
 
   text: 'Sign In',
   tooltip: 'Have an account?',

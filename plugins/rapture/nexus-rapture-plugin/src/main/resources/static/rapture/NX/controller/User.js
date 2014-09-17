@@ -29,31 +29,29 @@ Ext.define('NX.controller.User', {
   },
 
   views: [
-    'header.Login',
-    'header.Logout',
+    'header.SignIn',
+    'header.SignOut',
     'header.User',
     'Authenticate',
-    'Login'
+    'SignIn'
   ],
-
-  // TODO: normalize use of sign-in/out (replace log-in/out)
 
   refs: [
     {
-      ref: 'loginButton',
-      selector: 'nx-header-login'
+      ref: 'signInButton',
+      selector: 'nx-header-signin'
     },
     {
-      ref: 'logoutButton',
-      selector: 'nx-header-logout'
+      ref: 'signOutButton',
+      selector: 'nx-header-signout'
     },
     {
       ref: 'userButton',
       selector: 'nx-header-user-mode'
     },
     {
-      ref: 'login',
-      selector: 'nx-login'
+      ref: 'signIn',
+      selector: 'nx-signin'
     },
     {
       ref: 'authenticate',
@@ -81,14 +79,14 @@ Ext.define('NX.controller.User', {
         'nx-header-panel': {
           afterrender: me.manageButtons
         },
-        'nx-header-login': {
-          click: me.showLoginWindow
+        'nx-header-signin': {
+          click: me.showSignInWindow
         },
-        'nx-header-logout': {
-          click: me.logout
+        'nx-header-signout': {
+          click: me.signOut
         },
-        'nx-login button[action=login]': {
-          click: me.login
+        'nx-signin button[action=signin]': {
+          click: me.signIn
         },
         'nx-authenticate button[action=authenticate]': {
           click: me.doAuthenticateAction
@@ -98,17 +96,17 @@ Ext.define('NX.controller.User', {
 
     me.addEvents(
         /**
-         * @event login
+         * @event signin
          * Fires when a user had been successfully signed-in.
          * @param {Object} user
          */
-        'login',
+        'signin',
 
         /**
-         * @event logout
+         * @event signout
          * Fires when a user had been successfully signed-out.
          */
-        'logout'
+        'signout'
     );
   },
 
@@ -120,11 +118,11 @@ Ext.define('NX.controller.User', {
 
     if (user && !oldUser) {
       NX.Messages.add({text: 'User signed in: ' + user.id, type: 'default' });
-      me.fireEvent('login', user);
+      me.fireEvent('signin', user);
     }
     else if (!user && oldUser) {
       NX.Messages.add({text: 'User signed out', type: 'default' });
-      me.fireEvent('logout');
+      me.fireEvent('signout');
     }
 
     me.manageButtons();
@@ -142,7 +140,7 @@ Ext.define('NX.controller.User', {
 
   /**
    * @public
-   * Shows login or authentication window based on the fact that we have an user or not.
+   * Shows sign-in or authentication window based on the fact that we have an user or not.
    * @param {String} [message] Message to be shown in authentication window
    * @param {Object} [options] TODO
    */
@@ -153,7 +151,7 @@ Ext.define('NX.controller.User', {
       me.showAuthenticateWindow(message, Ext.apply(options || {}, { authenticateAction: me.authenticate }));
     }
     else {
-      me.showLoginWindow(options);
+      me.showSignInWindow(options);
     }
   },
 
@@ -173,14 +171,14 @@ Ext.define('NX.controller.User', {
 
   /**
    * @private
-   * Shows login window.
+   * Shows sign-in window.
    * @param {Object} [options] TODO
    */
-  showLoginWindow: function (options) {
+  showSignInWindow: function (options) {
     var me = this;
 
-    if (!me.getLogin()) {
-      me.getLoginView().create({ options: options });
+    if (!me.getSignIn()) {
+      me.getSignInView().create({ options: options });
     }
   },
 
@@ -207,7 +205,7 @@ Ext.define('NX.controller.User', {
   /**
    * @private
    */
-  login: function (button) {
+  signIn: function (button) {
     var me = this,
         win = button.up('window'),
         form = button.up('form'),
@@ -219,7 +217,7 @@ Ext.define('NX.controller.User', {
 
     win.getEl().mask('Signing in...');
 
-    NX.direct.rapture_Security.login(userName, userPass, values.remember === 'on', function (response) {
+    NX.direct.rapture_Security.signIn(userName, userPass, values.remember === 'on', function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.State.setUser(response.data);
@@ -301,12 +299,12 @@ Ext.define('NX.controller.User', {
   /**
    * @public
    */
-  logout: function () {
+  signOut: function () {
     var me = this;
 
     me.logDebug('Sign-out');
 
-    NX.direct.rapture_Security.logout(function (response) {
+    NX.direct.rapture_Security.signOut(function (response) {
       if (Ext.isObject(response) && response.success) {
         NX.State.setUser(undefined);
       }
@@ -316,22 +314,22 @@ Ext.define('NX.controller.User', {
   manageButtons: function () {
     var me = this,
         user = NX.State.getUser(),
-        loginButton = me.getLoginButton(),
-        logoutButton = me.getLogoutButton(),
+        signInButton = me.getSignInButton(),
+        signOutButton = me.getSignOutButton(),
         userButton = me.getUserButton();
 
-    if (loginButton) {
+    if (signInButton) {
       if (user) {
-        loginButton.hide();
+        signInButton.hide();
         userButton.setText(user.id);
         userButton.show();
-        logoutButton.show();
+        signOutButton.show();
       }
       else {
-        loginButton.show();
+        signInButton.show();
         userButton.setText('Not signed in');
         userButton.hide();
-        logoutButton.hide();
+        signOutButton.hide();
       }
     }
   }

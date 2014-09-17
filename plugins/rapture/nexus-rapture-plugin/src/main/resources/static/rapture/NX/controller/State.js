@@ -263,7 +263,7 @@ Ext.define('NX.controller.State', {
 
   /**
    * @private
-   * On login/logout update status interval.
+   * On sign-in/sign-out update status interval.
    */
   onUserChanged: function (user, oldUser) {
     var me = this,
