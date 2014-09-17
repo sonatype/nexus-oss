@@ -11,19 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
 <html>
-  <head>
-    <title>${statusCode} - ${statusName}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<head>
+  <title>ERROR $statusCode $statusName</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
-    <!--[if IE]>
-    <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
-    <![endif]-->
+  <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
+  <!--[if IE]>
+  <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
+  <![endif]-->
 
-    <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?${nexusVersion}" type="text/css" media="screen" title="no title" charset="utf-8">
-  </head>
-  <body>
-    <h1>${statusCode} - ${statusName}</h1>
-    <p>${errorDescription}</p>
-  </body>
+  <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
+</head>
+<body>
+<div class="nexus-error-message">
+  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
+  <span>ERROR $statusCode $statusName</span>
+</div>
+<div class="nexus-error-detail">
+  $errorDescription
+</div>
+</body>
 </html>

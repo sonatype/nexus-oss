@@ -1,4 +1,4 @@
-#*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -9,26 +9,38 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
- *###
-<html>
-<head>
-  <title>ERROR $statusCode $statusName</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+ */
 
-  <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
-  <!--[if IE]>
-  <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
-  <![endif]-->
+body {
+  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
 
-  <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
-</head>
-<body>
-<div class="nexus-error-message">
-  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
-  <span>ERROR $statusCode $statusName</span>
-</div>
-<div class="nexus-error-detail">
-  $errorDescription
-</div>
-</body>
-</html>
+.nexus-describe-message {
+  background-color: #2d3c69;
+  color: #ffffff;
+  padding: 10px;
+  font-size: larger;
+}
+
+.nexus-describe-message img,
+.nexus-describe-message span {
+  vertical-align: middle;
+}
+
+.nexus-describe-detail {
+  padding: 10px;
+}
+
+.nexus-describe-detail table {
+  border: 1px #999999;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.nexus-describe-detail table th {
+  background-color: #CCCCCC;
+}
+

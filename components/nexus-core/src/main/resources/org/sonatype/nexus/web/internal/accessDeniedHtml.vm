@@ -11,21 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  *###
 <html>
-  <head>
-    <title>Access Denied</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<head>
+  <title>ERROR: Access Denied</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
-    <!--[if IE]>
-    <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
-    <![endif]-->
+  <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
+  <!--[if IE]>
+  <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
+  <![endif]-->
 
-    <link rel="stylesheet" href="$nexusRoot/static/css/Sonatype-content.css?${nexusVersion}" type="text/css" media="screen" title="no title" charset="utf-8">
-  </head>
-  <body>
-    <h1>Access Denied</h1>
-    <p>
-      Please <a href="$nexusRoot">login</a> before attempting further requests.
-    </p>
-  </body>
+  <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
+</head>
+<body>
+<div class="nexus-error-message">
+  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
+  <span>ERROR: Access Denied</span>
+</div>
+<div class="nexus-error-detail">
+  Please <a href="$nexusRoot">sign-in</a> before attempting further requests.
+</div>
+</body>
 </html>
