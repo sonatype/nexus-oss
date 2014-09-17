@@ -35,11 +35,11 @@ Ext.define('NX.view.header.Help', {
    */
   initComponent: function () {
     var me = this,
-        edition = NX.State.getValue('status')['edition'].toLowerCase(),
-        linkBase = 'http://links.sonatype.com/products/nexus/',
-        issuesUrl = linkBase + edition + '/issues',
-        manualUrl = linkBase + edition + '/docs',
-        supportUrl = linkBase + edition + '/support';
+        edition = NX.State.getEdition(),
+        manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + NX.State.getVersionMajorMinor(),
+        linkBase = 'http://links.sonatype.com/products/nexus/' + edition,
+        issuesUrl = linkBase + '/issues',
+        supportUrl = linkBase + '/support';
 
     me.menu = [
       { text: 'Feature', action: 'feature' },

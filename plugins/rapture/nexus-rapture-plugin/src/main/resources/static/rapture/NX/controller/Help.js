@@ -21,7 +21,8 @@ Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.Icons',
-    'NX.Messages'
+    'NX.Messages',
+    'NX.Windows'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -38,6 +39,12 @@ Ext.define('NX.controller.Help', {
       selector: 'nx-header-help menuitem[action=feature]'
     }
   ],
+
+  /**
+   * @private
+   * @type {NX.model.Feature}
+   */
+  selectedFeature: undefined,
 
   /**
    * @override
@@ -88,6 +95,8 @@ Ext.define('NX.controller.Help', {
         iconName = feature.get('iconName'),
         featureHelp = me.getFeatureHelp();
 
+    me.selectedFeature = feature;
+
     featureHelp.setText('Help for: ' + text);
     featureHelp.setIconCls(NX.Icons.cls(iconName, 'x16'));
   },
@@ -96,8 +105,11 @@ Ext.define('NX.controller.Help', {
    * @private
    */
   onFeatureHelp: function() {
-    // TODO: redirect user to feature help page in book, for now just provide feedback this feature is not ready yet
-    NX.Messages.add({ text: 'Not yet implemented', type: 'warning' });
+    var me = this,
+        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/' + NX.State.getVersionMajorMinor(),
+        url = baseUrl + '/' + me.selectedFeature.get('helpKeyword');
+
+    NX.Windows.open(url);
   },
 
   /**

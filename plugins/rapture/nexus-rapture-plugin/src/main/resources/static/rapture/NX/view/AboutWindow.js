@@ -92,8 +92,8 @@ Ext.define('NX.view.AboutWindow', {
 
     // populate initial details
     me.down('#aboutInfo').showInfo({
-      'Version': NX.State.getValue('status')['version'],
-      'Edition': NX.State.getValue('status')['edition']
+      'Version': NX.State.getVersion(),
+      'Edition': NX.State.getEdition()
     });
   }
 
