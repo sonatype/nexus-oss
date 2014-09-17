@@ -19,8 +19,6 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.sonatype.nexus.log.LoggerLevel;
@@ -38,8 +36,6 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @since 2.7
  */
-@Singleton
-@Named
 public class LogbackOverrides
 {
 
