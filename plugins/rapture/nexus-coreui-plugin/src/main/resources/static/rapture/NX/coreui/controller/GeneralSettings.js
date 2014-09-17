@@ -45,7 +45,7 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
       visible: function () {
         return NX.Permissions.check('nexus:settings', 'read');
       }
-    });
+    }, me);
 
     me.listen({
       component: {

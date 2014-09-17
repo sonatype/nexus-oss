@@ -89,7 +89,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
           return NX.Permissions.check('nexus:repositories', 'read');
         }
       }
-    ]);
+    ], me);
 
     me.listen({
       controller: {

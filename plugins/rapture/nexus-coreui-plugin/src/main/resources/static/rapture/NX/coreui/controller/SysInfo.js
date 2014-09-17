@@ -58,7 +58,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
       visible: function () {
         return NX.Permissions.check('nexus:atlas', 'read');
       }
-    });
+    }, me);
 
     me.listen({
       controller: {

@@ -91,7 +91,7 @@ Ext.define('NX.coreui.controller.Search', {
       visible: function() {
         return NX.Permissions.check('nexus:repositories', 'read');
       }
-    });
+    }, me);
 
     me.getSearchFilterStore().each(function(model) {
       if (model.getId() === 'keyword') {
@@ -107,7 +107,7 @@ Ext.define('NX.coreui.controller.Search', {
           visible: function() {
             return NX.Permissions.check('nexus:repositories', 'read');
           }
-        });
+        }, me);
       }
       else {
         me.getApplication().getFeaturesController().registerFeature({
@@ -120,7 +120,7 @@ Ext.define('NX.coreui.controller.Search', {
           visible: function() {
             return NX.Permissions.check('nexus:repositories', 'read');
           }
-        });
+        }, me);
       }
     });
 
@@ -493,7 +493,7 @@ Ext.define('NX.coreui.controller.Search', {
       iconName: 'search-saved',
       description: model.get('description'),
       authenticationRequired: false
-    });
+    }, me);
 
     me.getController('Menu').refreshTree();
     NX.Bookmarks.navigateTo(NX.Bookmarks.fromToken('browse/search/saved/' + model.get('name')));

@@ -102,7 +102,7 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
         visible: function () {
           return NX.Permissions.check('nexus:artifact', 'create');
         }
-      });
+      }, me);
       shouldRefreshMenu = true;
     }
     if (!avoidMenuRefresh && shouldRefreshMenu) {
