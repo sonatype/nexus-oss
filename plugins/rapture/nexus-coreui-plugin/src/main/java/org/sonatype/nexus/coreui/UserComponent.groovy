@@ -279,8 +279,8 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:users:delete')
   @Validate
-  void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
-               final @NotEmpty(message = '[source] may not be empty') String source)
+  void remove(final @NotEmpty(message = '[id] may not be empty') String id,
+              final @NotEmpty(message = '[source] may not be empty') String source)
   {
     // TODO check if source is required or we always delete from default realm
     if (isAnonymousUser(id)) {

@@ -139,8 +139,8 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void delete_(final @NotEmpty(message = '[id] may not be empty') String id,
-               final String path)
+  void remove(final @NotEmpty(message = '[id] may not be empty') String id,
+              final String path)
   {
     protectedRepositoryRegistry.getRepository(id).deleteItem(new ResourceStoreRequest(path, true))
     log.info "Storage item(s) on path \"${path}\" (and below) were deleted from repository [${id}]"

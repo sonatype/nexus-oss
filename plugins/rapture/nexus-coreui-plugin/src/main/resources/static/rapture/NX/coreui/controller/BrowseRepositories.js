@@ -543,7 +543,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         'Delete Repository Item',
         'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
         function() {
-          NX.direct.coreui_RepositoryStorage.delete_(repository.getId(), path, function(response) {
+          NX.direct.coreui_RepositoryStorage.remove(repository.getId(), path, function(response) {
             if (Ext.isObject(response) && response.success) {
               node.parentNode.removeChild(node);
               NX.Messages.add({

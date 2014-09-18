@@ -261,7 +261,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.ldap_LdapServer.delete_(model.getId(), function(response) {
+    NX.direct.ldap_LdapServer.remove(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'LDAP server deleted: ' + description, type: 'success' });

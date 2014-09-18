@@ -126,7 +126,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:routes:delete')
   @Validate
-  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
     if (repositoryMapper.removeMapping(id)) {
       nexusConfiguration.saveConfiguration()
     }
