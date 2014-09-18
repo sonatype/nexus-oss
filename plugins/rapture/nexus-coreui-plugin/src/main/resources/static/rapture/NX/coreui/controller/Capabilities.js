@@ -460,7 +460,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.capability_Capability.delete_(model.getId(), function(response) {
+    NX.direct.capability_Capability.remove(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({

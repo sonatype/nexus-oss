@@ -251,7 +251,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         model = form.getRecord(),
         description = me.getDescription(model);
 
-    NX.direct.ssl_TrustStore.delete_(model.getId(), function (response) {
+    NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
         me.loadStore();
@@ -270,7 +270,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     var me = this,
         description = me.getDescription(model);
 
-    NX.direct.ssl_TrustStore.delete_(model.getId(), function (response) {
+    NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
