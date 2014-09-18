@@ -22,6 +22,7 @@ Ext.define('NX.view.info.Panel', {
   alias: 'widget.nx-info-panel',
 
   title: 'Summary',
+  autoScroll: true,
 
   items: {
     xtype: 'nx-info'

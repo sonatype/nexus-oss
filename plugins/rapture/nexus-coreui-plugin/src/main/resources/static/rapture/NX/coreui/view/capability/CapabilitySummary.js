@@ -25,6 +25,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   ],
 
   title: 'Summary',
+  autoScroll: true,
 
   /**
    * @override
