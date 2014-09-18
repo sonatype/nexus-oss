@@ -17,6 +17,8 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Update
 
+import javax.validation.constraints.NotNull
+
 import static org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType
 
 /**
@@ -34,7 +36,7 @@ class RepositoryRouteXO
   @NotEmpty
   String pattern
 
-  @NotEmpty
+  @NotNull
   MappingType mappingType
 
   @NotEmpty
