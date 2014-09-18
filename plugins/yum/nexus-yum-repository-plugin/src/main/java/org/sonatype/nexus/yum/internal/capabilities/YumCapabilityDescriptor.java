@@ -115,6 +115,11 @@ public class YumCapabilityDescriptor
   }
 
   @Override
+  protected String renderAbout() throws Exception {
+    return render(TYPE_ID + "-about.vm");
+  }
+
+  @Override
   public Set<Tag> getTags() {
     return tags(categoryTag("Yum"));
   }
