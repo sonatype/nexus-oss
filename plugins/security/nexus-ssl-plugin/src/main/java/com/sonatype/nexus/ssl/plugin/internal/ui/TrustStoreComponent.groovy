@@ -73,7 +73,7 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void deleteEntity(final @NotEmpty(message = '[id] may not be empty') String id) {
     trustStoreResource.delete(id)
   }
 

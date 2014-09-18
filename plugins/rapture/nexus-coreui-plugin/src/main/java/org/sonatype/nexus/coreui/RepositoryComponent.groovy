@@ -377,7 +377,7 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('nexus:repositories:delete')
   @Validate
-  void delete_(final @NotEmpty(message = '[id] may not be empty') String id) {
+  void deleteEntity(final @NotEmpty(message = '[id] may not be empty') String id) {
     protectedRepositoryRegistry.removeRepository(id)
   }
 
