@@ -49,7 +49,6 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.core.storage.OStorage.CLUSTER_TYPE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
@@ -232,7 +231,7 @@ public class DefaultTimeline
         new DateMidnight(timestamp, DateTimeZone.UTC).toString("YYYYMMdd"));
     int cid = db.getClusterIdByName(name); // undocumented: if cluster not exists, returns -1
     if (cid == -1) {
-      cid = db.addCluster(name, CLUSTER_TYPE.PHYSICAL);
+      cid = db.addCluster(name);
       final OSchema schema = db.getMetadata().getSchema();
       final OClass type = schema.getClass(DB_CLASS);
       type.addClusterId(cid);
