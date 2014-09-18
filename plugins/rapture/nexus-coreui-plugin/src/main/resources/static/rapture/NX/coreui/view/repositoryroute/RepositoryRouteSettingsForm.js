@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:routes', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:routes', 'update');
 
     me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function(store) {

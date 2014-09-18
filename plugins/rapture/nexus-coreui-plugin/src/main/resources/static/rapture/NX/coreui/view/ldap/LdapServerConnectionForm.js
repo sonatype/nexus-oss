@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('security:ldapconfig', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('security:ldapconfig', 'update');
 
     me.callParent(arguments);
 

@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:targets', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:targets', 'update');
 
     me.items = [
       {

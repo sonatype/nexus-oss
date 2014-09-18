@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('security:ldapconfig', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('security:ldapconfig', 'update');
 
     me.callParent(arguments);
 

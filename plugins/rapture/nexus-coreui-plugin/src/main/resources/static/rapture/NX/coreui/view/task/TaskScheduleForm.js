@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:tasks', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:tasks', 'update');
 
     me.callParent(arguments);
 

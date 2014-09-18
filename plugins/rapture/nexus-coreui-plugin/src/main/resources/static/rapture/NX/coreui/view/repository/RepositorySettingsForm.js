@@ -33,7 +33,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
   initComponent: function() {
     var me = this;
 
-    me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'update');
+    me.editableCondition = me.editableCondition || NX.Conditions.isPermitted('nexus:repositories', 'update');
 
     me.items = me.items || [];
     Ext.Array.insert(me.items, 0, [
