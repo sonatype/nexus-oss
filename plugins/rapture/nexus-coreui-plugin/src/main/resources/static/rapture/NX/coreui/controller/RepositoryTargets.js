@@ -47,10 +47,6 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
       selector: 'nx-coreui-repositorytarget-list'
     },
     {
-      ref: 'info',
-      selector: 'nx-coreui-repositorytarget-feature nx-info-panel'
-    },
-    {
       ref: 'settings',
       selector: 'nx-coreui-repositorytarget-feature nx-coreui-repositorytarget-settings'
     }
