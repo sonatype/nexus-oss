@@ -91,7 +91,7 @@ public class NexusBundleTracker
     if (wires != null) {
       for (BundleWire wire : wires) {
         try {
-          final Bundle dependency = wire.getCapability().getRevision().getBundle();
+          final Bundle dependency = wire.getProviderWiring().getBundle();
           if (visited.add(dependency.getSymbolicName()) && hasComponents(dependency)) {
             if (!live(dependency)) {
               dependency.start();
