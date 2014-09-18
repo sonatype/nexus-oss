@@ -162,7 +162,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
                 + ' minutes',
             type: 'warning'
           });
-          NX.Security.logout();
+          NX.Security.signOut();
         }
       },
       interval: 1000,

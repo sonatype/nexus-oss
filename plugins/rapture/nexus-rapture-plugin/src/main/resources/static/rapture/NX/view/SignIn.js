@@ -13,13 +13,13 @@
 /*global Ext*/
 
 /**
- * Login window.
+ * Sign-in window.
  *
  * @since 3.0
  */
-Ext.define('NX.view.Login', {
+Ext.define('NX.view.SignIn', {
   extend: 'Ext.window.Window',
-  alias: 'widget.nx-login',
+  alias: 'widget.nx-signin',
 
   title: 'Sign In',
 
@@ -74,7 +74,7 @@ Ext.define('NX.view.Login', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Sign In', action: 'login', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: 'Sign In', action: 'signin', formBind: true, bindToEnter: true, ui: 'primary' },
           { text: 'Cancel', handler: me.close, scope: me }
         ]
       }

@@ -13,13 +13,13 @@
 /*global Ext*/
 
 /**
- * Logout button.
+ * Sign-out button.
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.Logout', {
+Ext.define('NX.view.header.SignOut', {
   extend: 'Ext.button.Button',
-  alias: 'widget.nx-header-logout',
+  alias: 'widget.nx-header-signout',
 
   tooltip: "Sign out",
 

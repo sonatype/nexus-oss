@@ -94,14 +94,14 @@ public class SecurityComponent
     if (subject != null) {
       rememberMe = subject.isRemembered();
     }
-    return login(base64Username, base64Password, rememberMe);
+    return signIn(base64Username, base64Password, rememberMe);
   }
 
   @DirectMethod
   @Validate
-  public UserXO login(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
-                      final @NotEmpty(message = "[base64Password] may not be empty") String base64Password,
-                      final boolean rememberMe) throws Exception
+  public UserXO signIn(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
+                       final @NotEmpty(message = "[base64Password] may not be empty") String base64Password,
+                       final boolean rememberMe) throws Exception
   {
     try {
       securitySystem.login(new UsernamePasswordToken(
@@ -115,7 +115,7 @@ public class SecurityComponent
   }
 
   @DirectMethod
-  public void logout() {
+  public void signOut() {
     Subject subject = securitySystem.getSubject();
 
     if (subject != null) {
