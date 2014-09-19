@@ -36,6 +36,7 @@ Ext.define('NX.view.header.Help', {
     me.menu = [
       {
         text: 'Feature',
+        // iconCls is dynamic
         action: 'feature'
       },
       '-',
