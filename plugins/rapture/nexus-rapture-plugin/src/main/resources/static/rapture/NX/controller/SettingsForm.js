@@ -49,6 +49,9 @@ Ext.define('NX.controller.SettingsForm', {
         },
         'form[settingsForm=true][settingsFormSubmit=true] button[action=save]': {
           click: me.submitForm
+        },
+        'form[settingsForm=true] field[bindGroup]': {
+          validitychange: me.updateEnableState
         }
       }
     });
@@ -155,6 +158,40 @@ Ext.define('NX.controller.SettingsForm', {
             scope: form
           }
       );
+    }
+  },
+
+  /**
+   * @private
+   * Enable/Disable components marked with a "groupBind" property by checking that all fields marked with "bindGroup"
+   * that matches, are valid.
+   * @param {Ext.form.field.Base} field a field with a "bindGroup" property. "bindGroup" can be a space separated list of
+   * groups
+   */
+  updateEnableState: function(field) {
+    var form = field.up('form');
+
+    if (Ext.isString(field['bindGroup'])) {
+      Ext.Array.each(field['bindGroup'].split(' '), function(group) {
+        var bindables = form.query('component[groupBind=' + group + ']'),
+            validatables = form.query('field[bindGroup~=' + group + ']'),
+            enabled;
+
+        Ext.Array.each(bindables, function(bindable) {
+          if (!Ext.isDefined(enabled)) {
+            enabled = true;
+            Ext.Array.each(validatables, function(validatable) {
+              return enabled = validatable.isValid();
+            });
+          }
+          if (enabled) {
+            bindable.enable();
+          }
+          else {
+            bindable.disable()
+          }
+        });
+      });
     }
   }
 

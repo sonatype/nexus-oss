@@ -14,6 +14,8 @@ package com.sonatype.nexus.ldap.internal.ui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.extdirect.model.Password
+import org.sonatype.nexus.validation.Update
 
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
@@ -25,72 +27,58 @@ import javax.validation.constraints.NotNull
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
-class LdapServerXO
-extends LdapServerConnectionXO
+class LdapServerConnectionXO
 {
+  @NotEmpty(groups = Update)
+  String id
 
-  Boolean backupMirrorEnabled
+  Integer order
 
-  @NotNull(groups = BackupMirror)
-  Protocol backupMirrorProtocol
+  @NotEmpty
+  String name
+  String url
 
-  @NotEmpty(groups = BackupMirror)
-  String backupMirrorHost
+  @NotNull
+  Protocol protocol
+  Boolean useTrustStore
 
-  @NotNull(groups = BackupMirror)
+  @NotEmpty
+  String host
+
+  @NotNull
   @Min(1L)
   @Max(65535L)
-  Integer backupMirrorPort
-
-  String userBaseDn
-  Boolean userSubtree
+  Integer port
 
   @NotEmpty
-  String userObjectClass
-
-  String userLdapFilter
+  String searchBase
 
   @NotEmpty
-  String userIdAttribute
+  String authScheme
 
-  @NotEmpty
-  String userRealNameAttribute
+  String authRealm
 
-  @NotEmpty
-  String userEmailAddressAttribute
+  @NotEmpty(groups = AuthScheme)
+  String authUsername
 
-  String userPasswordAttribute
+  @NotNull(groups = AuthScheme)
+  Password authPassword
 
-  Boolean ldapGroupsAsRoles
+  @Min(0L)
+  Integer connectionTimeout
 
-  String groupType
+  @Min(0L)
+  Integer connectionRetryDelay
 
-  String groupBaseDn
+  @Min(0L)
+  Integer cacheTimeout
 
-  Boolean groupSubtree
 
-  @NotEmpty(groups = GroupStatic)
-  String groupObjectClass
+  public static enum Protocol {
+    ldap, ldaps
+  }
 
-  @NotEmpty(groups = GroupStatic)
-  String groupIdAttribute
-
-  @NotEmpty(groups = GroupStatic)
-  String groupMemberAttribute
-
-  @NotEmpty(groups = GroupStatic)
-  String groupMemberFormat
-
-  @NotEmpty(groups = GroupStatic)
-  String userMemberOfAttribute
-
-  public interface BackupMirror
-  {}
-
-  public interface GroupDynamic
-  {}
-
-  public interface GroupStatic
+  public interface AuthScheme
   {}
 
 }

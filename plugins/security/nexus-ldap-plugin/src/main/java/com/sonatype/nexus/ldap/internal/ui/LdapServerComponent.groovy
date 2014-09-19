@@ -168,17 +168,17 @@ extends DirectComponentSupport
   @RequiresAuthentication
   @RequiresPermissions('security:ldapconfig:update')
   @Validate
-  void verifyConnection(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
+  void verifyConnection(final @NotNull(message = '[ldapServerConnectionXO] may not be null') @Valid LdapServerConnectionXO ldapServerConnectionXO) {
     String authPassword = null
-    if (ldapServerXO.id) {
-      CLdapServerConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
+    if (ldapServerConnectionXO.id) {
+      CLdapServerConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerConnectionXO.id)
       if (!existing) {
-        throw new IllegalArgumentException('LDAP server with id "' + ldapServerXO.id + '" not found')
+        throw new IllegalArgumentException('LDAP server with id "' + ldapServerConnectionXO.id + '" not found')
       }
       authPassword = existing.connectionInfo.systemPassword
     }
     try {
-      ldapConnectionTester.testConnection(buildLdapContextFactory(ldapServerXO, authPassword))
+      ldapConnectionTester.testConnection(buildLdapContextFactory(validate(ldapServerConnectionXO), authPassword))
     }
     catch (Exception e) {
       throw new Exception(buildReason('Failed to connect to LDAP Server', e))
@@ -366,10 +366,15 @@ extends DirectComponentSupport
     )
   }
 
-  LdapServerXO validate(final LdapServerXO ldapServerXO) {
-    if (ldapServerXO.authScheme != 'none') {
-      validator.validate(ldapServerXO, LdapServerXO.AuthScheme)
+  LdapServerConnectionXO validate(final LdapServerConnectionXO ldapServerConnectionXO) {
+    if (ldapServerConnectionXO.authScheme != 'none') {
+      validator.validate(ldapServerConnectionXO, LdapServerConnectionXO.AuthScheme)
     }
+    return ldapServerConnectionXO
+  }
+
+  LdapServerXO validate(final LdapServerXO ldapServerXO) {
+    validate(ldapServerXO as LdapServerConnectionXO)
     if (ldapServerXO.backupMirrorEnabled) {
       validator.validate(ldapServerXO, LdapServerXO.BackupMirror)
     }
@@ -379,20 +384,20 @@ extends DirectComponentSupport
     return ldapServerXO
   }
 
-  private LdapContextFactory buildLdapContextFactory(final LdapServerXO ldapServerXO, final String authPassword) {
+  private LdapContextFactory buildLdapContextFactory(final LdapServerConnectionXO ldapServerConnectionXO, final String authPassword) {
     DefaultLdapContextFactory ldapContextFactory = new DefaultLdapContextFactory(
-        authentication: ldapServerXO.authScheme,
-        searchBase: ldapServerXO.searchBase,
-        systemUsername: ldapServerXO.authUsername,
-        systemPassword: ldapServerXO.authPassword?.valueIfValid ?: authPassword,
-        url: new LdapURL(ldapServerXO.protocol.toString(), ldapServerXO.host, ldapServerXO.port, ldapServerXO.searchBase)
+        authentication: ldapServerConnectionXO.authScheme,
+        searchBase: ldapServerConnectionXO.searchBase,
+        systemUsername: ldapServerConnectionXO.authUsername,
+        systemPassword: ldapServerConnectionXO.authPassword?.valueIfValid ?: authPassword,
+        url: new LdapURL(ldapServerConnectionXO.protocol.toString(), ldapServerConnectionXO.host, ldapServerConnectionXO.port, ldapServerConnectionXO.searchBase)
     )
-    if (ldapServerXO.protocol == LdapServerXO.Protocol.ldaps && ldapServerXO.useTrustStore) {
+    if (ldapServerConnectionXO.protocol == LdapServerConnectionXO.Protocol.ldaps && ldapServerConnectionXO.useTrustStore) {
       final SSLContext sslContext = trustStore.getSSLContext()
-      log.debug "Using Nexus SSL Trust Store for accessing ${ldapServerXO.host}:${ldapServerXO.port}"
+      log.debug "Using Nexus SSL Trust Store for accessing ${ldapServerConnectionXO.host}:${ldapServerConnectionXO.port}"
       return new SSLLdapContextFactory(sslContext, ldapContextFactory)
     }
-    log.debug "Using JVM Trust Store for accessing ${ldapServerXO.host}:${ldapServerXO.port}"
+    log.debug "Using JVM Trust Store for accessing ${ldapServerConnectionXO.host}:${ldapServerConnectionXO.port}"
     return ldapContextFactory
   }
 

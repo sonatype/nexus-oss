@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
     me.callParent(arguments);
 
     me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: 'Verify connection', formBind: true, action: 'verifyconnection' },
+        { xtype: 'button', text: 'Verify connection', groupBind: 'connection', action: 'verifyconnection' },
         { xtype: 'button', text: 'Verify user mapping', formBind: true, action: 'verifyusermapping' },
         { xtype: 'button', text: 'Verify login', formBind: true, action: 'verifylogin' }
     );
