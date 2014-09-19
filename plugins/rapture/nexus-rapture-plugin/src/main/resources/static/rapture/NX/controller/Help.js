@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Header help controller.
+ * Help controller.
  *
  * @since 3.0
  */
