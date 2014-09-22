@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.capability.support.WithoutConfiguration.WITHOUT_CONFIGURATION;
 
 /**
- * Rapture Settings capability.
+ * Force Base URL capability.
  *
  * @since 3.0
  */
