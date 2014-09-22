@@ -24,5 +24,4 @@ import groovy.transform.ToString
 class GeneralSettingsXO
 {
   String baseUrl
-  Boolean forceBaseUrl
 }
