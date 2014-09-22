@@ -23,10 +23,10 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.StringUtils;
-import org.restlet.data.Request;
 
 @Named
 @Singleton
@@ -71,26 +71,14 @@ public class RestletRepositoryURLBuilder
 
   @Override
   public String getRepositoryContentUrl(final Repository repository, final boolean forceBaseURL) {
-    final boolean shouldForceBaseUrl = forceBaseURL ||
-        (globalRestApiSettings.isEnabled()
-            && globalRestApiSettings.isForceBaseUrl()
-            && StringUtils.isNotBlank(globalRestApiSettings.getBaseUrl())
-        );
-
     String baseURL;
 
     // if force, always use force
-    if (shouldForceBaseUrl) {
+    if (forceBaseURL) {
       baseURL = globalRestApiSettings.isEnabled() ? globalRestApiSettings.getBaseUrl() : null;
     }
-    // next check if this thread has a restlet request
-    else if (Request.getCurrent() != null) {
-      // TODO: NEXUS-6045 hack, Restlet app root is now "/service/local", so going up 2 levels!
-      baseURL = Request.getCurrent().getRootRef().getParentRef().getParentRef().toString();
-    }
-    // as last resort, try to use the baseURL if set
     else {
-      baseURL = globalRestApiSettings.getBaseUrl();
+      baseURL = BaseUrlHolder.get();
     }
 
     // if all else fails?

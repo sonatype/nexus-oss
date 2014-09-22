@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 public class BaseUrlHolderFilter
-  implements Filter
+    implements Filter
 {
   private final GlobalRestApiSettings settings;
 
@@ -84,18 +85,28 @@ public class BaseUrlHolderFilter
       buff.append(settings.getBaseUrl());
     }
     else {
-      String requestUrl = request.getRequestURL().toString();
-      String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
+      String xForwardedProto = request.getHeader("X-Forwarded-Proto");
+      if (xForwardedProto != null) {
+        buff.append(xForwardedProto);
       }
-
-      String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
+      else {
+        String requestUrl = request.getRequestURL().toString();
+        buff.append(requestUrl.substring(0, requestUrl.indexOf(":")));
       }
+      buff.append("://");
 
-      buff.append(requestUrl);
+      String xForwardedHost = request.getHeader("X-Forwarded-Host");
+      if (xForwardedHost != null) {
+        // X-Forwarded-Host can be a comma separated list of hosts if request passed through more proxies
+        if (xForwardedHost.contains(",")) {
+          xForwardedHost = xForwardedHost.substring(0, xForwardedHost.indexOf(","));
+        }
+        buff.append(xForwardedHost);
+      }
+      else {
+        buff.append(request.getHeader("Host"));
+      }
+      buff.append("/");
     }
 
     return buff.toString();
