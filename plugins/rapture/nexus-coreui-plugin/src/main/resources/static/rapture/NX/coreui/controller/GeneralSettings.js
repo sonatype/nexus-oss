@@ -46,30 +46,6 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
         return NX.Permissions.check('nexus:settings', 'read');
       }
     }, me);
-
-    me.listen({
-      component: {
-        'nx-coreui-system-general-settings #baseUrl': {
-          change: me.onBaseUrlChange
-        }
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Enables force base URL if base url is set.
-   */
-  onBaseUrlChange: function (baseUrl) {
-    var forceBaseUrl = baseUrl.up('form').down('#forceBaseUrl');
-
-    if (!baseUrl.getValue()) {
-      forceBaseUrl.setValue(false);
-      forceBaseUrl.disable();
-    }
-    else if (forceBaseUrl.isDisabled()) {
-      forceBaseUrl.enable();
-    }
   }
 
 });

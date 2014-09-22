@@ -57,8 +57,7 @@ extends DirectComponentSupport
   @RequiresPermissions('nexus:settings:read')
   GeneralSettingsXO read() {
     return new GeneralSettingsXO(
-        baseUrl: globalRestApiSettings.baseUrl,
-        forceBaseUrl: globalRestApiSettings.forceBaseUrl
+        baseUrl: globalRestApiSettings.baseUrl
     )
   }
 
@@ -72,7 +71,6 @@ extends DirectComponentSupport
   GeneralSettingsXO update(final @NotNull(message = '[generalSettings] may not be null') @Valid GeneralSettingsXO generalSettingsXO) {
     validate(generalSettingsXO)
     globalRestApiSettings.baseUrl = generalSettingsXO.baseUrl
-    globalRestApiSettings.forceBaseUrl = StringUtils.isBlank(generalSettingsXO.baseUrl) ? false : generalSettingsXO.forceBaseUrl
     nexusConfiguration.saveConfiguration()
     return read()
   }

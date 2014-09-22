@@ -56,18 +56,6 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
             allowBlank: true,
             vtype: 'url',
             emptyText: NX.util.Url.baseUrl
-          },
-          {
-            xtype: 'label',
-            html: '<p>Optionally force the base URL which will be used by all server responses.</p>' +
-                '<p>This is an advanced feature and only is applicable to rare cases.  Improper usage of this setting could negatively impact users of the system.</p>'
-          },
-          {
-            xtype: 'checkbox',
-            name: 'forceBaseUrl',
-            itemId: 'forceBaseUrl',
-            boxLabel: 'Force base URL',
-            disabled: true
           }
         ]
       }
