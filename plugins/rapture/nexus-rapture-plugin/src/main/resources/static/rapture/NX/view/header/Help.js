@@ -35,35 +35,47 @@ Ext.define('NX.view.header.Help', {
 
     me.menu = [
       {
-        text: 'Feature',
-        // iconCls is dynamic
+        // text and iconCls is dynamic
+        tooltip: 'Help and documentation for the currently selected feature',
         action: 'feature'
       },
       '-',
       {
         text: 'About',
         iconCls: 'nx-icon-nexus-x16',
+        tooltip: 'About Sonatype Nexus',
         action: 'about'
       },
       {
         text: 'Documentation',
         iconCls: 'nx-icon-help-manual-x16',
+        tooltip: 'Sonatype Nexus product documentation',
         action: 'docs'
+      },
+      {
+        text: 'Knowledge Base',
+        iconCls: 'nx-icon-help-kb-x16',
+        tooltip: 'Sonatype Nexus knowledge base',
+        action: 'kb'
       },
       {
         text: 'Community',
         iconCls: 'nx-icon-help-community-x16',
+        tooltip: 'Sonatype Nexus community information',
         action: 'community'
-      },
-      {
-        text: 'Support',
-        iconCls: 'nx-icon-help-support-x16',
-        action: 'support'
       },
       {
         text: 'Issue Tracker',
         iconCls: 'nx-icon-help-issues-x16',
+        tooltip: 'Sonatype Nexus issue and bug tracker',
         action: 'issues'
+      },
+      '-',
+      {
+        text: 'Support',
+        iconCls: 'nx-icon-help-support-x16',
+        tooltip: 'Sonatype Nexus product support',
+        action: 'support'
       }
     ];
 

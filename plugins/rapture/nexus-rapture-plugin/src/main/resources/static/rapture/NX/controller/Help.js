@@ -43,7 +43,7 @@ Ext.define('NX.controller.Help', {
   /**
    * @private
    */
-  baseUrl: 'http://links.sonatype.com/products/nexus/',
+  baseUrl: 'http://links.sonatype.com/products/nexus',
 
   /**
    * @private
@@ -73,6 +73,10 @@ Ext.define('NX.controller.Help', {
       'help-community': {
         file: 'users_4.png',
         variants: ['x16', 'x32']
+      },
+      'help-kb': {
+        file: 'brain_trainer.png',
+        variants: ['x16', 'x32']
       }
     });
 
@@ -100,6 +104,9 @@ Ext.define('NX.controller.Help', {
         },
         'nx-header-help menuitem[action=community]': {
           click: me.onCommunity
+        },
+        'nx-header-help menuitem[action=kb]': {
+          click: me.onKnowledgeBase
         }
       }
     });
@@ -124,13 +131,21 @@ Ext.define('NX.controller.Help', {
 
   /**
    * @private
+   * @param {String} section
+   */
+  openUrl: function(section) {
+    NX.Windows.open(this.baseUrl + '/' + section);
+  },
+
+  /**
+   * @private
    */
   onFeatureHelp: function() {
     var me = this,
         keyword = me.selectedFeature.get('helpKeyword'),
-        url = me.baseUrl + 'docs-search/' + NX.State.getVersionMajorMinor() + '/' + keyword;
+        url = me.baseUrl + '/docs-search/' + NX.State.getVersionMajorMinor() + '/' + keyword;
 
-    NX.Windows.open(url);
+    NX.Windows.openUrl(url);
   },
 
   /**
@@ -144,27 +159,34 @@ Ext.define('NX.controller.Help', {
    * @private
    */
   onDocs: function() {
-    NX.Windows.open(this.baseUrl + 'docs/' + NX.State.getVersionMajorMinor());
+    NX.Windows.open(this.baseUrl + '/docs/' + NX.State.getVersionMajorMinor());
   },
 
   /**
    * @private
    */
   onSupport: function() {
-    NX.Windows.open(this.baseUrl + NX.State.getEdition().toLowerCase() + '/support');
+    this.openUrl('support');
   },
 
   /**
    * @private
    */
   onIssues: function() {
-    NX.Windows.open(this.baseUrl + NX.State.getEdition().toLowerCase() + '/issues');
+    this.openUrl('issues');
   },
 
   /**
    * @private
    */
   onCommunity: function() {
-    NX.Windows.open('http://links.sonatype.com/products/nexus/community');
+    this.openUrl('community');
+  },
+
+  /**
+   * @private
+   */
+  onKnowledgeBase: function() {
+    this.openUrl('kb');
   }
 });
