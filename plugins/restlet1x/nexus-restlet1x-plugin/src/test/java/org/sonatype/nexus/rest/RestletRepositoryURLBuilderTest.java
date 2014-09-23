@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.web.BaseUrlHolder;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -160,16 +161,13 @@ public class RestletRepositoryURLBuilderTest
   public void testBaseUrlGlobalRequest()
       throws Exception
   {
-    // NEXUS-6045: Restlet1x request cannot come in from anywhere else than /service/local anymore
-    String restletBaseURL = "http://from/request/service/local";
-
     Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
     Mockito.doReturn(false).when(globalRestApiSettings).isForceBaseUrl();
     Mockito.doReturn(GLOBAL_BASE_URL).when(globalRestApiSettings).getBaseUrl();
 
     try {
+      BaseUrlHolder.set("http://from/request/");
       Request request = new Request();
-      request.setRootRef(new Reference(restletBaseURL));
       Response response = new Response(request);
       Response.setCurrent(response);
 
@@ -182,6 +180,7 @@ public class RestletRepositoryURLBuilderTest
     }
     finally {
       Response.setCurrent(null);
+      BaseUrlHolder.unset();
     }
   }
 
