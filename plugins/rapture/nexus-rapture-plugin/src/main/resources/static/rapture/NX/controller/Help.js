@@ -165,7 +165,6 @@ Ext.define('NX.controller.Help', {
    * @private
    */
   onCommunity: function() {
-    // FIXME: Replace with links.sonatype.com
-    NX.Windows.open('http://www.sonatype.org/nexus/participate');
+    NX.Windows.open('http://links.sonatype.com/products/nexus/community');
   }
 });
