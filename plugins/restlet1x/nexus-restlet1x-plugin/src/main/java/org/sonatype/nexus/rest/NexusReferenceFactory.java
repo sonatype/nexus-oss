@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.rest;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.DefaultReferenceFactory;
 
-import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 
@@ -30,32 +28,10 @@ import static com.google.common.base.Preconditions.checkState;
 public class NexusReferenceFactory
     extends DefaultReferenceFactory
 {
-  private final GlobalRestApiSettings globalRestApiSettings;
-
-  @Inject
-  public NexusReferenceFactory(final GlobalRestApiSettings globalRestApiSettings) {
-    this.globalRestApiSettings = globalRestApiSettings;
-  }
 
   @Override
   public Reference getContextRoot(Request request) {
-    Reference result = null;
-
-    if (globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-        && StringUtils.isNotEmpty(globalRestApiSettings.getBaseUrl())) {
-      result = new Reference(globalRestApiSettings.getBaseUrl());
-    }
-    else {
-      // TODO: NEXUS-6045 hack, Restlet app root is now "/service/local", so going up 2 levels!
-      result = request.getRootRef().getParentRef().getParentRef();
-    }
-
-    // fix for when restlet is at webapp root
-    if (StringUtils.isEmpty(result.getPath())) {
-      result.setPath("/");
-    }
-
-    return result;
+    return new Reference(BaseUrlHolder.get());
   }
 
   /**

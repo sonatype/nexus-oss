@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.maven.routing.internal.ManagerImpl;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RoutingStatusMessageWrapper;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import org.junit.Before;
@@ -76,8 +77,8 @@ public class RoutingStatusResourceTest
         RoutingStatusResource.class.getName());
     waitForRoutingBackgroundUpdates();
 
+    BaseUrlHolder.set("http://localhost:8081/");
     final Request request = new Request();
-    request.setRootRef(new Reference("http://localhost:8081/nexus"));
     request.getAttributes().put(RoutingResourceSupport.REPOSITORY_ID_KEY, REPO_ID);
     Response.setCurrent(new Response(request));
     try {
@@ -113,6 +114,7 @@ public class RoutingStatusResourceTest
     }
     finally {
       Response.setCurrent(null);
+      BaseUrlHolder.unset();
     }
   }
 }
