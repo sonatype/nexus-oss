@@ -77,8 +77,11 @@ public class RestletRepositoryURLBuilder
     if (forceBaseURL) {
       baseURL = globalRestApiSettings.isEnabled() ? globalRestApiSettings.getBaseUrl() : null;
     }
-    else {
+    else if (BaseUrlHolder.isSet()) {
       baseURL = BaseUrlHolder.get();
+    }
+    else{
+      baseURL = globalRestApiSettings.getBaseUrl();
     }
 
     // if all else fails?
