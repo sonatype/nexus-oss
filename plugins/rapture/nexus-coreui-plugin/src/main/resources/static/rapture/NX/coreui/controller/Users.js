@@ -46,6 +46,7 @@ Ext.define('NX.coreui.controller.Users', {
     'user.UserChangePassword',
     'user.UserFeature',
     'user.UserList',
+    'user.UserSearchBox',
     'user.UserSettings',
     'user.UserSettingsForm',
     'user.UserSettingsExternal',
@@ -54,6 +55,7 @@ Ext.define('NX.coreui.controller.Users', {
   refs: [
     { ref: 'feature', selector: 'nx-coreui-user-feature' },
     { ref: 'list', selector: 'nx-coreui-user-list' },
+    { ref: 'userSearchBox', selector: 'nx-coreui-user-list nx-coreui-user-searchbox' },
     { ref: 'settings', selector: 'nx-coreui-user-feature nx-coreui-user-settings' },
     { ref: 'externalSettings', selector: 'nx-coreui-user-feature nx-coreui-user-settings-external' },
     { ref: 'privilegeTrace', selector: 'nx-coreui-user-feature nx-coreui-privilege-trace' },
@@ -137,7 +139,7 @@ Ext.define('NX.coreui.controller.Users', {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-user-list menuitem[action=filter]': {
-          click: me.filterBySource
+          click: me.onSourceChanged
         },
         'nx-coreui-user-list button[action=more]': {
           afterrender: me.bindMoreButton
@@ -147,6 +149,9 @@ Ext.define('NX.coreui.controller.Users', {
         },
         'nx-coreui-user-list menuitem[action=setpassword]': {
           click: me.showChangePasswordWindowForSelection
+        },
+        'nx-coreui-user-list nx-coreui-user-searchbox': {
+          search: me.loadStore
         },
         'nx-coreui-user-account button[action=changepassword]': {
           click: me.showChangePasswordWindowForUserAccount,
@@ -269,9 +274,8 @@ Ext.define('NX.coreui.controller.Users', {
       me.getUserStore().load({
         params: {
           filter: [
-            {
-              property: 'source', value: userSourceButton.sourceId
-            }
+            { property: 'source', value: userSourceButton.sourceId },
+            { property: 'userId', value: me.getUserSearchBox().getValue() }
           ]
         }
       });
@@ -330,15 +334,18 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  filterBySource: function(menuItem) {
+  onSourceChanged: function(menuItem) {
     var me = this,
-        userSourceButton = me.getList().down('button[action=filter]');
+        list = me.getList(),
+        userSourceButton = list.down('button[action=filter]');
+
 
     userSourceButton.setText(menuItem.source.get('name'));
     userSourceButton.setIconCls(menuItem.iconCls);
     userSourceButton.sourceId = menuItem.source.getId();
 
-    me.loadStore();
+    me.getUserStore().removeAll();
+    me.getUserSearchBox().setValue(undefined);
   },
 
   /**
