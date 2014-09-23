@@ -57,11 +57,8 @@ Ext.define('NX.coreui.view.user.UserList', {
     '-',
     '<b>Source:</b>',
     { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
+    '->',
     { xtype: 'nx-coreui-user-searchbox' }
-  ],
-
-  plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No user matched criteria "$filter"' }
   ]
 
 });
