@@ -271,6 +271,7 @@ Ext.define('NX.coreui.controller.Users', {
       if (!userSourceButton.sourceId) {
         userSourceButton.sourceId = 'default';
       }
+      me.updateEmptyText();
       me.getUserStore().load({
         params: {
           filter: [
@@ -344,8 +345,40 @@ Ext.define('NX.coreui.controller.Users', {
     userSourceButton.setIconCls(menuItem.iconCls);
     userSourceButton.sourceId = menuItem.source.getId();
 
-    me.getUserStore().removeAll();
     me.getUserSearchBox().setValue(undefined);
+    me.updateEmptyText();
+    me.getUserStore().removeAll();
+  },
+
+  /**
+   * @private
+   * Update grid empty text based on source/user id from search box.
+   */
+  updateEmptyText: function(){
+    var me = this,
+    list = me.getList(),
+        userSourceButton = list.down('button[action=filter]'),
+        userId = me.getUserSearchBox().getValue(),
+        emptyText;
+
+    emptyText = '<div class="x-grid-empty">';
+    if (userSourceButton.sourceId === 'default') {
+      if (userId) {
+        emptyText += 'No user matched query criteria "' + userId + '"';
+      }
+      else {
+        emptyText += 'No users defined';
+      }
+    }
+    else {
+      emptyText += 'No ' + userSourceButton.getText() + ' user matched query criteria';
+      if (userId) {
+        emptyText += ' "' + userId + '"';
+      }
+    }
+    emptyText += '</div>';
+
+    list.getView().emptyText = emptyText;
   },
 
   /**
