@@ -13,7 +13,7 @@
 /*global Ext, NX*/
 
 /**
- * Header help controller.
+ * Help controller.
  *
  * @since 3.0
  */
@@ -42,6 +42,11 @@ Ext.define('NX.controller.Help', {
 
   /**
    * @private
+   */
+  baseUrl: 'http://links.sonatype.com/products/nexus/',
+
+  /**
+   * @private
    * @type {NX.model.Feature}
    */
   selectedFeature: undefined,
@@ -57,12 +62,16 @@ Ext.define('NX.controller.Help', {
         file: 'support.png',
         variants: ['x16', 'x32']
       },
-      'help-issuetracker': {
+      'help-issues': {
         file: 'bug.png',
         variants: ['x16', 'x32']
       },
       'help-manual': {
         file: 'book_picture.png',
+        variants: ['x16', 'x32']
+      },
+      'help-community': {
+        file: 'users_4.png',
         variants: ['x16', 'x32']
       }
     });
@@ -79,6 +88,18 @@ Ext.define('NX.controller.Help', {
         },
         'nx-header-help menuitem[action=about]': {
           click: me.onAbout
+        },
+        'nx-header-help menuitem[action=docs]': {
+          click: me.onDocs
+        },
+        'nx-header-help menuitem[action=support]': {
+          click: me.onSupport
+        },
+        'nx-header-help menuitem[action=issues]': {
+          click: me.onIssues
+        },
+        'nx-header-help menuitem[action=community]': {
+          click: me.onCommunity
         }
       }
     });
@@ -106,8 +127,8 @@ Ext.define('NX.controller.Help', {
    */
   onFeatureHelp: function() {
     var me = this,
-        baseUrl = 'http://links.sonatype.com/products/nexus/docs-search/' + NX.State.getVersionMajorMinor(),
-        url = baseUrl + '/' + me.selectedFeature.get('helpKeyword');
+        keyword = me.selectedFeature.get('helpKeyword'),
+        url = me.baseUrl + 'docs-search/' + NX.State.getVersionMajorMinor() + '/' + keyword;
 
     NX.Windows.open(url);
   },
@@ -117,5 +138,34 @@ Ext.define('NX.controller.Help', {
    */
   onAbout: function() {
     Ext.widget('nx-aboutwindow');
+  },
+
+  /**
+   * @private
+   */
+  onDocs: function() {
+    NX.Windows.open(this.baseUrl + 'docs/' + NX.State.getVersionMajorMinor());
+  },
+
+  /**
+   * @private
+   */
+  onSupport: function() {
+    NX.Windows.open(this.baseUrl + NX.State.getEdition().toLowerCase() + '/support');
+  },
+
+  /**
+   * @private
+   */
+  onIssues: function() {
+    NX.Windows.open(this.baseUrl + NX.State.getEdition().toLowerCase() + '/issues');
+  },
+
+  /**
+   * @private
+   */
+  onCommunity: function() {
+    // FIXME: Replace with links.sonatype.com
+    NX.Windows.open('http://www.sonatype.org/nexus/participate');
   }
 });

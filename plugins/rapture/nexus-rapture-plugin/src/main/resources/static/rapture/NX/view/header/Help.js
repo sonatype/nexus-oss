@@ -20,9 +20,6 @@
 Ext.define('NX.view.header.Help', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-help',
-  requires: [
-    'NX.State'
-  ],
 
   tooltip: 'Help',
   glyph: 'xf059@FontAwesome', // fa-question-circle
@@ -34,15 +31,14 @@ Ext.define('NX.view.header.Help', {
    * @override
    */
   initComponent: function () {
-    var me = this,
-        edition = NX.State.getEdition().toLowerCase(),
-        manualUrl = 'http://links.sonatype.com/products/nexus/docs/' + NX.State.getVersionMajorMinor(),
-        linkBase = 'http://links.sonatype.com/products/nexus/' + edition,
-        issuesUrl = linkBase + '/issues',
-        supportUrl = linkBase + '/support';
+    var me = this;
 
     me.menu = [
-      { text: 'Feature', action: 'feature' },
+      {
+        text: 'Feature',
+        // iconCls is dynamic
+        action: 'feature'
+      },
       '-',
       {
         text: 'About',
@@ -52,20 +48,22 @@ Ext.define('NX.view.header.Help', {
       {
         text: 'Documentation',
         iconCls: 'nx-icon-help-manual-x16',
-        href: manualUrl,
-        hrefTarget: manualUrl
+        action: 'docs'
+      },
+      {
+        text: 'Community',
+        iconCls: 'nx-icon-help-community-x16',
+        action: 'community'
       },
       {
         text: 'Support',
         iconCls: 'nx-icon-help-support-x16',
-        href: supportUrl,
-        hrefTarget: supportUrl
+        action: 'support'
       },
       {
         text: 'Issue Tracker',
-        iconCls: 'nx-icon-help-issuetracker-x16',
-        href: issuesUrl,
-        hrefTarget: issuesUrl
+        iconCls: 'nx-icon-help-issues-x16',
+        action: 'issues'
       }
     ];
 
