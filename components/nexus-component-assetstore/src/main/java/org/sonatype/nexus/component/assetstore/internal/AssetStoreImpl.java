@@ -159,7 +159,7 @@ public class AssetStoreImpl
 
     // TODO: publish a message that an asset has just been added
 
-    return new BlobAsset(blob, path, contentType, blob.getMetrics().getCreationTime());
+    return new BlobAsset(componentId, blob, path, contentType, blob.getMetrics().getCreationTime());
   }
 
   private Record createAndSaveLocalBlobRefRecord(RecordStoreSession session, Record assetRecord, Blob blob) {
@@ -215,7 +215,7 @@ public class AssetStoreImpl
 
     // TODO: publish a message that an asset has just been updated
 
-    return new BlobAsset(blob, path, contentType, blob.getMetrics().getCreationTime());
+    return new BlobAsset(componentId, blob, path, contentType, blob.getMetrics().getCreationTime());
   }
 
   @Nullable
@@ -229,7 +229,7 @@ public class AssetStoreImpl
       if (assetRecord == null) {
         return null;
       }
-      return getAssetFromRecord(session, assetRecord);
+      return getAssetFromRecord(session, assetRecord, componentId);
     }
   }
 
@@ -245,7 +245,7 @@ public class AssetStoreImpl
 
       Map<String, Asset> assets = Maps.newHashMap();
       for (Record assetRecord : result) {
-        assets.put((String) assetRecord.get(PATH_FIELD), getAssetFromRecord(session, assetRecord));
+        assets.put((String) assetRecord.get(PATH_FIELD), getAssetFromRecord(session, assetRecord, componentId));
       }
 
       return assets;
@@ -253,9 +253,9 @@ public class AssetStoreImpl
   }
 
   @Override
-  public boolean delete(final ComponentId componentId, final Asset asset) {
+  public boolean delete(final ComponentId componentId, final String path) {
     checkNotNull(componentId);
-    checkNotNull(asset);
+    checkNotNull(path);
 
     Map<String, BlobId> oldBlobIds = Maps.newHashMap();
 
@@ -263,7 +263,7 @@ public class AssetStoreImpl
     try (RecordStoreSession session = recordStore.openSession()) {
       // TODO: begin transaction
 
-      Record assetRecord = getRecordWithId(session, ASSET_RECORD, assetId(componentId, asset.getPath()));
+      Record assetRecord = getRecordWithId(session, ASSET_RECORD, assetId(componentId, path));
       if (assetRecord == null) {
         return false;
       }
@@ -316,7 +316,7 @@ public class AssetStoreImpl
     }
   }
 
-  private Asset getAssetFromRecord(RecordStoreSession session, Record assetRecord) {
+  private Asset getAssetFromRecord(RecordStoreSession session, Record assetRecord, ComponentId componentId) {
     // get the blob
     BlobId blobId = new BlobId((String) getExistingLocalBlobRefRecord(session, assetRecord).get(BLOB_ID_FIELD));
     Blob blob = blobStore.get(blobId);
@@ -328,7 +328,7 @@ public class AssetStoreImpl
     String path = assetRecord.get(PATH_FIELD);
     String contentType = assetRecord.get(CONTENT_TYPE_FIELD);
     Date firstCreated = assetRecord.get(FIRST_CREATED_FIELD);
-    return new BlobAsset(blob, path, contentType, new DateTime(firstCreated));
+    return new BlobAsset(componentId, blob, path, contentType, new DateTime(firstCreated));
   }
 
   private Record getExistingLocalBlobRefRecord(RecordStoreSession session, Record assetRecord) {

@@ -12,11 +12,16 @@
  */
 package org.sonatype.nexus.component.model;
 
+import javax.annotation.Nullable;
+
 /**
- * This is a placeholder until the implementation in https://github.com/sonatype/nexus-oss/pull/747 is merged.
- *
- * @since 3.0
+ * A domain object representing a component.
  */
 public interface Component
 {
+  /**
+   * Gets the canonical id, or {@code null} if it hasn't been stored yet.
+   */
+  @Nullable
+  ComponentId getId();
 }

@@ -48,7 +48,7 @@ public class HandlerContext
   }
 
   public void setHandlers(final List<Handler> handlers) {
-    checkState(handlers == null, "Handlers can only be set once.");
+    checkState(this.handlers == null, "Handlers can only be set once.");
     this.handlers = checkNotNull(handlers).listIterator();
   }
 

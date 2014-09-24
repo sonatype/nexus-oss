@@ -10,22 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.views.rawbinaries.internal;
+package org.sonatype.nexus.component.services.query;
 
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentId;
+import java.util.Arrays;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An essentially placebo implementation of {@link Component} so this plugin has the same structure as other formats for
- * example purposes.
+ * A restriction that acts on one or more other restrictions.
  *
  * @since 3.0
  */
-public class RawComponent
-    implements Component
+public class CompoundMetadataQueryRestriction
+    extends MetadataQueryRestriction
 {
-  @Override
-  public ComponentId getId() {
-    return null;
+  public enum Operator {
+    AND,
+    OR
+  }
+
+  private final Operator operator;
+
+  private final MetadataQueryRestriction[] operands;
+
+  CompoundMetadataQueryRestriction(Operator operator, MetadataQueryRestriction... operands) {
+    this.operator = checkNotNull(operator);
+    this.operands = checkNotNull(operands);
+  }
+
+  public Operator getOperator() {
+    return operator;
+  }
+
+  public Iterable<MetadataQueryRestriction> operands() {
+    return Arrays.asList(operands);
   }
 }
