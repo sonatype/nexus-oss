@@ -42,7 +42,7 @@ public class VolumeChapterLocationStrategy
     return String.format("vol-%02d/chap-%02d/%s",
         tier(blobId, TIER_1_MODULO),
         tier(blobId, TIER_2_MODULO),
-        escapeFilename(blobId.getId())
+        escapeFilename(blobId.asUniqueString())
     );
   }
 
