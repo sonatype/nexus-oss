@@ -301,7 +301,7 @@ public class DefaultIndexerManager
   private Scanner scanner;
 
   /**
-   * As of 3.6.1, Lucene provides three FSDirectory implementations, all with there pros and cons.
+   * As of 3.6.1, Lucene provides three FSDirectory implementations, all with their pros and cons.
    * <ul>
    * <li>mmap -- {@link MMapDirectory}</li>
    * <li>nio -- {@link NIOFSDirectory}</li>
