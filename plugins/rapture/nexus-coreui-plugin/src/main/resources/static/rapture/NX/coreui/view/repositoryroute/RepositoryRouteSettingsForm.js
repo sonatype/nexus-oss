@@ -60,6 +60,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
       {
         xtype: 'nx-regexp',
         name: 'pattern',
+        itemId: 'pattern',
         fieldLabel: 'URL pattern',
         helpText: "A regular expression used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. '.*/com/some/company/.*' will match any artifact with 'com.some.company' as the group id or artifact id.",
         emptyText: 'enter a pattern'
