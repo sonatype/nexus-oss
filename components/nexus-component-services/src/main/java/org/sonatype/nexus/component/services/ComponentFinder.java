@@ -15,9 +15,10 @@ package org.sonatype.nexus.component.services;
 import java.util.List;
 
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 
 /**
- * First hack at a ComponentFinder interface.
+ * Search interface for finding components and assets.
  *
  * Note that the returned lists consist of POJOs that represent a snapshot of the state
  * of the underlying records at the time of the query. They are thus divorced from
@@ -25,9 +26,9 @@ import org.sonatype.nexus.component.model.Asset;
  */
 public interface ComponentFinder
 {
-  <T> List<T> findComponents(Class<T> domainClass, ComponentQuery componentQuery);
+  <T extends Component> List<T> findComponents(Class<T> componentClass, ComponentQuery componentQuery);
+
+  <T extends Component> List<T> findComponentsWithAssets(Class<T> componentClass, AssetQuery assetQuery);
 
   List<Asset> findAssets(AssetQuery assetQuery);
-
-  <T> List<T> findComponentsWithAssets(Class<T> Class, AssetQuery assetQuery);
 }
