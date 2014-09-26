@@ -47,7 +47,14 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
          * @param {NX.view.header.SearchBox} this search box
          * @param {String} search value
          */
-        'search'
+        'search',
+
+        /**
+         * @event searchcleared
+         * Fires when a search value had been cleared.
+         * @param {NX.view.header.SearchBox} this search box
+         */
+        'searchcleared'
     );
   },
 
@@ -129,6 +136,7 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
     if (me.getValue()) {
       me.setValue(undefined);
     }
+    me.fireEvent('searchcleared', me);
   }
 
 });

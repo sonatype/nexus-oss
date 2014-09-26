@@ -151,7 +151,8 @@ Ext.define('NX.coreui.controller.Users', {
           click: me.showChangePasswordWindowForSelection
         },
         'nx-coreui-user-list nx-coreui-user-searchbox': {
-          search: me.loadStore
+          search: me.loadStore,
+          searchcleared: me.onSearchCleared
         },
         'nx-coreui-user-account button[action=changepassword]': {
           click: me.showChangePasswordWindowForUserAccount,
@@ -335,28 +336,49 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @private
    */
-  onSourceChanged: function(menuItem) {
+  onSearchCleared: function() {
     var me = this,
         list = me.getList(),
         userSourceButton = list.down('button[action=filter]');
 
+    if (userSourceButton.sourceId === 'default') {
+      me.loadStore();
+    }
+    else {
+      me.updateEmptyText();
+      me.getUserStore().removeAll();
+    }
+  },
+
+  /**
+   * @private
+   */
+  onSourceChanged: function(menuItem) {
+    var me = this,
+        list = me.getList(),
+        userSourceButton = list.down('button[action=filter]');
 
     userSourceButton.setText(menuItem.source.get('name'));
     userSourceButton.setIconCls(menuItem.iconCls);
     userSourceButton.sourceId = menuItem.source.getId();
 
     me.getUserSearchBox().setValue(undefined);
-    me.updateEmptyText();
-    me.getUserStore().removeAll();
+    if (userSourceButton.sourceId === 'default') {
+      me.loadStore();
+    }
+    else {
+      me.updateEmptyText();
+      me.getUserStore().removeAll();
+    }
   },
 
   /**
    * @private
    * Update grid empty text based on source/user id from search box.
    */
-  updateEmptyText: function(){
+  updateEmptyText: function() {
     var me = this,
-    list = me.getList(),
+        list = me.getList(),
         userSourceButton = list.down('button[action=filter]'),
         userId = me.getUserSearchBox().getValue(),
         emptyText;
