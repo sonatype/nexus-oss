@@ -38,6 +38,7 @@ Ext.define('NX.app.Application', {
 
   uses: [
     // framework patches
+    'Ext.patch.Ticket_18960',
     'Ext.patch.Ticket_18964',
 
     // direct overrides
