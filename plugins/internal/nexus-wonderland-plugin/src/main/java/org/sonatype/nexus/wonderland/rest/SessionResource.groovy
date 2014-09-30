@@ -40,16 +40,8 @@ implements Resource
 {
   static final String RESOURCE_URI = '/wonderland/session'
 
-  //@Inject
-  final SecuritySystem securitySystem
-
   @DELETE
   void reset(@Context HttpServletRequest request) {
-    //Subject subject = securitySystem.subject
-    //if (subject) {
-    //  subject.logout()
-    //}
-
     HttpSession session = request.getSession(false)
     if (session) {
       session.invalidate()
