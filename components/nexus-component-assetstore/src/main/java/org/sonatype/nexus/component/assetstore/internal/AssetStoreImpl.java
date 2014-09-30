@@ -253,9 +253,9 @@ public class AssetStoreImpl
   }
 
   @Override
-  public boolean delete(final Asset asset) {
-    checkNotNull(asset);
-    checkNotNull(asset.getComponentId());
+  public boolean delete(final ComponentId componentId, final String path) {
+    checkNotNull(componentId);
+    checkNotNull(path);
 
     Map<String, BlobId> oldBlobIds = Maps.newHashMap();
 
@@ -263,7 +263,7 @@ public class AssetStoreImpl
     try (RecordStoreSession session = recordStore.openSession()) {
       // TODO: begin transaction
 
-      Record assetRecord = getRecordWithId(session, ASSET_RECORD, assetId(asset.getComponentId(), asset.getPath()));
+      Record assetRecord = getRecordWithId(session, ASSET_RECORD, assetId(componentId, path));
       if (assetRecord == null) {
         return false;
       }
