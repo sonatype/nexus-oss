@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.services.query.MetadataQuery;
 
 /**
  * Search interface for finding components and assets.
@@ -23,12 +24,12 @@ import org.sonatype.nexus.component.model.Component;
  * Note that the returned lists consist of POJOs that represent a snapshot of the state
  * of the underlying records at the time of the query. They are thus divorced from
  * the underlying session scope.
+ *
+ * @since 3.0
  */
 public interface ComponentFinder
 {
-  <T extends Component> List<T> findComponents(Class<T> componentClass, ComponentQuery componentQuery);
+  <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery metadataQuery);
 
-  <T extends Component> List<T> findComponentsWithAssets(Class<T> componentClass, AssetQuery assetQuery);
-
-  List<Asset> findAssets(AssetQuery assetQuery);
+  List<Asset> findAssets(MetadataQuery metadataQuery);
 }
