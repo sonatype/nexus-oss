@@ -29,6 +29,10 @@ import org.sonatype.nexus.component.services.query.MetadataQuery;
  */
 public interface ComponentFinder
 {
+  <T extends Component> long countComponents(Class<T> componentClass, MetadataQuery metadataQuery);
+
+  long countAssets(MetadataQuery metadataQuery);
+
   <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery metadataQuery);
 
   List<Asset> findAssets(MetadataQuery metadataQuery);
