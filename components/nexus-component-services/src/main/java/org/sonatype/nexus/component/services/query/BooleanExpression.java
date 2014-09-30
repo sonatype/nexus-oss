@@ -22,20 +22,33 @@ public class BooleanExpression
     LIKE
   }
 
+  public enum EntityType
+  {
+    ASSET,
+    COMPONENT
+  }
+
   private final Operator operator;
+
+  private final EntityType entityType;
 
   private final String name;
 
   private final String value;
 
-  BooleanExpression(Operator operator, String name, String value) {
+  BooleanExpression(Operator operator, EntityType entityType, String name, String value) {
     this.operator = checkNotNull(operator);
+    this.entityType = checkNotNull(entityType);
     this.name = checkNotNull(name);
     this.value = checkNotNull(value);
   }
 
   public Operator getOperator() {
     return operator;
+  }
+
+  public EntityType getEntityType() {
+    return entityType;
   }
 
   public String getName() {
