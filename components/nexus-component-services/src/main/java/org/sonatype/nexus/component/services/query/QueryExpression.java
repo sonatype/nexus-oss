@@ -12,29 +12,31 @@
  */
 package org.sonatype.nexus.component.services.query;
 
+import org.sonatype.nexus.component.services.query.BooleanExpression.EntityType;
+
 public abstract class QueryExpression
 {
   public static BooleanExpression assetFieldEquals(String name, Object value) {
-    return null;
+    return new BooleanExpression(BooleanExpression.Operator.EQ, EntityType.ASSET, name, value);
   }
 
   public static BooleanExpression assetFieldLike(String name, String pattern) {
-    return null;
+    return new BooleanExpression(BooleanExpression.Operator.LIKE, EntityType.ASSET, name, pattern);
   }
 
   public static BooleanExpression componentFieldEquals(String name, Object value) {
-    return null;
+    return new BooleanExpression(BooleanExpression.Operator.EQ, EntityType.COMPONENT, name, value);
   }
 
   public static BooleanExpression componentFieldLike(String name, String pattern) {
-    return null;
+    return new BooleanExpression(BooleanExpression.Operator.LIKE, EntityType.COMPONENT, name, pattern);
   }
 
   public static CompoundExpression and(QueryExpression... operands) {
-    return null;
+    return new CompoundExpression(CompoundExpression.Operator.AND, operands);
   }
 
   public static CompoundExpression or(QueryExpression... operands) {
-    return null;
+    return new CompoundExpression(CompoundExpression.Operator.OR, operands);
   }
 }

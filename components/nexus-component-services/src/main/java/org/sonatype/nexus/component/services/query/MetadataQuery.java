@@ -12,20 +12,107 @@
  */
 package org.sonatype.nexus.component.services.query;
 
+import java.util.List;
+
 import org.sonatype.nexus.component.model.ComponentId;
 
-// TODO: Constructor and builder-like methods, similar to RecordQuery
+import com.google.common.collect.Lists;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class MetadataQuery
 {
   private Integer limit;
 
   private Integer skip;
 
-  private ComponentId skipComponent;
+  private ComponentId skipComponentId;
 
-  private String orderBy;
+  private String skipAssetPath;
+
+  private List<String> orderBy = Lists.newArrayList();
 
   private boolean descending;
 
   private QueryExpression queryExpression;
+
+  public MetadataQuery() {
+  }
+
+  public MetadataQuery withLimit(Integer limit) {
+    checkArgument(checkNotNull(limit) > 0, "Limit must be positive");
+    this.limit = limit;
+    return this;
+  }
+
+  public Integer getLimit() {
+    return limit;
+  }
+
+  public MetadataQuery withSkip(Integer skip) {
+    checkArgument(checkNotNull(skip) >= 0, "Skip must be non-negative");
+    checkArgument(skipComponentId == null, "Cannot skip; skip component id is already specified");
+    this.skip = skip;
+    return this;
+  }
+
+  public Integer getSkip() {
+    return skip;
+  }
+
+  public MetadataQuery withSkipComponentId(ComponentId skipComponentId) {
+    checkNotNull(skipComponentId);
+    checkArgument(skip == null, "Cannot skip component id; skip is already specified");
+    checkArgument(orderBy.isEmpty(), "Cannot skip component id; order by is already specified");
+    this.skipComponentId = skipComponentId;
+    return this;
+  }
+
+  public ComponentId getSkipComponentId() {
+    return skipComponentId;
+  }
+
+  public MetadataQuery withSkipAssetPath(String skipAssetPath) {
+    checkNotNull(skipAssetPath);
+    checkArgument(skip == null, "Cannot skip asset path; skip is already specified");
+    checkArgument(orderBy.isEmpty(), "Cannot skip asset path; order by is already specified");
+    this.skipAssetPath = skipAssetPath;
+    return this;
+  }
+
+  public String getSkipAssetPath() {
+    return skipAssetPath;
+  }
+
+  public MetadataQuery withOrderBy(String orderBy) {
+    checkArgument(!(checkNotNull(orderBy).isEmpty()), "Order by cannot be empty");
+    checkArgument(skipComponentId == null, "Cannot order by; skip component id is already specified");
+    checkArgument(skipAssetPath == null, "Cannot order by; skip asset path is already specified");
+    this.orderBy.add(orderBy);
+    return this;
+  }
+
+  public List<String> getOrderBy() {
+    return orderBy;
+  }
+
+  public MetadataQuery withDescending(boolean descending) {
+    this.descending = descending;
+    return this;
+  }
+
+  public boolean isDescending() {
+    return descending;
+  }
+
+  public MetadataQuery withQueryExpression(QueryExpression queryExpression) {
+    checkNotNull(queryExpression);
+    this.queryExpression = queryExpression;
+    return this;
+  }
+
+  public QueryExpression getQueryExpression() {
+    return queryExpression;
+  }
 }

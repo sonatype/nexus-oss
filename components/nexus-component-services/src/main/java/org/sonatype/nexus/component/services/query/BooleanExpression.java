@@ -34,9 +34,9 @@ public class BooleanExpression
 
   private final String name;
 
-  private final String value;
+  private final Object value;
 
-  BooleanExpression(Operator operator, EntityType entityType, String name, String value) {
+  BooleanExpression(Operator operator, EntityType entityType, String name, Object value) {
     this.operator = checkNotNull(operator);
     this.entityType = checkNotNull(entityType);
     this.name = checkNotNull(name);
@@ -55,7 +55,7 @@ public class BooleanExpression
     return name;
   }
 
-  public String getValue() {
+  public Object getValue() {
     return value;
   }
 }

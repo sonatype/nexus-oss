@@ -17,6 +17,7 @@ import java.util.List;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
+import org.sonatype.nexus.component.services.query.QueryExpression;
 
 /**
  * Search interface for finding components and assets.
@@ -29,9 +30,9 @@ import org.sonatype.nexus.component.services.query.MetadataQuery;
  */
 public interface ComponentFinder
 {
-  <T extends Component> long countComponents(Class<T> componentClass, MetadataQuery metadataQuery);
+  <T extends Component> long countComponents(Class<T> componentClass, QueryExpression queryExpression);
 
-  long countAssets(MetadataQuery metadataQuery);
+  long countAssets(QueryExpression queryExpression);
 
   <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery metadataQuery);
 
