@@ -14,8 +14,8 @@ package org.sonatype.nexus.component.services.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BooleanExpression
-    extends QueryExpression
+public class BooleanMetadataQueryExpression
+    extends MetadataQueryExpression
 {
   public enum Operator {
     EQ,
@@ -36,7 +36,7 @@ public class BooleanExpression
 
   private final Object value;
 
-  BooleanExpression(Operator operator, EntityType entityType, String name, Object value) {
+  BooleanMetadataQueryExpression(Operator operator, EntityType entityType, String name, Object value) {
     this.operator = checkNotNull(operator);
     this.entityType = checkNotNull(entityType);
     this.name = checkNotNull(name);

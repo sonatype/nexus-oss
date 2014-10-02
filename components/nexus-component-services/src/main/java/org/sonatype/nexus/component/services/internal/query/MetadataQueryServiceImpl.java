@@ -20,11 +20,12 @@ import org.sonatype.nexus.component.assetstore.AssetStore;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.recordstore.RecordStore;
+import org.sonatype.nexus.component.recordstore.RecordStoreSession;
 import org.sonatype.nexus.component.services.mapper.ComponentRecordMapper;
 import org.sonatype.nexus.component.services.mapper.ComponentRecordMapperRegistry;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
+import org.sonatype.nexus.component.services.query.MetadataQueryExpression;
 import org.sonatype.nexus.component.services.query.MetadataQueryService;
-import org.sonatype.nexus.component.services.query.QueryExpression;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -53,14 +54,28 @@ public class MetadataQueryServiceImpl
 
   @Override
   public <T extends Component> long countComponents(final Class<T> componentClass,
-                                                    final QueryExpression queryExpression)
+                                                    final MetadataQueryExpression mdqe)
   {
     ComponentRecordMapper<T> mapper = getExistingMapper(componentClass);
+    // TODO: Uncomment
+    // RecordQueryExpression cRecordQueryExpression = cRecordQueryExpression(mapper, metadataQueryExpression)
+
+    try (RecordStoreSession session = recordStore.openSession()) {
+      // TODO: Uncomment
+      //return session.count(cRecordQueryExpression)
+    }
     return 0;
   }
 
   @Override
-  public long countAssets(final QueryExpression queryExpression) {
+  public long countAssets(final MetadataQueryExpression queryExpression) {
+    // TODO: Uncomment
+    // RecordQueryExpression aRecordQueryExpression = aRecordQueryExpression(metadataQueryExpression)
+
+    try (RecordStoreSession session = recordStore.openSession()) {
+      // TODO: Uncomment
+      //return session.count(aRecordQueryExpression)
+    }
     return 0;
   }
 
@@ -69,11 +84,25 @@ public class MetadataQueryServiceImpl
                                                       final MetadataQuery metadataQuery)
   {
     ComponentRecordMapper<T> mapper = getExistingMapper(componentClass);
+    // TODO: Uncomment
+    //RecordQuery cRecordQuery = cRecordQuery(mapper, metadataQuery)
+
+    try (RecordStoreSession session = recordStore.openSession()) {
+      // TODO: Uncomment
+      //return components(mapper, session.find(cRecordQuery));
+    }
     return null;
   }
 
   @Override
   public List<Asset> findAssets(final MetadataQuery metadataQuery) {
+    // TODO: Uncomment
+    //RecordQuery aRecordQuery = aRecordQuery(mapper, metadataQuery)
+
+    try (RecordStoreSession session = recordStore.openSession()) {
+      // TODO: Uncomment
+      //return assets(mapper, session.find(cRecordQuery));
+    }
     return null;
   }
 
@@ -83,4 +112,16 @@ public class MetadataQueryServiceImpl
     checkState(mapper != null, "No mapper registered for class %", componentClass);
     return mapper;
   }
+
+  // TODO: Implement
+  // private RecordQueryExpression cRecordQueryExpression(ComponentRecordMapper<T> mapper, MetadataQueryExpression mdqe) { }
+
+  // TODO: Implement
+  // private RecordQueryExpression aRecordQueryExpression(MetadataQueryExpression mdqe) { }
+
+  // TODO: Implement
+  // private <T extends Component> List<T> components(ComponentRecordMapper<T> mapper, List<Record> cRecords) { }
+
+  // TODO: Implement
+  // private <T extends Asset> List<T> assets(List<Record> aRecords) { }
 }

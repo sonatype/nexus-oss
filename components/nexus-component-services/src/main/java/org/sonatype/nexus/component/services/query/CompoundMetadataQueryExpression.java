@@ -16,8 +16,8 @@ import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CompoundExpression
-    extends QueryExpression
+public class CompoundMetadataQueryExpression
+    extends MetadataQueryExpression
 {
   public enum Operator {
     AND,
@@ -26,9 +26,9 @@ public class CompoundExpression
 
   private final Operator operator;
 
-  private final QueryExpression[] operands;
+  private final MetadataQueryExpression[] operands;
 
-  CompoundExpression(Operator operator, QueryExpression...operands) {
+  CompoundMetadataQueryExpression(Operator operator, MetadataQueryExpression... operands) {
     this.operator = checkNotNull(operator);
     this.operands = checkNotNull(operands);
   }
@@ -37,7 +37,7 @@ public class CompoundExpression
     return operator;
   }
 
-  public Iterable<QueryExpression> operands() {
+  public Iterable<MetadataQueryExpression> operands() {
     return Arrays.asList(operands);
   }
 }

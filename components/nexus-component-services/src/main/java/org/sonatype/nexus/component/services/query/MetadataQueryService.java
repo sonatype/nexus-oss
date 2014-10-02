@@ -27,9 +27,9 @@ import org.sonatype.nexus.component.model.Component;
  */
 public interface MetadataQueryService
 {
-  <T extends Component> long countComponents(Class<T> componentClass, QueryExpression queryExpression);
+  <T extends Component> long countComponents(Class<T> componentClass, MetadataQueryExpression queryExpression);
 
-  long countAssets(QueryExpression queryExpression);
+  long countAssets(MetadataQueryExpression queryExpression);
 
   <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery metadataQuery);
 
