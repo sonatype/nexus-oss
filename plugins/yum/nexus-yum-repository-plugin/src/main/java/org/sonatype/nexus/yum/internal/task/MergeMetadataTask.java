@@ -140,11 +140,10 @@ public class MergeMetadataTask
         try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
           final RepoMD repomd = new RepoMD(in);
           for (final String location : repomd.getLocations()) {
-            if (!location.matches("/" + Yum.PATH_OF_REPODATA + "/.*\\.sqlite\\.bz2")) {
-              log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
-              memberRepository.retrieveItem(
-                  new ResourceStoreRequest("/" + location)
-              );
+            String retrieveLocation = "/" + location;
+            if (!retrieveLocation.matches("/" + Yum.PATH_OF_REPODATA + "/.*\\.sqlite\\.bz2")) {
+              log.trace("Retrieving {}:{}", memberRepository.getId(), retrieveLocation);
+              memberRepository.retrieveItem(new ResourceStoreRequest(retrieveLocation));
             }
           }
         }
