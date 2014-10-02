@@ -94,6 +94,7 @@ public class YumHostedImpl
   public YumHostedImpl(final RepositoryURLBuilder repositoryURLBuilder,
                        final NexusScheduler nexusScheduler,
                        final ScheduledThreadPoolExecutor executor,
+                       final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,
                        final @Assisted HostedRepository repository,
                        final @Assisted File temporaryDirectory)
       throws MalformedURLException, URISyntaxException
@@ -114,6 +115,10 @@ public class YumHostedImpl
     this.baseDir = RepositoryUtils.getBaseDir(repository);
 
     this.yumGroupsDefinitionFile = null;
+
+    repository.registerRequestStrategy(
+        BlockSqliteDatabasesRequestStrategy.class.getName(), checkNotNull(blockSqliteDatabasesRequestStrategy)
+    );
   }
 
   private final YumRepositoryCache cache = new YumRepositoryCache();
