@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawBinaryViewFactory
     implements ViewFactory
 {
-  public static final String RAW_BINARY_RECIPE = "rawBinary";
+  public static final String FACTORY_NAME = "rawBinary";
 
   private final RawBinaryStore binaryStore;
 
@@ -48,7 +48,7 @@ public class RawBinaryViewFactory
 
   @Override
   public String getFactoryName() {
-    return RAW_BINARY_RECIPE;
+    return FACTORY_NAME;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class RawBinaryViewFactory
     final AllRequestMatcher binariesRequestMatcher = new AllRequestMatcher();
 
     final Router router = new Router();
-    router.addRoute(binariesRequestMatcher, new RawBinariesHandler(binaryStore));
+    router.addRoute(binariesRequestMatcher, new HostedRawBinariesHandler(binaryStore));
 
     return new View(config, router, notFoundHandler);
   }

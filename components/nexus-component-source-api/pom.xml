@@ -49,6 +49,11 @@
       <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-testsupport</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

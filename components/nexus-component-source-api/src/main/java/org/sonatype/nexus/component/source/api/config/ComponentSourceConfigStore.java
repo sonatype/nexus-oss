@@ -17,12 +17,15 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
  * A persistent store of {@link ComponentSourceConfig} objects.
  *
  * @since 3.0
  */
 public interface ComponentSourceConfigStore
+    extends Lifecycle
 {
   /**
    * Adds a config
@@ -30,7 +33,7 @@ public interface ComponentSourceConfigStore
    * @param config to be added
    * @throws IOException IOException If any problem encountered while read/store of config storage
    */
-  ComponentConfigId add(ComponentSourceConfig config) throws IOException;
+  ComponentSourceConfigId add(ComponentSourceConfig config) throws IOException;
 
   /**
    * Updates stored config if exists.
@@ -38,7 +41,7 @@ public interface ComponentSourceConfigStore
    * @param config to be updated
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  void update(ComponentConfigId id, ComponentSourceConfig config) throws IOException;
+  void update(ComponentSourceConfigId id, ComponentSourceConfig config) throws IOException;
 
   /**
    * Deletes stored config if exists.
@@ -47,7 +50,7 @@ public interface ComponentSourceConfigStore
    * @return false if config to be deleted does not exist in storage, true otherwise
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  void remove(ComponentConfigId id) throws IOException;
+  void remove(ComponentSourceConfigId id) throws IOException;
 
   /**
    * Retrieves stored configs.
@@ -55,7 +58,7 @@ public interface ComponentSourceConfigStore
    * @return configs (never null)
    * @throws IOException If any problem encountered while read/store of config storage
    */
-  Map<ComponentConfigId, ComponentSourceConfig> getAll() throws IOException;
+  Map<ComponentSourceConfigId, ComponentSourceConfig> getAll() throws IOException;
 
 
   /**

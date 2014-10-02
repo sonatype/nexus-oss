@@ -76,7 +76,6 @@ public class FileBlobStoreConcurrencyIT
     underTest.start();
   }
 
-
   @After
   public void tearDown() throws Exception {
     underTest.stop();

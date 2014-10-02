@@ -35,12 +35,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class RawBinariesHandler
+public class HostedRawBinariesHandler
     implements Handler
 {
   private final RawBinaryStore binaryStore;
 
-  public RawBinariesHandler(final RawBinaryStore binaryStore) {
+  public HostedRawBinariesHandler(final RawBinaryStore binaryStore) {
     this.binaryStore = checkNotNull(binaryStore);
   }
 
@@ -50,9 +50,9 @@ public class RawBinariesHandler
 
       case PUT:
         try {
-          final boolean result = binaryStore.create(req.getPath(), req.getContentType(), req.getInputStream());
+          final RawBinary created = binaryStore.create(req.getPath(), req.getContentType(), req.getInputStream());
 
-          if (result) {
+          if (created != null) {
             return Responses.created();
           }
           else {

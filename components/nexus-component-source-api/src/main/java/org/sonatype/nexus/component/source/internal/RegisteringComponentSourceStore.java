@@ -22,10 +22,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
-import org.sonatype.nexus.component.source.api.config.ComponentConfigId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -59,8 +60,8 @@ public class RegisteringComponentSourceStore
   }
 
   @Override
-  public ComponentConfigId add(final ComponentSourceConfig config) throws IOException {
-    final ComponentConfigId id = inner.add(config);
+  public ComponentSourceConfigId add(final ComponentSourceConfig config) throws IOException {
+    final ComponentSourceConfigId id = inner.add(config);
     final ComponentSource source = create(config);
     registry.register(source);
     return id;
@@ -68,7 +69,7 @@ public class RegisteringComponentSourceStore
 
 
   @Override
-  public void update(final ComponentConfigId id, final ComponentSourceConfig config) throws IOException {
+  public void update(final ComponentSourceConfigId id, final ComponentSourceConfig config) throws IOException {
     final ComponentSource oldSource = registry.getSource(config.getSourceName());
     registry.unregister(oldSource);
 
@@ -79,7 +80,7 @@ public class RegisteringComponentSourceStore
   }
 
   @Override
-  public void remove(final ComponentConfigId id) throws IOException {
+  public void remove(final ComponentSourceConfigId id) throws IOException {
     checkNotNull(id);
     final ComponentSourceConfig configToRemove = findById(id);
     inner.remove(id);
@@ -87,7 +88,7 @@ public class RegisteringComponentSourceStore
   }
 
   @Override
-  public Map<ComponentConfigId, ComponentSourceConfig> getAll() throws IOException {
+  public Map<ComponentSourceConfigId, ComponentSourceConfig> getAll() throws IOException {
     return inner.getAll();
   }
 
@@ -97,10 +98,25 @@ public class RegisteringComponentSourceStore
     return inner.get(sourceName);
   }
 
+  @Override
+  public void start() throws Exception {
+    inner.start();
+  }
+
+  @Override
+  public void stop() throws Exception {
+    inner.stop();
+  }
+
+  @Override
+  public Lifecycle getLifecycle() {
+    return inner.getLifecycle();
+  }
+
   @Nullable
-  private ComponentSourceConfig findById(ComponentConfigId id) throws IOException {
-    final Map<ComponentConfigId, ComponentSourceConfig> all = getAll();
-    for (ComponentConfigId eachId : all.keySet()) {
+  private ComponentSourceConfig findById(ComponentSourceConfigId id) throws IOException {
+    final Map<ComponentSourceConfigId, ComponentSourceConfig> all = getAll();
+    for (ComponentSourceConfigId eachId : all.keySet()) {
       if (eachId.equals(id)) {
         return all.get(id);
       }

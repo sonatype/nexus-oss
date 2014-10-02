@@ -19,12 +19,12 @@ import java.io.Serializable;
  *
  * @since 3.0
  */
-public class ComponentConfigId
-    implements Serializable, Comparable<ComponentConfigId>
+public class ComponentSourceConfigId
+    implements Serializable, Comparable<ComponentSourceConfigId>
 {
   private final String id;
 
-  public ComponentConfigId(final String id) {
+  public ComponentSourceConfigId(final String id) {
     this.id = id;
   }
 
@@ -42,13 +42,17 @@ public class ComponentConfigId
       return false;
     }
 
-    ComponentConfigId blobId = (ComponentConfigId) o;
+    ComponentSourceConfigId blobId = (ComponentSourceConfigId) o;
 
     return id.equals(blobId.id);
   }
 
   @Override
-  public int compareTo(final ComponentConfigId o) {
+  public int compareTo(final ComponentSourceConfigId o) {
     return id.compareTo(o.id);
+  }
+
+  public String asUniqueString() {
+    return id;
   }
 }

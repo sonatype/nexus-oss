@@ -16,12 +16,24 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.config.ComponentConfigId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.RecordIdObfuscator;
+import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+
+import com.google.common.collect.Maps;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.storage.ORecordMetadata;
 
 /**
  * A {@link ComponentSourceConfigStore} that persists source configs to the "config" orient DB instance.
@@ -33,26 +45,105 @@ import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore
 @Named("orient")
 @Singleton
 public class OrientComponentSourceConfigStore
+    extends LifecycleSupport
     implements ComponentSourceConfigStore
 {
-  @Override
-  public ComponentConfigId add(final ComponentSourceConfig config) throws IOException {
-    return null;
+
+  private final Provider<DatabaseInstance> databaseInstance;
+
+  private final RecordIdObfuscator recordIdObfuscator;
+
+
+  private final ComponentSourceConfigEntityAdapter entityAdapter;
+
+
+  private OClass entityType;
+
+  @Inject
+  public OrientComponentSourceConfigStore(final @Named("config") Provider<DatabaseInstance> databaseInstance,
+                                          final RecordIdObfuscator recordIdObfuscator,
+                                          final ComponentSourceConfigEntityAdapter entityAdapter)
+  {
+    this.databaseInstance = databaseInstance;
+    this.recordIdObfuscator = recordIdObfuscator;
+    this.entityAdapter = entityAdapter;
   }
 
   @Override
-  public void update(final ComponentConfigId id, final ComponentSourceConfig config) throws IOException {
-
+  protected void doStart() throws Exception {
+    try (ODatabaseDocumentTx db = databaseInstance.get().connect()) {
+      // register schema
+      entityType = entityAdapter.register(db);
+    }
   }
 
   @Override
-  public void remove(final ComponentConfigId id) throws IOException {
+  protected void doStop() throws Exception {
+    entityType = null;
+  }
 
+
+  @Override
+  public ComponentSourceConfigId add(final ComponentSourceConfig config) throws IOException {
+    ORID rid;
+    try (ODatabaseDocumentTx db = openDb()) {
+      ODocument doc = entityAdapter.create(db, config);
+      rid = doc.getIdentity();
+    }
+
+    log.debug("Added item with RID: {}", rid);
+    return convertId(rid);
   }
 
   @Override
-  public Map<ComponentConfigId, ComponentSourceConfig> getAll() throws IOException {
-    return null;
+  public void update(final ComponentSourceConfigId id, final ComponentSourceConfig config) throws IOException {
+    ORID rid = convertId(id);
+
+    try (ODatabaseDocumentTx db = openDb()) {
+      // load record and apply updated item attributes
+      ODocument doc = db.getRecord(rid);
+      if (doc == null) {
+        log.debug("Unable to update item with RID: {}", rid);
+        throw new IllegalArgumentException(id + " is not present in the store.");
+      }
+      entityAdapter.write(doc, config);
+    }
+
+    log.debug("Updated item with RID: {}", rid);
+  }
+
+  @Override
+  public void remove(final ComponentSourceConfigId id) throws IOException {
+    ORID rid = convertId(id);
+
+    try (ODatabaseDocumentTx db = openDb()) {
+      // if we can't get the metadata, then abort
+      ORecordMetadata md = db.getRecordMetadata(rid);
+      if (md == null) {
+        log.debug("Unable to delete item with RID: {}", rid);
+        return;
+      }
+      // else delete the record
+      db.delete(rid);
+    }
+
+    log.debug("Deleted item with RID: {}", rid);
+  }
+
+  @Override
+  public Map<ComponentSourceConfigId, ComponentSourceConfig> getAll() throws IOException {
+
+    Map<ComponentSourceConfigId, ComponentSourceConfig> items = Maps.newHashMap();
+
+    try (ODatabaseDocumentTx db = openDb()) {
+      for (ODocument doc : entityAdapter.browse(db)) {
+        ORID rid = doc.getIdentity();
+        ComponentSourceConfig item = entityAdapter.read(doc);
+        items.put(convertId(rid), item);
+      }
+    }
+
+    return items;
   }
 
   @Nullable
@@ -60,4 +151,22 @@ public class OrientComponentSourceConfigStore
   public ComponentSourceConfig get(final String sourceName) throws IOException {
     return null;
   }
+
+  /**
+   * Open a database connection using the pool.
+   */
+  private ODatabaseDocumentTx openDb() {
+    ensureStarted();
+    return databaseInstance.get().acquire();
+  }
+
+  private ComponentSourceConfigId convertId(final ORID rid) {
+    String encoded = recordIdObfuscator.encode(entityType, rid);
+    return new ComponentSourceConfigId(encoded);
+  }
+
+  private ORID convertId(final ComponentSourceConfigId id) {
+    return recordIdObfuscator.decode(entityType, id.toString());
+  }
+
 }
