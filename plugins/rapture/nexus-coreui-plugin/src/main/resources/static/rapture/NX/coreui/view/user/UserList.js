@@ -28,16 +28,16 @@ Ext.define('NX.coreui.view.user.UserList', {
       xtype: 'nx-iconcolumn',
       width: 36,
       iconVariant: 'x16',
-      iconName: function () {
+      iconName: function() {
         return 'user-default';
       }
     },
-    {header: 'User Id', dataIndex: 'userId'},
-    {header: 'Realm', dataIndex: 'realm'},
-    {header: 'First name', dataIndex: 'firstName'},
-    {header: 'Last name', dataIndex: 'lastName', width: 300},
-    {header: 'Email', dataIndex: 'email', width: 250},
-    {header: 'Status', dataIndex: 'status'}
+    { header: 'User Id', dataIndex: 'userId', flex: 2 },
+    { header: 'Realm', dataIndex: 'realm' },
+    { header: 'First name', dataIndex: 'firstName', flex: 2 },
+    { header: 'Last name', dataIndex: 'lastName', flex: 2 },
+    { header: 'Email', dataIndex: 'email', flex: 2 },
+    { header: 'Status', dataIndex: 'status' }
   ],
 
   viewConfig: {
@@ -57,10 +57,7 @@ Ext.define('NX.coreui.view.user.UserList', {
     '-',
     '<b>Source:</b>',
     { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
-  ],
-
-  plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No user matched criteria "$filter"' }
+    { xtype: 'nx-coreui-user-searchbox' }
   ]
 
 });

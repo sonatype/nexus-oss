@@ -25,7 +25,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   ],
 
   title: 'Create new route',
-  defaultFocus: 'name',
+  defaultFocus: 'pattern',
 
   /**
    * @override

@@ -93,7 +93,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
         'nx-coreui-repositoryroute-settings-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-repositoryroute-settings #mappingType': {
+        'nx-coreui-repositoryroute-settings-form #mappingType': {
           change: me.onMappingTypeChanged
         }
       }

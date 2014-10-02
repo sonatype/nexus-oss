@@ -89,7 +89,8 @@ extends DirectComponentSupport
     if (!source) {
       source = DEFAULT_SOURCE
     }
-    securitySystem.searchUsers(new UserSearchCriteria(source: source)).collect { user ->
+    def userId = parameters?.getFilter('userId')
+    securitySystem.searchUsers(new UserSearchCriteria(source: source, userId: userId)).collect { user ->
       asUserXO(user)
     }
   }

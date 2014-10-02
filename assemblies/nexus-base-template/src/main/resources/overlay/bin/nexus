@@ -1,6 +1,6 @@
 #!/bin/sh
-DIRNAME=`dirname $0`
-PROGNAME=`basename $0`
+DIRNAME=`dirname "$0"`
+PROGNAME=`basename "$0"`
 
 usage() {
     echo "${PROGNAME} { console | start | stop | restart | status }"
@@ -12,7 +12,7 @@ if [ "x$1" == "x" ]; then
 fi
 
 run() {
-    case $1 in
+    case "$1" in
         'console')
             shift
             exec "${DIRNAME}/karaf" "$@"

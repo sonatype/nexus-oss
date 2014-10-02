@@ -347,6 +347,12 @@
                   </fileset>
                 </delete>
 
+                <!-- temporary patch for KARAF-3249: dirname error if the distribution path contains spaces -->
+                <replace file="${project.build.directory}/assembly/bin/karaf" token='name $0' value='name "$0"'/>
+                <replace file="${project.build.directory}/assembly/bin/start" token='name $0' value='name "$0"'/>
+                <replace file="${project.build.directory}/assembly/bin/status" token='name $0' value='name "$0"'/>
+                <replace file="${project.build.directory}/assembly/bin/stop" token='name $0' value='name "$0"'/>
+
                 <!-- include a few additional extra packages required by our environment -->
                 <replace file="${project.build.directory}/assembly/etc/config.properties"
                   token="packages.extra="

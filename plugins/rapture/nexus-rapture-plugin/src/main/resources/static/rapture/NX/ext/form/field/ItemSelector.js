@@ -93,6 +93,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
       tbar = {
         xtype: 'nx-searchbox',
         emptyText: 'filter',
+        searchDelay: 200,
         listeners: {
           search: me.onSearch,
           searchcleared: me.onSearchCleared,
