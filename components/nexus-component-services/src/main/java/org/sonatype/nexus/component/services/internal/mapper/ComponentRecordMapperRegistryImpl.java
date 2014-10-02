@@ -37,7 +37,7 @@ public class ComponentRecordMapperRegistryImpl
   @Override
   public <T extends Component> void registerMapper(final ComponentRecordMapper<T> mapper) {
     checkState(map.putIfAbsent(mapper.getComponentClass(), mapper) == null,
-        "A ComponentRecordMapper is already registered for class %s", mapper.getComponentClass());
+        "Mapper already registered for class %s", mapper.getComponentClass());
   }
 
   @Nullable
