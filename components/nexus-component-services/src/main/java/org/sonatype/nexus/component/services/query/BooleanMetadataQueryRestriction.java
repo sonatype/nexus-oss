@@ -12,32 +12,50 @@
  */
 package org.sonatype.nexus.component.services.query;
 
-import java.util.Arrays;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CompoundMetadataQueryExpression
-    extends MetadataQueryExpression
+public class BooleanMetadataQueryRestriction
+    extends MetadataQueryRestriction
 {
   public enum Operator {
-    AND,
-    OR
+    EQ,
+    LIKE
+  }
+
+  public enum EntityType
+  {
+    ASSET,
+    COMPONENT
   }
 
   private final Operator operator;
 
-  private final MetadataQueryExpression[] operands;
+  private final EntityType entityType;
 
-  CompoundMetadataQueryExpression(Operator operator, MetadataQueryExpression... operands) {
+  private final String name;
+
+  private final Object value;
+
+  BooleanMetadataQueryRestriction(Operator operator, EntityType entityType, String name, Object value) {
     this.operator = checkNotNull(operator);
-    this.operands = checkNotNull(operands);
+    this.entityType = checkNotNull(entityType);
+    this.name = checkNotNull(name);
+    this.value = checkNotNull(value);
   }
 
   public Operator getOperator() {
     return operator;
   }
 
-  public Iterable<MetadataQueryExpression> operands() {
-    return Arrays.asList(operands);
+  public EntityType getEntityType() {
+    return entityType;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Object getValue() {
+    return value;
   }
 }

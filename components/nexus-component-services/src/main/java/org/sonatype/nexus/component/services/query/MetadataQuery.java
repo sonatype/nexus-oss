@@ -35,7 +35,7 @@ public class MetadataQuery
 
   private boolean descending;
 
-  private MetadataQueryExpression queryExpression;
+  private MetadataQueryRestriction restriction;
 
   public MetadataQuery() {
   }
@@ -106,13 +106,13 @@ public class MetadataQuery
     return descending;
   }
 
-  public MetadataQuery withQueryExpression(MetadataQueryExpression queryExpression) {
-    checkNotNull(queryExpression);
-    this.queryExpression = queryExpression;
+  public MetadataQuery withRestriction(MetadataQueryRestriction restriction) {
+    checkNotNull(restriction);
+    this.restriction = restriction;
     return this;
   }
 
-  public MetadataQueryExpression getQueryExpression() {
-    return queryExpression;
+  public MetadataQueryRestriction getRestriction() {
+    return restriction;
   }
 }

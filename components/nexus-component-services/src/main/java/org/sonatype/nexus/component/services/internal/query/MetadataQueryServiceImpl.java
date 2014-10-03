@@ -24,7 +24,7 @@ import org.sonatype.nexus.component.recordstore.RecordStoreSession;
 import org.sonatype.nexus.component.services.mapper.ComponentRecordMapper;
 import org.sonatype.nexus.component.services.mapper.ComponentRecordMapperRegistry;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
-import org.sonatype.nexus.component.services.query.MetadataQueryExpression;
+import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQueryService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -54,7 +54,7 @@ public class MetadataQueryServiceImpl
 
   @Override
   public <T extends Component> long countComponents(final Class<T> componentClass,
-                                                    final MetadataQueryExpression mdqe)
+                                                    final MetadataQueryRestriction mdqe)
   {
     ComponentRecordMapper<T> mapper = getExistingMapper(componentClass);
     // TODO: Uncomment
@@ -68,7 +68,7 @@ public class MetadataQueryServiceImpl
   }
 
   @Override
-  public long countAssets(final MetadataQueryExpression queryExpression) {
+  public long countAssets(final MetadataQueryRestriction queryExpression) {
     // TODO: Uncomment
     // RecordQueryExpression aRecordQueryExpression = aRecordQueryExpression(metadataQueryExpression)
 
