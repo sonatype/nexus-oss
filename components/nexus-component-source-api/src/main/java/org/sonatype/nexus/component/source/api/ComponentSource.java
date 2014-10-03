@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.component.source.api;
 
+import org.sonatype.nexus.component.model.ComponentOriginId;
+
 /**
  * A remote source for components.
  *
@@ -22,7 +24,7 @@ public interface ComponentSource
   /**
    * A cluster-wide unique name for this source.
    */
-  String getName();
+  ComponentSourceId getId();
 
   /**
    * Returns {@code true} if the remote source is accessible right now.

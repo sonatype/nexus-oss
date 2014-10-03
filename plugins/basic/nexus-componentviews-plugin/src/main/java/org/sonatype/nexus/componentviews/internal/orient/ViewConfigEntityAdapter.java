@@ -14,6 +14,7 @@ package org.sonatype.nexus.componentviews.internal.orient;
 
 import java.util.Map;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -42,7 +43,9 @@ public class ViewConfigEntityAdapter
       .type(ViewConfig.class)
       .build();
 
-  public static final String P_VIEWNAME = "viewName";
+  public static final String P_VIEWNAME = "id.name";
+
+  public static final String P_VIEWID = "id.identifier";
 
   public static final String P_FACTORYNAME = "factoryName";
 
@@ -62,6 +65,11 @@ public class ViewConfigEntityAdapter
 
       type.createProperty(P_VIEWNAME, OType.STRING).setNotNull(true);
       type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
+
+      type.createProperty(P_VIEWID, OType.STRING).setNotNull(true);
+      type.createIndex(P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
+
+
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
@@ -89,6 +97,7 @@ public class ViewConfigEntityAdapter
     checkNotNull(entity);
 
     document.field(P_VIEWNAME, entity.getViewName());
+    document.field(P_VIEWID, entity.getViewId().getIdentifier());
     document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 
@@ -101,10 +110,11 @@ public class ViewConfigEntityAdapter
   public ViewConfig read(final ODocument document) {
     checkNotNull(document);
 
-    ViewConfig entity = new ViewConfig((String) document.field(P_VIEWNAME, OType.STRING),
-        (String) document.field(P_FACTORYNAME, OType.STRING),
-        (Map<String, Object>) document.field(P_CONFIGURATION, OType.EMBEDDEDMAP)
-    );
+    final String viewName = document.field(P_VIEWNAME, OType.STRING);
+    final String viewId = document.field(P_VIEWID, OType.STRING);
+    final String factoryName = document.field(P_FACTORYNAME, OType.STRING);
+    final Map<String, Object> config = document.field(P_CONFIGURATION, OType.EMBEDDEDMAP);
+    ViewConfig entity = new ViewConfig(new ViewId(viewName, viewId), factoryName, config);
 
     return entity;
   }

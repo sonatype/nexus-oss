@@ -18,17 +18,17 @@ package org.sonatype.nexus.component.source.api;
 public abstract class ComponentSourceGroup
     implements PullComponentSource
 {
-  private final String name;
+  private final ComponentSourceId name;
 
   private final Iterable<PullComponentSource> sources;
 
-  public ComponentSourceGroup(final String name, final Iterable<PullComponentSource> sources) {
+  public ComponentSourceGroup(final ComponentSourceId name, final Iterable<PullComponentSource> sources) {
     this.name = name;
     this.sources = sources;
   }
 
   @Override
-  public String getName() {
+  public ComponentSourceId getId() {
     return name;
   }
 }

@@ -26,4 +26,10 @@ public interface ComponentSourceRegistry
    */
   @Nullable
   public <T extends ComponentSource> T getSource(String name);
+
+  /**
+   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
+   */
+  @Nullable
+  public <T extends ComponentSource> T getSource(ComponentSourceId sourceId);
 }

@@ -20,7 +20,8 @@ package org.sonatype.nexus.component.source.api;
 public interface ComponentReceiver
 {
   /**
-   * Receive components (possibly storing them).
+   * Receive components (possibly storing them). If storage of components or assets fails, this method
+   * should throw a {@link RuntimeException}, ideally, abandoning the storage of any
    *
    * @param source The {@link PushComponentSource} that pushed the components to us.
    */

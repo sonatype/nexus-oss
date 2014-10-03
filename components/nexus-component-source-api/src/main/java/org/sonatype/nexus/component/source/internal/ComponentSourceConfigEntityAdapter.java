@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -40,14 +41,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ComponentSourceConfigEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "viewConfig";
+  public static final String DB_PREFIX = "sourceConfig";
 
   public static final String DB_CLASS = new OClassNameBuilder()
       .prefix(DB_PREFIX)
       .type(ComponentSourceConfig.class)
       .build();
 
-  public static final String P_SOURCENAME = "viewName";
+  public static final String P_SOURCEID_NAME = "id.name";
+
+  public static final String P_SOURCEID_ID = "id.id";
 
   public static final String P_FACTORYNAME = "factoryName";
 
@@ -64,8 +67,12 @@ public class ComponentSourceConfigEntityAdapter
     if (type == null) {
       type = schema.createClass(DB_CLASS);
 
-      type.createProperty(P_SOURCENAME, OType.STRING).setNotNull(true);
-      type.createIndex(P_SOURCENAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCENAME);
+      type.createProperty(P_SOURCEID_NAME, OType.STRING).setNotNull(true);
+      type.createIndex(P_SOURCEID_NAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_NAME);
+
+      type.createProperty(P_SOURCEID_ID, OType.STRING).setNotNull(true);
+      type.createIndex(P_SOURCEID_ID + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_ID);
+
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
@@ -92,7 +99,8 @@ public class ComponentSourceConfigEntityAdapter
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_SOURCENAME, entity.getSourceName());
+    document.field(P_SOURCEID_NAME, entity.getSourceName().getName());
+    document.field(P_SOURCEID_ID, entity.getSourceName().getIdentifier());
     document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 
@@ -105,10 +113,13 @@ public class ComponentSourceConfigEntityAdapter
   public ComponentSourceConfig read(final ODocument document) {
     checkNotNull(document);
 
-    ComponentSourceConfig entity = new ComponentSourceConfig((String) document.field(P_SOURCENAME, OType.STRING),
-        (String) document.field(P_FACTORYNAME, OType.STRING),
-        (Map<String, Object>) document.field(P_CONFIGURATION, OType.EMBEDDEDMAP)
-    );
+    final String name = document.field(P_SOURCEID_NAME, OType.STRING);
+    final String identifier = document.field(P_SOURCEID_ID, OType.STRING);
+
+    final String factoryName = document.field(P_FACTORYNAME, OType.STRING);
+    final Map<String, Object> config = document.field(P_CONFIGURATION, OType.EMBEDDEDMAP);
+    ComponentSourceConfig entity = new ComponentSourceConfig(new ComponentSourceId(name, identifier), factoryName,
+        config);
 
     return entity;
   }

@@ -19,6 +19,7 @@ import org.sonatype.nexus.component.model.Asset;
  *
  * @since 3.0
  */
+// TODO: Make this <T extends Component> once that's merged down
 public interface ComponentEnvelope<T>
 {
   T getComponent();

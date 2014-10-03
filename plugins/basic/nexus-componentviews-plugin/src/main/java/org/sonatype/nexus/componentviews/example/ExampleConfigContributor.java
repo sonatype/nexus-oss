@@ -18,6 +18,7 @@ import java.util.HashMap;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigContributor;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
@@ -39,7 +40,7 @@ public class ExampleConfigContributor
     log.info("Force-adding a pathList view definition.");
     final ViewConfig pathListConfig = store.get("pathList");
     if (pathListConfig == null) {
-      store.add(new ViewConfig("pathList", "pathList", new HashMap<String, Object>()));
+      store.add(new ViewConfig(new ViewId("pathList", "foo_a23fab"), "pathList", new HashMap<String, Object>()));
     }
   }
 }

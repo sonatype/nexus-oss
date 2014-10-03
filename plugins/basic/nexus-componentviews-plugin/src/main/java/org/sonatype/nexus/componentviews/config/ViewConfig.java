@@ -12,10 +12,11 @@
  */
 package org.sonatype.nexus.componentviews.config;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.componentviews.ViewId;
+
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,22 +28,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ViewConfig
 {
-  private final String viewName;
+
+  private final ViewId viewId;
 
   private final String factoryName;
 
   private final Map<String, Object> configuration;
 
-  public ViewConfig(final String viewName, final String factoryName,
+  public ViewConfig(final ViewId viewId, final String factoryName,
                     final Map<String, Object> configuration)
   {
-    this.viewName = checkNotNull(viewName);
+    this.viewId = checkNotNull(viewId);
     this.factoryName = checkNotNull(factoryName);
     this.configuration = ImmutableMap.copyOf(checkNotNull(configuration));
   }
 
   public String getViewName() {
-    return viewName;
+    return viewId.getName();
+  }
+
+  public ViewId getViewId() {
+    return viewId;
   }
 
   public String getFactoryName() {
@@ -55,9 +61,6 @@ public class ViewConfig
 
   @Override
   public String toString() {
-    return "ViewConfig{" +
-        "viewName='" + viewName + '\'' +
-        ", factoryName='" + factoryName + '\'' +
-        '}';
+    return Objects.toStringHelper(this).add("viewId", viewId).add("factoryName", factoryName).toString();
   }
 }

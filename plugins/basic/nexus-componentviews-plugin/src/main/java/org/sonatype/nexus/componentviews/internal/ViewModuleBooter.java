@@ -95,7 +95,7 @@ public class ViewModuleBooter
     for (ViewConfig config : viewConfigStore.getAll().values()) {
       final ViewFactory factory = viewFactorySource.getFactory(config.getFactoryName());
       if (factory != null) {
-        log.debug("Creating view {}", config.getViewName());
+        log.debug("Creating view {}", config.getViewId());
         viewRegistry.registerView(factory.createView(config));
       }
       else {

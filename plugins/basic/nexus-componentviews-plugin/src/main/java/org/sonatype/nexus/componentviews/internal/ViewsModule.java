@@ -43,8 +43,8 @@ public class ViewsModule
       @Override
       protected void configureServlets() {
         bind(ComponentViewServlet.class);
-        serve("/views").with(ComponentViewServlet.class);
-        serve("/views/*").with(ComponentViewServlet.class);
+        serve("/view").with(ComponentViewServlet.class);
+        serve("/view/*").with(ComponentViewServlet.class);
       }
     });
     log.info("Nexus component views configured.");

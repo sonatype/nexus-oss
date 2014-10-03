@@ -15,6 +15,7 @@ package org.sonatype.nexus.component.source.api.config;
 import java.util.Map;
 
 import org.sonatype.nexus.component.source.api.ComponentSource;
+import org.sonatype.nexus.component.source.api.ComponentSourceId;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -27,13 +28,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ComponentSourceConfig
 {
-  private final String sourceName;
+  private final ComponentSourceId sourceName;
 
   private final String factoryName;
 
   private final Map<String, Object> configuration;
 
-  public ComponentSourceConfig(final String sourceName, final String factoryName,
+  public ComponentSourceConfig(final ComponentSourceId sourceName, final String factoryName,
                                final Map<String, Object> configuration)
   {
     this.sourceName = checkNotNull(sourceName);
@@ -41,7 +42,7 @@ public class ComponentSourceConfig
     this.configuration = ImmutableMap.copyOf(checkNotNull(configuration));
   }
 
-  public String getSourceName() {
+  public ComponentSourceId getSourceName() {
     return sourceName;
   }
 

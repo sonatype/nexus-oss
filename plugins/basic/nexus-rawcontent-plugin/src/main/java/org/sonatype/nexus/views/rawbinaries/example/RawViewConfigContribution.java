@@ -18,6 +18,7 @@ import java.util.Collections;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigContributor;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
@@ -40,23 +41,36 @@ public class RawViewConfigContribution
 {
   private static final String VIEW_NAME = "binaries";
 
+  private static final String VIEW_IDENTIFIER = "foo_234a34234";
+
   private static final String PROXY_VIEW_NAME = "bin-proxy";
+
+
+  private static final String PROXY_VIEW_IDENTIFIER = "bar_34wfe32434";
 
   @Override
   public void contributeTo(final ViewConfigStore viewConfigStore) throws IOException {
+
+    final ViewConfig hostedViewConfig = new ViewConfig(new ViewId(VIEW_NAME, VIEW_IDENTIFIER),
+        RawBinaryViewFactory.FACTORY_NAME,
+        Collections.<String, Object>emptyMap());
+
+    addIfAbsent(hostedViewConfig, viewConfigStore);
+
+    final ViewConfig proxyViewConfig = new ViewConfig(new ViewId(PROXY_VIEW_NAME, PROXY_VIEW_IDENTIFIER),
+        RawBinaryProxyViewFactory.FACTORY_NAME,
+        ImmutableMap.of("sourceName", (Object) RawSourceConfigContribution.SOURCE_NAME));
+
+    addIfAbsent(proxyViewConfig, viewConfigStore);
+  }
+
+  private void addIfAbsent(final ViewConfig config, final ViewConfigStore viewConfigStore) throws IOException {
     final ViewConfig viewConfig = viewConfigStore.get(VIEW_NAME);
     if (viewConfig == null) {
-      log.info("Force-adding config for /views/{}.", VIEW_NAME);
-      viewConfigStore.add(
-          new ViewConfig(VIEW_NAME, RawBinaryViewFactory.FACTORY_NAME, Collections.<String, Object>emptyMap()));
-    }
 
-    final ViewConfig proxyViewConfig = viewConfigStore.get(PROXY_VIEW_NAME);
-    if (proxyViewConfig == null) {
-      log.info("Force-adding config for /views/{}", PROXY_VIEW_NAME);
-      viewConfigStore.add(
-          new ViewConfig(PROXY_VIEW_NAME, RawBinaryProxyViewFactory.FACTORY_NAME,
-              ImmutableMap.of("sourceName", (Object) RawSourceConfigContribution.SOURCE_NAME)));
+      log.info("Force-adding config for /views/{}.", config.getViewName());
+
+      viewConfigStore.add(config);
     }
   }
 }
