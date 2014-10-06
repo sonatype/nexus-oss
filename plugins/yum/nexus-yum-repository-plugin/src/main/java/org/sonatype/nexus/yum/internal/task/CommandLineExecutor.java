@@ -17,6 +17,9 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.gossip.Level;
+import org.sonatype.gossip.support.LoggingOutputStream;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -40,7 +43,10 @@ public class CommandLineExecutor
 
     CommandLine cmdLine = CommandLine.parse(command);
     DefaultExecutor executor = new DefaultExecutor();
-    executor.setStreamHandler(new PumpStreamHandler());
+    executor.setStreamHandler(new PumpStreamHandler(
+        new LoggingOutputStream(LOG, Level.DEBUG),
+        new LoggingOutputStream(LOG, Level.ERROR)
+    ));
 
     int exitValue = executor.execute(cmdLine);
     LOG.debug("Execution finished with exit code : {}", exitValue);
