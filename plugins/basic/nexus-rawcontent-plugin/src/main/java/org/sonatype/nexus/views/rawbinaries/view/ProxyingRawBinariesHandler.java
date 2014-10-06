@@ -1,3 +1,15 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2014 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package org.sonatype.nexus.views.rawbinaries.view;
 
 import java.io.IOException;
@@ -6,7 +18,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
+import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.ViewRequest;
@@ -60,13 +74,14 @@ public class ProxyingRawBinariesHandler
         // If not, contact the remote source and store whatever it has
 
         try {
-          final Iterable<ComponentEnvelope<Object>> envelopes = source
-              .fetchComponents(ImmutableMap.of("path", req.getPath()));
+          final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", req.getPath()));
 
-          for (ComponentEnvelope<Object> envelope : envelopes) {
+          // Here we presume we're getting Component back, since we don't actually use the component metadata
+          final Iterable<ComponentEnvelope<Component>> envelopes = source.fetchComponents(path);
+
+          for (ComponentEnvelope<Component> envelope : envelopes) {
             for (Asset asset : envelope.getAssets()) {
-              final RawBinary rawBinary = binaryStore.create(asset.getPath(), asset.getContentType(),
-                  asset.openStream());
+              binaryStore.create(asset.getPath(), asset.getContentType(), asset.openStream());
             }
           }
         }

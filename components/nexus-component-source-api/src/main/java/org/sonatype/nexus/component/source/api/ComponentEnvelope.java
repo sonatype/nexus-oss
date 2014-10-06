@@ -13,14 +13,14 @@
 package org.sonatype.nexus.component.source.api;
 
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 
 /**
  * A transmitted component and handles for any assets.
  *
  * @since 3.0
  */
-// TODO: Make this <T extends Component> once that's merged down
-public interface ComponentEnvelope<T>
+public interface ComponentEnvelope<T extends Component>
 {
   T getComponent();
 

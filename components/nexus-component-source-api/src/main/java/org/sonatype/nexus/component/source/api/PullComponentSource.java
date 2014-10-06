@@ -13,10 +13,10 @@
 package org.sonatype.nexus.component.source.api;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
 
 /**
@@ -44,5 +44,5 @@ public interface PullComponentSource
    * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
    */
   @Nullable
-  <T> Iterable<ComponentEnvelope<T>> fetchComponents(Map<String, String> query) throws IOException;
+  <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest request) throws IOException;
 }

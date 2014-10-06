@@ -73,7 +73,7 @@ public class RawBinaryProxyViewFactory
 
     checkNotNull(sourceName, "Source name cannot be null for proxy config");
 
-    final PullComponentSource source = (PullComponentSource) sourceRegistry.getSource(sourceName);
+    final PullComponentSource source = sourceRegistry.getSource(sourceName);
 
     final HostedRawBinariesHandler hosted = new HostedRawBinariesHandler(binaryStore);
     final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(hosted, binaryStore, source);
