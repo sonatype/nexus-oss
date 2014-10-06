@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RepositoryUtils;
@@ -139,10 +140,11 @@ public class MergeMetadataTask
         try (InputStream in = ((StorageFileItem) repomdItem).getInputStream()) {
           final RepoMD repomd = new RepoMD(in);
           for (final String location : repomd.getLocations()) {
-            log.trace("Retrieving {}:{}", memberRepository.getId(), "/" + location);
-            memberRepository.retrieveItem(
-                new ResourceStoreRequest("/" + location)
-            );
+            String retrieveLocation = "/" + location;
+            if (!retrieveLocation.matches("/" + Yum.PATH_OF_REPODATA + "/.*\\.sqlite\\.bz2")) {
+              log.trace("Retrieving {}:{}", memberRepository.getId(), retrieveLocation);
+              memberRepository.retrieveItem(new ResourceStoreRequest(retrieveLocation));
+            }
           }
         }
         // all metadata files are available by now so lets use it
@@ -224,7 +226,7 @@ public class MergeMetadataTask
       repos.append(" --repo=");
       repos.append(memberRepoBaseDir.toURI().toString());
     }
-    return format("mergerepo -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath());
+    return format("mergerepo --no-database %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath());
   }
 
   public static ScheduledTask<YumRepository> createTaskFor(final NexusScheduler nexusScheduler,

@@ -76,6 +76,7 @@ public class YumHostedImplDeletionsTest
         mock(RepositoryURLBuilder.class),
         nexusScheduler,
         new ScheduledThreadPoolExecutor(10),
+        new BlockSqliteDatabasesRequestStrategy(),
         repository,
         new File(util.getTargetDir(), "tmp")
     ).setProcessDeletes(true)
