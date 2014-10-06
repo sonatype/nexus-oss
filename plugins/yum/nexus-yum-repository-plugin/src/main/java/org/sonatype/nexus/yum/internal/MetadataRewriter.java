@@ -71,12 +71,13 @@ public class MetadataRewriter
    *
    * @param repository                 containing yum repository
    * @param memberRepositoriesBaseDirs list of merged group repository base dirs
+   * @return true if primary.xml/repomd.xml was changed
    */
-  public static void rewritePrimaryLocationsAfterMerge(final Repository repository,
-                                                       final List<File> memberRepositoriesBaseDirs)
+  public static boolean rewritePrimaryLocationsAfterMerge(final Repository repository,
+                                                          final List<File> memberRepositoriesBaseDirs)
   {
     log.debug("Checking if {}:primary.xml locations should be rewritten after merge", repository.getId());
-    rewritePrimaryLocations(
+    return rewritePrimaryLocations(
         repository,
         new Processor()
         {
@@ -116,11 +117,12 @@ public class MetadataRewriter
    * All locations that have an xml:base + url matching repository url will be changed to be relative to repository.
    *
    * @param repository containing yum repository
+   * @return true if primary.xml/repomd.xml was changed
    */
-  public static void rewritePrimaryLocationsAfterProxy(final ProxyRepository repository) {
+  public static boolean rewritePrimaryLocationsAfterProxy(final ProxyRepository repository) {
     log.debug("Checking if {}:primary.xml locations should be rewritten after being proxied", repository.getId());
     final String repositoryUrl = repository.getRemoteUrl();
-    rewritePrimaryLocations(
+    return rewritePrimaryLocations(
         repository,
         new Processor()
         {
@@ -153,8 +155,9 @@ public class MetadataRewriter
    * Remove references to sqlite from repomd.xml
    *
    * @param repository containing repomd.xml
+   * @return true if repomd.xml was changed
    */
-  public static void removeSqliteFromRepoMD(final Repository repository) {
+  public static boolean removeSqliteFromRepoMD(final Repository repository) {
     log.debug("Checking if sqlite databases should be removed from {}:repomd.xml", repository.getId());
     try {
       boolean changed = false;
@@ -190,6 +193,8 @@ public class MetadataRewriter
         }
         storeItem(repository, PATH_OF_REPOMD_XML, repoMDOut.toByteArray(), "application/xml");
       }
+
+      return changed;
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
@@ -202,15 +207,18 @@ public class MetadataRewriter
    *
    * @param repository containing primary.xml
    * @param processor  location processor
+   * @return true if primary.xml/repomd.xml was changed
    */
-  public static void rewritePrimaryLocations(final Repository repository, final Processor processor) {
+  public static boolean rewritePrimaryLocations(final Repository repository, final Processor processor) {
     try {
       byte[] repoMDContent = readRepoMD(repository);
       byte[] primaryContent = processPrimary(repository, processor, repoMDContent);
 
       if (primaryContent != null) {
         storePrimary(repository, repoMDContent, primaryContent);
+        return true;
       }
+      return false;
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
