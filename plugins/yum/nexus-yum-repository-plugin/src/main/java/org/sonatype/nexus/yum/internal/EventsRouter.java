@@ -21,15 +21,12 @@ import javax.inject.Provider;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumHosted;
@@ -54,16 +51,16 @@ public class EventsRouter
 
   private static final Logger log = LoggerFactory.getLogger(EventsRouter.class);
 
-  private final Provider<RepositoryRegistry> repositoryRegistry;
+  private final Provider<RepositoryRegistry> repositoryRegistryProvider;
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
   @Inject
-  public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
+  public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistryProvider,
                       final Provider<YumRegistry> yumRegistryProvider,
                       final EventBus eventBus)
   {
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryRegistryProvider = checkNotNull(repositoryRegistryProvider);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
     checkNotNull(eventBus).register(this);
   }
@@ -109,27 +106,6 @@ public class EventsRouter
     }
   }
 
-  /**
-   * Automatically merge group level metadata when "/repodata/repomd.xml" is (re)retrieved from proxy.
-   *
-   * @since 2.7
-   */
-  @AllowConcurrentEvents
-  @Subscribe
-  public void on(RepositoryItemEventCache itemEvent) {
-    ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
-    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
-      log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
-      List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
-      for (GroupRepository group : groups) {
-        Yum yum = yumRegistryProvider.get().get(group.getId());
-        if (yum != null && yum instanceof YumGroup) {
-          ((YumGroup) yum).markDirty();
-        }
-      }
-    }
-  }
-
   private boolean isCollectionItem(RepositoryItemEvent itemEvent) {
     return StorageCollectionItem.class.isAssignableFrom(itemEvent.getItem().getClass());
   }
@@ -149,7 +125,7 @@ public class EventsRouter
     if (repositoryIds != null) {
       for (final String repositoryId : repositoryIds) {
         try {
-          repositoryRegistry.get().getRepository(repositoryId).retrieveItem(
+          repositoryRegistryProvider.get().getRepository(repositoryId).retrieveItem(
               new ResourceStoreRequest(Yum.PATH_OF_REPOMD_XML)
           );
           return true;

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.yum.internal;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,7 +27,9 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RequestStrategy;
@@ -36,6 +39,8 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.yum.Yum;
+import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumRegistry;
 
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
@@ -58,10 +63,19 @@ public class ProxyMetadataRequestStrategy
 
   private static final String REPOMD_XML_PATH = "/" + Yum.PATH_OF_REPOMD_XML;
 
+  private final RepositoryRegistry repositoryRegistry;
+
+  private final YumRegistry yumRegistry;
+
   private final Walker walker;
 
   @Inject
-  public ProxyMetadataRequestStrategy(final Walker walker) {
+  public ProxyMetadataRequestStrategy(final RepositoryRegistry repositoryRegistry,
+                                      final YumRegistry yumRegistry,
+                                      final Walker walker)
+  {
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.yumRegistry = checkNotNull(yumRegistry);
     this.walker = checkNotNull(walker);
   }
 
@@ -70,12 +84,14 @@ public class ProxyMetadataRequestStrategy
     if (request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPODATA)) {
       try {
         long now = System.currentTimeMillis();
+        boolean changed = false;
 
         log.trace("Checking if remote {}:repomd.xml changed", repository.getId());
         StorageFileItem repoMDItem = (StorageFileItem) repository.retrieveItem(
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().getStoredLocally() > now) {
+          changed = true;
           MetadataRewriter.removeSqliteFromRepoMD(repository);
         }
 
@@ -86,7 +102,18 @@ public class ProxyMetadataRequestStrategy
               false, new ResourceStoreRequest("/" + repoMD.getLocation("primary"))
           );
           if (primaryItem.getRepositoryItemAttributes().getStoredLocally() > now) {
-            MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
+            changed = changed || MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
+          }
+        }
+
+        if (changed) {
+          log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
+          List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository(repository);
+          for (GroupRepository group : groups) {
+            Yum yum = yumRegistry.get(group.getId());
+            if (yum != null && yum instanceof YumGroup) {
+              ((YumGroup) yum).markDirty();
+            }
           }
         }
       }
