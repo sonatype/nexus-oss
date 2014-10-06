@@ -69,18 +69,21 @@ public class ProxyMetadataRequestStrategy
   public void onHandle(final Repository repository, final ResourceStoreRequest request, final Action action) {
     if (request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPODATA)) {
       try {
-        log.trace("Checking if remote {}:{} changed", repository.getId(), REPOMD_XML_PATH);
         long now = System.currentTimeMillis();
+
+        log.trace("Checking if remote {}:repomd.xml changed", repository.getId());
         StorageFileItem repoMDItem = (StorageFileItem) repository.retrieveItem(
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().getStoredLocally() > now) {
           MetadataRewriter.removeSqliteFromRepoMD(repository);
         }
+
+        log.trace("Checking if remote {}:primary.xml changed", repository.getId());
         try (InputStream in = repoMDItem.getInputStream()) {
           RepoMD repoMD = new RepoMD(in);
           StorageFileItem primaryItem = (StorageFileItem) repository.retrieveItem(
-              false, new ResourceStoreRequest(REPOMD_XML_PATH)
+              false, new ResourceStoreRequest("/" + repoMD.getLocation("primary"))
           );
           if (primaryItem.getRepositoryItemAttributes().getStoredLocally() > now) {
             MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
