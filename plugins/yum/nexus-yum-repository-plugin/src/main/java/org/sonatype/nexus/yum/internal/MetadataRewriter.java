@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.DigesterUtils;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,13 +167,17 @@ public class MetadataRewriter
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
         doc = documentBuilder.parse(in);
-        NodeList datas = doc.getElementsByTagName("data");
-        for (int i = 0; i < datas.getLength(); i++) {
-          Element data = (Element) datas.item(i);
+        List<Element> elementsToRemove = Lists.newArrayList();
+        NodeList dataNodes = doc.getElementsByTagName("data");
+        for (int i = 0; i < dataNodes.getLength(); i++) {
+          Element data = (Element) dataNodes.item(i);
           if (data.getAttribute("type").endsWith("_db")) {
-            data.getParentNode().removeChild(data);
+            elementsToRemove.add(data);
             changed = true;
           }
+        }
+        for (Element element : elementsToRemove) {
+          element.getParentNode().removeChild(element);
         }
       }
 
