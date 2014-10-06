@@ -378,7 +378,7 @@ public class MetadataRewriter
   /**
    * Location processor.
    */
-  public static interface Processor
+  private static interface Processor
   {
     boolean process(Element location);
   }
