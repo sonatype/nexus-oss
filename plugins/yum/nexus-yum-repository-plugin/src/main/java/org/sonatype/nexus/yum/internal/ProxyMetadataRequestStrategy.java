@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.yum.internal;
 
-import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -84,30 +83,16 @@ public class ProxyMetadataRequestStrategy
     if (request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPODATA)) {
       try {
         long now = System.currentTimeMillis();
-        boolean changed = false;
 
         log.trace("Checking if remote {}:repomd.xml changed", repository.getId());
         StorageFileItem repoMDItem = (StorageFileItem) repository.retrieveItem(
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().getStoredLocally() > now) {
-          changed = true;
           MetadataRewriter.removeSqliteFromRepoMD(repository);
-        }
+          MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
 
-        log.trace("Checking if remote {}:primary.xml changed", repository.getId());
-        try (InputStream in = repoMDItem.getInputStream()) {
-          RepoMD repoMD = new RepoMD(in);
-          StorageFileItem primaryItem = (StorageFileItem) repository.retrieveItem(
-              false, new ResourceStoreRequest("/" + repoMD.getLocation("primary"))
-          );
-          if (primaryItem.getRepositoryItemAttributes().getStoredLocally() > now) {
-            changed = changed || MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
-          }
-        }
-
-        if (changed) {
-          log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
+          log.trace("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
           List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository(repository);
           for (GroupRepository group : groups) {
             Yum yum = yumRegistry.get(group.getId());
