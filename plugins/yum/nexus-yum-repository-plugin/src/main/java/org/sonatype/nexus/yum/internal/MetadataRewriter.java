@@ -246,9 +246,9 @@ public class MetadataRewriter
     DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
     Document doc = documentBuilder.parse(new ByteArrayInputStream(repoMDContent));
-    NodeList datas = doc.getElementsByTagName("data");
-    for (int i = 0; i < datas.getLength(); i++) {
-      Element data = (Element) datas.item(i);
+    NodeList dataElements = doc.getElementsByTagName("data");
+    for (int i = 0; i < dataElements.getLength(); i++) {
+      Element data = (Element) dataElements.item(i);
       if ("primary".equals(data.getAttribute("type"))) {
         String checksum = data.getElementsByTagName("checksum").item(0).getTextContent();
         data.getElementsByTagName("checksum").item(0).setTextContent(String.valueOf(compressedSha256));
