@@ -284,7 +284,10 @@ public class RaptureWebResourceBundle
   private List<String> getPluginConfigs() {
     List<String> classNames = Lists.newArrayList();
     for (UiPluginDescriptor descriptor : pluginDescriptors) {
-      classNames.add(descriptor.getConfigClassName());
+      String className = descriptor.getConfigClassName();
+      if (className != null) {
+        classNames.add(className);
+      }
     }
     return classNames;
   }
