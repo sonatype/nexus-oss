@@ -102,17 +102,17 @@ public final class DirSupport
 
     private final Path to;
 
-    private final Predicate<Path> filter;
+    private final Predicate<Path> excludeFilter;
 
-    public CopyVisitor(final Path from, final Path to, final Predicate<Path> filter) {
+    public CopyVisitor(final Path from, final Path to, final Predicate<Path> excludeFilter) {
       this.from = from;
       this.to = to;
-      this.filter = filter;
+      this.excludeFilter = excludeFilter;
     }
 
     @Override
     public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes a) throws IOException {
-      if (filter != null && filter.apply(dir)) {
+      if (excludeFilter != null && excludeFilter.apply(dir)) {
         return FileVisitResult.SKIP_SUBTREE;
       }
       final Path targetPath = to.resolve(from.relativize(dir));
@@ -256,7 +256,7 @@ public final class DirSupport
    * of directory, this method will recursively delete all of it siblings and the passed in directory too.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static void delete(final Path dir, final @Nullable Predicate<Path> filter) throws IOException {
+  public static void delete(final Path dir, final @Nullable Predicate<Path> excludeFilter) throws IOException {
     validateDirectoryOrFile(dir);
     if (Files.isDirectory(dir)) {
       Files.walkFileTree(dir, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
@@ -264,7 +264,7 @@ public final class DirSupport
           {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-              if (filter != null && filter.apply(dir)) {
+              if (excludeFilter != null && excludeFilter.apply(dir)) {
                 return FileVisitResult.SKIP_SUBTREE;
               }
               return FileVisitResult.CONTINUE;
@@ -286,7 +286,7 @@ public final class DirSupport
                 // as in that case filtered folder and it's parents will
                 // not be empty, hence needs no deletion attempt as it would fail.
                 boolean needsDelete = true;
-                if (filter != null) {
+                if (excludeFilter != null) {
                   try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
                     if (dirStream.iterator().hasNext()) {
                       needsDelete = false;
@@ -320,10 +320,12 @@ public final class DirSupport
    * returned, and in any other case (path does not exists) {@code false} is returned.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static boolean deleteIfExists(final Path dir, final @Nullable Predicate<Path> filter) throws IOException {
+  public static boolean deleteIfExists(final Path dir, final @Nullable Predicate<Path> excludeFilter)
+      throws IOException
+  {
     checkNotNull(dir);
     if (Files.exists(dir)) {
-      delete(dir, filter);
+      delete(dir, excludeFilter);
       return true;
     }
     else {
@@ -349,12 +351,14 @@ public final class DirSupport
    * alter behaviour of Copy operation using copy options, as seen on {@link Files#copy(Path, Path, CopyOption...)}.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static void copy(final Path from, final Path to, final @Nullable Predicate<Path> filter) throws IOException {
+  public static void copy(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+      throws IOException
+  {
     validateDirectoryOrFile(from);
     checkNotNull(to);
     if (Files.isDirectory(from)) {
       Files.walkFileTree(from, DEFAULT_FILE_VISIT_OPTIONS, Integer.MAX_VALUE,
-          new CopyVisitor(from, to, filter));
+          new CopyVisitor(from, to, excludeFilter));
     }
     else {
       mkdir(to.getParent());
@@ -375,12 +379,12 @@ public final class DirSupport
    * "from" path does not exists, {@code false} is returned.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static boolean copyIfExists(final Path from, final Path to, final @Nullable Predicate<Path> filter)
+  public static boolean copyIfExists(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
       throws IOException
   {
     checkNotNull(from);
     if (Files.exists(from)) {
-      copy(from, to, filter);
+      copy(from, to, excludeFilter);
       return true;
     }
     else {
@@ -405,16 +409,21 @@ public final class DirSupport
    * existing Paths that might denote a regular file or a directory.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static void move(final Path from, final Path to, final @Nullable Predicate<Path> filter) throws IOException {
-    try {
-      Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+  public static void move(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+      throws IOException
+  {
+    if (excludeFilter == null) {
+      try {
+        Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+        return;
+      }
+      catch (IOException e) {
+        // This happens also when dir is to be moved to it's subdirectory, like what NX Trash does
+        // give up, do copy+delete
+      }
     }
-    catch (IOException e) {
-      // This happens also when dir is to be moved to it's subdirectory, like what NX Trash does
-      // give up, do copy+delete
-      copy(from, to, filter);
-      delete(from, filter);
-    }
+    copy(from, to, excludeFilter);
+    delete(from, excludeFilter);
   }
 
   /**
@@ -430,12 +439,12 @@ public final class DirSupport
    * "from" path does not exists, {@code false} is returned.
    * The passed in filter can leave out a directory and it's complete subtree from operation.
    */
-  public static boolean moveIfExists(final Path from, final Path to, final @Nullable Predicate<Path> filter)
+  public static boolean moveIfExists(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
       throws IOException
   {
     checkNotNull(from);
     if (Files.exists(from)) {
-      move(from, to, filter);
+      move(from, to, excludeFilter);
       return true;
     }
     else {
