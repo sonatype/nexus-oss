@@ -89,8 +89,7 @@ public class ProxyMetadataRequestStrategy
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().getStoredLocally() > now) {
-          MetadataRewriter.removeSqliteFromRepoMD(repository);
-          MetadataRewriter.rewritePrimaryLocationsAfterProxy((ProxyRepository) repository);
+          MetadataRewriter.rewriteProxiedMetadata((ProxyRepository) repository);
 
           log.trace("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
           List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository(repository);

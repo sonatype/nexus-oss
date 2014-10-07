@@ -99,7 +99,7 @@ public class MergeMetadataTask
         if (memberReposBaseDirs.size() > 1) {
           log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
           commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-          MetadataRewriter.rewritePrimaryLocationsAfterMerge(groupRepository, memberReposBaseDirs);
+          MetadataRewriter.rewriteMergedMetadata(groupRepository, memberReposBaseDirs);
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {

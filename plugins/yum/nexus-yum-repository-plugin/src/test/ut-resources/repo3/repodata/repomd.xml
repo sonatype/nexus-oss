@@ -9,6 +9,15 @@
   <size>321</size>
   <open-size>591</open-size>
 </data>
+<data type="filelists_db">
+  <location xml:base="http://foobar.de/" href="repodata/filelists.sqlite.bz2"/>
+  <checksum type="sha1">29b660cec0cfca52189862b6d8217fa696ac50b6</checksum>
+  <timestamp>1330537351</timestamp>
+  <size>1495</size>
+  <open-size>7168</open-size>
+  <open-checksum type="sha1">cfcfae27b7ecaf2ddf33209d05d66bff3c721a1a</open-checksum>
+  <database_version>10</database_version>
+</data>
 <data type="updateinfo">
   <checksum type="sha256">ec2580f4ae94a8f7a87c40b4ced0c498a6688d77a6ca0b7594a7435e11328fb6</checksum>
   <open-checksum type="sha256">ded9c95e1b88197c906603b5d9693c579cb0afeade3bc7f8ec6cae06b962477d</open-checksum>
@@ -24,6 +33,15 @@
   <size>759</size>
   <open-size>2245</open-size>
 </data>
+<data type="primary_db">
+  <location xml:base="http://foobar.de/" href="repodata/primary.sqlite.bz2"/>
+  <checksum type="sha1">eb4addb28407d85f7d9c6845ffdcfe2a80fb3f62</checksum>
+  <timestamp>1330537351</timestamp>
+  <size>2729</size>
+  <open-size>26624</open-size>
+  <open-checksum type="sha1">08f4317e788610b77d2651ae7b69d324fd80c22f</open-checksum>
+  <database_version>10</database_version>
+</data>
 <data type="other">
   <checksum type="sha256">1e696d705c15231eefd7c8640c04e5dc7e257e0809ba905b6f00a0d32085ef69</checksum>
   <open-checksum type="sha256">274d11f14369dd7d21c1f938bea00bdae9b86a8c0108a277eef52b52e64043e9</open-checksum>
@@ -31,5 +49,14 @@
   <timestamp>1412266249</timestamp>
   <size>300</size>
   <open-size>467</open-size>
+</data>
+<data type="other_db">
+  <location xml:base="http://foobar.de/" href="repodata/other.sqlite.bz2"/>
+  <checksum type="sha1">e7eca98287b407a55151df2535d0bc03a2d5b3bc</checksum>
+  <timestamp>1330537351</timestamp>
+  <size>1461</size>
+  <open-size>6144</open-size>
+  <open-checksum type="sha1">341a14466bbe4e7687b0a93d36c183edf568c4f1</open-checksum>
+  <database_version>10</database_version>
 </data>
 </repomd>

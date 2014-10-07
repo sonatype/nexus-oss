@@ -12,33 +12,39 @@
  */
 package org.sonatype.nexus.yum.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers.equalTo;
@@ -56,50 +62,42 @@ public class MetadataRewriterTest
   @Rule
   public TestDataRule testData = new TestDataRule(util.resolveFile("src/test/ut-resources"));
 
+  private Map<String, byte[]> storage = Maps.newHashMap();
+
   @Test
-  public void verifyRewriteOfPrimaryLocationsAfterMerge()
+  public void verifyRewriteAfterMerge()
       throws Exception
   {
     Repository repository = mock(Repository.class);
-    when(repository.getId()).thenReturn("test");
-    when(repository.retrieveItem(eq(false), any(ResourceStoreRequest.class))).thenAnswer(new Answer<StorageFileItem>()
-    {
-      @Override
-      public StorageFileItem answer(final InvocationOnMock invocationOnMock) throws Throwable {
-        ResourceStoreRequest request = (ResourceStoreRequest) invocationOnMock.getArguments()[1];
-        StorageFileItem storageFileItem = mock(StorageFileItem.class);
-        when(storageFileItem.getInputStream()).thenReturn(
-            new FileInputStream(testData.resolveFile("repo3" + request.getRequestPath()))
-        );
-        return storageFileItem;
-      }
-    });
+    mockRepository(repository, "repo3");
 
-    MetadataRewriter.rewritePrimaryLocationsAfterMerge(
+    MetadataRewriter.rewriteMergedMetadata(
         repository,
         Arrays.asList(new File(STORAGE + "releases"), new File(STORAGE + "thirdparty"))
     );
 
-    ArgumentCaptor<StorageFileItem> items = ArgumentCaptor.forClass(StorageFileItem.class);
     ArgumentCaptor<ResourceStoreRequest> deleteRequests = ArgumentCaptor.forClass(ResourceStoreRequest.class);
     verify(repository).deleteItem(eq(false), deleteRequests.capture());
-    verify(repository, times(2)).storeItem(eq(false), items.capture());
 
     // verify that old primary.xml was deleted
     assertThat(deleteRequests.getAllValues().get(0).getRequestPath(), is(
         "/repodata/b7bad82bc89d0c651f8aeefffa3b43e69725c6fc0cc4dd840ecb999698861428-primary.xml.gz"
     ));
 
-    // check that first stored is primary.xml with a new name
-    assertThat(items.getAllValues().get(0).getPath(), is(
+    // check that primary.xml is stored
+    byte[] primaryBytes = storage.get(
         "/repodata/2fefc2f0541419d2dcf3fc73d2b8db1cc5782d522443b51b954c4e94d5a8c001-primary.xml.gz"
-    ));
+    );
+    assertThat(primaryBytes, is(notNullValue()));
 
-    // check that second stored is repomd.xml
-    assertThat(items.getAllValues().get(1).getPath(), is("/repodata/repomd.xml"));
+    // check that repomd.xml is stored
+    byte[] repomdBytes = storage.get(
+        "/repodata/repomd.xml"
+    );
+    assertThat(repomdBytes, is(notNullValue()));
 
     // compare primary.xml content
-    try (InputStream primaryIn = new GZIPInputStream(items.getAllValues().get(0).getInputStream())) {
+    try (InputStream primaryIn = new GZIPInputStream(new ByteArrayInputStream(primaryBytes))) {
       assertThat(
           IOUtils.toString(primaryIn),
           is(equalTo(readFileToString(testData.resolveFile("repo3-result/repodata/primary.xml"))))
@@ -108,53 +106,43 @@ public class MetadataRewriterTest
 
     // compare repomd.xml content
     assertThat(
-        IOUtils.toString(items.getAllValues().get(1).getInputStream()),
+        IOUtils.toString(new ByteArrayInputStream(repomdBytes)),
         is(equalTo(readFileToString(testData.resolveFile("repo3-result/repodata/repomd.xml"))))
     );
   }
 
   @Test
-  public void verifyRewriteOfPrimaryLocationsAfterProxy()
+  public void verifyRewriteAfterProxy()
       throws Exception
   {
     ProxyRepository repository = mock(ProxyRepository.class);
-    when(repository.getId()).thenReturn("test");
+    mockRepository(repository, "repo5");
     when(repository.getRemoteUrl()).thenReturn("http://localhost:8082/nexus/content/repositories/thirdparty");
-    when(repository.retrieveItem(eq(false), any(ResourceStoreRequest.class))).thenAnswer(new Answer<StorageFileItem>()
-    {
-      @Override
-      public StorageFileItem answer(final InvocationOnMock invocationOnMock) throws Throwable {
-        ResourceStoreRequest request = (ResourceStoreRequest) invocationOnMock.getArguments()[1];
-        StorageFileItem storageFileItem = mock(StorageFileItem.class);
-        when(storageFileItem.getInputStream()).thenReturn(
-            new FileInputStream(testData.resolveFile("repo5" + request.getRequestPath()))
-        );
-        return storageFileItem;
-      }
-    });
 
-    MetadataRewriter.rewritePrimaryLocationsAfterProxy(repository);
+    MetadataRewriter.rewriteProxiedMetadata(repository);
 
-    ArgumentCaptor<StorageFileItem> items = ArgumentCaptor.forClass(StorageFileItem.class);
     ArgumentCaptor<ResourceStoreRequest> deleteRequests = ArgumentCaptor.forClass(ResourceStoreRequest.class);
     verify(repository).deleteItem(eq(false), deleteRequests.capture());
-    verify(repository, times(2)).storeItem(eq(false), items.capture());
 
     // verify that old primary.xml was deleted
     assertThat(deleteRequests.getAllValues().get(0).getRequestPath(), is(
         "/repodata/57a84398efb9478dd2fc2d23467b55479939ff3a48f21d0beacd0b5849713f48-primary.xml.gz"
     ));
 
-    // check that first stored is primary.xml with a new name
-    assertThat(items.getAllValues().get(0).getPath(), is(
+    // check that primary.xml is stored
+    byte[] primaryBytes = storage.get(
         "/repodata/8ef31e4bdca995f6fe5b7a63387ddc60c718175ca6eaec9d4cadbefb81fd5828-primary.xml.gz"
-    ));
+    );
+    assertThat(primaryBytes, is(notNullValue()));
 
-    // check that second stored is repomd.xml
-    assertThat(items.getAllValues().get(1).getPath(), is("/repodata/repomd.xml"));
+    // check that repomd.xml is stored
+    byte[] repomdBytes = storage.get(
+        "/repodata/repomd.xml"
+    );
+    assertThat(repomdBytes, is(notNullValue()));
 
     // compare primary.xml content
-    try (InputStream primaryIn = new GZIPInputStream(items.getAllValues().get(0).getInputStream())) {
+    try (InputStream primaryIn = new GZIPInputStream(new ByteArrayInputStream(primaryBytes))) {
       assertThat(
           IOUtils.toString(primaryIn),
           is(equalTo(readFileToString(testData.resolveFile("repo5-result/repodata/primary.xml"))))
@@ -163,16 +151,14 @@ public class MetadataRewriterTest
 
     // compare repomd.xml content
     assertThat(
-        IOUtils.toString(items.getAllValues().get(1).getInputStream()),
+        IOUtils.toString(new ByteArrayInputStream(repomdBytes)),
         is(equalTo(readFileToString(testData.resolveFile("repo5-result/repodata/repomd.xml"))))
     );
   }
 
-  @Test
-  public void verifyRemoveOfSqliteFromRepoMD()
+  private void mockRepository(final Repository repository, final String repoDir)
       throws Exception
   {
-    Repository repository = mock(Repository.class);
     when(repository.getId()).thenReturn("test");
     when(repository.retrieveItem(eq(false), any(ResourceStoreRequest.class))).thenAnswer(new Answer<StorageFileItem>()
     {
@@ -180,26 +166,26 @@ public class MetadataRewriterTest
       public StorageFileItem answer(final InvocationOnMock invocationOnMock) throws Throwable {
         ResourceStoreRequest request = (ResourceStoreRequest) invocationOnMock.getArguments()[1];
         StorageFileItem storageFileItem = mock(StorageFileItem.class);
-        when(storageFileItem.getInputStream()).thenReturn(
-            new FileInputStream(testData.resolveFile("repo4" + request.getRequestPath()))
-        );
+        InputStream in;
+        if (storage.containsKey(request.getRequestPath())) {
+          in = new ByteArrayInputStream(storage.get(request.getRequestPath()));
+        }
+        else {
+          in = new FileInputStream(testData.resolveFile(repoDir + request.getRequestPath()));
+        }
+        when(storageFileItem.getInputStream()).thenReturn(in);
         return storageFileItem;
       }
     });
-
-    MetadataRewriter.removeSqliteFromRepoMD(repository);
-
-    ArgumentCaptor<StorageFileItem> items = ArgumentCaptor.forClass(StorageFileItem.class);
-    verify(repository).storeItem(eq(false), items.capture());
-
-    // check that repomd.xml is stored
-    assertThat(items.getAllValues().get(0).getPath(), is("/repodata/repomd.xml"));
-
-    // compare repomd.xml content
-    assertThat(
-        IOUtils.toString(items.getAllValues().get(0).getInputStream()),
-        is(equalTo(readFileToString(testData.resolveFile("repo4-result/repodata/repomd.xml"))))
-    );
+    doAnswer(new Answer()
+    {
+      @Override
+      public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
+        StorageFileItem item = (StorageFileItem) invocationOnMock.getArguments()[1];
+        storage.put(item.getPath(), IOUtils.toByteArray(item.getInputStream()));
+        return null;
+      }
+    }).when(repository).storeItem(eq(false), Mockito.any(StorageItem.class));
   }
 
 }

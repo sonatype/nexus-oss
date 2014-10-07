@@ -8,6 +8,7 @@
   <size>321</size>
   <open-size>591</open-size>
 </data>
+
 <data type="updateinfo">
   <checksum type="sha256">ec2580f4ae94a8f7a87c40b4ced0c498a6688d77a6ca0b7594a7435e11328fb6</checksum>
   <open-checksum type="sha256">ded9c95e1b88197c906603b5d9693c579cb0afeade3bc7f8ec6cae06b962477d</open-checksum>
@@ -23,6 +24,7 @@
   <size>682</size>
   <open-size>1978</open-size>
 </data>
+
 <data type="other">
   <checksum type="sha256">1e696d705c15231eefd7c8640c04e5dc7e257e0809ba905b6f00a0d32085ef69</checksum>
   <open-checksum type="sha256">274d11f14369dd7d21c1f938bea00bdae9b86a8c0108a277eef52b52e64043e9</open-checksum>
@@ -31,4 +33,5 @@
   <size>300</size>
   <open-size>467</open-size>
 </data>
+
 </repomd>
