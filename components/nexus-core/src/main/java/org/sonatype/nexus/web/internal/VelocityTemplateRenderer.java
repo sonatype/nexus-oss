@@ -82,6 +82,7 @@ public class VelocityTemplateRenderer
     checkArgument(responseCode >= 400);
     checkNotNull(errorDescription);
 
+    // ensure sanity of passed in strings which are used to render html content
     if (reasonPhrase != null) {
       reasonPhrase = StringEscapeUtils.escapeHtml(reasonPhrase);
     }
@@ -94,14 +95,7 @@ public class VelocityTemplateRenderer
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
     dataModel.put("errorDescription", errorDescription);
 
-    // NOTE: specifically not including stack trace, we do not want to include this in details shown to users
-    if (Strings.isNullOrEmpty(reasonPhrase)) {
-      response.setStatus(responseCode);
-    }
-    else {
-      response.setStatus(responseCode, reasonPhrase);
-    }
-
+    response.setStatus(responseCode);
     render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
         VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }
