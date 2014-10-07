@@ -72,8 +72,8 @@ public class VelocityTemplateRenderer
   public void renderErrorPage(final HttpServletRequest request,
                               final HttpServletResponse response,
                               final int responseCode,
-                              final @Nullable String reasonPhrase,
-                              final String errorDescription,
+                              @Nullable String reasonPhrase,
+                              String errorDescription,
                               final @Nullable Throwable exception)
       throws IOException
   {
@@ -82,15 +82,19 @@ public class VelocityTemplateRenderer
     checkArgument(responseCode >= 400);
     checkNotNull(errorDescription);
 
+    if (reasonPhrase != null) {
+      reasonPhrase = StringEscapeUtils.escapeHtml(reasonPhrase);
+    }
+    errorDescription = StringEscapeUtils.escapeHtml(errorDescription);
+
     final Map<String, Object> dataModel = Maps.newHashMap();
     dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
     dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
-    dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
+    dataModel.put("errorDescription", errorDescription);
 
     // NOTE: specifically not including stack trace, we do not want to include this in details shown to users
-
     if (Strings.isNullOrEmpty(reasonPhrase)) {
       response.setStatus(responseCode);
     }
