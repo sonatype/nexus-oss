@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.component.source.api.config;
 
+import java.io.IOException;
+
 import javax.inject.Named;
 
 /**
@@ -22,5 +24,5 @@ import javax.inject.Named;
  */
 public interface ComponentSourceConfigContributor
 {
-  void contributeTo(ComponentSourceConfigStore store);
+  void contributeTo(ComponentSourceConfigStore store) throws IOException;
 }

@@ -38,8 +38,8 @@ public abstract class ComponentOriginId
   public ComponentOriginId(final String name, final String identifier) {
     validatePortions(name, identifier);
 
-    this.name = checkNotNull(name);
-    this.identifier = checkNotNull(identifier);
+    this.name = name;
+    this.identifier = identifier;
   }
 
   public ComponentOriginId(final String uniqueString) {

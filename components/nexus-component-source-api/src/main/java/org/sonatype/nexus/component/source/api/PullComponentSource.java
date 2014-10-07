@@ -43,6 +43,5 @@ public interface PullComponentSource
    *
    * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
    */
-  @Nullable
-  <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest request) throws IOException;
+  <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }

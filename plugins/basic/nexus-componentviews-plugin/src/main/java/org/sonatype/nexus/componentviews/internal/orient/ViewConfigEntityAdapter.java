@@ -36,12 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ViewConfigEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "viewConfig";
-
-  public static final String DB_CLASS = new OClassNameBuilder()
-      .prefix(DB_PREFIX)
-      .type(ViewConfig.class)
-      .build();
+  public static final String DB_CLASS = new OClassNameBuilder().type("ViewConfig").build();
 
   public static final String P_VIEWNAME = "id.name";
 
@@ -64,15 +59,12 @@ public class ViewConfigEntityAdapter
       type = schema.createClass(DB_CLASS);
 
       type.createProperty(P_VIEWNAME, OType.STRING).setNotNull(true);
-      type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
-
       type.createProperty(P_VIEWID, OType.STRING).setNotNull(true);
-      type.createIndex(P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
-
-
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
+      type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
+      //type.createIndex(P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
     return type;
@@ -96,8 +88,11 @@ public class ViewConfigEntityAdapter
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_VIEWNAME, entity.getViewName());
-    document.field(P_VIEWID, entity.getViewId().getIdentifier());
+    final String viewName = entity.getViewName();
+    final String viewId = entity.getViewId().getIdentifier();
+
+    document.field(P_VIEWNAME, viewName);
+    document.field(P_VIEWID, viewId);
     document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 

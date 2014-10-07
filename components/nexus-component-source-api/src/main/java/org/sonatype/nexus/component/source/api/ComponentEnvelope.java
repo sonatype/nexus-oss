@@ -15,18 +15,37 @@ package org.sonatype.nexus.component.source.api;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 
+import static java.util.Arrays.asList;
+
 /**
  * A transmitted component and handles for any assets.
  *
  * @since 3.0
  */
-public interface ComponentEnvelope<T extends Component>
+public class ComponentEnvelope<T extends Component>
 {
-  T getComponent();
+  private final T component;
+
+  private final Iterable<Asset> assets;
+
+  public ComponentEnvelope(final T component, final Iterable<Asset> assets) {
+    this.component = component;
+    this.assets = assets;
+  }
+
+  public T getComponent() {
+    return component;
+  }
 
   /**
    * The {@link Asset}s returned are handles for remote resources: they should not be persisted directly, but
    * instead have their {@link Asset#openStream() streams} read. {@link Asset#getComponentId} will be {@code null}.
    */
-  Iterable<Asset> getAssets();
+  public Iterable<Asset> getAssets() {
+    return assets;
+  }
+
+  public static <T extends Component> ComponentEnvelope<T> simpleEnvelope(T component, Asset asset) {
+    return new ComponentEnvelope<T>(component, asList(asset));
+  }
 }

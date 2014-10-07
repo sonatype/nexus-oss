@@ -13,6 +13,7 @@
 package org.sonatype.nexus.component.source.internal;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -33,6 +34,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.storage.ORecordMetadata;
 
 /**
@@ -149,7 +151,20 @@ public class OrientComponentSourceConfigStore
   @Nullable
   @Override
   public ComponentSourceConfig get(final String sourceName) throws IOException {
-    return null;
+    try (ODatabaseDocumentTx db = openDb()) {
+
+      OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
+          "SELECT FROM " + ComponentSourceConfigEntityAdapter.DB_CLASS + " WHERE " +
+              ComponentSourceConfigEntityAdapter.P_SOURCEID_NAME + " = ?");
+
+      final List<ODocument> results = db.command(query).execute(sourceName);
+
+      if (results.isEmpty()) {
+        return null;
+      }
+
+      return entityAdapter.read(results.get(0));
+    }
   }
 
   /**

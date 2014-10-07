@@ -54,7 +54,7 @@ public class ComponentSourceBooter
 
   @Inject
   public ComponentSourceBooter(Map<String, ComponentSourceFactory> factories,
-                               final @Named("orientdb") ComponentSourceConfigStore sourceConfigStore,
+                               final @Named("orient") ComponentSourceConfigStore sourceConfigStore,
                                final InMemorySourceRegistry sourceRegistry,
                                final Set<ComponentSourceConfigContributor> configContributors)
   {
@@ -90,8 +90,8 @@ public class ComponentSourceBooter
         sourceRegistry.register(factory.createSource(config));
       }
       else {
-        log.error("No view factory found for view config {}", config);
-        throw new IllegalStateException("No view factory found for view config " + config);
+        log.error("No source factory found for view config {}", config);
+        throw new IllegalStateException("No source factory found for view config " + config);
       }
     }
   }

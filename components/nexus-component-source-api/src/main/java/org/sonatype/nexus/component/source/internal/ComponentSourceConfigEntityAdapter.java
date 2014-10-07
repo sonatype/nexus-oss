@@ -41,16 +41,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ComponentSourceConfigEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "sourceConfig";
+  public static final String DB_CLASS = new OClassNameBuilder().type("ComponentSource").build();
 
-  public static final String DB_CLASS = new OClassNameBuilder()
-      .prefix(DB_PREFIX)
-      .type(ComponentSourceConfig.class)
-      .build();
+  public static final String P_SOURCEID_NAME = "name";
 
-  public static final String P_SOURCEID_NAME = "id.name";
-
-  public static final String P_SOURCEID_ID = "id.id";
+  public static final String P_SOURCEID_ID = "id";
 
   public static final String P_FACTORYNAME = "factoryName";
 
@@ -68,13 +63,12 @@ public class ComponentSourceConfigEntityAdapter
       type = schema.createClass(DB_CLASS);
 
       type.createProperty(P_SOURCEID_NAME, OType.STRING).setNotNull(true);
-      type.createIndex(P_SOURCEID_NAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_NAME);
-
       type.createProperty(P_SOURCEID_ID, OType.STRING).setNotNull(true);
-      type.createIndex(P_SOURCEID_ID + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_ID);
-
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
+
+      type.createIndex(P_SOURCEID_NAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_NAME);
+      //type.createIndex(P_SOURCEID_ID + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_ID);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
@@ -99,8 +93,11 @@ public class ComponentSourceConfigEntityAdapter
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_SOURCEID_NAME, entity.getSourceName().getName());
-    document.field(P_SOURCEID_ID, entity.getSourceName().getIdentifier());
+    final String name = entity.getSourceName().getName();
+    final String identifier = entity.getSourceName().getIdentifier();
+
+    document.field(P_SOURCEID_NAME, name);
+    document.field(P_SOURCEID_ID, identifier);
     document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 
