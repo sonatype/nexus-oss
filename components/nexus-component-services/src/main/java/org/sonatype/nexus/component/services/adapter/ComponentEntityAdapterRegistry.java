@@ -10,36 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.mapper;
+package org.sonatype.nexus.component.services.adapter;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.recordstore.Record;
-import org.sonatype.nexus.component.recordstore.RecordType;
 
 /**
- * Converts component domain objects to record persistence objects, and vice-versa.
+ * A registry of {@link ComponentEntityAdapter}s, keyed by {@link Component} domain class.
  *
  * @since 3.0
  */
-public interface ComponentRecordMapper<T extends Component>
+public interface ComponentEntityAdapterRegistry
 {
   /**
-   * Gets the component (domain) class.
+   * Registers an adapter and creates the OrientDB class in the database if it doesn't already exist.
+   *
+   * @throws IllegalStateException if an adapter already exists in the registry with the same component class.
    */
-  Class<T> getComponentClass();
+  <T extends Component> void registerAdapter(ComponentEntityAdapter<T> adapter);
 
   /**
-   * Gets the record type, for storage.
+   * Gets the registered adapter for the given component class, or {@code null} if it doesn't exist.
    */
-  RecordType getRecordType();
-
-  /**
-   * Converts a component to a record object.
-   */
-  void componentToRecord(T component, Record record);
-
-  /**
-   * Converts a record to a component object.
-   */
-  T recordToComponent(Record record);
+  @Nullable
+  <T extends Component> ComponentEntityAdapter<T> getAdapter(Class<T> componentClass);
 }

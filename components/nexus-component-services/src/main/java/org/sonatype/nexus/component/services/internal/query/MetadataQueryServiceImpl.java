@@ -15,17 +15,20 @@ package org.sonatype.nexus.component.services.internal.query;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.component.assetstore.AssetStore;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.recordstore.RecordStore;
-import org.sonatype.nexus.component.recordstore.RecordStoreSession;
-import org.sonatype.nexus.component.services.mapper.ComponentRecordMapper;
-import org.sonatype.nexus.component.services.mapper.ComponentRecordMapperRegistry;
+import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
+import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapterRegistry;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQueryService;
+import org.sonatype.nexus.orient.DatabaseInstance;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -38,90 +41,57 @@ import static com.google.common.base.Preconditions.checkState;
 public class MetadataQueryServiceImpl
     implements MetadataQueryService
 {
-  private final RecordStore recordStore;
+  private final Provider<DatabaseInstance> databaseInstance;
 
   private final AssetStore assetStore;
 
-  private final ComponentRecordMapperRegistry mapperRegistry;
+  private final ComponentEntityAdapterRegistry adapterRegistry;
 
   @Inject
-  public MetadataQueryServiceImpl(RecordStore recordStore, AssetStore assetStore,
-                                  ComponentRecordMapperRegistry mapperRegistry) {
-    this.recordStore = checkNotNull(recordStore);
+  public MetadataQueryServiceImpl(@Named("metadata") Provider<DatabaseInstance> databaseInstance,
+                                  AssetStore assetStore,
+                                  ComponentEntityAdapterRegistry adapterRegistry) {
+    this.databaseInstance = checkNotNull(databaseInstance);
     this.assetStore = checkNotNull(assetStore);
-    this.mapperRegistry = checkNotNull(mapperRegistry);
+    this.adapterRegistry = checkNotNull(adapterRegistry);
   }
 
   @Override
   public <T extends Component> long countComponents(final Class<T> componentClass,
-                                                    final MetadataQueryRestriction mdqe)
-  {
-    ComponentRecordMapper<T> mapper = getExistingMapper(componentClass);
-    // TODO: Uncomment
-    // RecordQueryExpression cRecordQueryExpression = cRecordQueryExpression(mapper, metadataQueryExpression)
-
-    try (RecordStoreSession session = recordStore.openSession()) {
-      // TODO: Uncomment
-      //return session.count(cRecordQueryExpression)
+                                                    final MetadataQueryRestriction mdqe) {
+    ComponentEntityAdapter<T> mapper = registeredAdapter(componentClass);
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
     }
     return 0;
   }
 
   @Override
   public long countAssets(final MetadataQueryRestriction queryExpression) {
-    // TODO: Uncomment
-    // RecordQueryExpression aRecordQueryExpression = aRecordQueryExpression(metadataQueryExpression)
-
-    try (RecordStoreSession session = recordStore.openSession()) {
-      // TODO: Uncomment
-      //return session.count(aRecordQueryExpression)
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
     }
     return 0;
   }
 
   @Override
   public <T extends Component> List<T> findComponents(final Class<T> componentClass,
-                                                      final MetadataQuery metadataQuery)
-  {
-    ComponentRecordMapper<T> mapper = getExistingMapper(componentClass);
-    // TODO: Uncomment
-    //RecordQuery cRecordQuery = cRecordQuery(mapper, metadataQuery)
-
-    try (RecordStoreSession session = recordStore.openSession()) {
-      // TODO: Uncomment
-      //return components(mapper, session.find(cRecordQuery));
+                                                      final MetadataQuery metadataQuery) {
+    ComponentEntityAdapter<T> mapper = registeredAdapter(componentClass);
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
     }
     return null;
   }
 
   @Override
   public List<Asset> findAssets(final MetadataQuery metadataQuery) {
-    // TODO: Uncomment
-    //RecordQuery aRecordQuery = aRecordQuery(mapper, metadataQuery)
-
-    try (RecordStoreSession session = recordStore.openSession()) {
-      // TODO: Uncomment
-      //return assets(mapper, session.find(cRecordQuery));
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
     }
     return null;
   }
 
 
-  private <T extends Component> ComponentRecordMapper<T> getExistingMapper(final Class<T> componentClass) {
-    ComponentRecordMapper<T> mapper = mapperRegistry.getMapper(componentClass);
-    checkState(mapper != null, "No mapper registered for class %", componentClass);
+  private <T extends Component> ComponentEntityAdapter<T> registeredAdapter(final Class<T> componentClass) {
+    ComponentEntityAdapter<T> mapper = adapterRegistry.getAdapter(componentClass);
+    checkState(mapper != null, "No adapter registered for class %", componentClass);
     return mapper;
   }
-
-  // TODO: Implement
-  // private RecordQueryExpression cRecordQueryExpression(ComponentRecordMapper<T> mapper, MetadataQueryExpression mdqe) { }
-
-  // TODO: Implement
-  // private RecordQueryExpression aRecordQueryExpression(MetadataQueryExpression mdqe) { }
-
-  // TODO: Implement
-  // private <T extends Component> List<T> components(ComponentRecordMapper<T> mapper, List<Record> cRecords) { }
-
-  // TODO: Implement
-  // private <T extends Asset> List<T> assets(List<Record> aRecords) { }
 }
