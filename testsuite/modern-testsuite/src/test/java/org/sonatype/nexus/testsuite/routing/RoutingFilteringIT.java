@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.routing;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,8 @@ import org.sonatype.sisu.litmus.testsupport.group.Smoke;
 import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.PathRecorderBehaviour;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -105,19 +103,7 @@ public class RoutingFilteringIT
     client().getSubsystem(Caches.class).expireCaches(proxyRepositoryId);
     // nuke the repo cache
     try {
-      content().delete(repositoryLocation(proxyRepositoryId, "/com"));
-    }
-    catch (NexusClientNotFoundException e) {
-      // ignore
-    }
-    try {
-      content().delete(repositoryLocation(proxyRepositoryId, "/org"));
-    }
-    catch (NexusClientNotFoundException e) {
-      // ignore
-    }
-    try {
-      content().delete(repositoryLocation(proxyRepositoryId, "/hu"));
+      content().delete(repositoryLocation(proxyRepositoryId, "/"));
     }
     catch (NexusClientNotFoundException e) {
       // ignore
@@ -144,7 +130,7 @@ public class RoutingFilteringIT
     final File downloadsDir = testIndex().getDirectory("downloads");
 
     // bring up remote server using Jetty
-    final PathRecorder recorder = new PathRecorder();
+    final PathRecorderBehaviour recorder = new PathRecorderBehaviour();
     final PrefixesFile prefixesFile = new PrefixesFile();
     prefixesFile.setContent(null);
 
@@ -163,6 +149,7 @@ public class RoutingFilteringIT
         .create(MavenProxyRepository.class, repositoryIdForTest("someorgProxy1"))
         .asProxyOf(server.getUrl().toExternalForm())
         .doNotDownloadRemoteIndexes()
+        .doNotAutoBlock()
         .save();
 
     routingTest().waitForAllRoutingUpdateJobToStop();
@@ -227,7 +214,7 @@ public class RoutingFilteringIT
       Status proxyStatus = routing().getStatus(proxyRepository.id());
       // sit and wait for remote discovery (or the timeout Junit @Rule will kill us)
       while (proxyStatus.getPublishedStatus() != Outcome.SUCCEEDED) {
-        Thread.sleep(10000);
+        Thread.sleep(1000);
         proxyStatus = routing().getStatus(proxyRepository.id());
       }
 
@@ -255,7 +242,7 @@ public class RoutingFilteringIT
         // GET /org/someorg/artifact/1.0/artifact-1.0.pom.sha1,
         // GET /org/someorg/artifact/1.0/artifact-1.0.pom,
         final List<String> requests = recorder.getPathsForVerb("GET");
-        assertThat(requests.size(), is(4));
+        assertThat(requests.toString(), requests.size(), is(4));
         assertThat(
             requests,
             containsInAnyOrder(ORG_SOMEORG_ARTIFACT_10_POM, ORG_SOMEORG_ARTIFACT_10_POM + ".sha1",
@@ -285,7 +272,7 @@ public class RoutingFilteringIT
     final File downloadsDir = testIndex().getDirectory("downloads");
 
     // bring up remote server using Jetty
-    final PathRecorder recorder = new PathRecorder();
+    final PathRecorderBehaviour recorder = new PathRecorderBehaviour();
     final PrefixesFile prefixesFile = new PrefixesFile();
     // now set the prefixes file that contains /org/someorg prefix only, and repeat
     prefixesFile.setContent(Files.toString(testData().resolveFile("someorg-prefixes.txt"),
@@ -305,6 +292,7 @@ public class RoutingFilteringIT
         repositories().create(MavenProxyRepository.class, repositoryIdForTest("someorgProxy1"))
             .asProxyOf(server.getUrl().toExternalForm())
             .doNotDownloadRemoteIndexes()
+            .doNotAutoBlock()
             .save();
 
     routingTest().waitForAllRoutingUpdateJobToStop();
@@ -336,7 +324,7 @@ public class RoutingFilteringIT
         // GET /org/someorg/artifact/1.0/artifact-1.0.pom.sha1,
         // GET /org/someorg/artifact/1.0/artifact-1.0.pom,
         final List<String> requests = recorder.getPathsForVerb("GET");
-        assertThat(requests.size(), is(4));
+        assertThat(requests.toString(), requests.size(), is(4));
         assertThat(
             requests,
             containsInAnyOrder(ORG_SOMEORG_ARTIFACT_10_POM, ORG_SOMEORG_ARTIFACT_10_POM + ".sha1",
@@ -354,7 +342,7 @@ public class RoutingFilteringIT
       Status proxyStatus = routing().getStatus(proxyRepository.id());
       // sit and wait for remote discovery (or the timeout Junit @Rule will kill us)
       while (proxyStatus.getPublishedStatus() != Outcome.FAILED) {
-        Thread.sleep(10000);
+        Thread.sleep(1000);
         proxyStatus = routing().getStatus(proxyRepository.id());
       }
 
@@ -389,7 +377,7 @@ public class RoutingFilteringIT
         // GET /com/someorg/artifact/1.0/artifact-1.0.pom.sha1,
         // GET /com/someorg/artifact/1.0/artifact-1.0.pom,
         final List<String> requests = recorder.getPathsForVerb("GET");
-        assertThat(requests.size(), is(10));
+        assertThat(requests.toString(), requests.size(), is(10));
         assertThat(
             requests,
             containsInAnyOrder(COM_SOMEORG_ARTIFACT_10_POM, COM_SOMEORG_ARTIFACT_10_POM + ".sha1",
@@ -433,29 +421,6 @@ public class RoutingFilteringIT
         response.sendError(404);
       }
       return false;
-    }
-  }
-
-  private static class PathRecorder
-      implements Behaviour
-  {
-    private final Multimap<String, String> pathsMap = ArrayListMultimap.create();
-
-    public boolean execute(HttpServletRequest request, HttpServletResponse response, Map<Object, Object> ctx)
-        throws Exception
-    {
-      final String path = request.getRequestURI();
-      final String verb = request.getMethod();
-      pathsMap.put(verb, path);
-      return true;
-    }
-
-    public List<String> getPathsForVerb(final String verb) {
-      return new ArrayList<String>(pathsMap.get(verb));
-    }
-
-    public void clear() {
-      pathsMap.clear();
     }
   }
 }
