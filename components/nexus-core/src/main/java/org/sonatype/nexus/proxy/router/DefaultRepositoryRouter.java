@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -53,7 +52,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.targets.TargetSet;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -425,11 +423,7 @@ public class DefaultRepositoryRouter
       }
 
       if (kind == null) {
-        // unknown explodedPath[0]
-        throw new ItemNotFoundException(
-            reasonFor(
-                request,
-                "Repository kind '" + explodedPath[0] + "' is unknown"));
+        throw new ItemNotFoundException(reasonFor(request, "Invalid repository path"));
       }
 
       result.setStrippedPrefix(PathUtils.concatPaths(explodedPath[0]));
@@ -446,8 +440,7 @@ public class DefaultRepositoryRouter
 
         if (!repository.isExposed()) {
           // this is not the main facet or the repo is not exposed
-          throw new ItemNotFoundException(reasonFor(request, "Repository %s exists but is not exposed.",
-              RepositoryStringUtils.getHumanizedNameString(repository)));
+          throw new ItemNotFoundException(reasonFor(request, "Repository not exposed"));
         }
       }
       catch (NoSuchRepositoryException e) {
