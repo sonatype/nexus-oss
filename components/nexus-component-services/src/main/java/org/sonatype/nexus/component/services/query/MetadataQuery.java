@@ -14,6 +14,8 @@ package org.sonatype.nexus.component.services.query;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.component.model.ComponentId;
 
 import com.google.common.collect.Lists;
@@ -46,6 +48,7 @@ public class MetadataQuery
     return this;
   }
 
+  @Nullable
   public Integer getLimit() {
     return limit;
   }
@@ -57,6 +60,7 @@ public class MetadataQuery
     return this;
   }
 
+  @Nullable
   public Integer getSkip() {
     return skip;
   }
@@ -69,6 +73,7 @@ public class MetadataQuery
     return this;
   }
 
+  @Nullable
   public ComponentId getSkipComponentId() {
     return skipComponentId;
   }
@@ -81,6 +86,7 @@ public class MetadataQuery
     return this;
   }
 
+  @Nullable
   public String getSkipAssetPath() {
     return skipAssetPath;
   }
@@ -112,6 +118,7 @@ public class MetadataQuery
     return this;
   }
 
+  @Nullable
   public MetadataQueryRestriction getRestriction() {
     return restriction;
   }

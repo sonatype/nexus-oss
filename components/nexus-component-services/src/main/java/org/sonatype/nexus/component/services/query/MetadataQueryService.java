@@ -14,6 +14,8 @@ package org.sonatype.nexus.component.services.query;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 
@@ -27,9 +29,9 @@ import org.sonatype.nexus.component.model.Component;
  */
 public interface MetadataQueryService
 {
-  <T extends Component> long countComponents(Class<T> componentClass, MetadataQueryRestriction restriction);
+  <T extends Component> long countComponents(Class<T> componentClass, @Nullable MetadataQueryRestriction restriction);
 
-  long countAssets(MetadataQueryRestriction restriction);
+  long countAssets(@Nullable MetadataQueryRestriction restriction);
 
   <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery query);
 
