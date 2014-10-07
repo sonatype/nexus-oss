@@ -12,21 +12,32 @@
  */
 package org.sonatype.nexus.yum.internal;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumHosted;
@@ -55,13 +66,17 @@ public class EventsRouter
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
+  private final Provider<Walker> walkerProvider;
+
   @Inject
   public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistryProvider,
                       final Provider<YumRegistry> yumRegistryProvider,
+                      final Provider<Walker> walkerProvider,
                       final EventBus eventBus)
   {
     this.repositoryRegistryProvider = checkNotNull(repositoryRegistryProvider);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
+    this.walkerProvider = checkNotNull(walkerProvider);
     checkNotNull(eventBus).register(this);
   }
 
@@ -102,6 +117,48 @@ public class EventsRouter
       }
       else if (isCollectionItem(itemEvent)) {
         ((YumHosted) yum).regenerateWhenDirectoryIsRemoved(itemEvent.getItem().getPath());
+      }
+    }
+  }
+
+  @AllowConcurrentEvents
+  @Subscribe
+  public void on(RepositoryItemEventCache itemEvent) {
+    final ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
+    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
+      log.debug("Yum metadata changed for {}. Removing obsolete metadata", repository.getId());
+      try {
+        RepoMD repoMD = new RepoMD(((StorageFileItem) itemEvent.getItem()).getInputStream());
+        final Collection<String> locations = repoMD.getLocations();
+        ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA);
+        request.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);
+        DefaultWalkerContext context = new DefaultWalkerContext(repository, request);
+        context.getProcessors().add(new AbstractFileWalkerProcessor()
+        {
+          @Override
+          protected void processFileItem(final WalkerContext context, final StorageFileItem item) throws Exception {
+            if (!item.getPath().equals("/" + Yum.PATH_OF_REPOMD_XML)
+                && !locations.contains(item.getPath().substring(1))) {
+              log.trace("Removing obsolete {}:{}", repository.getId(), item.getPath());
+              repository.deleteItem(true, item.getResourceStoreRequest());
+            }
+          }
+        });
+        walkerProvider.get().walk(context);
+      }
+      catch (WalkerException e) {
+        Throwable stopCause = e.getWalkerContext().getStopCause();
+        if (!(stopCause instanceof ItemNotFoundException)) {
+          if (stopCause != null) {
+            log.warn("Failed to clean proxy YUM metadata", stopCause);
+          }
+          else {
+            log.warn("Failed to clean proxy YUM metadata", e);
+          }
+        }
+      }
+      catch (Exception e) {
+        log.warn("Failed to clean proxy YUM metadata", e);
       }
     }
   }
