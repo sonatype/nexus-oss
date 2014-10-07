@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.web.BaseUrlHolder;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -40,7 +39,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 public class BaseUrlHolderFilter
-  extends ComponentSupport
   implements Filter
 {
   private final GlobalRestApiSettings settings;
