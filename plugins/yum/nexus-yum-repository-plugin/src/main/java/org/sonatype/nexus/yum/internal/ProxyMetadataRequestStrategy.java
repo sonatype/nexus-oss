@@ -65,7 +65,7 @@ public class ProxyMetadataRequestStrategy
 
   @Override
   public void onHandle(final Repository repository, final ResourceStoreRequest request, final Action action) {
-    if (request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPODATA)) {
+    if (action.isReadAction() && request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPOMD_XML)) {
       try {
         long now = System.currentTimeMillis();
 
