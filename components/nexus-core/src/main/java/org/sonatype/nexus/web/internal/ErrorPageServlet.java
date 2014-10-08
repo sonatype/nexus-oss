@@ -26,6 +26,7 @@ import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * An {@code error.html} servlet to handle generic servlet error-page dispatched requests.
@@ -60,7 +61,7 @@ public class ErrorPageServlet
 
     // this happens if someone browses directly to the error page
     if (errorCode == null) {
-      errorCode = 404;
+      errorCode = SC_NOT_FOUND;
       errorMessage = "Not found";
     }
 
@@ -74,8 +75,7 @@ public class ErrorPageServlet
         response,
         errorCode,
         null, // default reason phrase will be used
-        errorMessage,
-        cause
+        errorMessage
     );
   }
 }

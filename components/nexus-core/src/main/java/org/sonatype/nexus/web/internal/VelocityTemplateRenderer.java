@@ -33,7 +33,6 @@ import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
@@ -69,12 +68,11 @@ public class VelocityTemplateRenderer
   }
 
   @Override
-  public void renderErrorPage(final HttpServletRequest request,
+  public void renderErrorPage(final HttpServletRequest request, // FIXME: This is never used
                               final HttpServletResponse response,
                               final int responseCode,
                               @Nullable String reasonPhrase,
-                              String errorDescription,
-                              final @Nullable Throwable exception)
+                              String errorDescription)
       throws IOException
   {
     checkNotNull(request);
@@ -83,19 +81,23 @@ public class VelocityTemplateRenderer
     checkNotNull(errorDescription);
 
     // ensure sanity of passed in strings which are used to render html content
+    errorDescription = StringEscapeUtils.escapeHtml(errorDescription);
     if (reasonPhrase != null) {
       reasonPhrase = StringEscapeUtils.escapeHtml(reasonPhrase);
     }
-    errorDescription = StringEscapeUtils.escapeHtml(errorDescription);
+    else {
+      reasonPhrase = errorDescription; // already sanitized above
+    }
 
     final Map<String, Object> dataModel = Maps.newHashMap();
     dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
-    dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
+    dataModel.put("statusName", reasonPhrase);
     dataModel.put("errorDescription", errorDescription);
 
-    response.setStatus(responseCode);
+    response.setStatus(responseCode, reasonPhrase);
+
     render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
         VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }

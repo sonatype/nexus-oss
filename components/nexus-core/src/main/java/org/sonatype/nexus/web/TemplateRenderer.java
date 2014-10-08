@@ -36,14 +36,12 @@ public interface TemplateRenderer
    * @param responseCode     The HTTP error code, must be greater of equal to 400.
    * @param reasonPhrase     The HTTP reason phrase, might be {@code null} (in that case the defaults will be used).
    * @param errorDescription Error description meant for human consumption, will be rendered on the error page.
-   * @param exception        The exception (if any) that lead to this error condition, might be {@code null}.
    */
   void renderErrorPage(HttpServletRequest request,
                        HttpServletResponse response,
                        int responseCode,
                        @Nullable String reasonPhrase,
-                       String errorDescription,
-                       @Nullable Throwable exception)
+                       String errorDescription)
       throws IOException;
 
   interface TemplateLocator

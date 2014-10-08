@@ -75,8 +75,7 @@ public class ErrorPageFilter
           response,
           e.getResponseCode(),
           e.getReasonPhrase(),
-          messageOf(e),
-          e.getCause()
+          messageOf(e)
       );
     }
     catch (IOException e) {
@@ -91,8 +90,7 @@ public class ErrorPageFilter
           response,
           SC_INTERNAL_SERVER_ERROR,
           null, // default reason phrase will be used
-          messageOf(e),
-          e
+          messageOf(e)
       );
     }
   }
