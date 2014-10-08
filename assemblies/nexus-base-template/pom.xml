@@ -347,6 +347,10 @@
                   </fileset>
                 </delete>
 
+                <!-- this property is no longer required for local attach in Java7; removing it avoids random port -->
+                <replace file="${project.build.directory}/assembly/bin/karaf" token="-Dcom.sun.management.jmxremote"/>
+                <replace file="${project.build.directory}/assembly/bin/karaf.bat" token="-Dcom.sun.management.jmxremote"/>
+
                 <!-- temporary patch for KARAF-3249: dirname error if the distribution path contains spaces -->
                 <replace file="${project.build.directory}/assembly/bin/karaf" token='name $0' value='name "$0"'/>
                 <replace file="${project.build.directory}/assembly/bin/start" token='name $0' value='name "$0"'/>
