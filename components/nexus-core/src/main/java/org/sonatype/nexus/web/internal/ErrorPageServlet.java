@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.nexus.web.WebUtils;
 
@@ -37,6 +38,19 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class ErrorPageServlet
     extends HttpServlet
 {
+
+  public static final String ERROR_SERVLET_NAME = "javax.servlet.error.servlet_name";
+
+  public static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
+
+  public static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
+
+  public static final String ERROR_MESSAGE = "javax.servlet.error.message";
+
+  public static final String ERROR_EXCEPTION_TYPE = "javax.servlet.error.exception_type";
+
+  public static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
+
   private final TemplateRenderer templateRenderer;
 
   private final WebUtils webUtils;
@@ -55,9 +69,21 @@ public class ErrorPageServlet
   {
     webUtils.addNoCacheResponseHeaders(response);
 
-    Integer errorCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-    String errorMessage = (String) request.getAttribute("javax.servlet.error.message");
-    Throwable cause = (Throwable) request.getAttribute("javax.servlet.error.exception");
+    //String servletName = (String) request.getAttribute(ERROR_SERVLET_NAME);
+    //String requestUri = (String) request.getAttribute(ERROR_REQUEST_URI);
+    Integer errorCode = (Integer) request.getAttribute(ERROR_STATUS_CODE);
+    String errorMessage = (String) request.getAttribute(ERROR_MESSAGE);
+    //Class causeType = (Class) request.getAttribute(ERROR_EXCEPTION_TYPE);
+    Throwable cause = (Throwable) request.getAttribute(ERROR_EXCEPTION);
+    String reasonPhrase = null;
+
+    // Handle customization of error from exception details
+    if (cause instanceof ErrorStatusException) {
+      ErrorStatusException e = (ErrorStatusException)cause;
+      errorCode = e.getResponseCode();
+      reasonPhrase = e.getReasonPhrase();
+      errorMessage = messageOf(e);
+    }
 
     // this happens if someone browses directly to the error page
     if (errorCode == null) {
@@ -74,8 +100,24 @@ public class ErrorPageServlet
         request,
         response,
         errorCode,
-        null, // default reason phrase will be used
+        reasonPhrase,
         errorMessage
     );
+  }
+
+  /**
+   * Returns the message of given throwable, or if message is null will toString throwable.
+   */
+  private static String messageOf(final Throwable cause) {
+    String message = cause.getMessage();
+    if (message == null) {
+      return cause.toString();
+    }
+    return message;
+  }
+
+  static void attachCause(final HttpServletRequest request, final Throwable cause) {
+    request.setAttribute(ERROR_EXCEPTION_TYPE, cause.getClass());
+    request.setAttribute(ERROR_EXCEPTION, cause);
   }
 }
