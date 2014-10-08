@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.yum.internal;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,6 +42,7 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumHosted;
+import org.sonatype.nexus.yum.YumProxy;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -125,10 +127,21 @@ public class EventsRouter
   @Subscribe
   public void on(RepositoryItemEventCache itemEvent) {
     final ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
-    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
-      log.debug("Yum metadata changed for {}. Removing obsolete metadata", repository.getId());
+    StorageItem item = itemEvent.getItem();
+    if (repository != null && item.getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
+      log.debug("{}:{} cached", repository.getId(), item.getPath());
       try {
-        RepoMD repoMD = new RepoMD(((StorageFileItem) itemEvent.getItem()).getInputStream());
+        log.debug("Resetting processed flag...", repository.getId(), item.getPath());
+        item.getRepositoryItemAttributes().remove(YumProxy.PROCESSED);
+        repository.getAttributesHandler().storeAttributes(item);
+      }
+      catch (IOException e) {
+        log.warn("Failed to reset processing flag for {}:{}", repository.getId(), item.getPath(), e);
+      }
+
+      try {
+        log.debug("Removing obsolete metadata files...", repository.getId(), item.getPath());
+        RepoMD repoMD = new RepoMD(((StorageFileItem) item).getInputStream());
         final Collection<String> locations = repoMD.getLocations();
         ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA);
         request.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);

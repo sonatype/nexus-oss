@@ -26,9 +26,9 @@ import org.sonatype.nexus.proxy.repository.AbstractRequestStrategy;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RequestStrategy;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumProxy;
 import org.sonatype.nexus.yum.YumRegistry;
 
 import com.google.common.base.Throwables;
@@ -67,14 +67,14 @@ public class ProxyMetadataRequestStrategy
   public void onHandle(final Repository repository, final ResourceStoreRequest request, final Action action) {
     if (action.isReadAction() && request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPOMD_XML)) {
       try {
-        long now = System.currentTimeMillis();
-
         log.trace("Checking if remote {}:repomd.xml changed", repository.getId());
         StorageFileItem repoMDItem = (StorageFileItem) repository.retrieveItem(
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
-        if (repoMDItem.getRepositoryItemAttributes().getStoredLocally() > now) {
+        if (repoMDItem.getRepositoryItemAttributes().get(YumProxy.PROCESSED) == null) {
           MetadataRewriter.rewriteProxiedMetadata((ProxyRepository) repository);
+          repoMDItem.getRepositoryItemAttributes().put(YumProxy.PROCESSED, String.valueOf(System.currentTimeMillis()));
+          repository.getAttributesHandler().storeAttributes(repoMDItem);
 
           log.trace("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
           List<GroupRepository> groups = repositoryRegistry.getGroupsOfRepository(repository);
