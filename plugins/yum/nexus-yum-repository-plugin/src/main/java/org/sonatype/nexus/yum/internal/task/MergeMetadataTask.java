@@ -1,4 +1,5 @@
 /*
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -37,7 +38,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRepository;
-import org.sonatype.nexus.yum.internal.MetadataRewriter;
+import org.sonatype.nexus.yum.internal.MetadataProcessor;
 import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
@@ -99,7 +100,7 @@ public class MergeMetadataTask
         if (memberReposBaseDirs.size() > 1) {
           log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
           commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
-          MetadataRewriter.rewriteMergedMetadata(groupRepository, memberReposBaseDirs);
+          MetadataProcessor.processMergedMetadata(groupRepository, memberReposBaseDirs);
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {

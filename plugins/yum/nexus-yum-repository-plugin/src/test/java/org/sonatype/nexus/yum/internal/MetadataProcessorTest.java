@@ -50,11 +50,11 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.DiffMatchers.equalTo;
 
 /**
- * {@link MetadataRewriter} UTs.
+ * {@link MetadataProcessor} UTs.
  *
  * @since 2.11
  */
-public class MetadataRewriterTest
+public class MetadataProcessorTest
     extends TestSupport
 {
   private static final String STORAGE = "/home/centos/sonatype/nexus-bundles/assemblies/nexus-pro/target/nexus/sonatype-work/nexus/storage/";
@@ -65,13 +65,13 @@ public class MetadataRewriterTest
   private Map<String, byte[]> storage = Maps.newHashMap();
 
   @Test
-  public void verifyRewriteAfterMerge()
+  public void verifyProcessAfterMerge()
       throws Exception
   {
     Repository repository = mock(Repository.class);
     mockRepository(repository, "repo3");
 
-    MetadataRewriter.rewriteMergedMetadata(
+    MetadataProcessor.processMergedMetadata(
         repository,
         Arrays.asList(new File(STORAGE + "releases"), new File(STORAGE + "thirdparty"))
     );
@@ -112,14 +112,14 @@ public class MetadataRewriterTest
   }
 
   @Test
-  public void verifyRewriteAfterProxy()
+  public void verifyProcessAfterProxy()
       throws Exception
   {
     ProxyRepository repository = mock(ProxyRepository.class);
     mockRepository(repository, "repo5");
     when(repository.getRemoteUrl()).thenReturn("http://localhost:8082/nexus/content/repositories/thirdparty");
 
-    MetadataRewriter.rewriteProxiedMetadata(repository);
+    MetadataProcessor.processProxiedMetadata(repository);
 
     ArgumentCaptor<ResourceStoreRequest> deleteRequests = ArgumentCaptor.forClass(ResourceStoreRequest.class);
     verify(repository).deleteItem(eq(false), deleteRequests.capture());

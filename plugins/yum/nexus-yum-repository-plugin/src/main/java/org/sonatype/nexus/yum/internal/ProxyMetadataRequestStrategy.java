@@ -51,7 +51,7 @@ public class ProxyMetadataRequestStrategy
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().get(YumProxy.PROCESSED) == null) {
-          MetadataRewriter.rewriteProxiedMetadata((ProxyRepository) repository);
+          MetadataProcessor.processProxiedMetadata((ProxyRepository) repository);
           repoMDItem.getRepositoryItemAttributes().put(YumProxy.PROCESSED, String.valueOf(System.currentTimeMillis()));
           repository.getAttributesHandler().storeAttributes(repoMDItem);
         }

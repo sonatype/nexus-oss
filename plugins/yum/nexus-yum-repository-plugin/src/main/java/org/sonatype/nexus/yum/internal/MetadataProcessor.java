@@ -59,12 +59,12 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
  *
  * @since 2.11
  */
-public class MetadataRewriter
+public class MetadataProcessor
 {
 
-  private static final Logger log = LoggerFactory.getLogger(MetadataRewriter.class);
+  private static final Logger log = LoggerFactory.getLogger(MetadataProcessor.class);
 
-  private MetadataRewriter() {
+  private MetadataProcessor() {
   }
 
   /**
@@ -76,11 +76,11 @@ public class MetadataRewriter
    * @param memberRepositoriesBaseDirs list of merged group repository base dirs
    * @return true if primary.xml/repomd.xml was changed
    */
-  public static boolean rewriteMergedMetadata(final Repository repository,
+  public static boolean processMergedMetadata(final Repository repository,
                                               final List<File> memberRepositoriesBaseDirs)
   {
     log.debug("Checking if {}:primary.xml locations should be rewritten after merge", repository.getId());
-    return rewriteMetadata(
+    return processMetadata(
         repository,
         new Processor()
         {
@@ -122,10 +122,10 @@ public class MetadataRewriter
    * @param repository containing yum repository
    * @return true if primary.xml/repomd.xml was changed
    */
-  public static boolean rewriteProxiedMetadata(final ProxyRepository repository) {
+  public static boolean processProxiedMetadata(final ProxyRepository repository) {
     log.debug("Checking if {}:primary.xml locations should be rewritten after being proxied", repository.getId());
     final String repositoryUrl = repository.getRemoteUrl();
-    return rewriteMetadata(
+    return processMetadata(
         repository,
         new Processor()
         {
@@ -162,10 +162,10 @@ public class MetadataRewriter
    * @param processor  location processor
    * @return true if primary.xml/repomd.xml was changed
    */
-  private static boolean rewriteMetadata(final Repository repository, final Processor processor) {
+  private static boolean processMetadata(final Repository repository, final Processor processor) {
     try {
       Document repoMDDoc = parseRepoMD(repository);
-      String primaryHref = rewritePrimary(repository, processor, repoMDDoc);
+      String primaryHref = processPrimary(repository, processor, repoMDDoc);
       boolean changed = updatePrimaryInRepoMD(repository, repoMDDoc, primaryHref);
       changed = removeSqliteFromRepoMD(repository, repoMDDoc) || changed;
       if (changed) {
@@ -187,7 +187,7 @@ public class MetadataRewriter
    * @param repoMDDoc  parsed repomx.xml
    * @return path of primary.xml
    */
-  private static String rewritePrimary(final Repository repository,
+  private static String processPrimary(final Repository repository,
                                        final Processor processor,
                                        final Document repoMDDoc)
       throws Exception
