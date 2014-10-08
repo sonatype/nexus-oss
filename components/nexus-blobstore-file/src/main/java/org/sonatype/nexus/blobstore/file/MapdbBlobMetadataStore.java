@@ -23,13 +23,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
-import org.sonatype.nexus.blobstore.file.AutoClosableIterable;
-import org.sonatype.nexus.blobstore.file.BlobMetadata;
-import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
-import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.mapdb.Atomic;
@@ -100,11 +97,11 @@ public class MapdbBlobMetadataStore
    * Immutable metadata record for internal storage in MapDB.
    */
   private static class MetadataRecord
-    implements Serializable
+      implements Serializable
   {
     private final BlobState state;
 
-    private final Map<String,String> headers;
+    private final Map<String, String> headers;
 
     private final boolean metrics;
 
@@ -172,7 +169,7 @@ public class MapdbBlobMetadataStore
 
     final MetadataRecord record = convert(metadata);
 
-    return database.execute(new Fun.Function1<BlobId, DB>()
+    return execute(new Fun.Function1<BlobId, DB>()
     {
       @Override
       public BlobId run(final DB db) {
@@ -220,7 +217,7 @@ public class MapdbBlobMetadataStore
     final MetadataRecord record = convert(metadata);
     log.trace("Update: {}={}", id, record);
 
-    database.execute(new TxBlock()
+    execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -241,7 +238,7 @@ public class MapdbBlobMetadataStore
 
     log.trace("Delete: {}", id);
 
-    database.execute(new TxBlock()
+    execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -330,7 +327,7 @@ public class MapdbBlobMetadataStore
   public void compact() {
     ensureStarted();
 
-    database.execute(new TxBlock()
+    execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -338,5 +335,33 @@ public class MapdbBlobMetadataStore
         db.compact();
       }
     });
+  }
+
+  /**
+   * Executes a MapDB operation, but with the correct OSGi classloader.
+   */
+  public <A> A execute(org.mapdb.Fun.Function1<A, org.mapdb.DB> txBlock) {
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      return database.execute(txBlock);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
+  }
+
+  /**
+   * Executes a MapDB operation, but with the correct OSGi classloader.
+   */
+  public void execute(TxBlock txBlock){
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      database.execute(txBlock);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
   }
 }
