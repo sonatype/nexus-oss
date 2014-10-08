@@ -68,9 +68,10 @@ public class MetadataProcessor
   }
 
   /**
-   * Rewrites locations in primary.xml after a merge.
-   * Locations are wrongly written as file urls of merged group repository base dirs, which will be rewritten to be
-   * relative to group repository.
+   * Processes metadata:
+   * - Rewrites locations in primary.xml after a merge. Locations are wrongly written as file urls of merged group
+   * repository base dirs, which will be rewritten to be relative to group repository.
+   * - Removes sqlite databases from repomd.xml.
    *
    * @param repository                 containing yum repository
    * @param memberRepositoriesBaseDirs list of merged group repository base dirs
@@ -116,8 +117,10 @@ public class MetadataProcessor
   }
 
   /**
-   * Rewrites locations in primary.xml after it had been proxied.
-   * All locations that have an xml:base + url matching repository url will be changed to be relative to repository.
+   * Processes metadata:
+   * - Rewrites locations in primary.xml after it had been proxied. All locations that have an xml:base + url matching
+   * repository url will be changed to be relative to repository.
+   * - Removes sqlite databases from repomd.xml.
    *
    * @param repository containing yum repository
    * @return true if primary.xml/repomd.xml was changed
@@ -155,8 +158,10 @@ public class MetadataProcessor
   }
 
   /**
-   * Process all locations from primary.xml. If any of location is changed will save the changed primary.xml and update
-   * repomd.xml according to new primary.xml.
+   * Processes metadata:
+   * - Use processor to process all locations in primary.xml.
+   * - Update primary data entry in repomd.xml if primary.xml changes.
+   * - Removes sqllite from repomd.xml.
    *
    * @param repository containing primary.xml
    * @param processor  location processor

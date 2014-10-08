@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO
+ * A request strategy that applies to yum enabled proxies that will process repomd.xml/primary.xml before being served.
  *
  * @since 2.7.0
  */
@@ -43,6 +43,9 @@ public class ProxyMetadataRequestStrategy
 
   private static final String REPOMD_XML_PATH = "/" + Yum.PATH_OF_REPOMD_XML;
 
+  /**
+   * @since 2.11
+   */
   @Override
   public void onHandle(final Repository repository, final ResourceStoreRequest request, final Action action) {
     if (action.isReadAction() && request.getRequestPath().startsWith("/" + Yum.PATH_OF_REPOMD_XML)) {
