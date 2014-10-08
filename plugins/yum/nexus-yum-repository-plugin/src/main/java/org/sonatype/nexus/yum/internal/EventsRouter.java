@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -129,9 +130,8 @@ public class EventsRouter
     final ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
     StorageItem item = itemEvent.getItem();
     if (repository != null && item.getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
-      log.debug("{}:{} cached", repository.getId(), item.getPath());
       try {
-        log.debug("Resetting processed flag...", repository.getId(), item.getPath());
+        log.debug("Resetting processed flag... ({}:{} cached)", repository.getId(), item.getPath());
         item.getRepositoryItemAttributes().remove(YumProxy.PROCESSED);
         repository.getAttributesHandler().storeAttributes(item);
       }
@@ -139,8 +139,17 @@ public class EventsRouter
         log.warn("Failed to reset processing flag for {}:{}", repository.getId(), item.getPath(), e);
       }
 
+      log.debug("Marking group repositories as dirty... ({}:{} cached)", repository.getId(), item.getPath());
+      List<GroupRepository> groups = repositoryRegistryProvider.get().getGroupsOfRepository(repository);
+      for (GroupRepository group : groups) {
+        Yum yum = yumRegistryProvider.get().get(group.getId());
+        if (yum != null && yum instanceof YumGroup) {
+          ((YumGroup) yum).markDirty();
+        }
+      }
+
       try {
-        log.debug("Removing obsolete metadata files...", repository.getId(), item.getPath());
+        log.debug("Removing obsolete metadata files... ({}:{} cached)", repository.getId(), item.getPath());
         RepoMD repoMD = new RepoMD(((StorageFileItem) item).getInputStream());
         final Collection<String> locations = repoMD.getLocations();
         ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA);
