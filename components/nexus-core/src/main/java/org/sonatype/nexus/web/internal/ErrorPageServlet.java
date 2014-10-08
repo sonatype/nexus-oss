@@ -45,16 +45,34 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class ErrorPageServlet
     extends HttpServlet
 {
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_SERVLET_NAME = "javax.servlet.error.servlet_name";
 
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
 
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
 
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_MESSAGE = "javax.servlet.error.message";
 
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_EXCEPTION_TYPE = "javax.servlet.error.exception_type";
 
+  /**
+   * @since 3.0
+   */
   public static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
 
   private final TemplateRenderer templateRenderer;
@@ -156,6 +174,9 @@ public class ErrorPageServlet
     return message;
   }
 
+  /**
+   * @since 3.0
+   */
   static void attachCause(final HttpServletRequest request, final Throwable cause) {
     request.setAttribute(ERROR_EXCEPTION_TYPE, cause.getClass());
     request.setAttribute(ERROR_EXCEPTION, cause);
