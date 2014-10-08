@@ -15,6 +15,7 @@ package org.sonatype.nexus.yum.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -51,10 +52,23 @@ public class ProxyMetadataRequestStrategy
             false, new ResourceStoreRequest(REPOMD_XML_PATH)
         );
         if (repoMDItem.getRepositoryItemAttributes().get(YumProxy.PROCESSED) == null) {
-          MetadataProcessor.processProxiedMetadata((ProxyRepository) repository);
-          repoMDItem.getRepositoryItemAttributes().put(YumProxy.PROCESSED, String.valueOf(System.currentTimeMillis()));
-          repository.getAttributesHandler().storeAttributes(repoMDItem);
+          try {
+            repoMDItem.getRepositoryItemUid().getLock().lock(Action.update);
+            if (repoMDItem.getRepositoryItemAttributes().get(YumProxy.PROCESSED) == null) {
+              MetadataProcessor.processProxiedMetadata((ProxyRepository) repository);
+              repoMDItem.getRepositoryItemAttributes().put(
+                  YumProxy.PROCESSED, String.valueOf(System.currentTimeMillis())
+              );
+              repository.getAttributesHandler().storeAttributes(repoMDItem);
+            }
+          }
+          finally {
+            repoMDItem.getRepositoryItemUid().getLock().unlock();
+          }
         }
+      }
+      catch (ItemNotFoundException e) {
+        // ignore as we do not have a repomd.xml
       }
       catch (Exception e) {
         throw Throwables.propagate(e);
