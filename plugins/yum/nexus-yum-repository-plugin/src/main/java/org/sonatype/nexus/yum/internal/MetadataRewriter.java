@@ -246,12 +246,12 @@ public class MetadataRewriter
                                                final String primaryPath)
       throws Exception
   {
-    log.debug("Updating 'primary' data entry in {}:repomd.xml", repository.getId());
-
     XPath xPath = XPathFactory.newInstance().newXPath();
     String primaryHref = xPath.compile("/repomd/data[@type='primary']/location/@href").evaluate(repoMDDoc);
 
     if (!Objects.equals(primaryPath, primaryHref)) {
+      log.debug("Updating 'primary' data entry in {}:repomd.xml", repository.getId());
+
       Element primaryEl = (Element) xPath.compile("/repomd/data[@type='primary']").evaluate(repoMDDoc, NODE);
 
       StorageFileItem primaryItem = (StorageFileItem) repository.retrieveItem(
