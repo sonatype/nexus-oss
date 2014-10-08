@@ -24,10 +24,12 @@ import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigContributor;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.api.config.ComponentSourceRegistryInitializedEvent;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -52,12 +54,15 @@ public class ComponentSourceBooter
 
   private final Set<ComponentSourceConfigContributor> configContributors;
 
+  private final EventBus eventBus;
+
   @Inject
   public ComponentSourceBooter(Map<String, ComponentSourceFactory> factories,
                                final @Named("orient") ComponentSourceConfigStore sourceConfigStore,
                                final InMemorySourceRegistry sourceRegistry,
-                               final Set<ComponentSourceConfigContributor> configContributors)
+                               final Set<ComponentSourceConfigContributor> configContributors, final EventBus eventBus)
   {
+    this.eventBus = eventBus;
     this.factories = checkNotNull(factories);
     this.configContributors = checkNotNull(configContributors);
     this.sourceConfigStore = checkNotNull(sourceConfigStore);
@@ -71,6 +76,7 @@ public class ComponentSourceBooter
       contrib.contributeTo(sourceConfigStore);
     }
     createSources();
+    eventBus.post(new ComponentSourceRegistryInitializedEvent(sourceRegistry));
   }
 
   @Subscribe

@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.config.ComponentSourceRegistryInitializedEvent;
 import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigContributor;
@@ -80,6 +81,14 @@ public class ViewModuleBooter
     for (ViewConfigContributor contrib : configContributors) {
       contrib.contributeTo(viewConfigStore);
     }
+  }
+
+  /**
+   * Views are dependent on component sources, so wait until the component source registry has been initialized before
+   * creating views.
+   */
+  @Subscribe
+  public void on(ComponentSourceRegistryInitializedEvent event) throws Exception {
     createViews();
   }
 
