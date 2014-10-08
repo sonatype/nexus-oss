@@ -67,8 +67,8 @@ public class ComponentSourceConfigEntityAdapter
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
-      type.createIndex(P_SOURCEID_NAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_NAME);
-      //type.createIndex(P_SOURCEID_ID + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_ID);
+      type.createIndex(DB_CLASS + "_" + P_SOURCEID_NAME + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_NAME);
+      type.createIndex(DB_CLASS + "_" + P_SOURCEID_ID + "idx", INDEX_TYPE.UNIQUE, P_SOURCEID_ID);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }

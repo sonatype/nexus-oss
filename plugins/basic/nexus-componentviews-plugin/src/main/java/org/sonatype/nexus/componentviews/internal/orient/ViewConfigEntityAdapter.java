@@ -38,9 +38,9 @@ public class ViewConfigEntityAdapter
 {
   public static final String DB_CLASS = new OClassNameBuilder().type("ViewConfig").build();
 
-  public static final String P_VIEWNAME = "id.name";
+  public static final String P_VIEWNAME = "name";
 
-  public static final String P_VIEWID = "id.identifier";
+  public static final String P_VIEWID = "id";
 
   public static final String P_FACTORYNAME = "factoryName";
 
@@ -63,8 +63,8 @@ public class ViewConfigEntityAdapter
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
-      type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
-      //type.createIndex(P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
+      type.createIndex(DB_CLASS + "_" + P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
+      type.createIndex(DB_CLASS + "_" + P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
     return type;

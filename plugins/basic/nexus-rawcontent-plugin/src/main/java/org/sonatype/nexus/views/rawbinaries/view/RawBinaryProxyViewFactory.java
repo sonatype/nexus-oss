@@ -28,6 +28,7 @@ import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Transforms {@link ViewConfig config} for raw binary proxy views into actual {@link View} objects.
@@ -74,6 +75,8 @@ public class RawBinaryProxyViewFactory
     checkNotNull(sourceName, "Source name cannot be null for proxy config");
 
     final PullComponentSource source = sourceRegistry.getSource(sourceName);
+
+    checkState(source != null, "PullComponentSource %s not found while trying to create view %s.", sourceName, config);
 
     final HostedRawBinariesHandler hosted = new HostedRawBinariesHandler(binaryStore);
     final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(hosted, binaryStore, source);

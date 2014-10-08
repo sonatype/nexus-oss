@@ -31,6 +31,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 
 /**
@@ -46,8 +47,8 @@ public class RawBinaryComponentSource
   private final String urlPrefix;
 
   public RawBinaryComponentSource(final ComponentSourceId sourceName, final String urlPrefix) {
-    this.sourceName = sourceName;
-    this.urlPrefix = urlPrefix;
+    this.sourceName = checkNotNull(sourceName);
+    this.urlPrefix = checkNotNull(urlPrefix);
   }
 
   @Nullable
