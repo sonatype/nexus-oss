@@ -40,6 +40,9 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
  * An {@code error.html} servlet to handle generic servlet error-page dispatched requests.
  *
  * @since 2.8
+ *
+ * @see ErrorPageFilter
+ * @see ErrorStatusException
  */
 @Singleton
 public class ErrorPageServlet
@@ -138,7 +141,8 @@ public class ErrorPageServlet
     else {
       errorName = errorMessage; // already sanitized above
     }
-    
+
+    response.setStatus(errorCode, errorName);
     render(response, errorCode, errorName, errorMessage);
   }
 
@@ -151,14 +155,12 @@ public class ErrorPageServlet
                       final String errorMessage)
       throws IOException
   {
-    final Map<String, Object> dataModel = Maps.newHashMap();
+    Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(5);
     dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("urlSuffix", applicationVersion); // for cache busting
     dataModel.put("errorCode", errorCode);
     dataModel.put("errorName", errorName);
     dataModel.put("errorDescription", errorMessage);
-
-    response.setStatus(errorCode, errorName);
 
     templateRenderer.render(templateLocator, dataModel, response);
   }

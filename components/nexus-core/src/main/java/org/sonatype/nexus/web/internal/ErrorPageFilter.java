@@ -36,6 +36,7 @@ import static org.sonatype.nexus.web.internal.ErrorPageServlet.attachCause;
  * @since 2.8
  *
  * @see ErrorPageServlet
+ * @see ErrorStatusException
  */
 @Singleton
 public class ErrorPageFilter
@@ -59,6 +60,8 @@ public class ErrorPageFilter
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) resp;
 
+    // Delegate any exceptions to the ErrorPageServlet via standard sendError servlet api
+    // Custom handling here to avoid logging from Jetty implementation
     try {
       chain.doFilter(request, response);
     }
