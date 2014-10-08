@@ -80,7 +80,7 @@ public class MetadataRewriter
                                               final List<File> memberRepositoriesBaseDirs)
   {
     log.debug("Checking if {}:primary.xml locations should be rewritten after merge", repository.getId());
-    return rewritePrimaryLocations(
+    return rewriteMetadata(
         repository,
         new Processor()
         {
@@ -125,7 +125,7 @@ public class MetadataRewriter
   public static boolean rewriteProxiedMetadata(final ProxyRepository repository) {
     log.debug("Checking if {}:primary.xml locations should be rewritten after being proxied", repository.getId());
     final String repositoryUrl = repository.getRemoteUrl();
-    return rewritePrimaryLocations(
+    return rewriteMetadata(
         repository,
         new Processor()
         {
@@ -162,7 +162,7 @@ public class MetadataRewriter
    * @param processor  location processor
    * @return true if primary.xml/repomd.xml was changed
    */
-  private static boolean rewritePrimaryLocations(final Repository repository, final Processor processor) {
+  private static boolean rewriteMetadata(final Repository repository, final Processor processor) {
     try {
       Document repoMDDoc = parseRepoMD(repository);
       String primaryHref = rewritePrimary(repository, processor, repoMDDoc);
