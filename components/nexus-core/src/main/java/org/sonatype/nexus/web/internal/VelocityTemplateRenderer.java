@@ -20,28 +20,21 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.VelocityException;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -57,49 +50,9 @@ public class VelocityTemplateRenderer
 {
   private final Provider<VelocityEngine> velocityEngineProvider;
 
-  private final String applicationVersion;
-
   @Inject
-  public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider,
-                                  final SystemStatus systemStatus)
-  {
+  public VelocityTemplateRenderer(final Provider<VelocityEngine> velocityEngineProvider) {
     this.velocityEngineProvider = checkNotNull(velocityEngineProvider);
-    this.applicationVersion = systemStatus.getVersion();
-  }
-
-  @Override
-  public void renderErrorPage(final HttpServletRequest request, // FIXME: This is never used
-                              final HttpServletResponse response,
-                              final int responseCode,
-                              @Nullable String reasonPhrase,
-                              String errorDescription)
-      throws IOException
-  {
-    checkNotNull(request);
-    checkNotNull(response);
-    checkArgument(responseCode >= 400);
-    checkNotNull(errorDescription);
-
-    // ensure sanity of passed in strings which are used to render html content
-    errorDescription = StringEscapeUtils.escapeHtml(errorDescription);
-    if (reasonPhrase != null) {
-      reasonPhrase = StringEscapeUtils.escapeHtml(reasonPhrase);
-    }
-    else {
-      reasonPhrase = errorDescription; // already sanitized above
-    }
-
-    final Map<String, Object> dataModel = Maps.newHashMap();
-    dataModel.put("nexusRoot", BaseUrlHolder.get());
-    dataModel.put("nexusVersion", applicationVersion);
-    dataModel.put("statusCode", responseCode);
-    dataModel.put("statusName", reasonPhrase);
-    dataModel.put("errorDescription", errorDescription);
-
-    response.setStatus(responseCode, reasonPhrase);
-
-    render(template("/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
-        VelocityTemplateRenderer.class.getClassLoader()), dataModel, response);
   }
 
   @Override
@@ -125,8 +78,6 @@ public class VelocityTemplateRenderer
   {
     render(getVelocityTemplate(templateLocator), dataModel, response);
   }
-
-  // ==
 
   private void render(final Template template, final Map<String, Object> dataModel, final HttpServletResponse response)
       throws IOException

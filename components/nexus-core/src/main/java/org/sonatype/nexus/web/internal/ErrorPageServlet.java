@@ -14,6 +14,7 @@
 package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,9 +23,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.ErrorStatusException;
 import org.sonatype.nexus.web.TemplateRenderer;
+import org.sonatype.nexus.web.TemplateRenderer.TemplateLocator;
 import org.sonatype.nexus.web.WebUtils;
+
+import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -38,7 +45,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class ErrorPageServlet
     extends HttpServlet
 {
-
   public static final String ERROR_SERVLET_NAME = "javax.servlet.error.servlet_name";
 
   public static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
@@ -53,14 +59,24 @@ public class ErrorPageServlet
 
   private final TemplateRenderer templateRenderer;
 
+  private final String applicationVersion;
+
   private final WebUtils webUtils;
+
+  private final TemplateLocator templateLocator;
 
   @Inject
   public ErrorPageServlet(final TemplateRenderer templateRenderer,
+                          final SystemStatus systemStatus,
                           final WebUtils webUtils)
   {
     this.templateRenderer = checkNotNull(templateRenderer);
+    this.applicationVersion = checkNotNull(systemStatus).getVersion();
     this.webUtils = checkNotNull(webUtils);
+
+    this.templateLocator = templateRenderer.template(
+        "/org/sonatype/nexus/web/internal/errorPageContentHtml.vm",
+        getClass().getClassLoader());
   }
 
   @Override
@@ -75,13 +91,13 @@ public class ErrorPageServlet
     String errorMessage = (String) request.getAttribute(ERROR_MESSAGE);
     //Class causeType = (Class) request.getAttribute(ERROR_EXCEPTION_TYPE);
     Throwable cause = (Throwable) request.getAttribute(ERROR_EXCEPTION);
-    String reasonPhrase = null;
+    String errorName = null;
 
     // Handle customization of error from exception details
     if (cause instanceof ErrorStatusException) {
-      ErrorStatusException e = (ErrorStatusException)cause;
+      ErrorStatusException e = (ErrorStatusException) cause;
       errorCode = e.getResponseCode();
-      reasonPhrase = e.getReasonPhrase();
+      errorName = e.getReasonPhrase();
       errorMessage = messageOf(e);
     }
 
@@ -96,13 +112,37 @@ public class ErrorPageServlet
       errorMessage = "Unknown error";
     }
 
-    templateRenderer.renderErrorPage(
-        request,
-        response,
-        errorCode,
-        reasonPhrase,
-        errorMessage
-    );
+    // ensure sanity of passed in strings which are used to render html content
+    errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
+    if (errorName != null) {
+      errorName = StringEscapeUtils.escapeHtml(errorName);
+    }
+    else {
+      errorName = errorMessage; // already sanitized above
+    }
+    
+    render(response, errorCode, errorName, errorMessage);
+  }
+
+  /**
+   * Render error page.
+   */
+  private void render(final HttpServletResponse response,
+                      final int errorCode,
+                      final String errorName,
+                      final String errorMessage)
+      throws IOException
+  {
+    final Map<String, Object> dataModel = Maps.newHashMap();
+    dataModel.put("nexusRoot", BaseUrlHolder.get());
+    dataModel.put("urlSuffix", applicationVersion); // for cache busting
+    dataModel.put("errorCode", errorCode);
+    dataModel.put("errorName", errorName);
+    dataModel.put("errorDescription", errorMessage);
+
+    response.setStatus(errorCode, errorName);
+
+    templateRenderer.render(templateLocator, dataModel, response);
   }
 
   /**
