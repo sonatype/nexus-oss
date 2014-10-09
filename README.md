@@ -75,4 +75,11 @@ To run custom testsuite shards, here runs all p2 tests in the legacy testsuite:
         -Pit,testsuite-gencustom,testsuite-runcustom \
         -Dautoshard.includes='**/p2/**/*IT.java'
 
+or run all capabilities tests in modern testsuite:
+
+    mvn -pl testsuite/modern-testsuite/pom.xml clean install \
+        -Pit,testsuite-gencustom,testsuite-runcustom \
+        -Dautoshard.includes='**/capabilities/**/*IT.java'
+
+
 
