@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.ldap.dao;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -208,10 +209,16 @@ public class DefaultLdapGroupDAO
 
     String groupMemberFormat = configuration.getGroupMemberFormat();
 
-    String filter = "(&(objectClass=" + configuration.getGroupObjectClass() + ")(&(" + groupIdAttribute + "=*)(";
+    String filter = "(&(objectClass={0})(&({1}=*)(";
+    ArrayList<String> filterValues = new ArrayList<>();
+    filterValues.add(configuration.getGroupObjectClass());
+    filterValues.add(groupIdAttribute);
 
     if (groupMemberFormat != null) {
-      String member = StringUtils.replace(groupMemberFormat, "${username}", username);
+      String member = StringUtils.replace( groupMemberFormat, "${username}", "{2}" );
+      if (groupMemberFormat.contains("${username}")) {
+          filterValues.add(username);
+      }
 
       if (groupMemberFormat.contains("${dn}")) {
         LdapUser user;
@@ -222,7 +229,8 @@ public class DefaultLdapGroupDAO
           String message = "Failed to retrieve role information from ldap for user: " + username;
           throw new LdapDAOException(message, e);
         }
-        member = StringUtils.replace(member, "${dn}", user.getDn());
+        member = StringUtils.replace(member, "${dn}", "{" + filterValues.size() + "}");
+        filterValues.add(user.getDn());
       }
 
       filter += groupMemberAttribute + "=" + member + ")))";
@@ -238,7 +246,7 @@ public class DefaultLdapGroupDAO
     try {
       SearchControls ctls = this.getBaseSearchControls(new String[]{groupIdAttribute}, configuration
           .isGroupSubtree());
-      NamingEnumeration<SearchResult> results = context.search(groupBaseDn, filter, ctls);
+      NamingEnumeration<SearchResult> results = context.search( groupBaseDn, filter, filterValues.toArray(), ctls );
       try {
         Set<String> roles = this.getGroupIdsFromSearch(results, groupIdAttribute, configuration);
         return roles;
