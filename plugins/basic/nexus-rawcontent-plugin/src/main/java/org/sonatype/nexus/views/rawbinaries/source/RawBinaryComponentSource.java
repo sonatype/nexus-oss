@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.views.rawbinaries.source;
 
+import java.io.Closeable;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,6 +26,7 @@ import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -56,60 +59,86 @@ public class RawBinaryComponentSource
   public Iterable<ComponentEnvelope<RawComponent>> fetchComponents(final ComponentRequest request)
       throws IOException
   {
-    CloseableHttpClient httpclient = HttpClients.createDefault();
-
-    // TODO: A bit of validation here
+    final CloseableHttpClient httpclient = HttpClients.createDefault();
 
     final String uri = urlPrefix + request.getQuery().get("path");
 
     HttpGet httpGet = new HttpGet(uri);
 
-    try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-      System.out.println(response.getStatusLine());
-      final HttpEntity httpEntity = response.getEntity();
+    final CloseableHttpResponse response = httpclient.execute(httpGet);
 
-      final Asset asset = createAsset(httpEntity);
+    return asList(ComponentEnvelope.simpleEnvelope(new RawComponent(), new RequestClosingAsset(response)));
+  }
 
-      return asList(ComponentEnvelope.simpleEnvelope(new RawComponent(), asset));
+  /**
+   * An asset implementation that will take care of closing the underlying CloseableHttpResponse that backs the
+   * input stream from the remote source.
+   */
+  private static class RequestClosingAsset
+      implements Asset
+  {
+    final CloseableHttpResponse response;
+
+    final HttpEntity entity;
+
+    private RequestClosingAsset(final CloseableHttpResponse response) {
+      this.response = response;
+      this.entity = response.getEntity();
+    }
+
+    @Override
+    public String getPath() {
+      return ".";
+    }
+
+    @Override
+    public long getContentLength() {
+      return 0;
+    }
+
+    @Nullable
+    @Override
+    public String getContentType() {
+      return entity.getContentType().getValue();
+    }
+
+    @Nullable
+    @Override
+    public DateTime getFirstCreated() {
+      return null;
+    }
+
+    @Nullable
+    @Override
+    public DateTime getLastModified() {
+      return null;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+      return new ExtraCloseableStream(entity.getContent(), response);
     }
   }
 
-  private Asset createAsset(final HttpEntity entity1) {
-    return new Asset()
-    {
-      @Override
-      public String getPath() {
-        return ".";
-      }
+  /**
+   * A way of attaching a Closeable to an input stream, so the auto is closed as soon as the stream is.
+   */
+  private static class ExtraCloseableStream
+      extends FilterInputStream
+  {
+    final Closeable needsClosing;
 
-      @Override
-      public long getContentLength() {
-        return 0;
-      }
+    private ExtraCloseableStream(final InputStream in, final Closeable needsClosing) {
+      super(in);
+      this.needsClosing = needsClosing;
+    }
 
-      @Nullable
-      @Override
-      public String getContentType() {
-        return entity1.getContentType().getValue();
-      }
+    @Override
+    public void close() throws IOException {
+      super.close();
+      IOUtils.closeQuietly(needsClosing);
+    }
 
-      @Nullable
-      @Override
-      public DateTime getFirstCreated() {
-        return null;
-      }
-
-      @Nullable
-      @Override
-      public DateTime getLastModified() {
-        return null;
-      }
-
-      @Override
-      public InputStream openStream() throws IOException {
-        return entity1.getContent();
-      }
-    };
   }
 
   @Override

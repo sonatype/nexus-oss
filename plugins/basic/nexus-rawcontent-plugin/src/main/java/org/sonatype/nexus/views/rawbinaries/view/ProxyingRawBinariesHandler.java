@@ -18,7 +18,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
@@ -82,7 +81,7 @@ public class ProxyingRawBinariesHandler
 
           for (ComponentEnvelope<RawComponent> envelope : envelopes) {
             for (Asset asset : envelope.getAssets()) {
-              binaryStore.create(asset.getPath(), asset.getContentType(), asset.openStream());
+              binaryStore.create(req.getPath(), asset.getContentType(), asset.openStream());
             }
           }
         }

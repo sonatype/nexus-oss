@@ -33,12 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawBinaryEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "rawbinarymetadata";
-
-  public static final String DB_CLASS = new OClassNameBuilder()
-      .prefix(DB_PREFIX)
-      .type(ViewConfig.class)
-      .build();
+  public static final String DB_CLASS = new OClassNameBuilder().type(RawBinaryMetadata.class).build();
 
   public static final String P_PATH = "path";
 
