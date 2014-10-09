@@ -34,22 +34,6 @@
     <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-
-      <!--
-      HACK: ruby tests need this in DM to resolve and download this required gem.
-      -->
-      <dependency>
-        <groupId>rubygems</groupId>
-        <artifactId>nexus</artifactId>
-        <version>1.2.1</version>
-        <type>gem</type>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -90,18 +74,6 @@
     <dependency>
       <groupId>org.sonatype.http-testing-harness</groupId>
       <artifactId>server-provider</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ruby-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-ruby-tools</artifactId>
       <scope>test</scope>
     </dependency>
 
