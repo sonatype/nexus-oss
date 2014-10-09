@@ -19,6 +19,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
@@ -39,7 +40,7 @@ public class RawBinaryBlobStoreProvider
 {
   private final ApplicationDirectories appDirs;
 
-  private MapdbBlobMetadataStore metadataStore;
+  private BlobMetadataStore metadataStore;
 
   @Inject
   public RawBinaryBlobStoreProvider(final ApplicationDirectories appDirs) {
@@ -53,7 +54,7 @@ public class RawBinaryBlobStoreProvider
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
 
-    this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
+    this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
 
     final FileBlobStore fileBlobStore = new FileBlobStore(content, new VolumeChapterLocationStrategy(),
         new SimpleFileOperations(), metadataStore);

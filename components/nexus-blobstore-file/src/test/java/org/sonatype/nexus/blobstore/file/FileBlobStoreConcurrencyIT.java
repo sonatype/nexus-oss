@@ -61,7 +61,7 @@ public class FileBlobStoreConcurrencyIT
 
   public static final int BLOB_MAX_SIZE_BYTES = 5_000_000;
 
-  private MapdbBlobMetadataStore metadataStore;
+  private BlobMetadataStore metadataStore;
 
   private FileBlobStore underTest;
 
@@ -71,7 +71,7 @@ public class FileBlobStoreConcurrencyIT
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
 
-    this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
+    this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
     this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
     underTest.start();
   }

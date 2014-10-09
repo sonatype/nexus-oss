@@ -13,8 +13,14 @@
 
 package org.sonatype.nexus.blobstore.file;
 
+import java.io.Externalizable;
 import java.io.File;
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -26,7 +32,6 @@ import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.mapdb.Atomic;
@@ -54,10 +59,22 @@ public class MapdbBlobMetadataStore
 
   private TxMaker database;
 
-  public MapdbBlobMetadataStore(final File directory) {
+  private MapdbBlobMetadataStore(final File directory) {
     checkNotNull(directory);
     this.file = new File(directory, directory.getName() + ".db");
     log.debug("File: {}", file);
+  }
+
+  /**
+   * MapDB uses a classloading strategy incompatible with OSGi (it uses the current thread's context class loader).
+   * This method produces a BlobMetadataStore that has been wrapped with a proxy that ensures the right classloader
+   * is used for mapdb's serializing/deserializing operations.
+   */
+  public static BlobMetadataStore create(final File directory) {
+    final MapdbBlobMetadataStore inner = new MapdbBlobMetadataStore(directory);
+
+    return (BlobMetadataStore) Proxy.newProxyInstance(BlobMetadataStore.class.getClassLoader(),
+        new Class[]{BlobMetadataStore.class}, new ClassLoaderPreserver(inner));
   }
 
   /**
@@ -74,6 +91,7 @@ public class MapdbBlobMetadataStore
         .checksumEnable()
         .makeTxMaker();
   }
+
 
   @Override
   protected void doStop() throws Exception {
@@ -96,20 +114,22 @@ public class MapdbBlobMetadataStore
   /**
    * Immutable metadata record for internal storage in MapDB.
    */
-  private static class MetadataRecord
-      implements Serializable
+  static class MetadataRecord
+      implements Externalizable
   {
-    private final BlobState state;
+    private final static int FORMAT_VERSION = 1;
 
-    private final Map<String, String> headers;
+    private BlobState state;
 
-    private final boolean metrics;
+    private Map<String, String> headers;
 
-    private final DateTime created;
+    private boolean metrics;
 
-    private final String sha1;
+    private DateTime created;
 
-    private final Long size;
+    private String sha1;
+
+    private Long size;
 
     public MetadataRecord(final BlobMetadata source) {
       this.state = source.getBlobState();
@@ -129,6 +149,13 @@ public class MapdbBlobMetadataStore
       }
     }
 
+    /**
+     * Deserialization constructor.
+     */
+    @SuppressWarnings("unused")
+    public MetadataRecord() {
+    }
+
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
@@ -139,6 +166,51 @@ public class MapdbBlobMetadataStore
           ", sha1='" + sha1 + '\'' +
           ", size=" + size +
           '}';
+    }
+
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+      out.writeInt(FORMAT_VERSION);
+
+      out.writeObject(state);
+
+      out.writeInt(headers.size());
+      for (Map.Entry<String, String> header : headers.entrySet()) {
+        out.writeObject(header.getKey());
+        out.writeObject(header.getValue());
+      }
+
+      out.writeBoolean(metrics);
+
+      if (metrics) {
+        // writeObject preserves nulls
+        out.writeObject(created == null ? null : created.getMillis());
+        out.writeObject(sha1);
+        out.writeObject(size);
+      }
+    }
+
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+      final int version = in.readInt();
+
+      state = (BlobState) in.readObject();
+
+      headers = Maps.newHashMap();
+      final int numberOfHeaders = in.readInt();
+      for (int i = 0; i < numberOfHeaders; i++) {
+        headers.put((String) in.readObject(), (String) in.readObject());
+      }
+
+      metrics = in.readBoolean();
+      if (metrics) {
+        final Long createdMillis = (Long) in.readObject();
+        if (createdMillis != null) {
+          created = new DateTime(createdMillis);
+        }
+        sha1 = (String) in.readObject();
+        size = (Long) in.readObject();
+      }
     }
   }
 
@@ -169,7 +241,7 @@ public class MapdbBlobMetadataStore
 
     final MetadataRecord record = convert(metadata);
 
-    return execute(new Fun.Function1<BlobId, DB>()
+    return database.execute(new Fun.Function1<BlobId, DB>()
     {
       @Override
       public BlobId run(final DB db) {
@@ -217,7 +289,7 @@ public class MapdbBlobMetadataStore
     final MetadataRecord record = convert(metadata);
     log.trace("Update: {}={}", id, record);
 
-    execute(new TxBlock()
+    database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -238,7 +310,7 @@ public class MapdbBlobMetadataStore
 
     log.trace("Delete: {}", id);
 
-    execute(new TxBlock()
+    database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -327,7 +399,7 @@ public class MapdbBlobMetadataStore
   public void compact() {
     ensureStarted();
 
-    execute(new TxBlock()
+    database.execute(new TxBlock()
     {
       @Override
       public void tx(final DB db) throws TxRollbackException {
@@ -337,31 +409,23 @@ public class MapdbBlobMetadataStore
     });
   }
 
-  /**
-   * Executes a MapDB operation, but with the correct OSGi classloader.
-   */
-  public <A> A execute(org.mapdb.Fun.Function1<A, org.mapdb.DB> txBlock) {
-    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-      return database.execute(txBlock);
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(tccl);
-    }
-  }
+  private static class ClassLoaderPreserver
+      implements InvocationHandler
+  {
+    private final BlobMetadataStore inner;
 
-  /**
-   * Executes a MapDB operation, but with the correct OSGi classloader.
-   */
-  public void execute(TxBlock txBlock){
-    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-      database.execute(txBlock);
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(tccl);
+    private ClassLoaderPreserver(final BlobMetadataStore inner) {this.inner = inner;}
+
+    @Override
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+      ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+      try {
+        Thread.currentThread().setContextClassLoader(MapdbBlobMetadataStore.class.getClassLoader());
+        return method.invoke(inner, args);
+      }
+      finally {
+        Thread.currentThread().setContextClassLoader(tccl);
+      }
     }
   }
 }
