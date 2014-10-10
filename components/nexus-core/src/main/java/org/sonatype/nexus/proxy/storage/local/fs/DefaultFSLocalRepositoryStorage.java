@@ -405,7 +405,7 @@ public class DefaultFSLocalRepositoryStorage
 
       getFSPeer().moveItem(repository, getBaseDir(repository, from), from, fromTarget, to, toTarget);
 
-      repository.getAttributesHandler().getAttributeStorage().deleteAttributes(fromUid);
+      repository.getAttributesHandler().deleteAttributes(fromUid);
     }
     catch (LocalStorageException e) {
       // to not wrap these, they are IOEx subclass

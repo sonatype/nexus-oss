@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Content.ForceDirective;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
@@ -42,6 +43,13 @@ public abstract class RoutingITSupport
 {
   protected RoutingITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
+  }
+
+  @Override
+  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+    return super.configureNexus(configuration)
+        .setLogLevel("org.sonatype.nexus.proxy", "DEBUG")
+        .setLogLevel("org.sonatype.nexus.proxy.maven.routing", "TRACE");
   }
 
   /**
