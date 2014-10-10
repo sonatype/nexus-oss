@@ -57,6 +57,7 @@ public class ComponentViewServlet
       throws ServletException, IOException
   {
     final ViewNameParser viewNameParser = new ViewNameParser(req.getPathInfo());
+    req.getQueryString();
 
     final View view = viewRegistry.getView(viewNameParser.getViewName());
     if (view == null) {
@@ -64,7 +65,7 @@ public class ComponentViewServlet
     }
 
     final ViewRequest request = new WrappingViewRequest(req, viewNameParser.getViewName(), view.getConfig(),
-        viewNameParser.getRemainingPath());
+        viewNameParser.getRemainingPath(), req.getQueryString());
 
     try {
       view.dispatch(request).send(resp);

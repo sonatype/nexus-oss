@@ -27,6 +27,7 @@ import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -99,7 +100,8 @@ public class RawBinaryComponentSource
     @Nullable
     @Override
     public String getContentType() {
-      return entity.getContentType().getValue();
+      final Header contentType = entity.getContentType();
+      return contentType == null ? null : contentType.getValue();
     }
 
     @Nullable

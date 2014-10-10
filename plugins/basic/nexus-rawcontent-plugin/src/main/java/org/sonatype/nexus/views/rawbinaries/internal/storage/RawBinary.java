@@ -30,7 +30,7 @@ public interface RawBinary
 
   InputStream getInputStream();
 
-  String getMimeType();
+  String getContentType();
 
   DateTime getModifiedDate();
 }

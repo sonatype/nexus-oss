@@ -113,7 +113,7 @@ public class OrientRawBinaryStore
   }
 
   @Override
-  public RawBinary create(final String path, final String mimeType, final InputStream inputStream) {
+  public RawBinary create(final String path, final String contentType, final InputStream inputStream) {
     if (exists(path)) {
       return null;
     }
@@ -121,11 +121,11 @@ public class OrientRawBinaryStore
     Map<String, String> blobMetadata = new HashMap<>();
     blobMetadata.put(BlobStore.BLOB_NAME_HEADER, path);
     blobMetadata.put(BlobStore.CREATED_BY_HEADER, "Unknown");
-    blobMetadata.put("mimeType", mimeType);
+    blobMetadata.put("contentType", contentType);
 
     final Blob blob = blobStore.create(inputStream, blobMetadata);
 
-    final RawBinaryMetadata metadata = new RawBinaryMetadata(path, blob.getId().asUniqueString(), mimeType);
+    final RawBinaryMetadata metadata = new RawBinaryMetadata(path, blob.getId().asUniqueString(), contentType);
 
     ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {
@@ -188,8 +188,8 @@ public class OrientRawBinaryStore
       }
 
       @Override
-      public String getMimeType() {
-        return metadata.getMimeType();
+      public String getContentType() {
+        return metadata.getContentType();
       }
 
       @Override

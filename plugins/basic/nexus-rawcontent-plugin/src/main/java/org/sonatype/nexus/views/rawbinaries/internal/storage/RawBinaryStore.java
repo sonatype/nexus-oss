@@ -37,7 +37,7 @@ public interface RawBinaryStore
    * Returns the newly created {@link RawBinary}, {@code null} if it does not.
    */
   @Nullable
-  RawBinary create(String path, String mimeType, InputStream inputStream);
+  RawBinary create(String path, String contentType, InputStream inputStream);
 
   /**
    * Returns true if an artifact was deleted, false if there was no artifact to delete.

@@ -42,6 +42,12 @@ public interface ViewRequest
   String getPath();
 
   /**
+   * The query string
+   */
+  @Nullable
+  public String getQueryString();
+
+  /**
    * The HTTP method invoked (e.g. "GET", "PUT").
    */
   HttpMethod getMethod();

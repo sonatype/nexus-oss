@@ -59,14 +59,18 @@ public class ProxyingRawBinariesHandler
   @Nullable
   @Override
   protected ViewResponse before(final ViewRequest req) {
+    final String requestPath = ensureLeadingSlash(
+        req.getPath() + (req.getQueryString() == null ? "" : "?" + req.getQueryString()));
+
     switch (req.getMethod()) {
       case GET:
         // Check locally.
-        final List<RawBinary> localBinaries = binaryStore.getForPath(req.getPath());
+
+        final List<RawBinary> localBinaries = binaryStore.getForPath(requestPath);
 
         // Do we have a single result whose path matches the request exactly?
 
-        final RawBinary exactMatch = exactMatch(localBinaries, req.getPath());
+        final RawBinary exactMatch = exactMatch(localBinaries, requestPath);
         if (exactMatch != null) {
           return createStreamResponse(exactMatch);
         }
@@ -74,14 +78,14 @@ public class ProxyingRawBinariesHandler
         // If not, contact the remote source and store whatever it has
 
         try {
-          final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", req.getPath()));
+          final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
 
           // Here we presume we're getting Component back, since we don't actually use the component metadata
           final Iterable<ComponentEnvelope<RawComponent>> envelopes = source.fetchComponents(path);
 
           for (ComponentEnvelope<RawComponent> envelope : envelopes) {
             for (Asset asset : envelope.getAssets()) {
-              binaryStore.create(req.getPath(), asset.getContentType(), asset.openStream());
+              binaryStore.create(requestPath, asset.getContentType(), asset.openStream());
             }
           }
         }
@@ -99,7 +103,7 @@ public class ProxyingRawBinariesHandler
 
   ViewResponse createStreamResponse(final RawBinary binary) {
     return Responses
-        .streamResponse(binary.getInputStream(), binary.getMimeType(), binary.getModifiedDate().toDate());
+        .streamResponse(binary.getInputStream(), binary.getContentType(), binary.getModifiedDate().toDate());
   }
 
 
@@ -111,5 +115,9 @@ public class ProxyingRawBinariesHandler
       }
     }
     return null;
+  }
+
+  private String ensureLeadingSlash(String path) {
+    return path.startsWith("/") ? path : "/" + path;
   }
 }

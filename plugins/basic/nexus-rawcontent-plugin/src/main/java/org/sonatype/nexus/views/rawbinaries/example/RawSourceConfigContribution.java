@@ -44,7 +44,7 @@ public class RawSourceConfigContribution
   public void contributeTo(final ComponentSourceConfigStore store) throws IOException {
     final ComponentSourceConfig config = new ComponentSourceConfig(new ComponentSourceId(SOURCE_NAME, SOURCE_ID),
         RawComponentSourceFactory.NAME, ImmutableMap.of(RawComponentSourceFactory.REMOTE_URL_PARAM,
-        (Object) "http://search.maven.org/remotecontent?filepath="));
+        (Object) "http://search.maven.org/"));
 
     if (store.get(SOURCE_NAME) == null) {
       store.add(config);

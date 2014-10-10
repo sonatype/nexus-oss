@@ -39,20 +39,29 @@ public class WrappingViewRequest
 
   private final String path;
 
+  private final String queryString;
+
   private final Map<String, Object> requestContext = new HashMap<>();
 
   public WrappingViewRequest(final HttpServletRequest request, final String viewName, final ViewConfig viewConfig,
-                             final String path)
+                             final String path, final String queryString)
   {
+
     this.viewConfig = checkNotNull(viewConfig);
     this.request = checkNotNull(request);
     this.path = checkNotNull(path);
+    this.queryString = queryString;
   }
 
 
   @Override
   public String getPath() {
     return path;
+  }
+
+  @Nullable
+  public String getQueryString() {
+    return queryString;
   }
 
   @Override
