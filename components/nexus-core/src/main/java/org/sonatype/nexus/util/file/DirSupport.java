@@ -413,17 +413,11 @@ public final class DirSupport
       throws IOException
   {
     if (excludeFilter == null) {
-      try {
-        Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
-        return;
-      }
-      catch (IOException e) {
-        // This happens also when dir is to be moved to it's subdirectory, like what NX Trash does
-        // give up, do copy+delete
-      }
+      Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+    } else {
+      copy(from, to, excludeFilter);
+      delete(from, excludeFilter);
     }
-    copy(from, to, excludeFilter);
-    delete(from, excludeFilter);
   }
 
   /**
