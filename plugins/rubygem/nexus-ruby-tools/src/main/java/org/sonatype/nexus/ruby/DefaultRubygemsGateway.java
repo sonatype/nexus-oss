@@ -23,6 +23,10 @@ public class DefaultRubygemsGateway
     extends ScriptWrapper
     implements RubygemsGateway
 {
+  /**
+   * Ctor that accepts prepared scripting container, as usually the container is or should be
+   * managed (ie. by calling {@link ScriptingContainer#terminate()} when application is shut down.
+   */
   public DefaultRubygemsGateway(ScriptingContainer container) {
     super(container);
   }
