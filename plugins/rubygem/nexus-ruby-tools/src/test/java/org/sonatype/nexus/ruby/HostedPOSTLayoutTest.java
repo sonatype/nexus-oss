@@ -29,7 +29,6 @@ import org.sonatype.nexus.ruby.layout.HostedGETLayout;
 import org.sonatype.nexus.ruby.layout.HostedPOSTLayout;
 import org.sonatype.nexus.ruby.layout.SimpleStorage;
 import org.sonatype.nexus.ruby.layout.Storage;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +47,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(Parameterized.class)
 public class HostedPOSTLayoutTest
-    extends TestSupport
+    extends RubyScriptingTestSupport
 {
   private static File proxyBase() throws IOException {
     File base = new File("target/proxy");
@@ -85,7 +84,7 @@ public class HostedPOSTLayoutTest
     if (store instanceof CachingProxyStorage) {
       isHosted = false;
       fileSystem =
-          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
               new SimpleStorage(hostedBase())),
               null,
               null);
@@ -93,9 +92,9 @@ public class HostedPOSTLayoutTest
     else {
       isHosted = true;
       fileSystem =
-          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
               new SimpleStorage(hostedBase())),
-              new HostedPOSTLayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+              new HostedPOSTLayout(new DefaultRubygemsGateway(testScriptingContainer),
                   store),
               null);
     }

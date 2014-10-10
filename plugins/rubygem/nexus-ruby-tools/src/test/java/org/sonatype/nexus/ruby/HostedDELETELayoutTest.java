@@ -28,7 +28,6 @@ import org.sonatype.nexus.ruby.layout.HostedDELETELayout;
 import org.sonatype.nexus.ruby.layout.HostedGETLayout;
 import org.sonatype.nexus.ruby.layout.SimpleStorage;
 import org.sonatype.nexus.ruby.layout.Storage;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -47,7 +46,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(Parameterized.class)
 public class HostedDELETELayoutTest
-    extends TestSupport
+    extends RubyScriptingTestSupport
 {
   private static File proxyBase() throws IOException {
     File base = new File("target/proxy");
@@ -83,10 +82,10 @@ public class HostedDELETELayoutTest
 
   public HostedDELETELayoutTest(Storage store) throws IOException {
     fileSystem = new DefaultRubygemsFileSystem(
-        new HostedGETLayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+        new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
             store),
         null,
-        new HostedDELETELayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+        new HostedDELETELayout(new DefaultRubygemsGateway(testScriptingContainer),
             new SimpleStorage(hostedBase())));
     // delete proxy files
     proxyBase();

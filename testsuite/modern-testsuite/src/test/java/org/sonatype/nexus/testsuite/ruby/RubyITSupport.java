@@ -36,6 +36,7 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 
 import org.hamcrest.Matcher;
 import org.jruby.embed.ScriptingContainer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
@@ -108,6 +109,13 @@ public abstract class RubyITSupport
         .containing("---\n" +
             ":rubygems_api_key: blablablabla\n" +
             ":test: Basic YWRtaW46YWRtaW4xMjM=\n").run();
+  }
+
+  @After
+  public void cleanup() {
+    if (ruby != null) {
+      ruby.terminate();
+    }
   }
 
   // ==

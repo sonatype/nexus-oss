@@ -15,6 +15,7 @@ package org.sonatype.nexus.ruby;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,13 +29,17 @@ import static org.sonatype.nexus.ruby.TestUtils.numberOfLines;
 public class BundleRunnerTest
   extends TestSupport
 {
+  @Rule
+  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
+
   private BundleRunner runner;
 
   @Before
   public void setUp() throws Exception {
     // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    runner = new BundleRunner(new TestScriptingContainer());
+    runner = new BundleRunner(testScriptingContainerRule.get());
   }
+
 
   @Test
   public void testInstall() throws Exception {
