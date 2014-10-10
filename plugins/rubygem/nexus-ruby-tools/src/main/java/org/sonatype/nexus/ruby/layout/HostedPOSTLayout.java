@@ -24,12 +24,14 @@ import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
+import org.sonatype.nexus.ruby.SpecsHelper;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexType;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 
-import com.jcraft.jzlib.GZIPInputStream;
 import org.jruby.runtime.builtin.IRubyObject;
+
+import com.jcraft.jzlib.GZIPInputStream;
 
 /**
  * to make a HTTP POST to hosted repository allows only two path:
@@ -105,23 +107,17 @@ public class HostedPOSTLayout
    * add a spec (Ruby Object) to the specs.4.8 indices.
    */
   private void addSpecToIndex(IRubyObject spec) throws IOException {
+    SpecsHelper specs = gateway.newSpecsHelper();
     for (SpecsIndexType type : SpecsIndexType.values()) {
-      InputStream content = null;
-      SpecsIndexZippedFile specs = ensureSpecsIndexZippedFile(type);
+      SpecsIndexZippedFile specsIndex = ensureSpecsIndexZippedFile(type);
 
-      try (InputStream in = new GZIPInputStream(store.getInputStream(specs))) {
-        content = gateway.addSpec(spec, in, type);
-
-        // if nothing was added the content is NULL
-        if (content != null) {
-          store.update(IOUtil.toGzipped(content), specs);
-          if (specs.hasException()) {
-            throw new IOException(specs.getException());
+      try (InputStream in = new GZIPInputStream(store.getInputStream(specsIndex))) {
+        try (InputStream result = specs.addSpec(spec, in, type)) {
+          // if nothing was added the content is NULL
+          if (result != null) {
+            store.update(IOUtil.toGzipped(result), specsIndex);
           }
         }
-      }
-      finally {
-        IOUtil.close(content);
       }
     }
   }
