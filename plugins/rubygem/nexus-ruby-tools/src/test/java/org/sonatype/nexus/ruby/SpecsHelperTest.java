@@ -82,7 +82,7 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    IRubyObject spec1 = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject spec1 = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add gem
     InputStream is = specsHelper.addSpec(spec1, new FileInputStream(empty),
@@ -90,7 +90,7 @@ public class SpecsHelperTest
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    IRubyObject specJ = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject specJ = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     is = specsHelper.addSpec(specJ, is, SpecsIndexType.LATEST);
 
     dumpStream(is, target);
@@ -101,7 +101,7 @@ public class SpecsHelperTest
 
     // add a gem with newer version
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    IRubyObject spec = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     is = specsHelper.addSpec(spec, new FileInputStream(target), SpecsIndexType.LATEST);
 
     dumpStream(is, target);
@@ -124,20 +124,20 @@ public class SpecsHelperTest
     File releaseSpecsFile = new File("target/test_release_specs");
     
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
-    IRubyObject spec = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add gem
     InputStream releaseStream = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    spec = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     releaseStream = specsHelper.addSpec(spec, releaseStream, SpecsIndexType.RELEASE);
     dumpStream(releaseStream, releaseSpecsFile);
 
     // add a gem with newer version to release and latest index
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    IRubyObject s = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject s = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     
     releaseStream = specsHelper.addSpec(s, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(releaseStream, releaseSpecsFile);
@@ -194,7 +194,7 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    IRubyObject spec = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add released gem
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
@@ -231,7 +231,7 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.pre.gem");
 
-    IRubyObject spec = (IRubyObject) gateway.spec(new FileInputStream(gem));
+    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add prereleased gem
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.PRERELEASE);
