@@ -321,7 +321,7 @@ public abstract class AbstractNexusIntegrationTest
 
       // booting is now asynchronous, so have to wait for Nexus
       Thread.sleep(10000);
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 170; i++) {
         try {
           if (getNexusStatusUtil().isNexusRunning()) {
             return;

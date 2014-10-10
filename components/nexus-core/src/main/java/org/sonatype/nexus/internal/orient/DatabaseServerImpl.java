@@ -83,6 +83,9 @@ public class DatabaseServerImpl
     OServerConfiguration config = createConfiguration();
     server.startup(config);
 
+    // create default root user to avoid orientdb prompt on console
+    server.addUser(OServerConfiguration.SRV_ROOT_ADMIN, null, "*");
+
     // Log global configuration
     if (log.isDebugEnabled()) {
       StringWriter buff = new StringWriter();

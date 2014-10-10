@@ -144,7 +144,7 @@ Ext.define('NX.controller.Help', {
         keyword = me.selectedFeature.get('helpKeyword'),
         url = me.baseUrl + '/docs-search/' + NX.State.getVersionMajorMinor() + '/' + keyword;
 
-    NX.Windows.openUrl(url);
+    NX.Windows.open(url);
   },
 
   /**

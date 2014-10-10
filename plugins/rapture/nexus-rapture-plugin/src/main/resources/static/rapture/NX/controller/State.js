@@ -379,6 +379,18 @@ Ext.define('NX.controller.State', {
   },
 
   /**
+   * @public
+   * Refreshes status from server on demand.
+   */
+  refreshNow: function () {
+    var me = this;
+    if (me.statusProvider) {
+      me.statusProvider.disconnect();
+      me.statusProvider.connect();
+    }
+  },
+
+  /**
    * @private
    * Show messages about license.
    * @param {Object} license
