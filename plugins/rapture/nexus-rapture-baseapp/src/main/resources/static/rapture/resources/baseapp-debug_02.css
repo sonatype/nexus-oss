@@ -12155,3 +12155,18 @@
   border-color: #408140 !important;
   border-width: 2px !important;
 }
+
+/* line 1, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
+.x-form-trigger-wrap {
+  border-radius: 11px;
+  padding-left: 3px;
+  padding-right: 0px;
+  background-color: white;
+}
+
+/* line 10, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
+.x-trigger-cell,
+.x-form-field,
+.x-form-trigger-input-cell {
+  background-color: rgba(0, 0, 0, 0);
+}
