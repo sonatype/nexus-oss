@@ -63,5 +63,66 @@ module Nexus
     def marshal_dump( obj)
       ByteArrayInputStream.new( Marshal.dump( obj ).to_java.bytes )
     end
+
+    def load_specs( io )
+      marshal_load( io )
+    end
+
+    def dump_specs( specs )
+      specs.uniq!
+      specs.sort!
+      marshal_dump( compact_specs( specs ) )
+    end
+
+    def compact_specs( specs )
+      names = {}
+      versions = {}
+      platforms = {}
+
+      specs.map do |( name, version, platform )|
+        names[ name ] = name unless names.include? name
+        versions[ version ] = version unless versions.include? version
+        platforms[ platform ] = platform unless platforms.include? platform
+
+        [ names[ name ], versions[ version ], platforms[ platform ] ]
+      end
+    end
+
+    def do_add_spec( spec, source, latest = false )
+      specs = load_specs( source )
+      new_entry = [ spec.name, spec.version, spec.platform.to_s ]
+      unless specs.member?( new_entry )
+        if latest
+          new_specs = regenerate_latest( specs + [ new_entry ] )
+          dump_specs( new_specs ) if new_specs != specs
+        else
+          specs << new_entry
+          dump_specs( specs )
+        end
+      end
+    end
+
+    def regenerate_latest( specs )
+      specs.sort!
+      specs.uniq!
+      map = {}
+      specs.each do |s|
+        list = map[ s[ 0 ] ] ||= []
+        list << s
+      end
+      result = []
+      map.each do |name, list|
+        list.sort!
+        list.uniq!
+        lastest_versions = {}
+        list.each do |i|
+          version = i[1]
+          platform = i[2]
+          lastest_versions[ platform ] = i
+        end
+        result += lastest_versions.collect { |k, v| v }
+      end
+      result
+    end
   end
 end

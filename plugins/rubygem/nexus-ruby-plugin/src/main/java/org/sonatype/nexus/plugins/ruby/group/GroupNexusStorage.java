@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -38,6 +37,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.ruby.BundlerApiFile;
 import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.DependencyHelper;
+import org.sonatype.nexus.ruby.MergeSpecsHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.SpecsIndexType;
@@ -137,43 +137,32 @@ public class GroupNexusStorage
   private StorageItem merge(SpecsIndexZippedFile file, List<StorageItem> items)
       throws UnsupportedStorageOperationException, IOException, IllegalOperationException
   {
-    List<InputStream> streams = new LinkedList<InputStream>();
-    try {
-      for (StorageItem item : items) {
-        streams.add(new GZIPInputStream(((StorageFileItem) item).getInputStream()));
+    MergeSpecsHelper specs = gateway.newMergeSpecsHelper();
+    for (StorageItem item : items) {
+      try (InputStream is = ((StorageFileItem) item).getInputStream()) {
+        specs.add(new GZIPInputStream(is));
       }
-      return storeSpecsIndex(file, gateway.mergeSpecs(streams, file.specsType() == SpecsIndexType.LATEST));
     }
-    finally {
-      for (InputStream i : streams) {
-        IOUtil.close(i);
-      }
+    try (InputStream is = specs.getInputStream(file.specsType() == SpecsIndexType.LATEST)) {
+      return storeSpecsIndex(file, is);
     }
   }
 
   private StorageItem storeSpecsIndex(SpecsIndexZippedFile file, InputStream content)
       throws UnsupportedStorageOperationException, IOException, IllegalOperationException
   {
-    OutputStream out = null;
-    try {
-      ByteArrayOutputStream gzipped = new ByteArrayOutputStream();
-      out = new GZIPOutputStream(gzipped);
+    ByteArrayOutputStream gzipped = new ByteArrayOutputStream();
+    try (OutputStream out = new GZIPOutputStream(gzipped)) {
       IOUtil.copy(content, out);
-      // need to close gzip stream here
-      out.close();
-      ContentLocator cl = new PreparedContentLocator(new ByteArrayInputStream(gzipped.toByteArray()),
-          "application/x-gzip",
-          gzipped.size());
-      DefaultStorageFileItem item =
-          new DefaultStorageFileItem(repository,
-              new ResourceStoreRequest(file.storagePath()),
-              true, true, cl);
-      repository.storeItem(false, item);
-      return item;
     }
-    finally {
-      IOUtil.close(out);
-    }
+    ContentLocator cl = new PreparedContentLocator(new ByteArrayInputStream(gzipped.toByteArray()),
+        "application/x-gzip", gzipped.size());
+    DefaultStorageFileItem item =
+        new DefaultStorageFileItem(repository,
+            new ResourceStoreRequest(file.storagePath()),
+            true, true, cl);
+    repository.storeItem(false, item);
+    return item;
   }
 
   private StorageItem merge(DependencyFile file, List<StorageItem> dependencies)
