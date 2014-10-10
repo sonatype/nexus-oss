@@ -104,7 +104,7 @@ public final class DirSupport
 
     private final Predicate<Path> excludeFilter;
 
-    public CopyVisitor(final Path from, final Path to, final Predicate<Path> excludeFilter) {
+    public CopyVisitor(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter) {
       this.from = from;
       this.to = to;
       this.excludeFilter = excludeFilter;
