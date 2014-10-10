@@ -17,32 +17,12 @@ import java.util.List;
 
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
-import org.jruby.embed.osgi.OSGiScriptingContainer;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.osgi.framework.FrameworkUtil;
 
 public class DefaultRubygemsGateway
     extends ScriptWrapper
     implements RubygemsGateway
 {
-  private static ScriptingContainer newScriptingContainer() {
-    ScriptingContainer container;
-    try {
-      container = new OSGiScriptingContainer(FrameworkUtil.getBundle(DefaultRubygemsGateway.class));
-    }
-    catch (Throwable e) {
-      container = new ScriptingContainer();
-    }
-    // set the right classloader
-    container.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
-
-    return container;
-  }
-
-  public DefaultRubygemsGateway() {
-    this(newScriptingContainer());
-  }
-
   public DefaultRubygemsGateway(ScriptingContainer container) {
     super(container);
   }

@@ -12,13 +12,24 @@
  */
 package org.sonatype.nexus.plugins.ruby;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 
-// just make a "component" out of the DefaultRubygemsGateway
+import org.jruby.embed.ScriptingContainer;
+
+/**
+ * Note: this component is NOT a singleton, but it uses the singleton scripting container.
+ */
 @Named
 public class NexusRubygemsGateway
     extends DefaultRubygemsGateway
 {
+  @Inject
+  public NexusRubygemsGateway(final Provider<ScriptingContainer> containerProvider) {
+    super(containerProvider.get());
+  }
 }
