@@ -42,6 +42,11 @@ public class DefaultRubygemsGateway
   }
 
   @Override
+  public MergeSpecsHelper newMergeSpecsHelper() {
+    return callMethod("new_merge_specs_helper", MergeSpecsHelper.class);
+  }
+
+  @Override
   public DependencyData dependencies(InputStream is, String name, long modified) {
     return new DependencyDataImpl(scriptingContainer,
         callMethod("dependencies", new Object[]{name, is}, Object.class),
@@ -85,20 +90,6 @@ public class DefaultRubygemsGateway
             spec,
             specsIndex,
             releasesSpecs
-        },
-        List.class);
-
-    return array == null ? null : new ByteArrayInputStream(array);
-  }
-
-  @SuppressWarnings("resource")
-  @Override
-  public InputStream mergeSpecs(List<InputStream> streams, boolean latest) {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("merge_specs",
-        new Object[]{
-            streams,
-            latest
         },
         List.class);
 

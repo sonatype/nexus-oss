@@ -4,10 +4,13 @@ require 'nexus/indexer'
 require 'nexus/dependencies'
 require 'nexus/dependency_helper_impl'
 require 'nexus/gemspec_helper_impl'
+require 'nexus/merge_specs_helper_impl'
 
 module Nexus
   class Rubygems
 
+    # create a new instance of DependencyHelper
+    # @return [Nexus::DependencyHelperImpl]
     def new_dependency_helper
       Nexus::DependencyHelperImpl.new
     end
@@ -18,6 +21,12 @@ module Nexus
 
     def new_gemspec_helper_from_gem( file )
       Nexus::GemspecHelperImpl.from_gem( file )
+    end
+
+    # create a new instance of MergeSpecsHelper
+    # @return [Nexus::MergeSpecsHelperImpl]
+    def new_merge_specs_helper
+      Nexus::MergeSpecsHelperImpl.new
     end
 
     def recreate_rubygems_index( directory )

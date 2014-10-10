@@ -33,8 +33,6 @@ public interface RubygemsGateway
 
   InputStream deleteSpec(IRubyObject spec, InputStream specsIndex, InputStream refSpecs);
 
-  InputStream mergeSpecs(List<InputStream> streams, boolean latest);
-
   DependencyData dependencies(InputStream inputStream, String name, long modified);
 
   List<String> listAllVersions(String name, InputStream inputStream, long modified, boolean prerelease);
@@ -58,4 +56,10 @@ public interface RubygemsGateway
    * @return an empty DependencyHelper
    */
   DependencyHelper newDependencyHelper();
+
+  /**
+   * create a new instance of <code>MergeSpecsHelper</code>
+   * @return an empty MergeSpecsHelper
+   */
+  MergeSpecsHelper newMergeSpecsHelper();
 }
