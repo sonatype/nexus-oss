@@ -70,7 +70,7 @@ describe Nexus::DependencyHelperImpl do
 
     begin
       is = subject.input_stream( false )
-      subject.marshal_load( is ).must_equal [{:name=>"hufflepuf", :number=>"0.2.0", :platform=>"universal-java-1.5", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.2.0", :platform=>"x86-mswin32-60", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.1.0", :platform=>"ruby", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.1.0", :platform=>"universal-java-1.5", :dependencies=>[]}]
+      subject.marshal_load( is ).sort{ |n,m| "#{n[:name]}-#{n[:number]}-#{n[:platform]}" <=> "#{m[:name]}-#{m[:number]}-#{m[:platform]}" }.must_equal [{:name=>"hufflepuf", :number=>"0.1.0", :platform=>"ruby", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.1.0", :platform=>"universal-java-1.5", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.2.0", :platform=>"universal-java-1.5", :dependencies=>[]}, {:name=>"hufflepuf", :number=>"0.2.0", :platform=>"x86-mswin32-60", :dependencies=>[]}, ]
     ensure
       is.close if is
     end
