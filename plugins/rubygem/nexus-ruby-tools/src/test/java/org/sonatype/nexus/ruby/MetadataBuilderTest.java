@@ -18,6 +18,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,6 +27,9 @@ import static org.hamcrest.Matchers.equalTo;
 public class MetadataBuilderTest
     extends TestSupport
 {
+  @Rule
+  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
+
   private MetadataBuilder builder;
 
   private RubygemsGateway gateway;
@@ -33,7 +37,7 @@ public class MetadataBuilderTest
   @Before
   public void setUp() throws Exception {
     // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    gateway = new DefaultRubygemsGateway(new TestScriptingContainer());
+    gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
     builder = new MetadataBuilder(gateway.dependencies(asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
   }
 

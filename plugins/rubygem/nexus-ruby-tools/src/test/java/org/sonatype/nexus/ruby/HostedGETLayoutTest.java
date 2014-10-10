@@ -30,7 +30,6 @@ import org.sonatype.nexus.ruby.layout.CachingProxyStorage;
 import org.sonatype.nexus.ruby.layout.HostedGETLayout;
 import org.sonatype.nexus.ruby.layout.SimpleStorage;
 import org.sonatype.nexus.ruby.layout.Storage;
-import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +47,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(Parameterized.class)
 public class HostedGETLayoutTest
-    extends TestSupport
+    extends RubyScriptingTestSupport
 {
   private static File proxyBase() throws IOException {
     File base = new File("target/proxy");
@@ -84,7 +83,7 @@ public class HostedGETLayoutTest
 
   public HostedGETLayoutTest(Storage store) {
     bootstrap = new DefaultRubygemsFileSystem(
-        new HostedGETLayout(new DefaultRubygemsGateway(new TestScriptingContainer()),
+        new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
             store),
         null, null);
   }

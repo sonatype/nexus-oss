@@ -24,9 +24,9 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.jruby.embed.PathType;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -37,7 +37,8 @@ import static org.hamcrest.Matchers.hasSize;
 public class RubygemsGatewayTest
     extends TestSupport
 {
-  private ScriptingContainer scriptingContainer;
+  @Rule
+  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
 
   private RubygemsGateway gateway;
 
@@ -45,10 +46,9 @@ public class RubygemsGatewayTest
 
   @Before
   public void setUp() throws Exception {
-    scriptingContainer = new TestScriptingContainer();
     // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    gateway = new DefaultRubygemsGateway(scriptingContainer);
-    check = scriptingContainer.parse(PathType.CLASSPATH, "nexus/check.rb").run();
+    gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
+    check = testScriptingContainerRule.get().parse(PathType.CLASSPATH, "nexus/check.rb").run();
   }
 
   @Test
@@ -67,7 +67,7 @@ public class RubygemsGatewayTest
     out.close();
     is.close();
 
-    boolean equalSpecs = scriptingContainer.callMethod(check,
+    boolean equalSpecs = testScriptingContainerRule.get().callMethod(check,
         "check_gemspec_rz",
         new Object[]{gem, gemspecPath},
         Boolean.class);
@@ -109,7 +109,7 @@ public class RubygemsGatewayTest
     DependencyHelper deps = gateway.newDependencyHelper();
     dumpStream(deps.getInputStream(false), empty);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         empty.getAbsolutePath(),
         Integer.class);
@@ -122,7 +122,7 @@ public class RubygemsGatewayTest
 
     dumpStream(gateway.emptyIndex(), empty);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         empty.getAbsolutePath(),
         Integer.class);
@@ -149,7 +149,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -164,7 +164,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -209,7 +209,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -220,7 +220,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -240,7 +240,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -251,7 +251,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -268,7 +268,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -288,7 +288,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check,
+    int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -299,7 +299,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
@@ -316,7 +316,7 @@ public class RubygemsGatewayTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check,
+    size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
         target.getAbsolutePath(),
         Integer.class);
