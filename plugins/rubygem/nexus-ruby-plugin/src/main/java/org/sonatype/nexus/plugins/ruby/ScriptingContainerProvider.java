@@ -24,8 +24,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.Subscribe;
 import org.jruby.embed.ScriptingContainer;
-import org.jruby.embed.osgi.OSGiScriptingContainer;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * A provider for JRuby scipting container that creates it lazily (ie. if NX instance does not have rubygems
@@ -44,12 +42,7 @@ public class ScriptingContainerProvider
   public synchronized ScriptingContainer get() {
     if (scriptingContainer == null) {
       log.debug("Creating JRuby ScriptingContainer...");
-      try {
-        scriptingContainer = new OSGiScriptingContainer(FrameworkUtil.getBundle(DefaultRubygemsGateway.class));
-      }
-      catch (Throwable e) {
-        scriptingContainer = new ScriptingContainer();
-      }
+      scriptingContainer = new ScriptingContainer();
       scriptingContainer.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
     }
     return scriptingContainer;
