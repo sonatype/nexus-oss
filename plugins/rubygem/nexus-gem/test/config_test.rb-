@@ -1,0 +1,319 @@
+require 'minitest/autorun'
+require 'shoulda'
+require 'fileutils'
+require 'nexus/config'
+
+class ConfigTest < ::MiniTest::Unit::TestCase
+  include ShouldaContextLoadable 
+  
+  context 'file' do
+
+    should 'store key/values with repo' do
+      file = File.join( 'pkg', 'cfg' )
+      FileUtils.rm_f file
+      f = Nexus::Config::File.new( file, 'first' )
+      f[ 'asd' ] = 'dsa'
+      assert_equal( f.store, true )
+      ff = Nexus::Config::File.new( file, 'first' )
+      assert_equal( ff[ 'asd' ], 'dsa' )
+      ff = Nexus::Config::File.new( file, nil )
+      assert_equal( ff[ 'asd' ], nil )
+    end
+
+    should 'store key/values without repo' do
+      file = File.join( 'pkg', 'cfg' )
+      FileUtils.rm_f file
+      f = Nexus::Config::File.new( file, nil )
+      f[ 'asd' ] = 'dsa'
+      assert_equal( f.store, true )
+      ff = Nexus::Config::File.new( file, nil )
+      assert_equal( ff[ 'asd' ], 'dsa' )
+      ff = Nexus::Config::File.new( file, 'first' )
+      assert_equal( ff[ 'asd' ], nil )
+    end
+
+    should 'not store anything' do
+      f = Nexus::Config::File.new( nil, nil )
+      f[ 'asd' ] = 'dsa'
+      assert_equal( f.store, false )
+      ff = Nexus::Config::File.new( nil, 'first' )
+      f[ 'asd' ] = 'dsa'
+      assert_equal( f.store, false )
+    end
+  end
+
+  context 'config' do
+
+    should 'not use secrets file' do
+      file = File.join( 'pkg', 'cfg' )
+      FileUtils.rm_f file
+      c = Nexus::Config.new( :second, file, nil )
+      c[ 'asd' ] = 'dsa'
+      assert_equal c.key?( 'asd' ), true
+      
+      cc = Nexus::Config::File.new( file, :second )
+      assert_equal cc.key?( 'asd' ), true
+      assert_equal cc[ 'asd' ], 'dsa'
+    
+      cc = Nexus::Config::File.new( file, nil )
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ 'asd' ], nil
+
+      cc = Nexus::Config::File.new( file, 'third' )
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ 'asd' ], nil
+
+      cc = Nexus::Config.new( :second, file, nil )
+      assert_equal cc.key?( 'asd' ), true
+      assert_equal cc[ 'asd' ], 'dsa'
+
+      cc = Nexus::Config.new( nil, file, nil )
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ 'asd' ], nil
+
+      cc = Nexus::Config.new( 'third', file, nil )
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ 'asd' ], nil
+    end
+
+    should 'use secrets file' do
+      file = File.join( 'pkg', 'cfgstub' )
+      sfile = File.join( 'pkg', 'cfgsecrets' )
+      FileUtils.rm_f file
+      FileUtils.rm_f sfile
+      c = Nexus::Config.new( :second, file, sfile )
+      c[ 'asd' ] = 'dsa'
+      c[ :authorization ] = 'BASIC asddsa'
+
+      assert_equal c.key?( :secrets ), false
+      assert_equal c.key?( 'asd' ), true
+      assert_equal c.key?( :authorization ), true
+      
+      cc = Nexus::Config::File.new( file, :second )
+      assert_equal cc.key?( :secrets ), false
+      assert_equal cc.key?( :authorization ), false
+      assert_equal cc.key?( 'asd' ), true
+      assert_equal cc[ 'asd' ], 'dsa'
+    
+      cc = Nexus::Config::File.new( file, nil )
+      assert_equal cc.key?( :secrets ), true
+      assert_equal cc.key?( :authorization ), false
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ :secrets ], sfile
+
+      cc = Nexus::Config::File.new( file, 'third' )
+      assert_equal cc.key?( :secrets ), false
+      assert_equal cc.key?( :authorization ), false
+      assert_equal cc.key?( 'asd' ), false
+
+      cc = Nexus::Config.new( :second, file, nil )
+      assert_equal cc.key?( :secrets ), false
+      assert_equal cc.key?( :authorization ), true
+      assert_equal cc.key?( 'asd' ), true
+      assert_equal cc[ 'asd' ], 'dsa'
+      assert_equal cc[ :authorization ], 'BASIC asddsa'
+
+      cc = Nexus::Config.new( nil, file, nil )
+      assert_equal cc.key?( :secrets ), true
+      assert_equal cc.key?( :authorization ), false
+      assert_equal cc.key?( 'asd' ), false
+      assert_equal cc[ :secrets ], sfile
+
+      cc = Nexus::Config.new( 'third', file, nil )
+      assert_equal cc.key?( :secrets ), false
+      assert_equal cc.key?( :authorization ), false
+      assert_equal cc.key?( 'asd' ), false
+    end
+
+    # should 'copy authorization when starting to use secrets file' do
+    #   file = File.join( 'pkg', 'cfgstub1' )
+    #   sfile = File.join( 'pkg', 'cfgsecrets1' )
+    #   FileUtils.rm_f file
+    #   FileUtils.rm_f sfile
+    #   c = Nexus::Config.new( nil, file, nil )
+    #   c[ 'asd' ] = 'dsa'
+    #   c[ :authorization ] = 'BASIC asddsa'
+
+    #   assert_equal c.key?( 'asd' ), true
+    #   assert_equal c.key?( :authorization ), true
+      
+    #   c = Nexus::Config.new( nil, file, sfile )
+    #   assert_equal c.key?( :secrets ), true
+    #   assert_equal c.key?( 'asd' ), true
+    #   assert_equal c.key?( :authorization ), true
+    #   assert_equal c[ :authorization ], 'BASIC asddsa'
+    #   assert_equal c[ :secrets ], sfile
+      
+    #   cc = Nexus::Config::File.new( sfile, nil )
+    #   assert_equal cc.key?( :secrets ), false
+    #   assert_equal cc.key?( :authorization ), true
+    #   assert_equal cc.key?( 'asd' ), false
+    #   assert_equal cc[ :authorization ], 'BASIC asddsa'
+
+    #   cc = Nexus::Config::File.new( file, nil )
+    #   assert_equal cc.key?( :secrets ), true
+    #   assert_equal cc.key?( :authorization ), false
+    #   assert_equal cc.key?( 'asd' ), true
+    #   assert_equal cc[ :secrets ], sfile
+
+    #   cc = Nexus::Config::File.new( file, 'third' )
+    #   assert_equal cc.key?( :secrets ), false
+    #   assert_equal cc.key?( :authorization ), false
+    #   assert_equal cc.key?( 'asd' ), false
+    # end
+  end
+
+  # context 'encrypted config' do
+
+  #   should 'not use secrets file' do
+  #     file = File.join( 'pkg', 'enccfg' )
+  #     FileUtils.rm_f file
+  #     c = Nexus::Config.new( :second, file, nil, 'behappy' )
+  #     c[ :authorization ] = 'dsa'
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ], 'dsa'
+
+  #     cc = Nexus::Config.new( :second, file, nil )
+  #     assert_equal cc[ :authorization ] != 'dsa', true
+
+  #     ccc = Nexus::Config.new( nil, file, nil, 'behappy' )
+  #     ccc[ :authorization ] = 'dsa'
+  #     assert_equal ccc.key?( :authorization ), true
+  #     assert_equal ccc.key?( :iv ), true
+  #     assert_equal ccc[ :authorization ], 'dsa'
+
+  #     cccc = Nexus::Config.new( nil, file, nil )
+  #     assert_equal cccc[ :authorization ] != 'dsa', true
+  #     assert_equal cccc[ :authorization ] != cc[ :authorization ], true
+  #     assert_equal cccc[ :iv ] != cc[ :iv ], true
+  #   end
+
+  #   should 'use secrets file' do
+  #     file = File.join( 'pkg', 'enccfgstub' )
+  #     sfile = File.join( 'pkg', 'enccfgsecrets' )
+  #     FileUtils.rm_f file
+  #     FileUtils.rm_f sfile
+  #     c = Nexus::Config.new( :second, file, sfile, 'behappy' )
+  #     c[ :authorization ] = 'dsa'
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ], 'dsa'
+
+  #     cc = Nexus::Config.new( :second, file, sfile )
+  #     assert_equal cc[ :authorization ] != 'dsa', true
+
+  #     ccc = Nexus::Config.new( nil, file, sfile, 'behappy' )
+  #     ccc[ :authorization ] = 'dsa'
+  #     assert_equal ccc.key?( :authorization ), true
+  #     assert_equal ccc.key?( :iv ), true
+  #     assert_equal ccc[ :authorization ], 'dsa'
+
+  #     cccc = Nexus::Config.new( nil, file, sfile, )
+  #     assert_equal cccc[ :authorization ] != 'dsa', true
+  #     assert_equal cccc[ :authorization ] != cc[ :authorization ], true
+  #     assert_equal cccc[ :iv ] != cc[ :iv ], true
+  #   end
+
+  #   should 'copy authorization/iv when starting to use secrets file' do
+  #     file = File.join( 'pkg', 'enccfgstub1' )
+  #     sfile = File.join( 'pkg', 'enccfgsecrets1' )
+  #     FileUtils.rm_f file
+  #     FileUtils.rm_f sfile
+  #     c = Nexus::Config.new( nil, file, nil, 'behappy' )
+  #     c[ 'asd' ] = 'dsa'
+  #     c[ :authorization ] = 'BASIC asddsa'
+
+  #     assert_equal c.key?( 'asd' ), true
+  #     assert_equal c.key?( :token ), true
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+      
+  #     c = Nexus::Config.new( nil, file, sfile, 'behappy' )
+  #     assert_equal c.key?( :secrets ), true
+  #     assert_equal c.key?( 'asd' ), true
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ], 'BASIC asddsa'
+  #     assert_equal c[ :secrets ], sfile
+
+  #     c = Nexus::Config.new( nil, sfile, nil, 'behappy' )
+  #     assert_equal c.key?( :secrets ), false
+  #     assert_equal c.key?( 'asd' ), false
+  #     assert_equal c.key?( :token ), true
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ], 'BASIC asddsa'
+  #   end
+
+  #   should 'encrypt authorization when starting to use encryption' do
+  #     file = File.join( 'pkg', 'enccfg1' )
+  #     FileUtils.rm_f file
+  #     c = Nexus::Config.new( nil, file, nil )
+  #     c[ 'asd' ] = 'dsa'
+  #     c[ :authorization ] = 'BASIC asddsa'
+
+  #     assert_equal c.key?( 'asd' ), true
+  #     assert_equal c.key?( :token ), false
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), false
+      
+  #     c = Nexus::Config.new( nil, file, nil, 'behappy' )
+  #     c[ :authorization ] # just retrieve data to trigger encryption
+  #     assert_equal c.key?( 'asd' ), true
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ], 'BASIC asddsa'
+
+  #     c = Nexus::Config.new( nil, file, nil )
+  #     assert_equal c.key?( 'asd' ), true
+  #     assert_equal c.key?( :token ), true
+  #     assert_equal c.key?( :authorization ), true
+  #     assert_equal c.key?( :iv ), true
+  #     assert_equal c[ :authorization ] != 'BASIC asddsa', true
+  #   end
+  # end
+
+  context 'auxilary functions' do
+
+    should 'encrypt and decrypt credentials' do
+      file = File.join( 'pkg', 'auxcfg' )
+      sfile = File.join( 'pkg', 'auxsrt' )
+      FileUtils.rm_f file
+      FileUtils.rm_f sfile
+
+      [ nil, sfile ].each do |sf|
+        [ nil, 'first' ].each do |repo|
+          c = Nexus::Config.new( repo, file, sf )
+          c[ :url ] = 'http://example.com'
+          c[ :authorization ] = 'BASIC asddsa'
+
+          cc = Nexus::Config.new( repo, file, sf )
+          
+          cc.encrypt_credentials( 'be happy' )
+
+          assert_equal cc[ :authorization ], 'BASIC asddsa'
+          
+          #cc.new_secrets( sfile )
+          #assert File.exists?( sfile ), true
+
+          ccc = Nexus::Config.new( repo, file, sf, 'be happy' )
+          assert_equal ccc[ :authorization ], 'BASIC asddsa'
+          assert_equal ccc[ :iv ], cc[ :iv ]
+          
+          cc.decrypt_credentials
+
+          assert_equal cc[ :authorization ], 'BASIC asddsa'
+
+          ccc = Nexus::Config.new( repo, file, sf )
+
+          assert_equal ccc[ :authorization ], 'BASIC asddsa'
+          assert_equal ccc[ :iv ], nil
+
+          #cc.new_secrets( nil )
+          #assert File.exists?( sfile ), false
+        end
+      end
+    end
+  end
+end

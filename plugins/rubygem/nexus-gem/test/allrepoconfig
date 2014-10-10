@@ -1,0 +1,5 @@
+---
+:url: something
+hosted:
+  :url: http://localhost:8181/nexus/content/repositories/gemshosted
+:secrets: /home/christian/.gem/secrets

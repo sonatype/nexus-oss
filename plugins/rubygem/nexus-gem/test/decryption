@@ -1,0 +1,9 @@
+---
+:url: http://localhost:8181/nexus/content/repositories/gemshosted
+:authorization: Az9cOCUzVspXX5716r2Us7uwcGnno31XnzduQMYfAYUwJZeuxzIK0/lY+43/ww/v
+hosted:
+  :url: http://localhost:8181/nexus/content/repositories/gemshosted
+  :authorization: pIeBtwiOuATPPua+XXwkt/L4GkIZSKGowfC06EXiwSaJUtDqw6vWW5hWgdHeWPqg
+  :iv: KU7rJUPOu/U6NbVyz+Hlxg==
+:iv: swGfvPZE+puYJFHsruQtNA==
+:token: L4LibEwbKpdNDWuTMwb+u2W+gF7ndnG99dXxRS3a25s=
