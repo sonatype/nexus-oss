@@ -74,7 +74,7 @@ public class LdapGroupDAOIT
     assertTrue(groups.contains("public"));
     assertTrue(groups.contains("snapshots"));
 
-    groups = lgm.getGroupMembership("brianf", initialContext, configuration);
+    groups = lgm.getGroupMembership("Fox, Brian", initialContext, configuration);
     assertTrue(groups.contains("public"));
     assertTrue(groups.contains("releases"));
 

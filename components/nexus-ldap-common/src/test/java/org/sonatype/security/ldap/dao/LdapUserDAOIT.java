@@ -60,8 +60,8 @@ public class LdapUserDAOIT
     // assertEquals( "Tamas Cservenak", user.getRealName() );
     assertEquals("cstamas123", user.getPassword());
 
-    user = lum.getUser("brianf", initialContext, configuration);
-    assertEquals("brianf", user.getUsername());
+    user = lum.getUser("Fox, Brian", initialContext, configuration);
+    assertEquals("Fox, Brian", user.getUsername());
     // assertEquals( "Brian Fox", user.getRealName() );
     assertEquals("brianf123", user.getPassword());
 
