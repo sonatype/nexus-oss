@@ -20,11 +20,14 @@ import org.sonatype.nexus.ruby.ApiV1File;
 import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.GemFile;
 import org.sonatype.nexus.ruby.GemspecFile;
+import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexType;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
+
+import org.jruby.runtime.builtin.IRubyObject;
 
 /**
  * on hosted rubygems repositories you can delete only gem files. deleting
@@ -103,12 +106,12 @@ public class HostedDELETELayout
   private void deleteGemFile(GemFile file) {
     store.retrieve(file);
     try (InputStream is = store.getInputStream(file)) {
-      Object spec = gateway.spec(is);
+      GemspecHelper spec = gateway.newGemspecHelperFromGem(is);
 
-      deleteSpecFromIndex(spec);
+      deleteSpecFromIndex(spec.gemspec());
 
       // delete dependencies so the next request will recreate it
-      delete(super.dependencyFile(gateway.name(spec)));
+      delete(super.dependencyFile(spec.name()));
       delete(super.gemspecFile(file.filename()));
       store.delete(file);
     }
@@ -120,7 +123,7 @@ public class HostedDELETELayout
   /**
    * delete given spec (a Ruby Object) and delete it from all the specs.4.8 indices.
    */
-  private void deleteSpecFromIndex(Object spec) throws IOException {
+  private void deleteSpecFromIndex(IRubyObject spec) throws IOException {
     SpecsIndexZippedFile release = null;
     for (SpecsIndexType type : SpecsIndexType.values()) {
       InputStream content = null;

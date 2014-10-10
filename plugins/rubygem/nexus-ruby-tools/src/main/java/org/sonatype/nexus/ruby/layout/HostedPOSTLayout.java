@@ -20,6 +20,7 @@ import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.GemFile;
 import org.sonatype.nexus.ruby.GemspecFile;
+import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.ruby.SpecsIndexType;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 
 import com.jcraft.jzlib.GZIPInputStream;
+import org.jruby.runtime.builtin.IRubyObject;
 
 /**
  * to make a HTTP POST to hosted repository allows only two path:
@@ -62,25 +64,24 @@ public class HostedPOSTLayout
         // an error or something else but we need the payload now
         return;
       }
-      Object spec;
+      GemspecHelper spec;
       try(InputStream is = store.getInputStream(file)) {
-        spec = gateway.spec(is);
+        spec = gateway.newGemspecHelperFromGem(is);
       }
 
-      String filename = gateway.filename(spec);
       // check gemname matches coordinates from its specification
       switch (file.type()) {
         case GEM:
-          if (!(((GemFile) file).filename() + ".gem").equals(filename)) {
+          if (!(((GemFile) file).filename() + ".gem").equals(spec.filename())) {
             store.delete(file);
             // now set the error for further processing
-            file.setException(new IOException("filename from " + file + " does not match gemname: " + filename));
+            file.setException(new IOException("filename from " + file + " does not match gemname: " + spec.filename()));
             return;
           }
           break;
         case API_V1:
           try (InputStream is = store.getInputStream(file)) {
-            store.create(is, ((ApiV1File) file).gem(filename));
+            store.create(is, ((ApiV1File) file).gem(spec.filename()));
           }
           store.delete(file);
           break;
@@ -88,12 +89,12 @@ public class HostedPOSTLayout
           throw new RuntimeException("BUG");
       }
 
-      addSpecToIndex(spec);
+      addSpecToIndex(spec.gemspec());
 
       // delete dependencies so the next request will recreate it
-      delete(super.dependencyFile(gateway.name(spec)));
+      delete(super.dependencyFile(spec.name()));
       // delete gemspec so the next request will recreate it
-      delete(super.gemspecFile(gateway.filename(spec).replaceFirst(".gem$", "")));
+      delete(super.gemspecFile(spec.filename().replaceFirst(".gem$", "")));
     }
     catch (IOException e) {
       file.setException(e);
@@ -103,7 +104,7 @@ public class HostedPOSTLayout
   /**
    * add a spec (Ruby Object) to the specs.4.8 indices.
    */
-  private void addSpecToIndex(Object spec) throws IOException {
+  private void addSpecToIndex(IRubyObject spec) throws IOException {
     for (SpecsIndexType type : SpecsIndexType.values()) {
       InputStream content = null;
       SpecsIndexZippedFile specs = ensureSpecsIndexZippedFile(type);

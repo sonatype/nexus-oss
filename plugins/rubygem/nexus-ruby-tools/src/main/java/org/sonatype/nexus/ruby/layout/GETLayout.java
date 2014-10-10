@@ -174,7 +174,7 @@ public class GETLayout
       }
       else {
         try(InputStream is = store.getInputStream(gemspec)) {
-          store.memory(gateway.pom(is, snapshot), file);
+          store.memory(gateway.newGemspecHelper(is).pom(snapshot), file);
         }
       }
     }

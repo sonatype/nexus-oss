@@ -42,12 +42,12 @@ module Nexus
     def runzip( io )
       Marshal.load( Gem.inflate( read_binary( io ) ) )
     end
-    
+
     # marshal a given object and turn it into a ruby-zip stream.
     # @param obj [Object] any ruby object
     # @return [IO] stream with rzipped marshalled object
     def rzip( obj )
-      ByteArrayInputStream.new( Gem.deflate( Marshal.dump( obj ) ).to_java.bytes )
+      ByteArrayInputStream.new( Gem.deflate( Marshal.dump( obj ) ).to_java_bytes )
     end
 
     # unmarshal object from stream or file

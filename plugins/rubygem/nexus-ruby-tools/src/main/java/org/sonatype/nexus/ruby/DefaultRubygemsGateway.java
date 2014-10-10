@@ -72,14 +72,9 @@ public class DefaultRubygemsGateway
     return new ByteArrayInputStream(array);
   }
 
-  @Override
-  public Object spec(InputStream gem) {
-    return callMethod("spec_get", gem, Object.class);
-  }
-
   @SuppressWarnings("resource")
   @Override
-  public InputStream addSpec(Object spec, InputStream specsIndex, SpecsIndexType type) {
+  public InputStream addSpec(IRubyObject spec, InputStream specsIndex, SpecsIndexType type) {
     @SuppressWarnings("unchecked")
     List<Long> array = (List<Long>) callMethod("add_spec",
         new Object[]{
@@ -93,13 +88,13 @@ public class DefaultRubygemsGateway
   }
 
   @Override
-  public InputStream deleteSpec(Object spec, InputStream specsIndex) {
+  public InputStream deleteSpec(IRubyObject spec, InputStream specsIndex) {
     return deleteSpec(spec, specsIndex, null);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public InputStream deleteSpec(Object spec, InputStream specsIndex, InputStream releasesSpecs) {
+  public InputStream deleteSpec(IRubyObject spec, InputStream specsIndex, InputStream releasesSpecs) {
     @SuppressWarnings("unchecked")
     List<Long> array = (List<Long>) callMethod("delete_spec",
         new Object[]{
@@ -124,11 +119,6 @@ public class DefaultRubygemsGateway
         List.class);
 
     return array == null ? null : new ByteArrayInputStream(array);
-  }
-
-  @Override
-  public String pom(InputStream specRz, boolean snapshot) {
-    return callMethod("to_pom", new Object[]{specRz, snapshot}, String.class);
   }
 
   @SuppressWarnings("unchecked")
@@ -163,22 +153,12 @@ public class DefaultRubygemsGateway
   }
 
   @Override
-  public ByteArrayInputStream createGemspecRz(Object spec) {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("create_quick",
-        new Object[]{spec},
-        List.class);
-
-    return new ByteArrayInputStream(array);
+  public GemspecHelper newGemspecHelper(InputStream gemspec) {
+    return callMethod("new_gemspec_helper", gemspec, GemspecHelper.class);
   }
 
   @Override
-  public String filename(Object spec) {
-    return scriptingContainer.callMethod(spec, "file_name", String.class);
-  }
-
-  @Override
-  public String name(Object spec) {
-    return scriptingContainer.callMethod(spec, "name", String.class);
+  public GemspecHelper newGemspecHelperFromGem(InputStream gem) {
+    return callMethod("new_gemspec_helper_from_gem", gem, GemspecHelper.class);
   }
 }

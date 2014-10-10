@@ -3,12 +3,21 @@ require 'json'
 require 'nexus/indexer'
 require 'nexus/dependencies'
 require 'nexus/dependency_helper_impl'
+require 'nexus/gemspec_helper_impl'
 
 module Nexus
   class Rubygems
 
     def new_dependency_helper
       Nexus::DependencyHelperImpl.new
+    end
+
+    def new_gemspec_helper( file )
+      Nexus::GemspecHelperImpl.from_gemspec_rz( file )
+    end
+
+    def new_gemspec_helper_from_gem( file )
+      Nexus::GemspecHelperImpl.from_gem( file )
     end
 
     def recreate_rubygems_index( directory )

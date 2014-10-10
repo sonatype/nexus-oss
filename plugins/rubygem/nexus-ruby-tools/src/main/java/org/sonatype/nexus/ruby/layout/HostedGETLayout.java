@@ -20,6 +20,7 @@ import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.DependencyHelper;
 import org.sonatype.nexus.ruby.GemFile;
 import org.sonatype.nexus.ruby.GemspecFile;
+import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
@@ -89,11 +90,11 @@ public class HostedGETLayout
     }
     else {
       try(InputStream is = store.getInputStream(gemspec.gem())) {
-        Object spec = gateway.spec(is);
+        GemspecHelper spec = gateway.newGemspecHelperFromGem(is);
 
         // just update in case so no need to deal with concurrency
         // since once the file is there no update happen again
-        store.update(gateway.createGemspecRz(spec), gemspec);
+        store.update(spec.getRzInputStream(), gemspec);
 
         store.retrieve(gemspec);
       }

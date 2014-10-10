@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.sonatype.nexus.ruby.DependencyHelper;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -54,8 +55,8 @@ public class RubygemsGatewayTest
   public void testGenerateGemspecRz() throws Exception {
     String gem = "src/test/resources/gems/n/nexus-0.1.0.gem";
 
-    Object spec = gateway.spec(new FileInputStream(gem));
-    InputStream is = gateway.createGemspecRz(spec);
+    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
+    InputStream is = spec.getRzInputStream();
     int c = is.read();
     String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
     FileOutputStream out = new FileOutputStream(gemspecPath);
@@ -71,17 +72,6 @@ public class RubygemsGatewayTest
         new Object[]{gem, gemspecPath},
         Boolean.class);
     assertThat("spec from stream equal spec from gem", equalSpecs, equalTo(true));
-  }
-
-  @Test
-  public void testGenerateGemspecRzWithPlatform() throws Exception {
-    String gem = "src/test/resources/gems/n/nexus-0.1.0-java.gem";
-
-    Object spec = gateway.spec(new FileInputStream(gem));
-    InputStream is = gateway.createGemspecRz(spec);
-    is.close();
-    // TODO: What do we assert here???
-    assertThat("did create without inconsistent gem-name exception", true, equalTo(true));
   }
 
   @Test
@@ -106,7 +96,7 @@ public class RubygemsGatewayTest
   public void testPom() throws Exception {
     File some = new File("src/test/resources/rb-fsevent-0.9.4.gemspec.rz");
 
-    String pom = gateway.pom(new FileInputStream(some), false);
+    String pom = gateway.newGemspecHelper(new FileInputStream(some)).pom(false);
     assertThat(pom.replace("\n", "").replaceAll("<developers>.*$", "").replaceAll("^.*<name>|</name>.*$", ""),
         equalTo("Very simple &amp; usable FSEvents API"));
   }
@@ -145,17 +135,17 @@ public class RubygemsGatewayTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    Object spec1 = gateway.spec(new FileInputStream(gem));
+    GemspecHelper spec1 = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
 
     // add gem
-    InputStream is = gateway.addSpec(spec1,
+    InputStream is = gateway.addSpec(spec1.gemspec(),
         new FileInputStream(empty),
         SpecsIndexType.LATEST);
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    Object specJ = gateway.spec(new FileInputStream(gem));
-    is = gateway.addSpec(specJ, is, SpecsIndexType.LATEST);
+    GemspecHelper specJ = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
+    is = gateway.addSpec(specJ.gemspec(), is, SpecsIndexType.LATEST);
 
     dumpStream(is, target);
 
@@ -167,8 +157,8 @@ public class RubygemsGatewayTest
 
     // add a gem with newer version
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    Object spec = gateway.spec(new FileInputStream(gem));
-    is = gateway.addSpec(spec,
+    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
+    is = gateway.addSpec(spec.gemspec(),
         new FileInputStream(target),
         SpecsIndexType.LATEST);
 
@@ -181,11 +171,11 @@ public class RubygemsGatewayTest
     assertThat("specsfile size", size, equalTo(2));
 
     // add both the gems with older version
-    is = gateway.addSpec(spec1,
+    is = gateway.addSpec(spec1.gemspec(),
         new FileInputStream(target),
         SpecsIndexType.LATEST);
     assertThat("no change", is, nullValue());
-    is = gateway.addSpec(specJ,
+    is = gateway.addSpec(specJ.gemspec(),
         new FileInputStream(target),
         SpecsIndexType.LATEST);
     assertThat("no change", is, nullValue());
@@ -198,24 +188,24 @@ public class RubygemsGatewayTest
     File targetRef = new File("target/test_ref_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    Object spec = gateway.spec(new FileInputStream(gem));
+    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
 
     // add gem
-    InputStream isRef = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
+    InputStream isRef = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    spec = gateway.spec(new FileInputStream(gem));
-    isRef = gateway.addSpec(spec, isRef, SpecsIndexType.RELEASE);
+    spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
+    isRef = gateway.addSpec(spec.gemspec(), isRef, SpecsIndexType.RELEASE);
 
     dumpStream(isRef, targetRef);
 
     // add a gem with newer version
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    Object s = gateway.spec(new FileInputStream(gem));
-    InputStream is = gateway.addSpec(s, new FileInputStream(empty), SpecsIndexType.LATEST);
+    GemspecHelper s = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
+    InputStream is = gateway.addSpec(s.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
 
-    is = gateway.deleteSpec(s, is, new FileInputStream(targetRef));
+    is = gateway.deleteSpec(s.gemspec(), is, new FileInputStream(targetRef));
 
     dumpStream(is, target);
 
@@ -225,7 +215,7 @@ public class RubygemsGatewayTest
         Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
-    is = gateway.deleteSpec(spec, new FileInputStream(target),
+    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target),
         new FileInputStream(targetRef));
 
     dumpStream(is, target);
@@ -243,10 +233,10 @@ public class RubygemsGatewayTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    Object spec = gateway.spec(new FileInputStream(gem));
+    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
 
     // add released gem
-    InputStream is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
+    InputStream is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
 
     dumpStream(is, target);
 
@@ -257,7 +247,7 @@ public class RubygemsGatewayTest
     assertThat("specsfile size", size, equalTo(1));
 
     // delete gem
-    is = gateway.deleteSpec(spec, new FileInputStream(target));
+    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target));
 
     dumpStream(is, target);
 
@@ -269,12 +259,12 @@ public class RubygemsGatewayTest
     assertThat("specsfile size", size, equalTo(0));
 
     // try adding released gem as prereleased
-    is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.PRERELEASE);
+    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.PRERELEASE);
 
     assertThat("no change", is, nullValue());
 
     // adding to latest
-    is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
+    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
 
     dumpStream(is, target);
 
@@ -291,10 +281,10 @@ public class RubygemsGatewayTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.pre.gem");
 
-    Object spec = gateway.spec(new FileInputStream(gem));
+    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
 
     // add prereleased gem
-    InputStream is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.PRERELEASE);
+    InputStream is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.PRERELEASE);
 
     dumpStream(is, target);
 
@@ -305,7 +295,7 @@ public class RubygemsGatewayTest
     assertThat("specsfile size", size, equalTo(1));
 
     // delete gem
-    is = gateway.deleteSpec(spec, new FileInputStream(target));
+    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target));
 
     dumpStream(is, target);
 
@@ -317,12 +307,12 @@ public class RubygemsGatewayTest
     assertThat("specsfile size", size, equalTo(0));
 
     // try adding prereleased gem as released
-    is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
+    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
 
     assertThat("no change", is, nullValue());
 
     // adding to latest
-    is = gateway.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
+    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
 
     dumpStream(is, target);
 
