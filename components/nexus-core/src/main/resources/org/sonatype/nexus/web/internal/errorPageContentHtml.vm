@@ -12,7 +12,7 @@
  *###
 <html>
 <head>
-  <title>ERROR $statusCode $statusName</title>
+  <title>ERROR $errorCode $errorName</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
   <link rel="icon" type="image/png" href="$nexusRoot/favicon.png">
@@ -20,12 +20,12 @@
   <link rel="SHORTCUT ICON" href="$nexusRoot/favicon.ico"/>
   <![endif]-->
 
-  <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$nexusVersion"/>
+  <link rel="stylesheet" type="text/css" href="$nexusRoot/static/css/nexus-error.css?$urlSuffix"/>
 </head>
 <body>
 <div class="nexus-error-message">
-  <img src="$nexusRoot/static/images/nexus.png?$nexusVersion"/>
-  <span>ERROR $statusCode $statusName</span>
+  <img src="$nexusRoot/static/images/nexus.png?$urlSuffix"/>
+  <span>ERROR $errorCode $errorName</span>
 </div>
 <div class="nexus-error-detail">
   $errorDescription

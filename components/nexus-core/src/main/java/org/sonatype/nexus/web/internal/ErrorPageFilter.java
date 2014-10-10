@@ -14,7 +14,6 @@ package org.sonatype.nexus.web.internal;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,29 +25,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.web.ErrorStatusException;
-import org.sonatype.nexus.web.TemplateRenderer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static org.sonatype.nexus.web.internal.ErrorPageServlet.attachCause;
 
 /**
  * Servlet filter to add error page rendering.
  *
  * @since 2.8
+ *
+ * @see ErrorPageServlet
+ * @see ErrorStatusException
  */
 @Singleton
 public class ErrorPageFilter
     extends ComponentSupport
     implements Filter
 {
-  private final TemplateRenderer templateRenderer;
-
-  @Inject
-  public ErrorPageFilter(final TemplateRenderer templateRenderer) {
-    this.templateRenderer = checkNotNull(templateRenderer);
-  }
-
   @Override
   public void init(final FilterConfig config) throws ServletException {
     // ignore
@@ -65,46 +59,19 @@ public class ErrorPageFilter
   {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) resp;
+
+    // Delegate any exceptions to the ErrorPageServlet via standard sendError servlet api
+    // Custom handling here to avoid logging from Jetty implementation
     try {
-      chain.doFilter(req, response);
+      chain.doFilter(request, response);
     }
     catch (ErrorStatusException e) {
-      // send for direct rendering, everything is prepared
-      templateRenderer.renderErrorPage(
-          request,
-          response,
-          e.getResponseCode(),
-          e.getReasonPhrase(),
-          messageOf(e),
-          e.getCause()
-      );
-    }
-    catch (IOException e) {
-      // IOException handling, do not leak information nor render error page
-      response.setStatus(SC_INTERNAL_SERVER_ERROR);
+      attachCause(request, e);
+      response.sendError(e.getResponseCode(), e.getReasonPhrase());
     }
     catch (Exception e) {
-      // runtime and servlet exceptions will end here (thrown probably by some non-nexus filter or servlet)
-      log.warn("Unexpected exception", e);
-      templateRenderer.renderErrorPage(
-          request,
-          response,
-          SC_INTERNAL_SERVER_ERROR,
-          null, // default reason phrase will be used
-          messageOf(e),
-          e
-      );
+      attachCause(request, e);
+      response.sendError(SC_INTERNAL_SERVER_ERROR);
     }
-  }
-
-  /**
-   * Returns the message of given throwable, or if message is null will toString throwable.
-   */
-  private static String messageOf(final Throwable cause) {
-    String message = cause.getMessage();
-    if (message == null) {
-      return cause.toString();
-    }
-    return message;
   }
 }
