@@ -45,7 +45,7 @@ public class HostedGETLayout
   protected void retrieveZipped(SpecsIndexZippedFile specs) {
     super.retrieveZipped(specs);
     if (specs.notExists()) {
-      try (InputStream content = gateway.emptyIndex()) {
+      try (InputStream content = gateway.newSpecsHelper().createEmptySpecs()) {
         // just update in case so no need to deal with concurrency
         // since once the file is there no update happen again
         store.update(IOUtil.toGzipped(content), specs);
@@ -104,6 +104,7 @@ public class HostedGETLayout
     }
   }
 
+  @Override
   public DependencyFile dependencyFile(String name) {
     DependencyFile file = super.dependencyFile(name);
     store.retrieve(file);
@@ -123,12 +124,12 @@ public class HostedGETLayout
       store.retrieve(specs);
       List<String> versions;
       try (InputStream is = store.getInputStream(specs)) {
-        versions = gateway.listAllVersions(file.name(), is, store.getModified(specs), false);
+        versions = gateway.newSpecsHelper().listAllVersions(file.name(), is);
       }
       specs = specsIndexFile(SpecsIndexType.PRERELEASE);
       store.retrieve(specs);
       try (InputStream is = store.getInputStream(specs)) {
-        versions.addAll(gateway.listAllVersions(file.name(), is, store.getModified(specs), true));
+        versions.addAll(gateway.newSpecsHelper().listAllVersions(file.name(), is));
       }
 
       DependencyHelper gemspecs = gateway.newDependencyHelper();

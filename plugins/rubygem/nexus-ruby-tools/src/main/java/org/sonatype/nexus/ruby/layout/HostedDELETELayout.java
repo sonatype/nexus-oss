@@ -23,6 +23,7 @@ import org.sonatype.nexus.ruby.GemspecFile;
 import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsGateway;
+import org.sonatype.nexus.ruby.SpecsHelper;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexType;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
@@ -112,6 +113,7 @@ public class HostedDELETELayout
 
       // delete dependencies so the next request will recreate it
       delete(super.dependencyFile(spec.name()));
+      // delete the gemspec.rz altogether
       delete(super.gemspecFile(file.filename()));
       store.delete(file);
     }
@@ -124,33 +126,16 @@ public class HostedDELETELayout
    * delete given spec (a Ruby Object) and delete it from all the specs.4.8 indices.
    */
   private void deleteSpecFromIndex(IRubyObject spec) throws IOException {
-    SpecsIndexZippedFile release = null;
+    SpecsHelper specs = gateway.newSpecsHelper();
     for (SpecsIndexType type : SpecsIndexType.values()) {
-      InputStream content = null;
-      InputStream rin = null;
-      SpecsIndexZippedFile specs = ensureSpecsIndexZippedFile(type);
-      try (InputStream in = new GZIPInputStream(store.getInputStream(specs))) {
-        switch (type) {
-          case RELEASE:
-            release = specs;
-          case PRERELEASE:
-            content = gateway.deleteSpec(spec, in);
-            break;
-          case LATEST:
-            // if we delete the entry from latest we need to use the releases to
-            // recreate the latest index
-            store.retrieve(release);
-            rin = new GZIPInputStream(store.getInputStream(release));
-            content = gateway.deleteSpec(spec, in, rin);
+      SpecsIndexZippedFile specsIndex = ensureSpecsIndexZippedFile(type);
+      try (InputStream in = new GZIPInputStream(store.getInputStream(specsIndex))) {
+        try (InputStream result = specs.deleteSpec(spec, in, type)) {
+          // if nothing was added the content is NULL
+          if (result != null) {
+            store.update(IOUtil.toGzipped(result), specsIndex);
+          }
         }
-        // if nothing was added the result is NULL
-        if (content != null) {
-          store.update(IOUtil.toGzipped(content), specs);
-        }
-      }
-      finally {
-        IOUtil.close(rin);
-        IOUtil.close(content);
       }
     }
   }

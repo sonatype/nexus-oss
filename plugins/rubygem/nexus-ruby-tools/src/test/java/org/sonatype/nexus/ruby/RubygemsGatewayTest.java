@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.sonatype.nexus.ruby.DependencyHelper;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -30,9 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 
 public class RubygemsGatewayTest
     extends TestSupport
@@ -75,24 +72,6 @@ public class RubygemsGatewayTest
   }
 
   @Test
-  public void testListAllVersions() throws Exception {
-    File some = new File("src/test/resources/some_specs");
-
-    List<String> versions = gateway.listAllVersions("bla_does_not_exist",
-        new FileInputStream(some),
-        0,
-        false);
-    assertThat("versions size", versions, hasSize(0));
-
-    versions = gateway.listAllVersions("activerecord",
-        new FileInputStream(some),
-        0,
-        false);
-    assertThat("versions size", versions, hasSize(1));
-    assertThat("version", versions.get(0), equalTo("3.2.11-ruby"));
-  }
-
-  @Test
   public void testPom() throws Exception {
     File some = new File("src/test/resources/rb-fsevent-0.9.4.gemspec.rz");
 
@@ -114,213 +93,6 @@ public class RubygemsGatewayTest
         empty.getAbsolutePath(),
         Integer.class);
     assertThat("specsfile size", size, equalTo(0));
-  }
-
-  @Test
-  public void testEmptySpecs() throws Exception {
-    File empty = new File("target/empty");
-
-    dumpStream(gateway.emptyIndex(), empty);
-
-    int size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        empty.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(0));
-  }
-
-  @Test
-  public void testAddLatestGemToSpecs() throws Exception {
-    File empty = new File("src/test/resources/empty_specs");
-    File target = new File("target/test_specs");
-    File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
-
-    GemspecHelper spec1 = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-
-    // add gem
-    InputStream is = gateway.addSpec(spec1.gemspec(),
-        new FileInputStream(empty),
-        SpecsIndexType.LATEST);
-
-    // add another gem with different platform
-    gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    GemspecHelper specJ = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    is = gateway.addSpec(specJ.gemspec(), is, SpecsIndexType.LATEST);
-
-    dumpStream(is, target);
-
-    int size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(2));
-
-    // add a gem with newer version
-    gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    is = gateway.addSpec(spec.gemspec(),
-        new FileInputStream(target),
-        SpecsIndexType.LATEST);
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(2));
-
-    // add both the gems with older version
-    is = gateway.addSpec(spec1.gemspec(),
-        new FileInputStream(target),
-        SpecsIndexType.LATEST);
-    assertThat("no change", is, nullValue());
-    is = gateway.addSpec(specJ.gemspec(),
-        new FileInputStream(target),
-        SpecsIndexType.LATEST);
-    assertThat("no change", is, nullValue());
-  }
-
-  @Test
-  public void testDeleteLatestGemToSpecs() throws Exception {
-    File empty = new File("src/test/resources/empty_specs");
-    File target = new File("target/test_specs");
-    File targetRef = new File("target/test_ref_specs");
-    File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
-
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-
-    // add gem
-    InputStream isRef = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
-
-    // add another gem with different platform
-    gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    isRef = gateway.addSpec(spec.gemspec(), isRef, SpecsIndexType.RELEASE);
-
-    dumpStream(isRef, targetRef);
-
-    // add a gem with newer version
-    gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    GemspecHelper s = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    InputStream is = gateway.addSpec(s.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
-
-    is = gateway.deleteSpec(s.gemspec(), is, new FileInputStream(targetRef));
-
-    dumpStream(is, target);
-
-    int size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(2));
-
-    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target),
-        new FileInputStream(targetRef));
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
-  }
-
-  @Test
-  public void testAddDeleteReleasedGemToSpecs() throws Exception {
-    File empty = new File("src/test/resources/empty_specs");
-    File target = new File("target/test_specs");
-    File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
-
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-
-    // add released gem
-    InputStream is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
-
-    dumpStream(is, target);
-
-    int size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
-
-    // delete gem
-    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target));
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-
-    assertThat("specsfile size", size, equalTo(0));
-
-    // try adding released gem as prereleased
-    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.PRERELEASE);
-
-    assertThat("no change", is, nullValue());
-
-    // adding to latest
-    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
-  }
-
-  @Test
-  public void testAddDeletePrereleasedGemToSpecs() throws Exception {
-    File empty = new File("src/test/resources/empty_specs");
-    File target = new File("target/test_specs");
-    File gem = new File("src/test/resources/gems/n/nexus-0.1.0.pre.gem");
-
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-
-    // add prereleased gem
-    InputStream is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.PRERELEASE);
-
-    dumpStream(is, target);
-
-    int size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
-
-    // delete gem
-    is = gateway.deleteSpec(spec.gemspec(), new FileInputStream(target));
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-
-    assertThat("specsfile size", size, equalTo(0));
-
-    // try adding prereleased gem as released
-    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.RELEASE);
-
-    assertThat("no change", is, nullValue());
-
-    // adding to latest
-    is = gateway.addSpec(spec.gemspec(), new FileInputStream(empty), SpecsIndexType.LATEST);
-
-    dumpStream(is, target);
-
-    size = testScriptingContainerRule.get().callMethod(check,
-        "specs_size",
-        target.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(1));
   }
 
   private void dumpStream(final InputStream is, File target)

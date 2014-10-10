@@ -122,7 +122,7 @@ public class NoopDefaultLayout
     SpecsIndexZippedFile specs = super.specsIndexZippedFile(type);
     store.retrieve(specs);
     if (specs.notExists()) {
-      try (InputStream content = gateway.emptyIndex()) {
+      try (InputStream content = gateway.newSpecsHelper().createEmptySpecs()) {
         store.create(IOUtil.toGzipped(content), specs);
         if (specs.hasNoPayload()) {
           store.retrieve(specs);
