@@ -217,7 +217,7 @@ public class DefaultLdapGroupDAO
     if (groupMemberFormat != null) {
       String member = StringUtils.replace( groupMemberFormat, "${username}", "{2}" );
       if (groupMemberFormat.contains("${username}")) {
-          filterValues.add(username);
+        filterValues.add(username.replace(",", "\\,"));
       }
 
       if (groupMemberFormat.contains("${dn}")) {
@@ -236,7 +236,8 @@ public class DefaultLdapGroupDAO
       filter += groupMemberAttribute + "=" + member + ")))";
     }
     else {
-      filter += groupMemberAttribute + "=" + username + ")))";
+      filterValues.add(username.replace(",", "\\,"));
+      filter += groupMemberAttribute + "={2})))";
     }
 
     log.debug(
