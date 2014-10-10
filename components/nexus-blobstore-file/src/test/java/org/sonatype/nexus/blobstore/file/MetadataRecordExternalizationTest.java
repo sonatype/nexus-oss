@@ -15,6 +15,7 @@ package org.sonatype.nexus.blobstore.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -22,36 +23,51 @@ import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore.MetadataRecord;
 
 import com.google.common.collect.ImmutableMap;
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 
 public class MetadataRecordExternalizationTest
 {
-  @Test
-  public void roundTrip() throws Exception {
 
+  private MetadataRecord metadata;
+
+  @Before
+  public void setupData() {
     final BlobMetadata blobMetadata = new BlobMetadata(BlobState.CREATING, ImmutableMap.of("Hi", "mom"));
     blobMetadata.setMetrics(new BlobMetrics(new DateTime(), "pretend hash", 33434));
 
-    final MetadataRecord metadata = new MetadataRecord(blobMetadata);
+    metadata = new MetadataRecord(blobMetadata);
+  }
 
-    final ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-    final ObjectOutputStream objectsOut = new ObjectOutputStream(bytesOut);
+  @Test
+  public void roundTrip() throws Exception {
 
-    metadata.writeExternal(objectsOut);
+    final byte[] bytes = externalize(metadata);
 
-    objectsOut.close();
+    final MetadataRecord roundTripMetadata = readFrom(bytes);
 
-    final ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytesOut.toByteArray());
-    final ObjectInputStream objectsIn = new ObjectInputStream(bytesIn);
+    assertThat(roundTripMetadata, Matchers.is(equalTo(metadata)));
+  }
+
+  private MetadataRecord readFrom(final byte[] bytes) throws IOException, ClassNotFoundException {
+    final ObjectInputStream objectsIn = new ObjectInputStream(new ByteArrayInputStream(bytes));
 
     final MetadataRecord roundTripMetadata = new MetadataRecord();
     roundTripMetadata.readExternal(objectsIn);
 
-    assertThat(roundTripMetadata.toString(), is(equalTo(metadata.toString())));
+    return roundTripMetadata;
+  }
+
+  private byte[] externalize(MetadataRecord metadata) throws IOException {
+    final ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+    try (ObjectOutputStream objectsOut = new ObjectOutputStream(bytesOut)) {
+      metadata.writeExternal(objectsOut);
+      return bytesOut.toByteArray();
+    }
   }
 }

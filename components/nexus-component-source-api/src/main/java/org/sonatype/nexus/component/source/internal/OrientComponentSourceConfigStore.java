@@ -40,8 +40,6 @@ import com.orientechnologies.orient.core.storage.ORecordMetadata;
 /**
  * A {@link ComponentSourceConfigStore} that persists source configs to the "config" orient DB instance.
  *
- * TODO: The entire implementation.
- *
  * @since 3.0
  */
 @Named("orient")
@@ -50,14 +48,11 @@ public class OrientComponentSourceConfigStore
     extends LifecycleSupport
     implements ComponentSourceConfigStore
 {
-
   private final Provider<DatabaseInstance> databaseInstance;
 
   private final RecordIdObfuscator recordIdObfuscator;
 
-
   private final ComponentSourceConfigEntityAdapter entityAdapter;
-
 
   private OClass entityType;
 
@@ -83,7 +78,6 @@ public class OrientComponentSourceConfigStore
   protected void doStop() throws Exception {
     entityType = null;
   }
-
 
   @Override
   public ComponentSourceConfigId add(final ComponentSourceConfig config) throws IOException {
@@ -183,5 +177,4 @@ public class OrientComponentSourceConfigStore
   private ORID convertId(final ComponentSourceConfigId id) {
     return recordIdObfuscator.decode(entityType, id.toString());
   }
-
 }

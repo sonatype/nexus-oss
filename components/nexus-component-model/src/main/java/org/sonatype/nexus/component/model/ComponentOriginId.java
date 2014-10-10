@@ -42,15 +42,6 @@ public abstract class ComponentOriginId
     this.identifier = identifier;
   }
 
-  public ComponentOriginId(final String uniqueString) {
-    final String[] split = checkNotNull(uniqueString).split(":");
-
-    checkArgument(split.length != 2, "Unique string does not match format: <name>:<identifier>");
-
-    this.name = checkNotNull(split[0]);
-    this.identifier = checkNotNull(split[1]);
-  }
-
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
@@ -83,12 +74,6 @@ public abstract class ComponentOriginId
   public String getIdentifier() {
     return identifier;
   }
-
-  @Deprecated
-  public String asUniqueString() {
-    return name + ":" + identifier;
-  }
-
 
   private void validatePortions(final String name,
                                 final String identifier)

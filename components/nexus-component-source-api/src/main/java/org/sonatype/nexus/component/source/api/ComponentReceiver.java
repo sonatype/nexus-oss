@@ -13,7 +13,7 @@
 package org.sonatype.nexus.component.source.api;
 
 /**
- * A callback interface to handle the arrival of components from a push source.
+ * A callback interface to handle the arrival of components from a {@link PushComponentSource}.
  *
  * @since 3.0
  */

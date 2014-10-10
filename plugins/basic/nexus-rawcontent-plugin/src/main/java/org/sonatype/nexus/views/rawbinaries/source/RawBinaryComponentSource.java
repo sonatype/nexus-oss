@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 
 /**
- * A source for remote {@link RawComponent}s which looks them up based on a URL prefix, appending the
+ * A source for remote {@link RawComponent}s which provides HTTP resources under a given URL prefix as assets.
  *
  * @since 3.0
  */
@@ -63,7 +63,7 @@ public class RawBinaryComponentSource
 
     final String uri = urlPrefix + request.getQuery().get("path");
 
-    HttpGet httpGet = new HttpGet(uri);
+    final HttpGet httpGet = new HttpGet(uri);
 
     final CloseableHttpResponse response = httpclient.execute(httpGet);
 

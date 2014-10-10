@@ -15,7 +15,7 @@ package org.sonatype.nexus.component.source.api;
 import org.sonatype.nexus.component.model.ComponentOriginId;
 
 /**
- * A unique identifier for component sources.
+ * A unique identifier for component sources, with a user-friendly name and a uuid-type identifier.
  *
  * @since 3.0
  */
@@ -24,9 +24,5 @@ public class ComponentSourceId
 {
   public ComponentSourceId(final String name, final String identifier) {
     super(name, identifier);
-  }
-
-  public ComponentSourceId(final String uniqueString) {
-    super(uniqueString);
   }
 }

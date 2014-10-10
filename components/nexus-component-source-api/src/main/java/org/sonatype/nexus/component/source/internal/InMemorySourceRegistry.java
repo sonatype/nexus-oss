@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -33,6 +34,7 @@ import static com.google.common.base.Preconditions.checkState;
 @Named
 @Singleton
 public class InMemorySourceRegistry
+    extends ComponentSupport
     implements ComponentSourceRegistry
 {
   private final ConcurrentHashMap<String, ComponentSource> sources = new ConcurrentHashMap<>();
@@ -43,12 +45,18 @@ public class InMemorySourceRegistry
     final ComponentSource alreadyBound = sources.putIfAbsent(source.getId().getName(), source);
 
     checkState(alreadyBound == null, "A source is already bound to name %s", source.getId());
+
+    log.info("Registering component source {}", source);
   }
 
   public boolean unregister(ComponentSource source) {
     checkNotNull(source);
 
     final ComponentSource removed = sources.remove(source.getId());
+
+    if (removed != null) {
+      log.info("Unregistering source {}", source);
+    }
 
     return removed != null;
   }

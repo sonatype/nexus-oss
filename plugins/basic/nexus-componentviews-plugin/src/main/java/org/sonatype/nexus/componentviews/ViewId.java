@@ -15,6 +15,8 @@ package org.sonatype.nexus.componentviews;
 import org.sonatype.nexus.component.model.ComponentOriginId;
 
 /**
+ * A unique identifier for a view, with a user-readable name and a uuid-type identifier.
+ *
  * @since 3.0
  */
 public class ViewId
@@ -22,9 +24,5 @@ public class ViewId
 {
   public ViewId(final String name, final String identifier) {
     super(name, identifier);
-  }
-
-  public ViewId(final String uniqueString) {
-    super(uniqueString);
   }
 }

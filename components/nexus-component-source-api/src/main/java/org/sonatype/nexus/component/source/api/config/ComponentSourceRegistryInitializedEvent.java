@@ -17,6 +17,7 @@ import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Fired when the {@link ComponentSourceRegistry} has been populated as Nexus starts.
+ *
  * @since 3.0
  */
 public class ComponentSourceRegistryInitializedEvent

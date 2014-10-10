@@ -24,6 +24,7 @@ import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -74,7 +75,7 @@ public class MapdbBlobMetadataStore
     final MapdbBlobMetadataStore inner = new MapdbBlobMetadataStore(directory);
 
     return (BlobMetadataStore) Proxy.newProxyInstance(BlobMetadataStore.class.getClassLoader(),
-        new Class[]{BlobMetadataStore.class}, new ClassLoaderPreserver(inner));
+        new Class[]{BlobMetadataStore.class}, new OsgiCompatibleClassloaderAdvice(inner));
   }
 
   /**
@@ -91,7 +92,6 @@ public class MapdbBlobMetadataStore
         .checksumEnable()
         .makeTxMaker();
   }
-
 
   @Override
   protected void doStop() throws Exception {
@@ -112,7 +112,7 @@ public class MapdbBlobMetadataStore
   }
 
   /**
-   * Immutable metadata record for internal storage in MapDB.
+   * Metadata record for internal storage in MapDB.
    */
   static class MetadataRecord
       implements Externalizable
@@ -130,6 +130,40 @@ public class MapdbBlobMetadataStore
     private String sha1;
 
     private Long size;
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      MetadataRecord that = (MetadataRecord) o;
+
+      if (!Objects.equals(state, that.state)) {
+        return false;
+      }
+      if (!Objects.equals(headers, that.headers)) {
+        return false;
+      }
+      if (metrics != that.metrics) {
+        return false;
+      }
+      if (!Objects.equals(created, that.created)) {
+        return false;
+      }
+      if (!Objects.equals(sha1, that.sha1)) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(state, headers, metrics, created, sha1, size);
+    }
 
     public MetadataRecord(final BlobMetadata source) {
       this.state = source.getBlobState();
@@ -193,6 +227,7 @@ public class MapdbBlobMetadataStore
     @Override
     public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
       final int version = in.readInt();
+      checkState(version == 1, "Version must be 1.");
 
       state = (BlobState) in.readObject();
 
@@ -409,22 +444,26 @@ public class MapdbBlobMetadataStore
     });
   }
 
-  private static class ClassLoaderPreserver
+  /**
+   * An invocation handler that ensures the context classloader is set up correctly for OSGi before MapDB attempts to
+   * use it to resolve classes for serialized/externalized objects.
+   */
+  private static class OsgiCompatibleClassloaderAdvice
       implements InvocationHandler
   {
     private final BlobMetadataStore inner;
 
-    private ClassLoaderPreserver(final BlobMetadataStore inner) {this.inner = inner;}
+    private OsgiCompatibleClassloaderAdvice(final BlobMetadataStore inner) {this.inner = inner;}
 
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-      ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+      ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
       try {
         Thread.currentThread().setContextClassLoader(MapdbBlobMetadataStore.class.getClassLoader());
         return method.invoke(inner, args);
       }
       finally {
-        Thread.currentThread().setContextClassLoader(tccl);
+        Thread.currentThread().setContextClassLoader(originalClassLoader);
       }
     }
   }

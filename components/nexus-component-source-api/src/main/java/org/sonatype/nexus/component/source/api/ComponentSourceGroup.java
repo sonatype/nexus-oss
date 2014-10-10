@@ -13,6 +13,8 @@
 package org.sonatype.nexus.component.source.api;
 
 /**
+ * TODO: This is a fledgling support class, groups to be fleshed out in a subsequent PR.
+ *
  * @since 3.0
  */
 public abstract class ComponentSourceGroup
