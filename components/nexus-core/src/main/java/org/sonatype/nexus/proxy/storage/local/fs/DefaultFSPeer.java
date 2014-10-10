@@ -257,7 +257,7 @@ public class DefaultFSPeer
       log.debug("Moving file from {} to {}", fromTarget.getAbsolutePath(), toTarget.getAbsolutePath());
     }
     try {
-      if (!DirSupport.moveIfExists(fromTarget.toPath(), toTarget.toPath(), DOTTED_FILE_FILTER)) {
+      if (!DirSupport.pseudoMoveIfExists(fromTarget.toPath(), toTarget.toPath(), DOTTED_FILE_FILTER)) {
         throw new ItemNotFoundException(reasonFor(from, repository,
             "Path %s not found in local storage of repository %s", from.getRequestPath(),
             RepositoryStringUtils.getHumanizedNameString(repository)));

@@ -397,48 +397,54 @@ public final class DirSupport
   /**
    * Performs a move operation. It will attempt a real move (if source and target are on same file store), but will
    * fallback to a sequence of "copy" and then "delete" (not a real move!). This method accepts
-   * existing Paths that might denote a regular file or a directory.
+   * existing Paths that might denote a regular file or a directory. It basically delegates to {@link Files#move(Path,
+   * Path, CopyOption...)} method with "replace existing" parameter.
    */
-  public static void move(final Path from, final Path to) throws IOException {
-    move(from, to, null);
-  }
-
-  /**
-   * Performs a move operation. It will attempt a real move (if source and target are on same file store), but will
-   * fallback to a sequence of "copy" and then "delete" (not a real move!). This method accepts
-   * existing Paths that might denote a regular file or a directory.
-   * The passed in filter can leave out a directory and it's complete subtree from operation.
-   */
-  public static void move(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+  public static void move(final Path from, final Path to)
       throws IOException
   {
-    if (excludeFilter == null) {
-      Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
-    } else {
-      copy(from, to, excludeFilter);
-      delete(from, excludeFilter);
-    }
+    Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
   }
 
   /**
    * Invokes {@link #move(Path, Path)} if passed in "from" path exists and returns {@code true}. If
    * "from" path does not exists, {@code false} is returned.
    */
-  public static boolean moveIfExists(final Path from, final Path to) throws IOException {
-    return moveIfExists(from, to, null);
-  }
-
-  /**
-   * Invokes {@link #move(Path, Path)} if passed in "from" path exists and returns {@code true}. If
-   * "from" path does not exists, {@code false} is returned.
-   * The passed in filter can leave out a directory and it's complete subtree from operation.
-   */
-  public static boolean moveIfExists(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+  public static boolean moveIfExists(final Path from, final Path to)
       throws IOException
   {
     checkNotNull(from);
     if (Files.exists(from)) {
-      move(from, to, excludeFilter);
+      move(from, to);
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  /**
+   * Performs a pseudo move operation (copy+delete). This method accepts existing Paths that might denote a regular file
+   * or a directory. While this method is not a real move (like {@link #move(Path, Path)} is), it is a bit more capable:
+   * it can move a complete directory structure to it's one sub-directory.
+   */
+  public static void pseudoMove(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+      throws IOException
+  {
+    copy(from, to, excludeFilter);
+    delete(from, excludeFilter);
+  }
+
+  /**
+   * Invokes {@link #pseudoMove(Path, Path, Predicate)} if passed in "from" path exists and returns {@code true}. If
+   * "from" path does not exists, {@code false} is returned.
+   */
+  public static boolean pseudoMoveIfExists(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+      throws IOException
+  {
+    checkNotNull(from);
+    if (Files.exists(from)) {
+      pseudoMove(from, to, excludeFilter);
       return true;
     }
     else {
