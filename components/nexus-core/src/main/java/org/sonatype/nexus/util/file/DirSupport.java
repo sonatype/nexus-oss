@@ -428,7 +428,7 @@ public final class DirSupport
    * or a directory. While this method is not a real move (like {@link #move(Path, Path)} is), it is a bit more capable:
    * it can move a complete directory structure to it's one sub-directory.
    */
-  public static void pseudoMove(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+  public static void copyDeleteMove(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
       throws IOException
   {
     copy(from, to, excludeFilter);
@@ -436,15 +436,17 @@ public final class DirSupport
   }
 
   /**
-   * Invokes {@link #pseudoMove(Path, Path, Predicate)} if passed in "from" path exists and returns {@code true}. If
+   * Invokes {@link #copyDeleteMove(Path, Path, Predicate)} if passed in "from" path exists and returns {@code true}. If
    * "from" path does not exists, {@code false} is returned.
    */
-  public static boolean pseudoMoveIfExists(final Path from, final Path to, final @Nullable Predicate<Path> excludeFilter)
+  public static boolean copyDeleteMoveIfExists(final Path from,
+                                               final Path to,
+                                               final @Nullable Predicate<Path> excludeFilter)
       throws IOException
   {
     checkNotNull(from);
     if (Files.exists(from)) {
-      pseudoMove(from, to, excludeFilter);
+      copyDeleteMove(from, to, excludeFilter);
       return true;
     }
     else {

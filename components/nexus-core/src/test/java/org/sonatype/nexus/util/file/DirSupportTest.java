@@ -178,9 +178,10 @@ public class DirSupportTest
   }
 
   @Test
-  public void pseudoMoveToSubdir() throws IOException {
+  public void copyDeleteMoveToSubdir() throws IOException {
     final Path target = root.toPath().resolve("dir2/dir21");
-    DirSupport.pseudoMove(root.toPath(), target, new Predicate<Path>() {
+    DirSupport.copyDeleteMove(root.toPath(), target, new Predicate<Path>()
+    {
       @Override
       public boolean apply(@Nullable final Path input) {
         return input.startsWith(target);
@@ -231,9 +232,9 @@ public class DirSupportTest
    * of repo local storage, the root was being moved under "/.nexus/trash".
    */
   @Test(expected = FileSystemException.class)
-  public void pseudoMoveToSubdirNullFilter() throws IOException {
+  public void copyDeleteMoveToSubdirNullFilter() throws IOException {
     final Path target = root.toPath().resolve("dir2/dir21");
-    DirSupport.pseudoMove(root.toPath(), target, null);
+    DirSupport.copyDeleteMove(root.toPath(), target, null);
   }
 
   @Test
