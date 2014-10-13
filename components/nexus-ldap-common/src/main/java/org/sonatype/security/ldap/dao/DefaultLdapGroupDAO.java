@@ -31,11 +31,13 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.LdapName;
 
+import org.sonatype.security.ldap.LdapEncoder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.security.ldap.LdapEncoder.nameEncode;
 
 /**
  * @author cstamas
@@ -217,7 +219,7 @@ public class DefaultLdapGroupDAO
     if (groupMemberFormat != null) {
       String member = StringUtils.replace( groupMemberFormat, "${username}", "{2}" );
       if (groupMemberFormat.contains("${username}")) {
-        filterValues.add(username.replace(",", "\\,"));
+        filterValues.add(nameEncode(username));
       }
 
       if (groupMemberFormat.contains("${dn}")) {
@@ -236,7 +238,7 @@ public class DefaultLdapGroupDAO
       filter += groupMemberAttribute + "=" + member + ")))";
     }
     else {
-      filterValues.add(username.replace(",", "\\,"));
+      filterValues.add(nameEncode(username));
       filter += groupMemberAttribute + "={2})))";
     }
 
