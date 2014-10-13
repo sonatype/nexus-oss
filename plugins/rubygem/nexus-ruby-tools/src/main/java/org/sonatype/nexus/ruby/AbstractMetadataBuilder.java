@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class AbstractMetadataBuilder
+public abstract class AbstractMetadataBuilder
 {
   static SimpleDateFormat formater = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -27,7 +27,6 @@ public class AbstractMetadataBuilder
   protected final String timestamp;
 
   public AbstractMetadataBuilder(long modified) {
-    super();
     timestamp = formater.format(new Date(modified));
   }
 }

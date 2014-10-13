@@ -29,13 +29,13 @@ public class BundleRunner
    * @param ruby ScriptingContainer to use
    */
   public BundleRunner(ScriptingContainer ruby) {
-    super(ruby);
+    super(ruby, newScript(ruby));
   }
 
   /**
    * create a new ruby object of the bundler command
    */
-  protected Object newScript() {
+  private static Object newScript(final ScriptingContainer scriptingContainer) {
     IRubyObject runnerClass = scriptingContainer.parse(PathType.CLASSPATH, "nexus/bundle_runner.rb").run();
     return scriptingContainer.callMethod(runnerClass, "new", IRubyObject.class);
   }

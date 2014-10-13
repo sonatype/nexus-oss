@@ -52,7 +52,7 @@ import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
  */
 public class GETLayout
     extends DefaultLayout
-    implements org.sonatype.nexus.ruby.Layout
+    implements Layout
 {
   protected final RubygemsGateway gateway;
 

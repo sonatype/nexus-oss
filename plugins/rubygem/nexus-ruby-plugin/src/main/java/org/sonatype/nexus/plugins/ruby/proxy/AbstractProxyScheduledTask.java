@@ -35,9 +35,8 @@ public abstract class AbstractProxyScheduledTask
       }
       else {
         getLogger().info(
-            RepositoryStringUtils.getFormattedMessage(
-                "Repository %s is not a hosted Rubygems repository. Will not rebuild metadata, but the task seems wrongly configured!",
-                repository));
+                "Repository {} is not a hosted Rubygems repository. Will not rebuild metadata, but the task seems wrongly configured!",
+                repository);
       }
     }
     else {

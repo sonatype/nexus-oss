@@ -28,10 +28,10 @@ public class DefaultRubygemsGateway
    * managed (ie. by calling {@link ScriptingContainer#terminate()} when application is shut down.
    */
   public DefaultRubygemsGateway(ScriptingContainer container) {
-    super(container);
+    super(container, newScript(container));
   }
 
-  protected Object newScript() {
+  private static Object newScript(final ScriptingContainer scriptingContainer) {
     IRubyObject nexusRubygemsClass = scriptingContainer.parse(PathType.CLASSPATH, "nexus/rubygems.rb").run();
     return scriptingContainer.callMethod(nexusRubygemsClass, "new", Object.class);
   }
