@@ -130,9 +130,9 @@ public class DefaultProxyRubyRepository
         try {
           super.deleteItem(false, item.getResourceStoreRequest());
         }
-        catch (@SuppressWarnings("deprecation") StorageException
+        catch (IOException
             | UnsupportedStorageOperationException | IllegalOperationException | ItemNotFoundException e) {
-          log.error("could not delete volatile file: " + item);
+          log.error("could not delete volatile file: {}", item);
         }
         return true;
       }

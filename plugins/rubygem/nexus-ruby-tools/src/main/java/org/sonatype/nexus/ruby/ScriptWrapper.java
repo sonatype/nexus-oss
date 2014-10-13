@@ -14,7 +14,7 @@ package org.sonatype.nexus.ruby;
 
 import org.jruby.embed.ScriptingContainer;
 
-public class ScriptWrapper
+public abstract class ScriptWrapper
 {
   protected final ScriptingContainer scriptingContainer;
 
@@ -33,9 +33,7 @@ public class ScriptWrapper
   /**
    * Sub-class should override to provide custom object/script creation.
    */
-  protected Object newScript() {
-    throw new UnsupportedOperationException();
-  }
+  protected abstract Object newScript();
 
   protected void callMethod(String methodName, Object singleArg) {
     scriptingContainer.callMethod(object, methodName, singleArg);
