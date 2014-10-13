@@ -132,7 +132,7 @@ public class DefaultProxyRubyRepository
         }
         catch (IOException
             | UnsupportedStorageOperationException | IllegalOperationException | ItemNotFoundException e) {
-          log.error("could not delete volatile file: {}", item);
+          log.warn("could not delete volatile file: {}", item, e);
         }
         return true;
       }
