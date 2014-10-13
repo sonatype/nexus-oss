@@ -20,20 +20,10 @@ public abstract class ScriptWrapper
 
   private final Object object;
 
-  public ScriptWrapper(ScriptingContainer scriptingContainer) {
-    this.scriptingContainer = scriptingContainer;
-    this.object = newScript();
-  }
-
   public ScriptWrapper(ScriptingContainer scriptingContainer, Object object) {
     this.scriptingContainer = scriptingContainer;
     this.object = object;
   }
-
-  /**
-   * Sub-class should override to provide custom object/script creation.
-   */
-  protected abstract Object newScript();
 
   protected void callMethod(String methodName, Object singleArg) {
     scriptingContainer.callMethod(object, methodName, singleArg);

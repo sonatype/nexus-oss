@@ -29,11 +29,11 @@ public class GemRunner
   private boolean listRemoteFirstRun = true;
 
   public GemRunner(ScriptingContainer ruby, String baseUrl) {
-    super(ruby);
+    super(ruby, newScript(ruby));
     this.baseUrl = baseUrl;
   }
 
-  protected Object newScript() {
+  private static Object newScript(final ScriptingContainer scriptingContainer) {
     IRubyObject runnerClass = scriptingContainer.parse(PathType.CLASSPATH, "nexus/gem_runner.rb").run();
     return scriptingContainer.callMethod(runnerClass, "new", IRubyObject.class);
   }

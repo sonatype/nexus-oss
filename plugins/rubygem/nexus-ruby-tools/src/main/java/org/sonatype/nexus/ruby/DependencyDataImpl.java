@@ -31,11 +31,6 @@ public class DependencyDataImpl
   }
 
   @Override
-  protected Object newScript() {
-    throw new UnsupportedOperationException(); // TODO: wth?
-  }
-
-  @Override
   public String[] versions(boolean prereleased) {
     return callMethod("versions", prereleased, String[].class);
   }
