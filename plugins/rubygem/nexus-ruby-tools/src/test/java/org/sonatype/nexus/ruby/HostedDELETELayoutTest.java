@@ -300,7 +300,7 @@ public class HostedDELETELayoutTest
   public void testGem() throws Exception {
     String[] pathes = {"/gems/pre-0.1.0.beta.gem", "/gems/p/pre-0.1.0.beta.gem"};
     assertFiletypeWithPayload(pathes, FileType.GEM, InputStream.class);
-    pathes = new String[]{"/gems/zip-2.0.2.gem", "/gems/zip-2.0.2.gem"};
+    pathes = new String[]{"/gems/zip-2.0.2.gem", "/gems/z/zip-2.0.2.gem"};
     assertNotFound(pathes, FileType.GEM);
   }
 
@@ -406,27 +406,6 @@ public class HostedDELETELayoutTest
   protected void assertNotFound(String[] pathes, FileType type) {
     assertFiletypeWithNullPayload(pathes, type, false);
   }
-
-  //
-  //    protected void assertNotFound( String[] pathes, FileType type )
-  //    {
-  //        for( String path : pathes )
-  //        {
-  //            RubygemsFile file = bootstrap.accept( path );
-  //            assertThat( path, file.type(), equalTo( type ) );
-  //            assertThat( path, file.exists(), is( false ) );
-  //        }
-  //    }
-  //    protected void assertIOException( String[] pathes, FileType type )
-  //    {
-  //        for( String path : pathes )
-  //        {
-  //            RubygemsFile file = bootstrap.accept( path );
-  //            assertThat( path, file.type(), equalTo( type ) );
-  //            assertThat( path, file.get(), nullValue() );
-  //            assertThat( path, file.getException(), is( instanceOf( IOException.class ) ) );
-  //        }
-  //    }
 
   protected void assertForbidden(String[] pathes) {
     for (String path : pathes) {

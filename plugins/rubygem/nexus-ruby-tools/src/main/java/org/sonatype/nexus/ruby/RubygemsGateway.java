@@ -13,7 +13,6 @@
 package org.sonatype.nexus.ruby;
 
 import java.io.InputStream;
-import java.util.List;
 
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -25,19 +24,7 @@ public interface RubygemsGateway
 
   void purgeBrokenGemspecFiles(String directory);
 
-  InputStream emptyIndex();
-
-  InputStream addSpec(IRubyObject spec, InputStream specsDump, SpecsIndexType type);
-
-  InputStream deleteSpec(IRubyObject spec, InputStream specsDump);
-
-  InputStream deleteSpec(IRubyObject spec, InputStream specsIndex, InputStream refSpecs);
-
-  InputStream mergeSpecs(List<InputStream> streams, boolean latest);
-
   DependencyData dependencies(InputStream inputStream, String name, long modified);
-
-  List<String> listAllVersions(String name, InputStream inputStream, long modified, boolean prerelease);
 
   /**
    * create a new instance of <code>GemspecHelper</code>
@@ -58,4 +45,16 @@ public interface RubygemsGateway
    * @return an empty DependencyHelper
    */
   DependencyHelper newDependencyHelper();
+
+  /**
+   * create a new instance of <code>SpecsHelper</code>
+   * @return an empty SpecsHelper
+   */
+  SpecsHelper newSpecsHelper();
+
+  /**
+   * create a new instance of <code>MergeSpecsHelper</code>
+   * @return an empty MergeSpecsHelper
+   */
+  MergeSpecsHelper newMergeSpecsHelper();
 }

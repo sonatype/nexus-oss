@@ -42,83 +42,20 @@ public class DefaultRubygemsGateway
   }
 
   @Override
+  public SpecsHelper newSpecsHelper() {
+    return callMethod("new_specs_helper", SpecsHelper.class);
+  }
+
+  @Override
+  public MergeSpecsHelper newMergeSpecsHelper() {
+    return callMethod("new_merge_specs_helper", MergeSpecsHelper.class);
+  }
+
+  @Override
   public DependencyData dependencies(InputStream is, String name, long modified) {
     return new DependencyDataImpl(scriptingContainer,
         callMethod("dependencies", new Object[]{name, is}, Object.class),
         modified);
- }
-
-  @Override
-  public InputStream emptyIndex() {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("empty_specs", List.class);
-
-    return new ByteArrayInputStream(array);
-  }
-
-  @SuppressWarnings("resource")
-  @Override
-  public InputStream addSpec(IRubyObject spec, InputStream specsIndex, SpecsIndexType type) {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("add_spec",
-        new Object[]{
-            spec,
-            specsIndex,
-            type.name().toLowerCase()
-        },
-        List.class);
-
-    return array == null ? null : new ByteArrayInputStream(array);
-  }
-
-  @Override
-  public InputStream deleteSpec(IRubyObject spec, InputStream specsIndex) {
-    return deleteSpec(spec, specsIndex, null);
-  }
-
-  @SuppressWarnings("resource")
-  @Override
-  public InputStream deleteSpec(IRubyObject spec, InputStream specsIndex, InputStream releasesSpecs) {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("delete_spec",
-        new Object[]{
-            spec,
-            specsIndex,
-            releasesSpecs
-        },
-        List.class);
-
-    return array == null ? null : new ByteArrayInputStream(array);
-  }
-
-  @SuppressWarnings("resource")
-  @Override
-  public InputStream mergeSpecs(List<InputStream> streams, boolean latest) {
-    @SuppressWarnings("unchecked")
-    List<Long> array = (List<Long>) callMethod("merge_specs",
-        new Object[]{
-            streams,
-            latest
-        },
-        List.class);
-
-    return array == null ? null : new ByteArrayInputStream(array);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public synchronized List<String> listAllVersions(String name,
-                                                   InputStream inputStream,
-                                                   long modified,
-                                                   boolean prerelease) {
-    return (List<String>) callMethod("list_all_versions",
-        new Object[]{
-            name,
-            inputStream,
-            modified,
-            prerelease
-        },
-        List.class);
   }
 
   @Override
