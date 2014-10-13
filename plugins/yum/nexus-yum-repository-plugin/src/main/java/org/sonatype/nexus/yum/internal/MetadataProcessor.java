@@ -97,12 +97,10 @@ public class MetadataProcessor
               for (File memberReposBaseDir : memberRepositoriesBaseDirs) {
                 String memberRepoDirPath = memberReposBaseDir.getPath();
                 int pos = href.indexOf(memberRepoDirPath);
-                if (pos > 0) {
-                  if (pos + memberRepoDirPath.length() <= href.length()) {
-                    href = href.substring(pos + memberRepoDirPath.length());
-                    if (href.startsWith("/")) {
-                      href = href.substring(1);
-                    }
+                if (pos > -1) {
+                  href = href.substring(pos + memberRepoDirPath.length());
+                  if (href.startsWith("/")) {
+                    href = href.substring(1);
                   }
                   location.setAttribute("href", href);
                   location.removeAttribute("xml:base");
