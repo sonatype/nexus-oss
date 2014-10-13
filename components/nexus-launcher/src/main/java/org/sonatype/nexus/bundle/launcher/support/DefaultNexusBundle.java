@@ -282,7 +282,7 @@ public class DefaultNexusBundle
               new InetSocketAddress(getConfiguration().getHostName(), getConfiguration().getDebugPort()));
           return true;
         }
-      }.await(Time.seconds(10), Time.seconds(100), Time.seconds(1));
+      }.await(Time.seconds(10), Time.seconds(170), Time.seconds(1));
       if (jvmSuspended) {
         log.info("{} ({}) suspended for debugging at {}:{}", getName(), getConfiguration().getId(),
             getConfiguration().getHostName(), getConfiguration().getDebugPort());
