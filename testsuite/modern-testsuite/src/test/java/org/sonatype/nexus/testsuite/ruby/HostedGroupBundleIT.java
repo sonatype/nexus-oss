@@ -12,17 +12,11 @@
  */
 package org.sonatype.nexus.testsuite.ruby;
 
-import java.io.IOException;
 
 public class HostedGroupBundleIT
     extends BundleITSupport
 {
   public HostedGroupBundleIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates, "gemshostgroup");
-  }
-
-  @Override
-  protected void testAfterBundleComplete() throws IOException {
-    assertHostedFiles();
   }
 }
