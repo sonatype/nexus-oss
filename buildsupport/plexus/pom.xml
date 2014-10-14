@@ -118,6 +118,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov-jdk15</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
     </dependencies>
