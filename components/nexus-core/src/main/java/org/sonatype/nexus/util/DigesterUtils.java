@@ -40,7 +40,7 @@ public class DigesterUtils
   /**
    * Calculates a digest for a String user the requested algorithm.
    */
-  private static String getDigest(String alg, InputStream is)
+  public static String getDigest(String alg, InputStream is)
       throws NoSuchAlgorithmException
   {
     String result = null;

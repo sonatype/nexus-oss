@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -65,6 +67,17 @@ public class DefaultFSPeer
     extends ComponentSupport
     implements FSPeer
 {
+  /**
+   * Filter for "move" and "delete" operations, to leave out folders
+   * like ".meta" and ".nexus", with latter causing endless recursion
+   * and IOException when deleting "/" folder.
+   */
+  private static final Predicate<Path> DOTTED_FILE_FILTER = new Predicate<Path>() {
+    @Override
+    public boolean apply(final Path input) {
+      return input.getFileName().toString().startsWith(".");
+    }
+  };
 
   private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
 
@@ -222,7 +235,7 @@ public class DefaultFSPeer
       log.debug("Deleting file: {}", target.getAbsolutePath());
     }
     try {
-      if (!DirSupport.deleteIfExists(target.toPath())) {
+      if (!DirSupport.deleteIfExists(target.toPath(), DOTTED_FILE_FILTER)) {
         throw new ItemNotFoundException(reasonFor(request, repository,
             "Path %s not found in local storage of repository %s", request.getRequestPath(),
             RepositoryStringUtils.getHumanizedNameString(repository)));
@@ -244,7 +257,7 @@ public class DefaultFSPeer
       log.debug("Moving file from {} to {}", fromTarget.getAbsolutePath(), toTarget.getAbsolutePath());
     }
     try {
-      if (!DirSupport.moveIfExists(fromTarget.toPath(), toTarget.toPath())) {
+      if (!DirSupport.copyDeleteMoveIfExists(fromTarget.toPath(), toTarget.toPath(), DOTTED_FILE_FILTER)) {
         throw new ItemNotFoundException(reasonFor(from, repository,
             "Path %s not found in local storage of repository %s", from.getRequestPath(),
             RepositoryStringUtils.getHumanizedNameString(repository)));

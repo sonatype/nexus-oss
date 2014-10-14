@@ -116,7 +116,7 @@ public class VersionedResource
       );
     }
 
-    return yumHosted.getYumRepository(aliasVersion, interpretation.getRepositoryUrl());
+    return yumHosted.getYumRepository(aliasVersion);
   }
 
   @Override

@@ -24,7 +24,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
@@ -43,9 +42,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
@@ -118,18 +115,15 @@ public class GenerateMetadataTaskSettingsTest
         mock(EventBus.class),
         repoRegistry(),
         mock(YumRegistry.class),
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
     task.setRpmDir(rpmsDir().getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
     // when
     task.setDefaults();
     // then
     assertThat(task.getRepoDir(), is(rpmsDir().getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
   }
 
   @Test
@@ -141,7 +135,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(EventBus.class),
         repoRegistry(),
         mock(YumRegistry.class),
-        repositoryURLBuilder(),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -151,9 +144,7 @@ public class GenerateMetadataTaskSettingsTest
     task.setDefaults();
     // then
     assertThat(task.getRpmDir(), is(rpmsDir().getAbsolutePath()));
-    assertThat(task.getRpmUrl(), is(RPM_URL));
     assertThat(task.getRepoDir(), is(rpmsDir().getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
   }
 
   @Test
@@ -164,7 +155,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         mock(YumRegistry.class),
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -194,7 +184,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         yumRegistry,
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -204,12 +193,6 @@ public class GenerateMetadataTaskSettingsTest
     thrown.expect(IllegalStateException.class);
     thrown.expectMessage("hosted repositories");
     task.doRun();
-  }
-
-  private RepositoryURLBuilder repositoryURLBuilder() {
-    final RepositoryURLBuilder settings = mock(RepositoryURLBuilder.class);
-    when(settings.getExposedRepositoryContentUrl(any(Repository.class), eq(true))).thenReturn(RPM_URL);
-    return settings;
   }
 
   private RepositoryRegistry repoRegistry()
@@ -246,7 +229,6 @@ public class GenerateMetadataTaskSettingsTest
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         yumRegistry,
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -262,9 +244,7 @@ public class GenerateMetadataTaskSettingsTest
 
     };
     task.setRpmDir(rpmsDir().getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
     task.setRepoDir(rpmsDir());
-    task.setRepoUrl(RPM_URL);
     task.setRepositoryId(repo);
     task.setVersion(version);
     task.setAddedFiles(null);

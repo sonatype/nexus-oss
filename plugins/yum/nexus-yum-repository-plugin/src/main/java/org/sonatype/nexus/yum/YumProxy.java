@@ -21,4 +21,6 @@ public interface YumProxy
     extends Yum
 {
 
+  public static final String PROCESSED = "yum.processed";
+
 }

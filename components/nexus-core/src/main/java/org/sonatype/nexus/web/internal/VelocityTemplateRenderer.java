@@ -85,7 +85,7 @@ public class VelocityTemplateRenderer
     dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", applicationVersion);
     dataModel.put("statusCode", responseCode);
-    dataModel.put("statusName", Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase);
+    dataModel.put("statusName", StringEscapeUtils.escapeHtml(Strings.isNullOrEmpty(reasonPhrase) ? errorDescription : reasonPhrase));
     dataModel.put("errorDescription", StringEscapeUtils.escapeHtml(errorDescription));
 
     // NOTE: specifically not including stack trace, we do not want to include this in details shown to users

@@ -15,14 +15,18 @@ package org.sonatype.nexus.util.file;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystemException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -171,6 +175,66 @@ public class DirSupportTest
     assertThat(target.toFile(), not(isEmptyDirectory()));
     assertThat(target.resolve("dir2").resolve("dir21").toFile(), isDirectory());
     assertThat(target.resolve("dir2").resolve("dir21").resolve("file211.txt").toFile(), isFile());
+  }
+
+  @Test
+  public void copyDeleteMoveToSubdir() throws IOException {
+    final Path target = root.toPath().resolve("dir2/dir21");
+    DirSupport.copyDeleteMove(root.toPath(), target, new Predicate<Path>()
+    {
+      @Override
+      public boolean apply(@Nullable final Path input) {
+        return input.startsWith(target);
+      }
+    });
+    assertThat(root, exists());
+    assertThat(root.toPath().resolve("dir1").toFile(), not(exists()));
+    assertThat(root.toPath().resolve("dir2").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/file21.txt").toFile(), not(exists()));
+    assertThat(root.toPath().resolve("dir2/file22.txt").toFile(), not(exists()));
+    assertThat(root.toPath().resolve("dir2/file23.txt").toFile(), not(exists()));
+    assertThat(root.toPath().resolve("dir2/dir21").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/file211.txt").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/file212.txt").toFile(), exists());
+
+    assertThat(root.toPath().resolve("dir2/dir21/dir1").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir1/file11.txt").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir1/file12.txt").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir2").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir2/file21.txt").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir2/file22.txt").toFile(), exists());
+    assertThat(root.toPath().resolve("dir2/dir21/dir2/file23.txt").toFile(), exists());
+
+    assertThat(root, exists());
+    assertThat(target.toFile(), exists());
+    assertThat(target.toFile(), isDirectory());
+    assertThat(target.toFile(), not(isEmptyDirectory()));
+    assertThat(root.toPath().resolve("dir2").resolve("dir21").toFile(), isDirectory());
+    assertThat(root.toPath().resolve("dir2").resolve("dir21").resolve("file211.txt").toFile(), isFile());
+  }
+
+  /**
+   * This is what happened when repo root was being deleted: endless cycle in as "manual" copy/move was
+   * performed (during copy), as it copied files "ahead" of itself, basically "rolling" files deeper
+   * and deeper. {@link FileSystemException} is thrown once file path length reaches OS limit. In case
+   * of repo local storage, the root was being moved under "/.nexus/trash".
+   */
+  @Test(expected = FileSystemException.class)
+  public void moveToSubdir() throws IOException {
+    final Path target = root.toPath().resolve("dir2/dir21");
+    DirSupport.move(root.toPath(), target);
+  }
+
+  /**
+   * This is what happened when repo root was being deleted: endless cycle in as "manual" copy/move was
+   * performed (during copy), as it copied files "ahead" of itself, basically "rolling" files deeper
+   * and deeper. {@link FileSystemException} is thrown once file path length reaches OS limit. In case
+   * of repo local storage, the root was being moved under "/.nexus/trash".
+   */
+  @Test(expected = FileSystemException.class)
+  public void copyDeleteMoveToSubdirNullFilter() throws IOException {
+    final Path target = root.toPath().resolve("dir2/dir21");
+    DirSupport.copyDeleteMove(root.toPath(), target, null);
   }
 
   @Test

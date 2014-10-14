@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.yum;
 
-import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,7 +108,7 @@ public interface YumHosted
    */
   ScheduledTask<YumRepository> addRpmAndRegenerate(String path);
 
-  YumRepository getYumRepository(String version, URL repoBaseUrl)
+  YumRepository getYumRepository(String version)
       throws Exception;
 
   void regenerateWhenPathIsRemoved(String path);

@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
@@ -176,7 +175,6 @@ public class GenerateMetadataTaskConcurrencyTest
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         yumRegistry,
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
