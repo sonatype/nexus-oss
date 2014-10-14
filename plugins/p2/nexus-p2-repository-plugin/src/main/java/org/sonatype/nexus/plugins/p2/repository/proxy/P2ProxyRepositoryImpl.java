@@ -378,8 +378,20 @@ public class P2ProxyRepositoryImpl
     final RepositoryItemUidLock lock = uid.getLock();
 
     try {
+      // Lock the metadata do be sure that the artifacts are retrieved from consistent paths.
       lock.lock(Action.read);
-      return super.retrieveItem(fromTask, request);
+      try {
+        // NOTE - THIS CANNOT be a write action (create/delete/update) as that will force a write lock
+        // thus serializing access to this p2 repo. Using a read action here, will block the file from
+        // being deleted/updated while retrieving the remote item, and that is all we need.
+
+        // NXCM-2499 temporarily we do put access serialization back here, to avoid all the deadlocks.
+        lock.lock(Action.create);
+        return super.retrieveItem(fromTask, request);
+      }
+      finally {
+        lock.unlock();
+      }
     }
     finally {
       lock.unlock();
@@ -413,26 +425,10 @@ public class P2ProxyRepositoryImpl
       return item;
     }
 
-    // The request is not for a metadata file if we are here.
-    // Lock the metadata do be sure that the artifacts are retrieved from consistent paths.
-    final RepositoryItemUid uid = createUid(P2Constants.METADATA_LOCK_PATH);
-    final RepositoryItemUidLock lock = uid.getLock();
-
-    // NOTE - THIS CANNOT be a write action (create/delete/update) as that will force a write lock
-    // thus serializing access to this p2 repo. Using a read action here, will block the file from
-    // being deleted/updated while retrieving the remote item, and that is all we need.
-
-    // NXCM-2499 temporarily we do put access serialization back here, to avoid all the deadlocks.
-    try {
-      lock.lock(Action.create);
-      // note this method can potentially go retrieve new mirrors, but it is using locking, so no
-      // need to worry about multiples getting in
-      configureMirrors(request);
-      return super.doRetrieveItem(request);
-    }
-    finally {
-      lock.unlock();
-    }
+    // note this method can potentially go retrieve new mirrors, but it is using locking, so no
+    // need to worry about multiples getting in
+    configureMirrors(request);
+    return super.doRetrieveItem(request);
   }
 
   private volatile Map<String, String> mirrorsURLsByRepositoryURL;
