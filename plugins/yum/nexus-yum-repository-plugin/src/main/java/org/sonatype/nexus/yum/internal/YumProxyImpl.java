@@ -44,6 +44,7 @@ public class YumProxyImpl
 
   @Inject
   public YumProxyImpl(final ProxyMetadataRequestStrategy proxyMetadataRequestStrategy,
+                      final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,
                       final @Assisted ProxyRepository repository)
       throws MalformedURLException, URISyntaxException
 
@@ -52,7 +53,12 @@ public class YumProxyImpl
     this.baseDir = RepositoryUtils.getBaseDir(repository);
     this.yumRepository = new YumRepositoryImpl(baseDir, repository.getId(), null);
 
-    repository.registerRequestStrategy(ProxyMetadataRequestStrategy.class.getName(), proxyMetadataRequestStrategy);
+    repository.registerRequestStrategy(
+        BlockSqliteDatabasesRequestStrategy.class.getName(), checkNotNull(blockSqliteDatabasesRequestStrategy)
+    );
+    repository.registerRequestStrategy(
+        ProxyMetadataRequestStrategy.class.getName(), checkNotNull(proxyMetadataRequestStrategy)
+    );
   }
 
   @Override

@@ -57,4 +57,13 @@ public class RepoMD
     return locations.values();
   }
 
+  /**
+   * Gets the location for a specified data type.
+   * @param type data type
+   * @return location, or nullif notne was found for type
+   */
+  public String getLocation(String type) {
+    return locations.get(type);
+  }
+
 }

@@ -15,7 +15,6 @@ package org.sonatype.nexus.yum.internal;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +28,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRepository;
@@ -62,8 +60,6 @@ public class YumHostedImpl
 
   private static final int MAX_EXECUTION_COUNT = 100;
 
-  private final RepositoryURLBuilder repositoryURLBuilder;
-
   private final NexusScheduler nexusScheduler;
 
   private final ScheduledThreadPoolExecutor executor;
@@ -91,15 +87,14 @@ public class YumHostedImpl
       new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
 
   @Inject
-  public YumHostedImpl(final RepositoryURLBuilder repositoryURLBuilder,
-                       final NexusScheduler nexusScheduler,
+  public YumHostedImpl(final NexusScheduler nexusScheduler,
                        final ScheduledThreadPoolExecutor executor,
+                       final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,
                        final @Assisted HostedRepository repository,
                        final @Assisted File temporaryDirectory)
       throws MalformedURLException, URISyntaxException
 
   {
-    this.repositoryURLBuilder = checkNotNull(repositoryURLBuilder);
     this.nexusScheduler = checkNotNull(nexusScheduler);
     this.executor = checkNotNull(executor);
     this.repository = checkNotNull(repository);
@@ -114,6 +109,10 @@ public class YumHostedImpl
     this.baseDir = RepositoryUtils.getBaseDir(repository);
 
     this.yumGroupsDefinitionFile = null;
+
+    repository.registerRequestStrategy(
+        BlockSqliteDatabasesRequestStrategy.class.getName(), checkNotNull(blockSqliteDatabasesRequestStrategy)
+    );
   }
 
   private final YumRepositoryCache cache = new YumRepositoryCache();
@@ -199,20 +198,17 @@ public class YumHostedImpl
 
   @Override
   public YumRepository getYumRepository() throws Exception {
-    return getYumRepository(null, null);
+    return getYumRepository(null);
   }
 
   ScheduledTask<YumRepository> createYumRepository(final String version,
-                                                   final File yumRepoBaseDir,
-                                                   final URL yumRepoUrl)
+                                                   final File yumRepoBaseDir)
   {
     try {
       File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
       GenerateMetadataTask task = createTask();
       task.setRpmDir(rpmBaseDir.getAbsolutePath());
-      task.setRpmUrl(repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true));
       task.setRepoDir(yumRepoBaseDir);
-      task.setRepoUrl(yumRepoBaseDir == null ? null : yumRepoUrl.toString());
       task.setRepositoryId(repository.getId());
       task.setVersion(version);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
@@ -224,13 +220,13 @@ public class YumHostedImpl
   }
 
   @Override
-  public YumRepository getYumRepository(final String version, final URL baseRepoUrl)
+  public YumRepository getYumRepository(final String version)
       throws Exception
   {
     YumRepositoryImpl yumRepository = cache.lookup(repository.getId(), version);
     if ((yumRepository == null) || yumRepository.isDirty()) {
       final ScheduledTask<YumRepository> future = createYumRepository(
-          version, createRepositoryTempDir(repository, version), baseRepoUrl
+          version, createRepositoryTempDir(repository, version)
       );
       yumRepository = (YumRepositoryImpl) future.get();
       cache.cache(yumRepository);
@@ -264,7 +260,6 @@ public class YumHostedImpl
       final File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
       final GenerateMetadataTask task = createTask();
       task.setRpmDir(rpmBaseDir.getAbsolutePath());
-      task.setRpmUrl(repositoryURLBuilder.getRepositoryContentUrl(repository, true));
       task.setRepositoryId(repository.getId());
       task.setAddedFiles(filePath);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
