@@ -80,6 +80,8 @@ public abstract class AbstractNexusIntegrationTest
 
   protected static Logger staticLog = LoggerFactory.getLogger(AbstractNexusIntegrationTest.class);
 
+  private static final int BOOT_TIMEOUT_IN_SECONDS = 170;
+
   private static boolean needsInit = false;
 
   private static String nexusBaseDir;
@@ -321,7 +323,7 @@ public abstract class AbstractNexusIntegrationTest
 
       // booting is now asynchronous, so have to wait for Nexus
       Thread.sleep(10000);
-      for (int i = 0; i < 170; i++) {
+      for (int i = 0; i < BOOT_TIMEOUT_IN_SECONDS; i++) {
         try {
           if (getNexusStatusUtil().isNexusRunning()) {
             return;
