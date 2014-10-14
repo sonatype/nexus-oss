@@ -561,6 +561,7 @@
               <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <exclude>**/nexus-csrfguard/**/org/sonatype/nexus/csrfguard/CsrfGuardFilter.java</exclude>
               <exclude>**/nexus-csrfguard/**/org/sonatype/nexus/csrfguard/CsrfGuardServlet.java</exclude>
+              <exclude>**/nexus-ldap-common/**/org/sonatype/security/ldap/LdapEncoder.java</exclude>
 
               <!--
               HACK: Excludes for temporary import bits

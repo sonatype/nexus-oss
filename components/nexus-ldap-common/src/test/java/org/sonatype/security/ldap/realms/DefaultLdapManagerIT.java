@@ -62,7 +62,7 @@ public class DefaultLdapManagerIT
     Set<LdapUser> users = ldapManager.getAllUsers();
     Assert.assertEquals(3, users.size());
 
-    String[] orderedUsers = {"brianf", "cstamas", "jvanzyl"};
+    String[] orderedUsers = {"Fox, Brian", "cstamas", "jvanzyl"};
 
     int index = 0;
     for (LdapUser user : users) {
