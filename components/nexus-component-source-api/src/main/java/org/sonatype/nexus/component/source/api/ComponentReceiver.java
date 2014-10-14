@@ -12,12 +12,14 @@
  */
 package org.sonatype.nexus.component.source.api;
 
+import org.sonatype.nexus.component.model.Component;
+
 /**
  * A callback interface to handle the arrival of components from a {@link PushComponentSource}.
  *
  * @since 3.0
  */
-public interface ComponentReceiver
+public interface ComponentReceiver<T extends Component>
 {
   /**
    * Receive components (possibly storing them). If storage of components or assets fails, this method
@@ -25,5 +27,5 @@ public interface ComponentReceiver
    *
    * @param source The {@link PushComponentSource} that pushed the components to us.
    */
-  void receive(Iterable<ComponentEnvelope> components, ComponentSource source);
+  void receive(Iterable<ComponentEnvelope<T>> components, ComponentSource source);
 }

@@ -12,21 +12,23 @@
  */
 package org.sonatype.nexus.component.source.api;
 
+import org.sonatype.nexus.component.model.Component;
+
 /**
  * A remote source for components, where component transfers are initiated by the remote source, such as Smart Proxy.
  *
  * @since 3.0
  */
-public interface PushComponentSource
+public interface PushComponentSource<T extends Component>
     extends ComponentSource
 {
   /**
    * Register a {@link ComponentReceiver} with this source so it will receive components from this source.
    */
-  void register(ComponentReceiver receiver);
+  void register(ComponentReceiver<T> receiver);
 
   /**
    * Unregister the receiver.
    */
-  void unregister(ComponentReceiver receiver);
+  void unregister(ComponentReceiver<T> receiver);
 }
