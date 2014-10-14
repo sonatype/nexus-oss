@@ -46,7 +46,7 @@ Ext.define('NX.view.header.Panel', {
           backgroundColor: '#000000'
         },
         anchor: '100%',
-        padding: "0 0 0 8px",
+        padding: "0 0 0 21px",
 
         defaults: {
           scale: 'medium'
@@ -55,30 +55,23 @@ Ext.define('NX.view.header.Panel', {
         items: [
           { xtype: 'nx-header-logo' },
           {
-            xtype: 'container',
-
-            layout: {
-              type: 'vbox'
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: 'Sonatype Nexus',
-                style: {
-                  'color': '#FFFFFF',
-                  'font-size': '18px'
-                }
-              },
-              {
-                xtype: 'label',
-                text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
-                style: {
-                  'color': '#CCCCCC',
-                  'font-size': '10px'
-                }
-              }
-            ]
+            xtype: 'label',
+            text: 'Sonatype Nexus',
+            style: {
+                'color': '#FFFFFF',
+                'font-size': '20px',
+                'font-weight': 200
+            }
+          },
+          {
+            xtype: 'label',
+            text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
+            style: {
+                'color': '#FFFFFF',
+                'font-size': '10px',
+                'font-weight': 'bold',
+                'top': '17px !important'
+            }
           }
         ]
       }

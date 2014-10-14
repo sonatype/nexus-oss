@@ -6,7 +6,7 @@
  * ui: 'primary'
  */
 
-$button-primary-base-color: #2476C3 !default;
+$button-primary-base-color: #2476FC !default;
 $button-primary-base-color-over: button-default-background-color-over($button-primary-base-color) !default;
 $button-primary-base-color-focus: button-default-background-color-focus($button-primary-base-color) !default;
 $button-primary-base-color-pressed: button-default-background-color-pressed($button-primary-base-color) !default;
@@ -37,7 +37,7 @@ $button-primary-color-pressed: button-default-color-pressed($button-primary-colo
 $button-primary-color-disabled: button-default-color-disabled($button-primary-color) !default;
 
 $button-primary-glyph-color: $button-primary-color !default;
-$button-primary-glyph-opacity: .5 !default;
+$button-primary-glyph-opacity: 1 !default;
 
 @include extjs-button-small-ui(
   $ui: 'primary',
@@ -114,7 +114,7 @@ $button-danger-color-pressed: button-default-color-pressed($button-danger-color)
 $button-danger-color-disabled: button-default-color-disabled($button-danger-color) !default;
 
 $button-danger-glyph-color: $button-danger-color !default;
-$button-danger-glyph-opacity: .5 !default;
+$button-danger-glyph-opacity: 1 !default;
 
 @include extjs-button-small-ui(
   $ui: 'danger',
@@ -191,7 +191,7 @@ $button-warning-color-pressed: button-default-color-pressed($button-warning-colo
 $button-warning-color-disabled: button-default-color-disabled($button-warning-color) !default;
 
 $button-warning-glyph-color: $button-warning-color !default;
-$button-warning-glyph-opacity: .5 !default;
+$button-warning-glyph-opacity: 1 !default;
 
 @include extjs-button-small-ui(
   $ui: 'warning',
@@ -268,7 +268,7 @@ $button-success-color-pressed: button-default-color-pressed($button-success-colo
 $button-success-color-disabled: button-default-color-disabled($button-success-color) !default;
 
 $button-success-glyph-color: $button-success-color !default;
-$button-success-glyph-opacity: .5 !default;
+$button-success-glyph-opacity: 1 !default;
 
 @include extjs-button-small-ui(
   $ui: 'success',
@@ -386,7 +386,7 @@ $button-header-toolbar-color-pressed: button-toolbar-color-pressed($button-heade
 $button-header-toolbar-color-disabled: button-toolbar-color-disabled($button-header-toolbar-color) !default;
 
 $button-header-toolbar-glyph-color: $button-header-toolbar-color !default;
-$button-header-toolbar-glyph-opacity: .5 !default;
+$button-header-toolbar-glyph-opacity: 1 !default;
 
 @include extjs-button-toolbar-medium-ui(
   $ui: 'header',
@@ -428,7 +428,7 @@ $button-header-toolbar-glyph-opacity: .5 !default;
   $font-family-disabled: $button-medium-font-family-disabled,
 
   $glyph-color: #FFFFFF,
-  $glyph-opacity: 0.5
+  $glyph-opacity: 1
 );
 
 /**
@@ -441,7 +441,7 @@ $button-headermode-toolbar-border-color-focus: button-toolbar-border-color-focus
 $button-headermode-toolbar-border-color-pressed: button-toolbar-border-color-pressed($button-headermode-toolbar-border-color) !default;
 $button-headermode-toolbar-border-color-disabled: button-toolbar-border-color-disabled($button-headermode-toolbar-border-color) !default;
 
-$button-headermode-toolbar-background-color: #2476C3 !default;
+$button-headermode-toolbar-background-color: #2476FC !default;
 $button-headermode-toolbar-background-color-over: button-toolbar-background-color-over($button-headermode-toolbar-background-color) !default;
 $button-headermode-toolbar-background-color-focus: button-toolbar-background-color-focus($button-headermode-toolbar-background-color) !default;
 $button-headermode-toolbar-background-color-pressed: button-toolbar-background-color-pressed($button-headermode-toolbar-background-color) !default;
@@ -462,7 +462,7 @@ $button-headermode-toolbar-color-disabled: button-toolbar-color-disabled($button
 $button-medium-text-padding: 2px;
 
 $button-headermode-toolbar-glyph-color: $button-headermode-toolbar-color !default;
-$button-headermode-toolbar-glyph-opacity: .5 !default;
+$button-headermode-toolbar-glyph-opacity: 1 !default;
 
 @include extjs-button-toolbar-medium-ui(
   $ui: 'headermode',
@@ -510,11 +510,11 @@ $button-headermode-toolbar-glyph-opacity: .5 !default;
 );
 
 .headermode {
-  height: 46px;
+  height: 39px;
   border-radius: 0;
   padding: 3px 6px;
 
   .x-btn-wrap {
-    margin-top: 7px;
+    margin-top: 4px;
   }
 }

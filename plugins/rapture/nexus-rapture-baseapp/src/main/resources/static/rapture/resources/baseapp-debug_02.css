@@ -458,7 +458,7 @@
 .x-btn-warning-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -969,7 +969,7 @@
 .x-btn-success-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -1472,7 +1472,7 @@
 .x-btn-plain-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #1f1f1f;
   padding: 0 5px;
 }
@@ -1985,7 +1985,7 @@
 .x-btn-header-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
 }
@@ -2006,7 +2006,6 @@
   font-size: 24px;
   line-height: 24px;
   color: white;
-  opacity: 0.5;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-header-toolbar-medium .x-btn-glyph {
@@ -2482,7 +2481,7 @@
 .x-btn-headermode-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 2px;
 }
@@ -2503,7 +2502,6 @@
   font-size: 24px;
   line-height: 24px;
   color: white;
-  opacity: 0.5;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-headermode-toolbar-medium .x-btn-glyph {
@@ -2615,26 +2613,26 @@
 .x-btn-headermode-toolbar-medium-focus {
   border-color: #165188;
   background-image: none;
-  background-color: #2271bb;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387fc1), color-stop(50%, #2271bb), color-stop(51%, #206bb1), color-stop(100%, #2271bb));
-  background-image: -webkit-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -moz-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -o-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -ms-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
+  background-color: #2271f1;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387ff2), color-stop(50%, #2271f1), color-stop(51%, #206be4), color-stop(100%, #2271f1));
+  background-image: -webkit-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -moz-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -o-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -ms-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-over {
   border-color: #165188;
   background-image: none;
-  background-color: #2271bb;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387fc1), color-stop(50%, #2271bb), color-stop(51%, #206bb1), color-stop(100%, #2271bb));
-  background-image: -webkit-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -moz-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -o-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: -ms-linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
-  background-image: linear-gradient(top, #387fc1, #2271bb 50%, #206bb1 51%, #2271bb);
+  background-color: #2271f1;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387ff2), color-stop(50%, #2271f1), color-stop(51%, #206be4), color-stop(100%, #2271f1));
+  background-image: -webkit-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -moz-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -o-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: -ms-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-image: linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2642,13 +2640,13 @@
 .x-btn-headermode-toolbar-medium-pressed {
   border-color: #154e82;
   background-image: none;
-  background-color: #216cb3;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #216cb3), color-stop(50%, #1f66aa), color-stop(51%, #216cb3), color-stop(100%, #377aba));
-  background-image: -webkit-linear-gradient(top, #216cb3, #1f66aa 50%, #216cb3 51%, #377aba);
-  background-image: -moz-linear-gradient(top, #216cb3, #1f66aa 50%, #216cb3 51%, #377aba);
-  background-image: -o-linear-gradient(top, #216cb3, #1f66aa 50%, #216cb3 51%, #377aba);
-  background-image: -ms-linear-gradient(top, #216cb3, #1f66aa 50%, #216cb3 51%, #377aba);
-  background-image: linear-gradient(top, #216cb3, #1f66aa 50%, #216cb3 51%, #377aba);
+  background-color: #216ce7;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #216ce7), color-stop(50%, #1f66db), color-stop(51%, #216ce7), color-stop(100%, #377ae9));
+  background-image: -webkit-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
+  background-image: -moz-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
+  background-image: -o-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
+  background-image: -ms-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
+  background-image: linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2667,7 +2665,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-focus .x-frame-mc {
-  background-color: #2271bb;
+  background-color: #2271f1;
   background-image: url(images/btn/btn-headermode-toolbar-medium-focus-fbg.gif);
 }
 
@@ -2687,7 +2685,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-over .x-frame-mc {
-  background-color: #2271bb;
+  background-color: #2271f1;
   background-image: url(images/btn/btn-headermode-toolbar-medium-over-fbg.gif);
 }
 
@@ -2716,7 +2714,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-menu-active .x-frame-mc,
 .x-btn-headermode-toolbar-medium-pressed .x-frame-mc {
-  background-color: #216cb3;
+  background-color: #216ce7;
   background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-fbg.gif);
 }
 
@@ -2821,13 +2819,13 @@
 /* */
 /* line 512, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .headermode {
-  height: 46px;
+  height: 39px;
   border-radius: 0;
   padding: 3px 6px;
 }
 /* line 517, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .headermode .x-btn-wrap {
-  margin-top: 7px;
+  margin-top: 4px;
 }
 
 /* line 1, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/Toolbar.scss */
@@ -2896,7 +2894,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3218,7 +3216,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3540,7 +3538,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3862,7 +3860,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -4184,7 +4182,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -4612,7 +4610,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -6156,7 +6154,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -7700,7 +7698,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -9244,7 +9242,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -10788,7 +10786,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: arial, tahoma, verdana, helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */

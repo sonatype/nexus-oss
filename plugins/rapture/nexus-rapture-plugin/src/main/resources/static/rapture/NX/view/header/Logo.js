@@ -25,14 +25,14 @@ Ext.define('NX.view.header.Logo', {
   alias: 'widget.nx-header-logo',
 
   autoEl: 'span',
-  height: 32,
-  width: 32,
+  height: 24,
+  width: 24,
 
   /**
    * @protected
    */
   initComponent: function() {
-    this.setSrc(NX.Icons.url('nexus', 'x32'));
+    this.setSrc(NX.Icons.url('nexus', 'x24'));
     this.callParent();
   }
 });

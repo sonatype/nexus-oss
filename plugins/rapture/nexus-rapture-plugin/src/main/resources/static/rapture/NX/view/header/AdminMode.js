@@ -25,7 +25,6 @@ Ext.define('NX.view.header.AdminMode', {
   title: 'Administration',
   tooltip: 'Server administration and configuration',
   glyph: 'xf013@FontAwesome', /* fa-gear */
-  text: 'Administer',
 
   collapseMenu: false
 
