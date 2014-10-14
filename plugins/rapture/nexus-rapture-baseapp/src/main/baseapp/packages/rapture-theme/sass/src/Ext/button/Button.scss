@@ -459,6 +459,8 @@ $button-headermode-toolbar-color-focus: button-toolbar-color-focus($button-heade
 $button-headermode-toolbar-color-pressed: button-toolbar-color-pressed($button-headermode-toolbar-color) !default;
 $button-headermode-toolbar-color-disabled: button-toolbar-color-disabled($button-headermode-toolbar-color) !default;
 
+$button-medium-text-padding: 2px;
+
 $button-headermode-toolbar-glyph-color: $button-headermode-toolbar-color !default;
 $button-headermode-toolbar-glyph-opacity: .5 !default;
 
@@ -501,6 +503,18 @@ $button-headermode-toolbar-glyph-opacity: .5 !default;
   $font-family-pressed: $button-medium-font-family-pressed,
   $font-family-disabled: $button-medium-font-family-disabled,
 
-  $glyph-color: #FFFFFF,
-  $glyph-opacity: 0.5
+  $text-padding: $button-medium-text-padding,
+
+  $glyph-color: $button-headermode-toolbar-glyph-color,
+  $glyph-opacity: $button-headermode-toolbar-glyph-opacity
 );
+
+.headermode {
+  height: 46px;
+  border-radius: 0;
+  padding: 3px 6px;
+
+  .x-btn-wrap {
+    margin-top: 7px;
+  }
+}

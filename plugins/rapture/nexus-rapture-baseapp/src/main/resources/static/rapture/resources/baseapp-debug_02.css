@@ -2484,7 +2484,7 @@
   font-weight: bold;
   font-family: arial, tahoma, verdana, helvetica, sans-serif;
   color: white;
-  padding: 0 8px;
+  padding: 0 2px;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium .x-btn-arrow {
@@ -2819,6 +2819,22 @@
 
 /*</if slicer>*/
 /* */
+/* line 512, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.headermode {
+  height: 46px;
+  border-radius: 0;
+  padding: 3px 6px;
+}
+/* line 517, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.headermode .x-btn-wrap {
+  margin-top: 7px;
+}
+
+/* line 1, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/Toolbar.scss */
+.x-toolbar .x-box-inner {
+  overflow: visible;
+}
+
 /**
  * @class Ext.panel.Panel
  */
