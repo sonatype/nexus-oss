@@ -22,7 +22,7 @@ import org.sonatype.nexus.component.model.ComponentOriginId;
 public class ComponentSourceId
     extends ComponentOriginId
 {
-  public ComponentSourceId(final String name, final String identifier) {
-    super(name, identifier);
+  public ComponentSourceId(final String name, final String internalId) {
+    super(name, internalId);
   }
 }

@@ -17,6 +17,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.component.source.api.ComponentSourceId;
+import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -27,6 +29,14 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface ComponentSourceConfigStore
     extends Lifecycle
 {
+  /**
+   * Creates a new {@link ComponentSourceId} based on a user-provided name, which should be invoked to provide new
+   * sources an {@link ComponentSourceConfig#getSourceId()} () id}.
+   *
+   * To find the id of a source currently in use, use {@link ComponentSourceRegistry#getSource(String)}.
+   */
+  public ComponentSourceId createId(String name);
+
   /**
    * Adds a config
    *

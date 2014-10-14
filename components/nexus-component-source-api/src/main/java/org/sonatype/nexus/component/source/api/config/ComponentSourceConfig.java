@@ -34,15 +34,15 @@ public class ComponentSourceConfig
 
   private final Map<String, Object> configuration;
 
-  public ComponentSourceConfig(final ComponentSourceId sourceName, final String factoryName,
+  public ComponentSourceConfig(final ComponentSourceId sourceId, final String factoryName,
                                final Map<String, Object> configuration)
   {
-    this.sourceName = checkNotNull(sourceName);
+    this.sourceName = checkNotNull(sourceId);
     this.factoryName = checkNotNull(factoryName);
     this.configuration = ImmutableMap.copyOf(checkNotNull(configuration));
   }
 
-  public ComponentSourceId getSourceName() {
+  public ComponentSourceId getSourceId() {
     return sourceName;
   }
 

@@ -15,12 +15,14 @@ package org.sonatype.nexus.componentviews.internal.orient;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigId;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
@@ -97,6 +99,11 @@ public class OrientViewConfigStore
 
   private ORID convertId(final ViewConfigId id) {
     return recordIdObfuscator.decode(entityType, id.toString());
+  }
+
+  @Override
+  public ViewId createId(final String name) {
+    return new ViewId(name, UUID.randomUUID().toString());
   }
 
   @Override

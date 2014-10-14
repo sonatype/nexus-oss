@@ -38,11 +38,11 @@ public class RawSourceConfigContribution
 {
   public static final String SOURCE_NAME = "binary-source";
 
-  public static final String SOURCE_ID = "foo_2f32wdf23r";
+  public static final String INTERNAL_ID = "foo_2f32wdf23r";
 
   @Override
   public void contributeTo(final ComponentSourceConfigStore store) throws IOException {
-    final ComponentSourceConfig config = new ComponentSourceConfig(new ComponentSourceId(SOURCE_NAME, SOURCE_ID),
+    final ComponentSourceConfig config = new ComponentSourceConfig(new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),
         RawComponentSourceFactory.NAME, ImmutableMap.of(RawComponentSourceFactory.REMOTE_URL_PARAM,
         (Object) "http://search.maven.org/"));
 
