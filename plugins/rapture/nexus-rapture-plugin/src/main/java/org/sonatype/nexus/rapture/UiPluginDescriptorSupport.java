@@ -30,6 +30,10 @@ public class UiPluginDescriptorSupport
 {
   private final String pluginId;
 
+  private boolean hasStyle = true;
+
+  private boolean hasScript = true;
+
   private String namespace;
 
   private String configClassName;
@@ -45,6 +49,24 @@ public class UiPluginDescriptorSupport
   }
 
   @Override
+  public boolean hasStyle() {
+    return hasStyle;
+  }
+
+  public void setHasStyle(final boolean hasStyle) {
+    this.hasStyle = hasStyle;
+  }
+
+  @Override
+  public boolean hasScript() {
+    return hasScript;
+  }
+
+  public void setHasScript(final boolean hasScript) {
+    this.hasScript = hasScript;
+  }
+
+  @Override
   @Nullable
   public String getNamespace() {
     return namespace;
@@ -55,6 +77,7 @@ public class UiPluginDescriptorSupport
   }
 
   @Override
+  @Nullable
   public String getConfigClassName() {
     return configClassName;
   }

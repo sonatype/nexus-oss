@@ -458,7 +458,7 @@
 .x-btn-warning-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -969,7 +969,7 @@
 .x-btn-success-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -1472,7 +1472,7 @@
 .x-btn-plain-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #1f1f1f;
   padding: 0 5px;
 }
@@ -1985,7 +1985,7 @@
 .x-btn-header-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
 }
@@ -2481,7 +2481,7 @@
 .x-btn-headermode-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 2px;
 }
@@ -2894,7 +2894,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3216,7 +3216,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3538,7 +3538,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -3860,7 +3860,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -4182,7 +4182,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -4610,7 +4610,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -6154,7 +6154,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -7698,7 +7698,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -9242,7 +9242,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -10786,7 +10786,7 @@
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
