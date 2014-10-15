@@ -93,7 +93,10 @@ Sonatype.Events.addListener('fileNodeClickedEvent', function(node, passthru) {
       {
         if (node && node.isLeaf())
         {
+          var payload = passthru.container.payload;
+          
           passthru.container.artifactContainer.updateArtifact({
+                format : (payload && payload.data) ? payload.data.format : null,
                 text : node.attributes.text,
                 leaf : node.attributes.leaf,
                 resourceURI : node.attributes.resourceURI

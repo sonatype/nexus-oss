@@ -89,6 +89,9 @@ NX.define('Sonatype.repoServer.Maven2InformationPanel', {
   showArtifact : function(data, artifactContainer) {
     this.data = data;
     if (data) {
+      if(!data.format){
+        data.format = 'maven2';
+      }
       Ext.Ajax.request({
         url : this.data.resourceURI + '?describe=maven2&isLocal=true',
         callback : function(options, isSuccess, response) {
