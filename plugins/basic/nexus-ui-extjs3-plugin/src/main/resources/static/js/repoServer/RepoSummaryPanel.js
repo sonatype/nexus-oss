@@ -112,16 +112,23 @@ Ext.extend(Sonatype.repoServer.HostedRepositorySummaryPanel, Sonatype.repoServer
       populateFields : function(arr, srcObj, fpanel) {
         Sonatype.repoServer.HostedRepositorySummaryPanel.superclass.populateFields.call(this, arr, srcObj, fpanel);
 
-        this.populateDistributionManagementField(this.payload.data.id, this.payload.data.repoPolicy, this.payload.data.contentResourceURI);
+        this.populateDistributionManagementField(this.payload.data.id, this.payload.data.repoPolicy, this.payload.data.contentResourceURI, this.payload.data.format);
       },
-      populateDistributionManagementField : function(id, policy, uri) {
-        var distMgmtString = '<distributionManagement>\n  <${repositoryType}>\n    <id>${repositoryId}</id>\n    <url>${repositoryUrl}</url>\n  </${repositoryType}>\n</distributionManagement>';
+      populateDistributionManagementField : function(id, policy, uri, format) {
+        if (['maven1', 'maven2'].indexOf(format) > -1) {
+          var distMgmtString = '<distributionManagement>\n  <${repositoryType}>\n    <id>${repositoryId}</id>\n    <url>${repositoryUrl}</url>\n  </${repositoryType}>\n</distributionManagement>';
 
-        distMgmtString = distMgmtString.replaceAll('${repositoryType}', policy == 'Release' ? 'repository' : 'snapshotRepository');
-        distMgmtString = distMgmtString.replaceAll('${repositoryId}', id);
-        distMgmtString = distMgmtString.replaceAll('${repositoryUrl}', uri);
+          distMgmtString = distMgmtString.replaceAll('${repositoryType}',
+              policy == 'Release' ? 'repository' : 'snapshotRepository');
+          distMgmtString = distMgmtString.replaceAll('${repositoryId}', id);
+          distMgmtString = distMgmtString.replaceAll('${repositoryUrl}', uri);
 
-        this.find('name', 'distMgmtField')[0].setRawValue(distMgmtString);
+          this.find('name', 'distMgmtField')[0].setRawValue(distMgmtString);
+          this.find('name', 'distMgmtField')[0].show();
+        }
+        else {
+          this.find('name', 'distMgmtField')[0].hide();
+        }
       }
     });
 

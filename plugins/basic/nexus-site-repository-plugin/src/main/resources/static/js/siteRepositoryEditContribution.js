@@ -31,13 +31,13 @@
     populateFields:function ( arr, srcObj, fpanel ) {
       Sonatype.repoServer.HostedRepositorySummaryPanel.superclass.populateFields.call( this, arr, srcObj, fpanel );
 
-      if ( this.payload.data.provider === 'site' ) {
+      if ( this.payload.data.format === 'site' ) {
         this.populateSiteDistributionManagementField(
           this.payload.data.id, this.payload.data.contentResourceURI
         );
       } else {
         this.populateDistributionManagementField(
-          this.payload.data.id, this.payload.data.repoPolicy, this.payload.data.contentResourceURI
+          this.payload.data.id, this.payload.data.repoPolicy, this.payload.data.contentResourceURI, this.payload.data.format
         );
       }
     },
