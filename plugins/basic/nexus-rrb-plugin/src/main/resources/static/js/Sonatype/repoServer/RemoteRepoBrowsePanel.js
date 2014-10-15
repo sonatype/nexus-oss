@@ -23,6 +23,7 @@ define('Sonatype/repoServer/RemoteRepoBrowsePanel', function() {
   Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
     var sp = Sonatype.lib.Permissions;
     if ( sp.checkPermission( 'nexus:browseremote', sp.READ)
+          && (['maven1', 'maven2', 'obr', 'p2'].indexOf(rec.data.format) > -1)
           && rec.data.remoteUri //only add panel if there is a remoteUri
           && rec.data.remoteUri.match( /^(?:http|https|ftp):\/\//i ) ) { //and it is valid uri (to rule out special proxy repo types, such as procurement)
   //	  alert(printallmembers(rec.data));
