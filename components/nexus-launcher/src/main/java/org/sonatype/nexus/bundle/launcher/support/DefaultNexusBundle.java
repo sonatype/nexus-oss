@@ -46,6 +46,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.nexus.bundle.launcher.support.DefaultNexusBundleConfiguration.DEFAULT_START_TIMEOUT;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
@@ -60,8 +61,6 @@ public class DefaultNexusBundle
     extends DefaultWebBundle<NexusBundle, NexusBundleConfiguration>
     implements NexusBundle
 {
-  private static final int BOOT_TIMEOUT_IN_SECONDS = 170;
-
   /**
    * File task builder.
    * Cannot be null.
@@ -283,7 +282,7 @@ public class DefaultNexusBundle
               new InetSocketAddress(getConfiguration().getHostName(), getConfiguration().getDebugPort()));
           return true;
         }
-      }.await(Time.seconds(10), Time.seconds(BOOT_TIMEOUT_IN_SECONDS), Time.seconds(1));
+      }.await(Time.seconds(10), Time.seconds(DEFAULT_START_TIMEOUT), Time.seconds(1));
       if (jvmSuspended) {
         log.info("{} ({}) suspended for debugging at {}:{}", getName(), getConfiguration().getId(),
             getConfiguration().getHostName(), getConfiguration().getDebugPort());
@@ -313,7 +312,7 @@ public class DefaultNexusBundle
           new CommandMonitorTalker(LOCALHOST, commandMonitorPort).send(PingCommand.NAME);
           return true;
         }
-      }.await(Time.seconds(10), Time.seconds(BOOT_TIMEOUT_IN_SECONDS), Time.seconds(1));
+      }.await(Time.seconds(10), Time.seconds(DEFAULT_START_TIMEOUT), Time.seconds(1));
       if (monitorInstalled) {
         log.debug("{} ({}) command monitor detected at {}:{}", getName(), getConfiguration().getId(),
             getConfiguration().getHostName(), commandMonitorPort);
