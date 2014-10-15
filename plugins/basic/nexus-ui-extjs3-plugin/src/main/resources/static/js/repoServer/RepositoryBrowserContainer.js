@@ -78,7 +78,8 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowserContainer, Ext.Panel, {
 
 // Add the browse storage and browse index panels to the repo
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
-      if (rec.data.resourceURI && rec.data.format !== 'npm')
+      if (rec.data.resourceURI
+          && (['maven1', 'maven2', 'nuget', 'obr', 'p2', 'site'].indexOf(rec.data.format) > -1))
       {
         cardPanel.add(new Sonatype.repoServer.RepositoryBrowserContainer({
               payload : rec,
