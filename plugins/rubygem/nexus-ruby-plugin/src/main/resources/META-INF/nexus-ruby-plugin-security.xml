@@ -118,7 +118,7 @@
       </properties>
     </privilege>
     <privilege>
-      <id>Rubygems-delete</id>
+      <id>rubygems-delete</id>
       <name>All Rubygems Repositories - (delete)</name>
       <description>Give permission to delete any content in any Rubygems Repository.</description>
       <type>target</type>
