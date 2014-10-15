@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.ruby.layout;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -72,7 +73,7 @@ public interface Storage
    * use the <code>String</code> to generate the payload
    * for the <code>RubygemsFile</code> instance.
    */
-  void memory(InputStream data, RubygemsFile file);
+  void memory(ByteArrayInputStream data, RubygemsFile file);
 
   /**
    * use the <code>String</code> can converts it with to <code>byte</code array

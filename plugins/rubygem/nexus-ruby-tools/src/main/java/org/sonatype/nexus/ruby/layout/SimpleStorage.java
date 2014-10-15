@@ -16,9 +16,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
@@ -39,6 +40,51 @@ import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 public class SimpleStorage
     implements Storage
 {
+
+  static interface StreamLocation {
+    InputStream openStream() throws IOException;
+  }
+
+  static class URLStreamLocation implements StreamLocation {
+    private URL url;
+
+    URLStreamLocation(URL url) {
+      this.url = url;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+      return url.openStream();
+    }
+  }
+
+  static class BytesStreamLocation implements StreamLocation {
+    private ByteArrayInputStream stream;
+
+    BytesStreamLocation(ByteArrayInputStream stream) {
+      this.stream = stream;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+      return stream;
+    }
+  }
+
+  static class URLGzipStreamLocation implements StreamLocation {
+    private StreamLocation stream;
+
+    URLGzipStreamLocation(StreamLocation stream) {
+      this.stream = stream;
+    }
+
+    @Override
+    public InputStream openStream() throws IOException {
+      return new GZIPInputStream(stream.openStream());
+    }
+  }
+  
+  
   private final SecureRandom random = new SecureRandom();
 
   private final File basedir;
@@ -61,7 +107,7 @@ public class SimpleStorage
       is = Files.newInputStream(toPath(file));
     }
     else {
-      is = (InputStream) file.get();
+      is = ((StreamLocation) file.get()).openStream();
     }
     // reset state since we have a payload and no exceptions
     file.resetState();
@@ -84,17 +130,17 @@ public class SimpleStorage
   public void retrieve(RubygemsFile file) {
     file.resetState();
 
-    if (Files.notExists(toPath(file))) {
+    Path path = toPath(file);
+    if (Files.notExists(path)) {
       file.markAsNotExists();
     }
-    try {
-      file.set(getInputStream(file));
-    }
-    catch (NoSuchFileException e) {
-      file.markAsNotExists();
-    }
-    catch (IOException e) {
-      file.setException(e);
+    else {
+      try {
+        set(file, path);
+      }
+      catch (IOException e) {
+        file.setException(e);
+      }
     }
   }
 
@@ -118,12 +164,7 @@ public class SimpleStorage
     if (zipped.hasException()) {
       file.setException(zipped.getException());
     }
-    try {
-      file.set(new GZIPInputStream(getInputStream(zipped)));
-    }
-    catch (IOException e) {
-      file.setException(e);
-    }
+    file.set(new URLGzipStreamLocation((StreamLocation) zipped.get()));
   }
 
   @Override
@@ -136,7 +177,7 @@ public class SimpleStorage
       Files.createFile(mutex);
       Files.copy(is, source);
       Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
-      file.set(Files.newInputStream(target));
+      set(file, target);
     }
     catch (FileAlreadyExistsException e) {
       mutex = null;
@@ -153,6 +194,16 @@ public class SimpleStorage
     }
   }
 
+  /**
+   * set the payload
+   * @param file which gets the payload
+   * @param path the path to the payload
+   * @throws MalformedURLException
+   */
+  private void set(RubygemsFile file, Path path) throws MalformedURLException{
+    file.set(new URLStreamLocation(path.toUri().toURL()));
+  }
+
   @Override
   public void update(InputStream is, RubygemsFile file) {
     Path target = toPath(file);
@@ -161,7 +212,7 @@ public class SimpleStorage
       createDirectory(source.getParent());
       Files.copy(is, source);
       Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
-      file.set(Files.newInputStream(target));
+      set(file, target);
     }
     catch (IOException e) {
       file.setException(e);
@@ -191,8 +242,8 @@ public class SimpleStorage
   }
 
   @Override
-  public void memory(InputStream data, RubygemsFile file) {
-    file.set(data);
+  public void memory(ByteArrayInputStream data, RubygemsFile file) {
+    file.set(new BytesStreamLocation(data));
   }
 
   @Override
@@ -204,5 +255,4 @@ public class SimpleStorage
   public String[] listDirectory(Directory dir) {
     return toPath(dir).toFile().list();
   }
-
 }

@@ -79,7 +79,7 @@ public class CachingProxyStorage
   @Override
   public void retrieve(BundlerApiFile file) {
     try {
-      file.set(toUrl(file).openStream());
+      file.set(new URLStreamLocation(toUrl(file)));
     }
     catch (IOException e) {
       file.setException(e);

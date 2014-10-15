@@ -164,7 +164,7 @@ public class NexusStorage
   }
 
   @Override
-  public void memory(InputStream data, RubygemsFile file) {
+  public void memory(ByteArrayInputStream data, RubygemsFile file) {
     memory(data, file, ContentLocator.UNKNOWN_LENGTH);
   }
 
