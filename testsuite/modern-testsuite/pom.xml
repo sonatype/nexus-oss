@@ -46,6 +46,12 @@
         <version>1.2.1</version>
         <type>gem</type>
       </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>bundler</artifactId>
+        <version>1.7.3</version>
+        <type>gem</type>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
