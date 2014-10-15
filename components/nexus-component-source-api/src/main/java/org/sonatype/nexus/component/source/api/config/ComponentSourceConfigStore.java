@@ -31,7 +31,7 @@ public interface ComponentSourceConfigStore
 {
   /**
    * Creates a new {@link ComponentSourceId} based on a user-provided name, which should be invoked to provide new
-   * sources an {@link ComponentSourceConfig#getSourceId()} () id}.
+   * sources an {@link ComponentSourceConfig#getSourceId() id}.
    *
    * To find the id of a source currently in use, use {@link ComponentSourceRegistry#getSource(String)}.
    */

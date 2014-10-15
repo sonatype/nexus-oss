@@ -36,7 +36,7 @@ public interface ViewConfigStore
    *
    * To find an existing view based on its name, use {@link ViewRegistry#getView(String)}.
    */
-  public ViewId createId(String name);
+  ViewId createId(String name);
 
   /**
    * Adds a config
