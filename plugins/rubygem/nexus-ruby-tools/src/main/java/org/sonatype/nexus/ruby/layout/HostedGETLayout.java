@@ -23,6 +23,7 @@ import org.sonatype.nexus.ruby.GemspecFile;
 import org.sonatype.nexus.ruby.GemspecHelper;
 import org.sonatype.nexus.ruby.IOUtil;
 import org.sonatype.nexus.ruby.RubygemsGateway;
+import org.sonatype.nexus.ruby.SpecsHelper;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexType;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
@@ -123,13 +124,14 @@ public class HostedGETLayout
       SpecsIndexFile specs = specsIndexFile(SpecsIndexType.RELEASE);
       store.retrieve(specs);
       List<String> versions;
+      SpecsHelper specsHelper = gateway.newSpecsHelper();
       try (InputStream is = store.getInputStream(specs)) {
-        versions = gateway.newSpecsHelper().listAllVersions(file.name(), is);
+        versions = specsHelper.listAllVersions(file.name(), is);
       }
       specs = specsIndexFile(SpecsIndexType.PRERELEASE);
       store.retrieve(specs);
       try (InputStream is = store.getInputStream(specs)) {
-        versions.addAll(gateway.newSpecsHelper().listAllVersions(file.name(), is));
+        versions.addAll(specsHelper.listAllVersions(file.name(), is));
       }
 
       DependencyHelper gemspecs = gateway.newDependencyHelper();

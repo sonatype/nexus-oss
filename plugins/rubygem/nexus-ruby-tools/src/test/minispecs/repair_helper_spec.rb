@@ -1,23 +1,11 @@
-require 'nexus/rubygems'
+require 'nexus/repair_helper_impl'
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'stringio'
 
-describe Nexus::Rubygems do
+describe Nexus::RepairHelperImpl do
 
-  subject { Nexus::Rubygems.new }
-
-  let( :nothing ) do
-    tmp = File.join( 'target', 'merge_nothing' )
-    File.open( tmp, 'w' ){ |f| f.print Marshal.dump( [ a1java, a2, b4 ] ) }
-    tmp
-  end
-
-  let( :something ) do
-    tmp = File.join( 'target', 'merge_something' )
-    File.open( tmp, 'w' ){ |f| f.print Marshal.dump( [ a2java, a2 ] ) }
-    tmp
-  end
+  subject { Nexus::RepairHelperImpl.new }
 
   let( :broken_from ) do
     File.join( 'src', 'test', 'resources', 'broken' )

@@ -11,6 +11,7 @@
 # Eclipse Foundation. All other trademarks are the property of their respective owners.
 #
 require 'nexus/rubygems_helper'
+require 'maven/tools/pom'
 
 java_import org.sonatype.nexus.ruby.GemspecHelper
 

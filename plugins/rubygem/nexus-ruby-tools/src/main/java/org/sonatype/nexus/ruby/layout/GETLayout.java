@@ -274,7 +274,7 @@ public class GETLayout
    */
   protected DependencyData newDependencyData(DependencyFile file) throws IOException {
     try(InputStream is = store.getInputStream(file)) {
-      return gateway.dependencies(is, file.name(), store.getModified(file));
+      return gateway.newDependencyData(is, file.name(), store.getModified(file));
     }
   }
 

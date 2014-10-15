@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.ruby.FileType;
+import org.sonatype.nexus.ruby.RepairHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.SpecsIndexType;
@@ -248,8 +249,9 @@ public class DefaultProxyRubyRepository
       retrieveItem(true, request);
     }
     String directory = getBaseDirectory();
-    gateway.purgeBrokenDepencencyFiles(directory);
-    gateway.purgeBrokenGemspecFiles(directory);
+    RepairHelper repair = gateway.newRepairHelper();
+    repair.purgeBrokenDepencencyFiles(directory);
+    repair.purgeBrokenGemspecFiles(directory);
   }
 
   private String getBaseDirectory() {

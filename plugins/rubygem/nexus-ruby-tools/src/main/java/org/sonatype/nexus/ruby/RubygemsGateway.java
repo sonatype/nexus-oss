@@ -14,17 +14,15 @@ package org.sonatype.nexus.ruby;
 
 import java.io.InputStream;
 
-import org.jruby.runtime.builtin.IRubyObject;
-
+/**
+ * factory for all the ruby classes. all those ruby classes come with java interface
+ * so they can be used easily from java.
+ * 
+ * @author christian
+ *
+ */
 public interface RubygemsGateway
 {
-  void recreateRubygemsIndex(String directory);
-
-  void purgeBrokenDepencencyFiles(String directory);
-
-  void purgeBrokenGemspecFiles(String directory);
-
-  DependencyData dependencies(InputStream inputStream, String name, long modified);
 
   /**
    * create a new instance of <code>GemspecHelper</code>
@@ -57,4 +55,20 @@ public interface RubygemsGateway
    * @return an empty MergeSpecsHelper
    */
   MergeSpecsHelper newMergeSpecsHelper();
+
+  /**
+   * create a new instance of <code>RepairHelper</code>
+   * @return an empty DependencyHelper
+   */
+  RepairHelper newRepairHelper();
+
+  /**
+   * create a new instance of <code>DependencyData</code> and parse
+   * the given dependency data
+   * @param dependency the input-stream with the dependency data
+   * @param name of gem of the dependency data
+   * @param modified when the dependency data were last modified
+   * @return dependency data
+   */
+  DependencyData newDependencyData(InputStream dependency, String name, long modified);
 }

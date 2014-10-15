@@ -1,4 +1,4 @@
-require 'nexus/rubygems'
+require 'nexus/merge_specs_helper_impl'
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'stringio'
@@ -6,7 +6,7 @@ require 'stringio'
 describe Nexus::MergeSpecsHelperImpl do
 
   # just create it the same as the java app would do it
-  subject { Nexus::Rubygems.new.new_merge_specs_helper }
+  subject { Nexus::MergeSpecsHelperImpl.new }
 
   let( :a1java ) { [ 'a', '1', 'java' ] }
   let( :a2java ) { [ 'a', '2', 'java' ] }

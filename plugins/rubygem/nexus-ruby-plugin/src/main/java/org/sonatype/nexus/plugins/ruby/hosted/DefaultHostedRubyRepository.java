@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.ruby.RepairHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.layout.HostedRubygemsFileSystem;
@@ -168,8 +169,9 @@ public class DefaultHostedRubyRepository
     if (log.isDebugEnabled()) {
       log.debug("recreate rubygems metadata in {}", directory);
     }
-    gateway.recreateRubygemsIndex(directory);
-    gateway.purgeBrokenDepencencyFiles(directory);
+    RepairHelper repair = gateway.newRepairHelper();
+    repair.recreateRubygemsIndex(directory);
+    repair.purgeBrokenDepencencyFiles(directory);
   }
 
   protected String getBaseDirectory() throws LocalStorageException {
