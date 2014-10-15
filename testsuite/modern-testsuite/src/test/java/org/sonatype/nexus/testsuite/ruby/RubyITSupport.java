@@ -211,7 +211,7 @@ public abstract class RubyITSupport
 
     if (withBundler) {
       // install nexus + bundler gem
-      File bundlerGem = testData().resolveFile("bundler.gem");
+      File bundlerGem = artifactResolver().resolveFromDependencyManagement("rubygems", "bundler", "gem", null, null, null);
       gemRunner().install(nexusGem, bundlerGem);
     }
     else {
