@@ -13,18 +13,40 @@
 
 package org.sonatype.nexus.testsuite.ruby;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
 
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.client.core.condition.NexusStatusConditions.any27AndLater;
+import static org.sonatype.nexus.testsuite.ruby.TestUtils.lastLine;
 
 public class DownloadsOnEmptyRepositoriesIT
     extends RubyITSupport
 {
   public DownloadsOnEmptyRepositoriesIT(String repoId) {
     super(repoId);
+  }
+
+  @Test
+  public void uploadGemWithPushCommand() throws Exception {
+    // make sure the credentials file has the right permissions otherwise the push command fails silently
+    Files.setPosixFilePermissions(new File(getBundleTargetDirectory(), ".gem/credentials").toPath(),
+        PosixFilePermissions.fromString("rw-------"));
+
+    File gem = testData().resolveFile("pre-0.1.0.beta.gem");
+    assertThat(lastLine(gemRunner().push("gemshost", gem)),
+        equalTo("Pushing gem to http://127.0.0.1:"+nexus().getPort()+"/nexus/content/repositories/gemshost..."));
+
+    assertGem("gemshost", gem.getName());
+
+    // install the "pre" gem from repository
+    assertThat(lastLine(gemRunner().install("gemshost", "--pre", "pre")), equalTo("1 gem installed"));
   }
 
   @Test

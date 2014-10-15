@@ -43,6 +43,7 @@ import org.junit.runners.Parameterized;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
@@ -115,6 +116,8 @@ public abstract class RubyITSupport
   public void cleanup() {
     if (ruby != null) {
       ruby.terminate();
+      bundleRunner = null;
+      gemRunner = null;
     }
   }
 
@@ -247,5 +250,17 @@ public abstract class RubyITSupport
   protected RubyGroupRepository createRubyGroupRepository(final String id, final String... members) {
     checkNotNull(id);
     return repositories().create(RubyGroupRepository.class, id).withName(id).addMember(members).save();
+  }
+
+  protected void assertGem(String repoId, String name) {
+    String gemName = "gems/" + name;
+    String gemspecName = "quick/Marshal.4.8/" + name + "spec.rz";
+    String dependencyName = "api/v1/dependencies/" + name.replaceFirst("-.*$", ".json.rz");
+
+    assertFileDownload(repoId, gemName, is(true));
+    assertFileDownload(repoId, gemspecName, is(true));
+    assertFileDownload(repoId, "api/" + gemName, is(true));
+    assertFileDownload(repoId, "api/" + gemspecName, is(true));
+    assertFileDownload(repoId, dependencyName, is(true));
   }
 }

@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.testsuite.ruby;
 
 import java.io.File;
@@ -18,40 +17,37 @@ import java.io.File;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.testsuite.ruby.TestUtils.lastLine;
 import static org.sonatype.nexus.testsuite.ruby.TestUtils.numberOfLines;
 
-public abstract class GemLifecycleITSupport
+public class GemLifecycleIT
     extends RubyITSupport
 {
-  protected String repoId;
 
-  public GemLifecycleITSupport(final String nexusBundleCoordinates, final String repoId) {
+  public GemLifecycleIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
-    this.repoId = repoId;
   }
-
-  @Test
-  public void installPrereleasedGem() throws Exception {
-    File preGem = testData().resolveFile("pre-0.1.0.beta.gem");
-    String result = gemRunner().install(preGem);
-    assertThat(result, containsString("Successfully installed pre-0.1.0.beta"));
-  }
-
-  int numberOfInstalledGems = 1;
 
   @Test
   public void uploadGemWithNexusGemCommand() throws Exception {
+    uploadGemWithNexusGemCommand("gemshost");
+    uploadGemWithNexusGemCommand("gemsproxy");
+    uploadGemWithNexusGemCommand("gemshostgroup");
+    uploadGemWithNexusGemCommand("gemsproxygroup");
+    uploadGemWithNexusGemCommand("gemsgroup");
+  }
+
+  private void uploadGemWithNexusGemCommand(String repoId) throws Exception {
+    log("== START {}", repoId);
+    cleanup();
+
     File nexusGem = installLatestNexusGem();
 
     String gemName = "gems/" + nexusGem.getName();
     String gemspecName = "quick/Marshal.4.8/" + nexusGem.getName() + "spec.rz";
-    String dependencyName = "api/v1/dependencies/" +
-        nexusGem.getName().replaceFirst("-.*$", ".json.rz");
 
     // make sure our gem is not on the repository
     assertFileDownload(repoId, gemName, is(false));
@@ -64,12 +60,10 @@ public abstract class GemLifecycleITSupport
     assertThat(nx1, lastLine(nx1), equalTo("Created"));
     assertThat(nx2, lastLine(nx2), endsWith("not allowed"));
 
-    assertFileDownload(repoId, gemName, is(true));
-    assertFileDownload(repoId, gemspecName, is(true));
-    assertFileDownload(repoId, dependencyName, is(true));
+    assertGem(repoId, nexusGem.getName());
 
     // now we have one remote gem
-    assertThat(numberOfLines(gemRunner().list(repoId)), is(numberOfInstalledGems));
+    assertThat(numberOfLines(gemRunner().list(repoId)), is(1));
 
     // reinstall the gem from repository
     assertThat(lastLine(gemRunner().install(repoId, "nexus")), equalTo("1 gem installed"));
@@ -78,22 +72,22 @@ public abstract class GemLifecycleITSupport
     // mismatch filenames on upload
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("something went wrong"));
 
-    moreAsserts(gemName, gemspecName, dependencyName);
+    moreAsserts(repoId, gemName, gemspecName, 
+        "api/v1/dependencies/" + nexusGem.getName().replaceFirst("-.*$", ".json.rz"));
 
     winGem = testData().resolveFile("win-2-x86-mswin32-60.gem");
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("Created"));
 
-    assertFileDownload(repoId, "gems/" + winGem.getName(),
-        is(true));
-    assertFileDownload(repoId, "quick/Marshal.4.8/" + winGem.getName() + "spec.rz",
-        is(true));
-    assertFileDownload(repoId, "api/v1/dependencies/" + winGem.getName().replaceFirst("-.*$", ".json.rz"),
-        is(true));
+    assertGem(repoId, winGem.getName());
+
+    // just cleanup
+    assertFileRemoval("gemshost", "gems/" + winGem.getName(), is(true));
+
+    log("== END {}", repoId);
   }
 
-  abstract void moreAsserts(String gemName, String gemspecName, String dependencyName);
-
-  void deleteHostedFiles(String gemName, String gemspecName, String dependencyName) {
+  private void deleteHostedFiles(String gemName, String gemspecName, String dependencyName) {
+    String repoId = "gemshost";
     // can not delete gemspec files
     assertFileRemoval(repoId, gemspecName, is(false));
 
@@ -112,7 +106,8 @@ public abstract class GemLifecycleITSupport
     // TODO specs index files
   }
 
-  void deleteProxiedFiles(String gemName, String gemspecName, String dependencyName) {
+  private void deleteProxiedFiles(String gemName, String gemspecName, String dependencyName) {
+    String repoId = "gemsproxy";
     gemName = gemName.replace("nexus", "n/nexus");
     gemspecName = gemspecName.replace("nexus", "n/nexus");
 
@@ -131,6 +126,17 @@ public abstract class GemLifecycleITSupport
     assertFileDownload(repoId, gemspecName, is(true));
     assertFileDownload(repoId, dependencyName, is(true));
 
+    // just clean up
+    assertFileRemoval(repoId, gemName, is(true));
+    assertFileRemoval(repoId, gemspecName, is(true));
+
     // TODO specs index files
+  }
+
+  private void moreAsserts(String repoId, String gemName, String gemspecName, String dependencyName) {
+    if (repoId.contains("proxy")) {
+      deleteProxiedFiles(gemName, gemspecName, dependencyName);
+    }
+    deleteHostedFiles(gemName, gemspecName, dependencyName);
   }
 }
