@@ -13,8 +13,7 @@
 
 -->
 <features>
-  <feature name="${project.artifactId}" description="${pluginDescription}">
-    <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+  <feature name="${project.artifactId}">
     <!--
     Wrappers that require use of fragments
     -->

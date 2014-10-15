@@ -28,11 +28,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.ops4j.pax.swissbox</groupId>
-      <artifactId>pax-swissbox-bnd</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.ops4j.pax.logging</groupId>
       <artifactId>pax-logging-logback</artifactId>
     </dependency>

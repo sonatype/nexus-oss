@@ -15,37 +15,15 @@ package org.sonatype.nexus.web;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Rendering component, to render error pages.
+ * Template rendering helper.
  *
  * @since 2.8
  */
 public interface TemplateRenderer
 {
-  /**
-   * Renders a standard error page. Passed in responseCode must be greater or equal to 400. All the parameters
-   * must be non-null except for {@code reasonPhrase} and {@code exception}. When this call returns, the
-   * {@link HttpServletResponse} will be commited with rendered error page, and response code set.
-   *
-   * @param request          The servlet request.
-   * @param response         The servlet response.
-   * @param responseCode     The HTTP error code, must be greater of equal to 400.
-   * @param reasonPhrase     The HTTP reason phrase, might be {@code null} (in that case the defaults will be used).
-   * @param errorDescription Error description meant for human consumption, will be rendered on the error page.
-   * @param exception        The exception (if any) that lead to this error condition, might be {@code null}.
-   */
-  void renderErrorPage(HttpServletRequest request,
-                       HttpServletResponse response,
-                       int responseCode,
-                       @Nullable String reasonPhrase,
-                       String errorDescription,
-                       @Nullable Throwable exception)
-      throws IOException;
-
   interface TemplateLocator
   {
     public String name();

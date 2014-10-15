@@ -646,7 +646,7 @@
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-maven-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.0.2</version>
           <extensions>true</extensions>
           <configuration>
             <excludedArtifactIds>
@@ -714,6 +714,7 @@
               Excludes for specific classes which have compatible, yet different licences.
               -->
               <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
+              <exclude>**/nexus-ldap-plugin/**/org/sonatype/security/ldap/LdapEncoder.java</exclude>
             </excludes>
           </configuration>
         </plugin>

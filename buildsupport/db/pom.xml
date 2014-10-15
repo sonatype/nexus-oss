@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <orientdb.version>1.7.8</orientdb.version>
+    <orientdb.version>2.0-M2</orientdb.version>
   </properties>
 
   <dependencyManagement>
@@ -43,12 +43,6 @@
         <groupId>org.mapdb</groupId>
         <artifactId>mapdb</artifactId>
         <version>1.0.4</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.orientechnologies</groupId>
-        <artifactId>orient-commons</artifactId>
-        <version>${orientdb.version}</version>
       </dependency>
 
       <dependency>

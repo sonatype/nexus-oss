@@ -72,32 +72,18 @@ public class BaseUrlHolderFilter
     }
   }
 
-  /**
-   * Calculates the "application root" URL, as seen by client (from {@link HttpServletRequest} made by it),
-   * or if "force base URL" configuration is set, to that URL.
-   */
   @VisibleForTesting
   String calculateBaseUrl(final HttpServletRequest request) {
-    StringBuilder buff = new StringBuilder();
-
+    // if settings forces base-url use that
     if (settings.isEnabled() && settings.isForceBaseUrl() && !Strings.isNullOrEmpty(settings.getBaseUrl())) {
-      buff.append(settings.getBaseUrl());
-    }
-    else {
-      String requestUrl = request.getRequestURL().toString();
-      String pathInfo = request.getPathInfo();
-      if (!Strings.isNullOrEmpty(pathInfo)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - pathInfo.length());
-      }
-
-      String servletPath = request.getServletPath();
-      if (!Strings.isNullOrEmpty(servletPath)) {
-        requestUrl = requestUrl.substring(0, requestUrl.length() - servletPath.length());
-      }
-
-      buff.append(requestUrl);
+      return settings.getBaseUrl();
     }
 
-    return buff.toString();
+    // else calculate from request
+    return String.format("%s://%s:%d%s",
+        request.getScheme(),
+        request.getServerName(),
+        request.getServerPort(),
+        request.getContextPath());
   }
 }
