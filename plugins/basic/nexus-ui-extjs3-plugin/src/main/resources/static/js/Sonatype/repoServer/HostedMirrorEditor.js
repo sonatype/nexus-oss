@@ -129,7 +129,8 @@ NX.define('Sonatype.repoServer.HostedMirrorEditor', {
     var sp = Sonatype.lib.Permissions;
     if (rec.data.resourceURI && sp.checkPermission('nexus:repositorymirrors', sp.READ) &&  rec.data.userManaged)
     {
-      if (rec.data.repoType === 'hosted')
+      if (rec.data.repoType === 'hosted'
+          && (['maven1', 'maven2'].indexOf(rec.data.format) > -1))
       {
         cardPanel.add(new Sonatype.repoServer.HostedMirrorEditor({
           payload : rec,
