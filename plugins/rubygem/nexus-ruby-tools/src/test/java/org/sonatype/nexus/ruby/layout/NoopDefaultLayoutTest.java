@@ -10,13 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.ruby;
+package org.sonatype.nexus.ruby.layout;
 
-import java.io.File;
-
+import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.cuba.DefaultRubygemsFileSystem;
-import org.sonatype.nexus.ruby.layout.DELETELayout;
-import org.sonatype.nexus.ruby.layout.SimpleStorage;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -25,12 +22,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-public class DELETELayoutTest
+public class NoopDefaultLayoutTest
     extends TestSupport
 {
-  private final DefaultRubygemsFileSystem bootstrap =
-      new DefaultRubygemsFileSystem(new DELETELayout(null, new SimpleStorage(new File("target"))),
-          null, null);
+  private final DefaultRubygemsFileSystem bootstrap = new DefaultRubygemsFileSystem(
+      new NoopDefaultLayout(null, null), null, null);
 
   @Test
   public void testSpecsZippedIndex() throws Exception {
@@ -39,17 +35,17 @@ public class DELETELayoutTest
         "/prerelease_specs.4.8.gz",
         "/latest_specs.4.8.gz"
     };
-    assertFound(pathes, FileType.SPECS_INDEX_ZIPPED);
+    assertFiletype(pathes, FileType.SPECS_INDEX_ZIPPED);
   }
 
   @Test
-  public void testSpecsUnzippedIndex() throws Exception {
+  public void testSpecsIndex() throws Exception {
     String[] pathes = {
         "/specs.4.8",
         "/prerelease_specs.4.8",
         "/latest_specs.4.8"
     };
-    assertForbidden(pathes);
+    assertFiletype(pathes, FileType.SPECS_INDEX);
   }
 
   @Test
@@ -108,7 +104,7 @@ public class DELETELayoutTest
   @Test
   public void testApiV1() throws Exception {
     String[] pathes = {"/api/v1/gems", "/api/v1/api_key"};
-    assertForbidden(pathes);
+    assertFiletype(pathes, FileType.API_V1);
   }
 
   @Test
@@ -117,26 +113,26 @@ public class DELETELayoutTest
         "/api/v1/dependencies?gems=nexus", "/api/v1/dependencies/jbundler.json.rz",
         "/api/v1/dependencies/b/bundler.json.rz"
     };
-    assertFound(pathes, FileType.DEPENDENCY);
+    assertFiletype(pathes, FileType.DEPENDENCY);
   }
 
   @Test
   public void testGemspec() throws Exception {
     String[] pathes = {"/quick/Marshal.4.8/jbundler.gemspec.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rz"};
-    assertFound(pathes, FileType.GEMSPEC);
+    assertFiletype(pathes, FileType.GEMSPEC);
   }
 
   @Test
   public void testGem() throws Exception {
     String[] pathes = {"/gems/jbundler.gem", "/gems/b/bundler.gem"};
-    assertFound(pathes, FileType.GEM);
+    assertFiletype(pathes, FileType.GEM);
   }
 
   @Test
   public void testDirectory() throws Exception {
     String[] pathes = {
         "/", "/api", "/api/", "/api/v1", "/api/v1/",
-        "/api/v1/dependencies", "/gems/", "/gems",
+        "/api/v1/dependencies", "/gems/", "/gems"
     };
     assertForbidden(pathes);
     String[] mpathes = {
@@ -176,18 +172,7 @@ public class DELETELayoutTest
 
   protected void assertFiletype(String[] pathes, FileType type) {
     for (String path : pathes) {
-      RubygemsFile file = bootstrap.get(path);
-      assertThat(path, file.type(), equalTo(type));
-      assertThat(path, file.get(), equalTo(null));
-      assertThat(path, file.hasException(), is(false));
-    }
-  }
-
-  protected void assertFound(String[] pathes, FileType type) {
-    for (String path : pathes) {
-      RubygemsFile file = bootstrap.get(path);
-      assertThat(path, file.type(), equalTo(type));
-      assertThat(path, file.notExists(), is(false));
+      assertThat(path, bootstrap.get(path).type(), equalTo(type));
     }
   }
 

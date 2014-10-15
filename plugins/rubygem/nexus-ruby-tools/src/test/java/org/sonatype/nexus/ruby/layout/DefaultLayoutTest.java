@@ -10,11 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.ruby;
+package org.sonatype.nexus.ruby.layout;
 
+import org.sonatype.nexus.ruby.BundlerApiFile;
+import org.sonatype.nexus.ruby.DependencyData;
+import org.sonatype.nexus.ruby.FileType;
+import org.sonatype.nexus.ruby.GemArtifactFile;
+import org.sonatype.nexus.ruby.GemFile;
+import org.sonatype.nexus.ruby.GemspecFile;
+import org.sonatype.nexus.ruby.MavenMetadataFile;
+import org.sonatype.nexus.ruby.MavenMetadataSnapshotFile;
+import org.sonatype.nexus.ruby.PomFile;
+import org.sonatype.nexus.ruby.RubygemsFile;
+import org.sonatype.nexus.ruby.SpecsIndexFile;
+import org.sonatype.nexus.ruby.SpecsIndexType;
+import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 import org.sonatype.nexus.ruby.cuba.DefaultRubygemsFileSystem;
 import org.sonatype.nexus.ruby.cuba.RubygemsFileSystem;
-import org.sonatype.nexus.ruby.layout.DefaultLayout;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
