@@ -493,7 +493,12 @@ NX.define('Sonatype.panels.GridViewer', {
         this.cardPanel.add(panel);
       }
       else {
-        return;
+        panel.add({
+          xtype : 'panel',
+          layout : 'fit',
+          html : '<div class="little-padding">No details available.</div>'
+        });
+        this.cardPanel.add(panel);
       }
     }
     else {
