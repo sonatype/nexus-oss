@@ -16,6 +16,11 @@ import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * {@link DefaultProxyRubyRepository} configuration.
+ *
+ * @since 2.11
+ */
 public class DefaultProxyRubyRepositoryConfiguration
     extends AbstractProxyRepositoryConfiguration
 {

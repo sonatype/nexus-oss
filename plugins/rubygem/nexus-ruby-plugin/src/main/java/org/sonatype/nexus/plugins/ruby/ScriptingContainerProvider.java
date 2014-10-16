@@ -26,9 +26,11 @@ import com.google.common.eventbus.Subscribe;
 import org.jruby.embed.ScriptingContainer;
 
 /**
- * A provider for JRuby scipting container that creates it lazily (ie. if NX instance does not have rubygems
+ * A provider for JRuby scripting container that creates it lazily (ie. if NX instance does not have rubygems
  * repository, the container should not be created either. Also, this provider is an event subscriber, that will
  * terminate the container to have it properly clean up the resources.
+ *
+ * @since 2.11
  */
 @Singleton
 @Named
@@ -41,7 +43,7 @@ public class ScriptingContainerProvider
   @Override
   public synchronized ScriptingContainer get() {
     if (scriptingContainer == null) {
-      log.debug("Creating JRuby ScriptingContainer...");
+      log.debug("Creating JRuby ScriptingContainer");
       scriptingContainer = new ScriptingContainer();
       scriptingContainer.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
     }
@@ -51,7 +53,7 @@ public class ScriptingContainerProvider
   @Subscribe
   public void on(final NexusStoppedEvent event) {
     if (scriptingContainer != null) {
-      log.debug("Terminating JRuby ScriptingContainer...");
+      log.debug("Terminating JRuby ScriptingContainer");
       scriptingContainer.terminate();
     }
   }

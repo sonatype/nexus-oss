@@ -41,6 +41,11 @@ import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 import org.sonatype.nexus.ruby.layout.Storage;
 
+/**
+ * ???
+ *
+ * @since 2.11
+ */
 public class NexusStorage
     implements Storage
 {

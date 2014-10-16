@@ -25,6 +25,11 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * {@link DefaultRubyGroupRepository} template.
+ *
+ * @since 2.11
+ */
 public class DefaultRubyGroupRepositoryTemplate
     extends AbstractRubyGemRepositoryTemplate
 {

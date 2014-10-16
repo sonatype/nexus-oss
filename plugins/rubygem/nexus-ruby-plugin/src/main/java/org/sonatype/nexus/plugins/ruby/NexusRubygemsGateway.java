@@ -21,8 +21,12 @@ import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 
 import org.jruby.embed.ScriptingContainer;
 
+// NOTE: this component is NOT a singleton, but it uses the singleton scripting container.
+
 /**
- * Note: this component is NOT a singleton, but it uses the singleton scripting container.
+ * ???
+ *
+ * @since 2.11
  */
 @Named
 public class NexusRubygemsGateway

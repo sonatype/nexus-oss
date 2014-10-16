@@ -48,6 +48,11 @@ import org.sonatype.nexus.ruby.layout.HostedRubygemsFileSystem;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * Default {@link HostedRubyRepository} implementation.
+ *
+ * @since 2.11
+ */
 @Named(DefaultHostedRubyRepository.ID)
 public class DefaultHostedRubyRepository
     extends AbstractRepository
@@ -66,10 +71,9 @@ public class DefaultHostedRubyRepository
   private final NexusRubygemsFacade facade;
 
   @Inject
-  public DefaultHostedRubyRepository(@Named(RubyContentClass.ID) ContentClass contentClass,
-                                     HostedRubyRepositoryConfigurator configurator,
-                                     RubygemsGateway gateway)
-      throws LocalStorageException, ItemNotFoundException
+  public DefaultHostedRubyRepository(final @Named(RubyContentClass.ID) ContentClass contentClass,
+                                     final HostedRubyRepositoryConfigurator configurator,
+                                     final RubygemsGateway gateway)
   {
     this.contentClass = contentClass;
     this.configurator = configurator;
@@ -108,8 +112,9 @@ public class DefaultHostedRubyRepository
   }
 
   @SuppressWarnings("deprecation")
+  @Override
   public void storeItem(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
-      throws UnsupportedStorageOperationException, IllegalOperationException, org.sonatype.nexus.proxy.StorageException, AccessDeniedException
+      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
   {
     RubygemsFile file = facade.file(request.getRequestPath());
     if (file == null) {
@@ -131,7 +136,7 @@ public class DefaultHostedRubyRepository
   @SuppressWarnings("deprecation")
   @Override
   public void deleteItem(ResourceStoreRequest request)
-      throws org.sonatype.nexus.proxy.StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
+      throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
   {
     facade.handleMutation(this, facade.delete(request.getRequestPath()));
   }

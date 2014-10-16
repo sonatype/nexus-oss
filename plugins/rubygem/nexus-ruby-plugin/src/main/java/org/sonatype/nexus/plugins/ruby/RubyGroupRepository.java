@@ -14,6 +14,11 @@ package org.sonatype.nexus.plugins.ruby;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
+/**
+ * Rubygems group repository.
+ *
+ * @since 2.11
+ */
 public interface RubyGroupRepository
     extends RubyRepository, GroupRepository
 {

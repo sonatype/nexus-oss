@@ -18,6 +18,11 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
+/**
+ * Support for rubygem repository templates.
+ *
+ * @since 2.11
+ */
 public abstract class AbstractRubyGemRepositoryTemplate
     extends AbstractRepositoryTemplate
 {

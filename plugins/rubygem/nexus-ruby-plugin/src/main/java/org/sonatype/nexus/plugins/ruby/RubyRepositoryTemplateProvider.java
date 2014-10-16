@@ -24,6 +24,11 @@ import org.sonatype.nexus.plugins.ruby.proxy.DefaultProxyRubyRepositoryTemplate;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
+/**
+ * Rubygems template provider.
+ *
+ * @since 2.11
+ */
 @Singleton
 @Named(RubyRepositoryTemplateProvider.PROVIDER_ID)
 public class RubyRepositoryTemplateProvider
