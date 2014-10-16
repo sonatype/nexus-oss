@@ -46,6 +46,10 @@ import org.mapdb.TxRollbackException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.blobstore.file.internal.ExternalizationHelper.readNullableLong;
+import static org.sonatype.nexus.blobstore.file.internal.ExternalizationHelper.readNullableString;
+import static org.sonatype.nexus.blobstore.file.internal.ExternalizationHelper.writeNullableLong;
+import static org.sonatype.nexus.blobstore.file.internal.ExternalizationHelper.writeNullableString;
 
 /**
  * MapDB implementation of {@link BlobMetadataStore}.
@@ -206,21 +210,21 @@ public class MapdbBlobMetadataStore
     public void writeExternal(final ObjectOutput out) throws IOException {
       out.writeInt(FORMAT_VERSION);
 
-      out.writeObject(state);
+      out.writeInt(state.ordinal());
 
       out.writeInt(headers.size());
       for (Map.Entry<String, String> header : headers.entrySet()) {
-        out.writeObject(header.getKey());
-        out.writeObject(header.getValue());
+        writeNullableString(out, header.getKey());
+        writeNullableString(out, header.getValue());
       }
 
       out.writeBoolean(metrics);
 
       if (metrics) {
         // writeObject preserves nulls
-        out.writeObject(created == null ? null : created.getMillis());
-        out.writeObject(sha1);
-        out.writeObject(size);
+        writeNullableLong(out, created == null ? null : created.getMillis());
+        writeNullableString(out, sha1);
+        writeNullableLong(out, size);
       }
     }
 
@@ -229,22 +233,22 @@ public class MapdbBlobMetadataStore
       final int version = in.readInt();
       checkState(version == 1, "Version must be 1.");
 
-      state = (BlobState) in.readObject();
+      state = BlobState.values()[in.readInt()];
 
       headers = Maps.newHashMap();
       final int numberOfHeaders = in.readInt();
       for (int i = 0; i < numberOfHeaders; i++) {
-        headers.put((String) in.readObject(), (String) in.readObject());
+        headers.put(readNullableString(in), readNullableString(in));
       }
 
       metrics = in.readBoolean();
       if (metrics) {
-        final Long createdMillis = (Long) in.readObject();
+        final Long createdMillis = readNullableLong(in);
         if (createdMillis != null) {
           created = new DateTime(createdMillis);
         }
-        sha1 = (String) in.readObject();
-        size = (Long) in.readObject();
+        sha1 = readNullableString(in);
+        size = readNullableLong(in);
       }
     }
   }
