@@ -10,10 +10,14 @@
 
   $ui-header-padding: 4px 10px 5px,
   $ui-header-color: #1f1f1f,
-  $ui-header-background-color: #E0E0E0,
+  $ui-header-background-color: #FFFFFF,
   $ui-header-icon-height: 32,
   $ui-header-icon-width: 32,
   $ui-header-text-transform: $panel-light-header-text-transform,
+
+  $ui-wrap-border-width: 0 0 0 1px,
+  $ui-wrap-border-color: #e3e3e3,
+
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
