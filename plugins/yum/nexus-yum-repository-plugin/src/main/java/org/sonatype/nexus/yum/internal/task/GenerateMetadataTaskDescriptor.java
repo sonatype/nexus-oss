@@ -69,8 +69,8 @@ public class GenerateMetadataTaskDescriptor
 
   private final CheckboxFormField forceFullScan = new CheckboxFormField(
       PARAM_FORCE_FULL_SCAN,
-      "Force Full Scan",
-      "Forces a full scan and does not use the cached RPM file list.",
+      "Full Rebuild",
+      "Forces a full rebuild and does not use the cached RPM file list.",
       OPTIONAL
   ).withInitialValue(false);
 
