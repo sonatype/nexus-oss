@@ -62,7 +62,7 @@ public class ComponentSourceBooter
                                final InMemorySourceRegistry sourceRegistry,
                                final Set<ComponentSourceConfigContributor> configContributors, final EventBus eventBus)
   {
-    this.eventBus = eventBus;
+    this.eventBus = checkNotNull(eventBus);
     this.factories = checkNotNull(factories);
     this.configContributors = checkNotNull(configContributors);
     this.sourceConfigStore = checkNotNull(sourceConfigStore);
@@ -96,7 +96,6 @@ public class ComponentSourceBooter
         sourceRegistry.register(factory.createSource(config));
       }
       else {
-        log.error("No source factory found for view config {}", config);
         throw new IllegalStateException("No source factory found for view config " + config);
       }
     }

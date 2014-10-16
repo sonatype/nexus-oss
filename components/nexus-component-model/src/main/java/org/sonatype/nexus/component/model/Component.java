@@ -13,7 +13,7 @@
 package org.sonatype.nexus.component.model;
 
 /**
- * This is a placeholder for Chris' implementation.
+ * This is a placeholder until the implementation in https://github.com/sonatype/nexus-oss/pull/747 is merged.
  *
  * @since 3.0
  */

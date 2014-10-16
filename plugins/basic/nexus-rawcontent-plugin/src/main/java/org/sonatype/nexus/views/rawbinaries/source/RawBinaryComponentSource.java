@@ -147,9 +147,4 @@ public class RawBinaryComponentSource
   public ComponentSourceId getId() {
     return sourceName;
   }
-
-  @Override
-  public boolean isAvailable() {
-    return true;
-  }
 }

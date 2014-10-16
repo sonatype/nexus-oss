@@ -25,9 +25,4 @@ public interface ComponentSource
    * A cluster-wide unique name for this source.
    */
   ComponentSourceId getId();
-
-  /**
-   * Returns {@code true} if the remote source is accessible right now.
-   */
-  boolean isAvailable();
 }
