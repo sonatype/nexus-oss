@@ -167,7 +167,7 @@ public class OrientViewConfigStore
     try (ODatabaseDocumentTx db = openDb()) {
 
       OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
-          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE viewName = ?");
+          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE " + ViewConfigEntityAdapter.P_VIEWNAME + " = ?");
 
       final List<ODocument> results = db.command(query).execute(viewName);
 
