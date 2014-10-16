@@ -30,7 +30,7 @@ public class ViewsModule
 {
   private static final Logger log = LoggerFactory.getLogger(ViewsModule.class);
 
-  public static final String MOUNT_POINT = "/views/*";
+  public static final String MOUNT_POINT = "/view/*";
 
   @Override
   protected void configure() {
