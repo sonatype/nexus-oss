@@ -3217,7 +3217,7 @@
   font-size: 13px;
   font-weight: normal;
   font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  border-width: 0;
+  border-width: 1px;
   border-style: solid;
 }
 
@@ -4445,24 +4445,6 @@
 .x-panel-developer-outer-border-trbl {
   border-color: #444444 !important;
   border-width: 1px !important;
-}
-
-/**
- * ui: 'breadcrumb'
- */
-/* line 75, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-breadcrumb {
-  background-color: #FFFFFF;
-  color: #AAAAAA;
-  font-weight: bold;
-  border-color: #e3e3e3;
-  border-width: 0 0 1px 0;
-  border-style: solid;
-  padding: 6px 6px 6px 21px;
-}
-/* line 84, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-breadcrumb label {
-  padding-right: 7px;
 }
 
 /**
