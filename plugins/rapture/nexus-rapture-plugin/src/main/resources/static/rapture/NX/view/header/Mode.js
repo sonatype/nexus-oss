@@ -22,6 +22,7 @@ Ext.define('NX.view.header.Mode', {
 
   ui: 'headermode',
   toggleGroup: 'mode',
+  cls: 'headermode',
 
   /**
    * @cfg mode Mode name

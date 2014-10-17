@@ -57,6 +57,11 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public abstract class AbstractNexusIntegrationTest
   extends TestSupport
 {
+  /**
+   * Default start timeout value in seconds.
+   */
+  public static final int DEFAULT_START_TIMEOUT = 170;
+
   public static final String REPO_NEXUS_TEST_HARNESS_RELEASE_GROUP = "nexus-test-harness-release-group";
 
   public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
@@ -321,7 +326,7 @@ public abstract class AbstractNexusIntegrationTest
 
       // booting is now asynchronous, so have to wait for Nexus
       Thread.sleep(10000);
-      for (int i = 0; i < 170; i++) {
+      for (int i = 0; i < DEFAULT_START_TIMEOUT; i++) {
         try {
           if (getNexusStatusUtil().isNexusRunning()) {
             return;
