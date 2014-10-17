@@ -351,16 +351,10 @@
                 <replace file="${project.build.directory}/assembly/bin/karaf" token="-Dcom.sun.management.jmxremote"/>
                 <replace file="${project.build.directory}/assembly/bin/karaf.bat" token="-Dcom.sun.management.jmxremote"/>
 
-                <!-- temporary patch for KARAF-3249: dirname error if the distribution path contains spaces -->
-                <replace file="${project.build.directory}/assembly/bin/karaf" token='name $0' value='name "$0"'/>
-                <replace file="${project.build.directory}/assembly/bin/start" token='name $0' value='name "$0"'/>
-                <replace file="${project.build.directory}/assembly/bin/status" token='name $0' value='name "$0"'/>
-                <replace file="${project.build.directory}/assembly/bin/stop" token='name $0' value='name "$0"'/>
-
                 <replace file="${project.build.directory}/assembly/etc/config.properties">
                   <!-- include a few additional extra packages required by our environment -->
                   <replacefilter token="packages.extra="
-                                 value="packages.extra= \${line.separator} sun.misc, \${line.separator} sun.security.ssl, \${line.separator} com.sun.net.httpserver, \${line.separator} javax.annotation;version=1.2, \${line.separator} javax.annotation.security;version=1.2, \${line.separator} org.xerial.snappy,"/>
+                                 value="packages.extra= \${line.separator} sun.security.ssl, \${line.separator} com.sun.net.httpserver, \${line.separator} javax.annotation;version=1.2, \${line.separator} javax.annotation.security;version=1.2, \${line.separator} org.xerial.snappy,"/>
                   <!-- comment this so mvn: protocol is active as soon as possible -->
                   <replacefilter token="org.ops4j.pax.url.mvn.requireConfigAdminConfig"
                                  value="#org.ops4j.pax.url.mvn.requireConfigAdminConfig"/>
@@ -368,9 +362,9 @@
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
-                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features"/>
-                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.0/xml/features"/>
-                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.1/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.2/xml/features"/>
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.2/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.2/xml/features"/>
                   <replacefilter token=",kar,ssh,management"/>
                   <replacefilter token=",region"/>
                 </replace>
@@ -379,9 +373,6 @@
                   <!-- pax-logging-service (log4j) with pax-logging-logback plus our metrics support -->
                   <replacefilter token="${mvn:pax-logging-service}"
                                  value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}"/>
-                  <!-- update pax-swissbox-bnd from default to version we ship -->
-                  <replacefilter token="mvn\:org.ops4j.pax.swissbox/pax-swissbox-bnd/1.7.0"
-                                 value="${mvn:pax-swissbox-bnd}"/>
                 </replace>
               </target>
             </configuration>
