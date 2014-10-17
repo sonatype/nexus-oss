@@ -52,17 +52,15 @@ public class RubygemsGatewayTest
   public void testGenerateGemspecRz() throws Exception {
     String gem = "src/test/resources/gems/n/nexus-0.1.0.gem";
 
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    InputStream is = spec.getRzInputStream();
-    int c = is.read();
-    String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
-    FileOutputStream out = new FileOutputStream(gemspecPath);
-    while (c != -1) {
-      out.write(c);
-      c = is.read();
+    GemspecHelper spec;
+    try (InputStream is = new FileInputStream(gem)) {
+      spec = gateway.newGemspecHelperFromGem(is);
     }
-    out.close();
-    is.close();
+
+    String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
+    try (InputStream is = spec.getRzInputStream()) {
+      dumpStream(is, new File(gemspecPath));
+    }
 
     boolean equalSpecs = testScriptingContainerRule.get().callMethod(check,
         "check_gemspec_rz",
@@ -75,7 +73,10 @@ public class RubygemsGatewayTest
   public void testPom() throws Exception {
     File some = new File("src/test/resources/rb-fsevent-0.9.4.gemspec.rz");
 
-    String pom = gateway.newGemspecHelper(new FileInputStream(some)).pom(false);
+    String pom;
+    try (InputStream is = new FileInputStream(some)) {
+      pom = gateway.newGemspecHelper(is).pom(false);
+    }
     assertThat(pom.replace("\n", "").replaceAll("<developers>.*$", "").replaceAll("^.*<name>|</name>.*$", ""),
         equalTo("Very simple &amp; usable FSEvents API"));
   }
@@ -86,7 +87,9 @@ public class RubygemsGatewayTest
 
     // create empty dependencies file
     DependencyHelper deps = gateway.newDependencyHelper();
-    dumpStream(deps.getInputStream(false), empty);
+    try (InputStream is = deps.getInputStream(false)) {
+      dumpStream(is, empty);
+    }
 
     int size = testScriptingContainerRule.get().callMethod(check,
         "specs_size",
@@ -98,17 +101,8 @@ public class RubygemsGatewayTest
   private void dumpStream(final InputStream is, File target)
       throws IOException
   {
-    try {
-      FileOutputStream output = new FileOutputStream(target);
-      try {
-        IOUtils.copy(is, output);
-      }
-      finally {
-        IOUtils.closeQuietly(output);
-      }
-    }
-    finally {
-      IOUtils.closeQuietly(is);
+    try (FileOutputStream output = new FileOutputStream(target)) {
+      IOUtils.copy(is, output);
     }
   }
 }

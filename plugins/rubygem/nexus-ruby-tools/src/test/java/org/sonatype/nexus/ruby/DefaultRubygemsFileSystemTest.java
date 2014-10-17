@@ -21,10 +21,10 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class DefaultBootstrapTest
+public class DefaultRubygemsFileSystemTest
     extends TestSupport
 {
-  private final DefaultRubygemsFileSystem bootstrap = new DefaultRubygemsFileSystem();
+  private final DefaultRubygemsFileSystem fileSystem = new DefaultRubygemsFileSystem();
 
   @Test
   public void testSpecsZippedIndex() throws Exception {
@@ -169,7 +169,7 @@ public class DefaultBootstrapTest
 
   protected void assertFiletype(String[] pathes, FileType type) {
     for (String path : pathes) {
-      assertThat(path, bootstrap.file(path).type(), equalTo(type));
+      assertThat(path, fileSystem.file(path).type(), equalTo(type));
     }
   }
 }
