@@ -57,21 +57,19 @@ public class ComponentViewServlet
       throws ServletException, IOException
   {
     final ViewNameParser viewNameParser = new ViewNameParser(req.getPathInfo());
-    req.getQueryString();
 
     final View view = viewRegistry.getView(viewNameParser.getViewName());
     if (view == null) {
       throw new ErrorStatusException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "View not found.");
     }
 
-    final ViewRequest request = new WrappingViewRequest(req, viewNameParser.getViewName(), view.getConfig(),
+    final ViewRequest request = new HttpViewRequest(req, viewNameParser.getViewName(), view.getConfig(),
         viewNameParser.getRemainingPath(), req.getQueryString());
 
     try {
       view.dispatch(request).send(resp);
     }
     catch (Exception e) {
-
       Throwables.propagate(e);
     }
   }

@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.componentviews;
 
+import org.sonatype.nexus.componentviews.Router.Route;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 
+import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +46,21 @@ public class View
   }
 
   public ViewResponse dispatch(final ViewRequest request) {
-    final Handler handler = router.findHandler(request);
+    final Route route = router.findRoute(request);
 
-    if (handler == null) {
-      return noRouteHandler.handle(request);
+    final HandlerContext context = new HandlerContext(request, route.getHandlers());
+
+    try {
+      if (route == null) {
+        return noRouteHandler.handle(context);
+      }
+
+      return context.proceed();
     }
-
-    // No exception handling here presumes that these will get caught by a global filter and nicely reported as
-    // 500 errors.
-    return handler.handle(request);
+    catch (Exception e) {
+      // Exceptions will get caught by a global filter and nicely reported as 500 errors.
+      throw Throwables.propagate(e);
+    }
   }
 
   public ViewConfig getConfig() {

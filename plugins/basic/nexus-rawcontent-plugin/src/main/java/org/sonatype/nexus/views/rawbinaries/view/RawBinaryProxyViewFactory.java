@@ -19,6 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
+import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
@@ -29,6 +30,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Arrays.asList;
 
 /**
  * Transforms {@link ViewConfig config} for raw binary proxy views into actual {@link View} objects.
@@ -78,10 +80,10 @@ public class RawBinaryProxyViewFactory
 
     checkState(source != null, "PullComponentSource %s not found while trying to create view %s.", sourceName, config);
 
+    final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(binaryStore, source);
     final HostedRawBinariesHandler hosted = new HostedRawBinariesHandler(binaryStore);
-    final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(hosted, binaryStore, source);
 
-    router.addRoute(binariesRequestMatcher, proxyingWrapper);
+    router.addRoute(binariesRequestMatcher, asList(proxyingWrapper, hosted));
 
     return new View(config, router, notFoundHandler);
   }
