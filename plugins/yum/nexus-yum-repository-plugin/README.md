@@ -330,10 +330,6 @@ and run _sudo yum update_ on your _production_ machine.
 Version aliases let you create versionized views on your Maven RPM repositories, which is useful your RPM staging, but
 don't let you stage your whole bunch of artifacts like RPMs, JARs, WARs, Docs, etc. together. For this you need _Nexus Professional_.
 
-## Help & Issues
-
-Ask for help at our [Google Group][7] or [create a new issue][8].
-
 ## How to build
 
 The build process is based on [Apache Maven 3][3]. You must have [createrepo][10] installed in order to execute all 
@@ -349,8 +345,6 @@ to run all tests and create a plugin bundle.
 [4]: http://www.immobilienscout24.de
 [5]: http://blog.schlomo.schapiro.org/2011/05/configuration-management-with.html
 [6]: http://www.slideshare.net/actionjackx/automated-java-deployments-with-rpm
-[7]: https://groups.google.com/group/nexus-yum-repository-plugin/
-[8]: https://github.com/sonatype/nexus-yum-repository-plugin/issues/new
 [9]: http://www.sonatype.com/books/nexus-book/reference/install-sect-install.html
 [10]: http://createrepo.baseurl.org/
 [11]: http://code.google.com/p/nexus-yum-repository-plugin/issues/detail?id=4
