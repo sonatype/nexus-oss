@@ -65,4 +65,19 @@
   $ui-header-background-color: #3d4e7e
 );
 
+/**
+ * ui: 'breadcrumb'
+ */
+.x-panel-breadcrumb {
+  background-color: #FFFFFF;
+  color:#AAAAAA;
+  font-weight:bold;
+  border-color: #e3e3e3;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  padding: 6px 6px 6px 21px;
 
+  label {
+    padding-right: 7px;
+  }
+}

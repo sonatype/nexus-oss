@@ -4446,6 +4446,24 @@
 }
 
 /**
+ * ui: 'breadcrumb'
+ */
+/* line 71, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-breadcrumb {
+  background-color: #FFFFFF;
+  color: #AAAAAA;
+  font-weight: bold;
+  border-color: #e3e3e3;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  padding: 6px 6px 6px 21px;
+}
+/* line 80, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-breadcrumb label {
+  padding-right: 7px;
+}
+
+/**
  * @class Ext.window.Window
  */
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */

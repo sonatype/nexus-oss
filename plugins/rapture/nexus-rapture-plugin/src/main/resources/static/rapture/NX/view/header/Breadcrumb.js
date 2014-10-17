@@ -18,22 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.view.header.Breadcrumb', {
-  extend: 'Ext.container.Container',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-header-breadcrumb',
+
+  ui: 'breadcrumb',
 
   layout: {
     type: 'hbox',
     align: 'stretch',
     pack: 'start'
-  },
-
-  padding: '6px 6px 6px 21px',
-
-  style: {
-    'background-color': '#FFFFFF',
-    'color': '#AAAAAA',
-    'font-weight': 'bold',
-    'border': 'solid #e3e3e3',
-    'border-width': '0 0 1px 0'
   }
 });

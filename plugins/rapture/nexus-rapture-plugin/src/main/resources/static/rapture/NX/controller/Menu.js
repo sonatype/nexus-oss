@@ -223,7 +223,7 @@ Ext.define('NX.controller.Menu', {
         if (modeButton && modeButton.title) {
           me.getHeaderBreadcrumb().add(
             [
-              { xtype: 'label', text: modeButton.title, style: { 'padding-right': padding } }
+              { xtype: 'label', text: modeButton.title }
             ]
           );
         }
@@ -232,8 +232,8 @@ Ext.define('NX.controller.Menu', {
         for (var e in elements) {
           me.getHeaderBreadcrumb().add(
               [
-                  { xtype: 'label', text: '/', style: { 'padding-right': padding } },
-                  { xtype: 'label', text: elements[e], style: { 'padding-right': padding } }
+                  { xtype: 'label', text: '/' },
+                  { xtype: 'label', text: elements[e] }
               ]
           );
         }
