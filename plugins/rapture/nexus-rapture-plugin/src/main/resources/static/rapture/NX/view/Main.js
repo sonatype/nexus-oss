@@ -39,8 +39,8 @@ Ext.define('NX.view.Main', {
       border: false,
       collapsible: false,
       collapsed: false,
-      resizable: false
-      /*resizeHandles: 'e'*/
+      resizable: false,
+      header: false
     },
 
     {
@@ -87,7 +87,7 @@ Ext.define('NX.view.Main', {
 
     me.callParent();
 
-    me.down('nx-header-panel>toolbar').add([
+    me.down('nx-header-toolbar>toolbar').add([
       ' ', ' ', // 2x pad
       { xtype: 'nx-header-dashboard-mode' },
       { xtype: 'nx-header-search-mode' },

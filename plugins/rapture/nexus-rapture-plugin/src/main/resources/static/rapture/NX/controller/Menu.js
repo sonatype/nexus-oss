@@ -58,6 +58,10 @@ Ext.define('NX.controller.Menu', {
     {
       ref: 'headerPanel',
       selector: 'nx-header-panel'
+    },
+    {
+      ref: 'headerBreadcrumb',
+      selector: 'nx-header-breadcrumb'
     }
   ],
 
@@ -209,6 +213,33 @@ Ext.define('NX.controller.Menu', {
     if (featureModel) {
       path = featureModel.get('path');
       if (path && path.length > 0) {
+
+        Ext.suspendLayouts();
+
+        me.getHeaderBreadcrumb().removeAll();
+
+        var padding = "7px";
+        var modeButton = me.getHeaderPanel().down('button[mode=' + me.mode + ']');
+        if (modeButton && modeButton.title) {
+          me.getHeaderBreadcrumb().add(
+            [
+              { xtype: 'label', text: modeButton.title, style: { 'padding-right': padding } }
+            ]
+          );
+        }
+
+        var elements = path.split("/").slice(2);
+        for (var e in elements) {
+          me.getHeaderBreadcrumb().add(
+              [
+                  { xtype: 'label', text: '/', style: { 'padding-right': padding } },
+                  { xtype: 'label', text: elements[e], style: { 'padding-right': padding } }
+              ]
+          );
+        }
+
+        Ext.resumeLayouts(true);
+
         me.fireEvent('featureselected', featureModel);
       }
     }

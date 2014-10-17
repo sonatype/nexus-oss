@@ -20,63 +20,9 @@
 Ext.define('NX.view.header.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-header-panel',
-  requires: [
-    'NX.State'
-  ],
 
-  layout: {
-    type: 'vbox',
-    align: 'stretch',
-    pack: 'start'
-  },
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.items = [
-      { xtype: 'nx-header-branding', hidden: true },
-      {
-        xtype: 'toolbar',
-
-        // TODO replace style with UI
-        style: {
-          backgroundColor: '#000000'
-        },
-        anchor: '100%',
-        padding: "0 0 0 21px",
-
-        defaults: {
-          scale: 'medium'
-        },
-
-        items: [
-          { xtype: 'nx-header-logo' },
-          {
-            xtype: 'label',
-            text: 'Sonatype Nexus',
-            style: {
-                'color': '#FFFFFF',
-                'font-size': '20px',
-                'font-weight': 200
-            }
-          },
-          {
-            xtype: 'label',
-            text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
-            style: {
-                'color': '#FFFFFF',
-                'font-size': '10px',
-                'font-weight': 'bold',
-                'top': '17px !important'
-            }
-          }
-        ]
-      }
-    ];
-
-    me.callParent();
-  }
+  items: [
+    { xtype: 'nx-header-toolbar' },
+    { xtype: 'nx-header-breadcrumb' }
+  ]
 });

@@ -2828,16 +2828,9 @@
   margin-top: 4px;
 }
 
-/*@include extjs-toolbar-ui(
-  $ui: 'georgethemonkey',
-
-  $background-color: "#FFFFFF"
-);*/
-/* line 7, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/Toolbar.scss */
-.x-toolbar .x-box-inner {
+/*.x-toolbar .x-box-inner {
   overflow: visible;
-}
-
+}*/
 /**
  * @class Ext.panel.Panel
  */
@@ -3222,7 +3215,7 @@
   font-size: 13px;
   font-weight: normal;
   font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  border-width: 1px;
+  border-width: 0;
   border-style: solid;
 }
 
