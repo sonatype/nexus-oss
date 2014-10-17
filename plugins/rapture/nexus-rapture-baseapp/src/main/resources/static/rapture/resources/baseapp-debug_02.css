@@ -12200,3 +12200,24 @@
 .x-form-trigger-input-cell {
   background-color: rgba(0, 0, 0, 0);
 }
+
+/**
+ * @class Ext.toolbar.TextItem
+ */
+/**
+ * ui: 'product-name'
+ */
+/* line 8, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+.product-name {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 200px;
+}
+
+/* line 14, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+.product-version {
+  color: #FFFFFF;
+  font-size: 10px;
+  letter-spacing: 1px;
+  top: 15px !important;
+}

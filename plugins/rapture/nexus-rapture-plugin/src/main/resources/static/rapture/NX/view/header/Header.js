@@ -55,23 +55,14 @@ Ext.define('NX.view.header.Header', {
         items: [
           { xtype: 'nx-header-logo' },
           {
-            xtype: 'label',
-            text: 'Sonatype Nexus',
-            style: {
-              'color': '#FFFFFF',
-              'font-size': '20px',
-              'font-weight': 200
-            }
+            xtype: 'tbtext',
+            cls: 'product-name',
+            text: 'Sonatype Nexus'
           },
           {
-            xtype: 'label',
-            text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
-            style: {
-              'color': '#FFFFFF',
-              'font-size': '10px',
-              'font-weight': 'bold',
-              'top': '17px !important'
-            }
+            xtype: 'tbtext',
+            cls: 'product-version',
+            text: NX.State.getEdition() + ' ' + NX.State.getVersion()
           }
         ]
       }

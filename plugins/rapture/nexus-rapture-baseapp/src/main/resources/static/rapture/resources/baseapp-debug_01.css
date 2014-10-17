@@ -67,11 +67,6 @@
 /**
  * @class Ext.Component
  */
-/* line 11, ../../../baseapp/packages/rapture-theme/sass/var/Ext/Component.scss */
-html {
-  -webkit-font-smoothing: antialiased !important;
-}
-
 /**
  * @class Ext.tip.QuickTip
  */
