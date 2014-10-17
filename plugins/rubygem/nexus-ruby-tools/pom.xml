@@ -30,6 +30,12 @@
       <groupId>org.jruby</groupId>
       <artifactId>jruby</artifactId>
       <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jruby</groupId>
+          <artifactId>yecht</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
