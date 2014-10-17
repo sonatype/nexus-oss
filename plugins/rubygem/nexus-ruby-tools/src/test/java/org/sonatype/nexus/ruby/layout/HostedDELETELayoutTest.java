@@ -31,7 +31,6 @@ import org.sonatype.nexus.ruby.layout.SimpleStorage.URLGzipStreamLocation;
 import org.sonatype.nexus.ruby.layout.SimpleStorage.URLStreamLocation;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -178,8 +177,8 @@ public class HostedDELETELayoutTest
         "/maven/prereleases/rubygems/pre/0.1.0.beta-SNAPSHOT/jbundler-0.1.0.beta-123213123.pom"
     };
     String[] xmls = {
-        IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("pre.pom")),
-        IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("pre-snapshot.pom"))
+        loadPomResource("pre.pom"),
+        loadPomResource("pre-snapshot.pom")
     };
     assertFiletypeWithPayload(pathes, FileType.POM, xmls);
     pathes = new String[]{"/maven/releases/rubygems/zip/2.0.2/zip-2.0.2.pom"};

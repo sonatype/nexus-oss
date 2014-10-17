@@ -47,7 +47,7 @@ public class MetadataBuilderTest
 
   @Test
   public void testReleaseXml() throws Exception {
-    String xml = IOUtils.toString(asStream("metadata-releases.xml"));
+    String xml = IOUtils.toString(asStream("metadata-releases.xml")).replaceFirst("(?s)^.*<meta", "<meta");
     builder.appendVersions(false);
     //System.err.println( builder.toString() );
     //System.out.println( xml );
@@ -56,7 +56,7 @@ public class MetadataBuilderTest
 
   @Test
   public void testPrereleaseXml() throws Exception {
-    String xml = IOUtils.toString(asStream("metadata-prereleases.xml"));
+    String xml = IOUtils.toString(asStream("metadata-prereleases.xml")).replaceFirst("(?s)^.*<meta", "<meta");
     builder.appendVersions(true);
     //System.err.println( builder.toString() );
     //System.out.println( xml );

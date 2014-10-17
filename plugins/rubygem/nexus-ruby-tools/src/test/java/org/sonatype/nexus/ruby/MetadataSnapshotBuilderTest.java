@@ -33,7 +33,8 @@ public class MetadataSnapshotBuilderTest
 
   @Test
   public void testXml() throws Exception {
-    String xml = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("metadata-snapshot.xml"));
+    String xml = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("metadata-snapshot.xml"))
+        .replaceFirst("(?s)^.*<meta", "<meta");
     //        System.err.println( builder.toString() );
     //        System.err.println( xml );
     assertThat(builder.toString(), equalTo(xml));
