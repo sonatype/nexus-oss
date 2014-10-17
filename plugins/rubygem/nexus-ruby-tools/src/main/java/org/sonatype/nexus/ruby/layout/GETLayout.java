@@ -22,6 +22,7 @@ import org.sonatype.nexus.ruby.BundlerApiFile;
 import org.sonatype.nexus.ruby.DependencyData;
 import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.DependencyHelper;
+import org.sonatype.nexus.ruby.Directory;
 import org.sonatype.nexus.ruby.GemArtifactFile;
 import org.sonatype.nexus.ruby.GemArtifactIdDirectory;
 import org.sonatype.nexus.ruby.GemFile;
@@ -124,7 +125,12 @@ public class GETLayout
   @Override
   public RubygemsDirectory rubygemsDirectory(String path) {
     RubygemsDirectory dir = super.rubygemsDirectory(path);
-    dir.setItems(store.listDirectory(directory("/api/v1/dependencies/")));
+    Directory d = directory("/api/v1/dependencies/");
+    dir.setItems(store.listDirectory(d));
+    // copy the error over to the original directory
+    if (d.hasException()) {
+      dir.setException(d.getException());
+    }
     return dir;
   }
 
