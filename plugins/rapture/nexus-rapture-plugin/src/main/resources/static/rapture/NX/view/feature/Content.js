@@ -36,22 +36,14 @@ Ext.define('NX.view.feature.Content', {
         width: 32
       },
       {
-        xtype: 'label',
-        itemId: 'title',
-        style: {
-          'color': '#000000',
-          'font-size': '16px',
-          'font-weight': 'bold'
-        }
+        xtype: 'tbtext',
+        cls: 'feature-name',
+        itemId: 'title'
       },
-      '-',
       {
-        xtype: 'label',
-        itemId: 'description',
-        style: {
-          'color': '#000000',
-          'font-size': '12px'
-        }
+        xtype: 'tbtext',
+        cls: 'feature-description',
+        itemId: 'description'
       }
     ]
   },

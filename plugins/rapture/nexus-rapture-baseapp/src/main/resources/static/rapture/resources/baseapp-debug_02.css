@@ -2828,9 +2828,6 @@
   margin-top: 4px;
 }
 
-/*.x-toolbar .x-box-inner {
-  overflow: visible;
-}*/
 /**
  * @class Ext.panel.Panel
  */
@@ -3155,6 +3152,11 @@
 .x-panel-feature-content-outer-border-trbl {
   border-color: #e3e3e3 !important;
   border-width: 0 0 0 1px !important;
+}
+
+/* line 24, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-feature-content > .x-panel-header-feature-content > .x-box-inner {
+  border-bottom: 1px solid #e3e3e3;
 }
 
 /**
@@ -4448,7 +4450,7 @@
 /**
  * ui: 'breadcrumb'
  */
-/* line 71, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 75, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-breadcrumb {
   background-color: #FFFFFF;
   color: #AAAAAA;
@@ -4458,7 +4460,7 @@
   border-style: solid;
   padding: 6px 6px 6px 21px;
 }
-/* line 80, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 84, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-breadcrumb label {
   padding-right: 7px;
 }
@@ -12214,10 +12216,33 @@
   font-weight: 200px;
 }
 
-/* line 14, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+/**
+ * ui: 'product-version'
+ */
+/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .product-version {
   color: #FFFFFF;
   font-size: 10px;
   letter-spacing: 1px;
   top: 15px !important;
+}
+
+/**
+ * ui: 'feature-name'
+ */
+/* line 27, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+.feature-name {
+  color: #000000;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/**
+ * ui: 'feature-description'
+ */
+/* line 36, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+.feature-description {
+  color: #000000;
+  font-size: 12px;
+  top: 18px !important;
 }

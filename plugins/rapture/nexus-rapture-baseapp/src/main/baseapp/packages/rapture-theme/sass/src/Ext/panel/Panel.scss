@@ -21,6 +21,10 @@
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
+.x-panel-feature-content > .x-panel-header-feature-content > .x-box-inner {
+  border-bottom: 1px solid #e3e3e3
+}
+
 /**
  * ui: 'feature-menu'
  */
