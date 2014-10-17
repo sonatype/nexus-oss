@@ -12193,11 +12193,11 @@
   padding-right: 0px;
   background-color: white;
 }
-
 /* line 10, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
-.x-trigger-cell,
-.x-form-field,
-.x-form-trigger-input-cell {
+.x-form-trigger-wrap input.x-form-field,
+.x-form-trigger-wrap .x-trigger-cell,
+.x-form-trigger-wrap .x-form-trigger,
+.x-form-trigger-wrap .x-form-trigger-input-cell {
   background-color: rgba(0, 0, 0, 0);
 }
 
