@@ -145,7 +145,7 @@
 
                     <!-- Generate 'prod' flavor -->
                     <exec executable="sencha" dir="${project.build.directory}/baseapp" failonerror="true">
-                    <arg line="app build production"/>
+                      <arg line="app build production"/>
                     </exec>
 
                     <!-- Install generated baseapp resources -->
