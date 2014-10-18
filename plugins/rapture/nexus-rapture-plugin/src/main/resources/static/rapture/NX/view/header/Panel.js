@@ -54,22 +54,28 @@ Ext.define('NX.view.header.Panel', {
         items: [
           { xtype: 'nx-header-logo' },
           {
-            xtype: 'label',
-            text: 'Sonatype Nexus',
-            style: {
-              'color': '#FFFFFF',
-              'font-family': 'Proxima Nova Thin',
-              'font-size': '20px'
-            }
-          },
-          {
-            xtype: 'label',
-            text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
-            style: {
-              'color': '#FFFFFF',
-              'font-family': 'Proxima Nova Semibold',
-              'font-size': '10px'
-            }
+            xtype: 'container',
+            items: [
+              {
+                xtype: 'label',
+                text: 'Sonatype Nexus',
+                style: {
+                  'color': '#FFFFFF',
+                  'font-family': 'Proxima Nova Thin',
+                  'font-size': '20px'
+                }
+              },
+              {
+                xtype: 'label',
+                text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
+                style: {
+                  'padding-left': '8px',
+                  'color': '#FFFFFF',
+                  'font-family': 'Proxima Nova Semibold',
+                  'font-size': '10px'
+                }
+              }
+            ]
           }
         ]
       }
