@@ -45,7 +45,6 @@ public class RawViewConfigContribution
 
   private static final String PROXY_VIEW_NAME = "bin-proxy";
 
-
   private static final String PROXY_VIEW_IDENTIFIER = "bar_34wfe32434";
 
   @Override
@@ -65,7 +64,7 @@ public class RawViewConfigContribution
   }
 
   private void addIfAbsent(final ViewConfig config, final ViewConfigStore viewConfigStore) throws IOException {
-    final ViewConfig viewConfig = viewConfigStore.get(VIEW_NAME);
+    final ViewConfig viewConfig = viewConfigStore.get(config.getViewName());
     if (viewConfig == null) {
 
       log.info("Force-adding config for /views/{}.", config.getViewName());
