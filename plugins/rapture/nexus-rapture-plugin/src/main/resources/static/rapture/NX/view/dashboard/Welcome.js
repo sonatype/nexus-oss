@@ -21,7 +21,6 @@ Ext.define('NX.view.dashboard.Welcome', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dashboard-welcome',
   requires: [
-    'NX.State',
     'NX.util.Url'
   ],
 
