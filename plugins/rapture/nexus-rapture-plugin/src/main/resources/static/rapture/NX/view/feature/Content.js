@@ -22,6 +22,7 @@ Ext.define('NX.view.feature.Content', {
   alias: 'widget.nx-feature-content',
 
   ui: 'feature-content',
+  cls: 'feature-content',
   layout: 'fit',
 
   header: {

@@ -3,7 +3,7 @@
  */
 
 /**
- * ui: 'product-name'
+ * cls: 'product-name'
  */
 .product-name {
   color: #FFFFFF;
@@ -12,7 +12,7 @@
 }
 
 /**
- * ui: 'product-version'
+ * cls: 'product-version'
  */
 .product-version {
   color: #FFFFFF;
@@ -22,19 +22,19 @@
 }
 
 /**
- * ui: 'feature-name'
+ * cls: 'feature-name'
  */
 .feature-name {
   color: #000000;
-  font-size: 16px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 /**
- * ui: 'feature-description'
+ * cls: 'feature-description'
  */
 .feature-description {
   color: #000000;
   font-size: 12px;
-  top: 18px !important;
+  top: 21px !important;
 }

@@ -23,6 +23,7 @@ Ext.define('NX.view.feature.Menu', {
 
   width: 220,
   ui: 'feature-menu',
+  cls: 'feature-menu',
 
   stateful: true,
   stateId: 'nx-feature-menu',
