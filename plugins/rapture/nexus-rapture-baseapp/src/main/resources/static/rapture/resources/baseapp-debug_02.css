@@ -1984,7 +1984,7 @@
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
@@ -2480,7 +2480,7 @@
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 2px;
