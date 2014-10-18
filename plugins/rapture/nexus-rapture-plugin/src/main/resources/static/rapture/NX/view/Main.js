@@ -36,7 +36,7 @@ Ext.define('NX.view.Main', {
     {
       xtype: 'nx-feature-menu',
       region: 'west',
-      border: true,
+      border: false,
       collapsible: true,
       collapsed: false,
       resizable: true,

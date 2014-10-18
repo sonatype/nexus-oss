@@ -1,0 +1,40 @@
+/**
+ * @class Ext.toolbar.TextItem
+ */
+
+/**
+ * cls: 'product-name'
+ */
+.product-name {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 200px;
+}
+
+/**
+ * cls: 'product-version'
+ */
+.product-version {
+  color: #FFFFFF;
+  font-size: 10px;
+  letter-spacing: 1px;
+  top: 15px !important;
+}
+
+/**
+ * cls: 'feature-name'
+ */
+.feature-name {
+  color: #000000;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/**
+ * cls: 'feature-description'
+ */
+.feature-description {
+  color: #000000;
+  font-size: 12px;
+  top: 21px !important;
+}

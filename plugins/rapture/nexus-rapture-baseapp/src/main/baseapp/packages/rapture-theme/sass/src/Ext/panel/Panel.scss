@@ -10,12 +10,23 @@
 
   $ui-header-padding: 4px 10px 5px,
   $ui-header-color: #1f1f1f,
-  $ui-header-background-color: #E0E0E0,
+  $ui-header-background-color: #FFFFFF,
   $ui-header-icon-height: 32,
   $ui-header-icon-width: 32,
   $ui-header-text-transform: $panel-light-header-text-transform,
+
+  $ui-wrap-border-width: 0 0 0 2px,
+  $ui-wrap-border-color: #CCCCCC,
+
   $ui-tool-background-image: $panel-light-tool-background-image
 );
+
+/**
+ * cls: 'feature-content'
+ */
+.feature-content .x-panel-feature-content > .x-panel-header-feature-content > .x-box-inner {
+  border-bottom: 1px solid #e3e3e3
+}
 
 /**
  * ui: 'feature-menu'
@@ -23,7 +34,11 @@
 @include extjs-panel-ui(
   $ui: 'feature-menu',
 
-  $ui-header-padding: 4px
+  $ui-header-padding: 4px,
+  $ui-body-background-color: #EEEEEE,
+
+  $ui-wrap-border-width: 3px,
+  $ui-wrap-border-color: #888888
 );
 
 /**

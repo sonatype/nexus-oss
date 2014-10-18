@@ -67,11 +67,6 @@
 /**
  * @class Ext.Component
  */
-/* line 11, ../../../baseapp/packages/rapture-theme/sass/var/Ext/Component.scss */
-html {
-  -webkit-font-smoothing: antialiased !important;
-}
-
 /**
  * @class Ext.tip.QuickTip
  */
@@ -4699,7 +4694,7 @@ div.x-editor {
   padding-left: 20px;
   white-space: nowrap;
   color: #000;
-  font: normal 12px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 12px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border: 1px solid;
   border-color: #ddd #bbb #bbb #ddd;
   background-color: #fff;
@@ -5874,7 +5869,7 @@ a.x-tab .x-tab-inner-right {
 .x-body {
   color: black;
   font-size: 13px;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: #f5f5f5;
 }
 
@@ -5913,7 +5908,7 @@ a.x-tab .x-tab-inner-right {
   padding: 0;
   background-color: transparent;
   color: #666666;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 39, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/LoadMask.scss */
@@ -5992,7 +5987,7 @@ a.x-tab .x-tab-inner-right {
   color: #666666;
   font-weight: bold;
   font-size: 13px;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-align: center;
   line-height: 20px;
 }
@@ -7438,7 +7433,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -7946,7 +7941,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
 }
@@ -8454,7 +8449,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-large .x-btn-inner {
   font-size: 16px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 10px;
 }
@@ -8962,7 +8957,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-toolbar-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 5px;
 }
@@ -9470,7 +9465,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 8px;
 }
@@ -9978,7 +9973,7 @@ a.x-tab .x-tab-inner-right {
 .x-btn-default-toolbar-large .x-btn-inner {
   font-size: 16px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 10px;
 }
@@ -10425,7 +10420,7 @@ a.x-tab .x-tab-inner-right {
   margin: 0 6px 0 4px;
   color: #303030;
   line-height: 16px;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
   font-weight: normal;
 }
@@ -10762,7 +10757,7 @@ a.x-tab .x-tab-inner-right {
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -11081,7 +11076,7 @@ a.x-tab .x-tab-inner-right {
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -13260,7 +13255,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 132, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/container/ButtonGroup.scss */
 .x-btn-group-header-text-container-default {
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 16px;
   color: #666666;
 }
@@ -13584,7 +13579,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 132, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/container/ButtonGroup.scss */
 .x-btn-group-header-text-container-default-framed {
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 16px;
   color: #666666;
 }
@@ -13890,7 +13885,7 @@ a.x-tab .x-tab-inner-right {
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -15324,7 +15319,7 @@ a.x-tab .x-tab-inner-right {
 .x-form-invalid-under {
   padding: 2px 2px 2px 20px;
   color: #cf4c35;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 16px;
   background: no-repeat 0 2px;
   background-image: url(images/form/exclamation.png);
@@ -15347,7 +15342,7 @@ div.x-lbl-top-err-icon {
 /* line 26, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/Labelable.scss */
 .x-form-item-label {
   color: black;
-  font: normal 13px/17px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/17px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin-top: 4px;
 }
 
@@ -15376,7 +15371,7 @@ div.x-lbl-top-err-icon {
 /* line 6, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Base.scss */
 .x-form-item,
 .x-form-field {
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 21, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Base.scss */
@@ -15456,7 +15451,7 @@ textarea.x-form-empty-field {
 
 /* line 11, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Display.scss */
 .x-form-display-field {
-  font: normal 13px/17px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/17px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: black;
   margin-top: 4px;
 }
@@ -15533,7 +15528,7 @@ textarea.x-form-empty-field {
 /* line 40, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Checkbox.scss */
 .x-form-cb-label {
   margin-top: 4px;
-  font: normal 13px/17px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/17px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 53, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Checkbox.scss */
@@ -15621,7 +15616,7 @@ textarea.x-form-empty-field {
 
 /* line 45, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-fieldset-header-text {
-  font: normal 12px/16px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 12px/16px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: black;
   padding: 1px 0;
 }
@@ -15887,7 +15882,7 @@ div.x-form-spinner-down {
 /* line 15, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/view/BoundList.scss */
 .x-boundlist-item {
   padding: 0 6px;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 22px;
   cursor: pointer;
   cursor: hand;
@@ -15996,7 +15991,7 @@ a.x-datepicker-arrow:hover {
 .x-datepicker-column-header {
   width: 30px;
   color: black;
-  font: bold 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: bold 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-align: right;
   background-image: none;
   background-color: white;
@@ -16019,7 +16014,7 @@ a.x-datepicker-arrow:hover {
 /* line 128, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/picker/Date.scss */
 .x-datepicker-date {
   padding: 0 7px 0 0;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: black;
   cursor: pointer;
   line-height: 23px;
@@ -16113,7 +16108,7 @@ a.x-datepicker-date:hover {
 /* line 233, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/picker/Date.scss */
 .x-monthpicker-item {
   margin: 5px 0 5px;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-align: center;
 }
 
@@ -16399,7 +16394,7 @@ a.x-color-picker-item:hover {
 
 /* line 100, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/HtmlEditor.scss */
 .x-html-editor-wrap textarea {
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: white;
   resize: none;
 }
@@ -16417,13 +16412,13 @@ a.x-color-picker-item:hover {
   padding: 10px;
   color: gray;
   background-color: white;
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 15, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Table.scss */
 .x-grid-cell {
   color: "none";
-  font: normal 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: white;
   border-color: #ededed;
   border-style: solid;
@@ -16645,7 +16640,7 @@ a.x-color-picker-item:hover {
 .x-column-header {
   border-right: 1px solid silver;
   color: #666666;
-  font: bold 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: bold 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #f5f5f5;
 }
 
@@ -16788,7 +16783,7 @@ a.x-color-picker-item:hover {
 /* line 30, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/Grouping.scss */
 .x-grid-group-title {
   color: #666666;
-  font: bold 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: bold 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 36, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/Grouping.scss */
@@ -16819,7 +16814,7 @@ a.x-color-picker-item:hover {
 
 /* line 1, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/RowBody.scss */
 .x-grid-rowbody {
-  font: normal 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 5px 10px 5px 10px;
 }
 
@@ -16840,7 +16835,7 @@ a.x-color-picker-item:hover {
   border-color: #ededed;
   background-color: transparent !important;
   border-top-width: 0;
-  font: normal 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* line 24, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/feature/Summary.scss */
@@ -16888,7 +16883,7 @@ a.x-color-picker-item:hover {
 
 /* line 4, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/plugin/Editing.scss */
 .x-grid-editor .x-form-text {
-  font: normal 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 4px 9px 3px 9px;
 }
 /* line 22, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/plugin/Editing.scss */
@@ -16902,7 +16897,7 @@ a.x-color-picker-item:hover {
 }
 /* line 64, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/grid/plugin/Editing.scss */
 .x-grid-editor .x-form-display-field {
-  font: normal 13px/15px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px/15px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 5px 10px 4px 10px;
   text-overflow: ellipsis;
 }
@@ -17304,7 +17299,7 @@ a.x-color-picker-item:hover {
 .x-accordion-hd .x-panel-header-text-container {
   color: #666666;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-transform: none;
 }
 
@@ -17529,7 +17524,7 @@ a.x-color-picker-item:hover {
 
 /* line 198, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/menu/Menu.scss */
 .x-menu-item-text {
-  font: normal 13px proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal 13px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 23px;
   padding-top: 1px;
   color: black;
@@ -19255,7 +19250,7 @@ a.x-color-picker-item:hover {
 .x-tab-default .x-tab-inner {
   font-size: 13px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   line-height: 16px;
 }
@@ -20287,7 +20282,7 @@ a.x-color-picker-item:hover {
 .x-btn-plain-toolbar-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 5px;
 }
@@ -20781,7 +20776,7 @@ a.x-color-picker-item:hover {
 .x-btn-plain-toolbar-medium .x-btn-inner {
   font-size: 14px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 8px;
 }
@@ -21275,7 +21270,7 @@ a.x-color-picker-item:hover {
 .x-btn-plain-toolbar-large .x-btn-inner {
   font-size: 16px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #666666;
   padding: 0 10px;
 }
@@ -21713,7 +21708,7 @@ a.x-color-picker-item:hover {
   color: #666666;
   font-size: 13px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 15px;
   padding: 1px 0 0;
   text-transform: none;
@@ -21726,7 +21721,7 @@ a.x-color-picker-item:hover {
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -22033,7 +22028,7 @@ a.x-color-picker-item:hover {
   color: #666666;
   font-size: 13px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 15px;
   padding: 1px 0 0;
   text-transform: none;
@@ -22046,7 +22041,7 @@ a.x-color-picker-item:hover {
   color: black;
   font-size: 13px;
   font-weight: normal;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   border-width: 1px;
   border-style: solid;
 }
@@ -23962,7 +23957,7 @@ a.x-color-picker-item:hover {
 .x-btn-primary-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }
@@ -24473,7 +24468,7 @@ a.x-color-picker-item:hover {
 .x-btn-danger-small .x-btn-inner {
   font-size: 12px;
   font-weight: bold;
-  font-family: proxima_nova_rgregular, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
 }

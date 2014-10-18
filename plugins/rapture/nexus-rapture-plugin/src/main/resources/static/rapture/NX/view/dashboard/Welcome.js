@@ -21,7 +21,6 @@ Ext.define('NX.view.dashboard.Welcome', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dashboard-welcome',
   requires: [
-    'NX.State',
     'NX.util.Url'
   ],
 
@@ -56,18 +55,6 @@ Ext.define('NX.view.dashboard.Welcome', {
           'text-align': 'center',
           'vertical-align': 'middle',
           margin: '100px 0 0 0'
-        }
-      },
-      {
-        xtype: 'label',
-        html: '<code>' + 'Nexus <em>' + NX.State.getEdition() + '</em> ' + NX.State.getVersion() + '</code>',
-
-        style: {
-          'color': '#000000',
-          'font-size': '20px',
-          'font-weight': 'bold',
-          'text-align': 'center',
-          'padding': '20px'
         }
       }
     ];

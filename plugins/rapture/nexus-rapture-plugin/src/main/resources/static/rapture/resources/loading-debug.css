@@ -38,7 +38,7 @@
 #loading .loading-indicator {
   background: black;
   color: #444;
-  font: bold 12px arial, tahoma, verdana, helvetica, sans-serif;
+  font: bold 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
   height: auto;
   margin: 0;
   padding: 10px;
