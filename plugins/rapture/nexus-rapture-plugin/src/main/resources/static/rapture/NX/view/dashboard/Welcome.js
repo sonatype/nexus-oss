@@ -57,18 +57,6 @@ Ext.define('NX.view.dashboard.Welcome', {
           'vertical-align': 'middle',
           margin: '100px 0 0 0'
         }
-      },
-      {
-        xtype: 'label',
-        html: 'Sonatype Nexus ' + NX.State.getEdition() + ' ' + NX.State.getVersion(),
-
-        style: {
-          'color': '#000000',
-          'font-size': '20px',
-          'font-weight': 'bold',
-          'text-align': 'center',
-          'padding': '20px'
-        }
       }
     ];
 
