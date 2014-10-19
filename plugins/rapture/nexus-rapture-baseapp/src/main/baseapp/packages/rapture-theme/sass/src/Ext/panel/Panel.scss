@@ -45,11 +45,11 @@
   .x-grid-cell {
     background-color: #f1f1f1;
   }
-  .x-grid-row-selected .x-grid-cell {
-    background-color: #CDCDCD;
-  }
-  .x-grid-row-over .x-grid-cell {
+  .x-grid-row-over .x-grid-td {
     background-color: #e1e1e1;
+  }
+  .x-grid-row-selected .x-grid-td {
+    background-color: #d1d1d1;
   }
 }
 
