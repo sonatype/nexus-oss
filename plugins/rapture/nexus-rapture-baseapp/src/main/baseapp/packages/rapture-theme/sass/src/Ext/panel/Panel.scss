@@ -31,11 +31,15 @@
 /**
  * ui: 'feature-menu'
  */
+$grid-feature-menu-background-color: #f1f1f1;
+$grid-feature-menu-over-background-color: #e1e1e1;
+$grid-feature-menu-selected-background-color: #d1d1d1;
+
 @include extjs-panel-ui(
   $ui: 'feature-menu',
 
   $ui-header-padding: 4px,
-  $ui-body-background-color: #f1f1f1,
+  $ui-body-background-color: $grid-feature-menu-background-color,
 
   $ui-wrap-border-width: 3px,
   $ui-wrap-border-color: #888888
@@ -43,13 +47,13 @@
 
 .x-panel-body-feature-menu {
   .x-grid-cell {
-    background-color: #f1f1f1;
+    background-color: $grid-feature-menu-background-color;
   }
   .x-grid-row-over .x-grid-td {
-    background-color: #e1e1e1;
+    background-color: $grid-feature-menu-over-background-color;
   }
   .x-grid-row-selected .x-grid-td {
-    background-color: #d1d1d1;
+    background-color: $grid-feature-menu-selected-background-color;
   }
 }
 
