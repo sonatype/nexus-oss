@@ -35,11 +35,26 @@
   $ui: 'feature-menu',
 
   $ui-header-padding: 4px,
-  $ui-body-background-color: #EEEEEE,
+  $ui-body-background-color: #f1f1f1,
 
   $ui-wrap-border-width: 3px,
   $ui-wrap-border-color: #888888
 );
+
+/**
+ * cls: 'feature-menu'
+ */
+.feature-menu {
+  .x-grid-cell {
+    background-color: #f1f1f1;
+  }
+  .x-grid-row-selected .x-grid-cell {
+    background-color: #CDCDCD;
+  }
+  .x-grid-row-over .x-grid-cell {
+    background-color: #e1e1e1;
+  }
+}
 
 /**
  * ui: 'feature-detail'

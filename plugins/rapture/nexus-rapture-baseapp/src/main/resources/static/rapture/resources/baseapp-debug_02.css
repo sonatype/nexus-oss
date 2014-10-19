@@ -3214,7 +3214,7 @@
 
 /* line 301, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-body-feature-menu {
-  background: #eeeeee;
+  background: #f1f1f1;
   border-color: #444444;
   color: black;
   font-size: 13px;
@@ -3482,6 +3482,22 @@
 .x-panel-feature-menu-outer-border-trbl {
   border-color: #888888 !important;
   border-width: 3px !important;
+}
+
+/**
+ * cls: 'feature-menu'
+ */
+/* line 48, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.feature-menu .x-grid-cell {
+  background-color: #f1f1f1;
+}
+/* line 51, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.feature-menu .x-grid-row-selected .x-grid-cell {
+  background-color: #CDCDCD;
+}
+/* line 54, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.feature-menu .x-grid-row-over .x-grid-cell {
+  background-color: #e1e1e1;
 }
 
 /**
@@ -12238,14 +12254,3 @@
 /**
  * @class Ext.tree.Panel
  */
-/**
- * cls: 'feature-menu'
- */
-/* line 9, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tree/Panel.scss */
-.feature-menu .x-grid-cell {
-  background-color: #EEEEEE;
-}
-/* line 12, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tree/Panel.scss */
-.feature-menu .x-grid-row-selected .x-grid-cell {
-  background-color: #CDCDCD;
-}
