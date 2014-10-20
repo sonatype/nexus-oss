@@ -62,15 +62,4 @@ public interface ViewRequest
    * An input stream for the request body.
    */
   InputStream getInputStream() throws IOException;
-
-  /**
-   * Adds a value to the request context.
-   */
-  void setAttribute(String name, Object value);
-
-  /**
-   * Retrieves a value from the request context.
-   */
-  @Nullable
-  <T> T getAttribute(String name);
 }

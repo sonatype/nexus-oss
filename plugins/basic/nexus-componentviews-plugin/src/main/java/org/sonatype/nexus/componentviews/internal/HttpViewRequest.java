@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class WrappingViewRequest
+public class HttpViewRequest
     implements ViewRequest
 {
   private final HttpServletRequest request;
@@ -43,8 +43,8 @@ public class WrappingViewRequest
 
   private final Map<String, Object> requestContext = new HashMap<>();
 
-  public WrappingViewRequest(final HttpServletRequest request, final String viewName, final ViewConfig viewConfig,
-                             final String path, final String queryString)
+  public HttpViewRequest(final HttpServletRequest request, final ViewConfig viewConfig, final String path,
+                         final String queryString)
   {
 
     this.viewConfig = checkNotNull(viewConfig);
@@ -91,16 +91,5 @@ public class WrappingViewRequest
   @Override
   public InputStream getInputStream() throws IOException {
     return request.getInputStream();
-  }
-
-  @Override
-  public void setAttribute(final String name, final Object value) {
-    requestContext.put(name, value);
-  }
-
-  @Nullable
-  @Override
-  public Object getAttribute(final String name) {
-    return requestContext.get(name);
   }
 }

@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.componentviews;
 
-import java.io.IOException;
-
 /**
  * A piece of code that processes a {@link ViewRequest} and returns an appropriate {@link ViewResponse}.
  *
@@ -22,7 +20,7 @@ import java.io.IOException;
 public interface Handler
 {
   /**
-   * Determines the appropriate {@link ViewResponse} given the request.
+   * Determines the appropriate {@link ViewResponse} given the request and its context.
    */
-  ViewResponse handle(ViewRequest req);
+  ViewResponse handle(HandlerContext context) throws Exception;
 }

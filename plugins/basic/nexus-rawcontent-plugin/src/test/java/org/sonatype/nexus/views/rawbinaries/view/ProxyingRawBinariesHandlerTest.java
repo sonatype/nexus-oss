@@ -15,11 +15,10 @@ package org.sonatype.nexus.views.rawbinaries.view;
 import java.util.Collections;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
-import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewRequest.HttpMethod;
 import org.sonatype.nexus.componentviews.ViewResponse;
@@ -56,19 +55,22 @@ public class ProxyingRawBinariesHandlerTest
     store = mock(RawBinaryStore.class);
     source = mock(PullComponentSource.class);
 
-    handler = new TestableRawProxyHandler(mock(Handler.class), store, source);
+    handler = new TestableRawProxyHandler(store, source);
   }
 
   @Test
   public void binariesFoundLocallyAreStreamed() throws Exception {
     ViewRequest request = mockRequest(PATH, HttpMethod.GET);
 
+    HandlerContext context = mock(HandlerContext.class);
+    when(context.getRequest()).thenReturn(request);
+
     final RawBinary localBinary = mock(RawBinary.class);
     when(localBinary.getPath()).thenReturn(PATH);
 
     when(store.getForPath(PATH)).thenReturn(asList(localBinary));
 
-    handler.handle(request);
+    handler.handle(context);
 
     verify(store).getForPath(PATH);
 
@@ -78,6 +80,8 @@ public class ProxyingRawBinariesHandlerTest
   @Test
   public void notFoundLocallyCallsSource() throws Exception {
     ViewRequest request = mockRequest(PATH, HttpMethod.GET);
+    HandlerContext context = mock(HandlerContext.class);
+    when(context.getRequest()).thenReturn(request);
 
     // There's no matching local raw binary
     when(store.getForPath(PATH)).thenReturn(Collections.<RawBinary>emptyList());
@@ -91,11 +95,10 @@ public class ProxyingRawBinariesHandlerTest
     final ComponentRequest fetchRequest = new ComponentRequest(fetchParameters);
     when(source.fetchComponents(eq(fetchRequest))).thenReturn(fetchedComponents);
 
-    final ViewResponse handle = handler.handle(request);
+    final ViewResponse handle = handler.handle(context);
 
     verify(source).fetchComponents(eq(fetchRequest));
   }
-
 
   private ViewRequest mockRequest(final String path, final HttpMethod method) {
     ViewRequest request = mock(ViewRequest.class);
@@ -109,10 +112,10 @@ public class ProxyingRawBinariesHandlerTest
   {
     private RawBinary streamed;
 
-    private TestableRawProxyHandler(final Handler inner, final RawBinaryStore binaryStore,
+    private TestableRawProxyHandler(final RawBinaryStore binaryStore,
                                     final PullComponentSource source)
     {
-      super(inner, binaryStore, source);
+      super(binaryStore, source);
     }
 
     @Override

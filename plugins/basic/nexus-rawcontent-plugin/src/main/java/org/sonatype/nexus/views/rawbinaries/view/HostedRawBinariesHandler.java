@@ -17,6 +17,7 @@ import java.util.Formatter;
 import java.util.List;
 
 import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
@@ -45,7 +46,8 @@ public class HostedRawBinariesHandler
   }
 
   @Override
-  public ViewResponse handle(final ViewRequest req) {
+  public ViewResponse handle(final HandlerContext context) {
+    ViewRequest req = context.getRequest();
 
     String binaryPath = ensureLeadingSlash(
         req.getPath() + (req.getQueryString() == null ? "" : "?" + req.getQueryString()));

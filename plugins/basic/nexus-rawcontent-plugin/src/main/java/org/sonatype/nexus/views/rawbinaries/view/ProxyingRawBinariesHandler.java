@@ -22,9 +22,9 @@ import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
-import org.sonatype.nexus.componentviews.WrappingHandler;
 import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
@@ -41,24 +41,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class ProxyingRawBinariesHandler
-    extends WrappingHandler
+    implements Handler
+
 {
   private final RawBinaryStore binaryStore;
 
   private final PullComponentSource source;
 
-  public ProxyingRawBinariesHandler(final Handler innerHandler,
-                                    final RawBinaryStore binaryStore,
+  public ProxyingRawBinariesHandler(final RawBinaryStore binaryStore,
                                     final PullComponentSource source)
   {
-    super(checkNotNull(innerHandler));
     this.binaryStore = checkNotNull(binaryStore);
     this.source = checkNotNull(source);
   }
 
-  @Nullable
+
   @Override
-  protected ViewResponse before(final ViewRequest req) {
+  public ViewResponse handle(final HandlerContext context) throws Exception {
+    final ViewRequest req = context.getRequest();
+
     final String requestPath = ensureLeadingSlash(
         req.getPath() + (req.getQueryString() == null ? "" : "?" + req.getQueryString()));
 
@@ -93,8 +94,7 @@ public class ProxyingRawBinariesHandler
           Throwables.propagate(e);
         }
 
-        // Return null to delegate to the inner handler.
-        return null;
+        return context.proceed();
 
       default:
         return Responses.methodNotAllowed();
