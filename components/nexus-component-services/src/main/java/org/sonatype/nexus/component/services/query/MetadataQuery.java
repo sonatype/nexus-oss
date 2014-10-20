@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.component.services.query;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.ComponentId;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,9 +33,7 @@ public class MetadataQuery
 
   private String skipAssetPath;
 
-  private List<String> orderBy = Lists.newArrayList();
-
-  private boolean descending;
+  private Map<String, Boolean> orderBy = Maps.newLinkedHashMap();
 
   private MetadataQueryRestriction restriction;
 
@@ -91,25 +89,20 @@ public class MetadataQuery
     return skipAssetPath;
   }
 
-  public MetadataQuery withOrderBy(String orderBy) {
-    checkArgument(!(checkNotNull(orderBy).isEmpty()), "Order by cannot be empty");
+  public MetadataQuery withOrderBy(String propertyName, boolean ascending) {
+    checkArgument(!(checkNotNull(propertyName).isEmpty()), "Order by property name cannot be empty");
     checkArgument(skipComponentId == null, "Cannot order by; skip component id is already specified");
     checkArgument(skipAssetPath == null, "Cannot order by; skip asset path is already specified");
-    this.orderBy.add(orderBy);
+    this.orderBy.put(propertyName, ascending);
     return this;
   }
 
-  public List<String> getOrderBy() {
+  /**
+   * Gets the ORDER BY properties in insertion order. Values are properties names, keys are
+   * whether ascending order (true) or descending order (false) is wanted.
+   */
+  public Map<String, Boolean> getOrderBy() {
     return orderBy;
-  }
-
-  public MetadataQuery withDescending(boolean descending) {
-    this.descending = descending;
-    return this;
-  }
-
-  public boolean isDescending() {
-    return descending;
   }
 
   public MetadataQuery withRestriction(MetadataQueryRestriction restriction) {
