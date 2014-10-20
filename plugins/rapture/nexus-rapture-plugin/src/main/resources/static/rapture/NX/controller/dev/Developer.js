@@ -73,6 +73,9 @@ Ext.define('NX.controller.dev.Developer', {
         },
         'nx-dev-tests button[action=testMessages]': {
           click: me.testMessages
+        },
+        'nx-dev-tests button[action=toggleUnsupportedBrowser]': {
+          click: me.toggleUnsupportedBrowser
         }
       }
     });
@@ -138,6 +141,15 @@ Ext.define('NX.controller.dev.Developer', {
         text: 'test of ' + type
       });
     });
+  },
+
+  /**
+   * Toggle the unsupported browser application state.
+   *
+   * @private
+   */
+  toggleUnsupportedBrowser: function() {
+    NX.State.setBrowserSupported(!NX.State.isBrowserSupported());
   }
 
 });
