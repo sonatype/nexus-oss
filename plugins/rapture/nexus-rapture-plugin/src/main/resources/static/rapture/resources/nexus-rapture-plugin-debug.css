@@ -10,11 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 /**
  * Font-awesome
  */
 @import url('fonts/font-awesome-4.2.0/css/font-awesome.min.css');
+
+/**
+ * @class NX.view.header.Panel
+ */
+.nx-header-productname {
+  color: #FFFFFF;
+  font-family: 'Proxima Nova Thin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+}
+
+.nx-header-productversion {
+  color: #FFFFFF;
+  font-family: 'Proxima Nova Semibold', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 10px;
+
+  /* keep space between product name and version */
+  padding-left: 8px;
+}
 
 /**
  * @namespace NX.view.info

@@ -59,20 +59,14 @@ Ext.define('NX.view.header.Panel', {
               {
                 xtype: 'label',
                 text: 'Sonatype Nexus',
-                style: {
-                  'color': '#FFFFFF',
-                  'font-family': 'Proxima Nova Thin',
-                  'font-size': '20px'
-                }
+                cls: 'nx-header-productname'
               },
               {
                 xtype: 'label',
                 text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
+                cls: 'nx-header-productversion',
                 style: {
-                  'padding-left': '8px',
-                  'color': '#FFFFFF',
-                  'font-family': 'Proxima Nova Semibold',
-                  'font-size': '10px'
+                  'padding-left': '8px'
                 }
               }
             ]
