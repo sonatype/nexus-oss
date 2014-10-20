@@ -23,6 +23,7 @@ import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.Subscribe;
+import org.jruby.embed.IsolatedScriptingContainer;
 import org.jruby.embed.ScriptingContainer;
 
 /**
@@ -42,8 +43,7 @@ public class ScriptingContainerProvider
   public synchronized ScriptingContainer get() {
     if (scriptingContainer == null) {
       log.debug("Creating JRuby ScriptingContainer...");
-      scriptingContainer = new ScriptingContainer();
-      scriptingContainer.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
+      scriptingContainer = new IsolatedScriptingContainer();
     }
     return scriptingContainer;
   }

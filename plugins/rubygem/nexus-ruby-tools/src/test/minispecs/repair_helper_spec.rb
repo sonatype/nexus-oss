@@ -60,11 +60,11 @@ describe Nexus::RepairHelperImpl do
     Dir[ File.join( broken_to, '*specs.4.8.gz' ) ].size.must_equal 3
     Dir[ File.join( broken_to, '*specs.4.8' ) ].size.must_equal 0
     Dir[ File.join( broken_to, '*' ) ].size.must_equal 6
+    # includes all the gems coming from maven-tools dependency !!
     # this includes all the defaultgems from jruby
-    # also includes all the gems coming from maven-tools dependency !!
-    # i.e. a new jruby.version can change that number !!
+    # i.e. changing the jruby.version can change that number !!
     # puts Dir[ File.join( broken_to, 'quick', '**', '*' ) ].join("\n")
-    Dir[ File.join( broken_to, 'quick', '**', '*' ) ].size.must_equal 31
+    Dir[ File.join( broken_to, 'quick', '**', '*' ) ].size.must_equal 32
   end
 
 end
