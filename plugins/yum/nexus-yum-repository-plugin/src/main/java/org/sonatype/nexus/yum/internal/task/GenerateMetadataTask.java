@@ -303,7 +303,10 @@ public class GenerateMetadataTask
   }
 
   private String buildCreateRepositoryCommand(File packageList) {
-    StringBuilder commandLine = new StringBuilder("createrepo --update --verbose --no-database");
+    StringBuilder commandLine = new StringBuilder("createrepo --verbose --no-database");
+    if (!shouldForceFullScan()) {
+      commandLine.append(" --update");
+    }
     commandLine.append(" --outputdir ").append(getRepoDir().getAbsolutePath());
     commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
     commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
