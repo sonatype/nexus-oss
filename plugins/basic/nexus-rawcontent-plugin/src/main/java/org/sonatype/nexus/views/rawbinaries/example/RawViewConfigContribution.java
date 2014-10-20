@@ -41,22 +41,22 @@ public class RawViewConfigContribution
 {
   private static final String VIEW_NAME = "binaries";
 
-  private static final String VIEW_IDENTIFIER = "foo_234a34234";
+  private static final String INTERNAL_ID = "foo_234a34234";
 
   private static final String PROXY_VIEW_NAME = "bin-proxy";
 
-  private static final String PROXY_VIEW_IDENTIFIER = "bar_34wfe32434";
+  private static final String PROXY_INTERNAL_ID = "bar_34wfe32434";
 
   @Override
   public void contributeTo(final ViewConfigStore viewConfigStore) throws IOException {
 
-    final ViewConfig hostedViewConfig = new ViewConfig(new ViewId(VIEW_NAME, VIEW_IDENTIFIER),
+    final ViewConfig hostedViewConfig = new ViewConfig(new ViewId(VIEW_NAME, INTERNAL_ID),
         RawBinaryViewFactory.FACTORY_NAME,
         Collections.<String, Object>emptyMap());
 
     addIfAbsent(hostedViewConfig, viewConfigStore);
 
-    final ViewConfig proxyViewConfig = new ViewConfig(new ViewId(PROXY_VIEW_NAME, PROXY_VIEW_IDENTIFIER),
+    final ViewConfig proxyViewConfig = new ViewConfig(new ViewId(PROXY_VIEW_NAME, PROXY_INTERNAL_ID),
         RawBinaryProxyViewFactory.FACTORY_NAME,
         ImmutableMap.of("sourceName", (Object) RawSourceConfigContribution.SOURCE_NAME));
 

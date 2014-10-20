@@ -21,6 +21,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.api.ComponentSource;
+import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
@@ -60,6 +61,11 @@ public class RegisteringComponentSourceStore
   }
 
   @Override
+  public ComponentSourceId createId(final String name) {
+    return inner.createId(name);
+  }
+
+  @Override
   public ComponentSourceConfigId add(final ComponentSourceConfig config) throws IOException {
     final ComponentSourceConfigId id = inner.add(config);
     final ComponentSource source = create(config);
@@ -70,7 +76,7 @@ public class RegisteringComponentSourceStore
 
   @Override
   public void update(final ComponentSourceConfigId id, final ComponentSourceConfig config) throws IOException {
-    final ComponentSource oldSource = registry.getSource(config.getSourceName());
+    final ComponentSource oldSource = registry.getSource(config.getSourceId());
     registry.unregister(oldSource);
 
     inner.update(id, config);
@@ -84,7 +90,7 @@ public class RegisteringComponentSourceStore
     checkNotNull(id);
     final ComponentSourceConfig configToRemove = findById(id);
     inner.remove(id);
-    registry.unregister(registry.getSource(configToRemove.getSourceName()));
+    registry.unregister(registry.getSource(configToRemove.getSourceId()));
   }
 
   @Override

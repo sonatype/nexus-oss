@@ -28,22 +28,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ComponentSourceConfig
 {
-  private final ComponentSourceId sourceName;
+  private final ComponentSourceId sourceId;
 
   private final String factoryName;
 
   private final Map<String, Object> configuration;
 
-  public ComponentSourceConfig(final ComponentSourceId sourceName, final String factoryName,
+  public ComponentSourceConfig(final ComponentSourceId sourceId, final String factoryName,
                                final Map<String, Object> configuration)
   {
-    this.sourceName = checkNotNull(sourceName);
+    this.sourceId = checkNotNull(sourceId);
     this.factoryName = checkNotNull(factoryName);
     this.configuration = ImmutableMap.copyOf(checkNotNull(configuration));
   }
 
-  public ComponentSourceId getSourceName() {
-    return sourceName;
+  public ComponentSourceId getSourceId() {
+    return sourceId;
   }
 
   public String getFactoryName() {
@@ -57,7 +57,7 @@ public class ComponentSourceConfig
   @Override
   public String toString() {
     return "ComponentSourceConfig{" +
-        "sourceName='" + sourceName + '\'' +
+        "sourceId='" + sourceId + '\'' +
         ", factoryName='" + factoryName + '\'' +
         '}';
   }

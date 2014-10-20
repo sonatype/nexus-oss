@@ -89,7 +89,7 @@ public class ViewConfigEntityAdapter
     checkNotNull(entity);
 
     final String viewName = entity.getViewName();
-    final String viewId = entity.getViewId().getIdentifier();
+    final String viewId = entity.getViewId().getInternalId();
 
     document.field(P_VIEWNAME, viewName);
     document.field(P_VIEWID, viewId);
@@ -106,10 +106,10 @@ public class ViewConfigEntityAdapter
     checkNotNull(document);
 
     final String viewName = document.field(P_VIEWNAME, OType.STRING);
-    final String viewId = document.field(P_VIEWID, OType.STRING);
+    final String internalId = document.field(P_VIEWID, OType.STRING);
     final String factoryName = document.field(P_FACTORYNAME, OType.STRING);
     final Map<String, Object> config = document.field(P_CONFIGURATION, OType.EMBEDDEDMAP);
-    ViewConfig entity = new ViewConfig(new ViewId(viewName, viewId), factoryName, config);
+    ViewConfig entity = new ViewConfig(new ViewId(viewName, internalId), factoryName, config);
 
     return entity;
   }

@@ -33,13 +33,13 @@ public abstract class ComponentOriginId
 {
   private final String name;
 
-  private final String identifier;
+  private final String internalId;
 
-  public ComponentOriginId(final String name, final String identifier) {
-    validatePortions(name, identifier);
+  public ComponentOriginId(final String name, final String internalId) {
+    validatePortions(name, internalId);
 
     this.name = name;
-    this.identifier = identifier;
+    this.internalId = internalId;
   }
 
   @Override
@@ -53,26 +53,26 @@ public abstract class ComponentOriginId
 
     ComponentOriginId that = (ComponentOriginId) o;
 
-    return Objects.equals(name, that.name) && Objects.equals(identifier, that.identifier);
+    return Objects.equals(name, that.name) && Objects.equals(internalId, that.internalId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, identifier);
+    return Objects.hash(name, internalId);
   }
 
   @Override
   public String toString() {
     return com.google.common.base.Objects.toStringHelper(getClass()).add("name", name).add(
-        "identifier", identifier).toString();
+        "internalId", internalId).toString();
   }
 
   public String getName() {
     return name;
   }
 
-  public String getIdentifier() {
-    return identifier;
+  public String getInternalId() {
+    return internalId;
   }
 
   private void validatePortions(final String name,
@@ -80,6 +80,6 @@ public abstract class ComponentOriginId
   {
     // This is simpler, for now, than encoding colons, but maybe we'll want to do that.
     checkArgument(!checkNotNull(name).contains(":"), "name cannot contain the ':' character.");
-    checkArgument(!checkNotNull(identifier).contains(":"), "identifier cannot contain ':' character.");
+    checkArgument(!checkNotNull(identifier).contains(":"), "internalId cannot contain ':' character.");
   }
 }

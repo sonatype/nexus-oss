@@ -15,6 +15,7 @@ package org.sonatype.nexus.component.source.internal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -22,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
@@ -77,6 +79,11 @@ public class OrientComponentSourceConfigStore
   @Override
   protected void doStop() throws Exception {
     entityType = null;
+  }
+
+  @Override
+  public ComponentSourceId createId(final String name) {
+    return new ComponentSourceId(name, UUID.randomUUID().toString());
   }
 
   @Override

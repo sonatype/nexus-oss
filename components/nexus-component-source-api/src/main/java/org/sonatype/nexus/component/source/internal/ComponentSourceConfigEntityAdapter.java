@@ -93,8 +93,8 @@ public class ComponentSourceConfigEntityAdapter
     checkNotNull(document);
     checkNotNull(entity);
 
-    final String name = entity.getSourceName().getName();
-    final String identifier = entity.getSourceName().getIdentifier();
+    final String name = entity.getSourceId().getName();
+    final String identifier = entity.getSourceId().getInternalId();
 
     document.field(P_SOURCEID_NAME, name);
     document.field(P_SOURCEID_ID, identifier);
@@ -111,11 +111,11 @@ public class ComponentSourceConfigEntityAdapter
     checkNotNull(document);
 
     final String name = document.field(P_SOURCEID_NAME, OType.STRING);
-    final String identifier = document.field(P_SOURCEID_ID, OType.STRING);
+    final String internalId = document.field(P_SOURCEID_ID, OType.STRING);
 
     final String factoryName = document.field(P_FACTORYNAME, OType.STRING);
     final Map<String, Object> config = document.field(P_CONFIGURATION, OType.EMBEDDEDMAP);
-    ComponentSourceConfig entity = new ComponentSourceConfig(new ComponentSourceId(name, identifier), factoryName,
+    ComponentSourceConfig entity = new ComponentSourceConfig(new ComponentSourceId(name, internalId), factoryName,
         config);
 
     return entity;

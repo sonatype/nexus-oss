@@ -38,7 +38,7 @@ public class RawComponentSourceFactory
   @Override
   public ComponentSource createSource(final ComponentSourceConfig config) {
     checkNotNull(config);
-    return new RawBinaryComponentSource(config.getSourceName(),
+    return new RawBinaryComponentSource(config.getSourceId(),
         (String) config.getConfiguration().get(REMOTE_URL_PARAM));
   }
 }

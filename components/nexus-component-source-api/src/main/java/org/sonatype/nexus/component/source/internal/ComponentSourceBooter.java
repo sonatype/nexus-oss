@@ -91,7 +91,7 @@ public class ComponentSourceBooter
     for (ComponentSourceConfig config : sourceConfigStore.getAll().values()) {
       final ComponentSourceFactory factory = factories.get(config.getFactoryName());
       if (factory != null) {
-        log.debug("Creating source {}", config.getSourceName());
+        log.debug("Creating source {}", config.getSourceId());
 
         sourceRegistry.register(factory.createSource(config));
       }
