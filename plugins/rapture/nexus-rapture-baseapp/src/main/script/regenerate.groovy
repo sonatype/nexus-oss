@@ -18,10 +18,10 @@ ant.exec(executable: senchaExe, failonerror: true) {
 }
 
 // Extract extjs distribution
-def extDistZip = project.artifactMap['com.sencha:ext'].file
-def extDistDir = new File(project.build.directory, 'ext')
-ant.mkdir(dir: extDistDir)
-ant.unzip(src: extDistZip, dest: extDistDir) {
+def extZip = project.artifactMap['com.sencha:ext'].file
+def extDir = new File(project.build.directory, 'ext')
+ant.mkdir(dir: extDir)
+ant.unzip(src: extZip, dest: extDir) {
   cutdirsmapper(dirs: 1)
   patternset {
     exclude(name: 'ext-*/docs/**')
@@ -33,7 +33,7 @@ ant.unzip(src: extDistZip, dest: extDistDir) {
 def baseappDir = new File(project.build.directory, 'baseapp')
 ant.exec(executable: senchaExe, dir: project.build.directory, failonerror: true) {
   arg(value: '-sdk')
-  arg(file: extDistDir)
+  arg(file: extDir)
   arg(line: 'generate app baseapp')
   arg(file: baseappDir)
 }
