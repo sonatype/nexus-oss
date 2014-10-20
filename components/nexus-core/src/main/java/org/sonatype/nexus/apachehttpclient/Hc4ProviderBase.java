@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.apachehttpclient;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,9 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
@@ -46,6 +49,11 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpProcessor;
+import org.apache.http.protocol.HttpRequestExecutor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -92,6 +100,18 @@ public class Hc4ProviderBase
     final Builder builder = new Builder();
     builder.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
     builder.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
+    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
+      @Override
+      public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext context)
+          throws HttpException, IOException
+      {
+        // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+        if (!request.containsHeader(HTTP.USER_AGENT)) {
+          request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgentBuilder.formatGenericUserAgentString()));
+        }
+        super.preProcess(request, processor, context);
+      }
+    });
     applyConfig(builder, context);
     applyAuthenticationConfig(builder, context.getRemoteAuthenticationSettings(), null);
     applyProxyConfig(builder, context.getRemoteProxySettings());
