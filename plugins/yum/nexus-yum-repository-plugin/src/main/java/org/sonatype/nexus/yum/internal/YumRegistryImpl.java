@@ -30,9 +30,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
-import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
-import org.sonatype.nexus.yum.internal.task.RepositoryScanningTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,10 +92,6 @@ public class YumRegistryImpl
 
       createVirtualYumConfigFile(repository);
 
-      if (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)) {
-        runScanningTask((YumHosted) yum);
-      }
-
       return yum;
     }
     return yums.get(repository.getId());
@@ -118,12 +112,6 @@ public class YumRegistryImpl
   @Override
   public Yum get(final String repositoryId) {
     return yums.get(repositoryId);
-  }
-
-  private void runScanningTask(final YumHosted yum) {
-    RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
-    task.setYum(yum);
-    nexusScheduler.submit(RepositoryScanningTask.ID, task);
   }
 
   @Override

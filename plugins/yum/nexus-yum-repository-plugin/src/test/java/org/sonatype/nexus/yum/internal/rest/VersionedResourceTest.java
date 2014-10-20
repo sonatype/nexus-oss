@@ -30,7 +30,6 @@ import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 
-import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,13 +73,6 @@ public class VersionedResourceTest
     repositoryRegistry.addRepository(repository);
     final YumHosted yum = (YumHosted) yumRegistry.register(repository);
     yum.addAlias(ALIAS, VERSION);
-    waitFor(new Condition()
-    {
-      @Override
-      public boolean isSatisfied() {
-        return ((YumHosted) yumRegistry.get(TESTREPO)).getVersions().size() == 5;
-      }
-    });
   }
 
   @Test(expected = ResourceException.class)
@@ -88,13 +80,6 @@ public class VersionedResourceTest
       throws Exception
   {
     resource.get(null, createRequest("/", "blabla", "80.02.2"), null, null);
-  }
-
-  @Test(expected = ResourceException.class)
-  public void shouldThrowNotFoundForVersion()
-      throws Exception
-  {
-    resource.get(null, createRequest("/", TESTREPO, "not-present"), null, null);
   }
 
   @Test
