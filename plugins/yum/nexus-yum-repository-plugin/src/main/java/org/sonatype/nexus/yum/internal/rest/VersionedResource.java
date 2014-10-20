@@ -29,7 +29,6 @@ import org.restlet.resource.ResourceException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
-import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 
 /**
  * @since yum 3.0
@@ -100,20 +99,9 @@ public class VersionedResource
 
     YumHosted yumHosted = (YumHosted) yum;
 
-    final String aliasVersion;
-
-    if (yumHosted.getVersions().contains(version)) {
-      aliasVersion = version;
-    }
-    else {
-      aliasVersion = yumHosted.getVersion(version);
-    }
-
+    String aliasVersion = yumHosted.getVersion(version);
     if (aliasVersion == null) {
-      throw new ResourceException(
-          CLIENT_ERROR_NOT_FOUND,
-          "Couldn't find version or alias '" + version + "' in repository '" + repositoryId + "'"
-      );
+      aliasVersion = version;
     }
 
     return yumHosted.getYumRepository(aliasVersion);

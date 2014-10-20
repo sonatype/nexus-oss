@@ -340,10 +340,6 @@ public class GenerateMetadataTask
     return getCacheDir(getRepositoryIdVersion());
   }
 
-  private boolean isUseAbsoluteUrls() {
-    return isNotBlank(getVersion());
-  }
-
   private File createPackageDir() {
     return getCacheDir(PACKAGE_FILE_DIR_NAME);
   }
