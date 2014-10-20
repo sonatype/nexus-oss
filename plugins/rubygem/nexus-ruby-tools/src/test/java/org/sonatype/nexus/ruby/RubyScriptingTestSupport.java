@@ -13,7 +13,11 @@
 
 package org.sonatype.nexus.ruby;
 
+import java.io.IOException;
+
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.apache.commons.io.IOUtils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -37,5 +41,10 @@ public abstract class RubyScriptingTestSupport
     if (testScriptingContainer != null) {
       testScriptingContainer.terminate();
     }
+  }
+
+  protected String loadPomResource(String name) throws IOException {
+    return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(name))
+        .replaceFirst("(?s)^.*<project>", "<project>");
   }
 }
