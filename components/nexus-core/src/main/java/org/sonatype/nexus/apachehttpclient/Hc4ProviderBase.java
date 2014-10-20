@@ -100,18 +100,6 @@ public class Hc4ProviderBase
     final Builder builder = new Builder();
     builder.getHttpClientBuilder().setConnectionManager(httpClientConnectionManager);
     builder.getHttpClientBuilder().addInterceptorFirst(new ResponseContentEncoding());
-    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
-      @Override
-      public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext context)
-          throws HttpException, IOException
-      {
-        // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
-        if (!request.containsHeader(HTTP.USER_AGENT)) {
-          request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgentBuilder.formatGenericUserAgentString()));
-        }
-        super.preProcess(request, processor, context);
-      }
-    });
     applyConfig(builder, context);
     applyAuthenticationConfig(builder, context.getRemoteAuthenticationSettings(), null);
     applyProxyConfig(builder, context.getRemoteProxySettings());
@@ -136,7 +124,20 @@ public class Hc4ProviderBase
     builder.getRequestConfigBuilder().setConnectTimeout(getConnectionTimeout(context));
     builder.getRequestConfigBuilder().setSocketTimeout(getSoTimeout(context));
 
-    builder.getHttpClientBuilder().setUserAgent(userAgentBuilder.formatUserAgentString(context));
+    final String userAgent = userAgentBuilder.formatUserAgentString(context);
+    builder.getHttpClientBuilder().setUserAgent(userAgent);
+    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
+      @Override
+      public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
+          throws HttpException, IOException
+      {
+        // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+        if (!request.containsHeader(HTTP.USER_AGENT)) {
+          request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgent));
+        }
+        super.preProcess(request, processor, ctx);
+      }
+    });
   }
 
   /**

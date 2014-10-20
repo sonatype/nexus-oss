@@ -41,11 +41,13 @@ import org.fest.util.Strings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -105,7 +107,7 @@ public class Hc4ProviderRemoteTest
     when(remoteHttpProxySettings.getHostname()).thenReturn("localhost");
     when(remoteHttpProxySettings.getPort()).thenReturn(port);
 
-    when(userAgentBuilder.formatGenericUserAgentString()).thenReturn(UA);
+    when(userAgentBuilder.formatUserAgentString(Matchers.<RemoteStorageContext>any())).thenReturn(UA);
     when(applicationConfiguration.getGlobalRemoteStorageContext()).thenReturn(globalRemoteStorageContext);
   }
 
