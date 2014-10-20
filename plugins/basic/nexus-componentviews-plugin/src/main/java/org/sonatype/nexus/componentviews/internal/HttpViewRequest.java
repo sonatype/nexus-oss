@@ -43,8 +43,8 @@ public class HttpViewRequest
 
   private final Map<String, Object> requestContext = new HashMap<>();
 
-  public HttpViewRequest(final HttpServletRequest request, final String viewName, final ViewConfig viewConfig,
-                         final String path, final String queryString)
+  public HttpViewRequest(final HttpServletRequest request, final ViewConfig viewConfig, final String path,
+                         final String queryString)
   {
 
     this.viewConfig = checkNotNull(viewConfig);
@@ -91,16 +91,5 @@ public class HttpViewRequest
   @Override
   public InputStream getInputStream() throws IOException {
     return request.getInputStream();
-  }
-
-  @Override
-  public void setAttribute(final String name, final Object value) {
-    requestContext.put(name, value);
-  }
-
-  @Nullable
-  @Override
-  public Object getAttribute(final String name) {
-    return requestContext.get(name);
   }
 }

@@ -14,10 +14,12 @@ package org.sonatype.nexus.componentviews;
 
 import org.sonatype.nexus.componentviews.Router.Route;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 
 /**
  * A binding between a view name (which is part of the URL), and a list of {@link RequestMatcher request matchers},
@@ -26,19 +28,18 @@ import org.slf4j.LoggerFactory;
  * @since 3.0
  */
 public class View
+    extends ComponentSupport
 {
-  private static final Logger log = LoggerFactory.getLogger(View.class);
-
   private final Router router;
 
-  private final Handler noRouteHandler;
+  private final Route routeOfLastResort;
 
   private final ViewConfig config;
 
-  public View(final ViewConfig config, final Router router, final Handler noRouteHandler) {
-    this.router = router;
-    this.config = config;
-    this.noRouteHandler = noRouteHandler;
+  public View(final ViewConfig config, final Router router, final Handler handlerOfLastResort) {
+    this.router = checkNotNull(router);
+    this.config = checkNotNull(config);
+    this.routeOfLastResort = new Route(new AllRequestMatcher(), asList(handlerOfLastResort));
   }
 
   public String getName() {
@@ -46,16 +47,17 @@ public class View
   }
 
   public ViewResponse dispatch(final ViewRequest request) {
-    final Route route = router.findRoute(request);
+    final HandlerContext context = new HandlerContext(request);
 
-    final HandlerContext context = new HandlerContext(request, route.getHandlers());
+    final Route route = router.findRoute(context);
 
     try {
       if (route == null) {
-        return noRouteHandler.handle(context);
+        log.debug("No route found for request.");
+        return routeOfLastResort.dispatch(context);
       }
 
-      return context.proceed();
+      return route.dispatch(context);
     }
     catch (Exception e) {
       // Exceptions will get caught by a global filter and nicely reported as 500 errors.

@@ -14,10 +14,16 @@ package org.sonatype.nexus.componentviews;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Supports processing of a {@link ViewRequest} as it proceeds along a chain of {@link Handler}s.
@@ -29,15 +35,49 @@ public class HandlerContext
 {
   private final ViewRequest request;
 
-  private final ListIterator<Handler> handlers;
+  private ListIterator<Handler> handlers;
 
-  public HandlerContext(final ViewRequest request, final List<Handler> handlers) {
+  private final Map<Object, Object> attributes = Maps.newHashMap();
+
+  public HandlerContext(final ViewRequest request) {
     this.request = checkNotNull(request);
-    this.handlers = checkNotNull(handlers).listIterator();
   }
 
   public ViewRequest getRequest() {
     return request;
+  }
+
+  public void setHandlers(final List<Handler> handlers) {
+    checkState(handlers == null, "Handlers can only be set once.");
+    this.handlers = checkNotNull(handlers).listIterator();
+  }
+
+  public Object getAttribute(final Object key) {
+    checkNotNull(key);
+    return attributes.get(key);
+  }
+
+  public <T> T getAttribute(final Class<T> type) {
+    checkNotNull(type);
+    return type.cast(attributes.get(type));
+  }
+
+  @Nullable
+  public Object setAttribute(final Object key, final @Nullable Object value) {
+    checkNotNull(key);
+    if (value == null) {
+      return attributes.remove(key);
+    }
+    return attributes.put(key, value);
+  }
+
+  @Nullable
+  public <T> T setAttribute(final Class<T> type, final @Nullable T value) {
+    checkNotNull(type);
+    if (value == null) {
+      return type.cast(attributes.remove(type));
+    }
+    return type.cast(attributes.put(type, value));
   }
 
   /**

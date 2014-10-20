@@ -32,9 +32,9 @@ public class Router
    * Gets the {@link Route} for a given {@link ViewRequest}, or {@code null} if no matching route exists.
    */
   @Nullable
-  public Route findRoute(ViewRequest request) {
+  public Route findRoute(HandlerContext context) {
     for (Route route : routes) {
-      if (route.getRequestMatcher().matches(request)) {
+      if (route.getRequestMatcher().matches(context)) {
         return route;
       }
     }
@@ -51,17 +51,18 @@ public class Router
 
     private final List<Handler> handlers;
 
-    private Route(final RequestMatcher requestMatcher, final List<Handler> handlers) {
+    Route(final RequestMatcher requestMatcher, final List<Handler> handlers) {
       this.requestMatcher = checkNotNull(requestMatcher);
       this.handlers = checkNotNull(handlers);
     }
 
-    public RequestMatcher getRequestMatcher() {
-      return requestMatcher;
+    public ViewResponse dispatch(HandlerContext context) throws Exception {
+      context.setHandlers(handlers);
+      return context.proceed();
     }
 
-    public List<Handler> getHandlers() {
-      return handlers;
+    public RequestMatcher getRequestMatcher() {
+      return requestMatcher;
     }
   }
 }

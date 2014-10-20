@@ -63,8 +63,8 @@ public class ComponentViewServlet
       throw new ErrorStatusException(HttpServletResponse.SC_NOT_FOUND, "Not Found", "View not found.");
     }
 
-    final ViewRequest request = new HttpViewRequest(req, viewNameParser.getViewName(), view.getConfig(),
-        viewNameParser.getRemainingPath(), req.getQueryString());
+    final ViewRequest request = new HttpViewRequest(req, view.getConfig(), viewNameParser.getRemainingPath(),
+        req.getQueryString());
 
     try {
       view.dispatch(request).send(resp);
