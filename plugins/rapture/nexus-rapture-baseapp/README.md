@@ -30,4 +30,4 @@ If the content has changed, then the result needs to be committed:
 
 ## Locally install ExtJS distribution
 
-    mvn -Pinstall-ext -Dext.dist=ext-4.2.2-commercial.zip -Dext.version=4.2.2
+    mvn -Pinstall-ext -Dext.dist=ext-4.2.3-commercial.zip -Dext.version=4.2.3
