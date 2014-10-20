@@ -21,6 +21,13 @@ java_import org.sonatype.nexus.ruby.GemspecHelper
 # the underlying object.
 #
 # @author Christian Meier
+
+# workaround https://github.com/jruby/jruby/issues/2035 until
+# the next version of maven-tools gem is released
+if Encoding.default_external.to_s != 'UTF-8'
+  warn "set default encoding to UTF-8 for current runtime"
+  Encoding.default_external = 'utf-8'
+end
 module Nexus
   class GemspecHelperImpl
     include GemspecHelper
