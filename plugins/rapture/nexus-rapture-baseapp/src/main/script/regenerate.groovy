@@ -14,7 +14,7 @@
 // Sanity check sencha cmd
 def senchaExe = 'sencha'
 ant.exec(executable: senchaExe, failonerror: true) {
-  arg line: 'which'
+  arg(line: 'which')
 }
 
 // Extract extjs distribution
