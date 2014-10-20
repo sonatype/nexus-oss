@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.ruby;
 
 import java.io.File;
@@ -23,9 +24,9 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.jruby.embed.PathType;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -36,19 +37,19 @@ import static org.hamcrest.Matchers.hasSize;
 public class SpecsHelperTest
     extends TestSupport
 {
-  private ScriptingContainer scriptingContainer;
+  @Rule
+  public TestScriptingContainerRule scriptingContainerRule = new TestScriptingContainerRule();
 
   private RubygemsGateway gateway;
-  
-  private SpecsHelper specsHelper; 
-  
+
+  private SpecsHelper specsHelper;
+
   private IRubyObject check;
 
   @Before
   public void setUp() throws Exception {
-    scriptingContainer = new TestScriptingContainer();
-    gateway = new DefaultRubygemsGateway(scriptingContainer);
-    check = scriptingContainer.parse(PathType.CLASSPATH, "nexus/check.rb").run();
+    gateway = new DefaultRubygemsGateway(scriptingContainerRule.get());
+    check = scriptingContainerRule.get().parse(PathType.CLASSPATH, "nexus/check.rb").run();
     specsHelper = gateway.newSpecsHelper();
   }
 
@@ -58,7 +59,7 @@ public class SpecsHelperTest
 
     dumpStream(specsHelper.createEmptySpecs(), empty);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.get().callMethod(check, "specs_size",
         empty.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
   }
@@ -95,7 +96,7 @@ public class SpecsHelperTest
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -106,7 +107,7 @@ public class SpecsHelperTest
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -122,7 +123,7 @@ public class SpecsHelperTest
     File empty = new File("src/test/resources/empty_specs");
     File latestSpecsFile = new File("target/test_latest_specs");
     File releaseSpecsFile = new File("target/test_release_specs");
-    
+
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
     IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
@@ -138,20 +139,20 @@ public class SpecsHelperTest
     // add a gem with newer version to release and latest index
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
     IRubyObject s = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
-    
+
     releaseStream = specsHelper.addSpec(s, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(releaseStream, releaseSpecsFile);
-    
+
     InputStream is = specsHelper.addSpec(s, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
     // check the latest index
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.get().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
-    
+
     // check the release index
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(3));
 
@@ -159,7 +160,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(s, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(is, releaseSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -167,7 +168,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(s, new FileInputStream(latestSpecsFile), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -176,14 +177,14 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(spec, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(is, releaseSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
     is = specsHelper.deleteSpec(spec, new FileInputStream(latestSpecsFile), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }
@@ -200,7 +201,7 @@ public class SpecsHelperTest
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
@@ -208,7 +209,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(spec, new FileInputStream(target), SpecsIndexType.RELEASE);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
 
@@ -220,7 +221,7 @@ public class SpecsHelperTest
     is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }
@@ -237,7 +238,7 @@ public class SpecsHelperTest
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.PRERELEASE);
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
@@ -245,7 +246,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(spec, new FileInputStream(target), SpecsIndexType.PRERELEASE);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
 
@@ -257,7 +258,7 @@ public class SpecsHelperTest
     is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.get().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }
