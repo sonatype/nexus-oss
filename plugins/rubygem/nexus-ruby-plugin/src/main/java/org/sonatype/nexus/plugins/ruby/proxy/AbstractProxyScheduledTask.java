@@ -18,6 +18,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+// FIXME: This is only used by SyncRubygemsMetadataTask, why do we need this abstraction?
+
 public abstract class AbstractProxyScheduledTask
     extends AbstractNexusRepositoriesTask<Object>
 {

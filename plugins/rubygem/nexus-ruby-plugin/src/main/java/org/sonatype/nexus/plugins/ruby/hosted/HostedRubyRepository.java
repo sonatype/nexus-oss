@@ -17,6 +17,11 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 
+/**
+ * Rubygems hosted repository.
+ *
+ * @since 2.11
+ */
 public interface HostedRubyRepository
     extends RubyRepository, HostedRepository
 {

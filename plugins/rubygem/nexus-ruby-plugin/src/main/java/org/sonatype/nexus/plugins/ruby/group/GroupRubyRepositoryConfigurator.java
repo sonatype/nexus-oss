@@ -14,8 +14,14 @@ package org.sonatype.nexus.plugins.ruby.group;
 
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.ruby.RubyGroupRepository;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
 
+/**
+ * {@link RubyGroupRepository} configurator.
+ *
+ * @since 2.11
+ */
 @Singleton
 public class GroupRubyRepositoryConfigurator
     extends AbstractGroupRepositoryConfigurator

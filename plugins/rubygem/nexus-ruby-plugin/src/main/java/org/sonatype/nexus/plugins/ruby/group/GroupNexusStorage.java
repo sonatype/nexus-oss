@@ -46,6 +46,11 @@ import org.sonatype.nexus.ruby.layout.ProxyStorage;
 
 import org.codehaus.plexus.util.IOUtil;
 
+/**
+ * Rubygems group storage.
+ *
+ * @since 2.11
+ */
 public class GroupNexusStorage
     extends NexusStorage
     implements ProxyStorage
@@ -77,14 +82,12 @@ public class GroupNexusStorage
     catch (ItemNotFoundException e) {
       file.markAsNotExists();
     }
-    catch (IOException | IllegalOperationException | UnsupportedStorageOperationException e) {
+    catch (Exception e) {
       file.setException(e);
     }
   }
 
-  private StorageItem setup(RubygemsFile file)
-      throws ItemNotFoundException, UnsupportedStorageOperationException, IOException, IllegalOperationException
-  {
+  private StorageItem setup(RubygemsFile file) throws Exception {
     ResourceStoreRequest req = new ResourceStoreRequest(file.storagePath());
     // TODO is synchronized really needed
     synchronized (repository) {
@@ -96,9 +99,7 @@ public class GroupNexusStorage
     }
   }
 
-  private StorageItem store(RubygemsFile file, List<StorageItem> items)
-      throws UnsupportedStorageOperationException, IllegalOperationException, IOException
-  {
+  private StorageItem store(RubygemsFile file, List<StorageItem> items) throws Exception {
     StorageFileItem localItem = null;
     try {
       localItem = (StorageFileItem) repository.getLocalStorage().retrieveItem(repository,
@@ -134,9 +135,7 @@ public class GroupNexusStorage
     }
   }
 
-  private StorageItem merge(SpecsIndexZippedFile file, List<StorageItem> items)
-      throws UnsupportedStorageOperationException, IOException, IllegalOperationException
-  {
+  private StorageItem merge(SpecsIndexZippedFile file, List<StorageItem> items) throws Exception {
     MergeSpecsHelper specs = gateway.newMergeSpecsHelper();
     for (StorageItem item : items) {
       try (InputStream is = ((StorageFileItem) item).getInputStream()) {
@@ -148,9 +147,7 @@ public class GroupNexusStorage
     }
   }
 
-  private StorageItem storeSpecsIndex(SpecsIndexZippedFile file, InputStream content)
-      throws UnsupportedStorageOperationException, IOException, IllegalOperationException
-  {
+  private StorageItem storeSpecsIndex(SpecsIndexZippedFile file, InputStream content) throws Exception {
     ByteArrayOutputStream gzipped = new ByteArrayOutputStream();
     try (OutputStream out = new GZIPOutputStream(gzipped)) {
       IOUtil.copy(content, out);
@@ -165,9 +162,7 @@ public class GroupNexusStorage
     return item;
   }
 
-  private StorageItem merge(DependencyFile file, List<StorageItem> dependencies)
-      throws UnsupportedStorageOperationException, IllegalOperationException, IOException
-  {
+  private StorageItem merge(DependencyFile file, List<StorageItem> dependencies) throws Exception {
     DependencyHelper deps = gateway.newDependencyHelper();
     for (StorageItem item : dependencies) {
       try (InputStream is = ((StorageFileItem) item).getInputStream()) {

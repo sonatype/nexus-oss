@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -38,6 +39,11 @@ import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.cuba.RubygemsFileSystem;
 
+/**
+ * ???
+ *
+ * @since 2.11
+ */
 public class NexusRubygemsFacade
 {
   private final RubygemsFileSystem filesystem;
@@ -91,7 +97,7 @@ public class NexusRubygemsFacade
 
   @SuppressWarnings("deprecation")
   public StorageItem handleCommon(RubyRepository repository, RubygemsFile file)
-      throws IllegalOperationException, org.sonatype.nexus.proxy.StorageException
+      throws IllegalOperationException, StorageException
   {
     switch (file.state()) {
       case ERROR:
@@ -102,11 +108,11 @@ public class NexusRubygemsFacade
         if (e instanceof RemoteAccessException) {
           throw (RemoteAccessException) e;
         }
-        if (e instanceof org.sonatype.nexus.proxy.StorageException) {
-          throw (org.sonatype.nexus.proxy.StorageException) e;
+        if (e instanceof StorageException) {
+          throw (StorageException) e;
         }
         if (e instanceof IOException) {
-          throw new org.sonatype.nexus.proxy.StorageException(e);
+          throw new StorageException(e);
         }
         throw new RuntimeException(e);
       case PAYLOAD:
@@ -125,7 +131,7 @@ public class NexusRubygemsFacade
 
   @SuppressWarnings("deprecation")
   public StorageItem handleMutation(RubyRepository repository, RubygemsFile file)
-      throws IllegalOperationException, org.sonatype.nexus.proxy.StorageException, UnsupportedStorageOperationException
+      throws IllegalOperationException, StorageException, UnsupportedStorageOperationException
   {
     switch (file.state()) {
       case ERROR:
@@ -167,7 +173,7 @@ public class NexusRubygemsFacade
     @SuppressWarnings("deprecation")
     @Override
     public Collection<StorageItem> list()
-        throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, org.sonatype.nexus.proxy.StorageException
+        throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, StorageException
     {
       Collection<StorageItem> result;
       try {
@@ -192,7 +198,7 @@ public class NexusRubygemsFacade
 
   @SuppressWarnings("deprecation")
   public StorageItem handleRetrieve(RubyRepository repository, ResourceStoreRequest req, RubygemsFile file)
-      throws IllegalOperationException, org.sonatype.nexus.proxy.StorageException, ItemNotFoundException
+      throws IllegalOperationException, StorageException, ItemNotFoundException
   {
     switch (file.state()) {
       case NO_PAYLOAD:

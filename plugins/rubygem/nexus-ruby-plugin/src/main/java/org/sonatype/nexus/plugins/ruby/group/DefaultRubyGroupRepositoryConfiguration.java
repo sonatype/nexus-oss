@@ -16,6 +16,11 @@ import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfiguration;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * {@link DefaultRubyGroupRepository} configuration.
+ *
+ * @since 2.11
+ */
 public class DefaultRubyGroupRepositoryConfiguration
     extends AbstractGroupRepositoryConfiguration
 {

@@ -16,7 +16,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
+/**
+ * Rubygems repository {@link ContentClass}.
+ *
+ * @since 2.11
+ */
 @Singleton
 @Named(RubyContentClass.ID)
 public class RubyContentClass

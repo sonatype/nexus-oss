@@ -51,6 +51,11 @@ import org.sonatype.nexus.ruby.layout.ProxiedRubygemsFileSystem;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * Default {@link ProxyRubyRepository} implementation.
+ *
+ * @since 2.11
+ */
 @Named(DefaultProxyRubyRepository.ID)
 public class DefaultProxyRubyRepository
     extends AbstractProxyRepository
@@ -69,10 +74,9 @@ public class DefaultProxyRubyRepository
   private NexusRubygemsFacade facade;
 
   @Inject
-  public DefaultProxyRubyRepository(@Named(RubyContentClass.ID) ContentClass contentClass,
-                                    ProxyRubyRepositoryConfigurator configurator,
-                                    RubygemsGateway gateway)
-      throws LocalStorageException, ItemNotFoundException
+  public DefaultProxyRubyRepository(final @Named(RubyContentClass.ID) ContentClass contentClass,
+                                    final ProxyRubyRepositoryConfigurator configurator,
+                                    final RubygemsGateway gateway)
   {
     this.contentClass = contentClass;
     this.configurator = configurator;

@@ -20,6 +20,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * Rubygems hosted repository rebuild metadata task.
+ *
+ * @since 2.11
+ */
 @Named(RebuildRubygemsMetadataTaskDescriptor.ID)
 public class RebuildRubygemsMetadataTask
     extends AbstractNexusRepositoriesTask<Object>

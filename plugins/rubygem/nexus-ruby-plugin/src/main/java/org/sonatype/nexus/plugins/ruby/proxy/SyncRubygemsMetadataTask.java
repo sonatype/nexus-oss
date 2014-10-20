@@ -14,6 +14,11 @@ package org.sonatype.nexus.plugins.ruby.proxy;
 
 import javax.inject.Named;
 
+/**
+ * Rubygems synchronize metadata task.
+ *
+ * @since 2.11
+ */
 @Named(SyncRubygemsMetadataTaskDescriptor.ID)
 public class SyncRubygemsMetadataTask
     extends AbstractProxyScheduledTask

@@ -22,6 +22,11 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
+/**
+ * {@link SyncRubygemsMetadataTask} descriptor.
+ *
+ * @since 2.11
+ */
 @Singleton
 @Named("SyncRubygemsMetadata")
 public class SyncRubygemsMetadataTaskDescriptor

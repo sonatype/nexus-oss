@@ -19,6 +19,11 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
+/**
+ * Rubygems proxy repository.
+ *
+ * @since 2.11
+ */
 public interface ProxyRubyRepository
     extends RubyRepository, ProxyRepository
 {

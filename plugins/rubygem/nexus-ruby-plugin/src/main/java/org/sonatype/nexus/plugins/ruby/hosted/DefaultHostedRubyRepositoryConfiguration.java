@@ -16,6 +16,11 @@ import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfiguration;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * {@link DefaultHostedRubyRepository} configuration.
+ *
+ * @since 2.11
+ */
 public class DefaultHostedRubyRepositoryConfiguration
     extends AbstractRepositoryConfiguration
 {

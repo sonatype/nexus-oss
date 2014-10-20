@@ -16,6 +16,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.repository.AbstractRepositoryConfigurator;
 
+/**
+ * {@link HostedRubyRepository} configurator.
+ *
+ * @since 2.11
+ */
 @Singleton
 public class HostedRubyRepositoryConfigurator
     extends AbstractRepositoryConfigurator

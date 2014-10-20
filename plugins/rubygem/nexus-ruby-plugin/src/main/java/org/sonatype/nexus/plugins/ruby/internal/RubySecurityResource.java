@@ -22,7 +22,9 @@ import org.sonatype.nexus.plugins.ruby.RubyPlugin;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 /**
- * Ruby's {@link StaticSecurityResource}.
+ * Rubygems plugin {@link StaticSecurityResource}.
+ *
+ * @since 2.11
  */
 @Named
 @Singleton
