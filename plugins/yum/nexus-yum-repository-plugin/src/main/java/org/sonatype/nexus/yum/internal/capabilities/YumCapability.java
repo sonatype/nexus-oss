@@ -10,15 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.capabilities;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.Evaluable;
 import org.sonatype.nexus.yum.YumRegistry;
+import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
+
+import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,11 +39,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class YumCapability
     extends CapabilitySupport<YumCapabilityConfiguration>
 {
+  @NonNls
+  public static final String NL = System.getProperty("line.separator");
+
   private final YumRegistry yumRegistry;
 
+  private final CommandLineExecutor commandLineExecutor;
+
+  private String binariesLog;
+
+  private String binariesNotAvailableMessage;
+
   @Inject
-  public YumCapability(final YumRegistry yumRegistry) {
+  public YumCapability(final YumRegistry yumRegistry,
+                       final CommandLineExecutor commandLineExecutor)
+  {
     this.yumRegistry = checkNotNull(yumRegistry);
+    this.commandLineExecutor = checkNotNull(commandLineExecutor);
   }
 
   @Override
@@ -46,5 +66,75 @@ public class YumCapability
   @Override
   protected void onActivate(final YumCapabilityConfiguration config) throws Exception {
     yumRegistry.setMaxNumberOfParallelThreads(config.maxNumberParallelThreads());
+  }
+
+  /**
+   * Only activate if create/mergerepo are available (running with --version executes successfully).
+   *
+   * @since 2.11
+   */
+  @Override
+  public Condition activationCondition() {
+    return conditions().capabilities().evaluable(
+        new Evaluable()
+        {
+          @Override
+          public boolean isSatisfied() {
+            StringBuilder sb = new StringBuilder();
+            binariesNotAvailableMessage = null;
+
+            sb.append("createrepo version:").append(NL);
+            try {
+              ByteArrayOutputStream baos = new ByteArrayOutputStream();
+              if (commandLineExecutor.exec("createrepo --version", baos, baos) != 0) {
+                binariesNotAvailableMessage = "createrepo";
+              }
+              sb.append(new String(baos.toByteArray()));
+            }
+            catch (IOException e) {
+              binariesNotAvailableMessage = "createrepo";
+              sb.append(e.getMessage()).append(NL);
+            }
+
+            sb.append(NL).append("mergerepo version:").append(NL);
+            try {
+              ByteArrayOutputStream baos = new ByteArrayOutputStream();
+              if (commandLineExecutor.exec("mergerepo --version", baos, baos) != 0) {
+                binariesNotAvailableMessage += (binariesNotAvailableMessage == null ? "" : " and ") + "mergerepo";
+              }
+              sb.append(new String(baos.toByteArray()));
+            }
+            catch (IOException e) {
+              binariesNotAvailableMessage += (binariesNotAvailableMessage == null ? "" : " and ") + "mergerepo";
+              sb.append(e.getMessage()).append(NL);
+            }
+            binariesLog = sb.toString().replace(NL, "<br/>");
+            if (binariesNotAvailableMessage != null) {
+              binariesNotAvailableMessage += " not available (see status for details)";
+            }
+            return binariesNotAvailableMessage == null;
+          }
+
+          @Override
+          public String explainSatisfied() {
+            return "createrepo and mergerepo are available";
+          }
+
+          @Override
+          public String explainUnsatisfied() {
+            return binariesNotAvailableMessage;
+          }
+        }
+    );
+  }
+
+  /**
+   * Show output of create/mergerepo --version.
+   *
+   * @since 2.11
+   */
+  @Override
+  protected String renderStatus() {
+    return binariesLog;
   }
 }

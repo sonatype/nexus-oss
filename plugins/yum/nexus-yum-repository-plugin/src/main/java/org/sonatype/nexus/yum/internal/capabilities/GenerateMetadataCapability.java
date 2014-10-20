@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.yum.internal.capabilities;
 
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumHosted;
@@ -56,6 +58,14 @@ public class GenerateMetadataCapability
   @Override
   protected GenerateMetadataCapabilityConfiguration createConfig(final Map<String, String> properties) {
     return new GenerateMetadataCapabilityConfiguration(properties);
+  }
+
+  /**
+   * @since 2.11
+   */
+  @Override
+  public Condition activationCondition() {
+    return conditions().capabilities().capabilityOfTypeActive(YumCapabilityDescriptor.TYPE);
   }
 
 }
