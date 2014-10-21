@@ -14,26 +14,38 @@ package org.sonatype.nexus.plugins.ruby;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 
+import com.google.common.eventbus.Subscribe;
 import org.jruby.embed.ScriptingContainer;
-
-// NOTE: this component is NOT a singleton, but it uses the singleton scripting container.
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * ???
+ * Factory for Ruby backed helpers that also hooks into NX eventing and closes the gateway on system stop.
  *
  * @since 2.11
  */
+@Singleton
 @Named
 public class NexusRubygemsGateway
-    extends DefaultRubygemsGateway
+    extends DefaultRubygemsGateway implements EventSubscriber
 {
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
   @Inject
-  public NexusRubygemsGateway(final Provider<ScriptingContainer> containerProvider) {
-    super(containerProvider.get());
+  public NexusRubygemsGateway(final ScriptingContainer container) {
+    super(container);
+    log.debug("Creating RubygemsGateway");
+  }
+
+  @Subscribe
+  public void on(final NexusStoppedEvent event) {
+    log.debug("Terminating RubygemsGateway");
+    terminate();
   }
 }

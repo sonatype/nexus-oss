@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.nexus.ruby.DependencyFile;
 import org.sonatype.nexus.ruby.Directory;
 import org.sonatype.nexus.ruby.FileType;
@@ -78,12 +77,12 @@ public class ProxiesGETLayoutTest
   public ProxiesGETLayoutTest(Storage store) {
     if (store instanceof CachingProxyStorage) {
       fileSystem = new DefaultRubygemsFileSystem(
-          new ProxiedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+          new ProxiedGETLayout(rubygemsGateway(),
               (CachingProxyStorage) store),
           null, null);
     }
     else {
-      fileSystem = new DefaultRubygemsFileSystem(new GETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+      fileSystem = new DefaultRubygemsFileSystem(new GETLayout(rubygemsGateway(),
           store)
       {
 

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.nexus.ruby.Directory;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.GemArtifactFile;
@@ -85,7 +84,7 @@ public class HostedGETLayoutTest
 
   public HostedGETLayoutTest(Storage store) {
     bootstrap = new DefaultRubygemsFileSystem(
-        new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+        new HostedGETLayout(rubygemsGateway(),
             store),
         null, null);
   }

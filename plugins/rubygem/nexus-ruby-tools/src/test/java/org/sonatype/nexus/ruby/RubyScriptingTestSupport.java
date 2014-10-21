@@ -19,28 +19,35 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 
+import org.jruby.embed.ScriptingContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * Support class that needs heavy-weight {@link TestScriptingContainer} to have available in places like constructor.
+ * Support class that needs heavy-weight {@link TestJRubyContainer} to have available in places like constructor.
  * The container is manager "per-class" of the test.
  */
 public abstract class RubyScriptingTestSupport
     extends TestSupport
 {
-  protected static TestScriptingContainer testScriptingContainer;
+  private static TestJRubyContainer testScriptingContainer = new TestJRubyContainer();
 
   @BeforeClass
   public static void createContainer() {
-    testScriptingContainer = new TestScriptingContainer();
+    testScriptingContainer.start();
   }
 
   @AfterClass
   public static void terminateContainer() {
-    if (testScriptingContainer != null) {
-      testScriptingContainer.terminate();
-    }
+    testScriptingContainer.stop();
+  }
+
+  protected ScriptingContainer scriptingContainer() {
+    return testScriptingContainer.getScriptingContainer();
+  }
+
+  protected RubygemsGateway rubygemsGateway() {
+    return testScriptingContainer.getRubygemsGateway();
   }
 
   protected String loadPomResource(String name) throws IOException {
