@@ -15,6 +15,8 @@ package org.sonatype.nexus.views.rawbinaries.internal.storage;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -32,9 +34,10 @@ public interface RawBinaryStore
   List<RawBinary> getForPath(String prefix);
 
   /**
-   * Returns false if the creation was disallowed because another binary already exists at that path.
+   * Returns the newly created {@link RawBinary}, {@code null} if it does not.
    */
-  boolean create(String path, String mimeType, InputStream inputStream);
+  @Nullable
+  RawBinary create(String path, String contentType, InputStream inputStream);
 
   /**
    * Returns true if an artifact was deleted, false if there was no artifact to delete.

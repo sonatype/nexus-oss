@@ -15,9 +15,6 @@ package org.sonatype.nexus.componentviews;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.componentviews.Handler;
-import org.sonatype.nexus.componentviews.ViewRequest;
-import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
 
 /**
@@ -31,7 +28,7 @@ public class NotFoundHandler
     implements Handler
 {
   @Override
-  public ViewResponse handle(final ViewRequest req) {
+  public ViewResponse handle(final HandlerContext context) {
     return Responses.notFound(null);
   }
 }

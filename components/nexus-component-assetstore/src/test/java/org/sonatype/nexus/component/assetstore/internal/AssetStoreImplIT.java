@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
@@ -68,7 +69,7 @@ public class AssetStoreImplIT
 
   private OrientRecordStore recordStore;
 
-  private MapdbBlobMetadataStore blobMetadataStore;
+  private BlobMetadataStore blobMetadataStore;
 
   private BlobStore blobStore;
 
@@ -108,7 +109,7 @@ public class AssetStoreImplIT
       maybeDropType(schema, AssetStoreImpl.COMPONENT_RECORD);
     }
 
-    this.blobMetadataStore = new MapdbBlobMetadataStore(blobMetadataPath.toFile());
+    this.blobMetadataStore = MapdbBlobMetadataStore.create(blobMetadataPath.toFile());
     blobMetadataStore.start();
 
     blobStore = new FileBlobStore(blobContentPath, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), blobMetadataStore);

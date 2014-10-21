@@ -15,12 +15,14 @@ package org.sonatype.nexus.componentviews.internal.orient;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigId;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
@@ -100,6 +102,11 @@ public class OrientViewConfigStore
   }
 
   @Override
+  public ViewId createId(final String name) {
+    return new ViewId(name, UUID.randomUUID().toString());
+  }
+
+  @Override
   public ViewConfigId add(final ViewConfig item) throws IOException {
     ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {
@@ -167,7 +174,7 @@ public class OrientViewConfigStore
     try (ODatabaseDocumentTx db = openDb()) {
 
       OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
-          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE viewName = ?");
+          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE " + ViewConfigEntityAdapter.P_VIEWNAME + " = ?");
 
       final List<ODocument> results = db.command(query).execute(viewName);
 

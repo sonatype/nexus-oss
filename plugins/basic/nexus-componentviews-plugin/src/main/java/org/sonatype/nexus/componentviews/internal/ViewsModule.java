@@ -14,10 +14,6 @@ package org.sonatype.nexus.componentviews.internal;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.componentviews.config.ViewFactorySource;
-import org.sonatype.nexus.componentviews.config.ViewConfigStore;
-import org.sonatype.nexus.componentviews.internal.orient.OrientViewConfigStore;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
 import org.slf4j.Logger;
@@ -34,7 +30,7 @@ public class ViewsModule
 {
   private static final Logger log = LoggerFactory.getLogger(ViewsModule.class);
 
-  public static final String MOUNT_POINT = "/views/*";
+  public static final String MOUNT_POINT = "/view/*";
 
   @Override
   protected void configure() {
@@ -43,8 +39,7 @@ public class ViewsModule
       @Override
       protected void configureServlets() {
         bind(ComponentViewServlet.class);
-        serve("/views").with(ComponentViewServlet.class);
-        serve("/views/*").with(ComponentViewServlet.class);
+        serve(MOUNT_POINT).with(ComponentViewServlet.class);
       }
     });
     log.info("Nexus component views configured.");

@@ -20,7 +20,7 @@ package org.sonatype.nexus.componentviews;
 public interface Handler
 {
   /**
-   * Determines the appropriate {@link ViewResponse} given the request.
+   * Determines the appropriate {@link ViewResponse} given the request and its context.
    */
-  ViewResponse handle(ViewRequest req);
+  ViewResponse handle(HandlerContext context) throws Exception;
 }

@@ -14,6 +14,7 @@ package org.sonatype.nexus.componentviews.internal.orient;
 
 import java.util.Map;
 
+import org.sonatype.nexus.componentviews.ViewId;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -35,14 +36,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ViewConfigEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "viewConfig";
+  public static final String DB_CLASS = new OClassNameBuilder().type("ViewConfig").build();
 
-  public static final String DB_CLASS = new OClassNameBuilder()
-      .prefix(DB_PREFIX)
-      .type(ViewConfig.class)
-      .build();
+  public static final String P_VIEWNAME = "name";
 
-  public static final String P_VIEWNAME = "viewName";
+  public static final String P_VIEWID = "id";
 
   public static final String P_FACTORYNAME = "factoryName";
 
@@ -61,10 +59,12 @@ public class ViewConfigEntityAdapter
       type = schema.createClass(DB_CLASS);
 
       type.createProperty(P_VIEWNAME, OType.STRING).setNotNull(true);
-      type.createIndex(P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
+      type.createProperty(P_VIEWID, OType.STRING).setNotNull(true);
       type.createProperty(P_FACTORYNAME, OType.STRING).setNotNull(true);
       type.createProperty(P_CONFIGURATION, OType.EMBEDDEDMAP);
 
+      type.createIndex(DB_CLASS + "_" + P_VIEWNAME + "idx", INDEX_TYPE.UNIQUE, P_VIEWNAME);
+      type.createIndex(DB_CLASS + "_" + P_VIEWID + "idx", INDEX_TYPE.UNIQUE, P_VIEWID);
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
     return type;
@@ -88,7 +88,11 @@ public class ViewConfigEntityAdapter
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_VIEWNAME, entity.getViewName());
+    final String viewName = entity.getViewName();
+    final String viewId = entity.getViewId().getInternalId();
+
+    document.field(P_VIEWNAME, viewName);
+    document.field(P_VIEWID, viewId);
     document.field(P_FACTORYNAME, entity.getFactoryName());
     document.field(P_CONFIGURATION, entity.getConfiguration());
 
@@ -101,10 +105,11 @@ public class ViewConfigEntityAdapter
   public ViewConfig read(final ODocument document) {
     checkNotNull(document);
 
-    ViewConfig entity = new ViewConfig((String) document.field(P_VIEWNAME, OType.STRING),
-        (String) document.field(P_FACTORYNAME, OType.STRING),
-        (Map<String, Object>) document.field(P_CONFIGURATION, OType.EMBEDDEDMAP)
-    );
+    final String viewName = document.field(P_VIEWNAME, OType.STRING);
+    final String internalId = document.field(P_VIEWID, OType.STRING);
+    final String factoryName = document.field(P_FACTORYNAME, OType.STRING);
+    final Map<String, Object> config = document.field(P_CONFIGURATION, OType.EMBEDDEDMAP);
+    ViewConfig entity = new ViewConfig(new ViewId(viewName, internalId), factoryName, config);
 
     return entity;
   }

@@ -105,28 +105,7 @@ public class OrientRawBinaryStore
 
         final Blob blob = blobStore.get(new BlobId(metadata.getBlobId()));
 
-        binaries.add(new RawBinary()
-        {
-          @Override
-          public String getPath() {
-            return metadata.getPath();
-          }
-
-          @Override
-          public InputStream getInputStream() {
-            return blob.getInputStream();
-          }
-
-          @Override
-          public String getMimeType() {
-            return metadata.getMimeType();
-          }
-
-          @Override
-          public DateTime getModifiedDate() {
-            return blob.getMetrics().getCreationTime();
-          }
-        });
+        binaries.add(asRawBinary(metadata, blob));
       }
 
       return binaries;
@@ -134,29 +113,29 @@ public class OrientRawBinaryStore
   }
 
   @Override
-  public boolean create(final String path, final String mimeType, final InputStream inputStream) {
+  public RawBinary create(final String path, final String contentType, final InputStream inputStream) {
     if (exists(path)) {
-      return false;
+      return null;
     }
 
     Map<String, String> blobMetadata = new HashMap<>();
     blobMetadata.put(BlobStore.BLOB_NAME_HEADER, path);
     blobMetadata.put(BlobStore.CREATED_BY_HEADER, "Unknown");
-    blobMetadata.put("mimeType", mimeType);
+    blobMetadata.put("contentType", contentType);
 
     final Blob blob = blobStore.create(inputStream, blobMetadata);
 
-    final RawBinaryMetadata item = new RawBinaryMetadata(path, blob.getId().asUniqueString(), mimeType);
+    final RawBinaryMetadata metadata = new RawBinaryMetadata(path, blob.getId().asUniqueString(), contentType);
 
     ORID rid;
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = entityAdapter.create(db, item);
+      ODocument doc = entityAdapter.create(db, metadata);
       rid = doc.getIdentity();
     }
 
     log.debug("Added item with RID: {}", rid);
 
-    return true;
+    return asRawBinary(metadata, blob);
   }
 
   private boolean exists(final String path) {
@@ -193,6 +172,31 @@ public class OrientRawBinaryStore
       log.debug("Deleted item with RID: {}", rid);
       return true;
     }
+  }
+
+  private RawBinary asRawBinary(final RawBinaryMetadata metadata, final Blob blob) {
+    return new RawBinary()
+    {
+      @Override
+      public String getPath() {
+        return metadata.getPath();
+      }
+
+      @Override
+      public InputStream getInputStream() {
+        return blob.getInputStream();
+      }
+
+      @Override
+      public String getContentType() {
+        return metadata.getContentType();
+      }
+
+      @Override
+      public DateTime getModifiedDate() {
+        return blob.getMetrics().getCreationTime();
+      }
+    };
   }
 
   /**

@@ -17,6 +17,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.componentviews.ViewId;
+import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -28,6 +30,14 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface ViewConfigStore
     extends Lifecycle
 {
+  /**
+   * Creates a new {@link ViewConfigId} based on a user-provided name, which should be invoked to provide new views
+   * an {@link ViewConfig#getViewId() id}.
+   *
+   * To find an existing view based on its name, use {@link ViewRegistry#getView(String)}.
+   */
+  ViewId createId(String name);
+
   /**
    * Adds a config
    *

@@ -17,6 +17,7 @@ import java.util.Formatter;
 import java.util.List;
 
 import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
@@ -35,24 +36,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class RawBinariesHandler
+public class HostedRawBinariesHandler
     implements Handler
 {
   private final RawBinaryStore binaryStore;
 
-  public RawBinariesHandler(final RawBinaryStore binaryStore) {
+  public HostedRawBinariesHandler(final RawBinaryStore binaryStore) {
     this.binaryStore = checkNotNull(binaryStore);
   }
 
   @Override
-  public ViewResponse handle(final ViewRequest req) {
+  public ViewResponse handle(final HandlerContext context) {
+    ViewRequest req = context.getRequest();
+
+    String binaryPath = ensureLeadingSlash(
+        req.getPath() + (req.getQueryString() == null ? "" : "?" + req.getQueryString()));
     switch (req.getMethod()) {
 
       case PUT:
         try {
-          final boolean result = binaryStore.create(req.getPath(), req.getContentType(), req.getInputStream());
+          final RawBinary created = binaryStore.create(binaryPath, req.getContentType(), req.getInputStream());
 
-          if (result) {
+          if (created != null) {
             return Responses.created();
           }
           else {
@@ -65,7 +70,7 @@ public class RawBinariesHandler
         }
 
       case DELETE:
-        if (binaryStore.delete(req.getPath())) {
+        if (binaryStore.delete(binaryPath)) {
           return Responses.deleted();
         }
         else {
@@ -73,24 +78,27 @@ public class RawBinariesHandler
         }
 
       case GET:
-        final List<RawBinary> forPath = binaryStore.getForPath(req.getPath());
+        final List<RawBinary> binaries = binaryStore.getForPath(binaryPath);
 
         // Do we have a single result whose path matches the request exactly?
-        if (isSuccesfulRequestForSingleArtifact(req, forPath)) {
-          final RawBinary binary = forPath.get(0);
+        if (isSuccesfulRequestForSingleArtifact(binaryPath, binaries)) {
+          final RawBinary binary = binaries.get(0);
           return Responses
-              .streamResponse(binary.getInputStream(), binary.getMimeType(), binary.getModifiedDate().toDate());
+              .streamResponse(binary.getInputStream(), binary.getContentType(), binary.getModifiedDate().toDate());
         }
 
         StringBuilder html = new StringBuilder();
         html.append("<html><body>");
         // missing HTML encoding
 
-        html.append("<h1>").append(HtmlEscapers.htmlEscaper().escape(req.getPath())).append("</h1>");
+        html.append("<h1>").append(HtmlEscapers.htmlEscaper().escape(binaryPath)).append("</h1>");
         html.append("<ul>");
 
-        for (RawBinary binary : forPath) {
-          html.append(new Formatter().format("<li><a href=\"$s\">$s</a></li>", binary.getPath(), binary.getPath()));
+        for (RawBinary binary : binaries) {
+
+          html.append(
+              new Formatter()
+                  .format("<li><a href=\"%s\">%s</a></li>", stripLeadingSlash(binary.getPath()), binary.getPath()));
         }
         html.append("</ul>");
         html.append("</body></html>");
@@ -101,7 +109,15 @@ public class RawBinariesHandler
     }
   }
 
-  private boolean isSuccesfulRequestForSingleArtifact(final ViewRequest req, final List<RawBinary> forPath) {
-    return forPath.size() == 1 && forPath.get(0).getPath().equals(req.getPath());
+  private String stripLeadingSlash(String path) {
+    return path.startsWith("/") ? path.substring(1) : path;
+  }
+
+  private String ensureLeadingSlash(String path) {
+    return path.startsWith("/") ? path : "/" + path;
+  }
+
+  private boolean isSuccesfulRequestForSingleArtifact(final String requestedPath, final List<RawBinary> forPath) {
+    return forPath.size() == 1 && forPath.get(0).getPath().equals(requestedPath);
   }
 }

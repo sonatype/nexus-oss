@@ -50,7 +50,7 @@ public class FileBlobStoreIT
       BLOB_NAME_HEADER, "test/randomData.bin"
   );
 
-  private MapdbBlobMetadataStore metadataStore;
+  private BlobMetadataStore metadataStore;
 
   private FileBlobStore underTest;
 
@@ -60,7 +60,7 @@ public class FileBlobStoreIT
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
 
-    this.metadataStore = new MapdbBlobMetadataStore(metadata.toFile());
+    this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
     this.underTest = new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(),
         metadataStore);
     underTest.start();

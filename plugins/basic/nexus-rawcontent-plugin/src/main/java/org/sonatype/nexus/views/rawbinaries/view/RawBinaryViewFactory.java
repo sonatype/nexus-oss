@@ -17,14 +17,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
+import org.sonatype.nexus.componentviews.Handler;
+import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
-import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 
 /**
  * @since 3.0
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawBinaryViewFactory
     implements ViewFactory
 {
-  public static final String RAW_BINARY_RECIPE = "rawBinary";
+  public static final String FACTORY_NAME = "rawBinary";
 
   private final RawBinaryStore binaryStore;
 
@@ -48,7 +50,7 @@ public class RawBinaryViewFactory
 
   @Override
   public String getFactoryName() {
-    return RAW_BINARY_RECIPE;
+    return FACTORY_NAME;
   }
 
   @Override
@@ -58,7 +60,7 @@ public class RawBinaryViewFactory
     final AllRequestMatcher binariesRequestMatcher = new AllRequestMatcher();
 
     final Router router = new Router();
-    router.addRoute(binariesRequestMatcher, new RawBinariesHandler(binaryStore));
+    router.addRoute(binariesRequestMatcher, asList((Handler) new HostedRawBinariesHandler(binaryStore)));
 
     return new View(config, router, notFoundHandler);
   }

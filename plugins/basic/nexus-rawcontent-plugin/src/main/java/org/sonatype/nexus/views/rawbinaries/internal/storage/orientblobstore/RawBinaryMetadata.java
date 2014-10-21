@@ -23,12 +23,12 @@ public class RawBinaryMetadata
 
   private String blobId;
 
-  private String mimeType;
+  private String contentType;
 
-  public RawBinaryMetadata(final String path, final String blobId, final String mimeType) {
+  public RawBinaryMetadata(final String path, final String blobId, final String contentType) {
     this.path = path;
     this.blobId = blobId;
-    this.mimeType = mimeType;
+    this.contentType = contentType;
   }
 
   public String getPath() {
@@ -39,7 +39,7 @@ public class RawBinaryMetadata
     return blobId;
   }
 
-  public String getMimeType() {
-    return mimeType;
+  public String getContentType() {
+    return contentType;
   }
 }

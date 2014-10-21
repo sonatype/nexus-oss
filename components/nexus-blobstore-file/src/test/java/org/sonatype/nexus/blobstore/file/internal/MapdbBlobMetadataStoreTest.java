@@ -18,6 +18,7 @@ import java.util.List;
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.file.AutoClosableIterable;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
+import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -38,13 +39,13 @@ import static org.hamcrest.Matchers.emptyIterable;
 public class MapdbBlobMetadataStoreTest
   extends TestSupport
 {
-  private MapdbBlobMetadataStore underTest;
+  private BlobMetadataStore underTest;
 
   @Before
   public void setUp() throws Exception {
     File root = util.createTempDir("databases");
     File dir = new File(root, "test");
-    this.underTest = new MapdbBlobMetadataStore(dir);
+    this.underTest = MapdbBlobMetadataStore.create(dir);
     underTest.start();
   }
 

@@ -21,7 +21,7 @@ public class AllRequestMatcher
     implements RequestMatcher
 {
   @Override
-  public boolean matches(final ViewRequest request) {
+  public boolean matches(final HandlerContext context) {
     return true;
   }
 }

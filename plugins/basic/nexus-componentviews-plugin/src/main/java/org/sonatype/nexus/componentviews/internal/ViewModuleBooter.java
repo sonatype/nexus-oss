@@ -19,15 +19,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.config.ComponentSourceRegistryInitializedEvent;
 import org.sonatype.nexus.componentviews.ViewRegistry;
 import org.sonatype.nexus.componentviews.config.ViewConfig;
 import org.sonatype.nexus.componentviews.config.ViewConfigContributor;
 import org.sonatype.nexus.componentviews.config.ViewConfigStore;
 import org.sonatype.nexus.componentviews.config.ViewFactory;
 import org.sonatype.nexus.componentviews.config.ViewFactorySource;
-import org.sonatype.nexus.componentviews.example.PathListViewFactory;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -57,13 +56,9 @@ public class ViewModuleBooter
 
   private final Set<ViewConfigContributor> configContributors;
 
-  // TODO: This is a temporary example view
-  private final PathListViewFactory pathListViewFactory;
-
   @Inject
   public ViewModuleBooter(final EventBus eventBus, final ViewFactorySource viewFactorySource,
                           final ViewConfigStore viewConfigStore, final ViewRegistry viewRegistry,
-                          final PathListViewFactory pathListViewFactory,
                           final Set<ViewConfigContributor> configContributors)
   {
     this.configContributors = checkNotNull(configContributors);
@@ -71,11 +66,14 @@ public class ViewModuleBooter
     this.viewFactorySource = checkNotNull(viewFactorySource);
     this.viewConfigStore = checkNotNull(viewConfigStore);
     this.viewRegistry = checkNotNull(viewRegistry);
-    this.pathListViewFactory = checkNotNull(pathListViewFactory);
   }
 
+  /**
+   * Views are dependent on component sources, so wait until the component source registry has been initialized before
+   * creating views.
+   */
   @Subscribe
-  public void on(NexusInitializedEvent event) throws Exception {
+  public void on(ComponentSourceRegistryInitializedEvent event) throws Exception {
     viewConfigStore.start();
     for (ViewConfigContributor contrib : configContributors) {
       contrib.contributeTo(viewConfigStore);
@@ -95,7 +93,7 @@ public class ViewModuleBooter
     for (ViewConfig config : viewConfigStore.getAll().values()) {
       final ViewFactory factory = viewFactorySource.getFactory(config.getFactoryName());
       if (factory != null) {
-        log.debug("Creating view {}", config.getViewName());
+        log.debug("Creating view {}", config.getViewId());
         viewRegistry.registerView(factory.createView(config));
       }
       else {

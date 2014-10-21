@@ -13,11 +13,15 @@
 package org.sonatype.nexus.views.rawbinaries.internal.storage;
 
 import java.io.InputStream;
-import java.util.Date;
+
+import org.sonatype.nexus.component.model.Asset;
 
 import org.joda.time.DateTime;
 
 /**
+ * A stored raw binary asset. When component services come online, this class will be replaced with a metadata-only
+ * version, with the binary data moved into an {@link Asset}.
+ *
  * @since 3.0
  */
 public interface RawBinary
@@ -26,7 +30,7 @@ public interface RawBinary
 
   InputStream getInputStream();
 
-  String getMimeType();
+  String getContentType();
 
   DateTime getModifiedDate();
 }

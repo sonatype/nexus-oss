@@ -29,44 +29,40 @@ public class Router
   private final List<Route> routes = new ArrayList<>();
 
   /**
-   * Gets the handler for the given request, or {@code null} if no matching handler exists.
+   * Gets the {@link Route} for a given {@link ViewRequest}, or {@code null} if no matching route exists.
    */
   @Nullable
-  public Handler findHandler(ViewRequest request) {
-
+  public Route findRoute(HandlerContext context) {
     for (Route route : routes) {
-      if (route.getRequestMatcher().matches(request)) {
-        return route.getHandler();
+      if (route.getRequestMatcher().matches(context)) {
+        return route;
       }
     }
-
     return null;
   }
 
-  /**
-   * Routes will be considered in the order they're added.
-   */
-  public void addRoute(final RequestMatcher requestMatcher, final Handler handler) {
-    routes.add(new Route(checkNotNull(requestMatcher), checkNotNull(handler)));
+  public void addRoute(final RequestMatcher requestMatcher, final List<Handler> handlers) {
+    routes.add(new Route(requestMatcher, handlers));
   }
 
-  private static class Route
+  static class Route
   {
     private final RequestMatcher requestMatcher;
 
-    private final Handler handler;
+    private final List<Handler> handlers;
 
-    private Route(final RequestMatcher requestMatcher, final Handler handler) {
-      this.requestMatcher = requestMatcher;
-      this.handler = handler;
+    Route(final RequestMatcher requestMatcher, final List<Handler> handlers) {
+      this.requestMatcher = checkNotNull(requestMatcher);
+      this.handlers = checkNotNull(handlers);
+    }
+
+    public ViewResponse dispatch(HandlerContext context) throws Exception {
+      context.setHandlers(handlers);
+      return context.proceed();
     }
 
     public RequestMatcher getRequestMatcher() {
       return requestMatcher;
-    }
-
-    public Handler getHandler() {
-      return handler;
     }
   }
 }

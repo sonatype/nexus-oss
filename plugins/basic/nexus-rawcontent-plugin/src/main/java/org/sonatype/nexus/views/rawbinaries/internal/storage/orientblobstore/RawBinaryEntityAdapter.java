@@ -33,18 +33,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawBinaryEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_PREFIX = "rawbinarymetadata";
-
-  public static final String DB_CLASS = new OClassNameBuilder()
-      .prefix(DB_PREFIX)
-      .type(ViewConfig.class)
-      .build();
+  public static final String DB_CLASS = new OClassNameBuilder().type(RawBinaryMetadata.class).build();
 
   public static final String P_PATH = "path";
 
   public static final String P_BLOBID = "blobid";
 
-  public static final String P_MIMETYPE = "mimetype";
+  public static final String P_CONTENTTYPE = "contenttype";
 
   /**
    * Register schema.
@@ -60,7 +55,7 @@ public class RawBinaryEntityAdapter
       type.createProperty(P_PATH, OType.STRING).setNotNull(true);
       type.createIndex(P_PATH + "idx", INDEX_TYPE.UNIQUE, P_PATH);
       type.createProperty(P_BLOBID, OType.STRING).setNotNull(true);
-      type.createProperty(P_MIMETYPE, OType.STRING).setNotNull(true);
+      type.createProperty(P_CONTENTTYPE, OType.STRING);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
     }
@@ -87,7 +82,7 @@ public class RawBinaryEntityAdapter
 
     document.field(P_PATH, entity.getPath());
     document.field(P_BLOBID, entity.getBlobId());
-    document.field(P_MIMETYPE, entity.getMimeType());
+    document.field(P_CONTENTTYPE, entity.getContentType());
 
     return document.save();
   }
@@ -100,7 +95,7 @@ public class RawBinaryEntityAdapter
 
     RawBinaryMetadata entity = new RawBinaryMetadata((String) document.field(P_PATH, OType.STRING),
         (String) document.field(P_BLOBID, OType.STRING),
-        (String) document.field(P_MIMETYPE, OType.STRING)
+        (String) document.field(P_CONTENTTYPE, OType.STRING)
     );
 
     return entity;
