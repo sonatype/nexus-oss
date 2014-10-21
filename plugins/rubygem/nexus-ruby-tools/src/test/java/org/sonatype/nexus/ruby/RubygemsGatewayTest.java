@@ -20,10 +20,8 @@ import java.io.InputStream;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.jruby.embed.PathType;
-import org.jruby.runtime.builtin.IRubyObject;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,13 +34,6 @@ public class RubygemsGatewayTest
   @Rule
   public TestJRubyContainerRule testJRubyContainerRule = new TestJRubyContainerRule();
 
-  private IRubyObject check;
-
-  @Before
-  public void setUp() throws Exception {
-    check = testJRubyContainerRule.getScriptingContainer().parse(PathType.CLASSPATH, "nexus/check.rb").run();
-  }
-
   @Test
   public void testGenerateGemspecRz() throws Exception {
     String gem = "src/test/resources/gems/n/nexus-0.1.0.gem";
@@ -52,16 +43,13 @@ public class RubygemsGatewayTest
       spec = testJRubyContainerRule.getRubygemsGateway().newGemspecHelperFromGem(is);
     }
 
-    String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
+    File gemspecPath = new File("target/nexus-0.1.0.gemspec.rz");
     try (InputStream is = spec.getRzInputStream()) {
-      dumpStream(is, new File(gemspecPath));
+      dumpStream(is, gemspecPath);
     }
 
-    boolean equalSpecs = testJRubyContainerRule.getScriptingContainer().callMethod(check,
-        "check_gemspec_rz",
-        new Object[]{gem, gemspecPath},
-        Boolean.class);
-    assertThat("spec from stream equal spec from gem", equalSpecs, equalTo(true));
+    assertThat("generated gemspec matches reference", FileUtils.readFileToByteArray(gemspecPath), 
+        equalTo(FileUtils.readFileToByteArray(new File("src/test/resources/nexus-0.1.0.gemspec.rz"))));
   }
 
   @Test
@@ -86,11 +74,8 @@ public class RubygemsGatewayTest
       dumpStream(is, empty);
     }
 
-    int size = testJRubyContainerRule.getScriptingContainer().callMethod(check,
-        "specs_size",
-        empty.getAbsolutePath(),
-        Integer.class);
-    assertThat("specsfile size", size, equalTo(0));
+    assertThat("spec from stream equal spec from gem", FileUtils.readFileToByteArray(empty), 
+        equalTo(FileUtils.readFileToByteArray(new File("src/test/resources/empty_dependencies"))));
   }
 
   private void dumpStream(final InputStream is, File target)
