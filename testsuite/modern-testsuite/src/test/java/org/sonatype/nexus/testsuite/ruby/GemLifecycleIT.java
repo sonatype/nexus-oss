@@ -73,7 +73,7 @@ public class GemLifecycleIT
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("something went wrong"));
 
     moreAsserts(repoId, gemName, gemspecName, 
-        "api/v1/dependencies/" + nexusGem.getName().replaceFirst("-.*$", ".json.rz"));
+        "api/v1/dependencies/" + nexusGem.getName().replaceFirst("-.*$", ".ruby"));
 
     winGem = testData().resolveFile("win-2-x86-mswin32-60.gem");
     assertThat(lastLine(gemRunner().nexus(config, winGem)), equalTo("Created"));

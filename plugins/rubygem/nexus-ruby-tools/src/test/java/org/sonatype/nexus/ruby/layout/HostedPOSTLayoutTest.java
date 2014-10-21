@@ -112,11 +112,11 @@ public class HostedPOSTLayoutTest
     else {
       // get those files in place for the proxy to find
       fileSystem.get("/quick/Marshal.4.8/pre-0.1.0.beta.gemspec.rz");
-      fileSystem.get("/api/v1/dependencies/pre.json.rz");
+      fileSystem.get("/api/v1/dependencies/pre.ruby");
       fileSystem.get("/quick/Marshal.4.8/zip-2.0.2.gemspec.rz");
-      fileSystem.get("/api/v1/dependencies/zip.json.rz");
+      fileSystem.get("/api/v1/dependencies/zip.ruby");
       fileSystem.get("/quick/Marshal.4.8/second-2.gemspec.rz");
-      fileSystem.get("/api/v1/dependencies/second.json.rz");
+      fileSystem.get("/api/v1/dependencies/second.ruby");
     }
   }
 
@@ -165,7 +165,7 @@ public class HostedPOSTLayoutTest
 
     assertFiletypeWithPayload(pathes, FileType.SHA1, shas);
 
-    // these files carry a timestamp of creation of the json.rz file
+    // these files carry a timestamp of creation of the .ruby file
     pathes = new String[]{
         "/maven/prereleases/rubygems/pre/maven-metadata.xml.sha1",
         "/maven/prereleases/rubygems/pre/0.1.0.beta-SNAPSHOT/maven-metadata.xml.sha1",
@@ -354,9 +354,9 @@ public class HostedPOSTLayoutTest
   public void testNotFound() throws Exception {
     String[] pathes = {
         "/asa", "/asa/", "/api/a", "/api/v1ds", "/api/v1/ds",
-        "/api/v1/dependencies/jbundler.jsaon.rz", "/api/v1/dependencies/b/bundler.json.rzd",
-        "/api/v1/dependencies/basd/bundler.json.rz",
-        "/quick/Marshal.4.8/jbundler.jssaon.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
+        "/api/v1/dependencies/jbundler.jruby", "/api/v1/dependencies/b/bundler.rubyd",
+        "/api/v1/dependencies/basd/bundler.ruby",
+        "/quick/Marshal.4.8/jbundler.jruby.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
         "/quick/Marshal.4.8/basd/bundler.gemspec.rz",
         "/gems/jbundler.jssaonrz", "/gems/b/bundler.gemsa",
         "/gems/basd/bundler.gem",
@@ -379,9 +379,9 @@ public class HostedPOSTLayoutTest
   @Test
   public void testDependency() throws Exception {
     String[] pathes = {
-        "/api/v1/dependencies/z/zip.json.rz",
-        "/api/v1/dependencies/pre.json.rz",
-        "/api/v1/dependencies/s/second.json.rz",
+        "/api/v1/dependencies/z/zip.ruby",
+        "/api/v1/dependencies/pre.ruby",
+        "/api/v1/dependencies/s/second.ruby",
     };
     assertFiletypeWithPayload(pathes, FileType.DEPENDENCY, URLStreamLocation.class);
     pathes = new String[]{
