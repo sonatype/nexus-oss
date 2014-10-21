@@ -19,6 +19,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 
+import org.jruby.embed.ScriptingContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -29,18 +30,24 @@ import org.junit.BeforeClass;
 public abstract class RubyScriptingTestSupport
     extends TestSupport
 {
-  protected static TestScriptingContainer testScriptingContainer;
+  private static TestScriptingContainer testScriptingContainer = new TestScriptingContainer();
 
   @BeforeClass
   public static void createContainer() {
-    testScriptingContainer = new TestScriptingContainer();
+    testScriptingContainer.start();
   }
 
   @AfterClass
   public static void terminateContainer() {
-    if (testScriptingContainer != null) {
-      testScriptingContainer.terminate();
-    }
+    testScriptingContainer.stop();
+  }
+
+  protected ScriptingContainer scriptingContainer() {
+    return testScriptingContainer.getScriptingContainer();
+  }
+
+  protected RubygemsGateway rubygemsGateway() {
+    return testScriptingContainer.getRubygemsGateway();
   }
 
   protected String loadPomResource(String name) throws IOException {

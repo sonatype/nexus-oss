@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.GemArtifactFile;
 import org.sonatype.nexus.ruby.RubyScriptingTestSupport;
@@ -82,10 +81,10 @@ public class HostedDELETELayoutTest
 
   public HostedDELETELayoutTest(Storage store) throws IOException {
     fileSystem = new DefaultRubygemsFileSystem(
-        new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+        new HostedGETLayout(rubygemsGateway(),
             store),
         null,
-        new HostedDELETELayout(new DefaultRubygemsGateway(testScriptingContainer),
+        new HostedDELETELayout(rubygemsGateway(),
             new SimpleStorage(hostedBase())));
     // delete proxy files
     proxyBase();

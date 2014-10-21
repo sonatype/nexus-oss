@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.RubyScriptingTestSupport;
 import org.sonatype.nexus.ruby.RubygemsFile;
@@ -83,7 +82,7 @@ public class HostedPOSTLayoutTest
     if (store instanceof CachingProxyStorage) {
       isHosted = false;
       fileSystem =
-          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+          new DefaultRubygemsFileSystem(new HostedGETLayout(rubygemsGateway(),
               new SimpleStorage(hostedBase())),
               null,
               null);
@@ -91,9 +90,9 @@ public class HostedPOSTLayoutTest
     else {
       isHosted = true;
       fileSystem =
-          new DefaultRubygemsFileSystem(new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+          new DefaultRubygemsFileSystem(new HostedGETLayout(rubygemsGateway(),
               new SimpleStorage(hostedBase())),
-              new HostedPOSTLayout(new DefaultRubygemsGateway(testScriptingContainer),
+              new HostedPOSTLayout(rubygemsGateway(),
                   store),
               null);
     }
@@ -111,7 +110,7 @@ public class HostedPOSTLayoutTest
           "/gems/second-2.gem");
     }
     else {
-      // get those files in place for the proxy to find
+      // getScriptingContainer those files in place for the proxy to find
       fileSystem.get("/quick/Marshal.4.8/pre-0.1.0.beta.gemspec.rz");
       fileSystem.get("/api/v1/dependencies/pre.json.rz");
       fileSystem.get("/quick/Marshal.4.8/zip-2.0.2.gemspec.rz");

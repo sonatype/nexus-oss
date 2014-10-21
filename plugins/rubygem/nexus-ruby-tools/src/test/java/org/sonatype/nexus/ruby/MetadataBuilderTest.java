@@ -17,7 +17,6 @@ import java.io.InputStream;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -30,15 +29,9 @@ public class MetadataBuilderTest
   @Rule
   public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
 
-  private MetadataBuilder builder;
-
-  private RubygemsGateway gateway;
-
-  @Before
-  public void setUp() throws Exception {
-    // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
-    builder = new MetadataBuilder(gateway.newDependencyData(asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
+  private MetadataBuilder createMetadataBuilder() {
+    return new MetadataBuilder(testScriptingContainerRule.getRubygemsGateway().newDependencyData(
+        asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
   }
 
   private InputStream asStream(String file) {
@@ -47,6 +40,7 @@ public class MetadataBuilderTest
 
   @Test
   public void testReleaseXml() throws Exception {
+    final MetadataBuilder builder = createMetadataBuilder();
     try (InputStream is = asStream("metadata-releases.xml")) {
       String xml = IOUtils.toString(is).replaceFirst("(?s)^.*<meta", "<meta");
       builder.appendVersions(false);
@@ -58,6 +52,7 @@ public class MetadataBuilderTest
 
   @Test
   public void testPrereleaseXml() throws Exception {
+    final MetadataBuilder builder = createMetadataBuilder();
     try (InputStream is = asStream("metadata-prereleases.xml")) {
       String xml = IOUtils.toString(is).replaceFirst("(?s)^.*<meta", "<meta");
       builder.appendVersions(true);

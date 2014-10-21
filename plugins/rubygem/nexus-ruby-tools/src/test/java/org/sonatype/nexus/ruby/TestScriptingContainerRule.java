@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.ruby;
 
+import org.jruby.embed.ScriptingContainer;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -22,21 +23,23 @@ import org.junit.rules.ExternalResource;
 public class TestScriptingContainerRule
     extends ExternalResource
 {
-  private TestScriptingContainer testScriptingContainer;
+  private TestScriptingContainer testScriptingContainer = new TestScriptingContainer();
 
   @Override
   protected void before() throws Throwable {
     super.before();
-    this.testScriptingContainer = new TestScriptingContainer();
+    testScriptingContainer.start();
   }
 
   @Override
   protected void after() {
     super.after();
-    this.testScriptingContainer.terminate();
+    testScriptingContainer.stop();
   }
 
-  public TestScriptingContainer get() {
-    return testScriptingContainer;
+  public ScriptingContainer getScriptingContainer() {
+    return testScriptingContainer.getScriptingContainer();
   }
+
+  public RubygemsGateway getRubygemsGateway() { return testScriptingContainer.getRubygemsGateway(); }
 }

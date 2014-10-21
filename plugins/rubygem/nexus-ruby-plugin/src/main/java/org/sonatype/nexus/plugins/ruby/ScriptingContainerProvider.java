@@ -17,18 +17,16 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.eventbus.Subscribe;
 import org.jruby.embed.ScriptingContainer;
 
 /**
  * A provider for JRuby scripting container that creates it lazily (ie. if NX instance does not have rubygems
- * repository, the container should not be created either. Also, this provider is an event subscriber, that will
- * terminate the container to have it properly clean up the resources.
+ * repository, the container should not be created either). The termination of the container is NOT handled here,
+ * as it's assumed it shares lifespan either with JVM (ie. in production), or it's termination is properly handled
+ * elsewhere (ie. in tests).
  *
  * @since 2.11
  */
@@ -36,7 +34,7 @@ import org.jruby.embed.ScriptingContainer;
 @Named
 public class ScriptingContainerProvider
     extends ComponentSupport
-    implements Provider<ScriptingContainer>, EventSubscriber
+    implements Provider<ScriptingContainer>
 {
   private ScriptingContainer scriptingContainer;
 
@@ -48,13 +46,5 @@ public class ScriptingContainerProvider
       scriptingContainer.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
     }
     return scriptingContainer;
-  }
-
-  @Subscribe
-  public void on(final NexusStoppedEvent event) {
-    if (scriptingContainer != null) {
-      log.debug("Terminating JRuby ScriptingContainer");
-      scriptingContainer.terminate();
-    }
   }
 }

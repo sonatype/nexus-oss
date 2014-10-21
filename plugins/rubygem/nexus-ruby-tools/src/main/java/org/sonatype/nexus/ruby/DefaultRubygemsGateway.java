@@ -19,20 +19,18 @@ import org.jruby.embed.ScriptingContainer;
 public class DefaultRubygemsGateway
     implements RubygemsGateway
 {
-
-  private final Object dependencyHelperImplClass;
-  private final Object gemspecHelperImplClass;
-  private final Object specsHelperImplClass;
-  private final Object mergeSpecsHelperImplClass;
-  private final Object repairHelperImplClass;
-  private final Object dependencyDataImplClass;
   private final ScriptingContainer container;
+  private Object dependencyHelperImplClass;
+  private Object gemspecHelperImplClass;
+  private Object specsHelperImplClass;
+  private Object mergeSpecsHelperImplClass;
+  private Object repairHelperImplClass;
+  private Object dependencyDataImplClass;
 
   /**
-   * Ctor that accepts prepared scripting container, as usually the container is or should be
-   * managed (ie. by calling {@link ScriptingContainer#terminate()} when application is shut down.
+   * Ctor that accepts prepared non-null scripting container.
    */
-  public DefaultRubygemsGateway(ScriptingContainer container) {
+  public DefaultRubygemsGateway(final ScriptingContainer container) {
     this.container = container;
     dependencyHelperImplClass = container.runScriptlet("require 'nexus/dependency_helper_impl';"
         + "Nexus::DependencyHelperImpl");
@@ -46,6 +44,17 @@ public class DefaultRubygemsGateway
         + "Nexus::RepairHelperImpl");
     dependencyDataImplClass = container.runScriptlet("require 'nexus/dependency_data_impl';"
         + "Nexus::DependencyDataImpl");
+  }
+
+  @Override
+  public void terminate() {
+    dependencyHelperImplClass = null;
+    gemspecHelperImplClass = null;
+    specsHelperImplClass = null;
+    mergeSpecsHelperImplClass = null;
+    repairHelperImplClass = null;
+    dependencyDataImplClass = null;
+    container.terminate();
   }
 
   @Override

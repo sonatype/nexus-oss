@@ -32,17 +32,9 @@ public class BundleRunnerTest
   @Rule
   public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
 
-  private BundleRunner runner;
-
-  @Before
-  public void setUp() throws Exception {
-    // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    runner = new BundleRunner(testScriptingContainerRule.get());
-  }
-
-
   @Test
   public void testInstall() throws Exception {
+    final BundleRunner runner = new BundleRunner(testScriptingContainerRule.getScriptingContainer());
     //System.err.println( runner.install() );
     assertThat(numberOfLines(runner.install()), is(10));
     assertThat(lastLine(runner.install()),
@@ -50,22 +42,21 @@ public class BundleRunnerTest
   }
 
   @Test
-  public void testShowAll()
-      throws Exception
-  {
+  public void testShowAll() throws Exception {
+    final BundleRunner runner = new BundleRunner(testScriptingContainerRule.getScriptingContainer());
     assertThat(numberOfLines(runner.show()), is(5));
   }
 
   @Test
   public void testShow() throws Exception {
+    final BundleRunner runner = new BundleRunner(testScriptingContainerRule.getScriptingContainer());
     assertThat(numberOfLines(runner.show("zip")), is(1));
     assertThat(lastLine(runner.show("zip")), endsWith("zip-2.0.2"));
   }
 
   @Test
-  public void testConfig()
-      throws Exception
-  {
+  public void testConfig() throws Exception {
+    final BundleRunner runner = new BundleRunner(testScriptingContainerRule.getScriptingContainer());
     assertThat(runner.config(), containsString("mirror.http://rubygems.org"));
   }
 }
