@@ -103,13 +103,16 @@ public class MergeMetadataTask
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {
-          log.debug(
-              "Copying Yum metadata from {} to group repository {}", memberReposBaseDirs.get(0), groupRepository.getId()
-          );
           // delete without using group repository API as group repositories does not allow delete (read only)
           File groupRepodata = new File(repoBaseDir, PATH_OF_REPODATA);
           deleteQuietly(groupRepodata);
-          copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), groupRepodata);
+          if (memberReposBaseDirs.size() == 1) {
+            log.debug(
+                "Copying Yum metadata from {} to group repository {}",
+                memberReposBaseDirs.get(0), groupRepository.getId()
+            );
+            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), groupRepodata);
+          }
         }
       }
       finally {
