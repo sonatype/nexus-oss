@@ -15,7 +15,8 @@ public interface ComponentIdFactory
   ComponentId newId();
 
   /**
-   * Restore a {@link ComponentId} from its "unique string" format, as is necessary
+   * Restore a {@link ComponentId} from its "unique string" format, such as when deserializing component IDs stored
+   * as Strings.
    */
   ComponentId fromUniqueString(String uniqueString);
 }
