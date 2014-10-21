@@ -42,7 +42,7 @@ import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 import org.sonatype.nexus.ruby.layout.Storage;
 
 /**
- * ???
+ * A {@link RubyRepository} backed {@link Storage} implementation.
  *
  * @since 2.11
  */
