@@ -35,7 +35,11 @@ class TestJRubyContainer
   }
 
   public void stop() {
-    rubygemsGateway.terminate();
+    if (rubygemsGateway != null) {
+      rubygemsGateway.terminate();
+    }
+    rubygemsGateway = null;
+    scriptingContainer = null;
   }
 
   public ScriptingContainer getScriptingContainer() {
