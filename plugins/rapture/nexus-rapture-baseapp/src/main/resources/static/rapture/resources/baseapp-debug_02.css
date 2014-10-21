@@ -12187,21 +12187,34 @@
 }
 
 /**
- * @class Ext.form.field.Trigger
- */
-/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
+* @class Ext.form.field.Trigger
+*/
+/**
+* Style for the main header search field.
+*
+* cls: 'quicksearch'
+*/
+/* line 10, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
 .quicksearch .x-form-trigger-wrap {
   border-radius: 11px;
   padding-left: 3px;
   padding-right: 0px;
-  background-color: white;
+  background-color: #4c4c4c;
+  border-color: #303030;
 }
-/* line 14, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
+/* line 20, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
 .quicksearch .x-form-trigger-wrap input.x-form-field,
 .quicksearch .x-form-trigger-wrap .x-trigger-cell,
 .quicksearch .x-form-trigger-wrap .x-form-trigger,
 .quicksearch .x-form-trigger-wrap .x-form-trigger-input-cell {
   background-color: rgba(0, 0, 0, 0);
+}
+/* line 27, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
+.quicksearch .x-form-trigger-wrap input.x-form-field,
+.quicksearch .x-form-trigger-wrap .x-trigger-cell,
+.quicksearch .x-form-trigger-wrap .x-form-trigger,
+.quicksearch .x-form-trigger-wrap .x-form-text {
+  color: white;
 }
 
 /**
