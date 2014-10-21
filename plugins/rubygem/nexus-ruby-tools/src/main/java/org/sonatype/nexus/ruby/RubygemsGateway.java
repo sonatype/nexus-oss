@@ -23,6 +23,10 @@ import java.io.InputStream;
  */
 public interface RubygemsGateway
 {
+  /**
+   * Cleans up resources used by gateway and terminates it along with the underlying scripting container.
+   */
+  void terminate();
 
   /**
    * create a new instance of <code>GemspecHelper</code>

@@ -20,7 +20,7 @@ import org.sonatype.nexus.plugin.PluginIdentity;
 import org.eclipse.sisu.EagerSingleton;
 
 /**
- * Ruby plugin.
+ * Rubygems plugin.
  *
  * @since 2.11
  */

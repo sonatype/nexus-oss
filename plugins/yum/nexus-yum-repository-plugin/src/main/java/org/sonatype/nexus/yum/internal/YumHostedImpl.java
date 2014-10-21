@@ -17,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -36,7 +35,6 @@ import org.sonatype.nexus.yum.internal.task.TaskAlreadyScheduledException;
 import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +74,6 @@ public class YumHostedImpl
 
   private final File baseDir;
 
-  private final Set<String> versions;
-
   private final Map<String, String> aliases;
 
   private final Map<ScheduledFuture<?>, DelayedDirectoryDeletionTask> taskMap =
@@ -103,7 +99,6 @@ public class YumHostedImpl
     this.processDeletes = true;
     this.deleteProcessingDelay = DEFAULT_DELETE_PROCESSING_DELAY;
 
-    this.versions = Sets.newHashSet();
     this.aliases = Maps.newHashMap();
 
     this.baseDir = RepositoryUtils.getBaseDir(repository);
@@ -116,11 +111,6 @@ public class YumHostedImpl
   }
 
   private final YumRepositoryCache cache = new YumRepositoryCache();
-
-  @Override
-  public Set<String> getVersions() {
-    return versions;
-  }
 
   @Override
   public YumHosted setProcessDeletes(final boolean processDeletes) {
@@ -158,12 +148,6 @@ public class YumHostedImpl
   @Override
   public File getBaseDir() {
     return baseDir;
-  }
-
-  @Override
-  public void addVersion(final String version) {
-    versions.add(version);
-    LOG.debug("Added version '{}' to repository '{}", version, getNexusRepository().getId());
   }
 
   @Override

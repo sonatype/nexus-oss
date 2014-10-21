@@ -25,6 +25,11 @@ import org.sonatype.nexus.ruby.layout.ProxyStorage;
 
 import com.google.common.base.Throwables;
 
+/**
+ * Rubygems proxy storage.
+ *
+ * @since 2.11
+ */
 public class ProxyNexusStorage
     extends NexusStorage
     implements ProxyStorage

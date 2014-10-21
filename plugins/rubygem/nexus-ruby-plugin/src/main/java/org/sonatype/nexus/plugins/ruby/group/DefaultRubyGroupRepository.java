@@ -47,6 +47,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
+/**
+ * Default {@link RubyGroupRepository} implementation.
+ *
+ * @since 2.11
+ */
 @Named(DefaultRubyGroupRepository.ID)
 public class DefaultRubyGroupRepository
     extends AbstractGroupRepository
@@ -63,10 +68,9 @@ public class DefaultRubyGroupRepository
   private final NexusRubygemsFacade facade;
 
   @Inject
-  public DefaultRubyGroupRepository(@Named(RubyContentClass.ID) ContentClass contentClass,
-                                    GroupRubyRepositoryConfigurator configurator,
-                                    RubygemsGateway gateway)
-      throws LocalStorageException, ItemNotFoundException
+  public DefaultRubyGroupRepository(final @Named(RubyContentClass.ID) ContentClass contentClass,
+                                    final GroupRubyRepositoryConfigurator configurator,
+                                    final RubygemsGateway gateway)
   {
     this.contentClass = contentClass;
     this.configurator = configurator;

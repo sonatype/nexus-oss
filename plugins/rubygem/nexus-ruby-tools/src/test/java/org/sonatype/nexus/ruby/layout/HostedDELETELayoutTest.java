@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.GemArtifactFile;
 import org.sonatype.nexus.ruby.RubyScriptingTestSupport;
@@ -31,7 +30,6 @@ import org.sonatype.nexus.ruby.layout.SimpleStorage.URLGzipStreamLocation;
 import org.sonatype.nexus.ruby.layout.SimpleStorage.URLStreamLocation;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,10 +81,10 @@ public class HostedDELETELayoutTest
 
   public HostedDELETELayoutTest(Storage store) throws IOException {
     fileSystem = new DefaultRubygemsFileSystem(
-        new HostedGETLayout(new DefaultRubygemsGateway(testScriptingContainer),
+        new HostedGETLayout(rubygemsGateway(),
             store),
         null,
-        new HostedDELETELayout(new DefaultRubygemsGateway(testScriptingContainer),
+        new HostedDELETELayout(rubygemsGateway(),
             new SimpleStorage(hostedBase())));
     // delete proxy files
     proxyBase();
@@ -140,7 +138,7 @@ public class HostedDELETELayoutTest
     };
     assertNotFound(pathes, FileType.SHA1);
 
-    // these files carry a timestamp of creation of the json.rz file
+    // these files carry a timestamp of creation of the .ruby file
     pathes = new String[]{
         "/maven/prereleases/rubygems/pre/maven-metadata.xml.sha1",
         "/maven/prereleases/rubygems/pre/0.1.0.beta-SNAPSHOT/maven-metadata.xml.sha1",
@@ -178,8 +176,8 @@ public class HostedDELETELayoutTest
         "/maven/prereleases/rubygems/pre/0.1.0.beta-SNAPSHOT/jbundler-0.1.0.beta-123213123.pom"
     };
     String[] xmls = {
-        IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("pre.pom")),
-        IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("pre-snapshot.pom"))
+        loadPomResource("pre.pom"),
+        loadPomResource("pre-snapshot.pom")
     };
     assertFiletypeWithPayload(pathes, FileType.POM, xmls);
     pathes = new String[]{"/maven/releases/rubygems/zip/2.0.2/zip-2.0.2.pom"};
@@ -282,7 +280,7 @@ public class HostedDELETELayoutTest
   @Test
   public void testDependency() throws Exception {
     String[] pathes = {
-        "/api/v1/dependencies?gems=zip", "/api/v1/dependencies/pre.json.rz", "/api/v1/dependencies/z/zip.json.rz"
+        "/api/v1/dependencies?gems=zip", "/api/v1/dependencies/pre.ruby", "/api/v1/dependencies/z/zip.ruby"
     };
     assertFiletypeWithPayload(pathes, FileType.DEPENDENCY, URLStreamLocation.class);
   }
@@ -322,9 +320,9 @@ public class HostedDELETELayoutTest
   public void testNotFound() throws Exception {
     String[] pathes = {
         "/asa", "/asa/", "/api/a", "/api/v1ds", "/api/v1/ds",
-        "/api/v1/dependencies/jbundler.jsaon.rz", "/api/v1/dependencies/b/bundler.json.rzd",
-        "/api/v1/dependencies/basd/bundler.json.rz",
-        "/quick/Marshal.4.8/jbundler.jssaon.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
+        "/api/v1/dependencies/jbundler.jruby", "/api/v1/dependencies/b/bundler.rubyd",
+        "/api/v1/dependencies/basd/bundler.ruby",
+        "/quick/Marshal.4.8/jbundler.jruby.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
         "/quick/Marshal.4.8/basd/bundler.gemspec.rz",
         "/gems/jbundler.jssaonrz", "/gems/b/bundler.gemsa",
         "/gems/basd/bundler.gem",

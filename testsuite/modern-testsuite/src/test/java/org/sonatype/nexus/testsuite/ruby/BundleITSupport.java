@@ -95,8 +95,8 @@ public abstract class BundleITSupport
   protected void assertHostedFiles() throws IOException {
     assertFileDownload("/gems/z/zip-2.0.2.gem", 64000);
     assertFileDownload("/gems/zip-2.0.2.gem", 64000);
-    assertFileDownload("/api/v1/dependencies/z/zip.json.rz", 80);
-    assertFileDownload("/api/v1/dependencies/zip.json.rz", 80);
+    assertFileDownload("/api/v1/dependencies/z/zip.ruby", 80);
+    assertFileDownload("/api/v1/dependencies/zip.ruby", 80);
     assertFileDownload("/api/v1/dependencies?gems=zip", 80);
     // bundler uses this to check existence of the api/v1
     assertFileDownload(repoId, "/api/v1/dependencies", is(true));

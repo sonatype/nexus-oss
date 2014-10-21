@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.ruby;
 
+import org.sonatype.nexus.ruby.cuba.api.ApiV1DependenciesCuba;
+
 public class RubygemsDirectory
     extends Directory
 {
@@ -21,7 +23,7 @@ public class RubygemsDirectory
 
   public void setItems(String... items) {
     for (String item : items) {
-      this.items.add(item.replace(".json.rz", ""));
+      this.items.add(item.replace(ApiV1DependenciesCuba.RUBY, ""));
     }
   }
 }

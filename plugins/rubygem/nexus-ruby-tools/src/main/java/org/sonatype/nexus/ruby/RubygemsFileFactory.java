@@ -81,7 +81,7 @@ public interface RubygemsFileFactory
   GemspecFile gemspecFile(String filename);
 
   /**
-   * create <code>DependencyFile</code> /api/v1/dependencies/{name}.json.rz for
+   * create <code>DependencyFile</code> /api/v1/dependencies/{name}.ruby for
    * a given gem-name
    *
    * @param name of the gemfile

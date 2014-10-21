@@ -110,8 +110,8 @@ public class NoopDefaultLayoutTest
   @Test
   public void testDependency() throws Exception {
     String[] pathes = {
-        "/api/v1/dependencies?gems=nexus", "/api/v1/dependencies/jbundler.json.rz",
-        "/api/v1/dependencies/b/bundler.json.rz"
+        "/api/v1/dependencies?gems=nexus", "/api/v1/dependencies/jbundler.ruby",
+        "/api/v1/dependencies/b/bundler.ruby"
     };
     assertFiletype(pathes, FileType.DEPENDENCY);
   }
@@ -148,11 +148,11 @@ public class NoopDefaultLayoutTest
   public void testNotFound() throws Exception {
     String[] pathes = {
         "/asa", "/asa/", "/api/a", "/api/v1ds", "/api/v1/ds",
-        "/api/v1/dependencies/jbundler.jsaon.rz", "/api/v1/dependencies/b/bundler.json.rzd",
-        "/api/v1/dependencies/basd/bundler.json.rz",
-        "/quick/Marshal.4.8/jbundler.jssaon.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
+        "/api/v1/dependencies/jbundler.rubyz", "/api/v1/dependencies/b/bundler.rubyd",
+        "/api/v1/dependencies/basd/bundler.ruby",
+        "/quick/Marshal.4.8/jbundler.jrubyz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
         "/quick/Marshal.4.8/basd/bundler.gemspec.rz",
-        "/gems/jbundler.jssaonrz", "/gems/b/bundler.gemsa",
+        "/gems/jbundler.jrubyz", "/gems/b/bundler.gemsa",
         "/gems/basd/bundler.gem",
         "/maven/releasesss/rubygemsss/a",
         "/maven/releases/rubygemsss/jbundler",

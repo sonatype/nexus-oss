@@ -185,7 +185,7 @@ public class DefaultRubygemsFileFactory
   @Override
   public DependencyFile dependencyFile(String name) {
     return new DependencyFile(this,
-        join(API_V1_DEPS, SEPARATOR, name, ApiV1DependenciesCuba.JSON_RZ),
+        join(API_V1_DEPS, SEPARATOR, name, ApiV1DependenciesCuba.RUBY),
         join(API_V1_DEPS, "?gems=" + name),
         name);
   }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.ruby;
 
 import java.io.File;
@@ -23,9 +24,9 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.jruby.embed.PathType;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -36,20 +37,17 @@ import static org.hamcrest.Matchers.hasSize;
 public class SpecsHelperTest
     extends TestSupport
 {
-  private ScriptingContainer scriptingContainer;
+  @Rule
+  public TestJRubyContainerRule scriptingContainerRule = new TestJRubyContainerRule();
 
-  private RubygemsGateway gateway;
-  
-  private SpecsHelper specsHelper; 
-  
+  private SpecsHelper specsHelper;
+
   private IRubyObject check;
 
   @Before
   public void setUp() throws Exception {
-    scriptingContainer = new TestScriptingContainer();
-    gateway = new DefaultRubygemsGateway(scriptingContainer);
-    check = scriptingContainer.parse(PathType.CLASSPATH, "nexus/check.rb").run();
-    specsHelper = gateway.newSpecsHelper();
+    check = scriptingContainerRule.getScriptingContainer().parse(PathType.CLASSPATH, "nexus/check.rb").run();
+    specsHelper = scriptingContainerRule.getRubygemsGateway().newSpecsHelper();
   }
 
   @Test
@@ -58,7 +56,7 @@ public class SpecsHelperTest
 
     dumpStream(specsHelper.createEmptySpecs(), empty);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         empty.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
   }
@@ -82,7 +80,7 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    IRubyObject spec1 = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject spec1 = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add gem
     InputStream is = specsHelper.addSpec(spec1, new FileInputStream(empty),
@@ -90,23 +88,23 @@ public class SpecsHelperTest
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    IRubyObject specJ = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject specJ = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     is = specsHelper.addSpec(specJ, is, SpecsIndexType.LATEST);
 
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
     // add a gem with newer version
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject spec = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     is = specsHelper.addSpec(spec, new FileInputStream(target), SpecsIndexType.LATEST);
 
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -122,36 +120,36 @@ public class SpecsHelperTest
     File empty = new File("src/test/resources/empty_specs");
     File latestSpecsFile = new File("target/test_latest_specs");
     File releaseSpecsFile = new File("target/test_release_specs");
-    
+
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
-    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject spec = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add gem
     InputStream releaseStream = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
 
     // add another gem with different platform
     gem = new File("src/test/resources/gems/n/nexus-0.1.0-java.gem");
-    spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    spec = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
     releaseStream = specsHelper.addSpec(spec, releaseStream, SpecsIndexType.RELEASE);
     dumpStream(releaseStream, releaseSpecsFile);
 
     // add a gem with newer version to release and latest index
     gem = new File("src/test/resources/gems/n/nexus-0.2.0.gem");
-    IRubyObject s = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
-    
+    IRubyObject s = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+
     releaseStream = specsHelper.addSpec(s, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(releaseStream, releaseSpecsFile);
-    
+
     InputStream is = specsHelper.addSpec(s, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
     // check the latest index
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
-    
+
     // check the release index
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(3));
 
@@ -159,7 +157,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(s, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(is, releaseSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
@@ -167,23 +165,23 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(s, new FileInputStream(latestSpecsFile), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(2));
 
     // now delete one more spec
-    specsHelper = gateway.newSpecsHelper();
+    specsHelper = scriptingContainerRule.getRubygemsGateway().newSpecsHelper();
     is = specsHelper.deleteSpec(spec, new FileInputStream(releaseSpecsFile), SpecsIndexType.RELEASE);
     dumpStream(is, releaseSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         releaseSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
     is = specsHelper.deleteSpec(spec, new FileInputStream(latestSpecsFile), SpecsIndexType.LATEST);
     dumpStream(is, latestSpecsFile);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         latestSpecsFile.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }
@@ -194,13 +192,13 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.gem");
 
-    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject spec = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add released gem
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.RELEASE);
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
@@ -208,7 +206,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(spec, new FileInputStream(target), SpecsIndexType.RELEASE);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
 
@@ -220,7 +218,7 @@ public class SpecsHelperTest
     is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }
@@ -231,13 +229,13 @@ public class SpecsHelperTest
     File target = new File("target/test_specs");
     File gem = new File("src/test/resources/gems/n/nexus-0.1.0.pre.gem");
 
-    IRubyObject spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
+    IRubyObject spec = scriptingContainerRule.getRubygemsGateway().newGemspecHelperFromGem(new FileInputStream(gem)).gemspec();
 
     // add prereleased gem
     InputStream is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.PRERELEASE);
     dumpStream(is, target);
 
-    int size = scriptingContainer.callMethod(check, "specs_size",
+    int size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
 
@@ -245,7 +243,7 @@ public class SpecsHelperTest
     is = specsHelper.deleteSpec(spec, new FileInputStream(target), SpecsIndexType.PRERELEASE);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(0));
 
@@ -257,7 +255,7 @@ public class SpecsHelperTest
     is = specsHelper.addSpec(spec, new FileInputStream(empty), SpecsIndexType.LATEST);
     dumpStream(is, target);
 
-    size = scriptingContainer.callMethod(check, "specs_size",
+    size = scriptingContainerRule.getScriptingContainer().callMethod(check, "specs_size",
         target.getAbsolutePath(), Integer.class);
     assertThat("specsfile size", size, equalTo(1));
   }

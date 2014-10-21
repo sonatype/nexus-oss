@@ -13,7 +13,6 @@
 package org.sonatype.nexus.yum;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -114,10 +113,6 @@ public interface YumHosted
   void regenerateWhenPathIsRemoved(String path);
 
   void regenerateWhenDirectoryIsRemoved(String path);
-
-  Set<String> getVersions();
-
-  void addVersion(String version);
 
   void markDirty(String version);
 

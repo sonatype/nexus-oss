@@ -66,7 +66,7 @@ module Nexus
                       'api', 'v1', 'dependencies', 
                       '*' ) ].each do |file|
         begin
-          if File.file?( file ) and file =~ /.json.rz$/
+          if File.file?( file ) and file =~ /.ruby$/
             marshal_load( file )
           else
             FileUtils.rm_rf( file )

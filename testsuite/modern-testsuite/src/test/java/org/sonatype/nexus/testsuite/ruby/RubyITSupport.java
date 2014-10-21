@@ -255,7 +255,7 @@ public abstract class RubyITSupport
   protected void assertGem(String repoId, String name) {
     String gemName = "gems/" + name;
     String gemspecName = "quick/Marshal.4.8/" + name + "spec.rz";
-    String dependencyName = "api/v1/dependencies/" + name.replaceFirst("-.*$", ".json.rz");
+    String dependencyName = "api/v1/dependencies/" + name.replaceFirst("-.*$", ".ruby");
 
     assertFileDownload(repoId, gemName, is(true));
     assertFileDownload(repoId, gemspecName, is(true));

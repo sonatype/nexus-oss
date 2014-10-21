@@ -18,7 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.ruby.DependencyHelper;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -35,36 +34,30 @@ public class RubygemsGatewayTest
     extends TestSupport
 {
   @Rule
-  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
-
-  private RubygemsGateway gateway;
+  public TestJRubyContainerRule testJRubyContainerRule = new TestJRubyContainerRule();
 
   private IRubyObject check;
 
   @Before
   public void setUp() throws Exception {
-    // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
-    check = testScriptingContainerRule.get().parse(PathType.CLASSPATH, "nexus/check.rb").run();
+    check = testJRubyContainerRule.getScriptingContainer().parse(PathType.CLASSPATH, "nexus/check.rb").run();
   }
 
   @Test
   public void testGenerateGemspecRz() throws Exception {
     String gem = "src/test/resources/gems/n/nexus-0.1.0.gem";
 
-    GemspecHelper spec = gateway.newGemspecHelperFromGem(new FileInputStream(gem));
-    InputStream is = spec.getRzInputStream();
-    int c = is.read();
-    String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
-    FileOutputStream out = new FileOutputStream(gemspecPath);
-    while (c != -1) {
-      out.write(c);
-      c = is.read();
+    GemspecHelper spec;
+    try (InputStream is = new FileInputStream(gem)) {
+      spec = testJRubyContainerRule.getRubygemsGateway().newGemspecHelperFromGem(is);
     }
-    out.close();
-    is.close();
 
-    boolean equalSpecs = testScriptingContainerRule.get().callMethod(check,
+    String gemspecPath = "target/nexus-0.1.0.gemspec.rz";
+    try (InputStream is = spec.getRzInputStream()) {
+      dumpStream(is, new File(gemspecPath));
+    }
+
+    boolean equalSpecs = testJRubyContainerRule.getScriptingContainer().callMethod(check,
         "check_gemspec_rz",
         new Object[]{gem, gemspecPath},
         Boolean.class);
@@ -75,7 +68,10 @@ public class RubygemsGatewayTest
   public void testPom() throws Exception {
     File some = new File("src/test/resources/rb-fsevent-0.9.4.gemspec.rz");
 
-    String pom = gateway.newGemspecHelper(new FileInputStream(some)).pom(false);
+    String pom;
+    try (InputStream is = new FileInputStream(some)) {
+      pom = testJRubyContainerRule.getRubygemsGateway().newGemspecHelper(is).pom(false);
+    }
     assertThat(pom.replace("\n", "").replaceAll("<developers>.*$", "").replaceAll("^.*<name>|</name>.*$", ""),
         equalTo("Very simple &amp; usable FSEvents API"));
   }
@@ -85,10 +81,12 @@ public class RubygemsGatewayTest
     File empty = new File("target/empty");
 
     // create empty dependencies file
-    DependencyHelper deps = gateway.newDependencyHelper();
-    dumpStream(deps.getInputStream(false), empty);
+    DependencyHelper deps = testJRubyContainerRule.getRubygemsGateway().newDependencyHelper();
+    try (InputStream is = deps.getInputStream(false)) {
+      dumpStream(is, empty);
+    }
 
-    int size = testScriptingContainerRule.get().callMethod(check,
+    int size = testJRubyContainerRule.getScriptingContainer().callMethod(check,
         "specs_size",
         empty.getAbsolutePath(),
         Integer.class);
@@ -98,17 +96,8 @@ public class RubygemsGatewayTest
   private void dumpStream(final InputStream is, File target)
       throws IOException
   {
-    try {
-      FileOutputStream output = new FileOutputStream(target);
-      try {
-        IOUtils.copy(is, output);
-      }
-      finally {
-        IOUtils.closeQuietly(output);
-      }
-    }
-    finally {
-      IOUtils.closeQuietly(is);
+    try (FileOutputStream output = new FileOutputStream(target)) {
+      IOUtils.copy(is, output);
     }
   }
 }

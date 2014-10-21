@@ -17,7 +17,6 @@ import java.io.InputStream;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -28,17 +27,11 @@ public class MetadataBuilderTest
     extends TestSupport
 {
   @Rule
-  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
+  public TestJRubyContainerRule testJRubyContainerRule = new TestJRubyContainerRule();
 
-  private MetadataBuilder builder;
-
-  private RubygemsGateway gateway;
-
-  @Before
-  public void setUp() throws Exception {
-    // share the TestSCriptingContainer over all tests to have a uniform ENV setup
-    gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
-    builder = new MetadataBuilder(gateway.newDependencyData(asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
+  private MetadataBuilder createMetadataBuilder() {
+    return new MetadataBuilder(testJRubyContainerRule.getRubygemsGateway().newDependencyData(
+        asStream("nokogiri.ruby"), "nokogiri", 1397660433050l));
   }
 
   private InputStream asStream(String file) {
@@ -47,19 +40,25 @@ public class MetadataBuilderTest
 
   @Test
   public void testReleaseXml() throws Exception {
-    String xml = IOUtils.toString(asStream("metadata-releases.xml"));
-    builder.appendVersions(false);
-    //System.err.println( builder.toString() );
-    //System.out.println( xml );
-    assertThat(builder.toString(), equalTo(xml));
+    final MetadataBuilder builder = createMetadataBuilder();
+    try (InputStream is = asStream("metadata-releases.xml")) {
+      String xml = IOUtils.toString(is).replaceFirst("(?s)^.*<meta", "<meta");
+      builder.appendVersions(false);
+      //System.err.println( builder.toString() );
+      //System.out.println( xml );
+      assertThat(builder.toString(), equalTo(xml));
+    }
   }
 
   @Test
   public void testPrereleaseXml() throws Exception {
-    String xml = IOUtils.toString(asStream("metadata-prereleases.xml"));
-    builder.appendVersions(true);
-    //System.err.println( builder.toString() );
-    //System.out.println( xml );
-    assertThat(builder.toString(), equalTo(xml));
+    final MetadataBuilder builder = createMetadataBuilder();
+    try (InputStream is = asStream("metadata-prereleases.xml")) {
+      String xml = IOUtils.toString(is).replaceFirst("(?s)^.*<meta", "<meta");
+      builder.appendVersions(true);
+      //System.err.println( builder.toString() );
+      //System.out.println( xml );
+      assertThat(builder.toString(), equalTo(xml));
+    }
   }
 }

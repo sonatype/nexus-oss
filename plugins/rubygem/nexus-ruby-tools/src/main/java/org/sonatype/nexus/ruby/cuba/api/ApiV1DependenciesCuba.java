@@ -27,9 +27,9 @@ import org.sonatype.nexus.ruby.cuba.State;
 public class ApiV1DependenciesCuba
     implements Cuba
 {
-  public static final String JSON_RZ = ".json.rz";
+  public static final String RUBY = ".ruby";
 
-  private static Pattern FILE = Pattern.compile("^([^/]+)" + JSON_RZ + "$");
+  private static Pattern FILE = Pattern.compile("^([^/]+)[.]" + RUBY.substring(1) + "$");
 
   /**
    * no sub-directories
@@ -37,7 +37,7 @@ public class ApiV1DependenciesCuba
    * if there is query string with "gems" parameter then <code>BundlerApiFile</code> or
    * <code>DependencyFile</code> gets created.
    *
-   * otherwise all {name}.json.rz will be created as <code>DependencyFile</code>
+   * otherwise all {name}.ruby will be created as <code>DependencyFile</code>
    *
    * the directory itself does not produce the directory listing - only the empty <code>Directory</code>
    * object.

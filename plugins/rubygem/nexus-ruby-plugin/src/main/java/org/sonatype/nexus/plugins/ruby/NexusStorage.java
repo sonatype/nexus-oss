@@ -41,6 +41,11 @@ import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 import org.sonatype.nexus.ruby.layout.Storage;
 
+/**
+ * A {@link RubyRepository} backed {@link Storage} implementation.
+ *
+ * @since 2.11
+ */
 public class NexusStorage
     implements Storage
 {
@@ -189,7 +194,12 @@ public class NexusStorage
         }
       }
     }
-    catch (IOException | IllegalOperationException | ItemNotFoundException | AccessDeniedException | NoSuchResourceStoreException e) {
+    catch (ItemNotFoundException e) {
+      // an empty array is good enough
+    }
+    catch (IOException | IllegalOperationException | AccessDeniedException | NoSuchResourceStoreException e) {
+      dir.setException(e);
+      // the return is still an empty array but the exception gets propagated
     }
     return result.toArray(new String[result.size()]);
   }

@@ -13,30 +13,33 @@
 
 package org.sonatype.nexus.ruby;
 
+import org.jruby.embed.ScriptingContainer;
 import org.junit.rules.ExternalResource;
 
 /**
  * Simple Junit rule to expose managed container. If a test needs access to container in more specific places,
  * ie. ctor and so, take a look at {@link RubyScriptingTestSupport}.
  */
-public class TestScriptingContainerRule
+public class TestJRubyContainerRule
     extends ExternalResource
 {
-  private TestScriptingContainer testScriptingContainer;
+  private TestJRubyContainer testScriptingContainer = new TestJRubyContainer();
 
   @Override
   protected void before() throws Throwable {
     super.before();
-    this.testScriptingContainer = new TestScriptingContainer();
+    testScriptingContainer.start();
   }
 
   @Override
   protected void after() {
     super.after();
-    this.testScriptingContainer.terminate();
+    testScriptingContainer.stop();
   }
 
-  public TestScriptingContainer get() {
-    return testScriptingContainer;
+  public ScriptingContainer getScriptingContainer() {
+    return testScriptingContainer.getScriptingContainer();
   }
+
+  public RubygemsGateway getRubygemsGateway() { return testScriptingContainer.getRubygemsGateway(); }
 }

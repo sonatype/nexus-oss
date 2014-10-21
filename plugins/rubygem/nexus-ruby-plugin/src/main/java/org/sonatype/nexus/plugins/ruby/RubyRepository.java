@@ -20,6 +20,11 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * Rubygems repository.
+ *
+ * @since 2.11
+ */
 public interface RubyRepository
     extends Repository
 {

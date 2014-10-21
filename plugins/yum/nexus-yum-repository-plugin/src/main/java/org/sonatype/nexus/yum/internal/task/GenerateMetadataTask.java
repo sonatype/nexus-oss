@@ -305,7 +305,10 @@ public class GenerateMetadataTask
   private String buildCreateRepositoryCommand(File packageList) {
     StringBuilder commandLine = new StringBuilder();
     commandLine.append(yumRegistry.getCreaterepoPath());
-    commandLine.append(" --update --verbose --no-database");
+    if (!shouldForceFullScan()) {
+      commandLine.append(" --update");
+    }
+    commandLine.append(" --verbose --no-database");
     commandLine.append(" --outputdir ").append(getRepoDir().getAbsolutePath());
     commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
     commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
@@ -337,10 +340,6 @@ public class GenerateMetadataTask
 
   private File createCacheDir() {
     return getCacheDir(getRepositoryIdVersion());
-  }
-
-  private boolean isUseAbsoluteUrls() {
-    return isNotBlank(getVersion());
   }
 
   private File createPackageDir() {

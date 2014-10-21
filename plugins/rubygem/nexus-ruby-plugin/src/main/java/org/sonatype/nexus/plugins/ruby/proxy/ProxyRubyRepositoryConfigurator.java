@@ -24,6 +24,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
+/**
+ * {@link ProxyRubyRepository} configurator.
+ *
+ * @since 2.11
+ */
 @Singleton
 public class ProxyRubyRepositoryConfigurator
     extends AbstractProxyRepositoryConfigurator

@@ -21,10 +21,10 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class DefaultBootstrapTest
+public class DefaultRubygemsFileSystemTest
     extends TestSupport
 {
-  private final DefaultRubygemsFileSystem bootstrap = new DefaultRubygemsFileSystem();
+  private final DefaultRubygemsFileSystem fileSystem = new DefaultRubygemsFileSystem();
 
   @Test
   public void testSpecsZippedIndex() throws Exception {
@@ -110,8 +110,8 @@ public class DefaultBootstrapTest
   @Test
   public void testDependency() throws Exception {
     String[] pathes = {
-        "/api/v1/dependencies?gems=nexus", "/api/v1/dependencies/jbundler.json.rz",
-        "/api/v1/dependencies/b/bundler.json.rz"
+        "/api/v1/dependencies?gems=nexus", "/api/v1/dependencies/jbundler.ruby",
+        "/api/v1/dependencies/b/bundler.ruby"
     };
     assertFiletype(pathes, FileType.DEPENDENCY);
   }
@@ -145,9 +145,9 @@ public class DefaultBootstrapTest
   public void testNotFound() throws Exception {
     String[] pathes = {
         "/asa", "/asa/", "/api/a", "/api/v1ds", "/api/v1/ds",
-        "/api/v1/dependencies/jbundler.jsaon.rz", "/api/v1/dependencies/b/bundler.json.rzd",
-        "/api/v1/dependencies/basd/bundler.json.rz",
-        "/quick/Marshal.4.8/jbundler.jssaon.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
+        "/api/v1/dependencies/jbundler.jruby", "/api/v1/dependencies/b/bundler.rubyd",
+        "/api/v1/dependencies/basd/bundler.ruby",
+        "/quick/Marshal.4.8/jbundler.jsrubyz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
         "/quick/Marshal.4.8/basd/bundler.gemspec.rz",
         "/gems/jbundler.jssaonrz", "/gems/b/bundler.gemsa",
         "/gems/basd/bundler.gem",
@@ -169,7 +169,7 @@ public class DefaultBootstrapTest
 
   protected void assertFiletype(String[] pathes, FileType type) {
     for (String path : pathes) {
-      assertThat(path, bootstrap.file(path).type(), equalTo(type));
+      assertThat(path, fileSystem.file(path).type(), equalTo(type));
     }
   }
 }
