@@ -110,7 +110,7 @@ public class HostedPOSTLayoutTest
           "/gems/second-2.gem");
     }
     else {
-      // getScriptingContainer those files in place for the proxy to find
+      // get those files in place for the proxy to find
       fileSystem.get("/quick/Marshal.4.8/pre-0.1.0.beta.gemspec.rz");
       fileSystem.get("/api/v1/dependencies/pre.json.rz");
       fileSystem.get("/quick/Marshal.4.8/zip-2.0.2.gemspec.rz");
