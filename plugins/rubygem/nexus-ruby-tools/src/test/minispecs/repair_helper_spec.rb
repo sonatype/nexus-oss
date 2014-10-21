@@ -38,7 +38,7 @@ describe Nexus::RepairHelperImpl do
     dirs = Dir[ File.join( broken_to, 'api', '**', '*' ) ]
     dirs.each do |f|
       if File.file?( f )
-        f.must_match /.json.rz$/
+        f.must_match /.ruby$/
       else
         File.directory?( f ).must_equal true
       end

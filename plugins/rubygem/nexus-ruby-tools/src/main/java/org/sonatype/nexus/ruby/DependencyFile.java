@@ -14,7 +14,7 @@ package org.sonatype.nexus.ruby;
 
 
 /**
- * represents /api/v1/dependencies/{name}.json.rz
+ * represents /api/v1/dependencies/{name}.ruby
  * where the file content is the response of /api/v1/dependencies?gems={name}
  *
  * @author christian

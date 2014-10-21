@@ -38,7 +38,7 @@ public class MetadataBuilderTest
   public void setUp() throws Exception {
     // share the TestSCriptingContainer over all tests to have a uniform ENV setup
     gateway = new DefaultRubygemsGateway(testScriptingContainerRule.get());
-    builder = new MetadataBuilder(gateway.newDependencyData(asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
+    builder = new MetadataBuilder(gateway.newDependencyData(asStream("nokogiri.ruby"), "nokogiri", 1397660433050l));
   }
 
   private InputStream asStream(String file) {
