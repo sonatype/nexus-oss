@@ -20,6 +20,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionConstraint;
+import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.Evaluable;
@@ -82,49 +86,17 @@ public class YumCapability
         {
           @Override
           public boolean isSatisfied() {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder message = new StringBuilder();
+            StringBuilder verificationLog = new StringBuilder();
+
+            validate("createrepo", getConfig().getCreaterepoPath(), "[0.9.9,)", message, verificationLog);
+            verificationLog.append(NL);
+            validate("mergerepo", getConfig().getMergerepoPath(), "[0.1,)", message, verificationLog);
+
+            binariesLog = verificationLog.toString().replace(NL, "<br/>");
             binariesNotAvailableMessage = null;
-
-            sb.append("\"createrepo\" version:").append(NL);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-              if (commandLineExecutor.exec(getConfig().getCreaterepoPath() + " --version", baos, baos) != 0) {
-                binariesNotAvailableMessage = "\"createrepo\"";
-              }
-              sb.append(new String(baos.toByteArray()));
-            }
-            catch (IOException e) {
-              binariesNotAvailableMessage = "\"createrepo\"";
-              sb.append(new String(baos.toByteArray()));
-              sb.append(e.getMessage()).append(NL);
-            }
-
-            sb.append(NL).append("\"mergerepo\" version:").append(NL);
-            baos = new ByteArrayOutputStream();
-            try {
-              if (commandLineExecutor.exec(getConfig().getMergerepoPath() + " --version", baos, baos) != 0) {
-                if (binariesNotAvailableMessage == null) {
-                  binariesNotAvailableMessage = "\"mergerepo\"";
-                }
-                else {
-                  binariesNotAvailableMessage += " and \"mergerepo\"";
-                }
-              }
-              sb.append(new String(baos.toByteArray()));
-            }
-            catch (IOException e) {
-              if (binariesNotAvailableMessage == null) {
-                binariesNotAvailableMessage = "\"mergerepo\"";
-              }
-              else {
-                binariesNotAvailableMessage += " and \"mergerepo\"";
-              }
-              sb.append(new String(baos.toByteArray()));
-              sb.append(e.getMessage()).append(NL);
-            }
-            binariesLog = sb.toString().replace(NL, "<br/>");
-            if (binariesNotAvailableMessage != null) {
-              binariesNotAvailableMessage += " not available (see status for details)";
+            if (message.length() > 0) {
+              binariesNotAvailableMessage = message.toString();
             }
             return binariesNotAvailableMessage == null;
           }
@@ -137,6 +109,78 @@ public class YumCapability
           @Override
           public String explainUnsatisfied() {
             return binariesNotAvailableMessage;
+          }
+
+          private void validate(final String type, final String path,
+                                final String versionConstraint,
+                                final StringBuilder message, final StringBuilder verificationLog)
+          {
+            String and = message.length() > 0 ? " and " : "";
+            verificationLog.append("\"").append(type).append("\" version:").append(NL);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+              if (commandLineExecutor.exec(path + " --version", baos, baos) == 0) {
+                String versionOutput = new String(baos.toByteArray());
+                verificationLog.append(versionOutput);
+                ensureVersionCompatible(type, versionOutput, versionConstraint, message, verificationLog);
+              }
+              else {
+                message.append(and).append("\"").append(type).append("\" not available");
+                verificationLog.append(new String(baos.toByteArray()));
+              }
+            }
+            catch (IOException e) {
+              message.append(and).append("\"").append(type).append("\" not available");
+              verificationLog.append(new String(baos.toByteArray()));
+              verificationLog.append(e.getMessage()).append(NL);
+            }
+          }
+
+          public void ensureVersionCompatible(final String type, final String rawVersion,
+                                              final String versionConstraint,
+                                              final StringBuilder message, final StringBuilder verificationLog)
+          {
+            String version = parseVersion(type, rawVersion);
+            if (version == null) {
+              verificationLog.append("WARNING: Could not determine version!").append(NL);
+            }
+            else {
+              try {
+                VersionScheme scheme = new GenericVersionScheme();
+                VersionConstraint constraint = scheme.parseVersionConstraint(versionConstraint);
+                Version _version = scheme.parseVersion(version);
+                if (!constraint.containsVersion(_version)) {
+                  message.append("\"").append(type).append("\" incompatible version");
+                  verificationLog.append(NL);
+                  verificationLog.append("Incompatible ").append(type).append(" version detected:").append(NL);
+                  verificationLog.append("Detected version: ").append(_version).append(NL);
+                  verificationLog.append("Compatible version constraint: ").append(constraint).append(NL);
+                }
+              }
+              catch (Exception e) {
+                log.debug("Could not parse version from " + version, e);
+                verificationLog.append("WARNING: Could not parse version from ").append(version).append("!").append(NL);
+              }
+            }
+          }
+
+          private String parseVersion(final String type, final String rawVersion) {
+            try {
+              String[] lines = rawVersion.split("\n");
+              for (String line : lines) {
+                line = line.trim();
+
+                if (line.startsWith(type + " ")) { // trailing space in string on purpose
+                  String[] parts = line.split("\\s");
+                  // ignore the build #
+                  return parts[1];
+                }
+              }
+            }
+            catch (Exception e) {
+              log.debug("Could not determine version", e);
+            }
+            return null;
           }
         }
     );
