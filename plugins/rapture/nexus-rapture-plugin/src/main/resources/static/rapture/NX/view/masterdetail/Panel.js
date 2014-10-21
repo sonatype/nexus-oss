@@ -50,6 +50,7 @@ Ext.define('NX.view.masterdetail.Panel', {
       },
       {
         xtype: 'nx-masterdetail-tabs',
+        ui: 'masterdetail-tabs',
         region: 'south',
         split: true,
         collapsible: true,
