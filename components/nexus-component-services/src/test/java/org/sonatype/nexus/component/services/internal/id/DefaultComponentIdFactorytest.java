@@ -1,6 +1,7 @@
 package org.sonatype.nexus.component.services.internal.id;
 
 import org.sonatype.nexus.component.model.ComponentId;
+import org.sonatype.nexus.component.services.id.ComponentIdFactory;
 
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ public class DefaultComponentIdFactoryTest
 {
   @Test
   public void restoredIdsAreEqual() {
-    final DefaultComponentIdFactory factory = new DefaultComponentIdFactory();
+    final ComponentIdFactory factory = new DefaultComponentIdFactory();
 
     final ComponentId id = factory.newId();
 
