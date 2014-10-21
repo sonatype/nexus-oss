@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class DefaultComponentIdFactoryTest
+public class DefaultComponentIdServiceTest
 {
   @Test
   public void restoredIdsAreEqual() {
