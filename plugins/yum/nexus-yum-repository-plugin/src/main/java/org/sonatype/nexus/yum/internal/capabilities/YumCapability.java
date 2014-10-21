@@ -136,9 +136,9 @@ public class YumCapability
             }
           }
 
-          public void ensureVersionCompatible(final String type, final String rawVersion,
-                                              final String versionConstraint,
-                                              final StringBuilder message, final StringBuilder verificationLog)
+          private void ensureVersionCompatible(final String type, final String rawVersion,
+                                               final String versionConstraint,
+                                               final StringBuilder message, final StringBuilder verificationLog)
           {
             String version = parseVersion(type, rawVersion);
             if (version == null) {
