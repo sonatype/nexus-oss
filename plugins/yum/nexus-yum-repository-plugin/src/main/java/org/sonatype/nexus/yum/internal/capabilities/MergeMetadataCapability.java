@@ -42,12 +42,4 @@ public class MergeMetadataCapability
     return new MergeMetadataCapabilityConfiguration(properties);
   }
 
-  /**
-   * @since 2.11
-   */
-  @Override
-  public Condition activationCondition() {
-    return conditions().capabilities().capabilityOfTypeActive(YumCapabilityDescriptor.TYPE);
-  }
-
 }
