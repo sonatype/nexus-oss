@@ -12,27 +12,38 @@
  */
 package org.sonatype.nexus.yum.internal;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumHosted;
+import org.sonatype.nexus.yum.YumProxy;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -54,17 +65,21 @@ public class EventsRouter
 
   private static final Logger log = LoggerFactory.getLogger(EventsRouter.class);
 
-  private final Provider<RepositoryRegistry> repositoryRegistry;
+  private final Provider<RepositoryRegistry> repositoryRegistryProvider;
 
   private final Provider<YumRegistry> yumRegistryProvider;
 
+  private final Provider<Walker> walkerProvider;
+
   @Inject
-  public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistry,
+  public EventsRouter(final Provider<RepositoryRegistry> repositoryRegistryProvider,
                       final Provider<YumRegistry> yumRegistryProvider,
+                      final Provider<Walker> walkerProvider,
                       final EventBus eventBus)
   {
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryRegistryProvider = checkNotNull(repositoryRegistryProvider);
     this.yumRegistryProvider = checkNotNull(yumRegistryProvider);
+    this.walkerProvider = checkNotNull(walkerProvider);
     checkNotNull(eventBus).register(this);
   }
 
@@ -109,23 +124,63 @@ public class EventsRouter
     }
   }
 
-  /**
-   * Automatically merge group level metadata when "/repodata/repomd.xml" is (re)retrieved from proxy.
-   *
-   * @since 2.7
-   */
   @AllowConcurrentEvents
   @Subscribe
   public void on(RepositoryItemEventCache itemEvent) {
-    ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
-    if (repository != null && itemEvent.getItem().getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
-      log.debug("Yum metadata changed for {}. Looking if we should merge it...", repository.getId());
-      List<GroupRepository> groups = repositoryRegistry.get().getGroupsOfRepository(repository);
+    final ProxyRepository repository = itemEvent.getRepository().adaptToFacet(ProxyRepository.class);
+    StorageItem item = itemEvent.getItem();
+    if (repository != null && item.getPath().toLowerCase().equals("/" + Yum.PATH_OF_REPOMD_XML)) {
+      try {
+        log.debug("Resetting processed flag... ({}:{} cached)", repository.getId(), item.getPath());
+        item.getRepositoryItemAttributes().remove(YumProxy.PROCESSED);
+        repository.getAttributesHandler().storeAttributes(item);
+      }
+      catch (IOException e) {
+        log.warn("Failed to reset processing flag for {}:{}", repository.getId(), item.getPath(), e);
+      }
+
+      log.debug("Marking group repositories as dirty... ({}:{} cached)", repository.getId(), item.getPath());
+      List<GroupRepository> groups = repositoryRegistryProvider.get().getGroupsOfRepository(repository);
       for (GroupRepository group : groups) {
         Yum yum = yumRegistryProvider.get().get(group.getId());
         if (yum != null && yum instanceof YumGroup) {
           ((YumGroup) yum).markDirty();
         }
+      }
+
+      try {
+        log.debug("Removing obsolete metadata files... ({}:{} cached)", repository.getId(), item.getPath());
+        RepoMD repoMD = new RepoMD(((StorageFileItem) item).getInputStream());
+        final Collection<String> locations = repoMD.getLocations();
+        ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA);
+        request.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);
+        DefaultWalkerContext context = new DefaultWalkerContext(repository, request);
+        context.getProcessors().add(new AbstractFileWalkerProcessor()
+        {
+          @Override
+          protected void processFileItem(final WalkerContext context, final StorageFileItem item) throws Exception {
+            if (!item.getPath().equals("/" + Yum.PATH_OF_REPOMD_XML)
+                && !locations.contains(item.getPath().substring(1))) {
+              log.trace("Removing obsolete {}:{}", repository.getId(), item.getPath());
+              repository.deleteItem(true, item.getResourceStoreRequest());
+            }
+          }
+        });
+        walkerProvider.get().walk(context);
+      }
+      catch (WalkerException e) {
+        Throwable stopCause = e.getWalkerContext().getStopCause();
+        if (!(stopCause instanceof ItemNotFoundException)) {
+          if (stopCause != null) {
+            log.warn("Failed to clean proxy YUM metadata", stopCause);
+          }
+          else {
+            log.warn("Failed to clean proxy YUM metadata", e);
+          }
+        }
+      }
+      catch (Exception e) {
+        log.warn("Failed to clean proxy YUM metadata", e);
       }
     }
   }
@@ -149,7 +204,7 @@ public class EventsRouter
     if (repositoryIds != null) {
       for (final String repositoryId : repositoryIds) {
         try {
-          repositoryRegistry.get().getRepository(repositoryId).retrieveItem(
+          repositoryRegistryProvider.get().getRepository(repositoryId).retrieveItem(
               new ResourceStoreRequest(Yum.PATH_OF_REPOMD_XML)
           );
           return true;

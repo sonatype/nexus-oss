@@ -13,7 +13,6 @@
 package org.sonatype.nexus.yum.internal;
 
 import java.io.File;
-import java.net.URL;
 
 import javax.inject.Inject;
 
@@ -36,7 +35,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static junit.framework.Assert.assertNotSame;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,8 +42,6 @@ import static org.mockito.Mockito.when;
 public class YumHostedImplIT
     extends YumNexusTestSupport
 {
-
-  private static final String REPO_BASE_URL = "http://localhost:8081/nexus/service/local/snapshots/1.0";
 
   private static final String VERSION_1_0 = "1.0";
 
@@ -70,8 +66,8 @@ public class YumHostedImplIT
   public void shouldCacheRepository()
       throws Exception
   {
-    final YumRepository repo1 = yum.getYumRepository(VERSION_1_0, new URL(REPO_BASE_URL));
-    final YumRepository repo2 = yum.getYumRepository(VERSION_1_0, new URL(REPO_BASE_URL));
+    final YumRepository repo1 = yum.getYumRepository(VERSION_1_0);
+    final YumRepository repo2 = yum.getYumRepository(VERSION_1_0);
 
     Assert.assertEquals(repo1, repo2);
   }
@@ -80,11 +76,11 @@ public class YumHostedImplIT
   public void shouldRecreateRepository()
       throws Exception
   {
-    final YumRepository repo1 = yum.getYumRepository(VERSION_1_0, new URL(REPO_BASE_URL));
+    final YumRepository repo1 = yum.getYumRepository(VERSION_1_0);
 
     yum.markDirty(VERSION_1_0);
 
-    YumRepository repo2 = yum.getYumRepository(VERSION_1_0, new URL(REPO_BASE_URL));
+    YumRepository repo2 = yum.getYumRepository(VERSION_1_0);
 
     assertNotSame(repo1, repo2);
   }

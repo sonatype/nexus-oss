@@ -43,7 +43,8 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -119,18 +120,15 @@ public class GenerateMetadataTaskSettingsIT
         mock(EventBus.class),
         repoRegistry(),
         mock(YumRegistry.class),
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
     task.setRpmDir(rpmsDir().getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
     // when
     task.setDefaults();
     // then
     assertThat(task.getRepoDir(), is(rpmsDir().getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
   }
 
   @Test
@@ -142,7 +140,6 @@ public class GenerateMetadataTaskSettingsIT
         mock(EventBus.class),
         repoRegistry(),
         mock(YumRegistry.class),
-        repositoryURLBuilder(),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -152,9 +149,7 @@ public class GenerateMetadataTaskSettingsIT
     task.setDefaults();
     // then
     assertThat(task.getRpmDir(), is(rpmsDir().getAbsolutePath()));
-    assertThat(task.getRpmUrl(), is(RPM_URL));
     assertThat(task.getRepoDir(), is(rpmsDir().getAbsoluteFile()));
-    assertThat(task.getRepoUrl(), is(RPM_URL));
   }
 
   @Test
@@ -165,7 +160,6 @@ public class GenerateMetadataTaskSettingsIT
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         mock(YumRegistry.class),
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -195,7 +189,6 @@ public class GenerateMetadataTaskSettingsIT
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         yumRegistry,
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -247,7 +240,6 @@ public class GenerateMetadataTaskSettingsIT
         mock(EventBus.class),
         mock(RepositoryRegistry.class),
         yumRegistry,
-        mock(RepositoryURLBuilder.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
@@ -263,9 +255,7 @@ public class GenerateMetadataTaskSettingsIT
 
     };
     task.setRpmDir(rpmsDir().getAbsolutePath());
-    task.setRpmUrl(RPM_URL);
     task.setRepoDir(rpmsDir());
-    task.setRepoUrl(RPM_URL);
     task.setRepositoryId(repo);
     task.setVersion(version);
     task.setAddedFiles(null);
