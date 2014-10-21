@@ -24,13 +24,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * Support class that needs heavy-weight {@link TestScriptingContainer} to have available in places like constructor.
+ * Support class that needs heavy-weight {@link TestJRubyContainer} to have available in places like constructor.
  * The container is manager "per-class" of the test.
  */
 public abstract class RubyScriptingTestSupport
     extends TestSupport
 {
-  private static TestScriptingContainer testScriptingContainer = new TestScriptingContainer();
+  private static TestJRubyContainer testScriptingContainer = new TestJRubyContainer();
 
   @BeforeClass
   public static void createContainer() {

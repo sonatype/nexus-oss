@@ -23,7 +23,7 @@ import org.jruby.embed.ScriptingContainer;
  * Encapsulates all JRuby related containers and helpers into one class and manages their lifecycle. Hence,
  * this helper is reusable as in test rules, but also in other constructs.
  */
-class TestScriptingContainer
+class TestJRubyContainer
 {
   private ScriptingContainer scriptingContainer;
 

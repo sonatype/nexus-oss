@@ -38,7 +38,7 @@ public class SpecsHelperTest
     extends TestSupport
 {
   @Rule
-  public TestScriptingContainerRule scriptingContainerRule = new TestScriptingContainerRule();
+  public TestJRubyContainerRule scriptingContainerRule = new TestJRubyContainerRule();
 
   private SpecsHelper specsHelper;
 

@@ -20,10 +20,10 @@ import org.junit.rules.ExternalResource;
  * Simple Junit rule to expose managed container. If a test needs access to container in more specific places,
  * ie. ctor and so, take a look at {@link RubyScriptingTestSupport}.
  */
-public class TestScriptingContainerRule
+public class TestJRubyContainerRule
     extends ExternalResource
 {
-  private TestScriptingContainer testScriptingContainer = new TestScriptingContainer();
+  private TestJRubyContainer testScriptingContainer = new TestJRubyContainer();
 
   @Override
   protected void before() throws Throwable {

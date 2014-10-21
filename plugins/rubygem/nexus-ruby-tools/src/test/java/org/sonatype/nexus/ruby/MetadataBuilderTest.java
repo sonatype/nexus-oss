@@ -27,11 +27,11 @@ public class MetadataBuilderTest
     extends TestSupport
 {
   @Rule
-  public TestScriptingContainerRule testScriptingContainerRule = new TestScriptingContainerRule();
+  public TestJRubyContainerRule testJRubyContainerRule = new TestJRubyContainerRule();
 
   private MetadataBuilder createMetadataBuilder() {
-    return new MetadataBuilder(testScriptingContainerRule.getRubygemsGateway().newDependencyData(
-        asStream("nokogiri.json.rz"), "nokogiri", 1397660433050l));
+    return new MetadataBuilder(testJRubyContainerRule.getRubygemsGateway().newDependencyData(
+        asStream("nokogiri.ruby"), "nokogiri", 1397660433050l));
   }
 
   private InputStream asStream(String file) {
