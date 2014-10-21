@@ -131,7 +131,7 @@ public class HostedGETLayoutTest
 
     assertFiletypeWithPayload(pathes, FileType.SHA1, shas);
 
-    // these files carry a timestamp of creation of the json.rz file
+    // these files carry a timestamp of creation of the .ruby file
     pathes = new String[]{
         "/maven/releases/rubygems/zip/maven-metadata.xml.sha1",
         "/maven/prereleases/rubygems/pre/maven-metadata.xml.sha1",
@@ -274,7 +274,7 @@ public class HostedGETLayoutTest
   @Test
   public void testDependency() throws Exception {
     String[] pathes = {
-        "/api/v1/dependencies?gems=zip", "/api/v1/dependencies/pre.json.rz", "/api/v1/dependencies/z/zip.json.rz"
+        "/api/v1/dependencies?gems=zip", "/api/v1/dependencies/pre.ruby", "/api/v1/dependencies/z/zip.ruby"
     };
     assertFiletypeWithPayload(pathes, FileType.DEPENDENCY, URLStreamLocation.class);
   }
@@ -308,16 +308,16 @@ public class HostedGETLayoutTest
         "specs.4.8.gz", "latest_specs.4.8.gz", "prerelease_specs.4.8.gz");
     assertDirectory("/api", "v1", "quick", "gems");
     assertDirectory("/api/v1", "api_key", "dependencies");
-    assertDirectory("/api/v1/dependencies");//"hufflepuf.json.rz", "pre.json.rz", "zip.json.rz" );
+    assertDirectory("/api/v1/dependencies");//"hufflepuf.ruby", "pre.ruby", "zip.ruby" );
     assertDirectory("/api/quick", "Marshal.4.8");
     assertDirectory("/api/quick/Marshal.4.8");
     assertDirectory("/api/gems");
     assertDirectory("/quick", "Marshal.4.8");
     assertDirectory("/quick/Marshal.4.8");
-    assertDirectory("/gems");//"hufflepuf.json.rz", "pre.json.rz", "zip.json.rz" );
+    assertDirectory("/gems");//"hufflepuf.ruby", "pre.ruby", "zip.ruby" );
     assertDirectory("/maven", "prereleases", "releases");
     assertDirectory("/maven/prereleases", "rubygems");
-    // the lookup will create a hufflepuf.json.rz !
+    // the lookup will create a hufflepuf.ruby !
     assertDirectory("/maven/prereleases/rubygems/hufflepuf", "maven-metadata.xml", "maven-metadata.xml.sha1");
     assertDirectory("/maven/prereleases/rubygems", "hufflepuf", "pre", "zip");
     assertDirectory("/maven/releases", "rubygems");
@@ -361,8 +361,8 @@ public class HostedGETLayoutTest
   public void testNotFound() throws Exception {
     String[] pathes = {
         "/asa", "/asa/", "/api/a", "/api/v1ds", "/api/v1/ds",
-        "/api/v1/dependencies/jbundler.jsaon.rz", "/api/v1/dependencies/b/bundler.json.rzd",
-        "/api/v1/dependencies/basd/bundler.json.rz",
+        "/api/v1/dependencies/jbundler.jruby", "/api/v1/dependencies/b/bundler.jrubyd",
+        "/api/v1/dependencies/basd/bundler.ruby",
         "/quick/Marshal.4.8/jbundler.jssaon.rz", "/quick/Marshal.4.8/b/bundler.gemspec.rzd",
         "/quick/Marshal.4.8/basd/bundler.gemspec.rz",
         "/gems/jbundler.jssaonrz", "/gems/b/bundler.gemsa",
