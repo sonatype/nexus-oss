@@ -27,6 +27,13 @@ import org.joda.time.DateTime;
 public interface Asset
 {
   /**
+   * Gets the id of the component to which this asset belongs.
+   *
+   * NOTE: Having this probably means that the asset-store methods could be simplified.
+   */
+  ComponentId getComponentId();
+
+  /**
    * @return relative path to this asset in the containing component
    */
   String getPath();
