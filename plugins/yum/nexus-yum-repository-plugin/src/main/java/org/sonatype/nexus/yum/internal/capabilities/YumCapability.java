@@ -66,6 +66,8 @@ public class YumCapability
   @Override
   protected void onActivate(final YumCapabilityConfiguration config) throws Exception {
     yumRegistry.setMaxNumberOfParallelThreads(config.maxNumberParallelThreads());
+    yumRegistry.setCreaterepoPath(config.getCreaterepoPath());
+    yumRegistry.setMergerepoPath(config.getMergerepoPath());
   }
 
   /**
@@ -83,29 +85,41 @@ public class YumCapability
             StringBuilder sb = new StringBuilder();
             binariesNotAvailableMessage = null;
 
-            sb.append("createrepo version:").append(NL);
+            sb.append("\"createrepo\" version:").append(NL);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
-              ByteArrayOutputStream baos = new ByteArrayOutputStream();
-              if (commandLineExecutor.exec("createrepo --version", baos, baos) != 0) {
-                binariesNotAvailableMessage = "createrepo";
+              if (commandLineExecutor.exec(getConfig().getCreaterepoPath() + " --version", baos, baos) != 0) {
+                binariesNotAvailableMessage = "\"createrepo\"";
               }
               sb.append(new String(baos.toByteArray()));
             }
             catch (IOException e) {
-              binariesNotAvailableMessage = "createrepo";
+              binariesNotAvailableMessage = "\"createrepo\"";
+              sb.append(new String(baos.toByteArray()));
               sb.append(e.getMessage()).append(NL);
             }
 
-            sb.append(NL).append("mergerepo version:").append(NL);
+            sb.append(NL).append("\"mergerepo\" version:").append(NL);
+            baos = new ByteArrayOutputStream();
             try {
-              ByteArrayOutputStream baos = new ByteArrayOutputStream();
-              if (commandLineExecutor.exec("mergerepo --version", baos, baos) != 0) {
-                binariesNotAvailableMessage += (binariesNotAvailableMessage == null ? "" : " and ") + "mergerepo";
+              if (commandLineExecutor.exec(getConfig().getMergerepoPath() + " --version", baos, baos) != 0) {
+                if (binariesNotAvailableMessage == null) {
+                  binariesNotAvailableMessage = "\"mergerepo\"";
+                }
+                else {
+                  binariesNotAvailableMessage += " and \"mergerepo\"";
+                }
               }
               sb.append(new String(baos.toByteArray()));
             }
             catch (IOException e) {
-              binariesNotAvailableMessage += (binariesNotAvailableMessage == null ? "" : " and ") + "mergerepo";
+              if (binariesNotAvailableMessage == null) {
+                binariesNotAvailableMessage = "\"mergerepo\"";
+              }
+              else {
+                binariesNotAvailableMessage += " and \"mergerepo\"";
+              }
+              sb.append(new String(baos.toByteArray()));
               sb.append(e.getMessage()).append(NL);
             }
             binariesLog = sb.toString().replace(NL, "<br/>");
@@ -117,7 +131,7 @@ public class YumCapability
 
           @Override
           public String explainSatisfied() {
-            return "createrepo and mergerepo are available";
+            return "\"createrepo\" and \"mergerepo\" are available";
           }
 
           @Override

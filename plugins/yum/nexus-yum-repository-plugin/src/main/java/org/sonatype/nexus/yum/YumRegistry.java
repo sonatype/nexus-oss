@@ -24,6 +24,10 @@ public interface YumRegistry
 
   static final int DEFAULT_MAX_NUMBER_PARALLEL_THREADS = 10;
 
+  static final String DEFAULT_CREATEREPO_PATH = "createrepo";
+
+  static final String DEFAULT_MERGEREPO_PATH = "mergerepo";
+
   Yum register(MavenRepository repository);
 
   Yum unregister(String repositoryId);
@@ -35,6 +39,26 @@ public interface YumRegistry
   YumRegistry setMaxNumberOfParallelThreads(int maxNumberOfParallelThreads);
 
   int maxNumberOfParallelThreads();
+
+  /**
+   * @since 2.11
+   */
+  String getCreaterepoPath();
+
+  /**
+   * @since 2.11
+   */
+  void setCreaterepoPath(final String path);
+
+  /**
+   * @since 2.11
+   */
+  String getMergerepoPath();
+
+  /**
+   * @since 2.11
+   */
+  void setMergerepoPath(final String path);
 
   File getTemporaryDirectory();
 
