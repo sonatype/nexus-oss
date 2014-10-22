@@ -147,7 +147,7 @@ public class DefaultProxyRubyRepository
     }
     else {
       // all other files use artifact max age
-      return isOld(getExternalConfiguration(false).getArtifactMaxAge(), item);
+      return isOld(getArtifactMaxAge(), item);
     }
   }
 

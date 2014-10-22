@@ -77,12 +77,15 @@ public class GroupNexusStorage
 
   private void doRetrieve(RubygemsFile file) {
     try {
+      log.debug("doRetrieve :: {}", file);
       file.set(setup(file));
     }
     catch (ItemNotFoundException e) {
+      log.debug("doRetrieve-NotFound :: {} :: {}", file, e.toString());
       file.markAsNotExists();
     }
     catch (Exception e) {
+      log.debug("doRetrieve-Exception :: {} :: {}", file, e.toString());
       file.setException(e);
     }
   }
@@ -123,9 +126,9 @@ public class GroupNexusStorage
     if (outdated) {
       switch (file.type()) {
         case DEPENDENCY:
-          return merge((DependencyFile) file, items);
+          return mergeDependency((DependencyFile) file, items);
         case SPECS_INDEX_ZIPPED:
-          return merge((SpecsIndexZippedFile) file, items);
+          return mergeSpecsIndex((SpecsIndexZippedFile) file, items);
         default:
           throw new RuntimeException("BUG: should never reach here: " + file);
       }
@@ -135,7 +138,8 @@ public class GroupNexusStorage
     }
   }
 
-  private StorageItem merge(SpecsIndexZippedFile file, List<StorageItem> items) throws Exception {
+  private StorageItem mergeSpecsIndex(SpecsIndexZippedFile file, List<StorageItem> items) throws Exception {
+    log.debug("mergeSpecsIndex :: {} :: {}", file, items);
     MergeSpecsHelper specs = gateway.newMergeSpecsHelper();
     for (StorageItem item : items) {
       try (InputStream is = ((StorageFileItem) item).getInputStream()) {
@@ -162,7 +166,8 @@ public class GroupNexusStorage
     return item;
   }
 
-  private StorageItem merge(DependencyFile file, List<StorageItem> dependencies) throws Exception {
+  private StorageItem mergeDependency(DependencyFile file, List<StorageItem> dependencies) throws Exception {
+    log.debug("mergeDependency :: {} :: {}", file, dependencies);
     DependencyHelper deps = gateway.newDependencyHelper();
     for (StorageItem item : dependencies) {
       try (InputStream is = ((StorageFileItem) item).getInputStream()) {

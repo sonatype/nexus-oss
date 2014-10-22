@@ -40,6 +40,7 @@ import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.SpecsIndexFile;
 import org.sonatype.nexus.ruby.SpecsIndexZippedFile;
 import org.sonatype.nexus.ruby.layout.Storage;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * A {@link RubyRepository} backed {@link Storage} implementation.
@@ -47,6 +48,7 @@ import org.sonatype.nexus.ruby.layout.Storage;
  * @since 2.11
  */
 public class NexusStorage
+    extends ComponentSupport
     implements Storage
 {
   protected final RubyRepository repository;
@@ -57,6 +59,7 @@ public class NexusStorage
 
   @Override
   public void retrieve(RubygemsFile file) {
+    log.debug("retrieve :: {}", file);
     try {
       file.set(repository.retrieveDirectItem(new ResourceStoreRequest(file.storagePath())));
     }
@@ -80,6 +83,7 @@ public class NexusStorage
 
   @Override
   public void retrieve(SpecsIndexFile specs) {
+    log.debug("retrieve :: {}", specs);
     SpecsIndexZippedFile source = specs.zippedSpecsIndexFile();
     try {
       StorageFileItem item = (StorageFileItem)
@@ -138,6 +142,7 @@ public class NexusStorage
 
   @Override
   public void update(InputStream is, RubygemsFile file) {
+    log.debug("update :: {}", file);
     ResourceStoreRequest request = new ResourceStoreRequest(file.storagePath());
     ContentLocator contentLocator = new PreparedContentLocator(is, file.type().mime(), ContentLocator.UNKNOWN_LENGTH);
     DefaultStorageFileItem fileItem = new DefaultStorageFileItem(repository, request,
@@ -155,6 +160,7 @@ public class NexusStorage
 
   @SuppressWarnings("deprecation")
   public void delete(RubygemsFile file) {
+    log.debug("delete :: {}", file);
     ResourceStoreRequest request = new ResourceStoreRequest(file.storagePath());
 
     try {
