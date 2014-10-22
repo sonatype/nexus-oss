@@ -167,7 +167,7 @@ public class DefaultProxyRubyRepository
     getExternalConfiguration(true).setMetadataMaxAge(metadataMaxAge);
   }
 
-  private static Pattern BUNDLER_API_REQUEST = Pattern.compile("[?]gems=.+,.+");
+  private static Pattern BUNDLER_API_REQUEST = Pattern.compile(".*[?]gems=.+,.+");
 
   public AbstractStorageItem doCacheItem(AbstractStorageItem item)
       throws LocalStorageException
