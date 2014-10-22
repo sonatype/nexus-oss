@@ -53,8 +53,8 @@ public class NexusRubygemsGatewayProvider
   @Override
   public synchronized RubygemsGateway get() {
     if (rubygemsGateway == null) {
-      // TODO: this takes about 20 seconds! So, might INFO be even better
-      log.debug("Creating JRuby RubygemsGateway");
+      // this takes about 20 seconds and happens lazily, so log it visibly
+      log.info("Creating JRuby RubygemsGateway");
       rubygemsGateway = new DefaultRubygemsGateway(scriptingContainerProvider.get());
     }
     return rubygemsGateway;
