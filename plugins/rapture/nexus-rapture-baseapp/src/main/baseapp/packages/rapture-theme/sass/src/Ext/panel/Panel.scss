@@ -21,6 +21,13 @@
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
+.feature-content {
+  .x-toolbar {
+    background: white;
+    padding-left: 10px;
+  }
+}
+
 /**
  * cls: 'feature-content'
  */
@@ -100,5 +107,3 @@ $grid-feature-menu-selected-background-color: #d1d1d1;
   $ui-header-color: #ffffff,
   $ui-header-background-color: #3d4e7e
 );
-
-

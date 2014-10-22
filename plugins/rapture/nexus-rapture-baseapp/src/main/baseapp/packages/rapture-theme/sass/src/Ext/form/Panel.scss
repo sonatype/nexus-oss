@@ -1,0 +1,29 @@
+/**
+* @class Ext.form.Panel
+*/
+
+/**
+* Style for the user reset token panel
+*
+* ui: 'reset-tokens'
+*/
+
+@include extjs-panel-ui(
+  $ui: 'reset-tokens',
+
+  $ui-header-color: #333333,
+  $ui-header-padding: 25px 0 0 0 !important,
+  $ui-header-font-size: 16px,
+  $ui-header-background-color: #ffffff
+);
+
+.feature-content {
+  .x-panel-reset-tokens {
+    border-top: 1px #aaaaaa solid;
+    margin: 0 10px 0 10px !important;
+    left: 0 !important;
+    .x-toolbar {
+      padding-left: 0;
+    }
+  }
+}
