@@ -13,26 +13,33 @@
 package org.sonatype.nexus.component.services.internal.query;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.sonatype.nexus.component.assetstore.AssetStore;
+import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobId;
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.model.ComponentId;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapterRegistry;
+import org.sonatype.nexus.component.services.internal.adapter.AssetEntityAdapter;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQueryService;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -47,87 +54,143 @@ public class MetadataQueryServiceImpl
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final AssetStore assetStore;
+  // TODO: Eventually use AssetStore here instead of directly using BlobStore.
+  // What we really need is the ability to grab an Asset whose associated blob is stored on the local node
+  // and might be replicated on-demand, given an ODocument. It's ultimately AssetStore's to do that sort of thing,
+  // so directly using a BlobStore here is just a stop-gap until AssetStore exposes something like this:
+  // public Asset getAsset(ODocument, boolean replicateContentFirstIfNeeded)
+  private final BlobStore blobStore;
 
-  private final ComponentEntityAdapterRegistry adapterRegistry;
+  private final ComponentEntityAdapterRegistry componentAdapterRegistry;
+
+  private final AssetEntityAdapter assetAdapter;
 
   @Inject
   public MetadataQueryServiceImpl(@Named("metadata") Provider<DatabaseInstance> databaseInstance,
-                                  AssetStore assetStore,
-                                  ComponentEntityAdapterRegistry adapterRegistry) {
+                                  BlobStore blobStore,
+                                  ComponentEntityAdapterRegistry componentAdapterRegistry) {
     this.databaseInstance = checkNotNull(databaseInstance);
-    this.assetStore = checkNotNull(assetStore);
-    this.adapterRegistry = checkNotNull(adapterRegistry);
+    this.blobStore = checkNotNull(blobStore);
+    this.componentAdapterRegistry = checkNotNull(componentAdapterRegistry);
+    this.assetAdapter = new AssetEntityAdapter();
   }
 
   @Override
   public <T extends Component> long countComponents(final Class<T> componentClass,
                                                     final @Nullable MetadataQueryRestriction restriction) {
-    ComponentEntityAdapter<T> mapper = registeredAdapter(componentClass);
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      String query = orientQueryBuilder(db, queryWith(restriction)).buildComponentQuery(oClassName(componentClass), true);
-      // TODO: execute and return count
+      OrientQueryBuilder queryBuilder = orientQueryBuilder(db, queryWith(restriction));
+      String countQuery = queryBuilder.buildComponentQuery(oClassName(componentClass), true);
+      return executeCount(db, countQuery, queryBuilder.getParameters());
     }
-    return 0;
   }
 
   @Override
   public long countAssets(final @Nullable MetadataQueryRestriction restriction) {
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      String query = orientQueryBuilder(db, queryWith(restriction)).buildAssetQuery(true);
-      // TODO: execute and return count
+      OrientQueryBuilder queryBuilder = orientQueryBuilder(db, queryWith(restriction));
+      String countQuery = queryBuilder.buildAssetQuery(true);
+      return executeCount(db, countQuery, queryBuilder.getParameters());
     }
-    return 0;
   }
 
   @Override
   public <T extends Component> List<T> findComponents(final Class<T> componentClass,
                                                       final MetadataQuery metadataQuery) {
-    ComponentEntityAdapter<T> mapper = registeredAdapter(componentClass);
+    final ComponentEntityAdapter<T> componentAdapter = registeredComponentAdapter(componentClass);
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      String query = orientQueryBuilder(db, metadataQuery).buildComponentQuery(oClassName(componentClass), false);
-      // TODO: execute and convert results to Component domain objects using mapper
+      OrientQueryBuilder queryBuilder = orientQueryBuilder(db, metadataQuery);
+      String query = queryBuilder.buildComponentQuery(oClassName(componentClass), false);
+      return FluentIterable
+          .from(execute(db, query, queryBuilder.getParameters()))
+          .transform(new Function<ODocument, T>() {
+            @Override
+            public T apply(final ODocument document) {
+              return componentAdapter.convertToComponent(document);
+            }
+          }).toList();
     }
-    return null;
   }
 
   @Override
   public List<Asset> findAssets(final MetadataQuery metadataQuery) {
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      String query = orientQueryBuilder(db, metadataQuery).buildAssetQuery(false);
-      // TODO: execute and convert results to Asset domain objects
+      OrientQueryBuilder queryBuilder = orientQueryBuilder(db, metadataQuery);
+      String query = queryBuilder.buildAssetQuery(false);
+      return FluentIterable
+          .from(execute(db, query, queryBuilder.getParameters()))
+          .transform(new Function<ODocument, Asset>() {
+            @Override
+            public Asset apply(final ODocument document) {
+              return assetFromDocument(document);
+            }
+          }).toList();
     }
-    return null;
   }
 
-  private <T extends Component> ComponentEntityAdapter<T> registeredAdapter(final Class<T> componentClass) {
-    ComponentEntityAdapter<T> mapper = adapterRegistry.getAdapter(componentClass);
-    checkState(mapper != null, "No adapter registered for class %", componentClass);
-    return mapper;
+  private <T extends Component> ComponentEntityAdapter<T> registeredComponentAdapter(final Class<T> componentClass) {
+    ComponentEntityAdapter<T> adapter = componentAdapterRegistry.getAdapter(componentClass);
+    checkState(adapter != null, "No adapter registered for class %", componentClass);
+    return adapter;
   }
 
-  private String oClassName(Class type) {
-    return new OClassNameBuilder().prefix("metadata").type(type).build();
+  private Asset assetFromDocument(ODocument document) {
+    Map<String, String> blobRefs = document.field(AssetEntityAdapter.P_BLOB_REFS);
+    final String localBlobStoreId = "someBlobStoreId"; // TODO: Eventually use the actual local blob store id here
+    checkState(blobRefs.containsKey(localBlobStoreId), "Local blobRef does not exist for that asset");
+    BlobId blobId = new BlobId(blobRefs.get(localBlobStoreId));
+    Blob blob = blobStore.get(new BlobId(blobRefs.get(localBlobStoreId)));
+    checkState(blob != null, "Blob not found in local store: %", blobId.asUniqueString());
+    return assetAdapter.convertToAsset(document, blob);
   }
 
-  private OrientQueryBuilder orientQueryBuilder(ODatabaseDocumentTx db, MetadataQuery query) {
+  private static String oClassName(Class type) {
+    return new OClassNameBuilder().type(type).build();
+  }
+
+  private static OrientQueryBuilder orientQueryBuilder(ODatabaseDocumentTx db, MetadataQuery query) {
     if (query.getSkipComponentId() == null) {
       return new OrientQueryBuilder(query);
-    } else if (query.getSkipAssetPath() == null) {
-      return new OrientQueryBuilder(query, skipComponentRid(db, query.getSkipComponentId()));
     } else {
-      return new OrientQueryBuilder(query, skipAssetRid(db, query.getSkipComponentId(), query.getSkipAssetPath()));
+      ODocument skipDocument = null;
+      if (query.getSkipAssetPath() != null) {
+        skipDocument = getExistingDocumentWithId(db, AssetEntityAdapter.ORIENT_CLASS_NAME,
+            assetId(query.getSkipComponentId(), query.getSkipAssetPath()));
+      } else {
+        skipDocument = getExistingDocumentWithId(db, ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME,
+            query.getSkipComponentId().asUniqueString());
+      }
+      return new OrientQueryBuilder(query, skipDocument.getIdentity());
     }
   }
 
-  private ORID skipComponentRid(ODatabaseDocumentTx db, ComponentId skipComponentId) {
-    // TODO: find orid of component where id = skipComponentId
-    return null;
+  private static String assetId(ComponentId componentId, String assetPath) {
+    return String.format("%s:%s", componentId.asUniqueString(), assetPath);
   }
 
-  private ORID skipAssetRid(ODatabaseDocumentTx db, ComponentId skipComponentId, @Nullable String skipAssetPath) {
-    // TODO: get orid of asset where id = skipComponentId:skipAssetPath
-    return null;
+  private static ODocument getExistingDocumentWithId(ODatabaseDocumentTx db, String className, String id) {
+    ODocument document = getDocumentWithId(db, className, id);
+    checkState(document != null, "No such %: %", className, id);
+    return document;
+  }
+
+  @Nullable
+  private static ODocument getDocumentWithId(ODatabaseDocumentTx db, String className, String id) {
+    final String query = String.format("SELECT FROM %s WHERE id = ?", className);
+    List<ODocument> results = db.command(new OSQLSynchQuery<>(query)).execute(id);
+    if (results.isEmpty()) {
+      return null;
+    } else {
+      return results.get(0);
+    }
+  }
+
+  private static List<ODocument> execute(ODatabaseDocumentTx db, String query, Map<String, Object> parameters) {
+    return db.command(new OSQLSynchQuery<>(query)).execute(parameters);
+  }
+
+  private static long executeCount(ODatabaseDocumentTx db, String countQuery, Map<String, Object> parameters) {
+    return execute(db, countQuery, parameters).get(0).field("COUNT");
   }
 
   private static MetadataQuery queryWith(@Nullable MetadataQueryRestriction restriction) {

@@ -13,36 +13,43 @@
 package org.sonatype.nexus.component.services.adapter;
 
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.recordstore.Record;
+import org.sonatype.nexus.orient.OClassNameBuilder;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * Converts component domain objects to orient {@code ODocument} objects, and vice-versa.
+ * Adapter for converting between {@link Component} objects and OrientDB {@code ODocument}s.
  *
  * @since 3.0
  */
 public interface ComponentEntityAdapter<T extends Component>
 {
+  public static final String ORIENT_BASE_CLASS_NAME = new OClassNameBuilder().type(Component.class).build();
+
+  /** The component's unique id, which is system-generated. */
+  public static final String P_ID = "id";
+
+  /** The set of assets that comprise the component. */
+  public static final String P_ASSETS = "assets";
+
   /**
-   * Gets the component class.
+   * Gets the {@link Component} subclass this adapter works with.
    */
   Class<T> getComponentClass();
 
   /**
-   * Gets the OrientDB class, creating it in the database if it doesn't already exist.
+   * Creates the OrientDB class and associated indexes in the database if needed.
    */
-  OClass getDocumentClass(ODatabaseDocumentTx db);
+  void registerStorageClass(ODatabaseDocumentTx db);
 
   /**
-   * Converts a component to a document object.
+   * Converts a {@link Component} to an {@code ODocument}.
    */
-  void componentToDocument(T component, ODocument document);
+  void convertToDocument(T component, ODocument document);
 
   /**
-   * Converts a document to a component object.
+   * Converts an {@code ODocument} to a {@link Component}.
    */
-  T documentToComponent(Record record);
+  T convertToComponent(ODocument document);
 }

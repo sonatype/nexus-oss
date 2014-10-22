@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.component.services.internal.query;
 
+import java.util.Map;
+
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction.EntityType;
 import org.sonatype.nexus.component.services.query.CompoundMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 
+import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -28,6 +31,8 @@ public class OrientQueryBuilder
   private final MetadataQuery query;
 
   private final ORID skipRid;
+
+  private final Map<String, Object> parameters = Maps.newHashMap();
 
   public OrientQueryBuilder(MetadataQuery query) {
     this.query = checkNotNull(query);
@@ -45,11 +50,17 @@ public class OrientQueryBuilder
         "Metadata query does not specify a skipComponentId; OriendDB query must not specify a skipRid");
   }
 
+  public Map<String, Object> getParameters() {
+    return parameters;
+  }
+
   public String buildAssetQuery(boolean isCountQuery) {
+    parameters.clear();
     return buildQuery("Asset", isCountQuery, false);
   }
 
   public String buildComponentQuery(String componentClassName, boolean isCountQuery) {
+    parameters.clear();
     return buildQuery(checkNotNull(componentClassName), isCountQuery, true);
   }
 
@@ -137,7 +148,7 @@ public class OrientQueryBuilder
   private void appendBooleanRestriction(StringBuilder builder, BooleanMetadataQueryRestriction booleanRestriction, boolean isComponentQuery) {
     final String expression = booleanRestriction.getName()
         + " " + orientOperator(booleanRestriction.getOperator()) + " "
-        + orientValue(booleanRestriction.getValue());
+        + createParameter(booleanRestriction.getValue());
 
     if (booleanRestriction.getEntityType() == EntityType.COMPONENT) {
       if (isComponentQuery) {
@@ -160,6 +171,12 @@ public class OrientQueryBuilder
         builder.append(expression);
       }
     }
+  }
+
+  private String createParameter(Object value) {
+    String name = "param" + parameters.size() + 1;
+    parameters.put(name, value);
+    return name;
   }
 
   /**
@@ -199,37 +216,6 @@ public class OrientQueryBuilder
       return "LIKE";
     } else {
       throw new UnsupportedOperationException();
-    }
-  }
-
-  /**
-   * Gets the given value, quoted and/or escaped as necessary for the query.
-   */
-  private static String orientValue(Object value) {
-    if (value instanceof String) {
-      return "\"" + escape((String) value) + "\"";
-    } else {
-      return value.toString();
-    }
-  }
-
-  private static String escape(String s) {
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < s.length(); i++) {
-      builder.append(escape(s.charAt(i)));
-    }
-    return builder.toString();
-  }
-
-  // TODO: probably need to escape more, make sure this is more robust...
-  // find where orient's escaping takes place when OCommand.execute(..) is run..
-  private static String escape(char c) {
-    if (c == '"') {
-      return "\\\""; // return two characters: \"
-    } else if (c == '\\') {
-      return "\\\\"; // return two characters: \\
-    } else {
-      return c + ""; // no escaping needed
     }
   }
 }

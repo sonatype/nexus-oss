@@ -22,10 +22,14 @@ import javax.inject.Provider;
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapterRegistry;
+import org.sonatype.nexus.component.services.adapter.EntityAdapterSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -36,6 +40,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class ComponentEntityAdapterRegistryImpl
+    extends EntityAdapterSupport
     implements ComponentEntityAdapterRegistry
 {
   private final Provider<DatabaseInstance> databaseInstance;
@@ -45,6 +50,22 @@ public class ComponentEntityAdapterRegistryImpl
   @Inject
   public ComponentEntityAdapterRegistryImpl(@Named("metadata") Provider<DatabaseInstance> databaseInstance) {
     this.databaseInstance = checkNotNull(databaseInstance);
+    registerCoreStorageClasses();
+  }
+
+  private void registerCoreStorageClasses() {
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+      OSchema schema = db.getMetadata().getSchema();
+      // Component
+      if (!schema.existsClass(ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME)) {
+        OClass oClass = schema.createAbstractClass(ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME);
+        createRequiredAutoIndexedProperty(oClass, ComponentEntityAdapter.P_ID, OType.STRING, true);
+        createRequiredProperty(oClass, ComponentEntityAdapter.P_ASSETS, OType.LINKSET);
+        logCreatedClassInfo(oClass);
+      }
+      // Asset
+      new AssetEntityAdapter().registerStorageClass(db);
+    }
   }
 
   @Override
@@ -52,7 +73,7 @@ public class ComponentEntityAdapterRegistryImpl
     checkState(map.putIfAbsent(adapter.getComponentClass(), adapter) == null,
         "Adapter already registered for class %s", adapter.getComponentClass());
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      adapter.getDocumentClass(db);
+      adapter.registerStorageClass(db);
     }
   }
 
