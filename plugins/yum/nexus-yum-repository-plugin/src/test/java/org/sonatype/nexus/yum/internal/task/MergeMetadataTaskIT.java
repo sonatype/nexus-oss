@@ -52,7 +52,7 @@ public class MergeMetadataTaskIT
   }
 
   @Test
-  public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning()
+  public void shouldAllowConcurrentExecutionIfAnotherTaskIsRunning()
       throws Exception
   {
     final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class), mock(CommandLineExecutor.class));
@@ -61,7 +61,7 @@ public class MergeMetadataTaskIT
     final GroupRepository group2 = mock(GroupRepository.class);
     when(group2.getId()).thenReturn(GROUP_ID_2);
     task.setGroupRepository(group1);
-    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group2)), is(false));
+    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group2)), is(true));
   }
 
   private Map<String, List<ScheduledTask<?>>> createRunningTaskForGroups(final GroupRepository... groups) {
