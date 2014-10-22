@@ -12,32 +12,50 @@
  */
 package org.sonatype.nexus.component.services.internal.id;
 
-import java.util.UUID;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.component.model.ComponentId;
-import org.sonatype.nexus.component.services.id.ComponentIdFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A simple, uuid-based factory for {@link ComponentId}s.
+ * A basic implementation of {@link ComponentId}.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class DefaultComponentIdFactory
-    implements ComponentIdFactory
+class DefaultComponentId
+    implements ComponentId
 {
-  @Override
-  public ComponentId newId() {
-    return new DefaultComponentId(UUID.randomUUID().toString());
+  private final String uniqueString;
+
+  DefaultComponentId(final String uniqueString) {
+    this.uniqueString = checkNotNull(uniqueString);
   }
 
   @Override
-  public ComponentId fromUniqueString(final String uniqueString) {
-    return new DefaultComponentId(uniqueString);
+  public String asUniqueString() {
+    return uniqueString;
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    DefaultComponentId that = (DefaultComponentId) o;
+
+    return uniqueString.equals(that.uniqueString);
+  }
+
+  @Override
+  public int hashCode() {
+    return uniqueString.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return ComponentId.class.getSimpleName() + "[" + uniqueString + "]";
+  }
 }
