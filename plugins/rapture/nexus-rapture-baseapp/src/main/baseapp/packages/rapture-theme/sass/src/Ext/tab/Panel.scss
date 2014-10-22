@@ -9,11 +9,13 @@
 @include extjs-tab-panel-ui(
   $ui: 'sorted-tabpanel',
 
-  $ui-tab-background-color: #D1D1D1,
-  $ui-tab-background-color-active: #ffffff,
+  $ui-tab-background-color: #ffffff,
+  $ui-tab-background-color-active: #D1D1D1,
+  $ui-tab-background-color-over: #EEEEEE,
   $ui-strip-background-color: #ffffff,
   $ui-bar-background-color: #f4f4f4,
-  $ui-tab-color: #333333
+  $ui-tab-color: #333333,
+  $ui-tab-color-over: #333333
 );
 
 .x-tab-bar-sorted-tabpanel {
