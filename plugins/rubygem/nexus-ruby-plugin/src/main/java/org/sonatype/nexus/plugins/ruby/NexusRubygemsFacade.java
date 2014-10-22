@@ -38,6 +38,7 @@ import org.sonatype.nexus.ruby.Directory;
 import org.sonatype.nexus.ruby.FileType;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.cuba.RubygemsFileSystem;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * ???
@@ -45,6 +46,7 @@ import org.sonatype.nexus.ruby.cuba.RubygemsFileSystem;
  * @since 2.11
  */
 public class NexusRubygemsFacade
+    extends ComponentSupport
 {
   private final RubygemsFileSystem filesystem;
 
@@ -53,8 +55,9 @@ public class NexusRubygemsFacade
   }
 
   public RubygemsFile get(ResourceStoreRequest request) {
-    String[] pathAndQeury = extractGemsQuery(request);
-    return filesystem.get(pathAndQeury[0], pathAndQeury[1]);
+    String[] pathAndQuery = extractGemsQuery(request);
+    log.debug("get :: {} :: query={}", request.getRequestPath(), pathAndQuery);
+    return filesystem.get(pathAndQuery[0], pathAndQuery[1]);
   }
 
   private String[] extractGemsQuery(ResourceStoreRequest request) {
@@ -74,8 +77,9 @@ public class NexusRubygemsFacade
   }
 
   public RubygemsFile file(ResourceStoreRequest request) {
-    String[] pathAndQeury = extractGemsQuery(request);
-    return filesystem.file(pathAndQeury[0], pathAndQeury[1]);
+    String[] pathAndQuery = extractGemsQuery(request);
+    log.debug("file :: {} :: query={}", request.getRequestPath(), pathAndQuery);
+    return filesystem.file(pathAndQuery[0], pathAndQuery[1]);
   }
 
   public RubygemsFile file(String path) {
@@ -99,6 +103,7 @@ public class NexusRubygemsFacade
   public StorageItem handleCommon(RubyRepository repository, RubygemsFile file)
       throws IllegalOperationException, StorageException
   {
+    log.debug("handleCommon :: {} :: {}", repository.getId(), file);
     switch (file.state()) {
       case ERROR:
         Exception e = file.getException();
@@ -133,6 +138,7 @@ public class NexusRubygemsFacade
   public StorageItem handleMutation(RubyRepository repository, RubygemsFile file)
       throws IllegalOperationException, StorageException, UnsupportedStorageOperationException
   {
+    log.debug("handleMutation :: {} :: {}", repository.getId(), file);
     switch (file.state()) {
       case ERROR:
         Exception e = file.getException();
@@ -200,6 +206,7 @@ public class NexusRubygemsFacade
   public StorageItem handleRetrieve(RubyRepository repository, ResourceStoreRequest req, RubygemsFile file)
       throws IllegalOperationException, StorageException, ItemNotFoundException
   {
+    log.debug("handleRetrieve :: {} :: {}", repository.getId(), file);
     switch (file.state()) {
       case NO_PAYLOAD:
         if (file.type() == FileType.DIRECTORY) {
