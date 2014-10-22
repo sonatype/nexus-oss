@@ -56,6 +56,7 @@ public class DefaultProxyRubyRepositoryTemplate
     repo.setExternalConfiguration(ex);
 
     DefaultProxyRubyRepositoryConfiguration exConf = new DefaultProxyRubyRepositoryConfiguration(ex);
+    exConf.setMetadataMaxAge(30);
     repo.externalConfigurationImple = exConf;
 
     repo.setWritePolicy(RepositoryWritePolicy.READ_ONLY.name());
