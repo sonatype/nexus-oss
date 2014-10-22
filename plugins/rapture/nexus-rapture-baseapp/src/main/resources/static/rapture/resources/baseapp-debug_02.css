@@ -12606,12 +12606,12 @@
   padding: 8px 12px 7px 12px;
   border-width: 0 0 0 0;
   border-style: solid;
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tab-sorted-tabpanel-top-mc {
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12754,12 +12754,12 @@
   padding: 8px 12px 7px 12px;
   border-width: 0 0 0 0;
   border-style: solid;
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tab-sorted-tabpanel-bottom-mc {
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12902,12 +12902,12 @@
   padding: 8px 12px 7px 12px;
   border-width: 0 0 0 0;
   border-style: solid;
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tab-sorted-tabpanel-left-mc {
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -13050,12 +13050,12 @@
   padding: 8px 12px 7px 12px;
   border-width: 0 0 0 0;
   border-style: solid;
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tab-sorted-tabpanel-right-mc {
-  background-color: white;
+  background-color: #f4f4f4;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -13210,7 +13210,7 @@
 }
 /* line 344, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-ie8m .x-tab-sorted-tabpanel .x-tab-glyph {
-  color: white;
+  color: #f9f9f9;
 }
 /* line 353, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-strict .x-ie9 .x-tab-bar-vertical .x-tab-sorted-tabpanel {
@@ -13286,7 +13286,7 @@
 
 /* line 487, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-over {
-  background-color: #eeeeee;
+  background-color: #e4e4e4;
 }
 /* line 511, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-over .x-tab-glyph {
@@ -13294,7 +13294,7 @@
 }
 /* line 518, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-ie8m .x-tab-sorted-tabpanel-over .x-tab-glyph {
-  color: #f6f6f6;
+  color: #f1f1f1;
 }
 
 /* line 547, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13403,7 +13403,7 @@
 .x-tab-sorted-tabpanel-top-over .x-frame-mc,
 .x-tab-sorted-tabpanel-left-over .x-frame-mc,
 .x-tab-sorted-tabpanel-right-over .x-frame-mc {
-  background-color: #eeeeee;
+  background-color: #e4e4e4;
 }
 
 /* line 734, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13422,7 +13422,7 @@
 }
 /* line 741, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-bottom-over .x-frame-mc {
-  background-color: #eeeeee;
+  background-color: #e4e4e4;
 }
 
 /* line 758, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
