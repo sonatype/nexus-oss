@@ -3830,7 +3830,7 @@
 
 /* line 241, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-masterdetail-tabs {
-  font-size: 13px;
+  font-size: 16px;
   border: 1px solid #444444;
 }
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -3861,7 +3861,7 @@
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-text-container-masterdetail-tabs {
   color: #333333;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: bold;
   font-family: arial, helvetica, verdana, sans-serif;
   line-height: 15px;
