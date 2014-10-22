@@ -2613,26 +2613,26 @@
 .x-btn-headermode-toolbar-medium-focus {
   border-color: #165188;
   background-image: none;
-  background-color: #2271f1;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387ff2), color-stop(50%, #2271f1), color-stop(51%, #206be4), color-stop(100%, #2271f1));
-  background-image: -webkit-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -moz-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -o-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -ms-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-color: #aaaaaa;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2b2b2), color-stop(50%, #aaaaaa), color-stop(51%, #a1a1a1), color-stop(100%, #aaaaaa));
+  background-image: -webkit-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -moz-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -o-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -ms-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-over {
   border-color: #165188;
   background-image: none;
-  background-color: #2271f1;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #387ff2), color-stop(50%, #2271f1), color-stop(51%, #206be4), color-stop(100%, #2271f1));
-  background-image: -webkit-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -moz-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -o-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: -ms-linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
-  background-image: linear-gradient(top, #387ff2, #2271f1 50%, #206be4 51%, #2271f1);
+  background-color: #aaaaaa;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2b2b2), color-stop(50%, #aaaaaa), color-stop(51%, #a1a1a1), color-stop(100%, #aaaaaa));
+  background-image: -webkit-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -moz-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -o-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: -ms-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
+  background-image: linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2640,13 +2640,13 @@
 .x-btn-headermode-toolbar-medium-pressed {
   border-color: #154e82;
   background-image: none;
-  background-color: #216ce7;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #216ce7), color-stop(50%, #1f66db), color-stop(51%, #216ce7), color-stop(100%, #377ae9));
-  background-image: -webkit-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
-  background-image: -moz-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
-  background-image: -o-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
-  background-image: -ms-linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
-  background-image: linear-gradient(top, #216ce7, #1f66db 50%, #216ce7 51%, #377ae9);
+  background-color: #2476fc;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2476fc), color-stop(50%, #2270ef), color-stop(51%, #2476fc), color-stop(100%, #3983fc));
+  background-image: -webkit-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
+  background-image: -moz-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
+  background-image: -o-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
+  background-image: -ms-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
+  background-image: linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2665,7 +2665,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-focus .x-frame-mc {
-  background-color: #2271f1;
+  background-color: #aaaaaa;
   background-image: url(images/btn/btn-headermode-toolbar-medium-focus-fbg.gif);
 }
 
@@ -2685,7 +2685,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-over .x-frame-mc {
-  background-color: #2271f1;
+  background-color: #aaaaaa;
   background-image: url(images/btn/btn-headermode-toolbar-medium-over-fbg.gif);
 }
 
@@ -2714,7 +2714,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-headermode-toolbar-medium-menu-active .x-frame-mc,
 .x-btn-headermode-toolbar-medium-pressed .x-frame-mc {
-  background-color: #216ce7;
+  background-color: #2476fc;
   background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-fbg.gif);
 }
 
@@ -2817,13 +2817,13 @@
 
 /*</if slicer>*/
 /* */
-/* line 512, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 510, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .headermode {
   height: 39px;
   border-radius: 0;
   padding: 3px 6px;
 }
-/* line 517, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 515, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .headermode .x-btn-wrap {
   margin-top: 4px;
 }
