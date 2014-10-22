@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.component.services.adapter;
 
+import java.util.Set;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Component;
@@ -35,4 +37,9 @@ public interface ComponentEntityAdapterRegistry
    */
   @Nullable
   <T extends Component> ComponentEntityAdapter<T> getAdapter(Class<T> componentClass);
+
+  /**
+   * Gets all component classes for which a registered adapter exists.
+   */
+  Set<Class<? extends Component>> componentClasses();
 }

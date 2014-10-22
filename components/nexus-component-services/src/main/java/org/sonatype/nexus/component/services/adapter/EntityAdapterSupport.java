@@ -45,7 +45,7 @@ public abstract class EntityAdapterSupport
   protected OProperty createRequiredAutoIndexedProperty(OClass oClass, String propertyName, OType oType, boolean unique) {
     OProperty property = createRequiredProperty(oClass, propertyName, oType);
     String indexName = String.format("%s.%s", oClass.getName(), propertyName);
-    oClass.createIndex(indexName, unique ? INDEX_TYPE.UNIQUE : INDEX_TYPE.NOTUNIQUE);
+    oClass.createIndex(indexName, unique ? INDEX_TYPE.UNIQUE : INDEX_TYPE.NOTUNIQUE, propertyName);
     return property;
   }
 

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.component.services.query;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -22,18 +23,35 @@ import org.sonatype.nexus.component.model.Component;
 /**
  * Search interface for finding components and assets.
  *
- * Note that the returned lists consist of POJOs that represent a snapshot of the state of the underlying records at
- * the time of the query. They are thus divorced from the underlying session scope.
+ * Results represent the state of the stored items at the time of the query are are divorced from the session
+ * from which they originated by the time they are returned.
  *
  * @since 3.0
  */
 public interface MetadataQueryService
 {
+  /**
+   * Gets all component classes known to the service.
+   */
+  Set<Class<? extends Component>> componentClasses();
+
+  /**
+   * Gets the number of components of the given type matching the given restriction.
+   */
   <T extends Component> long countComponents(Class<T> componentClass, @Nullable MetadataQueryRestriction restriction);
 
+  /**
+   * Gets the number of assets matching the given restriction.
+   */
   long countAssets(@Nullable MetadataQueryRestriction restriction);
 
-  <T extends Component> List<T> findComponents(Class<T> componentClass, MetadataQuery query);
+  /**
+   * Gets the list of components of the given type matching the given query.
+   */
+  <T extends Component> List<T> findComponents(Class<T> componentClass, @Nullable MetadataQuery query);
 
-  List<Asset> findAssets(MetadataQuery query);
+  /**
+   * Gets the list of assets matching the given query.
+   */
+  List<Asset> findAssets(@Nullable MetadataQuery query);
 }

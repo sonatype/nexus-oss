@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.component.services.internal.adapter;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.Nullable;
@@ -48,7 +49,7 @@ public class ComponentEntityAdapterRegistryImpl
   private final ConcurrentMap<Class<? extends Component>, ComponentEntityAdapter> map = Maps.newConcurrentMap();
 
   @Inject
-  public ComponentEntityAdapterRegistryImpl(@Named("metadata") Provider<DatabaseInstance> databaseInstance) {
+  public ComponentEntityAdapterRegistryImpl(@Named("componentMetadata") Provider<DatabaseInstance> databaseInstance) {
     this.databaseInstance = checkNotNull(databaseInstance);
     registerCoreStorageClasses();
   }
@@ -82,5 +83,10 @@ public class ComponentEntityAdapterRegistryImpl
   @SuppressWarnings({"unchecked"})
   public <T extends Component> ComponentEntityAdapter<T> getAdapter(final Class<T> componentClass) {
     return map.get(componentClass);
+  }
+
+  @Override
+  public Set<Class<? extends Component>> componentClasses() {
+    return map.keySet();
   }
 }

@@ -14,6 +14,7 @@ package org.sonatype.nexus.component.services.internal.query;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ import static com.google.common.base.Preconditions.checkState;
 public class MetadataQueryServiceImpl
     implements MetadataQueryService
 {
-  private final Provider<DatabaseInstance> databaseInstance;
+  private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   // TODO: Eventually use AssetStore here instead of directly using BlobStore.
   // What we really need is the ability to grab an Asset whose associated blob is stored on the local node
@@ -66,28 +67,39 @@ public class MetadataQueryServiceImpl
   private final AssetEntityAdapter assetAdapter;
 
   @Inject
-  public MetadataQueryServiceImpl(@Named("metadata") Provider<DatabaseInstance> databaseInstance,
+  public MetadataQueryServiceImpl(@Named("componentMetadata") Provider<DatabaseInstance> databaseInstanceProvider,
                                   BlobStore blobStore,
                                   ComponentEntityAdapterRegistry componentAdapterRegistry) {
-    this.databaseInstance = checkNotNull(databaseInstance);
+    this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     this.blobStore = checkNotNull(blobStore);
     this.componentAdapterRegistry = checkNotNull(componentAdapterRegistry);
     this.assetAdapter = new AssetEntityAdapter();
   }
 
   @Override
+  public Set<Class<? extends Component>> componentClasses() {
+    return componentAdapterRegistry.componentClasses();
+  }
+
+  @Override
   public <T extends Component> long countComponents(final Class<T> componentClass,
                                                     final @Nullable MetadataQueryRestriction restriction) {
-    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+    String orientClassName;
+    if (componentClass == null) {
+      orientClassName = ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME;
+    } else {
+      orientClassName = oClassName(componentClass);
+    }
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       OrientQueryBuilder queryBuilder = orientQueryBuilder(db, queryWith(restriction));
-      String countQuery = queryBuilder.buildComponentQuery(oClassName(componentClass), true);
+      String countQuery = queryBuilder.buildComponentQuery(orientClassName, true);
       return executeCount(db, countQuery, queryBuilder.getParameters());
     }
   }
 
   @Override
   public long countAssets(final @Nullable MetadataQueryRestriction restriction) {
-    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       OrientQueryBuilder queryBuilder = orientQueryBuilder(db, queryWith(restriction));
       String countQuery = queryBuilder.buildAssetQuery(true);
       return executeCount(db, countQuery, queryBuilder.getParameters());
@@ -96,9 +108,9 @@ public class MetadataQueryServiceImpl
 
   @Override
   public <T extends Component> List<T> findComponents(final Class<T> componentClass,
-                                                      final MetadataQuery metadataQuery) {
+                                                      @Nullable final MetadataQuery metadataQuery) {
     final ComponentEntityAdapter<T> componentAdapter = registeredComponentAdapter(componentClass);
-    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       OrientQueryBuilder queryBuilder = orientQueryBuilder(db, metadataQuery);
       String query = queryBuilder.buildComponentQuery(oClassName(componentClass), false);
       return FluentIterable
@@ -113,8 +125,8 @@ public class MetadataQueryServiceImpl
   }
 
   @Override
-  public List<Asset> findAssets(final MetadataQuery metadataQuery) {
-    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+  public List<Asset> findAssets(@Nullable final MetadataQuery metadataQuery) {
+    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       OrientQueryBuilder queryBuilder = orientQueryBuilder(db, metadataQuery);
       String query = queryBuilder.buildAssetQuery(false);
       return FluentIterable
@@ -148,8 +160,10 @@ public class MetadataQueryServiceImpl
     return new OClassNameBuilder().type(type).build();
   }
 
-  private static OrientQueryBuilder orientQueryBuilder(ODatabaseDocumentTx db, MetadataQuery query) {
-    if (query.getSkipComponentId() == null) {
+  private static OrientQueryBuilder orientQueryBuilder(ODatabaseDocumentTx db, @Nullable MetadataQuery query) {
+    if (query == null) {
+      return new OrientQueryBuilder(new MetadataQuery());
+    } else if (query.getSkipComponentId() == null) {
       return new OrientQueryBuilder(query);
     } else {
       ODocument skipDocument = null;
