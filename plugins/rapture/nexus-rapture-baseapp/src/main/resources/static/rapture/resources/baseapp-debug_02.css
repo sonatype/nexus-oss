@@ -12587,6 +12587,7 @@
  * @class Ext.tab.Panel
  */
 /**
+ * @class NX.ext.tab.SortedPanel
  * ui: 'sorted-tabpanel'
  */
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12604,7 +12605,7 @@
   -webkit-border-bottom-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: 8px 12px 7px 12px;
-  border-width: 0 0 0 0;
+  border-width: 0px 0px 0 0px;
   border-style: solid;
   background-color: #f4f4f4;
 }
@@ -12752,7 +12753,7 @@
   -webkit-border-bottom-left-radius: 3px;
   border-bottom-left-radius: 3px;
   padding: 8px 12px 7px 12px;
-  border-width: 0 0 0 0;
+  border-width: 0 0px 0px 0px;
   border-style: solid;
   background-color: #f4f4f4;
 }
@@ -12900,7 +12901,7 @@
   -webkit-border-bottom-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: 8px 12px 7px 12px;
-  border-width: 0 0 0 0;
+  border-width: 0px 0px 0 0px;
   border-style: solid;
   background-color: #f4f4f4;
 }
@@ -13048,7 +13049,7 @@
   -webkit-border-bottom-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: 8px 12px 7px 12px;
-  border-width: 0 0 0 0;
+  border-width: 0px 0px 0 0px;
   border-style: solid;
   background-color: #f4f4f4;
 }
@@ -13183,7 +13184,7 @@
 /* */
 /* line 307, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel {
-  border-color: #444444;
+  border-color: #f4f4f4;
   margin: 0 1px 0 0;
   cursor: pointer;
 }
@@ -13239,12 +13240,12 @@
 .x-tab-sorted-tabpanel-top,
 .x-tab-sorted-tabpanel-left,
 .x-tab-sorted-tabpanel-right {
-  border-bottom: 0 solid #444444;
+  border-bottom: 0px solid #444444;
 }
 
 /* line 419, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-bottom {
-  border-top: 0 solid #444444;
+  border-top: 0px solid #444444;
 }
 
 /* line 440, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13286,6 +13287,7 @@
 
 /* line 487, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-over {
+  border-color: #e4e4e4;
   background-color: #e4e4e4;
 }
 /* line 511, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13299,7 +13301,8 @@
 
 /* line 547, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-active {
-  background-color: #d1d1d1;
+  border-color: #bbbbbb;
+  background-color: white;
 }
 /* line 553, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-active .x-tab-inner {
@@ -13311,23 +13314,24 @@
 }
 /* line 575, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-ie8m .x-tab-sorted-tabpanel-active .x-tab-glyph {
-  color: #8a8a8a;
+  color: #a1a1a1;
 }
 
 /* line 583, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-top-active,
 .x-tab-sorted-tabpanel-left-active,
 .x-tab-sorted-tabpanel-right-active {
-  border-bottom: 0 solid #d1d1d1;
+  border-bottom: 0px solid white;
 }
 
 /* line 596, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-bottom-active {
-  border-top: 0 solid #d1d1d1;
+  border-top: 0px solid white;
 }
 
 /* line 609, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-disabled {
+  border-color: #444444;
   cursor: default;
 }
 /* line 622, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13459,7 +13463,7 @@
 .x-tab-sorted-tabpanel-top-active .x-frame-mc,
 .x-tab-sorted-tabpanel-left-active .x-frame-mc,
 .x-tab-sorted-tabpanel-right-active .x-frame-mc {
-  background-color: #d1d1d1;
+  background-color: white;
 }
 
 /* line 780, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13478,7 +13482,7 @@
 }
 /* line 787, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-bottom-active .x-frame-mc {
-  background-color: #d1d1d1;
+  background-color: white;
 }
 
 /* line 804, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13647,63 +13651,63 @@
 
 /* line 157, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-sorted-tabpanel-horizontal {
-  height: 36px;
+  height: 32px;
 }
 /* line 161, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-content-box .x-tab-bar-sorted-tabpanel-horizontal {
-  height: 36px;
+  height: 32px;
 }
 
 /* line 169, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-sorted-tabpanel-vertical {
-  width: 36px;
+  width: 32px;
 }
 /* line 173, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-content-box .x-tab-bar-sorted-tabpanel-vertical {
-  width: 36px;
+  width: 32px;
 }
 
 /* line 180, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-body-sorted-tabpanel-top {
-  padding-bottom: 5px;
+  padding-bottom: 1px;
 }
 
 /* line 184, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-body-sorted-tabpanel-bottom {
-  padding-top: 5px;
+  padding-top: 1px;
 }
 
 /* line 188, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-body-sorted-tabpanel-left {
-  padding-right: 5px;
+  padding-right: 1px;
 }
 
 /* line 199, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-body-sorted-tabpanel-right {
-  padding-left: 5px;
+  padding-left: 1px;
 }
 
 /* line 210, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-strip-sorted-tabpanel {
   border-style: solid;
   border-color: #444444;
-  background-color: white;
+  background-color: #bbbbbb;
 }
 
 /* line 218, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-content-box .x-tab-bar-strip-sorted-tabpanel-horizontal {
-  height: 5px;
+  height: 1px;
 }
 
 /* line 226, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-content-box .x-tab-bar-strip-sorted-tabpanel-vertical {
-  width: 5px;
+  width: 1px;
 }
 
 /* line 232, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-strip-sorted-tabpanel-top {
   border-width: 0 0 0 0;
-  height: 5px;
+  height: 1px;
 }
 /* line 235, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-plain .x-tab-bar-strip-sorted-tabpanel-top {
@@ -13713,7 +13717,7 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-strip-sorted-tabpanel-bottom {
   border-width: 0 0 0 0;
-  height: 5px;
+  height: 1px;
 }
 /* line 243, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-plain .x-tab-bar-strip-sorted-tabpanel-bottom {
@@ -13723,7 +13727,7 @@
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-strip-sorted-tabpanel-left {
   border-width: 0 0 0 0;
-  width: 5px;
+  width: 1px;
 }
 /* line 251, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-plain .x-tab-bar-strip-sorted-tabpanel-left {
@@ -13733,7 +13737,7 @@
 /* line 265, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-strip-sorted-tabpanel-right {
   border-width: 0 0 0 0;
-  width: 5px;
+  width: 1px;
 }
 /* line 268, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-plain .x-tab-bar-strip-sorted-tabpanel-right {
@@ -13869,9 +13873,26 @@
 
 /*</if slicer>*/
 /* */
-/* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
-.x-tab-bar-sorted-tabpanel .x-box-inner {
-  border-color: #aaaaaa;
-  border-width: 0 0 1px 0;
-  border-style: solid;
+/* line 41, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+.x-tab-bar-body-sorted-tabpanel-top,
+.x-tab-bar-body-sorted-tabpanel-left,
+.x-tab-bar-body-sorted-tabpanel-right {
+  padding-left: 5px;
+}
+
+/* line 48, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+.x-tab-sorted-tabpanel-top,
+.x-tab-sorted-tabpanel-left,
+.x-tab-sorted-tabpanel-right {
+  border-bottom: 1px solid #bbbbbb;
+}
+
+/* line 55, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+.x-tab-sorted-tabpanel-top-active,
+.x-tab-sorted-tabpanel-left-active,
+.x-tab-sorted-tabpanel-right-active {
+  border-top: 1px solid #bbbbbb;
+  border-right: 1px solid #bbbbbb;
+  border-bottom: 1px solid #ffffff;
+  border-left: 1px solid #bbbbbb;
 }

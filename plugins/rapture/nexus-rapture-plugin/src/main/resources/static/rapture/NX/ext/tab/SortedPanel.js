@@ -95,6 +95,21 @@ Ext.define('NX.ext.tab.SortedPanel', {
         }
       }
     }
-  }
+  },
 
+  // FIXME: This doesn't belong here, this is styling treatment for master/detail tabs only
+  /**
+   * @Override
+   */
+  onAdd: function(item, index) {
+    var me = this;
+
+    item.tabConfig = item.tabConfig || {};
+    Ext.applyIf(item.tabConfig, {
+      // HACK: force tabs to follow scss style for borders
+      border: null
+    });
+
+    me.callParent([item, index]);
+  }
 });
