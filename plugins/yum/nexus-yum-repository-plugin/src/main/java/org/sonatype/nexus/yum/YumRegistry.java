@@ -14,6 +14,8 @@ package org.sonatype.nexus.yum;
 
 import java.io.File;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
@@ -46,9 +48,10 @@ public interface YumRegistry
   String getCreaterepoPath();
 
   /**
+   * @param path path to "createrepo" (if null value will be reset to "createrepo")
    * @since 2.11
    */
-  void setCreaterepoPath(final String path);
+  void setCreaterepoPath(final @Nullable String path);
 
   /**
    * @since 2.11
@@ -56,9 +59,10 @@ public interface YumRegistry
   String getMergerepoPath();
 
   /**
+   * @param path path to "mergerepo" (if null value will be reset to "mergerepo")
    * @since 2.11
    */
-  void setMergerepoPath(final String path);
+  void setMergerepoPath(final @Nullable String path);
 
   File getTemporaryDirectory();
 
