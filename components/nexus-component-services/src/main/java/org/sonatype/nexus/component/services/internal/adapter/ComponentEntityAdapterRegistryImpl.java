@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Default {@link ComponentEntityAdapter} implementation.
+ * Default {@link ComponentEntityAdapterRegistry} implementation.
  *
  * @since 3.0
  */
