@@ -23,6 +23,11 @@ import com.google.common.collect.Maps;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Represents a query for component or asset metadata.
+ *
+ * @since 3.0
+ */
 public class MetadataQuery
 {
   private Integer limit;
@@ -37,20 +42,32 @@ public class MetadataQuery
 
   private MetadataQueryRestriction restriction;
 
+  /**
+   * Creates a query with no restrictions, order, limit, or skip specified.
+   */
   public MetadataQuery() {
   }
 
+  /**
+   * Sets the maximum number of results the query may return.
+   */
   public MetadataQuery withLimit(Integer limit) {
     checkArgument(checkNotNull(limit) > 0, "Limit must be positive");
     this.limit = limit;
     return this;
   }
 
+  /**
+   * Gets the maximum number of results the query may return, or {@code null}.
+   */
   @Nullable
   public Integer getLimit() {
     return limit;
   }
 
+  /**
+   * Sets the number of results to skip, for paging.
+   */
   public MetadataQuery withSkip(Integer skip) {
     checkArgument(checkNotNull(skip) >= 0, "Skip must be non-negative");
     checkArgument(skipComponentId == null, "Cannot skip; skip component id is already specified");

@@ -14,6 +14,11 @@ package org.sonatype.nexus.component.services.query;
 
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction.EntityType;
 
+/**
+ * Base class for metadata query restrictions, providing static helpers to construct instances.
+ *
+ * @since 3.0
+ */
 public abstract class MetadataQueryRestriction
 {
   public static BooleanMetadataQueryRestriction assetFieldEquals(String name, Object value) {

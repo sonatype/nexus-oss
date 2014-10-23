@@ -71,6 +71,9 @@ import static org.sonatype.nexus.component.services.query.MetadataQueryRestricti
 import static org.sonatype.nexus.component.services.query.MetadataQueryRestriction.componentFieldEquals;
 import static org.sonatype.nexus.component.services.query.MetadataQueryRestriction.or;
 
+/**
+ * Integration tests for {@link MetadataQueryServiceImpl}.
+ */
 public class MetadataQueryServiceImplIT
     extends TestSupport
 {
