@@ -29,7 +29,7 @@ public class GemsCuba
 {
   public static final String GEM = ".gem";
 
-  private static Pattern FILE = Pattern.compile("^([^/]/)?([^/]+)" + GEM + "$");
+  private static final Pattern FILE = Pattern.compile("^([^/]/)?([^/]+)" + GEM + "$");
 
   /**
    * no sub-directories

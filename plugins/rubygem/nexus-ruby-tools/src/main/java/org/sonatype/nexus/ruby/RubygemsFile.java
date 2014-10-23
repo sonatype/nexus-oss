@@ -186,7 +186,7 @@ public class RubygemsFile
   /**
    * sets the state to ERROR and the exception as payload
    *
-   * @param exception (should not be null)
+   * @param e (should not be null)
    */
   public void setException(Exception e) {
     set(e);

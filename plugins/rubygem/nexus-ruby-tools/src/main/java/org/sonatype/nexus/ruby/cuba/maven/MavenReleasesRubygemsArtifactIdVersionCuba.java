@@ -28,7 +28,7 @@ public class MavenReleasesRubygemsArtifactIdVersionCuba
     implements Cuba
 {
 
-  private static Pattern FILE = Pattern.compile("^.*\\.(gem|pom|gem.sha1|pom.sha1)$");
+  private static final Pattern FILE = Pattern.compile("^.*\\.(gem|pom|gem.sha1|pom.sha1)$");
 
   private final String artifactId;
 

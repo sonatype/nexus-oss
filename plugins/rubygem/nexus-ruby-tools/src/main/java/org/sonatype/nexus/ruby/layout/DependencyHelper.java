@@ -38,7 +38,7 @@ public interface DependencyHelper {
   
   /**
    * add dependency data to instance from a rzipped gemspec object.
-   * @param marshalledDependencyData rzipped stream of the marshalled gemspec object
+   * @param gemspec rzipped stream of the marshalled gemspec object
    */
   void addGemspec(InputStream gemspec);
 
