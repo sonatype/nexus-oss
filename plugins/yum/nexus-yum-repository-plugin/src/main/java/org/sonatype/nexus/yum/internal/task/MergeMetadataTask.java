@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.MetadataProcessor;
 import org.sonatype.nexus.yum.internal.RepoMD;
@@ -50,7 +49,9 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -65,8 +66,6 @@ public class MergeMetadataTask
   private static final Logger log = LoggerFactory.getLogger(MergeMetadataTask.class);
 
   public static final String ID = "MergeMetadataTask";
-
-  private static final int MAXIMAL_PARALLEL_RUNS = 1;
 
   private GroupRepository groupRepository;
 
@@ -104,12 +103,16 @@ public class MergeMetadataTask
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {
-          log.debug(
-              "Remove group repository {} Yum metadata, because there is only one member with Yum metadata",
-              groupRepository.getId()
-          );
           // delete without using group repository API as group repositories does not allow delete (read only)
-          deleteQuietly(new File(repoBaseDir, "repodata"));
+          File groupRepodata = new File(repoBaseDir, PATH_OF_REPODATA);
+          deleteQuietly(groupRepodata);
+          if (memberReposBaseDirs.size() == 1) {
+            log.debug(
+                "Copying Yum metadata from {} to group repository {}",
+                memberReposBaseDirs.get(0), groupRepository.getId()
+            );
+            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), groupRepodata);
+          }
         }
       }
       finally {
@@ -144,7 +147,7 @@ public class MergeMetadataTask
           final RepoMD repomd = new RepoMD(in);
           for (final String location : repomd.getLocations()) {
             String retrieveLocation = "/" + location;
-            if (!retrieveLocation.matches("/" + Yum.PATH_OF_REPODATA + "/.*\\.sqlite\\.bz2")) {
+            if (!retrieveLocation.matches("/" + PATH_OF_REPODATA + "/.*\\.sqlite\\.bz2")) {
               log.trace("Retrieving {}:{}", memberRepository.getId(), retrieveLocation);
               memberRepository.retrieveItem(new ResourceStoreRequest(retrieveLocation));
             }
@@ -182,20 +185,15 @@ public class MergeMetadataTask
   public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
 
     if (activeTasks.containsKey(ID)) {
-      int activeRunningTasks = 0;
       for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
         if (RUNNING.equals(scheduledTask.getTaskState())) {
           if (conflictsWith((MergeMetadataTask) scheduledTask.getTask())) {
             return false;
           }
-          activeRunningTasks++;
         }
       }
-      return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
     }
-    else {
-      return true;
-    }
+    return true;
   }
 
   private boolean conflictsWith(MergeMetadataTask task) {
