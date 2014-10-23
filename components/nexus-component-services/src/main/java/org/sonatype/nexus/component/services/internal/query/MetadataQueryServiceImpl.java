@@ -26,7 +26,6 @@ import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentId;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapterRegistry;
 import org.sonatype.nexus.component.services.internal.adapter.AssetEntityAdapter;
@@ -35,6 +34,7 @@ import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQueryService;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -51,6 +51,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class MetadataQueryServiceImpl
+    extends ComponentSupport
     implements MetadataQueryService
 {
   private final Provider<DatabaseInstance> databaseInstanceProvider;
@@ -169,17 +170,13 @@ public class MetadataQueryServiceImpl
       ODocument skipDocument = null;
       if (query.getSkipAssetPath() != null) {
         skipDocument = getExistingDocumentWithId(db, AssetEntityAdapter.ORIENT_CLASS_NAME,
-            assetId(query.getSkipComponentId(), query.getSkipAssetPath()));
+            AssetEntityAdapter.assetId(query.getSkipComponentId(), query.getSkipAssetPath()));
       } else {
         skipDocument = getExistingDocumentWithId(db, ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME,
             query.getSkipComponentId().asUniqueString());
       }
       return new OrientQueryBuilder(query, skipDocument.getIdentity());
     }
-  }
-
-  private static String assetId(ComponentId componentId, String assetPath) {
-    return String.format("%s:%s", componentId.asUniqueString(), assetPath);
   }
 
   private static ODocument getExistingDocumentWithId(ODatabaseDocumentTx db, String className, String id) {
@@ -199,11 +196,12 @@ public class MetadataQueryServiceImpl
     }
   }
 
-  private static List<ODocument> execute(ODatabaseDocumentTx db, String query, Map<String, Object> parameters) {
+  private List<ODocument> execute(ODatabaseDocumentTx db, String query, Map<String, Object> parameters) {
+    log.info("Executing query: {} with parameters: {}", query, parameters);
     return db.command(new OSQLSynchQuery<>(query)).execute(parameters);
   }
 
-  private static long executeCount(ODatabaseDocumentTx db, String countQuery, Map<String, Object> parameters) {
+  private long executeCount(ODatabaseDocumentTx db, String countQuery, Map<String, Object> parameters) {
     return execute(db, countQuery, parameters).get(0).field("COUNT");
   }
 

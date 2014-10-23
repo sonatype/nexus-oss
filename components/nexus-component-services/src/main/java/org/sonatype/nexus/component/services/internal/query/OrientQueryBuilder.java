@@ -14,6 +14,7 @@ package org.sonatype.nexus.component.services.internal.query;
 
 import java.util.Map;
 
+import org.sonatype.nexus.component.services.internal.adapter.AssetEntityAdapter;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction.EntityType;
 import org.sonatype.nexus.component.services.query.CompoundMetadataQueryRestriction;
@@ -56,7 +57,7 @@ public class OrientQueryBuilder
 
   public String buildAssetQuery(boolean isCountQuery) {
     parameters.clear();
-    return buildQuery("Asset", isCountQuery, false);
+    return buildQuery(AssetEntityAdapter.ORIENT_CLASS_NAME, isCountQuery, false);
   }
 
   public String buildComponentQuery(String componentClassName, boolean isCountQuery) {
@@ -147,8 +148,8 @@ public class OrientQueryBuilder
    */
   private void appendBooleanRestriction(StringBuilder builder, BooleanMetadataQueryRestriction booleanRestriction, boolean isComponentQuery) {
     final String expression = booleanRestriction.getName()
-        + " " + orientOperator(booleanRestriction.getOperator()) + " "
-        + createParameter(booleanRestriction.getValue());
+        + " " + orientOperator(booleanRestriction.getOperator())
+        + " :" + createParameter(booleanRestriction.getValue());
 
     if (booleanRestriction.getEntityType() == EntityType.COMPONENT) {
       if (isComponentQuery) {
@@ -174,7 +175,7 @@ public class OrientQueryBuilder
   }
 
   private String createParameter(Object value) {
-    String name = "param" + parameters.size() + 1;
+    String name = "param" + (parameters.size() + 1);
     parameters.put(name, value);
     return name;
   }

@@ -92,4 +92,8 @@ public class AssetEntityAdapter
     Date firstCreated = document.field(P_FIRST_CREATED);
     return new BlobAsset(componentId, blob, path, contentType, new DateTime(firstCreated));
   }
+
+  public static String assetId(ComponentId componentId, String assetPath) {
+    return String.format("%s:%s", componentId.asUniqueString(), assetPath);
+  }
 }

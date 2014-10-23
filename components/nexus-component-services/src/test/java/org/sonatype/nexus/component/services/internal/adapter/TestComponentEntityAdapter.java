@@ -67,7 +67,8 @@ public class TestComponentEntityAdapter
 
     OSchema schema = db.getMetadata().getSchema();
     if (!schema.existsClass(ORIENT_CLASS_NAME)) {
-      OClass oClass = schema.createClass(ORIENT_CLASS_NAME);
+      OClass baseClass = schema.getClass(ORIENT_BASE_CLASS_NAME);
+      OClass oClass = schema.createClass(ORIENT_CLASS_NAME, baseClass);
       createOptionalProperty(oClass, P_BINARY, OType.BINARY);
       createOptionalProperty(oClass, P_BOOLEAN, OType.BOOLEAN);
       createOptionalProperty(oClass, P_BYTE, OType.BYTE);
