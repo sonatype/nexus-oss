@@ -106,11 +106,11 @@ public class NexusStorage
   }
 
   private ContentLocator gunzipContentLocator(StorageFileItem item) throws IOException {
-    try(final InputStream in = new GZIPInputStream(item.getInputStream()); final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      IOUtil.copy(in, out);
-      return new PreparedContentLocator(new ByteArrayInputStream(out.toByteArray()),
+    try (InputStream in = new GZIPInputStream(item.getInputStream())) {
+      ByteArrayInputStream gzipped = IOUtil.toGzipped(in);
+      return new PreparedContentLocator(gzipped,
           "application/x-marshal-ruby",
-          out.toByteArray().length);
+          gzipped.available());
     }
   }
 
