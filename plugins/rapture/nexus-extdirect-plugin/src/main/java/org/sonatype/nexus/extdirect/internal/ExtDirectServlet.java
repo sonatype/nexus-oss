@@ -45,7 +45,11 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.extdirect.DirectComponent;
 import org.sonatype.nexus.extdirect.ExtDirectPlugin;
 import org.sonatype.nexus.extdirect.model.Response;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -63,6 +67,7 @@ import com.softwarementors.extjs.djn.router.dispatcher.Dispatcher;
 import com.softwarementors.extjs.djn.router.processor.poll.PollRequestProcessor;
 import com.softwarementors.extjs.djn.servlet.DirectJNgineServlet;
 import com.softwarementors.extjs.djn.servlet.ssm.SsmDispatcher;
+import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.eclipse.sisu.BeanEntry;
@@ -95,17 +100,21 @@ public class ExtDirectServlet
 
   private final SecuritySystem securitySystem;
 
+  private final EventBus eventBus;
+
   private final EventRecorder eventRecorder;
 
   @Inject
   public ExtDirectServlet(final ApplicationDirectories directories,
                           final BeanLocator beanLocator,
                           final SecuritySystem securitySystem,
+                          final EventBus eventBus,
                           final @Nullable EventRecorder eventRecorder)
   {
     this.directories = checkNotNull(directories);
     this.beanLocator = checkNotNull(beanLocator);
     this.securitySystem = checkNotNull(securitySystem);
+    this.eventBus = checkNotNull(eventBus);
     this.eventRecorder = eventRecorder; // null okay
   }
 
@@ -198,12 +207,13 @@ public class ExtDirectServlet
 
         Subject subject = securitySystem.getSubject();
         if ((subject == null || !subject.isAuthenticated()) && securitySystem.isAnonymousAccessEnabled()) {
+          String anonymous = securitySystem.getAnonymousUsername();
           try {
-            securitySystem.login(new UsernamePasswordToken(
-                securitySystem.getAnonymousUsername(), securitySystem.getAnonymousPassword()
-            ));
+            securitySystem.login(new UsernamePasswordToken(anonymous, securitySystem.getAnonymousPassword()));
+            postAuthenticationEvent(anonymous, true);
           }
           catch (Exception e) {
+            postAuthenticationEvent(anonymous, false);
             log.error("Could not log in anonymous user");
           }
         }
@@ -324,6 +334,19 @@ public class ExtDirectServlet
         }.process(reader, writer, pathInfo);
       }
     };
+  }
+
+  private void postAuthenticationEvent(final String user, final boolean success) {
+    if (WebContextManager.isWebContextAttachedToCurrentThread()) {
+      HttpServletRequest request = WebContextManager.get().getRequest();
+      eventBus.post(
+          new NexusAuthenticationEvent(
+              this,
+              new ClientInfo(user, RemoteIPFinder.findIP(request), request.getHeader("user-agent")),
+              success
+          )
+      );
+    }
   }
 
   private static class RequestBoundReader
