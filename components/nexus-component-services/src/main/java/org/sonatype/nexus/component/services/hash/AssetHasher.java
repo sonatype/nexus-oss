@@ -16,37 +16,17 @@ import java.io.IOException;
 
 import org.sonatype.nexus.component.model.Asset;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-import com.google.common.hash.HashingInputStream;
-import com.google.common.io.ByteStreams;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * Hashes {@link Asset} content using common digest algorithms.
+ * Service that hashes {@link Asset} content.
  * 
  * @since 3.0
  */
-public enum AssetHasher
+public interface AssetHasher
 {
-  MD5(Hashing.md5()), SHA1(Hashing.sha1()), SHA512(Hashing.sha512());
-
-  private final HashFunction function;
-
-  private AssetHasher(final HashFunction function) {
-    this.function = checkNotNull(function);
-  }
-
   /**
    * @param asset The asset to hash
    * @return Hash as a series of bytes
    * @throws IOException
    */
-  public byte[] hash(final Asset asset) throws IOException {
-    try (final HashingInputStream is = new HashingInputStream(function, checkNotNull(asset).openStream())) {
-      ByteStreams.copy(is, ByteStreams.nullOutputStream());
-      return is.hash().asBytes();
-    }
-  }
+  byte[] hash(final Asset asset) throws IOException;
 }

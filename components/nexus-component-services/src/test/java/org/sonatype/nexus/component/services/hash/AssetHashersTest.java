@@ -18,6 +18,9 @@ import java.util.Locale;
 import org.sonatype.nexus.component.model.Asset;
 
 import com.google.common.io.BaseEncoding;
+import com.google.inject.Guice;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.apache.commons.io.Charsets;
 import org.junit.Test;
 
@@ -27,7 +30,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AssetHasherTest
+public class AssetHashersTest
 {
   private static final String DATA = "This is a test message for hashing!";
 
@@ -37,17 +40,20 @@ public class AssetHasherTest
 
   @Test
   public void md5hash() throws Exception {
-    assertThat(encode(AssetHasher.MD5.hash(mockAsset())), is(equalTo(MD5_HASH)));
+    assertThat(encode(AssetHashers.MD5.hash(mockAsset())), is(equalTo(MD5_HASH)));
+    assertThat(encode(injectHasher("MD5").hash(mockAsset())), is(equalTo(MD5_HASH)));
   }
 
   @Test
   public void sha1hash() throws Exception {
-    assertThat(encode(AssetHasher.SHA1.hash(mockAsset())), is(equalTo(SHA1_HASH)));
+    assertThat(encode(AssetHashers.SHA1.hash(mockAsset())), is(equalTo(SHA1_HASH)));
+    assertThat(encode(injectHasher("SHA1").hash(mockAsset())), is(equalTo(SHA1_HASH)));
   }
 
   @Test
   public void sha512hash() throws Exception {
-    assertThat(encode(AssetHasher.SHA512.hash(mockAsset())), is(equalTo(SHA512_HASH)));
+    assertThat(encode(AssetHashers.SHA512.hash(mockAsset())), is(equalTo(SHA512_HASH)));
+    assertThat(encode(injectHasher("SHA512").hash(mockAsset())), is(equalTo(SHA512_HASH)));
   }
 
   private static Asset mockAsset() throws Exception {
@@ -58,5 +64,10 @@ public class AssetHasherTest
 
   private static String encode(byte[] hash) {
     return BaseEncoding.base16().encode(hash).toLowerCase(Locale.ENGLISH);
+  }
+
+  private static AssetHasher injectHasher(String name) {
+    return Guice.createInjector(new AssetHashers.EnumModule()).getInstance(
+        Key.get(AssetHasher.class, Names.named(name)));
   }
 }
