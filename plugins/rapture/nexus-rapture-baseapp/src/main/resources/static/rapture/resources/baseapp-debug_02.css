@@ -453,7 +453,7 @@
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small .x-btn-inner {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
@@ -960,7 +960,7 @@
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small .x-btn-inner {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
@@ -1467,7 +1467,7 @@
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small .x-btn-inner {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -3681,7 +3681,7 @@
 
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-text-container-messages {
-  color: #dddddd;
+  color: white;
   font-size: 13px;
   font-weight: bold;
   font-family: arial, helvetica, verdana, sans-serif;
@@ -12409,7 +12409,6 @@
  */
 /* line 27, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .feature-name {
-  color: black;
   font-size: 26px;
   font-weight: bold;
 }
@@ -12417,9 +12416,8 @@
 /**
  * cls: 'feature-description'
  */
-/* line 36, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+/* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .feature-description {
-  color: black;
   font-size: 12px;
   top: 21px !important;
 }

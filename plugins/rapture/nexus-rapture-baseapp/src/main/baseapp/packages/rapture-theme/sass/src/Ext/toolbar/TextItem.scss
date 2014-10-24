@@ -25,16 +25,14 @@
  * cls: 'feature-name'
  */
 .feature-name {
-  color: $color-black;
-  font-size: 26px;
-  font-weight: bold;
+  font-size: $font-size-h2;
+  font-weight: $font-weight-h2;
 }
 
 /**
  * cls: 'feature-description'
  */
 .feature-description {
-  color: $color-black;
-  font-size: 12px;
+  font-size: $font-size-small;
   top: 21px !important;
 }
