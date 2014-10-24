@@ -441,11 +441,9 @@ $button-headermode-toolbar-border-color-focus: button-toolbar-border-color-focus
 $button-headermode-toolbar-border-color-pressed: button-toolbar-border-color-pressed($button-headermode-toolbar-border-color) !default;
 $button-headermode-toolbar-border-color-disabled: button-toolbar-border-color-disabled($button-headermode-toolbar-border-color) !default;
 
-$button-headermode-toolbar-background-color: #2476FC !default;
-$button-headermode-toolbar-background-color-over: button-toolbar-background-color-over($button-headermode-toolbar-background-color) !default;
-$button-headermode-toolbar-background-color-focus: button-toolbar-background-color-focus($button-headermode-toolbar-background-color) !default;
-$button-headermode-toolbar-background-color-pressed: button-toolbar-background-color-pressed($button-headermode-toolbar-background-color) !default;
-$button-headermode-toolbar-background-color-disabled: button-toolbar-background-color-disabled($button-headermode-toolbar-background-color) !default;
+$button-headermode-toolbar-background-color-pressed: #2476FC !default;
+$button-headermode-toolbar-background-color-focus: #AAAAAA !default;
+$button-headermode-toolbar-background-color-over: #AAAAAA !default;
 
 $button-headermode-toolbar-background-gradient: 'glossy-button' !default;
 $button-headermode-toolbar-background-gradient-over: 'glossy-button-over' !default;
