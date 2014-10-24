@@ -17,6 +17,7 @@ import java.util.Map;
 import org.sonatype.nexus.yum.YumRegistry;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Configuration adapter for {@link YumCapability}.
@@ -28,7 +29,15 @@ public class YumCapabilityConfiguration
 
   public static final String MAX_NUMBER_PARALLEL_THREADS = "maxNumberParallelThreads";
 
+  public static final String CREATEREPO_PATH = "createrepoPath";
+
+  public static final String MERGEREPO_PATH = "mergerepoPath";
+
   private int maxParallelThreads;
+
+  private String createrepoPath = YumRegistry.DEFAULT_CREATEREPO_PATH;
+
+  private String mergerepoPath = YumRegistry.DEFAULT_MERGEREPO_PATH;
 
   public YumCapabilityConfiguration(final int maxParallelThreads) {
     this.maxParallelThreads = maxParallelThreads;
@@ -43,15 +52,33 @@ public class YumCapabilityConfiguration
       // will use default
     }
     this.maxParallelThreads = maxParallelThreads;
+    createrepoPath = properties.get(CREATEREPO_PATH);
+    if (StringUtils.isBlank(createrepoPath)) {
+      createrepoPath = YumRegistry.DEFAULT_CREATEREPO_PATH;
+    }
+    mergerepoPath = properties.get(MERGEREPO_PATH);
+    if (StringUtils.isBlank(mergerepoPath)) {
+      mergerepoPath = YumRegistry.DEFAULT_MERGEREPO_PATH;
+    }
   }
 
   public int maxNumberParallelThreads() {
     return maxParallelThreads;
   }
 
+  public String getCreaterepoPath() {
+    return createrepoPath;
+  }
+
+  public String getMergerepoPath() {
+    return mergerepoPath;
+  }
+
   public Map<String, String> asMap() {
     final Map<String, String> props = Maps.newHashMap();
     props.put(MAX_NUMBER_PARALLEL_THREADS, String.valueOf(maxParallelThreads));
+    props.put(CREATEREPO_PATH, createrepoPath);
+    props.put(MERGEREPO_PATH, mergerepoPath);
     return props;
   }
 

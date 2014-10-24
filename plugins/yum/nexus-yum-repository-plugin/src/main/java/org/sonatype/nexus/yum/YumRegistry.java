@@ -14,6 +14,8 @@ package org.sonatype.nexus.yum;
 
 import java.io.File;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
@@ -23,6 +25,10 @@ public interface YumRegistry
 {
 
   static final int DEFAULT_MAX_NUMBER_PARALLEL_THREADS = 10;
+
+  static final String DEFAULT_CREATEREPO_PATH = "createrepo";
+
+  static final String DEFAULT_MERGEREPO_PATH = "mergerepo";
 
   Yum register(MavenRepository repository);
 
@@ -35,6 +41,28 @@ public interface YumRegistry
   YumRegistry setMaxNumberOfParallelThreads(int maxNumberOfParallelThreads);
 
   int maxNumberOfParallelThreads();
+
+  /**
+   * @since 2.11
+   */
+  String getCreaterepoPath();
+
+  /**
+   * @param path path to "createrepo" (if null value will be reset to "createrepo")
+   * @since 2.11
+   */
+  void setCreaterepoPath(final @Nullable String path);
+
+  /**
+   * @since 2.11
+   */
+  String getMergerepoPath();
+
+  /**
+   * @param path path to "mergerepo" (if null value will be reset to "mergerepo")
+   * @since 2.11
+   */
+  void setMergerepoPath(final @Nullable String path);
 
   File getTemporaryDirectory();
 

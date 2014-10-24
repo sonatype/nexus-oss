@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.MetadataProcessor;
 import org.sonatype.nexus.yum.internal.RepoMD;
@@ -69,13 +70,17 @@ public class MergeMetadataTask
 
   private GroupRepository groupRepository;
 
+  private final YumRegistry yumRegistry;
+
   private final CommandLineExecutor commandLineExecutor;
 
   @Inject
   public MergeMetadataTask(final EventBus eventBus,
+                           final YumRegistry yumRegistry,
                            final CommandLineExecutor commandLineExecutor)
   {
     super(eventBus, null);
+    this.yumRegistry = checkNotNull(yumRegistry);
     this.commandLineExecutor = checkNotNull(commandLineExecutor);
   }
 
@@ -227,7 +232,10 @@ public class MergeMetadataTask
       repos.append(" --repo=");
       repos.append(memberRepoBaseDir.toURI().toASCIIString());
     }
-    return format("mergerepo --no-database %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath());
+    return format(
+        "%s --no-database %s -o %s",
+        yumRegistry.getMergerepoPath(), repos.toString(), repoBaseDir.getAbsolutePath()
+    );
   }
 
   public static ScheduledTask<YumRepository> createTaskFor(final NexusScheduler nexusScheduler,
