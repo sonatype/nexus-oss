@@ -21,9 +21,24 @@ else {
 println "Flavors: $flavors"
 
 /**
+ * Convert flavor to environment name.
+ */
+def flavorToEnv = { flavor ->
+  switch (flavor) {
+    case 'debug':
+      return 'testing'
+    case 'prod':
+      return 'production'
+    default:
+      throw Exception("Unknown flavor: $flavor")
+  }
+}
+
+/**
  * Helper to display a block header.
  */
 def header = { text, lineStyle='-' ->
+  println ''
   println lineStyle * 80
   println text
   println lineStyle * 80
@@ -76,23 +91,17 @@ ant.copy(todir: baseappDir, overwrite: true, filtering: true) {
   }
 }
 
-// Generate 'debug' flavor
-if (flavors.contains('debug')) {
-  header 'Flavor: debug'
+// Generate all flavors
+flavors.each { flavor ->
+  def env = flavorToEnv flavor
+  header "Generating flavor: $flavor"
   ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
-    arg(line: 'app build testing')
-  }
-}
-
-// Generate 'prod' flavor
-if (flavors.contains('prod')) {
-  header 'Flavor: prod'
-  ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
-    arg(line: 'app build production')
+    arg(line: "app build $env")
   }
 }
 
 // Reset resources before copying over newly generated versions
+header 'Installing resources'
 def outputDir = new File(project.basedir, 'src/main/resources/static/rapture')
 ant.mkdir(dir: outputDir)
 ant.delete(dir: outputDir) {
@@ -102,18 +111,9 @@ ant.delete(dir: outputDir) {
 
 // Install generated baseapp resources
 ant.copy(todir: outputDir) {
-  // include 'debug' flavor resources
-  if (flavors.contains('debug')) {
-    fileset(dir: "${project.build.directory}/testing/baseapp") {
-      include(name: 'baseapp-*.js')
-      include(name: 'resources/*.css')
-      include(name: 'resources/images/**')
-    }
-  }
-
-  // include 'prod' flavor resources
-  if (flavors.contains('prod')) {
-    fileset(dir: "${project.build.directory}/production/baseapp") {
+  flavors.each { flavor ->
+    def env = flavorToEnv flavor
+    fileset(dir: "${project.build.directory}/$env/baseapp") {
       include(name: 'baseapp-*.js')
       include(name: 'resources/*.css')
       include(name: 'resources/images/**')
