@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class IOUtil
@@ -39,5 +40,11 @@ public class IOUtil
       copy(input, out);
     }
     return new ByteArrayInputStream(gzipped.toByteArray());
+  }
+
+  public static ByteArrayInputStream toGunzipped(final InputStream input) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    copy(new GZIPInputStream(input), out);
+    return new ByteArrayInputStream(out.toByteArray());
   }
 }
