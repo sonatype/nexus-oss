@@ -11,6 +11,24 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
+def flavors = project.properties['flavors']
+if (flavors) {
+  flavors = flavors.split(',')
+}
+else {
+  flavors = ['debug', 'prod']
+}
+println "Flavors: $flavors"
+
+/**
+ * Helper to display a block header.
+ */
+def header = { text, lineStyle='-' ->
+  println lineStyle * 80
+  println text
+  println lineStyle * 80
+}
+
 // Sanity check sencha cmd
 def senchaExe = 'sencha'
 ant.exec(executable: senchaExe, failonerror: true) {
@@ -18,6 +36,7 @@ ant.exec(executable: senchaExe, failonerror: true) {
 }
 
 // Extract extjs distribution
+header 'Extract ExtJS distribution'
 def extZip = project.artifactMap['com.sencha:ext'].file
 def extDir = new File(project.build.directory, 'ext')
 ant.mkdir(dir: extDir)
@@ -30,6 +49,7 @@ ant.unzip(src: extZip, dest: extDir) {
 }
 
 // Re-generate sencha cmd app
+header 'Generate application'
 def baseappDir = new File(project.build.directory, 'baseapp')
 ant.exec(executable: senchaExe, dir: project.build.directory, failonerror: true) {
   arg(value: '-sdk')
@@ -56,13 +76,19 @@ ant.copy(todir: baseappDir, overwrite: true, filtering: true) {
 }
 
 // Generate 'debug' flavor
-ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
-  arg(line: 'app build testing')
+if (flavors.contains('debug')) {
+  header 'Flavor: debug'
+  ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
+    arg(line: 'app build testing')
+  }
 }
 
 // Generate 'prod' flavor
-ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
-  arg(line: 'app build production')
+if (flavors.contains('prod')) {
+  header 'Flavor: prod'
+  ant.exec(executable: senchaExe, dir: baseappDir, failonerror: true) {
+    arg(line: 'app build production')
+  }
 }
 
 // Reset resources before copying over newly generated versions
@@ -75,19 +101,21 @@ ant.delete(dir: outputDir) {
 
 // Install generated baseapp resources
 ant.copy(todir: outputDir) {
-  fileset(dir: "${project.build.directory}/testing/baseapp") {
-    include(name: 'baseapp-*.js')
-    include(name: 'resources/*.css')
+  // include 'debug' flavor resources
+  if (flavors.contains('debug')) {
+    fileset(dir: "${project.build.directory}/testing/baseapp") {
+      include(name: 'baseapp-*.js')
+      include(name: 'resources/*.css')
+      include(name: 'resources/images/**')
+    }
   }
-  fileset(dir: "${project.build.directory}/production/baseapp") {
-    include(name: 'baseapp-*.js')
-    include(name: 'resources/*.css')
-  }
-}
 
-// Install 'prod' images, which are identical to 'debug' images
-ant.copy(todir: outputDir) {
-  fileset(dir: "${project.build.directory}/production/baseapp") {
-    include(name: 'resources/images/**')
+  // include 'prod' flavor resources
+  if (flavors.contains('prod')) {
+    fileset(dir: "${project.build.directory}/production/baseapp") {
+      include(name: 'baseapp-*.js')
+      include(name: 'resources/*.css')
+      include(name: 'resources/images/**')
+    }
   }
 }
