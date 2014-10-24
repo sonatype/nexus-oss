@@ -29,6 +29,10 @@
 
     &.no-border {
       border-top: none;
+
+      .x-panel-header {
+        padding: 0 !important;
+      }
     }
   }
 }
