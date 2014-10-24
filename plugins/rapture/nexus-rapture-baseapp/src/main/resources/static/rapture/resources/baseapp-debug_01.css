@@ -12747,7 +12747,7 @@ a.x-tab .x-tab-inner-right {
   width: 10px;
   border-style: solid;
   border-width: 5px;
-  border-color: #ffeaae;
+  border-color: #f5c649;
   zoom: 1;
 }
 /* line 194, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
@@ -12810,12 +12810,12 @@ a.x-tab .x-tab-inner-right {
   padding: 2px 2px 2px 2px;
   border-width: 1px;
   border-style: solid;
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tip-default-mc {
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12943,12 +12943,12 @@ a.x-tab .x-tab-inner-right {
 /* */
 /* line 112, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-default {
-  border-color: #ffeaae;
+  border-color: #f5c649;
 }
 /* line 121, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-default .x-tool-img {
   background-image: url(images/tools/tool-sprites-dark.png);
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 136, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
@@ -12994,12 +12994,12 @@ a.x-tab .x-tab-inner-right {
   padding: 2px 2px 2px 2px;
   border-width: 1px;
   border-style: solid;
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-tip-form-invalid-mc {
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -13127,12 +13127,12 @@ a.x-tab .x-tab-inner-right {
 /* */
 /* line 112, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-form-invalid {
-  border-color: #ffeaae;
+  border-color: #f5c649;
 }
 /* line 121, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
 .x-tip-form-invalid .x-tool-img {
   background-image: url(images/tools/tool-sprites-dark.png);
-  background-color: #fffdf6;
+  background-color: #fffaee;
 }
 
 /* line 136, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tip/Tip.scss */
