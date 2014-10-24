@@ -18,15 +18,20 @@ import java.util.TimeZone;
 
 public abstract class AbstractMetadataBuilder
 {
-  static SimpleDateFormat formater = new SimpleDateFormat("yyyyMMddHHmmss");
-
+  private static final SimpleDateFormat formater = new SimpleDateFormat("yyyyMMddHHmmss");
   static {
     formater.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
+
+  private static String formatTimestamp(final long modified) {
+    synchronized (formater) {
+      return formater.format(new Date(modified));
+    }
   }
 
   protected final String timestamp;
 
   public AbstractMetadataBuilder(long modified) {
-    timestamp = formater.format(new Date(modified));
+    timestamp = formatTimestamp(modified);
   }
 }

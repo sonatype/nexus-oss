@@ -30,14 +30,14 @@ public interface RubygemsGateway
 
   /**
    * create a new instance of <code>GemspecHelper</code>
-   * @param the stream to the rzipped marshalled Gem::Specification ruby-object
+   * @param gemspec the stream to the rzipped marshalled Gem::Specification ruby-object
    * @return an empty GemspecHelper
    */
   GemspecHelper newGemspecHelper(InputStream gemspec);
 
   /**
    * create a new instance of <code>GemspecHelper</code>
-   * @param the stream to the from which the gemspec gets extracted
+   * @param gem the stream to the from which the gemspec gets extracted
    * @return an empty GemspecHelper
    */
   GemspecHelper newGemspecHelperFromGem(InputStream gem);

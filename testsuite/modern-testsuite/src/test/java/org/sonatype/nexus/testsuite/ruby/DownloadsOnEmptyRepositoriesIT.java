@@ -18,10 +18,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermissions;
 
+import org.sonatype.nexus.ruby.client.RubyProxyRepository;
+import org.sonatype.nexus.ruby.cuba.api.ApiV1DependenciesCuba;
+
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.client.core.condition.NexusStatusConditions.any27AndLater;
 import static org.sonatype.nexus.testsuite.ruby.TestUtils.lastLine;
@@ -35,6 +40,9 @@ public class DownloadsOnEmptyRepositoriesIT
 
   @Test
   public void uploadGemWithPushCommand() throws Exception {
+    assertThatDependencyFileLengthForHosted(equalTo(4l));
+    assertThatDependencyFileLengthForProxies(equalTo(4l));
+
     // make sure the credentials file has the right permissions otherwise the push command fails silently
     Files.setPosixFilePermissions(new File(getBundleTargetDirectory(), ".gem/credentials").toPath(),
         PosixFilePermissions.fromString("rw-------"));
@@ -47,6 +55,30 @@ public class DownloadsOnEmptyRepositoriesIT
 
     // install the "pre" gem from repository
     assertThat(lastLine(gemRunner().install("gemshost", "--pre", "pre")), equalTo("1 gem installed"));
+
+    assertThatDependencyFileLengthForHosted(greaterThan(4l));
+    assertThatDependencyFileLengthForProxies(equalTo(4l));
+
+    repositories().get(RubyProxyRepository.class, "gemsproxy").withMetadataMaxAge(0).save();
+
+    assertThatDependencyFileLengthForHosted(greaterThan(4l));
+    assertThatDependencyFileLengthForProxies(greaterThan(4l));
+  }
+
+  private void assertThatDependencyFileLengthForHosted(Matcher<Long> matcher) {
+    assertThatDependencyFileLength("gemshost", matcher);
+    assertThatDependencyFileLength("gemshostgroup", matcher);
+    assertThatDependencyFileLength("gemsgroup", matcher);
+  }
+
+  private void assertThatDependencyFileLengthForProxies(Matcher<Long> matcher) {
+    assertThatDependencyFileLength("gemsproxy", matcher);
+    assertThatDependencyFileLength("gemsproxygroup", matcher);
+  }
+
+  private void assertThatDependencyFileLength(String repoId, Matcher<Long> matcher) {
+    File pre = assertFileDownload(repoId, "api/v1/dependencies/pre" + ApiV1DependenciesCuba.RUBY, is(true));
+    assertThat("length of dependencies file of repo: " + repoId, pre.length(), matcher);
   }
 
   @Test

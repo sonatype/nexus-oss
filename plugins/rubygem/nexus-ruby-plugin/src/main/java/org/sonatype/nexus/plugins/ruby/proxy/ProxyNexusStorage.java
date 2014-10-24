@@ -44,6 +44,7 @@ public class ProxyNexusStorage
   @Override
   public void retrieve(BundlerApiFile file) {
     try {
+      log.debug("retrieve :: {}", file);
       file.set(repository.retrieveDirectItem(new ResourceStoreRequest(file.storagePath(), false, true)));
     }
     catch (IOException | IllegalOperationException | ItemNotFoundException e) {
@@ -53,16 +54,17 @@ public class ProxyNexusStorage
 
   @Override
   public boolean isExpired(DependencyFile file) {
+    boolean expired = true;
     try {
       ResourceStoreRequest request = new ResourceStoreRequest(file.storagePath(), true, false);
       if (repository.getLocalStorage().containsItem(repository, request)) {
         StorageItem item = repository.getLocalStorage().retrieveItem(repository, request);
         long maxAge = repository.getMetadataMaxAge();
         if (maxAge > -1) {
-          return item.isExpired() || ((System.currentTimeMillis() - item.getRemoteChecked()) > (maxAge * 60L * 1000L));
+          expired = item.isExpired() || ((System.currentTimeMillis() - item.getRemoteChecked()) > (maxAge * 60L * 1000L));
         }
         else {
-          return false;
+          expired = false;
         }
       }
     }
@@ -73,6 +75,7 @@ public class ProxyNexusStorage
       // fail here
       throw Throwables.propagate(e);
     }
-    return true;
+    log.debug("isExpired={} :: {}", expired, file);
+    return expired;
   }
 }

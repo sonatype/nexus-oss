@@ -43,6 +43,8 @@ public class JerseyRubyProxyRepository
     settings.setProvider(JerseyRubyProxyRepository.PROVIDER);
     settings.setRepoPolicy("RELEASE");
     settings.setIndexable(false);
+    settings.setArtifactMaxAge(-1);
+    settings.setMetadataMaxAge(30); // Rubygems specific age!
 
     return settings;
   }

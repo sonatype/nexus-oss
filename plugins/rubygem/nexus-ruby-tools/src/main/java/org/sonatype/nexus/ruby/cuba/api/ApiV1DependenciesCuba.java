@@ -29,7 +29,7 @@ public class ApiV1DependenciesCuba
 {
   public static final String RUBY = ".ruby";
 
-  private static Pattern FILE = Pattern.compile("^([^/]+)[.]" + RUBY.substring(1) + "$");
+  private static final Pattern FILE = Pattern.compile("^([^/]+)[.]" + RUBY.substring(1) + "$");
 
   /**
    * no sub-directories
