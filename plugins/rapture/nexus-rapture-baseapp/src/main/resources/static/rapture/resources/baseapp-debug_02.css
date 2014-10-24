@@ -12564,7 +12564,7 @@
   font-size: 16px;
   font-weight: bold;
   font-family: arial, helvetica, verdana, sans-serif;
-  line-height: 15px;
+  line-height: 20px;
   padding: 1px 0 0;
   text-transform: none;
 }
@@ -12841,17 +12841,17 @@
   border-width: 1px !important;
 }
 
-/* line 21, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+/* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .feature-content .x-panel-subsection {
   border-top: 1px #aaaaaa solid;
   margin: 0 10px 20px 10px !important;
   left: 0 !important;
 }
-/* line 25, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+/* line 26, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .feature-content .x-panel-subsection .x-toolbar {
   padding-left: 0;
 }
-/* line 29, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+/* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .feature-content .x-panel-subsection.no-border {
   border-top: none;
 }
