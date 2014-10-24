@@ -107,6 +107,7 @@ public class NexusRubygemsFacade
     switch (file.state()) {
       case ERROR:
         Exception e = file.getException();
+        log.debug("handleCommon :: ERROR", e);
         if (e instanceof IllegalOperationException) {
           throw (IllegalOperationException) e;
         }
