@@ -89,17 +89,17 @@ Ext.define('NX.view.Main', {
 
     me.down('nx-header-panel>toolbar').add([
       ' ', ' ', // 2x pad
-      { xtype: 'nx-header-dashboard-mode' },
-      { xtype: 'nx-header-search-mode' },
-      { xtype: 'nx-header-browse-mode' },
-      { xtype: 'nx-header-admin-mode' },
+      { xtype: 'nx-header-dashboard-mode', ui: 'header' },
+      { xtype: 'nx-header-search-mode', ui: 'header' },
+      { xtype: 'nx-header-browse-mode', ui: 'header' },
+      { xtype: 'nx-header-admin-mode', ui: 'header' },
       ' ',
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       { xtype: 'nx-header-messages', ui: 'header' },
       { xtype: 'nx-header-refresh', ui: 'header' },
       { xtype: 'nx-header-signin', ui: 'header' },
-      { xtype: 'nx-header-user-mode', hidden: true },
+      { xtype: 'nx-header-user-mode', ui: 'header', hidden: true },
       { xtype: 'nx-header-signout', ui: 'header' },
       { xtype: 'nx-header-help', ui: 'header' }
     ]);

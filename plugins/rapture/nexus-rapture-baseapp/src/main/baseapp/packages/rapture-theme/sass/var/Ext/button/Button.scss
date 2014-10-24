@@ -1,0 +1,32 @@
+/**
+ * @class Ext.button.Button
+ */
+
+$button-default-color: $color-white;
+$button-default-color-over: $color-white;
+$button-default-color-focus: $color-white;
+$button-default-color-pressed: $color-white;
+$button-default-color-disabled: $color-white;
+
+$button-default-border-color: $color-night-rider;
+$button-default-border-color-over: $color-night-rider;
+$button-default-border-color-focus: $color-night-rider;
+$button-default-border-color-pressed: $color-night-rider;
+$button-default-border-color-disabled: $color-night-rider;
+
+$button-small-font-size: $font-size-body;
+$button-small-font-size-over: $font-size-body;
+$button-small-font-size-focus: $font-size-body;
+$button-small-font-size-pressed: $font-size-body;
+$button-small-font-size-disabled: $font-size-body;
+
+$button-small-font-weight: $font-weight-body;
+$button-small-font-weight-over: $font-weight-body;
+$button-small-font-weight-focus: $font-weight-body;
+$button-small-font-weight-pressed: $font-weight-body;
+$button-small-font-weight-disabled: $font-weight-body;
+
+$button-disabled-opacity: 50%;
+
+$button-default-glyph-color: $color-white;
+$button-default-glyph-opacity: 1;

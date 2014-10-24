@@ -20,9 +20,8 @@
 Ext.define('NX.view.header.Mode', {
   extend: 'Ext.button.Button',
 
-  ui: 'headermode',
   toggleGroup: 'mode',
-  cls: 'headermode',
+  cls: 'modebutton',
 
   /**
    * @cfg mode Mode name
