@@ -36,13 +36,14 @@ ant.exec(executable: senchaExe, failonerror: true) {
 }
 
 // Extract extjs distribution
-header 'Extract ExtJS distribution'
+header 'Extract ExtJS'
 def extZip = project.artifactMap['com.sencha:ext'].file
 def extDir = new File(project.build.directory, 'ext')
 ant.mkdir(dir: extDir)
 ant.unzip(src: extZip, dest: extDir) {
   cutdirsmapper(dirs: 1)
   patternset {
+    exclude(name: 'ext-*/builds/**')
     exclude(name: 'ext-*/docs/**')
     exclude(name: 'ext-*/welcome/**')
   }
