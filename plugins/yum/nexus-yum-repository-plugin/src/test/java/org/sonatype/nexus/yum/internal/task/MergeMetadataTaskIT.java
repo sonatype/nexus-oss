@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -44,7 +45,9 @@ public class MergeMetadataTaskIT
   public void shouldNotAllowConcurrentExecutionForSameRepo()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class), mock(CommandLineExecutor.class));
+    final MergeMetadataTask task = new MergeMetadataTask(
+        mock(EventBus.class), mock(YumRegistry.class), mock(CommandLineExecutor.class)
+    );
     final GroupRepository group = mock(GroupRepository.class);
     when(group.getId()).thenReturn(GROUP_ID_1);
     task.setGroupRepository(group);
@@ -55,7 +58,9 @@ public class MergeMetadataTaskIT
   public void shouldAllowConcurrentExecutionIfAnotherTaskIsRunning()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(mock(EventBus.class), mock(CommandLineExecutor.class));
+    final MergeMetadataTask task = new MergeMetadataTask(
+        mock(EventBus.class), mock(YumRegistry.class), mock(CommandLineExecutor.class)
+    );
     final GroupRepository group1 = mock(GroupRepository.class);
     when(group1.getId()).thenReturn(GROUP_ID_1);
     final GroupRepository group2 = mock(GroupRepository.class);
