@@ -12348,6 +12348,10 @@
 .feature-content .x-panel-subsection.no-border {
   border-top: none;
 }
+/* line 33, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
+.feature-content .x-panel-subsection.no-border .x-panel-header {
+  padding: 0 !important;
+}
 
 /**
 * @class Ext.form.field.Trigger

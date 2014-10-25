@@ -44,10 +44,10 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
       xtype: 'form',
       itemId: 'publishStatusForm',
       title: 'Publish Status',
-      frame: true,
       hidden: true,
+      ui: 'subsection',
+      cls: 'no-border',
 
-      bodyPadding: 10,
       margin: 10,
 
       items: [

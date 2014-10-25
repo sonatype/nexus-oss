@@ -88,10 +88,9 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         xtype: 'form',
         itemId: 'publishStatusForm',
         title: 'Publish Status',
-        frame: true,
         hidden: true,
+        ui: 'subsection',
 
-        bodyPadding: 10,
         margin: 10,
 
         items: [
@@ -127,10 +126,9 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         xtype: 'form',
         itemId: 'discoveryStatusForm',
         title: 'Discovery Status',
-        frame: true,
         hidden: true,
+        ui: 'subsection',
 
-        bodyPadding: 10,
         margin: 10,
 
         items: [
