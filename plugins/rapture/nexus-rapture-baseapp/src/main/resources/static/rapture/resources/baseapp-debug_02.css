@@ -84,42 +84,39 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-focus {
-  border-color: #75211d;
   background-image: none;
-  background-color: #c44540;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c95753), color-stop(50%, #c44540), color-stop(51%, #ba413c), color-stop(100%, #c44540));
-  background-image: -webkit-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -moz-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -o-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -ms-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #de3d63), color-stop(100%, #c6254b));
+  background-image: -webkit-linear-gradient(top, #de3d63, #c6254b);
+  background-image: -moz-linear-gradient(top, #de3d63, #c6254b);
+  background-image: -o-linear-gradient(top, #de3d63, #c6254b);
+  background-image: -ms-linear-gradient(top, #de3d63, #c6254b);
+  background-image: linear-gradient(top, #de3d63, #c6254b);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-over {
-  border-color: #75211d;
   background-image: none;
-  background-color: #c44540;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c95753), color-stop(50%, #c44540), color-stop(51%, #ba413c), color-stop(100%, #c44540));
-  background-image: -webkit-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -moz-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -o-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: -ms-linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
-  background-image: linear-gradient(top, #c95753, #c44540 50%, #ba413c 51%, #c44540);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2314f), color-stop(100%, #9e1e3c));
+  background-image: -webkit-linear-gradient(top, #b2314f, #9e1e3c);
+  background-image: -moz-linear-gradient(top, #b2314f, #9e1e3c);
+  background-image: -o-linear-gradient(top, #b2314f, #9e1e3c);
+  background-image: -ms-linear-gradient(top, #b2314f, #9e1e3c);
+  background-image: linear-gradient(top, #b2314f, #9e1e3c);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-menu-active,
 .x-btn-danger-small-pressed {
-  border-color: #601b18;
   background-image: none;
-  background-color: #a03834;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #a03834), color-stop(50%, #983531), color-stop(51%, #a03834), color-stop(100%, #a94b48));
-  background-image: -webkit-linear-gradient(top, #a03834, #983531 50%, #a03834 51%, #a94b48);
-  background-image: -moz-linear-gradient(top, #a03834, #983531 50%, #a03834 51%, #a94b48);
-  background-image: -o-linear-gradient(top, #a03834, #983531 50%, #a03834 51%, #a94b48);
-  background-image: -ms-linear-gradient(top, #a03834, #983531 50%, #a03834 51%, #a94b48);
-  background-image: linear-gradient(top, #a03834, #983531 50%, #a03834 51%, #a94b48);
+  background-color: #333333;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #85253b), color-stop(100%, #77162d));
+  background-image: -webkit-linear-gradient(top, #85253b, #77162d);
+  background-image: -moz-linear-gradient(top, #85253b, #77162d);
+  background-image: -o-linear-gradient(top, #85253b, #77162d);
+  background-image: -ms-linear-gradient(top, #85253b, #77162d);
+  background-image: linear-gradient(top, #85253b, #77162d);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -138,7 +135,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-focus .x-frame-mc {
-  background-color: #c44540;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-danger-small-focus-fbg.gif);
 }
 
@@ -158,7 +155,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-over .x-frame-mc {
-  background-color: #c44540;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-danger-small-over-fbg.gif);
 }
 
@@ -187,7 +184,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-menu-active .x-frame-mc,
 .x-btn-danger-small-pressed .x-frame-mc {
-  background-color: #a03834;
+  background-color: #333333;
   background-image: url(images/btn/btn-danger-small-pressed-fbg.gif);
 }
 
@@ -207,7 +204,7 @@
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-disabled .x-frame-mc {
-  background-color: #d64b46;
+  background-color: #444444;
   background-image: url(images/btn/btn-danger-small-disabled-fbg.gif);
 }
 
@@ -295,7 +292,7 @@
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small {
-  border-color: #c56213;
+  border-color: #333333;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -309,20 +306,20 @@
   border-width: 1px;
   border-style: solid;
   background-image: none;
-  background-color: #f2862f;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39243), color-stop(50%, #f2862f), color-stop(51%, #e57f2c), color-stop(100%, #f2862f));
-  background-image: -webkit-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -moz-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -o-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -ms-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
+  background-color: #606060;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39244), color-stop(100%, #da792b));
+  background-image: -webkit-linear-gradient(top, #f39244, #da792b);
+  background-image: -moz-linear-gradient(top, #f39244, #da792b);
+  background-image: -o-linear-gradient(top, #f39244, #da792b);
+  background-image: -ms-linear-gradient(top, #f39244, #da792b);
+  background-image: linear-gradient(top, #f39244, #da792b);
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-warning-small-mc {
   background-image: url(images/btn/btn-warning-small-fbg.gif);
   background-position: 0 top;
-  background-color: #f2862f;
+  background-color: #606060;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -456,8 +453,8 @@
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small .x-btn-inner {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
@@ -479,23 +476,22 @@
   font-size: 16px;
   line-height: 16px;
   color: white;
-  opacity: 0.5;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-warning-small .x-btn-glyph {
-  color: #f8c297;
+  color: white;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-disabled {
   background-image: none;
-  background-color: #f2862f;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39243), color-stop(50%, #f2862f), color-stop(51%, #e57f2c), color-stop(100%, #f2862f));
-  background-image: -webkit-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -moz-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -o-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: -ms-linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
-  background-image: linear-gradient(top, #f39243, #f2862f 50%, #e57f2c 51%, #f2862f);
+  background-color: #444444;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39244), color-stop(100%, #da792b));
+  background-image: -webkit-linear-gradient(top, #f39244, #da792b);
+  background-image: -moz-linear-gradient(top, #f39244, #da792b);
+  background-image: -o-linear-gradient(top, #f39244, #da792b);
+  background-image: -ms-linear-gradient(top, #f39244, #da792b);
+  background-image: linear-gradient(top, #f39244, #da792b);
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -595,42 +591,39 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-focus {
-  border-color: #b55a11;
   background-image: none;
-  background-color: #de7b2b;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e18840), color-stop(50%, #de7b2b), color-stop(51%, #d27428), color-stop(100%, #de7b2b));
-  background-image: -webkit-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -moz-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -o-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -ms-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39244), color-stop(100%, #da792b));
+  background-image: -webkit-linear-gradient(top, #f39244, #da792b);
+  background-image: -moz-linear-gradient(top, #f39244, #da792b);
+  background-image: -o-linear-gradient(top, #f39244, #da792b);
+  background-image: -ms-linear-gradient(top, #f39244, #da792b);
+  background-image: linear-gradient(top, #f39244, #da792b);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-over {
-  border-color: #b55a11;
   background-image: none;
-  background-color: #de7b2b;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e18840), color-stop(50%, #de7b2b), color-stop(51%, #d27428), color-stop(100%, #de7b2b));
-  background-image: -webkit-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -moz-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -o-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: -ms-linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
-  background-image: linear-gradient(top, #e18840, #de7b2b 50%, #d27428 51%, #de7b2b);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c17536), color-stop(100%, #ae6122));
+  background-image: -webkit-linear-gradient(top, #c17536, #ae6122);
+  background-image: -moz-linear-gradient(top, #c17536, #ae6122);
+  background-image: -o-linear-gradient(top, #c17536, #ae6122);
+  background-image: -ms-linear-gradient(top, #c17536, #ae6122);
+  background-image: linear-gradient(top, #c17536, #ae6122);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-menu-active,
 .x-btn-warning-small-pressed {
-  border-color: #93490e;
   background-image: none;
-  background-color: #b56423;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b56423), color-stop(50%, #ab5f21), color-stop(51%, #b56423), color-stop(100%, #bc7338));
-  background-image: -webkit-linear-gradient(top, #b56423, #ab5f21 50%, #b56423 51%, #bc7338);
-  background-image: -moz-linear-gradient(top, #b56423, #ab5f21 50%, #b56423 51%, #bc7338);
-  background-image: -o-linear-gradient(top, #b56423, #ab5f21 50%, #b56423 51%, #bc7338);
-  background-image: -ms-linear-gradient(top, #b56423, #ab5f21 50%, #b56423 51%, #bc7338);
-  background-image: linear-gradient(top, #b56423, #ab5f21 50%, #b56423 51%, #bc7338);
+  background-color: #333333;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #925829), color-stop(100%, #83491a));
+  background-image: -webkit-linear-gradient(top, #925829, #83491a);
+  background-image: -moz-linear-gradient(top, #925829, #83491a);
+  background-image: -o-linear-gradient(top, #925829, #83491a);
+  background-image: -ms-linear-gradient(top, #925829, #83491a);
+  background-image: linear-gradient(top, #925829, #83491a);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -649,7 +642,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-focus .x-frame-mc {
-  background-color: #de7b2b;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-warning-small-focus-fbg.gif);
 }
 
@@ -669,7 +662,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-over .x-frame-mc {
-  background-color: #de7b2b;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-warning-small-over-fbg.gif);
 }
 
@@ -698,7 +691,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-menu-active .x-frame-mc,
 .x-btn-warning-small-pressed .x-frame-mc {
-  background-color: #b56423;
+  background-color: #333333;
   background-image: url(images/btn/btn-warning-small-pressed-fbg.gif);
 }
 
@@ -718,7 +711,7 @@
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-disabled .x-frame-mc {
-  background-color: #f2862f;
+  background-color: #444444;
   background-image: url(images/btn/btn-warning-small-disabled-fbg.gif);
 }
 
@@ -806,7 +799,7 @@
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small {
-  border-color: #04642a;
+  border-color: #333333;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -820,20 +813,20 @@
   border-width: 1px;
   border-style: solid;
   background-image: none;
-  background-color: #0b9743;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a155), color-stop(50%, #0b9743), color-stop(51%, #0a8f3f), color-stop(100%, #0b9743));
-  background-image: -webkit-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -moz-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -o-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -ms-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
+  background-color: #606060;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a156), color-stop(100%, #0b893d));
+  background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
+  background-image: -moz-linear-gradient(top, #23a156, #0b893d);
+  background-image: -o-linear-gradient(top, #23a156, #0b893d);
+  background-image: -ms-linear-gradient(top, #23a156, #0b893d);
+  background-image: linear-gradient(top, #23a156, #0b893d);
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-success-small-mc {
   background-image: url(images/btn/btn-success-small-fbg.gif);
   background-position: 0 top;
-  background-color: #0b9743;
+  background-color: #606060;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -967,8 +960,8 @@
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small .x-btn-inner {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 5px;
@@ -990,23 +983,22 @@
   font-size: 16px;
   line-height: 16px;
   color: white;
-  opacity: 0.5;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-success-small .x-btn-glyph {
-  color: #85cba1;
+  color: white;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-disabled {
   background-image: none;
-  background-color: #0b9743;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a155), color-stop(50%, #0b9743), color-stop(51%, #0a8f3f), color-stop(100%, #0b9743));
-  background-image: -webkit-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -moz-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -o-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: -ms-linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
-  background-image: linear-gradient(top, #23a155, #0b9743 50%, #0a8f3f 51%, #0b9743);
+  background-color: #444444;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a156), color-stop(100%, #0b893d));
+  background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
+  background-image: -moz-linear-gradient(top, #23a156, #0b893d);
+  background-image: -o-linear-gradient(top, #23a156, #0b893d);
+  background-image: -ms-linear-gradient(top, #23a156, #0b893d);
+  background-image: linear-gradient(top, #23a156, #0b893d);
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -1106,42 +1098,39 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-focus {
-  border-color: #035c26;
   background-image: none;
-  background-color: #0a8a3d;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #229550), color-stop(50%, #0a8a3d), color-stop(51%, #098339), color-stop(100%, #0a8a3d));
-  background-image: -webkit-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -moz-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -o-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -ms-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a156), color-stop(100%, #0b893d));
+  background-image: -webkit-linear-gradient(top, #23a156, #0b893d);
+  background-image: -moz-linear-gradient(top, #23a156, #0b893d);
+  background-image: -o-linear-gradient(top, #23a156, #0b893d);
+  background-image: -ms-linear-gradient(top, #23a156, #0b893d);
+  background-image: linear-gradient(top, #23a156, #0b893d);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-over {
-  border-color: #035c26;
   background-image: none;
-  background-color: #0a8a3d;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #229550), color-stop(50%, #0a8a3d), color-stop(51%, #098339), color-stop(100%, #0a8a3d));
-  background-image: -webkit-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -moz-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -o-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: -ms-linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
-  background-image: linear-gradient(top, #229550, #0a8a3d 50%, #098339 51%, #0a8a3d);
+  background-color: #3e3e3e;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #1c8145), color-stop(100%, #096e31));
+  background-image: -webkit-linear-gradient(top, #1c8145, #096e31);
+  background-image: -moz-linear-gradient(top, #1c8145, #096e31);
+  background-image: -o-linear-gradient(top, #1c8145, #096e31);
+  background-image: -ms-linear-gradient(top, #1c8145, #096e31);
+  background-image: linear-gradient(top, #1c8145, #096e31);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-menu-active,
 .x-btn-success-small-pressed {
-  border-color: #034b1f;
   background-image: none;
-  background-color: #087132;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #087132), color-stop(50%, #076b2f), color-stop(51%, #087132), color-stop(100%, #207f46));
-  background-image: -webkit-linear-gradient(top, #087132, #076b2f 50%, #087132 51%, #207f46);
-  background-image: -moz-linear-gradient(top, #087132, #076b2f 50%, #087132 51%, #207f46);
-  background-image: -o-linear-gradient(top, #087132, #076b2f 50%, #087132 51%, #207f46);
-  background-image: -ms-linear-gradient(top, #087132, #076b2f 50%, #087132 51%, #207f46);
-  background-image: linear-gradient(top, #087132, #076b2f 50%, #087132 51%, #207f46);
+  background-color: #333333;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #156134), color-stop(100%, #0c4f26));
+  background-image: -webkit-linear-gradient(top, #156134, #0c4f26);
+  background-image: -moz-linear-gradient(top, #156134, #0c4f26);
+  background-image: -o-linear-gradient(top, #156134, #0c4f26);
+  background-image: -ms-linear-gradient(top, #156134, #0c4f26);
+  background-image: linear-gradient(top, #156134, #0c4f26);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -1160,7 +1149,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-focus .x-frame-mc {
-  background-color: #0a8a3d;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-success-small-focus-fbg.gif);
 }
 
@@ -1180,7 +1169,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-over .x-frame-mc {
-  background-color: #0a8a3d;
+  background-color: #3e3e3e;
   background-image: url(images/btn/btn-success-small-over-fbg.gif);
 }
 
@@ -1209,7 +1198,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-menu-active .x-frame-mc,
 .x-btn-success-small-pressed .x-frame-mc {
-  background-color: #087132;
+  background-color: #333333;
   background-image: url(images/btn/btn-success-small-pressed-fbg.gif);
 }
 
@@ -1229,7 +1218,7 @@
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-disabled .x-frame-mc {
-  background-color: #0b9743;
+  background-color: #444444;
   background-image: url(images/btn/btn-success-small-disabled-fbg.gif);
 }
 
@@ -1317,7 +1306,7 @@
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small {
-  border-color: transparent;
+  border-color: #333333;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1331,14 +1320,20 @@
   border-width: 1px;
   border-style: solid;
   background-image: none;
-  background-color: transparent;
+  background-color: #606060;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-plain-small-mc {
   background-image: url(images/btn/btn-plain-small-fbg.gif);
   background-position: 0 top;
-  background-color: transparent;
+  background-color: #606060;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1439,12 +1434,14 @@
 .x-btn-plain-small-ml,
 .x-btn-plain-small-mr {
   zoom: 1;
+  background-image: url(images/btn/btn-plain-small-corners.gif);
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-plain-small-ml,
 .x-btn-plain-small-mr {
   zoom: 1;
+  background-image: url(images/btn/btn-plain-small-sides.gif);
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1463,17 +1460,17 @@
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
 .x-btn-plain-small:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-plain-small-fbg.gif), bg:url(images/btn/btn-plain-small-bg.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-plain-small-fbg.gif), bg:url(images/btn/btn-plain-small-bg.gif), corners:url(images/btn/btn-plain-small-corners.gif), sides:url(images/btn/btn-plain-small-sides.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small .x-btn-inner {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #1f1f1f;
+  color: #333333;
   padding: 0 5px;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -1492,21 +1489,23 @@
 .x-btn-plain-small .x-btn-glyph {
   font-size: 16px;
   line-height: 16px;
-  color: #c6c6c6;
+  color: white;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-plain-small .x-btn-glyph {
-  color: #c6c6c6;
+  color: white;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-disabled {
   background-image: none;
-  background-color: transparent;
-}
-/* line 328, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small-disabled .x-btn-inner {
-  color: #c6c6c6;
+  background-color: #444444;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -1606,55 +1605,39 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-focus {
-  border-color: #353535;
   background-image: none;
   background-color: #3e3e3e;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #515151), color-stop(50%, #3e3e3e), color-stop(51%, #3a3a3a), color-stop(100%, #3e3e3e));
-  background-image: -webkit-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -moz-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -o-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -ms-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-}
-/* line 515, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small-focus .x-btn-inner {
-  color: #e8e8e8;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-over {
-  border-color: #353535;
   background-image: none;
   background-color: #3e3e3e;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #515151), color-stop(50%, #3e3e3e), color-stop(51%, #3a3a3a), color-stop(100%, #3e3e3e));
-  background-image: -webkit-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -moz-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -o-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: -ms-linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-  background-image: linear-gradient(top, #515151, #3e3e3e 50%, #3a3a3a 51%, #3e3e3e);
-}
-/* line 539, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small-over .x-btn-inner {
-  color: #e8e8e8;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #cbcbcb), color-stop(100%, #b8b8b8));
+  background-image: -webkit-linear-gradient(top, #cbcbcb, #b8b8b8);
+  background-image: -moz-linear-gradient(top, #cbcbcb, #b8b8b8);
+  background-image: -o-linear-gradient(top, #cbcbcb, #b8b8b8);
+  background-image: -ms-linear-gradient(top, #cbcbcb, #b8b8b8);
+  background-image: linear-gradient(top, #cbcbcb, #b8b8b8);
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-menu-active,
 .x-btn-plain-small-pressed {
-  border-color: #2b2b2b;
   background-image: none;
   background-color: #333333;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #333333), color-stop(50%, #303030), color-stop(51%, #333333), color-stop(100%, #474747));
-  background-image: -webkit-linear-gradient(top, #333333, #303030 50%, #333333 51%, #474747);
-  background-image: -moz-linear-gradient(top, #333333, #303030 50%, #333333 51%, #474747);
-  background-image: -o-linear-gradient(top, #333333, #303030 50%, #333333 51%, #474747);
-  background-image: -ms-linear-gradient(top, #333333, #303030 50%, #333333 51%, #474747);
-  background-image: linear-gradient(top, #333333, #303030 50%, #333333 51%, #474747);
-}
-/* line 564, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small-menu-active .x-btn-inner,
-.x-btn-plain-small-pressed .x-btn-inner {
-  color: #e8e8e8;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #919191), color-stop(100%, #808080));
+  background-image: -webkit-linear-gradient(top, #919191, #808080);
+  background-image: -moz-linear-gradient(top, #919191, #808080);
+  background-image: -o-linear-gradient(top, #919191, #808080);
+  background-image: -ms-linear-gradient(top, #919191, #808080);
+  background-image: linear-gradient(top, #919191, #808080);
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -1742,7 +1725,7 @@
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-disabled .x-frame-mc {
-  background-color: transparent;
+  background-color: #444444;
   background-image: url(images/btn/btn-plain-small-disabled-fbg.gif);
 }
 
@@ -1830,7 +1813,7 @@
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium {
-  border-color: transparent;
+  border-color: #e1e1e1;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1841,7 +1824,7 @@
   -o-border-radius: 3px;
   border-radius: 3px;
   padding: 3px 3px 3px 3px;
-  border-width: 1px;
+  border-width: 0;
   border-style: solid;
   background-image: none;
   background-color: transparent;
@@ -1875,7 +1858,7 @@
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-header-toolbar-medium-frameInfo {
-  font-family: th-3-3-3-3-1-1-1-1-3-3-3-3;
+  font-family: th-3-3-3-3-0-0-0-0-3-3-3-3;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1962,7 +1945,7 @@
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-header-toolbar-medium-mc {
-  padding: 1px 1px 1px 1px;
+  padding: 0px 0px 0px 0px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1984,7 +1967,7 @@
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: normal;
+  font-weight: bold;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
@@ -2115,42 +2098,24 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-focus {
-  border-color: #284e00;
+  border-color: #d8d8d8;
   background-image: none;
-  background-color: #2f6000;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #436f19), color-stop(50%, #2f6000), color-stop(51%, #2c5b00), color-stop(100%, #2f6000));
-  background-image: -webkit-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -moz-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -o-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -ms-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
+  background-color: #1c8145;
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-over {
-  border-color: #284e00;
+  border-color: #d8d8d8;
   background-image: none;
-  background-color: #2f6000;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #436f19), color-stop(50%, #2f6000), color-stop(51%, #2c5b00), color-stop(100%, #2f6000));
-  background-image: -webkit-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -moz-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -o-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: -ms-linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
-  background-image: linear-gradient(top, #436f19, #2f6000 50%, #2c5b00 51%, #2f6000);
+  background-color: #1c8145;
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-menu-active,
 .x-btn-header-toolbar-medium-pressed {
-  border-color: #264b00;
+  border-color: #cecece;
   background-image: none;
-  background-color: #2d5c00;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2d5c00), color-stop(50%, #2a5700), color-stop(51%, #2d5c00), color-stop(100%, #426c19));
-  background-image: -webkit-linear-gradient(top, #2d5c00, #2a5700 50%, #2d5c00 51%, #426c19);
-  background-image: -moz-linear-gradient(top, #2d5c00, #2a5700 50%, #2d5c00 51%, #426c19);
-  background-image: -o-linear-gradient(top, #2d5c00, #2a5700 50%, #2d5c00 51%, #426c19);
-  background-image: -ms-linear-gradient(top, #2d5c00, #2a5700 50%, #2d5c00 51%, #426c19);
-  background-image: linear-gradient(top, #2d5c00, #2a5700 50%, #2d5c00 51%, #426c19);
+  background-color: transparent;
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2169,7 +2134,7 @@
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-focus .x-frame-mc {
-  background-color: #2f6000;
+  background-color: #1c8145;
   background-image: url(images/btn/btn-header-toolbar-medium-focus-fbg.gif);
 }
 
@@ -2189,7 +2154,7 @@
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-over .x-frame-mc {
-  background-color: #2f6000;
+  background-color: #1c8145;
   background-image: url(images/btn/btn-header-toolbar-medium-over-fbg.gif);
 }
 
@@ -2218,7 +2183,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-menu-active .x-frame-mc,
 .x-btn-header-toolbar-medium-pressed .x-frame-mc {
-  background-color: #2d5c00;
+  background-color: transparent;
   background-image: url(images/btn/btn-header-toolbar-medium-pressed-fbg.gif);
 }
 
@@ -2321,511 +2286,47 @@
 
 /*</if slicer>*/
 /* */
-/**
- * ui: 'headermode'
- */
-/* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium {
-  border-color: transparent;
-}
-
-/* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-  padding: 3px 3px 3px 3px;
-  border-width: 1px;
-  border-style: solid;
-  background-image: none;
-  background-color: transparent;
-}
-
-/* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-mc {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-fbg.gif);
-  background-position: 0 top;
-  background-color: transparent;
-}
-
-/* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nlg .x-btn-headermode-toolbar-medium {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-bg.gif);
-  background-position: 0 top;
-}
-
-/* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nbr .x-btn-headermode-toolbar-medium {
-  padding: 0 !important;
-  border-width: 0 !important;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  -ms-border-radius: 0px;
-  -o-border-radius: 0px;
-  border-radius: 0px;
-  background-color: transparent;
-  background-image: none;
-}
-
-/* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-frameInfo {
-  font-family: th-3-3-3-3-1-1-1-1-3-3-3-3;
-}
-
-/* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tl {
-  background-position: 0 -6px;
-}
-
-/* line 319, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tr {
-  background-position: right -9px;
-}
-
-/* line 323, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-bl {
-  background-position: 0 -12px;
-}
-
-/* line 327, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-br {
-  background-position: right -15px;
-}
-
-/* line 331, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-ml {
-  background-position: 0 top;
-}
-
-/* line 335, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-mr {
-  background-position: right top;
-}
-
-/* line 339, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tc {
-  background-position: 0 0;
-}
-
-/* line 343, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-bc {
-  background-position: 0 -3px;
-}
-
-/* line 350, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tr,
-.x-btn-headermode-toolbar-medium-br,
-.x-btn-headermode-toolbar-medium-mr {
-  padding-right: 3px;
-}
-
-/* line 356, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tl,
-.x-btn-headermode-toolbar-medium-bl,
-.x-btn-headermode-toolbar-medium-ml {
-  padding-left: 3px;
-}
-
-/* line 360, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tc {
-  height: 3px;
-}
-
-/* line 363, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-bc {
-  height: 3px;
-}
-
-/* line 374, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-tl,
-.x-btn-headermode-toolbar-medium-bl,
-.x-btn-headermode-toolbar-medium-tr,
-.x-btn-headermode-toolbar-medium-br,
-.x-btn-headermode-toolbar-medium-tc,
-.x-btn-headermode-toolbar-medium-bc,
-.x-btn-headermode-toolbar-medium-ml,
-.x-btn-headermode-toolbar-medium-mr {
-  zoom: 1;
-}
-
-/* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-ml,
-.x-btn-headermode-toolbar-medium-mr {
-  zoom: 1;
-}
-
-/* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-headermode-toolbar-medium-mc {
-  padding: 1px 1px 1px 1px;
-}
-
-/* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-strict .x-ie7 .x-btn-headermode-toolbar-medium-tl,
-.x-strict .x-ie7 .x-btn-headermode-toolbar-medium-bl {
-  position: relative;
-  right: 0;
-}
-
-/*<if slicer>*/
-/* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-headermode-toolbar-medium:after {
-  display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-headermode-toolbar-medium-fbg.gif), bg:url(images/btn/btn-headermode-toolbar-medium-bg.gif)";
-}
-
-/*</if slicer>*/
-/* */
-/* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-inner {
-  font-size: 14px;
-  font-weight: normal;
-  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: white;
-  padding: 0 2px;
-}
-/* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-arrow {
-  background-image: url(images/button/headermode-toolbar-medium-arrow.png);
-}
-/* line 278, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-arrow-right {
-  padding-right: 30px;
-}
-/* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-arrow-bottom {
-  padding-bottom: 26px;
-}
-/* line 293, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-glyph {
-  font-size: 24px;
-  line-height: 24px;
-  color: white;
-}
-/* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie8m .x-btn-headermode-toolbar-medium .x-btn-glyph {
-  color: white;
-}
-
-/* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-disabled {
-  background-image: none;
-  background-color: transparent;
-}
-
-/* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon .x-btn-button,
-.x-btn-headermode-toolbar-medium-noicon .x-btn-button {
-  height: 24px;
-}
-/* line 350, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon .x-btn-inner,
-.x-btn-headermode-toolbar-medium-noicon .x-btn-inner {
-  line-height: 24px;
-}
-
-/* line 360, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon .x-btn-arrow-right .x-btn-inner,
-.x-btn-headermode-toolbar-medium-noicon .x-btn-arrow-right .x-btn-inner,
-.x-btn-headermode-toolbar-medium-icon-text-left .x-btn-arrow-right .x-btn-inner {
-  padding-right: 0;
-}
-
-/* line 375, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon .x-btn-inner {
-  width: 24px;
-  padding: 0;
-}
-/* line 381, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon .x-btn-icon-el {
-  width: 24px;
-  height: 24px;
-}
-
-/* line 388, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-left .x-btn-button {
-  height: 24px;
-}
-/* line 393, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-left .x-btn-inner {
-  line-height: 24px;
-  padding-left: 29px;
-}
-/* line 409, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-left .x-btn-icon-el {
-  width: 24px;
-  right: auto;
-}
-/* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-headermode-toolbar-medium-icon-text-left .x-btn-icon-el, .x-quirks .x-ie .x-btn-headermode-toolbar-medium-icon-text-left .x-btn-icon-el {
-  height: 24px;
-}
-
-/* line 430, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-right .x-btn-button {
-  height: 24px;
-}
-/* line 435, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-right .x-btn-inner {
-  line-height: 24px;
-  padding-right: 29px;
-}
-/* line 447, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-right .x-btn-icon-el {
-  width: 24px;
-  left: auto;
-}
-/* line 453, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-headermode-toolbar-medium-icon-text-right .x-btn-icon-el, .x-quirks .x-ie .x-btn-headermode-toolbar-medium-icon-text-right .x-btn-icon-el {
-  height: 24px;
-}
-
-/* line 468, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-top .x-btn-inner {
-  padding-top: 29px;
-}
-/* line 472, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-top .x-btn-icon-el {
-  height: 24px;
-  bottom: auto;
-}
-/* line 480, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-headermode-toolbar-medium-icon-text-top .x-btn-icon-el, .x-quirks .x-ie .x-btn-headermode-toolbar-medium-icon-text-top .x-btn-icon-el {
-  width: 100%;
-}
-
-/* line 488, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-bottom .x-btn-inner {
-  padding-bottom: 29px;
-}
-/* line 492, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-icon-text-bottom .x-btn-icon-el {
-  height: 24px;
-  top: auto;
-}
-/* line 500, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-headermode-toolbar-medium-icon-text-bottom .x-btn-icon-el, .x-quirks .x-ie .x-btn-headermode-toolbar-medium-icon-text-bottom .x-btn-icon-el {
-  width: 100%;
-}
-
-/* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-focus {
-  border-color: #165188;
-  background-image: none;
-  background-color: #aaaaaa;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2b2b2), color-stop(50%, #aaaaaa), color-stop(51%, #a1a1a1), color-stop(100%, #aaaaaa));
-  background-image: -webkit-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -moz-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -o-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -ms-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-}
-
-/* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-over {
-  border-color: #165188;
-  background-image: none;
-  background-color: #aaaaaa;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #b2b2b2), color-stop(50%, #aaaaaa), color-stop(51%, #a1a1a1), color-stop(100%, #aaaaaa));
-  background-image: -webkit-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -moz-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -o-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: -ms-linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-  background-image: linear-gradient(top, #b2b2b2, #aaaaaa 50%, #a1a1a1 51%, #aaaaaa);
-}
-
-/* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-menu-active,
-.x-btn-headermode-toolbar-medium-pressed {
-  border-color: #154e82;
-  background-image: none;
-  background-color: #2476fc;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2476fc), color-stop(50%, #2270ef), color-stop(51%, #2476fc), color-stop(100%, #3983fc));
-  background-image: -webkit-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
-  background-image: -moz-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
-  background-image: -o-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
-  background-image: -ms-linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
-  background-image: linear-gradient(top, #2476fc, #2270ef 50%, #2476fc 51%, #3983fc);
-}
-
-/* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-focus .x-frame-tl,
-.x-btn-headermode-toolbar-medium-focus .x-frame-bl,
-.x-btn-headermode-toolbar-medium-focus .x-frame-tr,
-.x-btn-headermode-toolbar-medium-focus .x-frame-br,
-.x-btn-headermode-toolbar-medium-focus .x-frame-tc,
-.x-btn-headermode-toolbar-medium-focus .x-frame-bc {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-focus-corners.gif);
-}
-/* line 592, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-focus .x-frame-ml,
-.x-btn-headermode-toolbar-medium-focus .x-frame-mr {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-focus-sides.gif);
-}
-/* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-focus .x-frame-mc {
-  background-color: #aaaaaa;
-  background-image: url(images/btn/btn-headermode-toolbar-medium-focus-fbg.gif);
-}
-
-/* line 610, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-over .x-frame-tl,
-.x-btn-headermode-toolbar-medium-over .x-frame-bl,
-.x-btn-headermode-toolbar-medium-over .x-frame-tr,
-.x-btn-headermode-toolbar-medium-over .x-frame-br,
-.x-btn-headermode-toolbar-medium-over .x-frame-tc,
-.x-btn-headermode-toolbar-medium-over .x-frame-bc {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-over-corners.gif);
-}
-/* line 614, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-over .x-frame-ml,
-.x-btn-headermode-toolbar-medium-over .x-frame-mr {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-over-sides.gif);
-}
-/* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-over .x-frame-mc {
-  background-color: #aaaaaa;
-  background-image: url(images/btn/btn-headermode-toolbar-medium-over-fbg.gif);
-}
-
-/* line 633, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-tl,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-bl,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-tr,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-br,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-tc,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-bc,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-tl,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-bl,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-tr,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-br,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-tc,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-bc {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-corners.gif);
-}
-/* line 637, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-ml,
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-mr,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-ml,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-mr {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-sides.gif);
-}
-/* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-menu-active .x-frame-mc,
-.x-btn-headermode-toolbar-medium-pressed .x-frame-mc {
-  background-color: #2476fc;
-  background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-fbg.gif);
-}
-
-/* line 655, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-disabled .x-frame-tl,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-bl,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-tr,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-br,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-tc,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-bc {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-disabled-corners.gif);
-}
-/* line 659, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-disabled .x-frame-ml,
-.x-btn-headermode-toolbar-medium-disabled .x-frame-mr {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-disabled-sides.gif);
-}
-/* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-disabled .x-frame-mc {
-  background-color: transparent;
-  background-image: url(images/btn/btn-headermode-toolbar-medium-disabled-fbg.gif);
-}
-
-/* line 674, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-headermode-toolbar-medium-focus {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-focus-bg.gif);
-}
-
-/* line 682, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-headermode-toolbar-medium-over {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-over-bg.gif);
-}
-
-/* line 691, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-headermode-toolbar-medium-menu-active,
-.x-nlg .x-btn-headermode-toolbar-medium-pressed {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-pressed-bg.gif);
-}
-
-/* line 699, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-headermode-toolbar-medium-disabled {
-  background-image: url(images/btn/btn-headermode-toolbar-medium-disabled-bg.gif);
-}
-
-/* line 707, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nbr .x-btn-headermode-toolbar-medium {
-  background-image: none;
-}
-
-/* line 722, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-split-right {
-  background-image: url(images/button/headermode-toolbar-medium-s-arrow.png);
-  padding-right: 32px;
-}
-/* line 735, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium .x-btn-split-bottom {
-  background-image: url(images/button/headermode-toolbar-medium-s-arrow-b.png);
-  padding-bottom: 28px;
-}
-
-/* line 758, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-headermode-toolbar-medium-disabled {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-  opacity: 0.5;
-}
-
-/*<if slicer>*/
-/* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-headermode-toolbar-medium-focus:after {
-  display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-headermode-toolbar-medium-focus-corners.gif), sides:url(images/btn/btn-headermode-toolbar-medium-focus-sides.gif), frame-bg:url(images/btn/btn-headermode-toolbar-medium-focus-fbg.gif), bg:url(images/btn/btn-headermode-toolbar-medium-focus-bg.gif)";
-}
-
-/*</if slicer>*/
-/* */
-/*<if slicer>*/
-/* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-headermode-toolbar-medium-over:after {
-  display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-headermode-toolbar-medium-over-corners.gif), sides:url(images/btn/btn-headermode-toolbar-medium-over-sides.gif), frame-bg:url(images/btn/btn-headermode-toolbar-medium-over-fbg.gif), bg:url(images/btn/btn-headermode-toolbar-medium-over-bg.gif)";
-}
-
-/*</if slicer>*/
-/* */
-/*<if slicer>*/
-/* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-headermode-toolbar-medium-pressed:after {
-  display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-headermode-toolbar-medium-pressed-corners.gif), sides:url(images/btn/btn-headermode-toolbar-medium-pressed-sides.gif), frame-bg:url(images/btn/btn-headermode-toolbar-medium-pressed-fbg.gif), bg:url(images/btn/btn-headermode-toolbar-medium-pressed-bg.gif)";
-}
-
-/*</if slicer>*/
-/* */
-/*<if slicer>*/
-/* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-headermode-toolbar-medium-disabled:after {
-  display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-headermode-toolbar-medium-disabled-corners.gif), sides:url(images/btn/btn-headermode-toolbar-medium-disabled-sides.gif), frame-bg:url(images/btn/btn-headermode-toolbar-medium-disabled-fbg.gif), bg:url(images/btn/btn-headermode-toolbar-medium-disabled-bg.gif)";
-}
-
-/*</if slicer>*/
-/* */
-/* line 510, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.headermode {
+/* line 111, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.x-btn-header-toolbar-medium {
   height: 39px;
   border-radius: 0;
   padding: 3px 6px;
 }
-/* line 515, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.headermode .x-btn-wrap {
+/* line 116, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.x-btn-header-toolbar-medium .x-btn-wrap {
   margin-top: 4px;
+}
+
+/**
+ * cls: 'modebutton'
+ */
+/* line 126, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton:hover,
+.modebutton:focus {
+  background-color: #dddddd;
+}
+/* line 129, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton:hover .x-btn-inner,
+.modebutton:focus .x-btn-inner {
+  color: #006bbf;
+}
+/* line 133, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton:hover .x-btn-glyph,
+.modebutton:focus .x-btn-glyph {
+  color: #006bbf;
+}
+
+/* line 138, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton.x-pressed {
+  background-color: #006bbf;
+}
+/* line 141, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton.x-pressed .x-btn-inner {
+  color: white;
+}
+/* line 145, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.modebutton.x-pressed .x-btn-glyph {
+  color: white;
 }
 
 /**
@@ -2873,7 +2374,7 @@
 
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-text-container-feature-content {
-  color: #1f1f1f;
+  color: white;
   font-size: 13px;
   font-weight: bold;
   font-family: arial, helvetica, verdana, sans-serif;
@@ -3038,134 +2539,126 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-l {
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-b {
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-bl {
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-r {
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-rl {
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-rb {
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-rbl {
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-t {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-tl {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-tb {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-tbl {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-tr {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-trl {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
-  border-left-color: #cccccc !important;
+  border-left-color: #cbcbcb !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-trb {
-  border-top-color: #cccccc !important;
+  border-top-color: #cbcbcb !important;
   border-top-width: 0 !important;
-  border-right-color: #cccccc !important;
+  border-right-color: #cbcbcb !important;
   border-right-width: 0 !important;
-  border-bottom-color: #cccccc !important;
+  border-bottom-color: #cbcbcb !important;
   border-bottom-width: 0 !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-content-outer-border-trbl {
-  border-color: #cccccc !important;
+  border-color: #cbcbcb !important;
   border-width: 0 0 0 2px !important;
 }
 
-/* line 25, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 24, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .feature-content .x-toolbar {
   background: white;
   padding-left: 10px;
-}
-
-/**
- * cls: 'feature-content'
- */
-/* line 34, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.feature-content .x-panel-feature-content > .x-panel-header-feature-content > .x-box-inner {
-  border-bottom: 1px solid #e3e3e3;
 }
 
 /**
@@ -3220,7 +2713,7 @@
 
 /* line 301, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-body-feature-menu {
-  background: #f1f1f1;
+  background: #f4f4f4;
   border-color: #444444;
   color: black;
   font-size: 13px;
@@ -3374,133 +2867,133 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-l {
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-b {
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-bl {
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-r {
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-rl {
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-rb {
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-rbl {
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-t {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-tl {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-tb {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-tbl {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-tr {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-trl {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
-  border-left-color: #888888 !important;
-  border-left-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
+  border-left-color: #444444 !important;
+  border-left-width: 1px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-trb {
-  border-top-color: #888888 !important;
-  border-top-width: 3px !important;
-  border-right-color: #888888 !important;
-  border-right-width: 3px !important;
-  border-bottom-color: #888888 !important;
-  border-bottom-width: 3px !important;
+  border-top-color: #444444 !important;
+  border-top-width: 1px !important;
+  border-right-color: #444444 !important;
+  border-right-width: 1px !important;
+  border-bottom-color: #444444 !important;
+  border-bottom-width: 1px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-panel-feature-menu-outer-border-trbl {
-  border-color: #888888 !important;
-  border-width: 3px !important;
+  border-color: #444444 !important;
+  border-width: 1px !important;
 }
 
-/* line 56, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 41, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-body-feature-menu .x-grid-cell {
-  background-color: #f1f1f1;
+  background-color: #f4f4f4;
 }
-/* line 59, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 44, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-body-feature-menu .x-grid-row-over .x-grid-td {
-  background-color: #e1e1e1;
+  background-color: #dddddd;
 }
-/* line 62, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+/* line 47, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-body-feature-menu .x-grid-row-selected .x-grid-td {
-  background-color: #d1d1d1;
+  background-color: #cbcbcb;
 }
 
 /**
@@ -3519,7 +3012,7 @@
 }
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-feature-detail .x-tool-img {
-  background-color: #8d8d8d;
+  background-color: #777777;
 }
 
 /* line 261, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -3568,13 +3061,13 @@
 /* line 463, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-feature-detail {
   background-image: none;
-  background-color: #8d8d8d;
+  background-color: #777777;
 }
 
 /* line 467, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-feature-detail-vertical {
   background-image: none;
-  background-color: #8d8d8d;
+  background-color: #777777;
 }
 
 /* line 525, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -3643,8 +3136,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-panel-header-feature-detail-vertical .x-panel-header-text-container {
-  background-color: #8d8d8d;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#8d8d8d);
+  background-color: #777777;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#777777);
 }
 
 /* line 582, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -3662,7 +3155,7 @@
 }
 /* line 604, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-ie8m .x-panel-header-feature-detail .x-panel-header-glyph {
-  color: #c6c6c6;
+  color: #bbbbbb;
 }
 
 /* line 613, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4188,7 +3681,7 @@
 
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-text-container-messages {
-  color: #dddddd;
+  color: white;
   font-size: 13px;
   font-weight: bold;
   font-family: arial, helvetica, verdana, sans-serif;
@@ -4485,7 +3978,7 @@
 }
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-developer .x-tool-img {
-  background-color: #3d4e7e;
+  background-color: #014e8a;
 }
 
 /* line 261, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4534,13 +4027,13 @@
 /* line 463, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-developer {
   background-image: none;
-  background-color: #3d4e7e;
+  background-color: #014e8a;
 }
 
 /* line 467, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-developer-vertical {
   background-image: none;
-  background-color: #3d4e7e;
+  background-color: #014e8a;
 }
 
 /* line 525, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4609,8 +4102,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-panel-header-developer-vertical .x-panel-header-text-container {
-  background-color: #3d4e7e;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#3d4e7e);
+  background-color: #014e8a;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#014e8a);
 }
 
 /* line 582, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4628,7 +4121,7 @@
 }
 /* line 604, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-ie8m .x-panel-header-developer .x-panel-header-glyph {
-  color: #9ea6be;
+  color: #80a6c4;
 }
 
 /* line 613, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4796,7 +4289,7 @@
  */
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-message-default {
-  border-color: #1f1f1f;
+  border-color: #333333;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -4960,13 +4453,13 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-default {
   font-size: 13px;
-  border-color: #1f1f1f;
+  border-color: #333333;
   zoom: 1;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 /* line 246, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-default .x-tool-img {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 257, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -4982,13 +4475,13 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-window-header-message-default-vertical .x-window-header-text-container {
-  background-color: #444444;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#444444);
+  background-color: #ebebeb;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#ebebeb);
 }
 
 /* line 267, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-text-container-message-default {
-  color: white;
+  color: black;
   font-weight: bold;
   line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
@@ -5014,12 +4507,12 @@
   padding: 5px 5px 3px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-top-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5162,12 +4655,12 @@
   padding: 5px 5px 5px 3px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-right-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5310,12 +4803,12 @@
   padding: 3px 5px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-bottom-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5458,12 +4951,12 @@
   padding: 5px 3px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-left-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5599,12 +5092,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-collapsed-top-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5740,12 +5233,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-collapsed-right-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -5881,12 +5374,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-collapsed-bottom-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -6022,12 +5515,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-default-collapsed-left-mc {
-  background-color: #444444;
+  background-color: #ebebeb;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -6171,7 +5664,7 @@
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-ie8m .x-window-header-message-default .x-window-header-glyph {
-  color: #a1a1a1;
+  color: #f5f5f5;
 }
 
 /* line 424, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -6222,125 +5715,125 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-l {
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-b {
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-bl {
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-r {
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-rl {
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-rb {
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-rbl {
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-t {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-tl {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-tb {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-tbl {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-tr {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-trl {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #1f1f1f !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-trb {
-  border-top-color: #1f1f1f !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1f1f1f !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1f1f1f !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-default-outer-border-trbl {
-  border-color: #1f1f1f !important;
+  border-color: #333333 !important;
   border-width: 2px !important;
 }
 
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-message-primary {
-  border-color: #1c5e9b;
+  border-color: #333333;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -6504,13 +5997,13 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-primary {
   font-size: 13px;
-  border-color: #1c5e9b;
+  border-color: #333333;
   zoom: 1;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 /* line 246, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-primary .x-tool-img {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 257, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -6526,8 +6019,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-window-header-message-primary-vertical .x-window-header-text-container {
-  background-color: #2476c3;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#2476c3);
+  background-color: #0047b2;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#0047b2);
 }
 
 /* line 267, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -6558,12 +6051,12 @@
   padding: 5px 5px 3px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-top-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -6706,12 +6199,12 @@
   padding: 5px 5px 5px 3px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-right-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -6854,12 +6347,12 @@
   padding: 3px 5px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-bottom-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7002,12 +6495,12 @@
   padding: 5px 3px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-left-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7143,12 +6636,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-collapsed-top-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7284,12 +6777,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-collapsed-right-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7425,12 +6918,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-collapsed-bottom-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7566,12 +7059,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-primary-collapsed-left-mc {
-  background-color: #2476c3;
+  background-color: #0047b2;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -7715,7 +7208,7 @@
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-ie8m .x-window-header-message-primary .x-window-header-glyph {
-  color: #91bae1;
+  color: #7fa3d8;
 }
 
 /* line 424, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -7766,125 +7259,125 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-l {
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-b {
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-bl {
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-r {
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-rl {
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-rb {
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-rbl {
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-t {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-tl {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-tb {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-tbl {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-tr {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-trl {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #1c5e9b !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-trb {
-  border-top-color: #1c5e9b !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #1c5e9b !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #1c5e9b !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-primary-outer-border-trbl {
-  border-color: #1c5e9b !important;
+  border-color: #333333 !important;
   border-width: 2px !important;
 }
 
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-message-danger {
-  border-color: #802420;
+  border-color: #333333;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -8048,13 +7541,13 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-danger {
   font-size: 13px;
-  border-color: #802420;
+  border-color: #333333;
   zoom: 1;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 /* line 246, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-danger .x-tool-img {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 257, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -8070,8 +7563,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-window-header-message-danger-vertical .x-window-header-text-container {
-  background-color: #d64b46;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#d64b46);
+  background-color: #db2852;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#db2852);
 }
 
 /* line 267, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -8102,12 +7595,12 @@
   padding: 5px 5px 3px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-top-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8250,12 +7743,12 @@
   padding: 5px 5px 5px 3px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-right-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8398,12 +7891,12 @@
   padding: 3px 5px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-bottom-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8546,12 +8039,12 @@
   padding: 5px 3px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-left-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8687,12 +8180,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-collapsed-top-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8828,12 +8321,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-collapsed-right-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -8969,12 +8462,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-collapsed-bottom-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -9110,12 +8603,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-danger-collapsed-left-mc {
-  background-color: #d64b46;
+  background-color: #db2852;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -9259,7 +8752,7 @@
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-ie8m .x-window-header-message-danger .x-window-header-glyph {
-  color: #eaa5a2;
+  color: #ed93a8;
 }
 
 /* line 424, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -9310,125 +8803,125 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-l {
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-b {
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-bl {
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-r {
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-rl {
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-rb {
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-rbl {
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-t {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-tl {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-tb {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-tbl {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-tr {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-trl {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #802420 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-trb {
-  border-top-color: #802420 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #802420 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #802420 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-danger-outer-border-trbl {
-  border-color: #802420 !important;
+  border-color: #333333 !important;
   border-width: 2px !important;
 }
 
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-message-warning {
-  border-color: #c06a25;
+  border-color: #333333;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -9592,13 +9085,13 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-warning {
   font-size: 13px;
-  border-color: #c06a25;
+  border-color: #333333;
   zoom: 1;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 /* line 246, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-warning .x-tool-img {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 257, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -9614,8 +9107,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-window-header-message-warning-vertical .x-window-header-text-container {
-  background-color: #f69e40;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#f69e40);
+  background-color: #f2862f;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#f2862f);
 }
 
 /* line 267, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -9646,12 +9139,12 @@
   padding: 5px 5px 3px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-top-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -9794,12 +9287,12 @@
   padding: 5px 5px 5px 3px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-right-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -9942,12 +9435,12 @@
   padding: 3px 5px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-bottom-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10090,12 +9583,12 @@
   padding: 5px 3px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-left-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10231,12 +9724,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-collapsed-top-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10372,12 +9865,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-collapsed-right-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10513,12 +10006,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-collapsed-bottom-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10654,12 +10147,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-warning-collapsed-left-mc {
-  background-color: #f69e40;
+  background-color: #f2862f;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -10803,7 +10296,7 @@
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-ie8m .x-window-header-message-warning .x-window-header-glyph {
-  color: #face9f;
+  color: #f8c297;
 }
 
 /* line 424, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -10854,125 +10347,125 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-l {
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-b {
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-bl {
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-r {
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-rl {
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-rb {
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-rbl {
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-t {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-tl {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-tb {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-tbl {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-tr {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-trl {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-left-color: #c06a25 !important;
+  border-left-color: #333333 !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-trb {
-  border-top-color: #c06a25 !important;
+  border-top-color: #333333 !important;
   border-top-width: 2px !important;
-  border-right-color: #c06a25 !important;
+  border-right-color: #333333 !important;
   border-right-width: 2px !important;
-  border-bottom-color: #c06a25 !important;
+  border-bottom-color: #333333 !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-warning-outer-border-trbl {
-  border-color: #c06a25 !important;
+  border-color: #333333 !important;
   border-width: 2px !important;
 }
 
 /* line 205, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-message-success {
-  border-color: #408140;
+  border-color: black;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -11136,13 +10629,13 @@
 /* line 240, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-success {
   font-size: 13px;
-  border-color: #408140;
+  border-color: black;
   zoom: 1;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 /* line 246, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-window-header-message-success .x-tool-img {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 257, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -11158,8 +10651,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-window-header-message-success-vertical .x-window-header-text-container {
-  background-color: #5ab45a;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#5ab45a);
+  background-color: #0b9743;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#0b9743);
 }
 
 /* line 267, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -11190,12 +10683,12 @@
   padding: 5px 5px 3px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-top-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -11338,12 +10831,12 @@
   padding: 5px 5px 5px 3px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-right-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -11486,12 +10979,12 @@
   padding: 3px 5px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-bottom-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -11634,12 +11127,12 @@
   padding: 5px 3px 5px 5px;
   border-width: 2px 2px 2px 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-left-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -11775,12 +11268,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-collapsed-top-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -11916,12 +11409,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-collapsed-right-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12057,12 +11550,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-collapsed-bottom-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12198,12 +11691,12 @@
   padding: 5px 5px 5px 5px;
   border-width: 2px;
   border-style: solid;
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-window-header-message-success-collapsed-left-mc {
-  background-color: #5ab45a;
+  background-color: #0b9743;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -12347,7 +11840,7 @@
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
 .x-ie8m .x-window-header-message-success .x-window-header-glyph {
-  color: #acd9ac;
+  color: #85cba1;
 }
 
 /* line 424, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/window/Window.scss */
@@ -12398,119 +11891,119 @@
 
 /* line 2, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-l {
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 6, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-b {
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 10, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-bl {
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 16, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-r {
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
 }
 
 /* line 20, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-rl {
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 26, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-rb {
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 32, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-rbl {
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 40, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-t {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
 }
 
 /* line 44, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-tl {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 50, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-tb {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 56, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-tbl {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 64, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-tr {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
 }
 
 /* line 70, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-trl {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
-  border-left-color: #408140 !important;
+  border-left-color: black !important;
   border-left-width: 2px !important;
 }
 
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-trb {
-  border-top-color: #408140 !important;
+  border-top-color: black !important;
   border-top-width: 2px !important;
-  border-right-color: #408140 !important;
+  border-right-color: black !important;
   border-right-width: 2px !important;
-  border-bottom-color: #408140 !important;
+  border-bottom-color: black !important;
   border-bottom-width: 2px !important;
 }
 
 /* line 86, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/border-management.scss */
 .x-window-message-success-outer-border-trbl {
-  border-color: #408140 !important;
+  border-color: black !important;
   border-width: 2px !important;
 }
 
@@ -12843,7 +12336,7 @@
 
 /* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .feature-content .x-panel-subsection {
-  border-top: 1px #aaaaaa solid;
+  border-top: 1px gray solid;
   margin: 0 10px 20px 10px !important;
   left: 0 !important;
 }
@@ -12869,8 +12362,8 @@
   border-radius: 11px;
   padding-left: 3px;
   padding-right: 0px;
-  background-color: #4c4c4c;
-  border-color: #303030;
+  background-color: #444444;
+  border-color: #333333;
 }
 /* line 20, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Trigger.scss */
 .quicksearch .x-form-trigger-wrap input.x-form-field,
@@ -12895,7 +12388,7 @@
  */
 /* line 8, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .product-name {
-  color: #FFFFFF;
+  color: white;
   font-size: 20px;
   font-weight: 200px;
 }
@@ -12905,7 +12398,7 @@
  */
 /* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .product-version {
-  color: #FFFFFF;
+  color: white;
   font-size: 10px;
   letter-spacing: 1px;
   top: 15px !important;
@@ -12916,7 +12409,6 @@
  */
 /* line 27, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .feature-name {
-  color: #000000;
   font-size: 26px;
   font-weight: bold;
 }
@@ -12924,9 +12416,8 @@
 /**
  * cls: 'feature-description'
  */
-/* line 36, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+/* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .feature-description {
-  color: #000000;
   font-size: 12px;
   top: 21px !important;
 }
@@ -13635,8 +13126,8 @@
 
 /* line 487, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-over {
-  border-color: #e4e4e4;
-  background-color: #e4e4e4;
+  border-color: #cbcbcb;
+  background-color: #dddddd;
 }
 /* line 511, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-over .x-tab-glyph {
@@ -13644,12 +13135,12 @@
 }
 /* line 518, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-ie8m .x-tab-sorted-tabpanel-over .x-tab-glyph {
-  color: #f1f1f1;
+  color: #eeeeee;
 }
 
 /* line 547, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-active {
-  border-color: #bbbbbb;
+  border-color: #cbcbcb;
   background-color: white;
 }
 /* line 553, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13755,7 +13246,7 @@
 .x-tab-sorted-tabpanel-top-over .x-frame-mc,
 .x-tab-sorted-tabpanel-left-over .x-frame-mc,
 .x-tab-sorted-tabpanel-right-over .x-frame-mc {
-  background-color: #e4e4e4;
+  background-color: #dddddd;
 }
 
 /* line 734, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -13774,7 +13265,7 @@
 }
 /* line 741, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-sorted-tabpanel-bottom-over .x-frame-mc {
-  background-color: #e4e4e4;
+  background-color: #dddddd;
 }
 
 /* line 758, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -14039,7 +13530,7 @@
 .x-tab-bar-strip-sorted-tabpanel {
   border-style: solid;
   border-color: #444444;
-  background-color: #bbbbbb;
+  background-color: #cbcbcb;
 }
 
 /* line 218, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
@@ -14232,15 +13723,15 @@
 .x-tab-sorted-tabpanel-top,
 .x-tab-sorted-tabpanel-left,
 .x-tab-sorted-tabpanel-right {
-  border-bottom: 1px solid #bbbbbb;
+  border-bottom: 1px solid #cbcbcb;
 }
 
 /* line 55, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-sorted-tabpanel-top-active,
 .x-tab-sorted-tabpanel-left-active,
 .x-tab-sorted-tabpanel-right-active {
-  border-top: 1px solid #bbbbbb;
-  border-right: 1px solid #bbbbbb;
-  border-bottom: 1px solid #ffffff;
-  border-left: 1px solid #bbbbbb;
+  border-top: 1px solid #cbcbcb;
+  border-right: 1px solid #cbcbcb;
+  border-bottom: 1px solid white;
+  border-left: 1px solid #cbcbcb;
 }

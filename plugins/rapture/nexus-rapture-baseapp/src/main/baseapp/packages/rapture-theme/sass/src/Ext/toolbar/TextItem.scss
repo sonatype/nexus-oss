@@ -6,7 +6,7 @@
  * cls: 'product-name'
  */
 .product-name {
-  color: #FFFFFF;
+  color: $color-white;
   font-size: 20px;
   font-weight: 200px;
 }
@@ -15,7 +15,7 @@
  * cls: 'product-version'
  */
 .product-version {
-  color: #FFFFFF;
+  color: $color-white;
   font-size: 10px;
   letter-spacing: 1px;
   top: 15px !important;
@@ -25,16 +25,14 @@
  * cls: 'feature-name'
  */
 .feature-name {
-  color: #000000;
-  font-size: 26px;
-  font-weight: bold;
+  font-size: $font-size-h2;
+  font-weight: $font-weight-h2;
 }
 
 /**
  * cls: 'feature-description'
  */
 .feature-description {
-  color: #000000;
-  font-size: 12px;
+  font-size: $font-size-small;
   top: 21px !important;
 }
