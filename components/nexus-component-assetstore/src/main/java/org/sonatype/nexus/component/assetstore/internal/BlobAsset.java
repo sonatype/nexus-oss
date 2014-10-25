@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.ComponentId;
 
 import org.joda.time.DateTime;
 
@@ -30,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BlobAsset
     implements Asset
 {
+  private final ComponentId componentId;
+
   private final Blob blob;
 
   private final String path;
@@ -38,11 +41,17 @@ public class BlobAsset
 
   private final DateTime firstCreated;
 
-  public BlobAsset(Blob blob, @Nullable String path, @Nullable String contentType, @Nullable DateTime firstCreated) {
+  public BlobAsset(ComponentId componentId, Blob blob, @Nullable String path, @Nullable String contentType, @Nullable DateTime firstCreated) {
+    this.componentId = checkNotNull(componentId);
     this.blob = checkNotNull(blob);
     this.path = path;
     this.contentType = contentType;
     this.firstCreated = firstCreated;
+  }
+
+  @Override
+  public ComponentId getComponentId() {
+    return componentId;
   }
 
   @Override

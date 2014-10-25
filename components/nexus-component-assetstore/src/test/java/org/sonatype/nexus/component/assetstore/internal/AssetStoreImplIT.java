@@ -183,12 +183,12 @@ public class AssetStoreImplIT
     assertThat(underTest.getAll(TEST_COMPONENT_ID).get(TEST_PATH).getPath(), is(asset.getPath()));
 
     // deleting it should report true and leave the component empty
-    assertThat(underTest.delete(TEST_COMPONENT_ID, asset), is(true));
+    assertThat(underTest.delete(TEST_COMPONENT_ID, TEST_PATH), is(true));
     assertThat(underTest.get(TEST_COMPONENT_ID, TEST_PATH), is(nullValue()));
     assertThat(underTest.getAll(TEST_COMPONENT_ID).isEmpty(), is(true));
 
     // deleting it again shouldn't cause problems, but should return false
-    assertThat(underTest.delete(TEST_COMPONENT_ID, asset), is(false));
+    assertThat(underTest.delete(TEST_COMPONENT_ID, TEST_PATH), is(false));
   }
 
   private void createComponentRecord(ComponentId id) {

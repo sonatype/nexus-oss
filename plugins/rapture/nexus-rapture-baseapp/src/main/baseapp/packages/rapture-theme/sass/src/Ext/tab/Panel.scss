@@ -11,25 +11,25 @@
   $ui: 'sorted-tabpanel',
 
   // text colors
-  $ui-tab-color: #333333,
-  $ui-tab-color-over: #333333,
+  $ui-tab-color: $color-night-rider,
+  $ui-tab-color-over: $color-night-rider,
 
   // tab border and backgrounds
-  $ui-tab-border-color: #f4f4f4,
-  $ui-tab-background-color: #f4f4f4,
+  $ui-tab-border-color: $color-light-smoke,
+  $ui-tab-background-color: $color-light-smoke,
 
-  $ui-tab-border-color-active: #bbbbbb,
-  $ui-tab-background-color-active: #ffffff,
+  $ui-tab-border-color-active: $color-light-gray,
+  $ui-tab-background-color-active: $color-white,
 
-  $ui-tab-border-color-over: #E4E4E4,
-  $ui-tab-background-color-over: #E4E4E4,
+  $ui-tab-border-color-over: $color-light-gray,
+  $ui-tab-background-color-over: $color-gainsboro,
 
   // background color of tab-bar
-  $ui-bar-background-color: #f4f4f4,
+  $ui-bar-background-color: $color-light-smoke,
 
   // strip under the tab-bar
   $ui-strip-height: 1px,
-  $ui-strip-background-color: #bbbbbb,
+  $ui-strip-background-color: $color-light-gray,
 
   // FIXME: WTF does this control?
   $ui-tab-border-width: 0px
@@ -46,15 +46,15 @@
 .x-tab-sorted-tabpanel-top,
 .x-tab-sorted-tabpanel-left,
 .x-tab-sorted-tabpanel-right {
-  border-bottom: 1px solid #bbbbbb;
+  border-bottom: 1px solid $color-light-gray;
 }
 
 // match active tab border color of strip under tab-bar, except bottom which should be white to match tab contents
 .x-tab-sorted-tabpanel-top-active,
 .x-tab-sorted-tabpanel-left-active,
 .x-tab-sorted-tabpanel-right-active {
-  border-top: 1px solid #bbbbbb;
-  border-right: 1px solid #bbbbbb;
-  border-bottom: 1px solid #ffffff;
-  border-left: 1px solid #bbbbbb;
+  border-top: 1px solid $color-light-gray;
+  border-right: 1px solid $color-light-gray;
+  border-bottom: 1px solid $color-white;
+  border-left: 1px solid $color-light-gray;
 }

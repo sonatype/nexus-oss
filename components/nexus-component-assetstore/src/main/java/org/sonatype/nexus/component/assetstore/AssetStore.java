@@ -63,5 +63,5 @@ public interface AssetStore
    *
    * @return {@code true} if the asset previously existed, {@code false} otherwise.
    */
-  boolean delete(ComponentId componentId, Asset asset);
+  boolean delete(ComponentId componentId, String path);
 }

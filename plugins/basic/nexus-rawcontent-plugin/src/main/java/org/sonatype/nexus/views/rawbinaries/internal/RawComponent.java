@@ -13,6 +13,7 @@
 package org.sonatype.nexus.views.rawbinaries.internal;
 
 import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.ComponentId;
 
 /**
  * An essentially placebo implementation of {@link Component} so this plugin has the same structure as other formats for
@@ -23,4 +24,8 @@ import org.sonatype.nexus.component.model.Component;
 public class RawComponent
     implements Component
 {
+  @Override
+  public ComponentId getId() {
+    return null;
+  }
 }

@@ -8,14 +8,14 @@
   $ui-padding: 4px,
 
   $ui-border-width: 2px,
-  $ui-border-color: #1F1F1F,
+  $ui-border-color: $color-night-rider,
 
   $ui-header-border-width: 2px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #444444,
+  $ui-header-color: $color-black,
+  $ui-header-background-color: $color-smoke,
 
-  $ui-body-color: #000000,
-  $ui-body-background-color: #FFFFFF
+  $ui-body-color: $color-black,
+  $ui-body-background-color: $color-white
 );
 
 @include extjs-window-ui(
@@ -24,14 +24,14 @@
   $ui-padding: 4px,
 
   $ui-border-width: 2px,
-  $ui-border-color: #1c5e9b,
+  $ui-border-color: $color-night-rider,
 
   $ui-header-border-width: 2px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #2476c3,
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-cobalt,
 
-  $ui-body-color: #000000,
-  $ui-body-background-color: #FFFFFF
+  $ui-body-color: $color-black,
+  $ui-body-background-color: $color-white
 );
 
 @include extjs-window-ui(
@@ -40,14 +40,14 @@
   $ui-padding: 4px,
 
   $ui-border-width: 2px,
-  $ui-border-color: #802420,
+  $ui-border-color: $color-night-rider,
 
   $ui-header-border-width: 2px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #d64b46,
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-cerise,
 
-  $ui-body-color: #000000,
-  $ui-body-background-color: #FFFFFF
+  $ui-body-color: $color-black,
+  $ui-body-background-color: $color-white
 );
 
 @include extjs-window-ui(
@@ -56,14 +56,14 @@
   $ui-padding: 4px,
 
   $ui-border-width: 2px,
-  $ui-border-color: #c06a25,
+  $ui-border-color: $color-night-rider,
 
   $ui-header-border-width: 2px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #f69e40,
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-sun,
 
-  $ui-body-color: #000000,
-  $ui-body-background-color: #FFFFFF
+  $ui-body-color: $color-black,
+  $ui-body-background-color: $color-white
 );
 
 @include extjs-window-ui(
@@ -72,12 +72,12 @@
   $ui-padding: 4px,
 
   $ui-border-width: 2px,
-  $ui-border-color: #408140,
+  $ui-border-color: $color-black,
 
   $ui-header-border-width: 2px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #5ab45a,
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-pigment-green,
 
-  $ui-body-color: #000000,
-  $ui-body-background-color: #FFFFFF
+  $ui-body-color: $color-black,
+  $ui-body-background-color: $color-white
 );

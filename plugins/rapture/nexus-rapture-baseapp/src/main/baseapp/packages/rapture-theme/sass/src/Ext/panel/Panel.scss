@@ -9,58 +9,43 @@
   $ui: 'feature-content',
 
   $ui-header-padding: 4px 10px 5px,
-  $ui-header-color: #1f1f1f,
-  $ui-header-background-color: #FFFFFF,
+  $ui-header-background-color: $color-white,
   $ui-header-icon-height: 32,
   $ui-header-icon-width: 32,
   $ui-header-text-transform: $panel-light-header-text-transform,
 
   $ui-wrap-border-width: 0 0 0 2px,
-  $ui-wrap-border-color: #CCCCCC,
+  $ui-wrap-border-color: $color-light-gray,
 
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
 .feature-content {
   .x-toolbar {
-    background: white;
+    background: $color-white;
     padding-left: 10px;
   }
 }
 
 /**
- * cls: 'feature-content'
- */
-.feature-content .x-panel-feature-content > .x-panel-header-feature-content > .x-box-inner {
-  border-bottom: 1px solid #e3e3e3
-}
-
-/**
  * ui: 'feature-menu'
  */
-$grid-feature-menu-background-color: #f1f1f1;
-$grid-feature-menu-over-background-color: #e1e1e1;
-$grid-feature-menu-selected-background-color: #d1d1d1;
-
 @include extjs-panel-ui(
   $ui: 'feature-menu',
 
   $ui-header-padding: 4px,
-  $ui-body-background-color: $grid-feature-menu-background-color,
-
-  $ui-wrap-border-width: 3px,
-  $ui-wrap-border-color: #888888
+  $ui-body-background-color: $color-light-smoke
 );
 
 .x-panel-body-feature-menu {
   .x-grid-cell {
-    background-color: $grid-feature-menu-background-color;
+    background-color: $color-light-smoke;
   }
   .x-grid-row-over .x-grid-td {
-    background-color: $grid-feature-menu-over-background-color;
+    background-color: $color-gainsboro;
   }
   .x-grid-row-selected .x-grid-td {
-    background-color: $grid-feature-menu-selected-background-color;
+    background-color: $color-light-gray;
   }
 }
 
@@ -71,8 +56,8 @@ $grid-feature-menu-selected-background-color: #d1d1d1;
   $ui: 'feature-detail',
 
   $ui-header-padding: 4px 10px 6px,
-  $ui-header-color: #FFFFFF,
-  $ui-header-background-color: #8D8D8D
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-dark-gray
 );
 
 /**
@@ -81,8 +66,8 @@ $grid-feature-menu-selected-background-color: #d1d1d1;
 @include extjs-panel-ui(
   $ui: 'masterdetail-tabs',
 
-  $ui-header-color: #333333,
-  $ui-header-background-color: #f4f4f4,
+  $ui-header-color: $color-night-rider,
+  $ui-header-background-color: $color-light-smoke,
   $ui-header-font-size: 16px,
   $ui-header-line-height: 20px
 );
@@ -94,8 +79,7 @@ $grid-feature-menu-selected-background-color: #d1d1d1;
   $ui: 'messages',
 
   $ui-header-padding: 4px,
-  $ui-header-color: #DDDDDD,
-  $ui-header-background-color: #000000
+  $ui-header-background-color: $color-black
 );
 
 /**
@@ -105,6 +89,6 @@ $grid-feature-menu-selected-background-color: #d1d1d1;
   $ui: 'developer',
 
   $ui-header-padding: 4px,
-  $ui-header-color: #ffffff,
-  $ui-header-background-color: #3d4e7e
+  $ui-header-color: $color-white,
+  $ui-header-background-color: $color-smalt
 );
