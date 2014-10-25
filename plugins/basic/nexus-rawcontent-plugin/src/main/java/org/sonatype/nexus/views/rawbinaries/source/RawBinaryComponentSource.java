@@ -20,6 +20,7 @@ import java.io.InputStream;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.ComponentId;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.ComponentSourceId;
@@ -85,6 +86,11 @@ public class RawBinaryComponentSource
     private RequestClosingAsset(final CloseableHttpResponse response) {
       this.response = response;
       this.entity = response.getEntity();
+    }
+
+    @Override
+    public ComponentId getComponentId() {
+      return null;
     }
 
     @Override

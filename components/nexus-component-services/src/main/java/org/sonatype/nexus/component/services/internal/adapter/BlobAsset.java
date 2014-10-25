@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.assetstore.internal;
+package org.sonatype.nexus.component.services.internal.adapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +27,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * {@link Blob}-based {@link Asset} implementation.
+ *
+ * @since 3.0
  */
-public class BlobAsset
+class BlobAsset
     implements Asset
 {
   private final ComponentId componentId;
@@ -41,7 +43,8 @@ public class BlobAsset
 
   private final DateTime firstCreated;
 
-  public BlobAsset(ComponentId componentId, Blob blob, @Nullable String path, @Nullable String contentType, @Nullable DateTime firstCreated) {
+  public BlobAsset(ComponentId componentId, Blob blob, @Nullable String path, @Nullable String contentType,
+                   @Nullable DateTime firstCreated) {
     this.componentId = checkNotNull(componentId);
     this.blob = checkNotNull(blob);
     this.path = path;
