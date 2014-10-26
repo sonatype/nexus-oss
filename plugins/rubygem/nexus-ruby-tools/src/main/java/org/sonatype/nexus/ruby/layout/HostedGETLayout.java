@@ -123,6 +123,10 @@ public class HostedGETLayout
     try {
       SpecsIndexFile specs = specsIndexFile(SpecsIndexType.RELEASE);
       store.retrieve(specs);
+      if (specs.hasException()) {
+        file.setException(specs.getException());
+        return;
+      }
       List<String> versions;
       SpecsHelper specsHelper = gateway.newSpecsHelper();
       try (InputStream is = store.getInputStream(specs)) {

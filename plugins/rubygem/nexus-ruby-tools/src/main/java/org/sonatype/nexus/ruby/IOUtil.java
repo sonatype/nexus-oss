@@ -12,39 +12,16 @@
  */
 package org.sonatype.nexus.ruby;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class IOUtil
 {
-  public static void close(InputStream input) {
-    if (input == null) {
-      return;
-    }
-
-    try {
-      input.close();
-    }
-    catch (IOException ex) {
-      // ignore
-    }
-  }
-
-  public static void close(OutputStream output) {
-    if (output == null) {
-      return;
-    }
-
-    try {
-      output.close();
-    }
-    catch (IOException ex) {
-      // ignore
-    }
-  }
 
   /**
    * Copy bytes from an <code>InputStream</code> to an <code>OutputStream</code>.
@@ -57,17 +34,17 @@ public class IOUtil
     }
   }
 
-  public static InputStream toGzipped(final InputStream input) throws IOException {
+  public static ByteArrayInputStream toGzipped(final InputStream input) throws IOException {
     ByteArrayOutputStream gzipped = new ByteArrayOutputStream();
-    GZIPOutputStream out = new GZIPOutputStream(gzipped);
-    try {
+    try (GZIPOutputStream out = new GZIPOutputStream(gzipped)) {
       copy(input, out);
-      out.close();
-      return new java.io.ByteArrayInputStream(gzipped.toByteArray());
     }
-    finally {
-      close(input);
-      close(out);
-    }
+    return new ByteArrayInputStream(gzipped.toByteArray());
+  }
+
+  public static ByteArrayInputStream toGunzipped(final InputStream input) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    copy(new GZIPInputStream(input), out);
+    return new ByteArrayInputStream(out.toByteArray());
   }
 }

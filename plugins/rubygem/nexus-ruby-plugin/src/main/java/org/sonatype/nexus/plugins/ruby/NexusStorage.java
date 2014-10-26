@@ -13,13 +13,11 @@
 package org.sonatype.nexus.plugins.ruby;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.GZIPInputStream;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -106,11 +104,11 @@ public class NexusStorage
   }
 
   private ContentLocator gunzipContentLocator(StorageFileItem item) throws IOException {
-    try(final InputStream in = new GZIPInputStream(item.getInputStream()); final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      IOUtil.copy(in, out);
-      return new PreparedContentLocator(new ByteArrayInputStream(out.toByteArray()),
+    try (InputStream in = item.getInputStream()) {
+      ByteArrayInputStream gzipped = IOUtil.toGunzipped(in);
+      return new PreparedContentLocator(gzipped,
           "application/x-marshal-ruby",
-          out.toByteArray().length);
+          gzipped.available());
     }
   }
 

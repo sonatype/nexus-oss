@@ -62,7 +62,7 @@ module Nexus
     # @param obj [Object] any ruby object
     # @return [IO] stream of the marshalled object
     def marshal_dump( obj)
-      ByteArrayInputStream.new( Marshal.dump( obj ).to_java.bytes )
+      ByteArrayInputStream.new( Marshal.dump( obj ).to_java_bytes )
     end
 
     def load_specs( io )
