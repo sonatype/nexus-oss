@@ -20,7 +20,6 @@
 Ext.define('NX.ext.tab.SortedPanel', {
   extend: 'Ext.tab.Panel',
   alias: 'widget.nx-sorted-tabpanel',
-  ui: 'sorted-tabpanel',
 
   /**
    * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab

@@ -24,13 +24,9 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
     'NX.Icons'
   ],
 
-  title: '',
+  ui: 'light',
+  title: 'fun',
   autoHideTabHeader: false,
-
-  // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
-  // FIXME: This will NOT works, since this is a 'Ext.tab.Panel' impl, not a 'Ext.panel.Panel'
-  // FIXME: color of this panel will be darker than others in the same location because of this
-  //ui: 'feature-detail',
 
   tools: [
     { type: 'maximize', tooltip: 'Maximize' }

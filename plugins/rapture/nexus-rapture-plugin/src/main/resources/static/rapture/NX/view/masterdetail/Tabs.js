@@ -26,9 +26,6 @@ Ext.define('NX.view.masterdetail.Tabs', {
     'NX.ext.tab.SortedPanel'
   ],
 
-  // HACK: For now make all detail panels light themed while we sort out the overall look of rapture
-  //ui: 'feature-detail',
-
   /**
    * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
    */
@@ -56,6 +53,7 @@ Ext.define('NX.view.masterdetail.Tabs', {
       {
         xtype: 'nx-sorted-tabpanel',
         itemId: 'tab',
+        ui: 'light',
         activeTab: 0,
         layoutOnTabChange: true,
         flex: 1,

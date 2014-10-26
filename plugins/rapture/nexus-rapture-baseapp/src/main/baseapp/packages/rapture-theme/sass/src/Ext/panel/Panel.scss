@@ -50,17 +50,6 @@
 }
 
 /**
- * ui: 'feature-detail'
- */
-@include extjs-panel-ui(
-  $ui: 'feature-detail',
-
-  $ui-header-padding: 4px 10px 6px,
-  $ui-header-color: $color-white,
-  $ui-header-background-color: $color-dark-gray
-);
-
-/**
  * ui: 'masterdetail-tabs'
  */
 @include extjs-panel-ui(
