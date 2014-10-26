@@ -12108,7 +12108,6 @@
  * @class Ext.tab.Panel
  */
 /**
- * @class NX.ext.tab.SortedPanel
  * ui: 'light'
  */
 /* line 235, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -13705,22 +13704,22 @@
 
 /*</if slicer>*/
 /* */
-/* line 118, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 117, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-body-light-top {
   padding-left: 5px;
 }
 
-/* line 123, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 122, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-strip-light-top {
   border-bottom: 1px solid white;
 }
 
-/* line 128, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 127, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top {
   border: 0px;
 }
 
-/* line 134, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 133, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-active {
   border-top: 1px solid #cbcbcb;
   border-right: 1px solid #cbcbcb;
