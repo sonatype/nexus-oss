@@ -60,6 +60,30 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <!--
+        Workaround build issue on Java8 where it disallows access to file: schemas during compilation
+        -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <executions>
+          <execution>
+            <id>access-external-schema</id>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>javax.xml.accessExternalSchema</name>
+                  <value>file,http</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
         <executions>
