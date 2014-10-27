@@ -12,13 +12,20 @@
  */
 package org.apache.shiro.nexus;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.sonatype.security.UserIdMdcHelper;
+import org.sonatype.security.events.AuthenticationEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Nexus customized {@link WebSecurityManager}.
@@ -28,14 +35,29 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 public class NexusWebSecurityManager
     extends DefaultWebSecurityManager
 {
+
+  private final Provider<EventBus> eventBus;
+
+  @Inject
+  public NexusWebSecurityManager(final Provider<EventBus> eventBus) {
+    this.eventBus = checkNotNull(eventBus);
+  }
+
   /**
    * After login set the userId MDC attribute.
    */
   @Override
   public Subject login(Subject subject, final AuthenticationToken token) throws AuthenticationException {
-    subject = super.login(subject, token);
-    UserIdMdcHelper.set(subject);
-    return subject;
+    try {
+      subject = super.login(subject, token);
+      UserIdMdcHelper.set(subject);
+      eventBus.get().post(new AuthenticationEvent(token.getPrincipal().toString(), true));
+      return subject;
+    }
+    catch (AuthenticationException e) {
+      eventBus.get().post(new AuthenticationEvent(token.getPrincipal().toString(), false));
+      throw e;
+    }
   }
 
   /**
