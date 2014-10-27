@@ -1306,7 +1306,7 @@
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small {
-  border-color: #333333;
+  border-color: #919191;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -1489,11 +1489,11 @@
 .x-btn-plain-small .x-btn-glyph {
   font-size: 16px;
   line-height: 16px;
-  color: white;
+  color: #333333;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-ie8m .x-btn-plain-small .x-btn-glyph {
-  color: white;
+  color: #333333;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2286,13 +2286,13 @@
 
 /*</if slicer>*/
 /* */
-/* line 111, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 120, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .x-btn-header-toolbar-medium {
   height: 39px;
   border-radius: 0;
   padding: 3px 6px;
 }
-/* line 116, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 125, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .x-btn-header-toolbar-medium .x-btn-wrap {
   margin-top: 4px;
 }
@@ -2300,31 +2300,31 @@
 /**
  * cls: 'modebutton'
  */
-/* line 126, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 135, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton:hover,
 .modebutton:focus {
   background-color: #dddddd;
 }
-/* line 129, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 138, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton:hover .x-btn-inner,
 .modebutton:focus .x-btn-inner {
   color: #006bbf;
 }
-/* line 133, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 142, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton:hover .x-btn-glyph,
 .modebutton:focus .x-btn-glyph {
   color: #006bbf;
 }
 
-/* line 138, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 147, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton.x-pressed {
   background-color: #006bbf;
 }
-/* line 141, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 150, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton.x-pressed .x-btn-inner {
   color: white;
 }
-/* line 145, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 154, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .modebutton.x-pressed .x-btn-glyph {
   color: white;
 }
