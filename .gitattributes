@@ -1,7 +1,2 @@
 *       text=auto
 *.dat   binary
-*.gz    binary
-*.rz    binary
-*.ruby  binary
-*.gem   binary
-*specs.4.8 binary

@@ -1,1 +1,5 @@
 *.rz    binary
+*.gz    binary
+*.ruby  binary
+*.gem   binary
+*specs.4.8 binary
