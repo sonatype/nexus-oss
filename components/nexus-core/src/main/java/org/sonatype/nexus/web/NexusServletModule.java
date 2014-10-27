@@ -17,10 +17,10 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.internal.orient.OrientModule;
-import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
 import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
+import org.sonatype.nexus.web.internal.WebContextFilter;
 import org.sonatype.nexus.web.metrics.MetricsModule;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
@@ -35,7 +35,7 @@ import static com.google.inject.name.Names.named;
 
 /**
  * Core Nexus servlet bindings.
- * 
+ *
  * @since 3.0
  */
 public class NexusServletModule
@@ -64,11 +64,11 @@ public class NexusServletModule
     {
       @Override
       protected void configureServlets() {
-        bind(BaseUrlHolderFilter.class);
+        bind(WebContextFilter.class);
         bind(ErrorPageFilter.class);
         bind(CommonHeadersFilter.class);
 
-        filter("/*").through(BaseUrlHolderFilter.class);
+        filter("/*").through(WebContextFilter.class);
         filter("/*").through(ErrorPageFilter.class);
         filter("/*").through(CommonHeadersFilter.class);
 

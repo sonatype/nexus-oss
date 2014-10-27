@@ -33,18 +33,20 @@ import com.google.common.base.Strings;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Filter to set the value for {@link BaseUrlHolder}.
+ * Filter to set the value for {@link BaseUrlHolder} and keep track to current request/thread.
  *
  * @since 2.8
  */
 @Singleton
-public class BaseUrlHolderFilter
-  implements Filter
+public class WebContextFilter
+    implements Filter
 {
   private final GlobalRestApiSettings settings;
 
+  private static final InheritableThreadLocal<HttpServletRequest> currentThreadRequest = new InheritableThreadLocal<>();
+
   @Inject
-  public BaseUrlHolderFilter(final GlobalRestApiSettings settings) {
+  public WebContextFilter(final GlobalRestApiSettings settings) {
     this.settings = checkNotNull(settings);
   }
 
@@ -62,14 +64,19 @@ public class BaseUrlHolderFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    String baseUrl = calculateBaseUrl((HttpServletRequest) request);
-    BaseUrlHolder.set(baseUrl);
+    BaseUrlHolder.set(calculateBaseUrl((HttpServletRequest) request));
+    currentThreadRequest.set((HttpServletRequest) request);
     try {
       chain.doFilter(request, response);
     }
     finally {
       BaseUrlHolder.unset();
+      currentThreadRequest.remove();
     }
+  }
+
+  static HttpServletRequest getCurrentThreadRequest() {
+    return currentThreadRequest.get();
   }
 
   @VisibleForTesting
