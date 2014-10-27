@@ -81,13 +81,19 @@ ant.delete {
   }
 }
 
-// Apply customizations to app
+// Apply customizations to app, filter all non-resources
 ant.copy(todir: baseappDir, overwrite: true, filtering: true) {
   fileset(dir: "${project.basedir}/src/main/baseapp") {
     include(name: '**')
+    exclude(name: '**/resources/**')
   }
   filterset {
     filter(token: 'project.build.directory', value: "${project.build.directory}")
+  }
+}
+ant.copy(todir: baseappDir, overwrite: true) {
+  fileset(dir: "${project.basedir}/src/main/baseapp") {
+    include(name: '**/resources/**')
   }
 }
 
