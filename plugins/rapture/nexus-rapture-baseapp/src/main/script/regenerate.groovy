@@ -50,38 +50,44 @@ ant.exec(executable: senchaExe, failonerror: true) {
   arg(line: 'which')
 }
 
-// Extract extjs distribution
-header 'Extract ExtJS'
-def extZip = project.artifactMap['com.sencha:ext'].file
+// Extract extjs distribution (if needed)
 def extDir = new File(project.build.directory, 'ext')
-ant.mkdir(dir: extDir)
-ant.unzip(src: extZip, dest: extDir) {
-  cutdirsmapper(dirs: 1)
-  patternset {
-    exclude(name: 'ext-*/builds/**')
-    exclude(name: 'ext-*/docs/**')
-    exclude(name: 'ext-*/welcome/**')
+if (!extDir.exists()) {
+  header 'Extract ExtJS'
+  def extZip = project.artifactMap['com.sencha:ext'].file
+  ant.mkdir(dir: extDir)
+  ant.unzip(src: extZip, dest: extDir) {
+    cutdirsmapper(dirs: 1)
+    patternset {
+      exclude(name: 'ext-*/builds/**')
+      exclude(name: 'ext-*/docs/**')
+      exclude(name: 'ext-*/welcome/**')
+    }
   }
 }
 
-// Re-generate sencha cmd app
-header 'Generate application'
+// Re-generate sencha cmd app (if needed)
 def baseappDir = new File(project.build.directory, 'baseapp')
-ant.exec(executable: senchaExe, dir: project.build.directory, failonerror: true) {
-  arg(value: '-sdk')
-  arg(file: extDir)
-  arg(line: 'generate app baseapp')
-  arg(file: baseappDir)
-}
+if (!baseappDir.exists()) {
+  header 'Generate application'
 
-// Strip out muck from generated app template
-ant.delete {
-  fileset(dir: baseappDir) {
-    include(name: 'app/**')
+  ant.exec(executable: senchaExe, dir: project.build.directory, failonerror: true) {
+    arg(value: '-sdk')
+    arg(file: extDir)
+    arg(line: 'generate app baseapp')
+    arg(file: baseappDir)
+  }
+
+  // Strip out muck from generated app template
+  ant.delete {
+    fileset(dir: baseappDir) {
+      include(name: 'app/**')
+    }
   }
 }
 
 // Apply customizations to app, filter all non-resources
+header 'Customizing application'
 ant.copy(todir: baseappDir, overwrite: true, filtering: true) {
   fileset(dir: "${project.basedir}/src/main/baseapp") {
     include(name: '**')

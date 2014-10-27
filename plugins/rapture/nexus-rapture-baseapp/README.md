@@ -28,6 +28,12 @@ If the content has changed, then the result needs to be committed:
 
     git commit . -m "regenerated baseapp"
 
+## Regenerating for development
+
+Slightly faster, will only generate the 'debug' flavors and will re-use extjs distribution and baseapp: 
+
+    mvn install -Pregenerate -Dflavors=debug
+
 ## Locally install ExtJS distribution
 
     mvn -Pinstall-ext -Dext.dist=ext-4.2.3-commercial.zip -Dext.version=4.2.3
