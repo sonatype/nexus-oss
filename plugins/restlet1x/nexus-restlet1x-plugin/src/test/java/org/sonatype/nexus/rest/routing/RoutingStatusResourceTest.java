@@ -21,8 +21,10 @@ import org.sonatype.nexus.proxy.maven.routing.internal.ManagerImpl;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RoutingStatusMessageWrapper;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Reference;
@@ -34,15 +36,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+// FIXME: This is an integration-test (starting up an embedded nexus server)
+
 public class RoutingStatusResourceTest
     extends NexusAppTestSupport
 {
   private final String REPO_ID = "releases";
 
   @Before
-  public void prepare()
-      throws Exception
-  {
+  public void prepare() throws Exception {
     startNx();
     lookup(ApplicationStatusSource.class).setState(SystemState.STARTED);
   }
@@ -80,6 +82,7 @@ public class RoutingStatusResourceTest
     request.setRootRef(new Reference("http://localhost:8081/nexus"));
     request.getAttributes().put(RoutingResourceSupport.REPOSITORY_ID_KEY, REPO_ID);
     Response.setCurrent(new Response(request));
+    BaseUrlHolder.set("http://localhost:8081/nexus");
     try {
       final M2Repository repository = (M2Repository) lookup(RepositoryRegistry.class).getRepository(REPO_ID);
 
@@ -113,6 +116,7 @@ public class RoutingStatusResourceTest
     }
     finally {
       Response.setCurrent(null);
+      BaseUrlHolder.unset();
     }
   }
 }
