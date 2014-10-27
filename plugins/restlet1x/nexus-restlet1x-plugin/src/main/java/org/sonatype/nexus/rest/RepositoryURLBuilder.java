@@ -20,12 +20,21 @@ import org.sonatype.nexus.proxy.repository.Repository;
 @Deprecated
 public interface RepositoryURLBuilder
 {
+  /**
+   * Return content url for repository, or {@code null} if base-url is not set.
+   */
   @Nullable
   String getRepositoryContentUrl(String repositoryId) throws NoSuchRepositoryException;
 
+  /**
+   * Return content url for repository, or {@code null} if base-url is not set.
+   */
   @Nullable
   String getRepositoryContentUrl(Repository repository);
 
+  /**
+   * Return content url for repository, or {@code null} if repository is not exposed or base-url is not set.
+   */
   @Nullable
   String getExposedRepositoryContentUrl(Repository repository);
 }

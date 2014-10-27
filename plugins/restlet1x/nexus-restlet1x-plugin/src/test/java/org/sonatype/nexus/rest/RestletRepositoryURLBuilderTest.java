@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.web.BaseUrlHolder;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -108,36 +107,20 @@ public class RestletRepositoryURLBuilderTest
   }
 
   @Test
-  public void testForceBaseUrlById() throws Exception {
+  public void testRepositoryContentUrl_forId() throws Exception {
     assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
         underTest.getRepositoryContentUrl(MOCK_REPO_ID));
   }
 
-  //@Test
-  //public void testForceBaseUrlByIdGlobalDisabled() throws Exception {
-  //  RestletRepositoryURLBuilder underTest = new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry);
-  //
-  //  assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-  //      underTest.getRepositoryContentUrl(MOCK_REPO_ID));
-  //}
-
   @Test
-  public void testNoRequestBaseURLNotSet() throws Exception {
+  public void testGetRepositoryContentUrl_noBaseUrl() throws Exception {
     BaseUrlHolder.unset();
 
     assertNull(underTest.getRepositoryContentUrl(MOCK_REPO_ID));
   }
 
-  //@Test
-  //public void testBaseUrlGlobalNoRequest() throws Exception {
-  //  RestletRepositoryURLBuilder underTest = new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry);
-  //
-  //  assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-  //      underTest.getRepositoryContentUrl(MOCK_REPO_ID));
-  //}
-
   @Test
-  public void testBaseUrlGlobalRequest() throws Exception {
+  public void testGetRepositoryContentUrl_customBaseUrl() throws Exception {
     BaseUrlHolder.set("http://from/request");
 
     // NEXUS-6045: Restlet1x request cannot come in from anywhere else than /service/local anymore
@@ -159,7 +142,7 @@ public class RestletRepositoryURLBuilderTest
   }
 
   @Test(expected = NoSuchRepositoryException.class)
-  public void testNotFound() throws NoSuchRepositoryException {
+  public void getRepositoryContentUrl_invalidRepoId() throws NoSuchRepositoryException {
     underTest.getRepositoryContentUrl(NOT_FOUND_REPO_ID);
   }
 }
