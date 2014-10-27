@@ -22,6 +22,7 @@ import org.sonatype.nexus.security.auth.ClientInfo;
 import org.sonatype.nexus.security.auth.ClientInfoProvider;
 import org.sonatype.nexus.web.RemoteIPFinder;
 
+import com.google.common.net.HttpHeaders;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
@@ -53,7 +54,7 @@ public class ClientInfoProviderImpl
       return new ClientInfo(
           subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : null,
           RemoteIPFinder.findIP(request),
-          request.getHeader("User-Agent")
+          request.getHeader(HttpHeaders.USER_AGENT)
       );
     }
     return null;
