@@ -40,6 +40,11 @@ public class PomFile
     return factory.gemspecFile(name(), version(), platform);
   }
 
+  public GemFile gem(DependencyData dependencies) {
+    String platform = dependencies.platform(version());
+    return factory.gemFile(name(), version(), platform);
+  }
+
   public DependencyFile dependency() {
     return factory.dependencyFile(name());
   }

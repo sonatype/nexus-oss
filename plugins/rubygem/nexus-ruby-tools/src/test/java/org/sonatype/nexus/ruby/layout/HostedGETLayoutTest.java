@@ -164,11 +164,13 @@ public class HostedGETLayoutTest
     String[] pathes = {
         "/maven/releases/rubygems/zip/2.0.2/zip-2.0.2.pom",
         "/maven/releases/rubygems/pre/0.1.0.beta/pre-0.1.0.beta.pom",
+        "/maven/releases/rubygems/my/0.1.0/my-0.1.0.pom",
         "/maven/prereleases/rubygems/pre/0.1.0.beta-SNAPSHOT/pre-0.1.0.beta-123213123.pom"
     };
     String[] xmls = {
         loadPomResource("zip.pom"),
         loadPomResource("pre.pom"),
+        loadPomResource("my.pom"),
         loadPomResource("pre-snapshot.pom")
     };
     assertFiletypeWithPayload(pathes, FileType.POM, xmls);
@@ -318,9 +320,9 @@ public class HostedGETLayoutTest
     assertDirectory("/maven/prereleases", "rubygems");
     // the lookup will create a hufflepuf.ruby !
     assertDirectory("/maven/prereleases/rubygems/hufflepuf", "maven-metadata.xml", "maven-metadata.xml.sha1");
-    assertDirectory("/maven/prereleases/rubygems", "hufflepuf", "pre", "zip");
+    assertDirectory("/maven/prereleases/rubygems", "hufflepuf", "my", "pre", "zip");
     assertDirectory("/maven/releases", "rubygems");
-    assertDirectory("/maven/releases/rubygems", "hufflepuf", "pre", "zip");
+    assertDirectory("/maven/releases/rubygems", "hufflepuf", "my", "pre", "zip");
     assertDirectory("/maven/releases/rubygems/hufflepuf", "0.1.0", "0.2.0", "maven-metadata.xml",
         "maven-metadata.xml.sha1");
     assertDirectory("/maven/releases/rubygems/jbundler", "maven-metadata.xml", "maven-metadata.xml.sha1");

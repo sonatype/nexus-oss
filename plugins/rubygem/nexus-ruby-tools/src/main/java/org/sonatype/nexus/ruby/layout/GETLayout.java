@@ -176,18 +176,40 @@ public class GETLayout
    */
   protected void setPomPayload(PomFile file, boolean snapshot) {
     try {
-      GemspecFile gemspec = file.gemspec(newDependencyData(file.dependency()));
-      if (gemspec.notExists()) {
-        file.markAsNotExists();
+      DependencyData dependencies = newDependencyData(file.dependency());
+      if ("java".equals(dependencies.platform(file.version()))) {
+        pomFromGem(file, snapshot, dependencies);
       }
       else {
-        try(InputStream is = store.getInputStream(gemspec)) {
-          store.memory(gateway.newGemspecHelper(is).pom(snapshot), file);
-        }
+        pomFromGemspec(file, snapshot, dependencies);
       }
     }
     catch (IOException e) {
       file.setException(e);
+    }
+  }
+
+  private void pomFromGemspec(PomFile file, boolean snapshot, DependencyData dependencies) throws IOException {
+    GemspecFile gemspec = file.gemspec(dependencies);
+    if (gemspec.notExists()) {
+      file.markAsNotExists();
+    }
+    else {
+      try(InputStream is = store.getInputStream(gemspec)) {
+        store.memory(gateway.newGemspecHelper(is).pom(snapshot), file);
+      }
+    }
+  }
+
+  private void pomFromGem(PomFile file, boolean snapshot, DependencyData dependencies) throws IOException {
+    GemFile gem = file.gem(dependencies);
+    if (gem.notExists()) {
+      file.markAsNotExists();
+    }
+    else {
+      try(InputStream is = store.getInputStream(gem)) {
+        store.memory(gateway.newGemspecHelperFromGem(is).pom(snapshot), file);
+      }
     }
   }
 
