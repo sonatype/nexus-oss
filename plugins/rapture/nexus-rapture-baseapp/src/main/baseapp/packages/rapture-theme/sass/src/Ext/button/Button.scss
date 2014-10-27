@@ -65,6 +65,12 @@
 @include extjs-button-small-ui(
   $ui: 'plain',
 
+  $border-color: $color-suva-gray,
+  $border-color-over: $color-suva-gray,
+  $border-color-focus: $color-suva-gray,
+  $border-color-pressed: $color-suva-gray,
+  $border-color-disabled: $color-suva-gray,
+
   $background-gradient: $color-white $color-light-gainsboro,
   $background-gradient-over: $color-light-gray $color-silver,
   $background-gradient-focus: $color-white $color-light-gainsboro,
@@ -74,7 +80,10 @@
   $color: $color-night-rider,
   $color-over: $color-night-rider,
   $color-focus: $color-night-rider,
-  $color-disabled: $color-night-rider
+  $color-disabled: $color-night-rider,
+
+  $glyph-color: $color-night-rider,
+  $glyph-opacity: 1
 );
 
 /**

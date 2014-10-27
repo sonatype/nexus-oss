@@ -69,10 +69,9 @@ Ext.define('NX.coreui.view.healthcheck.HealthCheckRepositorySettings', {
         xtype: 'form',
         itemId: 'statusForm',
         title: 'Status',
-        frame: true,
         hidden: true,
+        ui: 'subsection',
 
-        bodyPadding: 10,
         margin: 10,
 
         items: {
