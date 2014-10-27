@@ -81,3 +81,253 @@
   $ui-header-color: $color-white,
   $ui-header-background-color: $color-smalt
 );
+
+.x-panel-developer {
+  // Let the developer panes scroll as needed
+  .x-panel-body .x-tabpanel-child .x-box-inner {
+    overflow-y: auto;
+  }
+
+  /*
+   * Visual style sheet colors
+   */
+
+  // Shell colors
+  .color-black {
+    background-color: $color-black;
+  }
+
+  .color-night-rider {
+    background-color: $color-night-rider;
+  }
+
+  .color-charcoal {
+    background-color: $color-charcoal;
+  }
+
+  .color-dark-gray {
+    background-color: $color-dark-gray;
+  }
+
+  .color-gray {
+    background-color: $color-gray;
+  }
+
+  .color-light-gray {
+    background-color: $color-light-gray;
+  }
+
+  .color-gainsboro {
+    background-color: $color-gainsboro;
+  }
+
+  .color-smoke {
+    background-color: $color-smoke;
+  }
+
+  .color-light-smoke {
+    background-color: $color-light-smoke;
+  }
+
+  // Severity
+
+  .color-cerise {
+    background-color: $color-cerise;
+  }
+
+  .color-sun {
+    background-color: $color-sun;
+  }
+
+  .color-energy-yellow {
+    background-color: $color-energy-yellow;
+  }
+
+  .color-cobalt {
+    background-color: $color-cobalt;
+  }
+
+  .color-cerulean-blue {
+    background-color: $color-cerulean-blue;
+  }
+
+  // Forms
+
+  .color-citrus {
+    background-color: $color-citrus;
+  }
+
+  .color-free-speech-red {
+    background-color: $color-free-speech-red;
+  }
+
+  // Tooltips
+
+  .color-energy-yellow {
+    background-color: $color-energy-yellow;
+  }
+
+  .color-floral-white {
+    background-color: $color-floral-white;
+  }
+
+  // Dashboard
+
+  .color-pigment-green {
+    background-color: $color-pigment-green;
+  }
+
+  .color-madang {
+    background-color: $color-madang;
+  }
+
+  .color-venetian-red {
+    background-color: $color-venetian-red;
+  }
+
+  .color-beauty-bush {
+    background-color: $color-beauty-bush;
+  }
+
+  .color-navy-blue {
+    background-color: $color-navy-blue;
+  }
+
+  .color-cornflower {
+    background-color: $color-cornflower;
+  }
+
+  .color-affair {
+    background-color: $color-affair;
+  }
+
+  .color-east-side {
+    background-color: $color-east-side;
+  }
+
+  .color-blue-chalk {
+    background-color: $color-blue-chalk;
+  }
+
+  // Buttons
+
+  .color-white {
+    background-color: $color-white;
+  }
+
+  .color-light-gainsboro {
+    background-color: $color-light-gainsboro;
+  }
+
+  .color-light-gray {
+    background-color: $color-light-gray;
+  }
+
+  .color-silver {
+    background-color: $color-silver;
+  }
+
+  .color-suva-gray {
+    background-color: $color-suva-gray;
+  }
+
+  .color-gray {
+    background-color: $color-gray;
+  }
+
+  .color-denim {
+    background-color: $color-denim;
+  }
+
+  .color-light-cobalt {
+    background-color: $color-light-cobalt;
+  }
+
+  .color-dark-denim {
+    background-color: $color-smalt;
+  }
+
+  .color-smalt {
+    background-color: $color-dark-cerulean;
+  }
+
+  .color-dark-cerulean {
+    background-color: $color-dark-cerulean;
+  }
+
+  .color-prussian-blue {
+    background-color: $color-prussian-blue;
+  }
+
+  .color-light-cerise {
+    background-color: $color-light-cerise;
+  }
+
+  .color-brick-red {
+    background-color: $color-brick-red;
+  }
+
+  .color-old-rose {
+    background-color: $color-old-rose;
+  }
+
+  .color-fire-brick {
+    background-color: $color-fire-brick;
+  }
+
+  .color-shiraz {
+    background-color: $color-shiraz;
+  }
+
+  .color-falu-red {
+    background-color: $color-falu-red;
+  }
+
+  .color-sea-buckthorn {
+    background-color: $color-sea-buckthorn;
+  }
+
+  .color-tahiti-gold {
+    background-color: $color-tahiti-gold;
+  }
+
+  .color-zest {
+    background-color: $color-zest;
+  }
+
+  .color-rich-gold {
+    background-color: $color-rich-gold;
+  }
+
+  .color-afghan-tan {
+    background-color: $color-afghan-tan;
+  }
+
+  .color-russet {
+    background-color: $color-russet;
+  }
+
+  .color-elf-green {
+    background-color: $color-elf-green;
+  }
+
+  .color-dark-pigment-green {
+    background-color: $color-dark-pigment-green;
+  }
+
+  .color-salem {
+    background-color: $color-salem;
+  }
+
+  .color-jewel {
+    background-color: $color-jewel;
+  }
+
+  .color-fun-green {
+    background-color: $color-fun-green;
+  }
+
+  .color-dark-jewel {
+    background-color: $color-dark-jewel;
+  }
+}
