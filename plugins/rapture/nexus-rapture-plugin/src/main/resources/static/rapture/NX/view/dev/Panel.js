@@ -30,6 +30,10 @@ Ext.define('NX.view.dev.Panel', {
   stateful: true,
   stateId: 'nx-dev-panel',
 
+  tools: [
+    { type: 'maximize', tooltip: 'Maximize' }
+  ],
+
   layout: 'fit',
   items: {
     xtype: 'tabpanel',

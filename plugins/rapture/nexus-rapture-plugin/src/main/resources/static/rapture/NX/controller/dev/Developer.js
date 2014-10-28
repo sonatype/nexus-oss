@@ -65,6 +65,9 @@ Ext.define('NX.controller.dev.Developer', {
         'nx-dev-panel': {
           afterrender: me.manageDeveloperPanel
         },
+        'nx-dev-panel tool[type=maximize]': {
+          click: me.onMaximize
+        },
         'nx-dev-tests button[action=testError]': {
           click: me.testError
         },
@@ -107,6 +110,45 @@ Ext.define('NX.controller.dev.Developer', {
         developerPanel.hide();
       }
     }
+  },
+
+  /**
+   * Maximimze developer panel.
+   *
+   * @private
+   */
+  onMaximize: function(tool) {
+    var panel = tool.up('nx-dev-panel'),
+        container = panel.up('container'),
+        win;
+
+    container.remove(panel, false);
+    panel.getHeader().hide();
+
+    win = Ext.create('Ext.window.Window', {
+      maximized: true,
+      autoScroll: true,
+      closable: false,
+      layout: 'fit',
+      items: panel,
+      tools: [
+        {
+          type: 'close',
+          handler: function() {
+            win.hide(panel, function() {
+              win.remove(panel, false);
+              panel.getHeader().show();
+              container.add(panel);
+              win.destroy();
+            });
+          }
+        }
+      ],
+      title: panel.title,
+      iconCls: panel.iconCls
+    });
+
+    win.show(panel);
   },
 
   /**
