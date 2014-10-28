@@ -89,245 +89,266 @@
   }
 
   /*
+   * Meta styles for the visual style sheet
+   */
+
+  .category {
+    padding-bottom: 1em;
+    border-bottom: 1px $color-gainsboro solid;
+
+    .category-title {
+      text-transform: uppercase;
+      padding-bottom: 5px;
+      font-size: 120%;
+    }
+  }
+
+  /*
    * Visual style sheet colors
    */
 
-  // Shell colors
-  .color-black {
-    background-color: $color-black;
-  }
+  .color {
 
-  .color-night-rider {
-    background-color: $color-night-rider;
-  }
+    border: 1px $color-gainsboro solid;
+    margin: 0 3px 3px 0 !important;
 
-  .color-charcoal {
-    background-color: $color-charcoal;
-  }
+    // Shell colors
+    &.black {
+      background-color: $color-black;
+    }
 
-  .color-dark-gray {
-    background-color: $color-dark-gray;
-  }
+    &.night-rider {
+      background-color: $color-night-rider;
+    }
 
-  .color-gray {
-    background-color: $color-gray;
-  }
+    &.charcoal {
+      background-color: $color-charcoal;
+    }
 
-  .color-light-gray {
-    background-color: $color-light-gray;
-  }
+    &.dark-gray {
+      background-color: $color-dark-gray;
+    }
 
-  .color-gainsboro {
-    background-color: $color-gainsboro;
-  }
+    &.gray {
+      background-color: $color-gray;
+    }
 
-  .color-smoke {
-    background-color: $color-smoke;
-  }
+    &.light-gray {
+      background-color: $color-light-gray;
+    }
 
-  .color-light-smoke {
-    background-color: $color-light-smoke;
-  }
+    &.gainsboro {
+      background-color: $color-gainsboro;
+    }
 
-  // Severity
+    &.smoke {
+      background-color: $color-smoke;
+    }
 
-  .color-cerise {
-    background-color: $color-cerise;
-  }
+    &.light-smoke {
+      background-color: $color-light-smoke;
+    }
 
-  .color-sun {
-    background-color: $color-sun;
-  }
+    // Severity
 
-  .color-energy-yellow {
-    background-color: $color-energy-yellow;
-  }
+    &.cerise {
+      background-color: $color-cerise;
+    }
 
-  .color-cobalt {
-    background-color: $color-cobalt;
-  }
+    &.sun {
+      background-color: $color-sun;
+    }
 
-  .color-cerulean-blue {
-    background-color: $color-cerulean-blue;
-  }
+    &.energy-yellow {
+      background-color: $color-energy-yellow;
+    }
 
-  // Forms
+    &.cobalt {
+      background-color: $color-cobalt;
+    }
 
-  .color-citrus {
-    background-color: $color-citrus;
-  }
+    &.cerulean-blue {
+      background-color: $color-cerulean-blue;
+    }
 
-  .color-free-speech-red {
-    background-color: $color-free-speech-red;
-  }
+    // Forms
 
-  // Tooltips
+    &.citrus {
+      background-color: $color-citrus;
+    }
 
-  .color-energy-yellow {
-    background-color: $color-energy-yellow;
-  }
+    &.free-speech-red {
+      background-color: $color-free-speech-red;
+    }
 
-  .color-floral-white {
-    background-color: $color-floral-white;
-  }
+    // Tooltips
 
-  // Dashboard
+    &.energy-yellow {
+      background-color: $color-energy-yellow;
+    }
 
-  .color-pigment-green {
-    background-color: $color-pigment-green;
-  }
+    &.floral-white {
+      background-color: $color-floral-white;
+    }
 
-  .color-madang {
-    background-color: $color-madang;
-  }
+    // Dashboard
 
-  .color-venetian-red {
-    background-color: $color-venetian-red;
-  }
+    &.pigment-green {
+      background-color: $color-pigment-green;
+    }
 
-  .color-beauty-bush {
-    background-color: $color-beauty-bush;
-  }
+    &.madang {
+      background-color: $color-madang;
+    }
 
-  .color-navy-blue {
-    background-color: $color-navy-blue;
-  }
+    &.venetian-red {
+      background-color: $color-venetian-red;
+    }
 
-  .color-cornflower {
-    background-color: $color-cornflower;
-  }
+    &.beauty-bush {
+      background-color: $color-beauty-bush;
+    }
 
-  .color-affair {
-    background-color: $color-affair;
-  }
+    &.navy-blue {
+      background-color: $color-navy-blue;
+    }
 
-  .color-east-side {
-    background-color: $color-east-side;
-  }
+    &.cornflower {
+      background-color: $color-cornflower;
+    }
 
-  .color-blue-chalk {
-    background-color: $color-blue-chalk;
-  }
+    &.affair {
+      background-color: $color-affair;
+    }
 
-  // Buttons
+    &.east-side {
+      background-color: $color-east-side;
+    }
 
-  .color-white {
-    background-color: $color-white;
-  }
+    &.blue-chalk {
+      background-color: $color-blue-chalk;
+    }
 
-  .color-light-gainsboro {
-    background-color: $color-light-gainsboro;
-  }
+    // Buttons
 
-  .color-light-gray {
-    background-color: $color-light-gray;
-  }
+    &.white {
+      background-color: $color-white;
+    }
 
-  .color-silver {
-    background-color: $color-silver;
-  }
+    &.light-gainsboro {
+      background-color: $color-light-gainsboro;
+    }
 
-  .color-suva-gray {
-    background-color: $color-suva-gray;
-  }
+    &.light-gray {
+      background-color: $color-light-gray;
+    }
 
-  .color-gray {
-    background-color: $color-gray;
-  }
+    &.silver {
+      background-color: $color-silver;
+    }
 
-  .color-denim {
-    background-color: $color-denim;
-  }
+    &.suva-gray {
+      background-color: $color-suva-gray;
+    }
 
-  .color-light-cobalt {
-    background-color: $color-light-cobalt;
-  }
+    &.gray {
+      background-color: $color-gray;
+    }
 
-  .color-dark-denim {
-    background-color: $color-smalt;
-  }
+    &.denim {
+      background-color: $color-denim;
+    }
 
-  .color-smalt {
-    background-color: $color-dark-cerulean;
-  }
+    &.light-cobalt {
+      background-color: $color-light-cobalt;
+    }
 
-  .color-dark-cerulean {
-    background-color: $color-dark-cerulean;
-  }
+    &.dark-denim {
+      background-color: $color-smalt;
+    }
 
-  .color-prussian-blue {
-    background-color: $color-prussian-blue;
-  }
+    &.smalt {
+      background-color: $color-dark-cerulean;
+    }
 
-  .color-light-cerise {
-    background-color: $color-light-cerise;
-  }
+    &.dark-cerulean {
+      background-color: $color-dark-cerulean;
+    }
 
-  .color-brick-red {
-    background-color: $color-brick-red;
-  }
+    &.prussian-blue {
+      background-color: $color-prussian-blue;
+    }
 
-  .color-old-rose {
-    background-color: $color-old-rose;
-  }
+    &.light-cerise {
+      background-color: $color-light-cerise;
+    }
 
-  .color-fire-brick {
-    background-color: $color-fire-brick;
-  }
+    &.brick-red {
+      background-color: $color-brick-red;
+    }
 
-  .color-shiraz {
-    background-color: $color-shiraz;
-  }
+    &.old-rose {
+      background-color: $color-old-rose;
+    }
 
-  .color-falu-red {
-    background-color: $color-falu-red;
-  }
+    &.fire-brick {
+      background-color: $color-fire-brick;
+    }
 
-  .color-sea-buckthorn {
-    background-color: $color-sea-buckthorn;
-  }
+    &.shiraz {
+      background-color: $color-shiraz;
+    }
 
-  .color-tahiti-gold {
-    background-color: $color-tahiti-gold;
-  }
+    &.falu-red {
+      background-color: $color-falu-red;
+    }
 
-  .color-zest {
-    background-color: $color-zest;
-  }
+    &.sea-buckthorn {
+      background-color: $color-sea-buckthorn;
+    }
 
-  .color-rich-gold {
-    background-color: $color-rich-gold;
-  }
+    &.tahiti-gold {
+      background-color: $color-tahiti-gold;
+    }
 
-  .color-afghan-tan {
-    background-color: $color-afghan-tan;
-  }
+    &.zest {
+      background-color: $color-zest;
+    }
 
-  .color-russet {
-    background-color: $color-russet;
-  }
+    &.rich-gold {
+      background-color: $color-rich-gold;
+    }
 
-  .color-elf-green {
-    background-color: $color-elf-green;
-  }
+    &.afghan-tan {
+      background-color: $color-afghan-tan;
+    }
 
-  .color-dark-pigment-green {
-    background-color: $color-dark-pigment-green;
-  }
+    &.russet {
+      background-color: $color-russet;
+    }
 
-  .color-salem {
-    background-color: $color-salem;
-  }
+    &.elf-green {
+      background-color: $color-elf-green;
+    }
 
-  .color-jewel {
-    background-color: $color-jewel;
-  }
+    &.dark-pigment-green {
+      background-color: $color-dark-pigment-green;
+    }
 
-  .color-fun-green {
-    background-color: $color-fun-green;
-  }
+    &.salem {
+      background-color: $color-salem;
+    }
 
-  .color-dark-jewel {
-    background-color: $color-dark-jewel;
+    &.jewel {
+      background-color: $color-jewel;
+    }
+
+    &.fun-green {
+      background-color: $color-fun-green;
+    }
+
+    &.dark-jewel {
+      background-color: $color-dark-jewel;
+    }
   }
 }

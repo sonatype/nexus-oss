@@ -46,24 +46,27 @@ Ext.define('NX.view.dev.Buttons', {
      */
     me.items.push(
       {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
           type: 'vbox',
           padding: 4
         },
 
+        cls: 'category',
+
         items: [
 
           // Section title
           {
             xtype: 'label',
-            text: 'Logo'
+            text: 'Logo',
+            cls: 'category-title'
           },
 
           // Logo example
           {
-            xtype: 'panel',
+            xtype: 'container',
             items: [
               {
                 xtype: 'toolbar',
@@ -107,24 +110,27 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
           type: 'vbox',
           padding: 4
         },
 
+        cls: 'category',
+
         items: [
 
           // Section title
           {
             xtype: 'label',
-            text: 'Colors'
+            text: 'Colors',
+            cls: 'category-title'
           },
 
           // Shell colors
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'vbox',
@@ -137,7 +143,7 @@ Ext.define('NX.view.dev.Buttons', {
                 text: 'Shell'
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'hbox'
@@ -146,90 +152,90 @@ Ext.define('NX.view.dev.Buttons', {
                 items: [
 
                   // Black
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-black" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color black" },
                       { xtype: 'label', text: 'Black' },
                       { xtype: 'label', text: '#000000' }
                     ]
                   },
 
                   // Night Rider
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-night-rider" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color night-rider" },
                       { xtype: 'label', text: 'Night Rider' },
                       { xtype: 'label', text: '#333333' }
                     ]
                   },
 
                   // Charcoal
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-charcoal" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color charcoal" },
                       { xtype: 'label', text: 'Charcoal' },
                       { xtype: 'label', text: '#444444' }
                     ]
                   },
 
                   // Dark Gray
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-dark-gray" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color dark-gray" },
                       { xtype: 'label', text: 'Dark Gray' },
                       { xtype: 'label', text: '#777777' }
                     ]
                   },
 
                   // Gray
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-gray" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color gray" },
                       { xtype: 'label', text: 'Gray' },
                       { xtype: 'label', text: '#AAAAAA' }
                     ]
                   },
 
                   // Light Gray
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-gray" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color light-gray" },
                       { xtype: 'label', text: 'Light Gray' },
                       { xtype: 'label', text: '#CBCBCB' }
                     ]
                   },
 
                   // Gainsboro
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-gainsboro" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color gainsboro" },
                       { xtype: 'label', text: 'Gainsboro' },
                       { xtype: 'label', text: '#DDDDDD' }
                     ]
                   },
 
                   // Smoke
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-smoke" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color smoke" },
                       { xtype: 'label', text: 'Smoke' },
                       { xtype: 'label', text: '#EBEBEB' }
                     ]
                   },
 
                   // Light Smoke
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-smoke" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color light-smoke" },
                       { xtype: 'label', text: 'Light Smoke' },
                       { xtype: 'label', text: '#F4F4F4' }
                     ]
                   },
 
                   // White
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-white" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color white" },
                       { xtype: 'label', text: 'White' },
                       { xtype: 'label', text: '#FFFFFF' }
                     ]
@@ -239,7 +245,7 @@ Ext.define('NX.view.dev.Buttons', {
             ]
           },
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'hbox'
@@ -247,7 +253,7 @@ Ext.define('NX.view.dev.Buttons', {
 
             items: [
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox',
@@ -264,7 +270,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                   // Severity colors
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -273,45 +279,45 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Cerise
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-cerise" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color cerise" },
                           { xtype: 'label', text: 'Cerise' },
                           { xtype: 'label', text: '#DB2852' }
                         ]
                       },
 
                       // Sun
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-sun" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color sun" },
                           { xtype: 'label', text: 'Sun' },
                           { xtype: 'label', text: '#F2862F' }
                         ]
                       },
 
                       // Energy Yellow
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-energy-yellow" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color energy-yellow" },
                           { xtype: 'label', text: 'Energy Yellow' },
                           { xtype: 'label', text: '#F5C649' }
                         ]
                       },
 
                       // Cobalt
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-cobalt" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color cobalt" },
                           { xtype: 'label', text: 'Cobalt' },
                           { xtype: 'label', text: '#0047B2' }
                         ]
                       },
 
                       // Cerulean Blue
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-cerulean-blue" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color cerulean-blue" },
                           { xtype: 'label', text: 'Cerulean Blue' },
                           { xtype: 'label', text: '#2476C3' }
                         ]
@@ -321,7 +327,7 @@ Ext.define('NX.view.dev.Buttons', {
                 ]
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox',
@@ -338,7 +344,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                   // Form colors
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -347,18 +353,18 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Citrus
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-citrus" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color citrus" },
                           { xtype: 'label', text: 'Citrus' },
                           { xtype: 'label', text: '#84C900' }
                         ]
                       },
 
                       // Free Speech Red
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-free-speech-red" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color free-speech-red" },
                           { xtype: 'label', text: 'Free Speech Red' },
                           { xtype: 'label', text: '#C70000' }
                         ]
@@ -368,7 +374,7 @@ Ext.define('NX.view.dev.Buttons', {
                 ]
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox',
@@ -384,7 +390,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                   // Tooltip colors
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -393,18 +399,18 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Energy Yellow
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-energy-yellow" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color energy-yellow" },
                           { xtype: 'label', text: 'Energy Yellow' },
                           { xtype: 'label', text: '#F5C649' }
                         ]
                       },
 
                       // Floral White
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-floral-white" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color floral-white" },
                           { xtype: 'label', text: 'Floral White' },
                           { xtype: 'label', text: '#FFFAEE' }
                         ]
@@ -416,7 +422,7 @@ Ext.define('NX.view.dev.Buttons', {
             ]
           },
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'vbox',
@@ -432,7 +438,7 @@ Ext.define('NX.view.dev.Buttons', {
 
               // Dashboard colors
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'hbox'
@@ -441,81 +447,81 @@ Ext.define('NX.view.dev.Buttons', {
                 items: [
 
                   // Pigment Green
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-pigment-green" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color pigment-green" },
                       { xtype: 'label', text: 'Pigment Green' },
                       { xtype: 'label', text: '#0B9743' }
                     ]
                   },
 
                   // Madang
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-madang" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color madang" },
                       { xtype: 'label', text: 'Madang' },
                       { xtype: 'label', text: '#B6E9AB' }
                     ]
                   },
 
                   // Venetian Red
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-venetian-red" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color venetian-red" },
                       { xtype: 'label', text: 'Venetian Red' },
                       { xtype: 'label', text: '#BC0430' }
                     ]
                   },
 
                   // Beauty Bush
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-beauty-bush" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color beauty-bush" },
                       { xtype: 'label', text: 'Beauty Bush' },
                       { xtype: 'label', text: '#EDB2AF' }
                     ]
                   },
 
                   // Navy Blue
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-navy-blue" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color navy-blue" },
                       { xtype: 'label', text: 'Navy Blue' },
                       { xtype: 'label', text: '#006BBF' }
                     ]
                   },
 
                   // Cornflower
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-cornflower" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color cornflower" },
                       { xtype: 'label', text: 'Cornflower' },
                       { xtype: 'label', text: '#96CAEE' }
                     ]
                   },
 
                   // Affair
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-affair" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color affair" },
                       { xtype: 'label', text: 'Affair' },
                       { xtype: 'label', text: '#875393' }
                     ]
                   },
 
                   // East Side
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-east-side" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color east-side" },
                       { xtype: 'label', text: 'East Side' },
                       { xtype: 'label', text: '#B087B9' }
                     ]
                   },
 
                   // Blue Chalk
-                  { xtype: 'panel', layout: { type: 'vbox' },
+                  { xtype: 'container', layout: { type: 'vbox' },
                     items: [
-                      { xtype: 'panel', height: 40, width: 80, bodyCls: "color-blue-chalk" },
+                      { xtype: 'container', height: 40, width: 80, cls: "color blue-chalk" },
                       { xtype: 'label', text: 'Blue Chalk' },
                       { xtype: 'label', text: '#DAC5DF' }
                     ]
@@ -525,7 +531,7 @@ Ext.define('NX.view.dev.Buttons', {
             ]
           },
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'hbox'
@@ -533,7 +539,7 @@ Ext.define('NX.view.dev.Buttons', {
 
             items: [
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox',
@@ -546,7 +552,7 @@ Ext.define('NX.view.dev.Buttons', {
                     text: 'Buttons'
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -555,54 +561,54 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // White
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-white" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color white" },
                           { xtype: 'label', text: 'White' },
                           { xtype: 'label', text: '#FFFFFF' }
                         ]
                       },
 
                       // Light Gainsboro
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-gainsboro" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color light-gainsboro" },
                           { xtype: 'label', text: 'Light Gainsboro' },
                           { xtype: 'label', text: '#E6E6E6' }
                         ]
                       },
 
                       // Light Gray
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-gray" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color light-gray" },
                           { xtype: 'label', text: 'Light Gray' },
                           { xtype: 'label', text: '#CBCBCB' }
                         ]
                       },
 
                       // Silver
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-silver" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color silver" },
                           { xtype: 'label', text: 'Silver' },
                           { xtype: 'label', text: '#B8B8B8' }
                         ]
                       },
 
                       // Suva Gray
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-suva-gray" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color suva-gray" },
                           { xtype: 'label', text: 'Suva Gray' },
                           { xtype: 'label', text: '#919191' }
                         ]
                       },
 
                       // Gray
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-gray" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color gray" },
                           { xtype: 'label', text: 'Gray' },
                           { xtype: 'label', text: '#808080' }
                         ]
@@ -610,7 +616,7 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -619,54 +625,54 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Denim
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-denim" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color denim" },
                           { xtype: 'label', text: 'Denim' },
                           { xtype: 'label', text: '#197AC5' }
                         ]
                       },
 
                       // Light Cobalt
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-cobalt" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color light-cobalt" },
                           { xtype: 'label', text: 'Light Cobalt' },
                           { xtype: 'label', text: '#0161AD' }
                         ]
                       },
 
                       // Dark Denim
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-dark-denim" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color dark-denim" },
                           { xtype: 'label', text: 'Dark Denim' },
                           { xtype: 'label', text: '#14629E' }
                         ]
                       },
 
                       // Smalt
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-smalt" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color smalt" },
                           { xtype: 'label', text: 'Smalt' },
                           { xtype: 'label', text: '#014E8A' }
                         ]
                       },
 
                       // Dark Cerulean
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-dark-cerulean" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color dark-cerulean" },
                           { xtype: 'label', text: 'Dark Cerulean' },
                           { xtype: 'label', text: '#0F4976' }
                         ]
                       },
 
                       // Prussian Blue
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-prussian-blue" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color prussian-blue" },
                           { xtype: 'label', text: 'Prussian Blue' },
                           { xtype: 'label', text: '#013A68' }
                         ]
@@ -674,7 +680,7 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -683,54 +689,54 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Light Cerise
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-light-cerise" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color light-cerise" },
                           { xtype: 'label', text: 'Light Cerise' },
                           { xtype: 'label', text: '#DE3D63' }
                         ]
                       },
 
                       // Brick Red
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-brick-red" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color brick-red" },
                           { xtype: 'label', text: 'Brick Red' },
                           { xtype: 'label', text: '#C6254B' }
                         ]
                       },
 
                       // Old Rose
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-old-rose" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color old-rose" },
                           { xtype: 'label', text: 'Old Rose' },
                           { xtype: 'label', text: '#B2314F' }
                         ]
                       },
 
                       // Fire Brick
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-fire-brick" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color fire-brick" },
                           { xtype: 'label', text: 'Fire Brick' },
                           { xtype: 'label', text: '#9E1E3C' }
                         ]
                       },
 
                       // Shiraz
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-shiraz" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color shiraz" },
                           { xtype: 'label', text: 'Shiraz' },
                           { xtype: 'label', text: '#85253B' }
                         ]
                       },
 
                       // Falu Red
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-falu-red" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color falu-red" },
                           { xtype: 'label', text: 'Falu Red' },
                           { xtype: 'label', text: '#77162D' }
                         ]
@@ -738,7 +744,7 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -747,54 +753,54 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Sea Buckthorn
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-sea-buckthorn" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color sea-buckthorn" },
                           { xtype: 'label', text: 'Sea Buckthorn' },
                           { xtype: 'label', text: '#F39244' }
                         ]
                       },
 
                       // Tahiti Gold
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-tahiti-gold" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color tahiti-gold" },
                           { xtype: 'label', text: 'Tahiti Gold' },
                           { xtype: 'label', text: '#DA792B' }
                         ]
                       },
 
                       // Zest
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-zest" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color zest" },
                           { xtype: 'label', text: 'Zest' },
                           { xtype: 'label', text: '#C17536' }
                         ]
                       },
 
                       // Rich Gold
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-rich-gold" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color rich-gold" },
                           { xtype: 'label', text: 'Rich Gold' },
                           { xtype: 'label', text: '#AE6122' }
                         ]
                       },
 
                       // Afghan Tan
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-afghan-tan" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color afghan-tan" },
                           { xtype: 'label', text: 'Afghan Tan' },
                           { xtype: 'label', text: '#925829' }
                         ]
                       },
 
                       // Russet
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-russet" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color russet" },
                           { xtype: 'label', text: 'Russet' },
                           { xtype: 'label', text: '#83491A' }
                         ]
@@ -802,7 +808,7 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -811,54 +817,54 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Elf Green
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-elf-green" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color elf-green" },
                           { xtype: 'label', text: 'Elf Green' },
                           { xtype: 'label', text: '#23A156' }
                         ]
                       },
 
                       // Dark Pigment Green
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-dark-pigment-green" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color dark-pigment-green" },
                           { xtype: 'label', text: 'Dark Pigment Green' },
                           { xtype: 'label', text: '#0B893D' }
                         ]
                       },
 
                       // Salem
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-salem" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color salem" },
                           { xtype: 'label', text: 'Salem' },
                           { xtype: 'label', text: '#1C8145' }
                         ]
                       },
 
                       // Jewel
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-jewel" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color jewel" },
                           { xtype: 'label', text: 'Jewel' },
                           { xtype: 'label', text: '#096E31' }
                         ]
                       },
 
                       // Fun Green
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-fun-green" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color fun-green" },
                           { xtype: 'label', text: 'Fun Green' },
                           { xtype: 'label', text: '#156134' }
                         ]
                       },
 
                       // Dark Jewel
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-dark-jewel" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color dark-jewel" },
                           { xtype: 'label', text: 'Dark Jewel' },
                           { xtype: 'label', text: '#0C4F26' }
                         ]
@@ -868,7 +874,7 @@ Ext.define('NX.view.dev.Buttons', {
                 ]
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox',
@@ -881,7 +887,7 @@ Ext.define('NX.view.dev.Buttons', {
                     text: 'Font Awesome Icons'
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -890,27 +896,27 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // Navy Blue
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-navy-blue" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color navy-blue" },
                           { xtype: 'label', text: 'Navy Blue' },
                           { xtype: 'label', text: '#006BBF' }
                         ]
                       },
 
                       // Smalt
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-smalt" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color smalt" },
                           { xtype: 'label', text: 'Smalt' },
                           { xtype: 'label', text: '#014E8A' }
                         ]
                       },
 
                       // Prussian Blue
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-prussian-blue" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color prussian-blue" },
                           { xtype: 'label', text: 'Prussian Blue' },
                           { xtype: 'label', text: '#013A68' }
                         ]
@@ -918,7 +924,7 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'hbox'
@@ -927,27 +933,27 @@ Ext.define('NX.view.dev.Buttons', {
                     items: [
 
                       // White
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-white" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color white" },
                           { xtype: 'label', text: 'White' },
                           { xtype: 'label', text: '#FFFFFF' }
                         ]
                       },
 
                       // Gainsboro
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-gainsboro" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color gainsboro" },
                           { xtype: 'label', text: 'Gainsboro' },
                           { xtype: 'label', text: '#DDDDDD' }
                         ]
                       },
 
                       // Gray
-                      { xtype: 'panel', layout: { type: 'vbox' },
+                      { xtype: 'container', layout: { type: 'vbox' },
                         items: [
-                          { xtype: 'panel', height: 40, width: 80, bodyCls: "color-gray" },
+                          { xtype: 'container', height: 40, width: 80, cls: "color gray" },
                           { xtype: 'label', text: 'Gray' },
                           { xtype: 'label', text: '#AAAAAA' }
                         ]
@@ -968,23 +974,26 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
           type: 'vbox',
           padding: 4
         },
 
+        cls: 'category',
+
         items: [
 
           // Section title
           {
             xtype: 'label',
-            text: 'Fonts'
+            text: 'Fonts',
+            cls: 'category-title'
           },
 
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'hbox'
@@ -992,7 +1001,7 @@ Ext.define('NX.view.dev.Buttons', {
 
             items: [
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox'
@@ -1004,7 +1013,7 @@ Ext.define('NX.view.dev.Buttons', {
                     text: 'Proxima Nova Regular'
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'vbox'
@@ -1020,7 +1029,7 @@ Ext.define('NX.view.dev.Buttons', {
                 ]
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox'
@@ -1032,7 +1041,7 @@ Ext.define('NX.view.dev.Buttons', {
                     text: 'Proxima Nova Bold'
                   },
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'vbox'
@@ -1050,7 +1059,7 @@ Ext.define('NX.view.dev.Buttons', {
             ]
           },
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'vbox'
@@ -1062,7 +1071,7 @@ Ext.define('NX.view.dev.Buttons', {
                 text: 'Source Code Pro Regular'
               },
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'vbox'
@@ -1087,20 +1096,23 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
           type: 'vbox',
           padding: 4
         },
 
+        cls: 'category',
+
         items: [
           {
             xtype: 'label',
-            text: 'Type Styles'
+            text: 'Type Styles',
+            cls: 'category-title'
           },
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'table',
@@ -1129,12 +1141,14 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
           type: 'vbox',
           padding: 4
         },
+
+        cls: 'category',
 
         items: [
 
@@ -1145,16 +1159,17 @@ Ext.define('NX.view.dev.Buttons', {
           },
 
           {
-            xtype: 'panel',
+            xtype: 'container',
 
             layout: {
               type: 'vbox',
-              padding: 4
+              padding: 4,
+              cls: 'category-title'
             },
 
             items: [
               {
-                xtype: 'panel',
+                xtype: 'container',
 
                 layout: {
                   type: 'hbox'
@@ -1162,7 +1177,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                 items: [
                   {
-                    xtype: 'panel',
+                    xtype: 'container',
 
                     layout: {
                       type: 'vbox'
@@ -1174,7 +1189,7 @@ Ext.define('NX.view.dev.Buttons', {
                         text: 'Default'
                       },
                       {
-                        xtype: 'panel',
+                        xtype: 'container',
 
                         layout: {
                           type: 'table',
@@ -1183,7 +1198,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                         items: [
                           {
-                            xtype: 'panel',
+                            xtype: 'container',
 
                             layout: {
                               type: 'hbox'
@@ -1192,7 +1207,7 @@ Ext.define('NX.view.dev.Buttons', {
                             items: [
                               { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
                               {
-                                xtype: 'panel',
+                                xtype: 'container',
 
                                 layout: {
                                   type: 'vbox'
@@ -1200,7 +1215,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                                 items: [
                                   {
-                                    xtype: 'panel',
+                                    xtype: 'container',
 
                                     layout: {
                                       type: 'hbox'
@@ -1208,19 +1223,19 @@ Ext.define('NX.view.dev.Buttons', {
 
                                     items: [
                                       {
-                                        xtype: 'panel',
+                                        xtype: 'container',
                                         width: 10,
                                         height: 10,
-                                        bodyCls: 'color-white'
+                                        cls: 'color white'
                                       },
                                       {
                                         xtype: 'label',
-                                        text: '#FFFFFF'
+                                        text: '$color-white'
                                       }
                                     ]
                                   },
                                   {
-                                    xtype: 'panel',
+                                    xtype: 'container',
 
                                     layout: {
                                       type: 'hbox'
@@ -1228,14 +1243,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                                     items: [
                                       {
-                                        xtype: 'panel',
+                                        xtype: 'container',
                                         width: 10,
                                         height: 10,
-                                        bodyCls: 'color-light-gainsboro'
+                                        cls: 'color light-gainsboro'
                                       },
                                       {
                                         xtype: 'label',
-                                        text: '#E6E6E6'
+                                        text: '$color-light-gainsboro'
                                       }
                                     ]
                                   }
@@ -1244,7 +1259,7 @@ Ext.define('NX.view.dev.Buttons', {
                             ]
                           },
                           {
-                            xtype: 'panel',
+                            xtype: 'container',
 
                             layout: {
                               type: 'hbox'
@@ -1253,7 +1268,7 @@ Ext.define('NX.view.dev.Buttons', {
                             items: [
                               { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
                               {
-                                xtype: 'panel',
+                                xtype: 'container',
 
                                 layout: {
                                   type: 'vbox'
@@ -1261,7 +1276,7 @@ Ext.define('NX.view.dev.Buttons', {
 
                                 items: [
                                   {
-                                    xtype: 'panel',
+                                    xtype: 'container',
 
                                     layout: {
                                       type: 'hbox'
@@ -1269,19 +1284,19 @@ Ext.define('NX.view.dev.Buttons', {
 
                                     items: [
                                       {
-                                        xtype: 'panel',
+                                        xtype: 'container',
                                         width: 10,
                                         height: 10,
-                                        bodyCls: 'color-light-gray'
+                                        cls: 'color-light-gray'
                                       },
                                       {
                                         xtype: 'label',
-                                        text: '#CBCBCB'
+                                        text: '$color-light-gray'
                                       }
                                     ]
                                   },
                                   {
-                                    xtype: 'panel',
+                                    xtype: 'container',
 
                                     layout: {
                                       type: 'hbox'
@@ -1289,14 +1304,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                                     items: [
                                       {
-                                        xtype: 'panel',
+                                        xtype: 'container',
                                         width: 10,
                                         height: 10,
-                                        bodyCls: 'color-silver'
+                                        cls: 'color-silver'
                                       },
                                       {
                                         xtype: 'label',
-                                        text: '#B8B8B8'
+                                        text: '$color-silver'
                                       }
                                     ]
                                   }
@@ -1315,7 +1330,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Default buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1331,7 +1346,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Primary buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1349,7 +1364,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Danger buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1367,7 +1382,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Warning buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1385,7 +1400,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Success buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1403,7 +1418,7 @@ Ext.define('NX.view.dev.Buttons', {
 
           // Plain buttons
           {
-            xtype: 'panel',
+            xtype: 'container',
             layout: {
               type: 'hbox',
               padding: 4
@@ -1432,400 +1447,413 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'label',
-        text: 'Form Elements'
-      },
-      {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
-          type: 'table',
-          padding: 4,
-          columns: 4
+          type: 'vbox',
+          padding: 4
         },
 
-        items: [
-          {
-            xtype: 'panel',
+        cls: 'category',
 
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                value: 'Text Input'
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                value: 'Text Input',
-                allowBlank: false
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                allowBlank: false
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            colspan: 2,
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                value: 'Text Input'
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                value: 'Text Input',
-                allowBlank: false
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                allowBlank: false
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-
-            colspan: 2,
-
-            layout: {
-              type: 'vbox',
-              padding: 4
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: '[Label]'
-              },
-              {
-                xtype: 'label',
-                text: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200
-              }
-            ]
-          }
-        ]
-      },
-      {
-        xtype: 'panel',
-
-        layout: {
-          type: 'table',
-          padding: 4,
-          columns: 4
+        items: [{
+          xtype: 'label',
+          text: 'Form Elements',
+          cls: 'category-title'
         },
+          {
+            xtype: 'container',
 
-        items: [
-          {
-            xtype: 'checkbox',
-            boxLabel: 'Checkbox'
+            layout: {
+              type: 'table',
+              padding: 4,
+              columns: 4
+            },
+
+            items: [
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200,
+                    value: 'Text Input'
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200,
+                    value: 'Text Input',
+                    allowBlank: false
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200,
+                    allowBlank: false
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                colspan: 2,
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textfield',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200,
+                    value: 'Text Input'
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200,
+                    value: 'Text Input',
+                    allowBlank: false
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200,
+                    allowBlank: false
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                colspan: 2,
+
+                layout: {
+                  type: 'vbox',
+                  padding: 4
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: '[Label]'
+                  },
+                  {
+                    xtype: 'label',
+                    text: '[Optional description text]'
+                  },
+                  {
+                    xtype: 'textarea',
+                    width: 200
+                  }
+                ]
+              }
+            ]
           },
           {
-            xtype: 'checkbox',
-            boxLabel: 'Checkbox'
-          },
-          {
-            xtype: 'checkbox',
-            boxLabel: 'Checkbox',
-            checked: true
-          },
-          {
-            xtype: 'checkbox',
-            boxLabel: 'Checkbox',
-            checked: true
-          },
-          {
-            xtype: 'radio',
-            boxLabel: 'Radio Button'
-          },
-          {
-            xtype: 'radio',
-            boxLabel: 'Radio Button'
-          },
-          {
-            xtype: 'radio',
-            boxLabel: 'Radio Button',
-            checked: true
-          },
-          {
-            xtype: 'radio',
-            boxLabel: 'Radio Button',
-            checked: true
+            xtype: 'container',
+
+            layout: {
+              type: 'table',
+              padding: 4,
+              columns: 4
+            },
+
+            items: [
+              {
+                xtype: 'checkbox',
+                boxLabel: 'Checkbox'
+              },
+              {
+                xtype: 'checkbox',
+                boxLabel: 'Checkbox'
+              },
+              {
+                xtype: 'checkbox',
+                boxLabel: 'Checkbox',
+                checked: true
+              },
+              {
+                xtype: 'checkbox',
+                boxLabel: 'Checkbox',
+                checked: true
+              },
+              {
+                xtype: 'radio',
+                boxLabel: 'Radio Button'
+              },
+              {
+                xtype: 'radio',
+                boxLabel: 'Radio Button'
+              },
+              {
+                xtype: 'radio',
+                boxLabel: 'Radio Button',
+                checked: true
+              },
+              {
+                xtype: 'radio',
+                boxLabel: 'Radio Button',
+                checked: true
+              }
+            ]
           }
         ]
       }
@@ -1855,23 +1883,36 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'label',
-        text: 'Notifications'
-      },
-      {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
-          type: 'hbox',
-          defaultMargins: '0px 10px 0px 0px'
+          type: 'vbox'
         },
 
+        cls: 'category',
+
         items: [
-          notificationWindow('default'),
-          notificationWindow('primary'),
-          notificationWindow('danger'),
-          notificationWindow('warning'),
-          notificationWindow('success')
+          {
+            xtype: 'label',
+            text: 'Notifications',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'container',
+
+            layout: {
+              type: 'hbox',
+              defaultMargins: '0px 10px 0px 0px'
+            },
+
+            items: [
+              notificationWindow('default'),
+              notificationWindow('primary'),
+              notificationWindow('danger'),
+              notificationWindow('warning'),
+              notificationWindow('success')
+            ]
+          }
         ]
       }
     );
@@ -1882,21 +1923,34 @@ Ext.define('NX.view.dev.Buttons', {
 
     me.items.push(
       {
-        xtype: 'label',
-        text: 'Modals'
-      }/*,
-      {
-        xtype: 'panel',
+        xtype: 'container',
 
         layout: {
-          type: 'hbox',
-          padding: 4
+          type: 'vbox'
         },
 
+        cls: 'category',
+
         items: [
-          // TODO
+          {
+            xtype: 'label',
+            text: 'Modals',
+            cls: 'category-title'
+          }/*,
+          {
+            xtype: 'container',
+
+            layout: {
+              type: 'hbox',
+              padding: 4
+            },
+
+            items: [
+              // TODO
+            ]
+          }*/
         ]
-      }*/
+      }
     );
 
     /*

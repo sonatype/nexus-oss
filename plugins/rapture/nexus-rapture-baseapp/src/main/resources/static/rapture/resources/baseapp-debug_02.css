@@ -3965,6 +3965,9 @@
 /* line 85, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
 .x-panel-developer {
   /*
+   * Meta styles for the visual style sheet
+   */
+  /*
    * Visual style sheet colors
    */
 }
@@ -3972,232 +3975,248 @@
 .x-panel-developer .x-panel-body .x-tabpanel-child .x-box-inner {
   overflow-y: auto;
 }
-/* line 96, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-black {
-  background-color: black;
+/* line 95, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .category {
+  padding-bottom: 1em;
+  border-bottom: 1px #dddddd solid;
 }
-/* line 100, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-night-rider {
-  background-color: #333333;
+/* line 99, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .category .category-title {
+  text-transform: uppercase;
+  padding-bottom: 5px;
+  font-size: 120%;
 }
-/* line 104, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-charcoal {
-  background-color: #444444;
-}
-/* line 108, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-dark-gray {
-  background-color: #777777;
-}
-/* line 112, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-gray {
-  background-color: gray;
+/* line 110, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color {
+  border: 1px #dddddd solid;
+  margin: 0 3px 3px 0 !important;
 }
 /* line 116, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-gray {
-  background-color: #cbcbcb;
+.x-panel-developer .color.black {
+  background-color: black;
 }
 /* line 120, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-gainsboro {
-  background-color: #dddddd;
+.x-panel-developer .color.night-rider {
+  background-color: #333333;
 }
 /* line 124, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-smoke {
-  background-color: #ebebeb;
+.x-panel-developer .color.charcoal {
+  background-color: #444444;
 }
 /* line 128, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-smoke {
-  background-color: #f4f4f4;
+.x-panel-developer .color.dark-gray {
+  background-color: #777777;
 }
-/* line 134, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-cerise {
-  background-color: #db2852;
-}
-/* line 138, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-sun {
-  background-color: #f2862f;
-}
-/* line 142, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-energy-yellow {
-  background-color: #f5c649;
-}
-/* line 146, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-cobalt {
-  background-color: #0047b2;
-}
-/* line 150, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-cerulean-blue {
-  background-color: #2476c3;
-}
-/* line 156, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-citrus {
-  background-color: #84c900;
-}
-/* line 160, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-free-speech-red {
-  background-color: #c70000;
-}
-/* line 166, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-energy-yellow {
-  background-color: #f5c649;
-}
-/* line 170, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-floral-white {
-  background-color: #fffaee;
-}
-/* line 176, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-pigment-green {
-  background-color: #0b9743;
-}
-/* line 180, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-madang {
-  background-color: #b6e9ab;
-}
-/* line 184, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-venetian-red {
-  background-color: #bc0430;
-}
-/* line 188, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-beauty-bush {
-  background-color: #edb2af;
-}
-/* line 192, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-navy-blue {
-  background-color: #006bbf;
-}
-/* line 196, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-cornflower {
-  background-color: #96caee;
-}
-/* line 200, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-affair {
-  background-color: #875393;
-}
-/* line 204, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-east-side {
-  background-color: #b087b9;
-}
-/* line 208, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-blue-chalk {
-  background-color: #dac5df;
-}
-/* line 214, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-white {
-  background-color: white;
-}
-/* line 218, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-gainsboro {
-  background-color: #e6e6e6;
-}
-/* line 222, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-gray {
-  background-color: #cbcbcb;
-}
-/* line 226, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-silver {
-  background-color: #b8b8b8;
-}
-/* line 230, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-suva-gray {
-  background-color: #919191;
-}
-/* line 234, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-gray {
+/* line 132, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.gray {
   background-color: gray;
 }
+/* line 136, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.light-gray {
+  background-color: #cbcbcb;
+}
+/* line 140, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.gainsboro {
+  background-color: #dddddd;
+}
+/* line 144, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.smoke {
+  background-color: #ebebeb;
+}
+/* line 148, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.light-smoke {
+  background-color: #f4f4f4;
+}
+/* line 154, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.cerise {
+  background-color: #db2852;
+}
+/* line 158, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.sun {
+  background-color: #f2862f;
+}
+/* line 162, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.energy-yellow {
+  background-color: #f5c649;
+}
+/* line 166, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.cobalt {
+  background-color: #0047b2;
+}
+/* line 170, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.cerulean-blue {
+  background-color: #2476c3;
+}
+/* line 176, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.citrus {
+  background-color: #84c900;
+}
+/* line 180, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.free-speech-red {
+  background-color: #c70000;
+}
+/* line 186, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.energy-yellow {
+  background-color: #f5c649;
+}
+/* line 190, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.floral-white {
+  background-color: #fffaee;
+}
+/* line 196, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.pigment-green {
+  background-color: #0b9743;
+}
+/* line 200, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.madang {
+  background-color: #b6e9ab;
+}
+/* line 204, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.venetian-red {
+  background-color: #bc0430;
+}
+/* line 208, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.beauty-bush {
+  background-color: #edb2af;
+}
+/* line 212, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.navy-blue {
+  background-color: #006bbf;
+}
+/* line 216, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.cornflower {
+  background-color: #96caee;
+}
+/* line 220, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.affair {
+  background-color: #875393;
+}
+/* line 224, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.east-side {
+  background-color: #b087b9;
+}
+/* line 228, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.blue-chalk {
+  background-color: #dac5df;
+}
+/* line 234, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.white {
+  background-color: white;
+}
 /* line 238, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-denim {
-  background-color: #197ac5;
+.x-panel-developer .color.light-gainsboro {
+  background-color: #e6e6e6;
 }
 /* line 242, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-cobalt {
-  background-color: #0161ad;
+.x-panel-developer .color.light-gray {
+  background-color: #cbcbcb;
 }
 /* line 246, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-dark-denim {
-  background-color: #014e8a;
+.x-panel-developer .color.silver {
+  background-color: #b8b8b8;
 }
 /* line 250, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-smalt {
-  background-color: #0f4976;
+.x-panel-developer .color.suva-gray {
+  background-color: #919191;
 }
 /* line 254, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-dark-cerulean {
-  background-color: #0f4976;
+.x-panel-developer .color.gray {
+  background-color: gray;
 }
 /* line 258, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-prussian-blue {
-  background-color: #013a68;
+.x-panel-developer .color.denim {
+  background-color: #197ac5;
 }
 /* line 262, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-light-cerise {
-  background-color: #de3d63;
+.x-panel-developer .color.light-cobalt {
+  background-color: #0161ad;
 }
 /* line 266, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-brick-red {
-  background-color: #c6254b;
+.x-panel-developer .color.dark-denim {
+  background-color: #014e8a;
 }
 /* line 270, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-old-rose {
-  background-color: #b2314f;
+.x-panel-developer .color.smalt {
+  background-color: #0f4976;
 }
 /* line 274, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-fire-brick {
-  background-color: #9e1e3c;
+.x-panel-developer .color.dark-cerulean {
+  background-color: #0f4976;
 }
 /* line 278, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-shiraz {
-  background-color: #85253b;
+.x-panel-developer .color.prussian-blue {
+  background-color: #013a68;
 }
 /* line 282, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-falu-red {
-  background-color: #77162d;
+.x-panel-developer .color.light-cerise {
+  background-color: #de3d63;
 }
 /* line 286, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-sea-buckthorn {
-  background-color: #f39244;
+.x-panel-developer .color.brick-red {
+  background-color: #c6254b;
 }
 /* line 290, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-tahiti-gold {
-  background-color: #da792b;
+.x-panel-developer .color.old-rose {
+  background-color: #b2314f;
 }
 /* line 294, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-zest {
-  background-color: #c17536;
+.x-panel-developer .color.fire-brick {
+  background-color: #9e1e3c;
 }
 /* line 298, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-rich-gold {
-  background-color: #ae6122;
+.x-panel-developer .color.shiraz {
+  background-color: #85253b;
 }
 /* line 302, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-afghan-tan {
-  background-color: #925829;
+.x-panel-developer .color.falu-red {
+  background-color: #77162d;
 }
 /* line 306, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-russet {
-  background-color: #83491a;
+.x-panel-developer .color.sea-buckthorn {
+  background-color: #f39244;
 }
 /* line 310, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-elf-green {
-  background-color: #23a156;
+.x-panel-developer .color.tahiti-gold {
+  background-color: #da792b;
 }
 /* line 314, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-dark-pigment-green {
-  background-color: #0b893d;
+.x-panel-developer .color.zest {
+  background-color: #c17536;
 }
 /* line 318, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-salem {
-  background-color: #1c8145;
+.x-panel-developer .color.rich-gold {
+  background-color: #ae6122;
 }
 /* line 322, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-jewel {
-  background-color: #096e31;
+.x-panel-developer .color.afghan-tan {
+  background-color: #925829;
 }
 /* line 326, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-fun-green {
-  background-color: #156134;
+.x-panel-developer .color.russet {
+  background-color: #83491a;
 }
 /* line 330, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
-.x-panel-developer .color-dark-jewel {
+.x-panel-developer .color.elf-green {
+  background-color: #23a156;
+}
+/* line 334, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.dark-pigment-green {
+  background-color: #0b893d;
+}
+/* line 338, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.salem {
+  background-color: #1c8145;
+}
+/* line 342, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.jewel {
+  background-color: #096e31;
+}
+/* line 346, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.fun-green {
+  background-color: #156134;
+}
+/* line 350, ../../../baseapp/packages/rapture-theme/sass/src/Ext/panel/Panel.scss */
+.x-panel-developer .color.dark-jewel {
   background-color: #0c4f26;
 }
 
