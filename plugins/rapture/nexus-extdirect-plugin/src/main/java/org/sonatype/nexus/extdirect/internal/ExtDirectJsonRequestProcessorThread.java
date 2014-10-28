@@ -12,10 +12,16 @@
  */
 package org.sonatype.nexus.extdirect.internal;
 
+import java.util.Collections;
+import java.util.concurrent.Callable;
+
 import javax.inject.Named;
 
 import org.sonatype.security.UserIdMdcHelper;
 
+import com.google.common.base.Throwables;
+import com.google.inject.Key;
+import com.google.inject.servlet.ServletScopes;
 import com.softwarementors.extjs.djn.servlet.ssm.SsmJsonRequestProcessorThread;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -36,24 +42,38 @@ public class ExtDirectJsonRequestProcessorThread
 
   private final SubjectThreadState threadState;
 
+  private final Callable<String> processRequest;
+
   public ExtDirectJsonRequestProcessorThread() {
     Subject subject = SecurityUtils.getSubject();
     checkState(subject != null, "Subject is not set");
     // create the thread state by this moment as this is created in the master (web container) thread
     threadState = new SubjectThreadState(subject);
+    processRequest = ServletScopes.continueRequest(new Callable<String>()
+    {
+      @Override
+      public String call() {
+        threadState.bind();
+        UserIdMdcHelper.set();
+        try {
+          return ExtDirectJsonRequestProcessorThread.super.processRequest();
+        }
+        finally {
+          UserIdMdcHelper.unset();
+          threadState.restore();
+        }
+
+      }
+    }, Collections.<Key<?>, Object>emptyMap());
   }
 
   @Override
   public String processRequest() {
-
-    threadState.bind();
-    UserIdMdcHelper.set();
     try {
-      return super.processRequest();
+      return processRequest.call();
     }
-    finally {
-      UserIdMdcHelper.unset();
-      threadState.restore();
+    catch (Exception e) {
+      throw Throwables.propagate(e);
     }
   }
 
