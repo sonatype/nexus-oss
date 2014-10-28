@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
@@ -42,6 +45,11 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpProcessor;
+import org.apache.http.protocol.HttpRequestExecutor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -83,7 +91,20 @@ public class RemoteStorageContextCustomizer
     if (context.getRemoteConnectionSettings() != null) {
       String userAgentSuffix = context.getRemoteConnectionSettings().getUserAgentCustomizationString();
       if (!StringUtils.isEmpty(userAgentSuffix)) {
-        builder.setUserAgent(builder.getUserAgent() + " " + userAgentSuffix);
+        final String customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
+        builder.setUserAgent(customizedUserAgent);
+        builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
+          @Override
+          public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
+              throws HttpException, IOException
+          {
+            // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+            if (!request.containsHeader(HTTP.USER_AGENT)) {
+              request.addHeader(new BasicHeader(HTTP.USER_AGENT, customizedUserAgent));
+            }
+            super.preProcess(request, processor, ctx);
+          }
+        });
       }
     }
   }

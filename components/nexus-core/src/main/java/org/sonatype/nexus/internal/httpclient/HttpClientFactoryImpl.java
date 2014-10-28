@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.internal.httpclient;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +35,8 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.config.Registry;
@@ -44,6 +47,11 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpProcessor;
+import org.apache.http.protocol.HttpRequestExecutor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -293,7 +301,20 @@ public class HttpClientFactoryImpl
     builder.getRequestConfigBuilder().setStaleConnectionCheckEnabled(false);
 
     // Apply default user-agent
-    builder.setUserAgent(getUserAgent());
+    final String userAgent = getUserAgent();
+    builder.setUserAgent(userAgent);
+    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
+      @Override
+      public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
+          throws HttpException, IOException
+      {
+        // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+        if (!request.containsHeader(HTTP.USER_AGENT)) {
+          request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgent));
+        }
+        super.preProcess(request, processor, ctx);
+      }
+    });
     
     customizer.customize(builder);
 
