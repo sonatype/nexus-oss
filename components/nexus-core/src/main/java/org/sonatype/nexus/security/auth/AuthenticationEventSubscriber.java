@@ -53,7 +53,9 @@ public class AuthenticationEventSubscriber
     ClientInfo clientInfo = clientInfoProvider.get().getCurrentThreadClientInfo();
     eventBus.get().post(new NexusAuthenticationEvent(
         this,
-        new ClientInfo(event.getUserId(), clientInfo.getRemoteIP(), clientInfo.getUserAgent()),
+        clientInfo == null
+            ? new ClientInfo(event.getUserId(), null, null)
+            : new ClientInfo(event.getUserId(), clientInfo.getRemoteIP(), clientInfo.getUserAgent()),
         event.isSuccessful()
     ));
   }
