@@ -1832,75 +1832,48 @@ Ext.define('NX.view.dev.Buttons', {
     );
 
     /*
-     * Notifications
+     * Notifications messages.
      */
+
+    function notificationWindow(type) {
+      var style = 'message-' + type;
+      return {
+        xtype: 'window',
+        ui: style,
+        iconCls: NX.Icons.cls(style, 'x16'),
+        title: type,
+        html: "ui: '" + style + "'",
+        hidden: false,
+        collapsible: false,
+        floating: false,
+        closable: false,
+        draggable: false,
+        resizable: false,
+        width: 200
+      };
+    }
 
     me.items.push(
       {
         xtype: 'label',
         text: 'Notifications'
-      }/*,
+      },
       {
         xtype: 'panel',
 
         layout: {
           type: 'hbox',
-          padding: 4
+          defaultMargins: '0px 10px 0px 0px'
         },
 
         items: [
-          {
-            xtype: 'nx-message-notification',
-            ui: 'message-default',
-            iconCls: NX.Icons.cls('message-default', 'x16'),
-            title: 'Default',
-            html: 'Message',
-            autoClose: false,
-            slideInAnimation: 'none',
-            paddingX: 30
-          },
-          {
-            xtype: 'nx-message-notification',
-            ui: 'message-primary',
-            iconCls: NX.Icons.cls('message-primary', 'x16'),
-            title: 'Primary',
-            html: 'Message',
-            autoClose: false,
-            slideInAnimation: 'none',
-            paddingX: 30
-          },
-          {
-            xtype: 'nx-message-notification',
-            ui: 'message-danger',
-            iconCls: NX.Icons.cls('message-danger', 'x16'),
-            title: 'Danger',
-            html: 'Message',
-            autoClose: false,
-            slideInAnimation: 'none',
-            paddingX: 30
-          },
-          {
-            xtype: 'nx-message-notification',
-            ui: 'message-warning',
-            iconCls: NX.Icons.cls('message-warning', 'x16'),
-            title: 'Warning',
-            html: 'Message',
-            autoClose: false,
-            slideInAnimation: 'none',
-            paddingX: 30
-          },
-          {
-            xtype: 'nx-message-notification',
-            ui: 'message-success',
-            iconCls: NX.Icons.cls('message-success', 'x16'),
-            title: 'Success',
-            html: 'Message',
-            autoClose: false,
-            slideInAnimation: 'none',
-            paddingX: 30
-          }
+          notificationWindow('default'),
+          notificationWindow('primary'),
+          notificationWindow('danger'),
+          notificationWindow('warning'),
+          notificationWindow('success')
         ]
-      }*/
+      }
     );
 
     /*
