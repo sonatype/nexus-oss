@@ -966,6 +966,163 @@ Ext.define('NX.view.dev.Buttons', {
      * Fonts
      */
 
+    me.items.push(
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        items: [
+
+          // Section title
+          {
+            xtype: 'label',
+            text: 'Fonts'
+          },
+
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'hbox'
+            },
+
+            items: [
+              {
+                xtype: 'panel',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Proxima Nova Regular'
+                  },
+                  {
+                    xtype: 'panel',
+
+                    layout: {
+                      type: 'vbox'
+                    },
+
+                    items: [
+                      { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
+                      { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
+                      { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+                      { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
+                    ]
+                  }
+                ]
+              },
+              {
+                xtype: 'panel',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Proxima Nova Bold'
+                  },
+                  {
+                    xtype: 'panel',
+
+                    layout: {
+                      type: 'vbox'
+                    },
+
+                    items: [
+                      { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
+                      { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
+                      { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+                      { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox'
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: 'Source Code Pro Regular'
+              },
+              {
+                xtype: 'panel',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
+                  { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
+                  { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+                  { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    );
+
+    /*
+     * Type Styles
+     */
+
+    me.items.push(
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Type Styles'
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'table',
+              columns: 6
+            },
+
+            items: [
+              { html: 'Name' }, { html: 'Description' }, { html: 'Font & Weight' }, { html: 'Use Cases' }, { html: 'Pixels' }, { html: 'Sample' },
+              { html: 'h1' }, { html: 'Page Title' }, { html: 'Proxima Nova Light' }, { html: 'Header' }, { html: '40' }, { html: 'Sonatype Nexus' },
+              { html: 'h2' }, { html: 'Header' }, { html: 'Proxima Nova Bold' }, { html: 'Header' }, { html: '26' }, { html: 'Development' },
+              { html: 'h3' }, { html: 'Header' }, { html: 'Proxima Nova Bold' }, { html: 'Header' }, { html: '22' }, { html: 'Development' },
+              { html: 'h4' }, { html: 'Sub-Header' }, { html: 'Proxima Nova Bold' }, { html: 'Sub-Header' }, { html: '18' }, { html: 'Development' },
+              { html: 'h5' }, { html: 'Sub-Header' }, { html: 'Proxima Nova Bold' }, { html: 'Sub-Header' }, { html: '16' }, { html: 'Development' },
+              { html: 'p/ul/ol' }, { html: 'Body' }, { html: 'Proxima Nova Regular' }, { html: 'Body text, lists, default size' }, { html: '16' }, { html: 'Development' },
+              { html: 'code' }, { html: 'Code' }, { html: 'Source Code Pro Regular' }, { html: 'Code examples' }, { html: '16' }, { html: 'Development' },
+              { html: 'utility' }, { html: 'Small Text' }, { html: 'Proxima Nova Regular' }, { html: 'Labels, Side-Nav' }, { html: '16' }, { html: 'Development' }
+            ]
+          }
+        ]
+      }
+    );
+
     /*
      * Buttons
      */
