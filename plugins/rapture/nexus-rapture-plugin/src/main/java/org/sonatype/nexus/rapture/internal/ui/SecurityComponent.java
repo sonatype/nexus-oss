@@ -23,15 +23,20 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.rapture.StateContributor;
+import org.sonatype.nexus.security.auth.ClientInfo;
+import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.util.Tokens;
 import org.sonatype.nexus.validation.Validate;
+import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.wonderland.AuthTicketService;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Privilege;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -75,12 +80,16 @@ public class SecurityComponent
 
   private final AuthTicketService authTickets;
 
+  private final EventBus eventBus;
+
   @Inject
   public SecurityComponent(final SecuritySystem securitySystem,
-                           final AuthTicketService authTickets)
+                           final AuthTicketService authTickets,
+                           final EventBus eventBus)
   {
     this.securitySystem = checkNotNull(securitySystem);
     this.authTickets = checkNotNull(authTickets);
+    this.eventBus = checkNotNull(eventBus);
   }
 
   @DirectMethod
@@ -103,12 +112,13 @@ public class SecurityComponent
                        final @NotEmpty(message = "[base64Password] may not be empty") String base64Password,
                        final boolean rememberMe) throws Exception
   {
+    String username = Tokens.decodeBase64String(base64Username);
     try {
-      securitySystem.login(new UsernamePasswordToken(
-          Tokens.decodeBase64String(base64Username), Tokens.decodeBase64String(base64Password), rememberMe
-      ));
+      securitySystem.login(new UsernamePasswordToken(username, Tokens.decodeBase64String(base64Password), rememberMe));
+      postAuthenticationEvent(username, true);
     }
     catch (Exception e) {
+      postAuthenticationEvent(username, false);
       throw new Exception("Authentication failed", e);
     }
     return getUser();
@@ -319,6 +329,19 @@ public class SecurityComponent
     });
 
     return perms;
+  }
+
+  private void postAuthenticationEvent(final String user, final boolean success) {
+    if (WebContextManager.isWebContextAttachedToCurrentThread()) {
+      HttpServletRequest request = WebContextManager.get().getRequest();
+      eventBus.post(
+          new NexusAuthenticationEvent(
+              this,
+              new ClientInfo(user, RemoteIPFinder.findIP(request), request.getHeader("user-agent")),
+              success
+          )
+      );
+    }
   }
 
 }
