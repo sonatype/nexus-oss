@@ -23,6 +23,7 @@ import org.sonatype.nexus.security.auth.ClientInfoProvider;
 import org.sonatype.nexus.web.RemoteIPFinder;
 
 import com.google.common.net.HttpHeaders;
+import com.google.inject.ProvisionException;
 import com.google.inject.OutOfScopeException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -58,7 +59,7 @@ public class ClientInfoProviderImpl
           request.getHeader(HttpHeaders.USER_AGENT)
       );
     }
-    catch (OutOfScopeException e) {
+    catch (ProvisionException | OutOfScopeException e) {
       return null;
     }
   }
