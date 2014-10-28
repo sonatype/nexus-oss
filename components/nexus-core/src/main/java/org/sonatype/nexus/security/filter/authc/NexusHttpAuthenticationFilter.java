@@ -23,8 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.security.auth.ClientInfo;
-import org.sonatype.nexus.security.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.nexus.web.RemoteIPFinder;
 import org.sonatype.nexus.web.TemplateRenderer;
@@ -78,16 +76,16 @@ public class NexusHttpAuthenticationFilter
 
   @Inject
   private BrowserDetector browserDetector;
-  
+
   // ==
-  
+
   private String nexusVersion;
-  
+
   @Inject
   public void setApplicationVersion(final Provider<SystemStatus> systemStatusProvider) {
     this.nexusVersion = systemStatusProvider.get().getVersion();
   }
-  
+
   // ==
 
   protected SecuritySystem getSecuritySystem() {
@@ -188,9 +186,9 @@ public class NexusHttpAuthenticationFilter
       httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       // omit WWW-Authenticate we do NOT want to have browser prompt
 
-      Map<String,Object> params = ImmutableMap.of(
+      Map<String, Object> params = ImmutableMap.of(
           "nexusVersion", nexusVersion,
-          "nexusRoot", (Object)BaseUrlHolder.get()
+          "nexusRoot", (Object) BaseUrlHolder.get()
       );
       TemplateLocator template = templateRenderer.template(
           "/org/sonatype/nexus/web/internal/accessDeniedHtml.vm",
@@ -297,9 +295,6 @@ public class NexusHttpAuthenticationFilter
 
     if (anonymousLoginSuccessful) {
       getLogger().debug("Successfully logged in as anonymous");
-
-      postAuthcEvent(request, getSecuritySystem().getAnonymousUsername(), getUserAgent(request), true);
-
       return true;
     }
 
@@ -308,42 +303,10 @@ public class NexusHttpAuthenticationFilter
     return false;
   }
 
-  private void postAuthcEvent(ServletRequest request, String username, String userAgent, boolean success) {
-    if (eventBus != null) {
-      eventBus.post(
-          new NexusAuthenticationEvent(
-              this,
-              new ClientInfo(username, RemoteIPFinder.findIP((HttpServletRequest) request), userAgent),
-              success
-          )
-      );
-    }
-  }
-
-  @Override
-  protected boolean onLoginSuccess(final AuthenticationToken token,
-                                   final Subject subject,
-                                   final ServletRequest request,
-                                   final ServletResponse response)
-  {
-    // Prefer the subject principal over the token's, as these could be different for token-based authentication
-    String userId;
-    if (subject.getPrincipal() != null) {
-      userId = subject.getPrincipal().toString();
-    }
-    else {
-      userId = token.getPrincipal().toString();
-    }
-    postAuthcEvent(request, userId, getUserAgent(request), true);
-    return true;
-  }
-
   @Override
   protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException ae, ServletRequest request,
                                    ServletResponse response)
   {
-    postAuthcEvent(request, token.getPrincipal().toString(), getUserAgent(request), false);
-
     HttpServletResponse httpResponse = WebUtils.toHttp(response);
 
     if (ExpiredCredentialsException.class.isAssignableFrom(ae.getClass())) {

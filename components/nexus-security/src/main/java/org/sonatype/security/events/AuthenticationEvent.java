@@ -10,25 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.auth;
-
-import javax.annotation.Nullable;
+package org.sonatype.security.events;
 
 /**
- * Manages and provides {@link ClientInfo} instances.
+ * An event fired when the an user is authorized.
  *
- * @author cstamas
- * @since 2.1
+ * @since 3.0
  */
-public interface ClientInfoProvider
+public class AuthenticationEvent
 {
-  /**
-   * Returns the {@link ClientInfo} for current thread. It will be non-null if this thread is a REST (or better HTTP)
-   * Request processing thread, and {@code null} if this is a non REST Request processing thread (like a scheduled
-   * task threads are).
-   *
-   * @return the current thread's {@link ClientInfo} or {@code null} if none available.
-   */
-  @Nullable
-  ClientInfo getCurrentThreadClientInfo();
+
+  private final String userId;
+
+  private final boolean successful;
+
+  public AuthenticationEvent(final String userId, final boolean successful) {
+    this.userId = userId;
+    this.successful = successful;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public boolean isSuccessful() {
+    return successful;
+  }
+
+  @Override
+  public String toString() {
+    return "AuthenticationEvent{" +
+        "userId=" + userId +
+        ", successful=" + successful +
+        '}';
+  }
+
 }
