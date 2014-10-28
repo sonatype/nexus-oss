@@ -140,7 +140,8 @@ Ext.define('NX.view.dev.Buttons', {
             items: [
               {
                 xtype: 'label',
-                text: 'Shell'
+                text: 'Shell',
+                cls: 'color-category'
               },
               {
                 xtype: 'container',
@@ -265,7 +266,8 @@ Ext.define('NX.view.dev.Buttons', {
                   // Section title
                   {
                     xtype: 'label',
-                    text: 'Severity'
+                    text: 'Severity',
+                    cls: 'color-category'
                   },
 
                   // Severity colors
@@ -339,7 +341,8 @@ Ext.define('NX.view.dev.Buttons', {
                   // Section title
                   {
                     xtype: 'label',
-                    text: 'Forms'
+                    text: 'Forms',
+                    cls: 'color-category'
                   },
 
                   // Form colors
@@ -385,7 +388,8 @@ Ext.define('NX.view.dev.Buttons', {
                   // Section title
                   {
                     xtype: 'label',
-                    text: 'Tooltip'
+                    text: 'Tooltip',
+                    cls: 'color-category'
                   },
 
                   // Tooltip colors
@@ -433,7 +437,8 @@ Ext.define('NX.view.dev.Buttons', {
               // Section header
               {
                 xtype: 'label',
-                text: 'Dashboard'
+                text: 'Dashboard',
+                cls: 'color-category'
               },
 
               // Dashboard colors
@@ -549,7 +554,8 @@ Ext.define('NX.view.dev.Buttons', {
                 items: [
                   {
                     xtype: 'label',
-                    text: 'Buttons'
+                    text: 'Buttons',
+                    cls: 'color-category'
                   },
                   {
                     xtype: 'container',
@@ -884,7 +890,8 @@ Ext.define('NX.view.dev.Buttons', {
                 items: [
                   {
                     xtype: 'label',
-                    text: 'Font Awesome Icons'
+                    text: 'Font Awesome Icons',
+                    cls: 'color-category'
                   },
                   {
                     xtype: 'container',

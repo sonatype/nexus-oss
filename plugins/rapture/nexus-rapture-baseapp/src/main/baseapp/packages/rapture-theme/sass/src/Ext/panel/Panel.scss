@@ -107,6 +107,11 @@
    * Visual style sheet colors
    */
 
+  .color-category {
+    font-weight: bold;
+    padding-bottom: 5px;
+  }
+
   .color {
 
     border: 1px $color-gainsboro solid;
