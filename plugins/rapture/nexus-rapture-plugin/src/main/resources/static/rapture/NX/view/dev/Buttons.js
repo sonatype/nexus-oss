@@ -1104,7 +1104,7 @@ Ext.define('NX.view.dev.Buttons', {
 
             layout: {
               type: 'table',
-              columns: 6
+              columns: 6,
             },
 
             items: [
@@ -1144,6 +1144,175 @@ Ext.define('NX.view.dev.Buttons', {
             text: 'Buttons'
           },
 
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'panel',
+
+                layout: {
+                  type: 'hbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'panel',
+
+                    layout: {
+                      type: 'vbox'
+                    },
+
+                    items: [
+                      {
+                        xtype: 'label',
+                        text: 'Default'
+                      },
+                      {
+                        xtype: 'panel',
+
+                        layout: {
+                          type: 'table',
+                          columns: 2
+                        },
+
+                        items: [
+                          {
+                            xtype: 'panel',
+
+                            layout: {
+                              type: 'hbox'
+                            },
+
+                            items: [
+                              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
+                              {
+                                xtype: 'panel',
+
+                                layout: {
+                                  type: 'vbox'
+                                },
+
+                                items: [
+                                  {
+                                    xtype: 'panel',
+
+                                    layout: {
+                                      type: 'hbox'
+                                    },
+
+                                    items: [
+                                      {
+                                        xtype: 'panel',
+                                        width: 10,
+                                        height: 10,
+                                        bodyCls: 'color-white'
+                                      },
+                                      {
+                                        xtype: 'label',
+                                        text: '#FFFFFF'
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    xtype: 'panel',
+
+                                    layout: {
+                                      type: 'hbox'
+                                    },
+
+                                    items: [
+                                      {
+                                        xtype: 'panel',
+                                        width: 10,
+                                        height: 10,
+                                        bodyCls: 'color-light-gainsboro'
+                                      },
+                                      {
+                                        xtype: 'label',
+                                        text: '#E6E6E6'
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            xtype: 'panel',
+
+                            layout: {
+                              type: 'hbox'
+                            },
+
+                            items: [
+                              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
+                              {
+                                xtype: 'panel',
+
+                                layout: {
+                                  type: 'vbox'
+                                },
+
+                                items: [
+                                  {
+                                    xtype: 'panel',
+
+                                    layout: {
+                                      type: 'hbox'
+                                    },
+
+                                    items: [
+                                      {
+                                        xtype: 'panel',
+                                        width: 10,
+                                        height: 10,
+                                        bodyCls: 'color-light-gray'
+                                      },
+                                      {
+                                        xtype: 'label',
+                                        text: '#CBCBCB'
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    xtype: 'panel',
+
+                                    layout: {
+                                      type: 'hbox'
+                                    },
+
+                                    items: [
+                                      {
+                                        xtype: 'panel',
+                                        width: 10,
+                                        height: 10,
+                                        bodyCls: 'color-silver'
+                                      },
+                                      {
+                                        xtype: 'label',
+                                        text: '#B8B8B8'
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+
           // Default buttons
           {
             xtype: 'panel',
@@ -1155,8 +1324,6 @@ Ext.define('NX.view.dev.Buttons', {
               width: 100
             },
             items: [
-              { xtype: 'label', text: "ui: 'default'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
               { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true },
               { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'default', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
             ]
@@ -1263,13 +1430,501 @@ Ext.define('NX.view.dev.Buttons', {
      * Form Elements
      */
 
+    me.items.push(
+      {
+        xtype: 'label',
+        text: 'Form Elements'
+      },
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'table',
+          padding: 4,
+          columns: 4
+        },
+
+        items: [
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200,
+                value: 'Text Input'
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200,
+                value: 'Text Input',
+                allowBlank: false
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200,
+                allowBlank: false
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            colspan: 2,
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textfield',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200,
+                value: 'Text Input'
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200,
+                value: 'Text Input',
+                allowBlank: false
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200,
+                allowBlank: false
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+
+            colspan: 2,
+
+            layout: {
+              type: 'vbox',
+              padding: 4
+            },
+
+            items: [
+              {
+                xtype: 'label',
+                text: '[Label]'
+              },
+              {
+                xtype: 'label',
+                text: '[Optional description text]'
+              },
+              {
+                xtype: 'textarea',
+                width: 200
+              }
+            ]
+          }
+        ]
+      },
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'table',
+          padding: 4,
+          columns: 4
+        },
+
+        items: [
+          {
+            xtype: 'checkbox',
+            boxLabel: 'Checkbox'
+          },
+          {
+            xtype: 'checkbox',
+            boxLabel: 'Checkbox'
+          },
+          {
+            xtype: 'checkbox',
+            boxLabel: 'Checkbox',
+            checked: true
+          },
+          {
+            xtype: 'checkbox',
+            boxLabel: 'Checkbox',
+            checked: true
+          },
+          {
+            xtype: 'radio',
+            boxLabel: 'Radio Button'
+          },
+          {
+            xtype: 'radio',
+            boxLabel: 'Radio Button'
+          },
+          {
+            xtype: 'radio',
+            boxLabel: 'Radio Button',
+            checked: true
+          },
+          {
+            xtype: 'radio',
+            boxLabel: 'Radio Button',
+            checked: true
+          }
+        ]
+      }
+    );
+
     /*
      * Notifications
      */
 
+    me.items.push(
+      {
+        xtype: 'label',
+        text: 'Notifications'
+      }/*,
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'hbox',
+          padding: 4
+        },
+
+        items: [
+          {
+            xtype: 'nx-message-notification',
+            ui: 'message-default',
+            iconCls: NX.Icons.cls('message-default', 'x16'),
+            title: 'Default',
+            html: 'Message',
+            autoClose: false,
+            slideInAnimation: 'none',
+            paddingX: 30
+          },
+          {
+            xtype: 'nx-message-notification',
+            ui: 'message-primary',
+            iconCls: NX.Icons.cls('message-primary', 'x16'),
+            title: 'Primary',
+            html: 'Message',
+            autoClose: false,
+            slideInAnimation: 'none',
+            paddingX: 30
+          },
+          {
+            xtype: 'nx-message-notification',
+            ui: 'message-danger',
+            iconCls: NX.Icons.cls('message-danger', 'x16'),
+            title: 'Danger',
+            html: 'Message',
+            autoClose: false,
+            slideInAnimation: 'none',
+            paddingX: 30
+          },
+          {
+            xtype: 'nx-message-notification',
+            ui: 'message-warning',
+            iconCls: NX.Icons.cls('message-warning', 'x16'),
+            title: 'Warning',
+            html: 'Message',
+            autoClose: false,
+            slideInAnimation: 'none',
+            paddingX: 30
+          },
+          {
+            xtype: 'nx-message-notification',
+            ui: 'message-success',
+            iconCls: NX.Icons.cls('message-success', 'x16'),
+            title: 'Success',
+            html: 'Message',
+            autoClose: false,
+            slideInAnimation: 'none',
+            paddingX: 30
+          }
+        ]
+      }*/
+    );
+
     /*
      * Modals
      */
+
+    me.items.push(
+      {
+        xtype: 'label',
+        text: 'Modals'
+      }/*,
+      {
+        xtype: 'panel',
+
+        layout: {
+          type: 'hbox',
+          padding: 4
+        },
+
+        items: [
+          // TODO
+        ]
+      }*/
+    );
 
     /*
      * Menu
