@@ -77,6 +77,9 @@
  * @class Ext.Component
  */
 /**
+ * @class Ext.LoadMask
+ */
+/**
  * @class Ext.button.Button
  */
 /**
@@ -5898,9 +5901,9 @@ a.x-tab .x-tab-inner-right {
 
 /* line 1, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/LoadMask.scss */
 .x-mask {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-  opacity: 0.7;
-  background: white;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
+  opacity: 0.3;
+  background: black;
   cursor: default;
 }
 
