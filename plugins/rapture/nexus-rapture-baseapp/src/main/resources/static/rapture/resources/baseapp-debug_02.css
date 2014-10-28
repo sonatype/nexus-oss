@@ -12014,7 +12014,7 @@
 
 /* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Panel.scss */
 .feature-content .x-panel-subsection {
-  border-top: 1px gray solid;
+  border-top: 1px #dddddd solid;
   margin: 0 10px 20px 10px !important;
   left: 0 !important;
 }
