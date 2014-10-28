@@ -200,12 +200,6 @@ public class GenerateMetadataTaskSettingsIT
     task.doRun();
   }
 
-  private RepositoryURLBuilder repositoryURLBuilder() {
-    final RepositoryURLBuilder settings = mock(RepositoryURLBuilder.class);
-    when(settings.getExposedRepositoryContentUrl(any(Repository.class), eq(true))).thenReturn(RPM_URL);
-    return settings;
-  }
-
   private RepositoryRegistry repoRegistry()
       throws Exception
   {

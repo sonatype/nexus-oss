@@ -12,61 +12,29 @@
  */
 package org.sonatype.nexus.rest;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+@Deprecated
 public interface RepositoryURLBuilder
 {
   /**
-   * @see #getRepositoryContentUrl(String, boolean) where forceBaseURL is {@code false}.
+   * Return content url for repository, or {@code null} if base-url is not set.
    */
+  @Nullable
   String getRepositoryContentUrl(String repositoryId) throws NoSuchRepositoryException;
 
   /**
-   * Builds the content URL of a repository identified by Id. See {@link #getRepositoryContentUrl(Repository)} for
-   * full description.
-   * 
-   * @return the content URL.
-   * @since 2.7
+   * Return content url for repository, or {@code null} if base-url is not set.
    */
-  String getRepositoryContentUrl(String repositoryId, boolean forceBaseURL) throws NoSuchRepositoryException;
-
-  /**
-   * @see #getRepositoryContentUrl(Repository, boolean) where forceBaseURL is {@code false}.
-   */
+  @Nullable
   String getRepositoryContentUrl(Repository repository);
 
   /**
-   * Builds the content URL of a repository. Under some circumstances, it is impossible to build the URL for
-   * Repository (example: this call does not happen in a HTTP Request context and baseUrl is not set), in such cases
-   * this method returns {@code null}. Word of warning: the fact that a content URL is returned for a Repository does
-   * not imply that the same repository is reachable over that repository! It still depends is the Repository exposed
-   * or not {@link Repository#isExposed()}.
-   * 
-   * If "forceBaseURL" is {@code true}, the returned url will use server based URL even if the call happens in an HTTP
-   * request, regardless of the value of forceBaseURL in server settings.
-   * 
-   * @return the content URL or {@code null}.
-   * @since 2.7
+   * Return content url for repository, or {@code null} if repository is not exposed or base-url is not set.
    */
-  String getRepositoryContentUrl(Repository repository, boolean forceBaseURL);
-
-  /**
-   * @see #getExposedRepositoryContentUrl(Repository, boolean) where forceBaseURL is {@code false}.
-   */
+  @Nullable
   String getExposedRepositoryContentUrl(Repository repository);
-
-  /**
-   * Builds the exposed content URL of a repository. Same as {@link #getRepositoryContentUrl(Repository,boolean)} but
-   * honors {@link Repository#isExposed()}, by returning {@code null} when repository is not exposed.
-   * 
-   * If "forceBaseURL" is {@code true}, the returned url will use server based URL even if the call happens in an HTTP
-   * request,
-   * regardless of the value of forceBaseURL in server settings.
-   * 
-   * @return the content URL or {@code null}.
-   * @since 2.7
-   */
-  String getExposedRepositoryContentUrl(Repository repository, boolean forceBaseURL);
-
 }

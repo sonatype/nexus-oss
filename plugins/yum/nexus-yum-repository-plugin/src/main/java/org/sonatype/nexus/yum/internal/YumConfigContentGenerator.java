@@ -71,7 +71,7 @@ public class YumConfigContentGenerator
           try (PrintWriter out = new PrintWriter(baos)) {
             out.println("[" + repository.getId() + "]");
             out.println("name=" + repository.getName());
-            out.println("baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl(repository, true));
+            out.println("baseurl=" + repositoryURLBuilder.getExposedRepositoryContentUrl(repository));
             out.println("enabled=1");
             out.println("protect=0");
             out.println("gpgcheck=0");

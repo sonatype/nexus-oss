@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
@@ -25,8 +24,9 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.web.BaseUrlHolder;
 
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -34,6 +34,13 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doReturn;
+
+/**
+ * Tests for {@link RestletRepositoryURLBuilder}.
+ */
 public class RestletRepositoryURLBuilderTest
 {
   private static final String MOCK_REPO_ID = "test-id";
@@ -54,118 +61,70 @@ public class RestletRepositoryURLBuilderTest
 
   private RepositoryTypeRegistry repositoryTypeRegistry;
 
-  private GlobalRestApiSettings globalRestApiSettings;
+  private RestletRepositoryURLBuilder underTest;
 
   @Before
-  public void setUp()
-      throws Exception
-  {
+  public void setUp() throws Exception {
     repository = Mockito.mock(Repository.class);
-    Mockito.doReturn(MOCK_REPO_ID).when(repository).getId();
-    Mockito.doReturn(M2Repository.class.getName()).when(repository).getProviderRole();
-    Mockito.doReturn(MOCK_REPO_ID).when(repository).getPathPrefix();
-    Mockito.doReturn(M2Repository.class.getName()).when(repository).getProviderRole();
-    Mockito.doReturn("my-hint").when(repository).getProviderHint();
+    doReturn(MOCK_REPO_ID).when(repository).getId();
+    doReturn(M2Repository.class.getName()).when(repository).getProviderRole();
+    doReturn(MOCK_REPO_ID).when(repository).getPathPrefix();
+    doReturn(M2Repository.class.getName()).when(repository).getProviderRole();
+    doReturn("my-hint").when(repository).getProviderHint();
 
     group = Mockito.mock(GroupRepository.class);
-    Mockito.doReturn(MOCK_GROUP_ID).when(group).getId();
-    Mockito.doReturn(M2GroupRepository.class.getName()).when(group).getProviderRole();
-    Mockito.doReturn(MOCK_REPO_ID).when(group).getPathPrefix();
+    doReturn(MOCK_GROUP_ID).when(group).getId();
+    doReturn(M2GroupRepository.class.getName()).when(group).getProviderRole();
+    doReturn(MOCK_REPO_ID).when(group).getPathPrefix();
 
     repositoryRegistry = Mockito.mock(RepositoryRegistry.class);
-    Mockito.doReturn(repository).when(repositoryRegistry).getRepository(MOCK_REPO_ID);
-    Mockito.doReturn(group).when(repositoryRegistry).getRepository(MOCK_GROUP_ID);
-    Mockito.doThrow(new NoSuchRepositoryException(NOT_FOUND_REPO_ID)).when(repositoryRegistry).getRepository(
-        NOT_FOUND_REPO_ID);
+    doReturn(repository).when(repositoryRegistry).getRepository(MOCK_REPO_ID);
+    doReturn(group).when(repositoryRegistry).getRepository(MOCK_GROUP_ID);
+    Mockito.doThrow(new NoSuchRepositoryException(NOT_FOUND_REPO_ID))
+        .when(repositoryRegistry).getRepository(NOT_FOUND_REPO_ID);
 
-    globalRestApiSettings = Mockito.mock(GlobalRestApiSettings.class);
-
-    Set<RepositoryTypeDescriptor> typeDescriptors = new HashSet<RepositoryTypeDescriptor>();
+    Set<RepositoryTypeDescriptor> typeDescriptors = new HashSet<>();
     RepositoryTypeDescriptor myHintRtd;
     RepositoryTypeDescriptor invalidRtd;
     typeDescriptors.add(myHintRtd = new RepositoryTypeDescriptor(M2Repository.class, "my-hint", MOCK_PATH_PREFIX));
     typeDescriptors.add(invalidRtd = new RepositoryTypeDescriptor(M1Repository.class, "invalid", "invalid"));
 
     repositoryTypeRegistry = Mockito.mock(RepositoryTypeRegistry.class);
-    Mockito.doReturn(myHintRtd).when(repositoryTypeRegistry).getRepositoryTypeDescriptor(
+    doReturn(myHintRtd).when(repositoryTypeRegistry).getRepositoryTypeDescriptor(
         M2Repository.class.getName(), "my-hint");
-    Mockito.doReturn(invalidRtd).when(repositoryTypeRegistry).getRepositoryTypeDescriptor(
+    doReturn(invalidRtd).when(repositoryTypeRegistry).getRepositoryTypeDescriptor(
         M1Repository.class.getName(), "invalid");
-    Mockito.doReturn(typeDescriptors).when(repositoryTypeRegistry).getRegisteredRepositoryTypeDescriptors();
+    doReturn(typeDescriptors).when(repositoryTypeRegistry).getRegisteredRepositoryTypeDescriptors();
+
+    underTest = new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry);
+
+    BaseUrlHolder.set(GLOBAL_BASE_URL);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    BaseUrlHolder.unset();
   }
 
   @Test
-  public void testForceBaseUrlById()
-      throws Exception
-  {
-
-    Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
-    Mockito.doReturn(true).when(globalRestApiSettings).isForceBaseUrl();
-    Mockito.doReturn(GLOBAL_BASE_URL).when(globalRestApiSettings).getBaseUrl();
-
-    RestletRepositoryURLBuilder urlFinder =
-        new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
-    Assert.assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-        urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
+  public void testRepositoryContentUrl_forId() throws Exception {
+    assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
+        underTest.getRepositoryContentUrl(MOCK_REPO_ID));
   }
 
   @Test
-  public void testForceBaseUrlByIdGlobalDisabled()
-      throws Exception
-  {
+  public void testGetRepositoryContentUrl_noBaseUrl() throws Exception {
+    BaseUrlHolder.unset();
 
-    Mockito.doReturn(false).when(globalRestApiSettings).isEnabled();
-    Mockito.doReturn(true).when(globalRestApiSettings).isForceBaseUrl();
-    Mockito.doReturn(GLOBAL_BASE_URL).when(globalRestApiSettings).getBaseUrl();
-
-    RestletRepositoryURLBuilder urlFinder =
-        new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
-    Assert.assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-        urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
+    assertNull(underTest.getRepositoryContentUrl(MOCK_REPO_ID));
   }
 
   @Test
-  public void testNoRequestBaseURLNotSet()
-      throws Exception
-  {
-    Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
-    Mockito.doReturn(false).when(globalRestApiSettings).isForceBaseUrl();
-    Mockito.doReturn(null).when(globalRestApiSettings).getBaseUrl();
+  public void testGetRepositoryContentUrl_customBaseUrl() throws Exception {
+    BaseUrlHolder.set("http://from/request");
 
-    RestletRepositoryURLBuilder urlFinder =
-        new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
-    Assert.assertNull(urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
-  }
-
-  @Test
-  public void testBaseUrlGlobalNoRequest()
-      throws Exception
-  {
-
-    Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
-    Mockito.doReturn(false).when(globalRestApiSettings).isForceBaseUrl();
-    Mockito.doReturn(GLOBAL_BASE_URL).when(globalRestApiSettings).getBaseUrl();
-
-    RestletRepositoryURLBuilder urlFinder =
-        new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
-    Assert.assertEquals(GLOBAL_BASE_URL + "/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-        urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
-  }
-
-  @Test
-  public void testBaseUrlGlobalRequest()
-      throws Exception
-  {
     // NEXUS-6045: Restlet1x request cannot come in from anywhere else than /service/local anymore
     String restletBaseURL = "http://from/request/service/local";
-
-    Mockito.doReturn(true).when(globalRestApiSettings).isEnabled();
-    Mockito.doReturn(false).when(globalRestApiSettings).isForceBaseUrl();
-    Mockito.doReturn(GLOBAL_BASE_URL).when(globalRestApiSettings).getBaseUrl();
 
     try {
       Request request = new Request();
@@ -173,12 +132,9 @@ public class RestletRepositoryURLBuilderTest
       Response response = new Response(request);
       Response.setCurrent(response);
 
-      RestletRepositoryURLBuilder urlFinder =
-          new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
       // NEXUS-6045: Restlet1x request will point to the webapp root/content
-      Assert.assertEquals("http://from/request/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
-          urlFinder.getRepositoryContentUrl(MOCK_REPO_ID));
+      assertEquals("http://from/request/content/" + MOCK_PATH_PREFIX + "/" + MOCK_REPO_ID,
+          underTest.getRepositoryContentUrl(MOCK_REPO_ID));
     }
     finally {
       Response.setCurrent(null);
@@ -186,12 +142,7 @@ public class RestletRepositoryURLBuilderTest
   }
 
   @Test(expected = NoSuchRepositoryException.class)
-  public void testNotFound()
-      throws NoSuchRepositoryException
-  {
-    RestletRepositoryURLBuilder urlFinder =
-        new RestletRepositoryURLBuilder(repositoryRegistry, repositoryTypeRegistry, globalRestApiSettings);
-
-    urlFinder.getRepositoryContentUrl(NOT_FOUND_REPO_ID);
+  public void getRepositoryContentUrl_invalidRepoId() throws NoSuchRepositoryException {
+    underTest.getRepositoryContentUrl(NOT_FOUND_REPO_ID);
   }
 }
