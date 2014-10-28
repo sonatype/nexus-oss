@@ -23,6 +23,7 @@ import org.sonatype.nexus.security.auth.ClientInfoProvider;
 import org.sonatype.nexus.web.RemoteIPFinder;
 
 import com.google.common.net.HttpHeaders;
+import com.google.inject.OutOfScopeException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
@@ -48,8 +49,8 @@ public class ClientInfoProviderImpl
 
   @Override
   public ClientInfo getCurrentThreadClientInfo() {
-    HttpServletRequest request = httpRequestProvider.get();
-    if (request != null) {
+    try {
+      HttpServletRequest request = httpRequestProvider.get();
       Subject subject = SecurityUtils.getSubject();
       return new ClientInfo(
           subject != null && subject.getPrincipal() != null ? subject.getPrincipal().toString() : null,
@@ -57,7 +58,9 @@ public class ClientInfoProviderImpl
           request.getHeader(HttpHeaders.USER_AGENT)
       );
     }
-    return null;
+    catch (OutOfScopeException e) {
+      return null;
+    }
   }
 
 }
