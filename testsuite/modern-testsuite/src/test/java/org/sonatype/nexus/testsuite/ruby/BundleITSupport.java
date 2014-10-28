@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.client.core.subsystem.content.Location;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -79,6 +80,22 @@ public abstract class BundleITSupport
     assertHostedFiles();
 
     // TODO check storage to be empty
+  }
+
+  protected void checkUpdateOfMissingDependencies() throws IOException {
+    Location preAndZip = new Location(repoId, "/api/v1/dependencies?gems=pre,zip");
+    File download = new File(util.createTempDir(), "null");
+    content().download(preAndZip, download);
+
+    // remove one dependencies file
+    Location zip = new Location(repoId, "/api/v1/dependencies/zip.ruby");
+    content().delete(zip);
+
+    // make sure that the deleted dependencies file get resurrected
+    content().download(preAndZip, download);
+    assertThat(content().exists(zip), is(true));
+
+    assertThat(download.length(), equalTo(130l));
   }
 
   protected File assertFileDownload(String name, Integer len) throws IOException {
