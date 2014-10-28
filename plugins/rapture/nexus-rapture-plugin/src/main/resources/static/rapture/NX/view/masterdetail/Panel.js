@@ -26,11 +26,6 @@ Ext.define('NX.view.masterdetail.Panel', {
 
   layout: 'border',
 
-  /**
-   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
-   */
-  autoHideTabHeader: true,
-
   tabs: {
     xtype: 'nx-info-panel'
   },
@@ -61,8 +56,7 @@ Ext.define('NX.view.masterdetail.Panel', {
           align: 'stretch',
           pack: 'start'
         },
-        tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
-        autoHideTabHeader: me.autoHideTabHeader
+        tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs)
       }
     ];
 

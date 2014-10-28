@@ -26,7 +26,6 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
 
   ui: 'light',
   title: 'fun',
-  autoHideTabHeader: false,
 
   tools: [
     { type: 'maximize', tooltip: 'Maximize' }

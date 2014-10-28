@@ -21,6 +21,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-repositorytarget-settings',
 
+  title: 'Settings',
   items: { xtype: 'nx-coreui-repositorytarget-settings-form' }
 
 });
