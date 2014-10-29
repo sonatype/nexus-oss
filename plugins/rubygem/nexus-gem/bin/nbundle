@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-require 'rubygems'
-require 'bundler/monkey_patch'
-
-load Gem.bin_path('bundler', 'bundle')
