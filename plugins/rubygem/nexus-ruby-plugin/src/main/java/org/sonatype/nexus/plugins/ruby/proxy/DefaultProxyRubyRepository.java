@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -167,13 +166,13 @@ public class DefaultProxyRubyRepository
     getExternalConfiguration(true).setMetadataMaxAge(metadataMaxAge);
   }
 
-  private static Pattern BUNDLER_API_REQUEST = Pattern.compile(".*[?]gems=.+,.+");
+  private static Pattern BUNDLER_API_REQUEST = Pattern.compile(".*[?]gems=.*");
 
   public AbstractStorageItem doCacheItem(AbstractStorageItem item)
       throws LocalStorageException
   {
-    // a request for single gem will be cached but one for many will not be cached
-    if (BUNDLER_API_REQUEST.matcher(item.getPath()).matches()) {
+    // a bundler API request can not be cached
+    if (BUNDLER_API_REQUEST.matcher(item.getRepositoryItemUid().getPath()).matches()) {
       return item;
     }
     else {

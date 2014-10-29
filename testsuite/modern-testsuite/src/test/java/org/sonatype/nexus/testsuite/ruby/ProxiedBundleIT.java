@@ -12,10 +12,20 @@
  */
 package org.sonatype.nexus.testsuite.ruby;
 
+import java.io.IOException;
+
+import org.junit.Test;
+
 public class ProxiedBundleIT
     extends BundleITSupport
 {
   public ProxiedBundleIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates, "gemsproxy");
+  }
+
+  @Override
+  @Test
+  public void checkUpdateOfMissingDependencies() throws IOException {
+    super.checkUpdateOfMissingDependencies();
   }
 }
