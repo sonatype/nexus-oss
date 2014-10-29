@@ -17,7 +17,6 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 /**

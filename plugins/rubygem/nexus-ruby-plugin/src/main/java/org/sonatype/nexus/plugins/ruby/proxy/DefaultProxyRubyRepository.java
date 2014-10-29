@@ -244,26 +244,27 @@ public class DefaultProxyRubyRepository
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
-  public void syncMetadata() throws IllegalOperationException, ItemNotFoundException, org.sonatype.nexus.proxy.StorageException
+  public void syncMetadata() throws IllegalOperationException, ItemNotFoundException, IOException
   {
+    log.debug("sync rubygems specs.4.8.gz, latest_specs.4.8.gz, prereleased_specs.4.8.gz");
     for (SpecsIndexType type : SpecsIndexType.values()) {
       ResourceStoreRequest request = new ResourceStoreRequest(type.filepathGzipped());
       request.setRequestRemoteOnly(true);
       retrieveItem(true, request);
     }
-    String directory = getBaseDirectory();
+    purgeBrokenMetadataFiles();
+  }
+
+  @Override
+  public void purgeBrokenMetadataFiles() throws IllegalOperationException, ItemNotFoundException, IOException
+  {
+    String directory = this.getLocalUrl().replace("file:", "");
+    if (log.isDebugEnabled()) {
+      log.debug("purge broken *.gemspec.rz and *.ruby files in {}", directory);
+    }
     RepairHelper repair = gateway.newRepairHelper();
     repair.purgeBrokenDepencencyFiles(directory);
     repair.purgeBrokenGemspecFiles(directory);
-  }
-
-  private String getBaseDirectory() {
-    String basedir = this.getLocalUrl().replace("file:", "");
-    if (log.isDebugEnabled()) {
-      log.debug("recreate rubygems metadata in {}", basedir);
-    }
-    return basedir;
   }
 }

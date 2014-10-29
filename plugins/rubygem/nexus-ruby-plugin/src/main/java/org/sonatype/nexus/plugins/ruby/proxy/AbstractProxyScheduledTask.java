@@ -15,10 +15,7 @@ package org.sonatype.nexus.plugins.ruby.proxy;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-
-// FIXME: This is only used by SyncRubygemsMetadataTask, why do we need this abstraction?
 
 public abstract class AbstractProxyScheduledTask
     extends AbstractNexusRepositoriesTask<Object>
@@ -37,7 +34,7 @@ public abstract class AbstractProxyScheduledTask
       }
       else {
         getLogger().info(
-                "Repository {} is not a hosted Rubygems repository. Will not rebuild metadata, but the task seems wrongly configured!",
+                "Repository {} is not a Rubygems Proxy repository. Will not execute anything, but the task seems wrongly configured!",
                 repository);
       }
     }
