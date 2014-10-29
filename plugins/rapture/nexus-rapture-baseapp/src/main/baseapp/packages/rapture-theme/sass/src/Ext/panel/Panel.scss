@@ -93,24 +93,88 @@
    */
 
   .category {
-    padding-bottom: 1em;
+    padding-bottom: 2em;
     border-bottom: 1px $color-gainsboro solid;
 
     .category-title {
       text-transform: uppercase;
-      padding-bottom: 5px;
-      font-size: 120%;
+      padding-bottom: 1em;
+      font-size: $font-size-h3;
     }
+  }
+
+  .section-header,
+  .column-header {
+    font-size: $font-size-h5;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+  }
+
+  /*
+   * Visual style sheet fonts
+   */
+
+  .proxima-nova-regular {
+    font-family: $font-regular;
+  }
+
+  .proxima-nova-bold {
+    font-family: $font-regular;
+    font-weight: bold;
+  }
+
+  .source-code-pro-regular {
+    font-family: $font-monospace;
+  }
+
+  /*
+   * Visual style sheet type styles
+   */
+
+  .sample-h1 {
+    font-size: $font-size-h1;
+    font-weight: $font-weight-h1;
+  }
+
+  .sample-h2 {
+    font-size: $font-size-h2;
+    font-weight: $font-weight-h2;
+  }
+
+  .sample-h3 {
+    font-size: $font-size-h3;
+    font-weight: $font-weight-h3;
+  }
+
+  .sample-h4 {
+    font-size: $font-size-h4;
+    font-weight: $font-weight-h4;
+  }
+
+  .sample-h5 {
+    font-size: $font-size-h5;
+    font-weight: $font-weight-h5;
+  }
+
+  .sample-body {
+    font-size: $font-size-body;
+    font-weight: $font-weight-body;
+  }
+
+  .sample-code {
+    font-size: $font-size-code;
+    font-weight: $font-weight-code;
+    font-family: $font-monospace;
+  }
+
+  .sample-utility {
+    font-size: $font-size-utility;
+    font-weight: $font-weight-utility;
   }
 
   /*
    * Visual style sheet colors
    */
-
-  .color-category {
-    font-weight: bold;
-    padding-bottom: 5px;
-  }
 
   .color {
 

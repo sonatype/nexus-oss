@@ -141,7 +141,7 @@ Ext.define('NX.view.dev.Buttons', {
               {
                 xtype: 'label',
                 text: 'Shell',
-                cls: 'color-category'
+                cls: 'section-header'
               },
               {
                 xtype: 'container',
@@ -267,7 +267,7 @@ Ext.define('NX.view.dev.Buttons', {
                   {
                     xtype: 'label',
                     text: 'Severity',
-                    cls: 'color-category'
+                    cls: 'section-header'
                   },
 
                   // Severity colors
@@ -342,7 +342,7 @@ Ext.define('NX.view.dev.Buttons', {
                   {
                     xtype: 'label',
                     text: 'Forms',
-                    cls: 'color-category'
+                    cls: 'section-header'
                   },
 
                   // Form colors
@@ -389,7 +389,7 @@ Ext.define('NX.view.dev.Buttons', {
                   {
                     xtype: 'label',
                     text: 'Tooltip',
-                    cls: 'color-category'
+                    cls: 'section-header'
                   },
 
                   // Tooltip colors
@@ -438,7 +438,7 @@ Ext.define('NX.view.dev.Buttons', {
               {
                 xtype: 'label',
                 text: 'Dashboard',
-                cls: 'color-category'
+                cls: 'section-header'
               },
 
               // Dashboard colors
@@ -555,7 +555,7 @@ Ext.define('NX.view.dev.Buttons', {
                   {
                     xtype: 'label',
                     text: 'Buttons',
-                    cls: 'color-category'
+                    cls: 'section-header'
                   },
                   {
                     xtype: 'container',
@@ -891,7 +891,7 @@ Ext.define('NX.view.dev.Buttons', {
                   {
                     xtype: 'label',
                     text: 'Font Awesome Icons',
-                    cls: 'color-category'
+                    cls: 'section-header'
                   },
                   {
                     xtype: 'container',
@@ -1014,13 +1014,17 @@ Ext.define('NX.view.dev.Buttons', {
                   type: 'vbox'
                 },
 
+                padding: "0 8px 4x 0",
+
                 items: [
                   {
                     xtype: 'label',
-                    text: 'Proxima Nova Regular'
+                    text: 'Proxima Nova Regular',
+                    cls: 'section-header'
                   },
                   {
                     xtype: 'container',
+                    cls: 'proxima-nova-regular',
 
                     layout: {
                       type: 'vbox'
@@ -1042,13 +1046,17 @@ Ext.define('NX.view.dev.Buttons', {
                   type: 'vbox'
                 },
 
+                padding: "0 8px 4x 0",
+
                 items: [
                   {
                     xtype: 'label',
-                    text: 'Proxima Nova Bold'
+                    text: 'Proxima Nova Bold',
+                    cls: 'section-header'
                   },
                   {
                     xtype: 'container',
+                    cls: 'proxima-nova-bold',
 
                     layout: {
                       type: 'vbox'
@@ -1062,20 +1070,6 @@ Ext.define('NX.view.dev.Buttons', {
                     ]
                   }
                 ]
-              }
-            ]
-          },
-          {
-            xtype: 'container',
-
-            layout: {
-              type: 'vbox'
-            },
-
-            items: [
-              {
-                xtype: 'label',
-                text: 'Source Code Pro Regular'
               },
               {
                 xtype: 'container',
@@ -1084,11 +1078,29 @@ Ext.define('NX.view.dev.Buttons', {
                   type: 'vbox'
                 },
 
+                padding: "0 8px 4x 0",
+
                 items: [
-                  { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
-                  { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
-                  { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
-                  { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
+                  {
+                    xtype: 'label',
+                    text: 'Source Code Pro Regular',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+                    cls: 'source-code-pro-regular',
+
+                    layout: {
+                      type: 'vbox'
+                    },
+
+                    items: [
+                      { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
+                      { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
+                      { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+                      { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
+                    ]
+                  }
                 ]
               }
             ]
@@ -1123,19 +1135,118 @@ Ext.define('NX.view.dev.Buttons', {
 
             layout: {
               type: 'table',
-              columns: 6,
+              columns: 6
+            },
+
+            defaults: {
+              bodyStyle: 'padding: 0px 20px 20px 0'
             },
 
             items: [
-              { html: 'Name' }, { html: 'Description' }, { html: 'Font & Weight' }, { html: 'Use Cases' }, { html: 'Pixels' }, { html: 'Sample' },
-              { html: 'h1' }, { html: 'Page Title' }, { html: 'Proxima Nova Light' }, { html: 'Header' }, { html: '40' }, { html: 'Sonatype Nexus' },
-              { html: 'h2' }, { html: 'Header' }, { html: 'Proxima Nova Bold' }, { html: 'Header' }, { html: '26' }, { html: 'Development' },
-              { html: 'h3' }, { html: 'Header' }, { html: 'Proxima Nova Bold' }, { html: 'Header' }, { html: '22' }, { html: 'Development' },
-              { html: 'h4' }, { html: 'Sub-Header' }, { html: 'Proxima Nova Bold' }, { html: 'Sub-Header' }, { html: '18' }, { html: 'Development' },
-              { html: 'h5' }, { html: 'Sub-Header' }, { html: 'Proxima Nova Bold' }, { html: 'Sub-Header' }, { html: '16' }, { html: 'Development' },
-              { html: 'p/ul/ol' }, { html: 'Body' }, { html: 'Proxima Nova Regular' }, { html: 'Body text, lists, default size' }, { html: '16' }, { html: 'Development' },
-              { html: 'code' }, { html: 'Code' }, { html: 'Source Code Pro Regular' }, { html: 'Code examples' }, { html: '16' }, { html: 'Development' },
-              { html: 'utility' }, { html: 'Small Text' }, { html: 'Proxima Nova Regular' }, { html: 'Labels, Side-Nav' }, { html: '16' }, { html: 'Development' }
+              {
+                html: 'Name',
+                baseCls: 'column-header'
+              },
+              {
+                html: 'Description',
+                baseCls: 'column-header'
+              },
+              {
+                html: 'Font & Weight',
+                baseCls: 'column-header'
+              },
+              {
+                html: 'Use Cases',
+                baseCls: 'column-header'
+              },
+              {
+                html: 'Pixels',
+                baseCls: 'column-header'
+              },
+              {
+                html: 'Sample',
+                baseCls: 'column-header'
+              },
+
+              { html: 'h1' },
+              { html: 'Page Title' },
+              { html: 'Proxima Nova Light' },
+              { html: 'Header' },
+              { html: '40' },
+              {
+                html: 'Sonatype Nexus',
+                baseCls: 'sample-h1'
+              },
+
+              { html: 'h2' },
+              { html: 'Header' },
+              { html: 'Proxima Nova Bold' },
+              { html: 'Header' },
+              { html: '26' },
+              {
+                html: 'Development',
+                baseCls: 'sample-h2'
+              },
+
+              { html: 'h3' },
+              { html: 'Header' },
+              { html: 'Proxima Nova Bold' },
+              { html: 'Header' },
+              { html: '22' },
+              {
+                html: 'Development',
+                baseCls: 'sample-h3'
+              },
+
+              { html: 'h4' },
+              { html: 'Sub-Header' },
+              { html: 'Proxima Nova Bold' },
+              { html: 'Sub-Header' },
+              { html: '18' },
+              {
+                html: 'Development',
+                baseCls: 'sample-h4'
+              },
+
+              { html: 'h5' },
+              { html: 'Sub-Header' },
+              { html: 'Proxima Nova Bold' },
+              { html: 'Sub-Header' },
+              { html: '13' },
+              {
+                html: 'Development',
+                baseCls: 'sample-h5'
+              },
+
+              { html: 'p/ul/ol' },
+              { html: 'Body' },
+              { html: 'Proxima Nova Regular' },
+              { html: 'Body text, lists, default size' },
+              { html: '13' },
+              {
+                html: 'Development',
+                baseCls: 'sample-body'
+              },
+
+              { html: 'code' },
+              { html: 'Code' },
+              { html: 'Courier New Regular' },
+              { html: 'Code examples' },
+              { html: '13' },
+              {
+                html: 'Development',
+                baseCls: 'sample-code'
+              },
+
+              { html: 'utility' },
+              { html: 'Small Text' },
+              { html: 'Proxima Nova Regular' },
+              { html: 'Labels, Side-Nav' },
+              { html: '10' },
+              {
+                html: 'Development',
+                baseCls: 'sample-utility'
+              }
             ]
           }
         ]
