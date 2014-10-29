@@ -21,6 +21,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Closeables;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
@@ -40,6 +42,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NexusSSLConnectionSocketFactory
     implements LayeredConnectionSocketFactory
 {
+  private static final Splitter propertiesSplitter = Splitter.on(',').trimResults().omitEmptyStrings();
+
   private final SSLSocketFactory defaultSocketFactory;
 
   private final List<SSLContextSelector> selectors;
@@ -158,6 +162,6 @@ public class NexusSSLConnectionSocketFactory
     if (StringUtils.isBlank(s)) {
       return null;
     }
-    return s.split(" *, *");
+    return Iterables.toArray(propertiesSplitter.split(s), String.class);
   }
 }
