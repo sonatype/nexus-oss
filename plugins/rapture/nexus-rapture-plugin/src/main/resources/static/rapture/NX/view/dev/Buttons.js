@@ -1285,6 +1285,10 @@ Ext.define('NX.view.dev.Buttons', {
               columns: 3
             },
 
+            defaults: {
+              bodyStyle: "padding: 0 20px 20px 0"
+            },
+
             // Default buttons
             items: [
               {
@@ -1317,7 +1321,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1343,7 +1347,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true },
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true, margin: "0 10 10 0" },
                           { xtype: 'label', text: '50% Opacity' }
                         ]
                       },
@@ -1355,7 +1359,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1373,7 +1377,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default' },
+                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1382,7 +1386,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', pressed: 'true', enableToggle: 'true', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1392,31 +1396,15 @@ Ext.define('NX.view.dev.Buttons', {
                             },
 
                             items: [
-                              {
-                                xtype: 'container',
-                                width: 10,
-                                height: 10,
-                                cls: 'color suva-gray'
-                              },
-                              {
-                                xtype: 'label',
-                                text: '$color-suva-gray'
-                              },
-                              {
-                                xtype: 'container',
-                                width: 10,
-                                height: 10,
-                                cls: 'color gray'
-                              },
-                              {
-                                xtype: 'label',
-                                text: '$color-gray'
-                              }
+                              { xtype: 'container', width: 10, height: 10, cls: 'color suva-gray' },
+                              { xtype: 'label', text: '$color-suva-gray' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color gray' },
+                              { xtype: 'label', text: '$color-gray' }
                             ]
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', menu: [ { text: 'First' }, '-', { text: 'Second' } ], margin: "0 10 10 0" }
                     ]
                   }
                 ]
@@ -1453,7 +1441,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1479,7 +1467,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', disabled: true },
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', disabled: true, margin: "0 10 10 0" },
                           { xtype: 'label', text: '50% Opacity' }
                         ]
                       },
@@ -1491,7 +1479,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1509,7 +1497,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1518,7 +1506,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', pressed: 'true', enableToggle: 'true', margin: "0 10 10 0"  },
                           {
                             xtype: 'container',
 
@@ -1536,7 +1524,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', menu: [ { text: 'First' }, '-', { text: 'Second' } ], margin: "0 10 10 0" }
                     ]
                   }
                 ]
@@ -1573,7 +1561,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1599,7 +1587,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', disabled: true },
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', disabled: true, margin: "0 10 10 0" },
                           { xtype: 'label', text: '50% Opacity' }
                         ]
                       },
@@ -1611,7 +1599,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1638,7 +1626,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', pressed: 'true', enableToggle: 'true', margin: "0 10 10 0"  },
                           {
                             xtype: 'container',
 
@@ -1656,7 +1644,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                      { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', menu: [ { text: 'First' }, '-', { text: 'Second' } ], margin: "0 10 10 0" }
                     ]
                   }
                 ]
@@ -1693,7 +1681,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1719,7 +1707,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', disabled: true },
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', disabled: true, margin: "0 10 10 0" },
                           { xtype: 'label', text: '50% Opacity' }
                         ]
                       },
@@ -1731,7 +1719,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1749,7 +1737,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1758,7 +1746,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', pressed: 'true', enableToggle: 'true', margin: "0 10 10 0"  },
                           {
                             xtype: 'container',
 
@@ -1776,7 +1764,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', menu: [ { text: 'First' }, '-', { text: 'Second' } ], margin: "0 10 10 0" }
                     ]
                   }
                 ]
@@ -1813,7 +1801,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1839,7 +1827,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', disabled: true },
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', disabled: true, margin: "0 10 10 0" },
                           { xtype: 'label', text: '50% Opacity' }
                         ]
                       },
@@ -1851,7 +1839,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1869,7 +1857,7 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1878,7 +1866,7 @@ Ext.define('NX.view.dev.Buttons', {
                         },
 
                         items: [
-                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', pressed: 'true', enableToggle: 'true', margin: "0 10 10 0" },
                           {
                             xtype: 'container',
 
@@ -1896,30 +1884,55 @@ Ext.define('NX.view.dev.Buttons', {
                           }
                         ]
                       },
-                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', menu: [ { text: 'First' }, '-', { text: 'Second' } ], margin: "0 10 10 0" }
                     ]
                   }
                 ]
               },
+
+              // Buttons without icons
               {
                 xtype: 'container',
 
                 layout: {
-                  type: 'table',
-                  columns: 3
+                  type: 'vbox'
                 },
 
                 items: [
-                  { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain' },
-                  { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain' },
-                  { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', menu: [ { text: 'First' }, '-', { text: 'Second' } ] },
-                  { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', disabled: true },
-                  { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', disabled: true },
-                  { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', disabled: true, menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                  {
+                    xtype: 'label',
+                    text: 'w/ Icons',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+
+                    layout: {
+                      type: 'table',
+                      columns: 3
+                    },
+
+                    items: [
+                      { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', margin: "0 10 10 0" },
+                      { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', margin: "0 10 10 0" },
+                      { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', menu: [
+                        { text: 'First' },
+                        '-',
+                        { text: 'Second' }
+                      ], margin: "0 10 10 0" },
+                      { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', disabled: true, margin: "0 10 10 0" },
+                      { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', disabled: true, margin: "0 10 10 0" },
+                      { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', disabled: true, menu: [
+                        { text: 'First' },
+                        '-',
+                        { text: 'Second' }
+                      ], margin: "0 10 10 0" }
+                    ]
+                  }
                 ]
               }
             ]
-          },
+          }
         ]
       }
     );

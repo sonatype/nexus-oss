@@ -3,6 +3,35 @@
  */
 
 /**
+ * ui: 'default'
+ */
+
+@include extjs-button-small-ui(
+  $ui: 'default',
+
+  $background-gradient: $color-white $color-light-gainsboro,
+  $background-gradient-over: $color-light-gray $color-silver,
+  $background-gradient-focus: $color-white $color-light-gainsboro,
+  $background-gradient-pressed: $color-suva-gray $color-gray,
+  $background-gradient-disabled: $color-white $color-light-gainsboro,
+
+  $color: $color-night-rider,
+  $color-over: $color-night-rider,
+  $color-focus: $color-night-rider,
+  $color-pressed: $color-white,
+  $color-disabled: $color-night-rider,
+
+  $glyph-color: $color-night-rider
+);
+
+.x-btn.x-pressed {
+
+  .x-btn-glyph {
+    color: $color-white;
+  }
+}
+
+/**
  * ui: 'primary'
  */
 
@@ -80,6 +109,7 @@
   $color: $color-night-rider,
   $color-over: $color-night-rider,
   $color-focus: $color-night-rider,
+  $color-pressed: $color-white,
   $color-disabled: $color-night-rider,
 
   $glyph-color: $color-night-rider,
