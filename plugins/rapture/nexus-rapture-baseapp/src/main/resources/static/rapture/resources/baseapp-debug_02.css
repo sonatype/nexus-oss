@@ -12527,6 +12527,12 @@
   border-width: 2px !important;
 }
 
+/* Fixed modals for the visual style guide */
+/* line 87, ../../../baseapp/packages/rapture-theme/sass/src/Ext/window/Window.scss */
+.fixed-modal {
+  top: 0 !important;
+}
+
 /* line 1, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
 .user-token-field {
   padding: 2px;

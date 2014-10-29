@@ -2090,7 +2090,8 @@ Ext.define('NX.view.dev.Buttons', {
         xtype: 'container',
 
         layout: {
-          type: 'vbox'
+          type: 'vbox',
+          padding: 4
         },
 
         cls: 'category',
@@ -2130,7 +2131,8 @@ Ext.define('NX.view.dev.Buttons', {
         xtype: 'container',
 
         layout: {
-          type: 'vbox'
+          type: 'vbox',
+          padding: 4
         },
 
         cls: 'category',
@@ -2140,19 +2142,38 @@ Ext.define('NX.view.dev.Buttons', {
             xtype: 'label',
             text: 'Modals',
             cls: 'category-title'
-          }/*,
+          },
           {
             xtype: 'container',
 
             layout: {
               type: 'hbox',
-              padding: 4
+              defaultMargins: '0 40px 0 0'
             },
 
             items: [
-              // TODO
+              {
+                xtype: 'nx-signin',
+                hidden: false,
+                collapsible: false,
+                floating: false,
+                closable: false,
+                draggable: false,
+                resizable: false,
+                cls: 'fixed-modal'
+              },
+              {
+                xtype: 'nx-expire-session',
+                hidden: false,
+                collapsible: false,
+                floating: false,
+                closable: false,
+                draggable: false,
+                resizable: false,
+                cls: 'fixed-modal'
+              }
             ]
-          }*/
+          }
         ]
       }
     );
@@ -2161,17 +2182,233 @@ Ext.define('NX.view.dev.Buttons', {
      * Menu
      */
 
+    me.items.push(
+      {
+        xtype: 'container',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Menu',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'container',
+
+            layout: {
+              type: 'hbox',
+              defaultMargins: '0 20px 0 0'
+            },
+
+            items: [
+              {
+                xtype: 'menu',
+
+                floating: false,
+
+                items: [
+                  {
+                    // text and iconCls is dynamic
+                    text: 'Help for [Feature]',
+                    iconCls: 'nx-icon-search-default-x16',
+                    tooltip: 'Help and documentation for the currently selected feature',
+                    action: 'feature'
+                  },
+                  '-',
+                  {
+                    text: 'About',
+                    iconCls: 'nx-icon-nexus-x16',
+                    tooltip: 'About Sonatype Nexus',
+                    action: 'about'
+                  },
+                  {
+                    text: 'Documentation',
+                    iconCls: 'nx-icon-help-manual-x16',
+                    tooltip: 'Sonatype Nexus product documentation',
+                    action: 'docs'
+                  },
+                  {
+                    text: 'Knowledge Base',
+                    iconCls: 'nx-icon-help-kb-x16',
+                    tooltip: 'Sonatype Nexus knowledge base',
+                    action: 'kb'
+                  },
+                  {
+                    text: 'Community',
+                    iconCls: 'nx-icon-help-community-x16',
+                    tooltip: 'Sonatype Nexus community information',
+                    action: 'community'
+                  },
+                  {
+                    text: 'Issue Tracker',
+                    iconCls: 'nx-icon-help-issues-x16',
+                    tooltip: 'Sonatype Nexus issue and bug tracker',
+                    action: 'issues'
+                  },
+                  '-',
+                  {
+                    text: 'Support',
+                    iconCls: 'nx-icon-help-support-x16',
+                    tooltip: 'Sonatype Nexus product support',
+                    action: 'support'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    );
+
     /*
      * Header
      */
+
+    me.items.push(
+      {
+        xtype: 'container',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Header',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'container',
+
+            layout: {
+              type: 'vbox',
+              defaultMargins: '0 0 20px 0'
+            },
+
+            items: [
+              {
+                xtype: 'toolbar',
+
+                // set height to ensure we have uniform size and not depend on what is in the toolbar
+                height: 40,
+
+                style: {
+                  backgroundColor: '#000000'
+                },
+                anchor: '100%',
+                padding: "0 0 0 16px",
+
+                defaults: {
+                  scale: 'medium'
+                },
+
+                items: [
+                  { xtype: 'nx-header-logo' },
+                  {
+                    xtype: 'container',
+                    items: [
+                      {
+                        xtype: 'label',
+                        text: 'Sonatype Nexus',
+                        cls: 'nx-header-productname'
+                      },
+                      {
+                        xtype: 'label',
+                        text: NX.State.getEdition() + ' ' + NX.State.getVersion(),
+                        cls: 'nx-header-productversion',
+                        style: {
+                          'padding-left': '8px'
+                        }
+                      }
+                    ]
+                  },
+                  ' ', ' ', // 2x pad
+                  { xtype: 'nx-header-dashboard-mode', ui: 'header' },
+                  { xtype: 'nx-header-search-mode', ui: 'header' },
+                  { xtype: 'nx-header-browse-mode', ui: 'header' },
+                  { xtype: 'nx-header-admin-mode', ui: 'header' },
+                  ' ',
+                  { xtype: 'nx-header-quicksearch', hidden: true },
+                  '->',
+                  { xtype: 'nx-header-messages', ui: 'header' },
+                  { xtype: 'nx-header-refresh', ui: 'header' },
+                  { xtype: 'nx-header-signin', ui: 'header' },
+                  { xtype: 'nx-header-user-mode', ui: 'header', hidden: true },
+                  { xtype: 'nx-header-signout', ui: 'header' },
+                  { xtype: 'nx-header-help', ui: 'header' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    );
 
     /*
      * Tooltip
      */
 
+    me.items.push(
+      {
+        xtype: 'container',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Tooltip',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'button',
+            text: 'Mouse over me',
+            tooltip: 'This is a tooltip'
+          }
+        ]
+      }
+    );
+
     /*
      * Table
      */
+
+    /*me.items.push(
+      {
+        xtype: 'container',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Table',
+            cls: 'category-title'
+          }
+        ]
+      }
+    );*/
 
     /*
      * Panels
@@ -2180,6 +2417,59 @@ Ext.define('NX.view.dev.Buttons', {
     /*
      * Tabs
      */
+
+    me.items.push(
+      {
+        xtype: 'container',
+
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Tabs',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'tabpanel',
+
+            width: 500,
+            height: 150,
+            activeTab: 0,
+            ui: 'light',
+
+            header: {
+              height: 30
+            },
+
+            items: [
+              {
+                title: 'Settings',
+                bodyPadding: 10,
+                html: 'A simple tab'
+              },
+              {
+                title: 'Routing',
+                html: 'Another one'
+              },
+              {
+                title: 'Smart Proxy',
+                html: 'Yet another'
+              },
+              {
+                title: 'Health Check',
+                html: 'And one more'
+              }
+            ]
+          }
+        ]
+      }
+    );
 
     /*
      * Picker
