@@ -12,14 +12,12 @@
  */
 package org.sonatype.nexus.component.services.internal.adapter;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.nexus.component.model.ComponentId;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
-import org.sonatype.nexus.component.services.adapter.EntityAdapterSupport;
+import org.sonatype.nexus.component.services.adapter.EntityAdapter;
 import org.sonatype.nexus.component.services.model.TestComponent;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 
@@ -28,7 +26,6 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,8 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Entity adapter for {@link TestComponent}.
  */
 public class TestComponentEntityAdapter
-    extends EntityAdapterSupport
-    implements ComponentEntityAdapter<TestComponent>
+    extends EntityAdapter<TestComponent>
 {
   public static final String ORIENT_CLASS_NAME = new OClassNameBuilder().type(TestComponent.class).build();
 
@@ -57,17 +53,16 @@ public class TestComponentEntityAdapter
   public static final String P_UNREGISTERED = "unregisteredProp"; // not a formal part of the schema...all others are
 
   @Override
-  public Class<TestComponent> getComponentClass() {
+  public Class<TestComponent> getEntityClass() {
     return TestComponent.class;
   }
 
   @Override
   public void registerStorageClass(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-
-    OSchema schema = db.getMetadata().getSchema();
+    OSchema schema = checkNotNull(db).getMetadata().getSchema();
+    ComponentEntityAdapter.registerBaseClass(schema, log);
     if (!schema.existsClass(ORIENT_CLASS_NAME)) {
-      OClass baseClass = schema.getClass(ORIENT_BASE_CLASS_NAME);
+      OClass baseClass = schema.getClass(ComponentEntityAdapter.ORIENT_CLASS_NAME);
       OClass oClass = schema.createClass(ORIENT_CLASS_NAME, baseClass);
       createOptionalProperty(oClass, P_BINARY, OType.BINARY);
       createOptionalProperty(oClass, P_BOOLEAN, OType.BOOLEAN);
@@ -84,79 +79,47 @@ public class TestComponentEntityAdapter
       createRequiredAutoIndexedProperty(oClass, P_STRING, OType.STRING, true);
       // NOTE: P_UNREGISTERED is not a formal part of the schema, but may
       // still be used because this oClass doesn't specify strict mode
-      logCreatedClassInfo(oClass);
+      logCreatedClassInfo(log, oClass);
     }
   }
 
   @Override
-  public void convertToDocument(final TestComponent component, final ODocument document) {
-    ComponentId id = component.getId();
-
-    if (id == null) {
-      document.field(P_ID, (Object) null);
-    }
-    else {
-      document.field(P_ID, id.asUniqueString());
-    }
-
-    document.field(P_BINARY, component.getBinaryProp());
-    document.field(P_BOOLEAN, component.getBooleanProp());
-    document.field(P_BYTE, component.getByteProp());
-
-    if (component.getDatetimeProp() == null) {
-      document.field(P_DATETIME, (Object) null);
-    }
-    else {
-      document.field(P_DATETIME, component.getDatetimeProp().toDate());
-    }
-
-    document.field(P_DOUBLE, component.getDoubleProp());
-    document.field(P_EMBEDDEDLIST, component.getEmbeddedListProp());
-    document.field(P_EMBEDDEDMAP, component.getEmbeddedMapProp());
-    document.field(P_EMBEDDEDSET, component.getEmbeddedSetProp());
-    document.field(P_FLOAT, component.getFloatProp());
-    document.field(P_INTEGER, component.getIntegerProp());
-    document.field(P_LONG, component.getLongProp());
-    document.field(P_SHORT, component.getShortProp());
-    document.field(P_STRING, component.getStringProp());
-    document.field(P_UNREGISTERED, component.getUnregisteredProp());
+  public void convertToDocument(final TestComponent entity, final ODocument document) {
+    ComponentEntityAdapter.convertBasePropertiesToDocument(entity, document);
+    setValueOrNull(document, P_BINARY, entity.getBinaryProp());
+    setValueOrNull(document, P_BOOLEAN, entity.getBooleanProp());
+    setValueOrNull(document, P_BYTE, entity.getByteProp());
+    setValueOrNull(document, P_DATETIME, entity.getDatetimeProp());
+    setValueOrNull(document, P_DOUBLE, entity.getDoubleProp());
+    setValueOrNull(document, P_EMBEDDEDLIST, entity.getEmbeddedListProp());
+    setValueOrNull(document, P_EMBEDDEDMAP, entity.getEmbeddedMapProp());
+    setValueOrNull(document, P_EMBEDDEDSET, entity.getEmbeddedSetProp());
+    setValueOrNull(document, P_FLOAT, entity.getFloatProp());
+    setValueOrNull(document, P_INTEGER, entity.getIntegerProp());
+    setValueOrNull(document, P_LONG, entity.getLongProp());
+    setValueOrNull(document, P_SHORT, entity.getShortProp());
+    setValueOrNull(document, P_STRING, entity.getStringProp());
+    setValueOrNull(document, P_UNREGISTERED, entity.getUnregisteredProp());
   }
 
   @Override
-  public TestComponent convertToComponent(final ODocument document) {
-    TestComponent component = new TestComponent();
-
-    final String id = document.field(P_ID);
-    if (id != null) {
-      component.setId(new ComponentId() { // TODO: Switch to use ComponentId class when available
-        @Override
-        public String asUniqueString() {
-          return id;
-        }
-      });
-    }
-
-    component.setBinaryProp((byte[]) document.field(P_BINARY));
-    component.setBooleanProp((Boolean) document.field(P_BOOLEAN));
-    component.setByteProp((Byte) document.field(P_BYTE));
-
-    Date date = document.field(P_DATETIME);
-    if (date != null) {
-      component.setDatetimeProp(new DateTime(date));
-    }
-
-    component.setDoubleProp((Double) document.field(P_DOUBLE));
-    component.setEmbeddedListProp((List<String>) document.field(P_EMBEDDEDLIST));
-    component.setEmbeddedMapProp((Map<String, String>) document.field(P_EMBEDDEDMAP));
-    component.setEmbeddedSetProp((Set<String>) document.field(P_EMBEDDEDSET));
-
-    component.setFloatProp((Float) document.field(P_FLOAT));
-    component.setIntegerProp((Integer) document.field(P_INTEGER));
-    component.setLongProp((Long) document.field(P_LONG));
-    component.setShortProp((Short) document.field(P_SHORT));
-    component.setStringProp((String) document.field(P_STRING));
-    component.setUnregisteredProp(document.field(P_UNREGISTERED));
-
-    return component;
+  public TestComponent convertToEntity(final ODocument document) {
+    TestComponent entity = new TestComponent();
+    ComponentEntityAdapter.convertBasePropertiesToEntity(document, entity);
+    entity.setBinaryProp((byte[]) document.field(P_BINARY));
+    entity.setBooleanProp((Boolean) document.field(P_BOOLEAN));
+    entity.setByteProp((Byte) document.field(P_BYTE));
+    entity.setDatetimeProp(getDateTimeOrNull(document, P_DATETIME));
+    entity.setDoubleProp((Double) document.field(P_DOUBLE));
+    entity.setEmbeddedListProp((List<String>) document.field(P_EMBEDDEDLIST));
+    entity.setEmbeddedMapProp((Map<String, String>) document.field(P_EMBEDDEDMAP));
+    entity.setEmbeddedSetProp((Set<String>) document.field(P_EMBEDDEDSET));
+    entity.setFloatProp((Float) document.field(P_FLOAT));
+    entity.setIntegerProp((Integer) document.field(P_INTEGER));
+    entity.setLongProp((Long) document.field(P_LONG));
+    entity.setShortProp((Short) document.field(P_SHORT));
+    entity.setStringProp((String) document.field(P_STRING));
+    entity.setUnregisteredProp(document.field(P_UNREGISTERED));
+    return entity;
   }
 }

@@ -16,35 +16,35 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.Entity;
 
 /**
- * A registry of {@link ComponentEntityAdapter}s, keyed by {@link Component} domain class.
+ * A registry of {@link EntityAdapter}s, keyed by {@link Entity} domain class.
  *
  * @since 3.0
  */
-public interface ComponentEntityAdapterRegistry
+public interface EntityAdapterRegistry
 {
   /**
    * Registers an adapter and creates the OrientDB class in the database if it doesn't already exist.
    *
-   * @throws IllegalStateException if an adapter already exists in the registry with the same component class.
+   * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
    */
-  <T extends Component> void registerAdapter(ComponentEntityAdapter<T> adapter);
+  <T extends Entity> void registerAdapter(EntityAdapter<T> adapter);
 
   /**
    * Unregisters the adapter for the given component class. If no such adapter is registered, this is a no-op.
    */
-  <T extends Component> void unregisterAdapter(Class<T> componentClass);
+  <T extends Entity> void unregisterAdapter(Class<T> entityClass);
 
   /**
    * Gets the registered adapter for the given component class, or {@code null} if it doesn't exist.
    */
   @Nullable
-  <T extends Component> ComponentEntityAdapter<T> getAdapter(Class<T> componentClass);
+  <T extends Entity> EntityAdapter<T> getAdapter(Class<T> entityClass);
 
   /**
-   * Gets all component classes for which a registered adapter exists.
+   * Gets all entity classes for which a registered adapter exists.
    */
-  Set<Class<? extends Component>> componentClasses();
+  Set<Class<? extends Entity>> entityClasses();
 }

@@ -10,34 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.internal.id;
+package org.sonatype.nexus.component.model;
 
-import java.util.UUID;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.component.model.ComponentId;
-import org.sonatype.nexus.component.services.id.ComponentIdFactory;
+import javax.annotation.Nullable;
 
 /**
- * A simple, uuid-based factory for {@link ComponentId}s.
+ * Base implementation of {@link Asset}.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class DefaultComponentIdFactory
-    implements ComponentIdFactory
+abstract class BaseEntity
+    implements Entity
 {
+  private EntityId id;
+
+  @Nullable
   @Override
-  public ComponentId newId() {
-    return new DefaultComponentId(UUID.randomUUID().toString());
+  public EntityId getId() {
+    return id;
   }
 
   @Override
-  public ComponentId fromUniqueString(final String uniqueString) {
-    return new DefaultComponentId(uniqueString);
+  public void setId(final EntityId id) {
+    this.id = id;
   }
-
 }

@@ -17,29 +17,37 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Supplier;
 import org.joda.time.DateTime;
 
 /**
- * Represents an identifiable asset of a component.
+ * A file within a {@link Component}.
  * 
  * @since 3.0
  */
 public interface Asset
+    extends Entity
 {
   /**
-   * Gets the id of the component to which this asset belongs.
+   * Gets the id of the {@link Component} to which this asset belongs, or {@code null} if it hasn't been stored yet.
    */
-  ComponentId getComponentId();
+  @Nullable
+  EntityId getComponentId();
 
   /**
-   * @return relative path to this asset in the containing component
+   * @see #getComponentId()
    */
-  String getPath();
+  void setComponentId(EntityId entityId);
 
   /**
    * @return length of this asset in bytes, {@code -1} if unknown
    */
   long getContentLength();
+
+  /**
+   * @see #getContentLength()
+   */
+  void setContentLength(long contentLength);
 
   /**
    * @return content type of this asset, {@code null} if unknown
@@ -48,10 +56,20 @@ public interface Asset
   String getContentType();
 
   /**
+   * @see #getContentType()
+   */
+  void setContentType(String contentType);
+
+  /**
    * @return when this asset was first created, {@code null} if unknown
    */
   @Nullable
   DateTime getFirstCreated();
+
+  /**
+   * @see #getFirstCreated()
+   */
+  void setFirstCreated(DateTime firstCreated);
 
   /**
    * @return when this asset was last modified, {@code null} if unknown
@@ -60,7 +78,18 @@ public interface Asset
   DateTime getLastModified();
 
   /**
-   * @return input stream for reading the content of this asset
+   * @see #getLastModified()
    */
+  void setLastModified(DateTime lastModified);
+
+  /**
+   * @return input stream for reading the content of this asset, {@code null} if there is no stream supplier.
+   */
+  @Nullable
   InputStream openStream() throws IOException;
+
+  /**
+   * @see #openStream()
+   */
+  void setStreamSupplier(Supplier<InputStream> streamSupplier);
 }

@@ -10,17 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.model;
+package org.sonatype.nexus.component.services.id;
+
+import org.sonatype.nexus.component.model.EntityId;
 
 /**
- * Opaque component id in the normalized component system.
- * 
+ * A factory for creating new {@link EntityId}s, necessary for new components.
+ *
  * @since 3.0
  */
-public interface ComponentId
+public interface EntityIdFactory
 {
   /**
-   * Gets the id as a unique string.
+   * Create a new {@link EntityId}.
    */
-  String asUniqueString();
+  EntityId newId();
 }

@@ -32,12 +32,15 @@ import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentId;
+import org.sonatype.nexus.component.model.Entity;
+import org.sonatype.nexus.component.model.EntityId;
+import org.sonatype.nexus.component.services.adapter.AssetEntityAdapter;
 import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapter;
-import org.sonatype.nexus.component.services.adapter.ComponentEntityAdapterRegistry;
-import org.sonatype.nexus.component.services.internal.adapter.AssetEntityAdapter;
-import org.sonatype.nexus.component.services.internal.adapter.ComponentEntityAdapterRegistryImpl;
+import org.sonatype.nexus.component.services.adapter.EntityAdapterRegistry;
+import org.sonatype.nexus.component.services.internal.adapter.EntityAdapterRegistryImpl;
+import org.sonatype.nexus.component.services.internal.adapter.TestAssetEntityAdapter;
 import org.sonatype.nexus.component.services.internal.adapter.TestComponentEntityAdapter;
+import org.sonatype.nexus.component.services.model.TestAsset;
 import org.sonatype.nexus.component.services.model.TestComponent;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
@@ -78,8 +81,8 @@ import static org.sonatype.nexus.component.services.query.MetadataQueryRestricti
 public class MetadataQueryServiceImplIT
     extends TestSupport
 {
-  private static final String TEST_ID_1 = "component1";
-  private static final String TEST_ID_2 = "component2";
+  private static final String TEST_COMPONENT_ID_1 = "component1";
+  private static final String TEST_COMPONENT_ID_2 = "component2";
   private static final byte[] TEST_BINARY = new byte[] { 0x01, 0x02 };
   private static final boolean TEST_BOOLEAN = true;
   private static final byte TEST_BYTE = (byte) 0x42;
@@ -95,8 +98,10 @@ public class MetadataQueryServiceImplIT
   private static final String TEST_STRING_1 = "String One";
   private static final String TEST_STRING_2 = "String Two";
   private static final Object TEST_UNREGISTERED = "Unregistered";
-  private static final TestComponent TEST_COMPONENT_1 = createTestComponent(TEST_ID_1, TEST_STRING_1, true);
-  private static final TestComponent TEST_COMPONENT_2 = createTestComponent(TEST_ID_2, TEST_STRING_2, false);
+  private static final TestComponent TEST_COMPONENT_1 = createTestComponent(TEST_COMPONENT_ID_1, TEST_STRING_1, true);
+  private static final TestComponent TEST_COMPONENT_2 = createTestComponent(TEST_COMPONENT_ID_2, TEST_STRING_2, false);
+
+  private final TestAssetEntityAdapter testAssetEntityAdapter = new TestAssetEntityAdapter();
 
   private final TestComponentEntityAdapter testComponentEntityAdapter = new TestComponentEntityAdapter();
 
@@ -110,7 +115,7 @@ public class MetadataQueryServiceImplIT
 
   private MetadataQueryServiceImpl queryService;
 
-  private ComponentEntityAdapterRegistry adapterRegistry;
+  private EntityAdapterRegistry adapterRegistry;
 
   private Provider<DatabaseInstance> databaseInstanceProvider;
 
@@ -125,16 +130,17 @@ public class MetadataQueryServiceImplIT
 
     // create temp dir for test blob content, blob metadata, and component metadata storage
     File testDir = util.createTempDir();
-    System.out.println(testDir);
     Path testRoot = testDir.toPath();
     Path blobContentPath = testRoot.resolve("blobContent");
     Path blobMetadataPath = testRoot.resolve("blobMetadata");
     Path componentMetadataPath = testRoot.resolve("componentMetadata");
+    log("NOTE: To examine the state of this database after the test ends, enter the "
+        + "following in the OrientDB console:\nuse plocal:" + componentMetadataPath + " admin admin");
 
     this.databaseServer = new MinimalDatabaseServer();
     databaseServer.start();
 
-    this.databaseManager = new DatabaseManagerImpl(componentMetadataPath.toFile());
+    this.databaseManager = new DatabaseManagerImpl(componentMetadataPath.getParent().toFile());
     databaseManager.start();
 
     databaseInstanceProvider = new Provider<DatabaseInstance>() {
@@ -147,8 +153,10 @@ public class MetadataQueryServiceImplIT
     // drop all classes
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       OSchema schema = db.getMetadata().getSchema();
+      maybeDropClass(schema, TestAssetEntityAdapter.ORIENT_CLASS_NAME);
+      maybeDropClass(schema, TestComponentEntityAdapter.ORIENT_CLASS_NAME);
       maybeDropClass(schema, AssetEntityAdapter.ORIENT_CLASS_NAME);
-      maybeDropClass(schema, ComponentEntityAdapter.ORIENT_BASE_CLASS_NAME);
+      maybeDropClass(schema, ComponentEntityAdapter.ORIENT_CLASS_NAME);
     }
 
     this.blobMetadataStore = MapdbBlobMetadataStore.create(blobMetadataPath.toFile());
@@ -156,7 +164,7 @@ public class MetadataQueryServiceImplIT
 
     blobStore = new FileBlobStore(blobContentPath, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), blobMetadataStore);
 
-    adapterRegistry = new ComponentEntityAdapterRegistryImpl(databaseInstanceProvider);
+    adapterRegistry = new EntityAdapterRegistryImpl(databaseInstanceProvider);
     queryService = new MetadataQueryServiceImpl(databaseInstanceProvider, blobStore, adapterRegistry);
   }
 
@@ -183,37 +191,47 @@ public class MetadataQueryServiceImplIT
 
   @Test
   public void initialState() {
-    assertThat(adapterRegistry.componentClasses().size(), is(0));
-    assertThat(queryService.componentClasses().size(), is(0));
-    assertThat(queryService.countAssets(null), is(0L));
-    assertThat(queryService.findAssets(null).size(), is(0));
+    assertThat(adapterRegistry.entityClasses().size(), is(0));
+    assertThat(queryService.entityClasses().size(), is(0));
   }
 
   @Test
-  public void registerComponentAdapter() {
+  public void registerAdapters() {
     adapterRegistry.registerAdapter(testComponentEntityAdapter);
+    adapterRegistry.registerAdapter(testAssetEntityAdapter);
 
-    assertThat(adapterRegistry.componentClasses().size(), is(1));
-    assertThat(queryService.componentClasses().size(), is(1));
-    assertThat(queryService.countAssets(null), is(0L));
-    assertThat(queryService.findAssets(null).size(), is(0));
+    assertThat(adapterRegistry.entityClasses().size(), is(2));
+    assertThat(queryService.entityClasses().size(), is(2));
+    assertThat(queryService.count(TestComponent.class, null), is(0L));
+    assertThat(queryService.find(TestComponent.class, null).size(), is(0));
+    assertThat(queryService.count(TestAsset.class, null), is(0L));
+    assertThat(queryService.find(TestAsset.class, null).size(), is(0));
   }
 
   @Test
-  public void totalComponentCount() {
+  public void totalEntityCount() {
     addTwoTestComponentsWithTwoAssetsEach();
     long total = 0;
-    for (Class<? extends Component> componentClass: queryService.componentClasses()) {
-      total += queryService.countComponents(componentClass, null);
+    for (Class<? extends Entity> entityClass: queryService.entityClasses()) {
+      total += queryService.count(entityClass, null);
     }
-    assertThat(total, is(2L));
+    assertThat(total, is(6L)); // 2 testcomponents, 4 testassets
   }
 
   @Test
   public void totalAssetCount() {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    assertThat(queryService.countAssets(null), is(4L));
+    assertThat(queryService.count(Asset.class, null), is(4L));
+    assertThat(queryService.count(TestAsset.class, null), is(4L));
+  }
+
+  @Test
+  public void totalComponentCount() {
+    addTwoTestComponentsWithTwoAssetsEach();
+
+    assertThat(queryService.count(Component.class, null), is(2L));
+    assertThat(queryService.count(TestComponent.class, null), is(2L));
   }
 
   @Test
@@ -223,10 +241,10 @@ public class MetadataQueryServiceImplIT
     // SELECT FROM testcomponent
 
     // count should be 2
-    assertThat(queryService.countComponents(TestComponent.class, null), is(2L));
+    assertThat(queryService.count(TestComponent.class, null), is(2L));
 
     MetadataQuery query = new MetadataQuery().orderBy(ComponentEntityAdapter.P_ID, true);
-    List<TestComponent> results = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> results = queryService.find(TestComponent.class, query);
 
     // query should return component1 then component2
     assertThat(results.size(), is(2));
@@ -239,13 +257,13 @@ public class MetadataQueryServiceImplIT
     addTwoTestComponentsWithTwoAssetsEach();
 
     // SELECT FROM testcomponent WHERE id = 'component1'
-    MetadataQueryRestriction restriction = componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_ID_1);
+    MetadataQueryRestriction restriction = componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_1);
 
     // count should be 1
-    assertThat(queryService.countComponents(TestComponent.class, restriction), is(1L));
+    assertThat(queryService.count(TestComponent.class, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestComponent> results = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> results = queryService.find(TestComponent.class, query);
 
     // query should return component1 only
     assertThat(results.size(), is(1));
@@ -258,15 +276,15 @@ public class MetadataQueryServiceImplIT
 
     // SELECT FROM testcomponent WHERE (id = 'component1' OR id = 'component2')
     MetadataQueryRestriction restriction = or(
-        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_ID_1),
-        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_ID_2));
+        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_1),
+        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_2));
 
     // count should be 2
-    assertThat(queryService.countComponents(TestComponent.class, restriction), is(2L));
+    assertThat(queryService.count(TestComponent.class, restriction), is(2L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(ComponentEntityAdapter.P_ID,
         true);
-    List<TestComponent> results = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> results = queryService.find(TestComponent.class, query);
 
     // query should return component1 then component2
     assertThat(results.size(), is(2));
@@ -278,14 +296,14 @@ public class MetadataQueryServiceImplIT
   public void queryComponentsWithSimpleAssetRestriction() {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM testcomponent WHERE assets contains ( path = '/test/path/1' )
-    MetadataQueryRestriction restriction = assetPropertyEquals(AssetEntityAdapter.P_PATH, testPath(1));
+    // SELECT FROM testcomponent WHERE assets contains ( downloadCount = 1 )
+    MetadataQueryRestriction restriction = assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1);
 
     // count should be 1
-    assertThat(queryService.countComponents(TestComponent.class, restriction), is(1L));
+    assertThat(queryService.count(TestComponent.class, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestComponent> results = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> results = queryService.find(TestComponent.class, query);
 
     // query should return component1 only
     assertThat(results.size(), is(1));
@@ -296,17 +314,16 @@ public class MetadataQueryServiceImplIT
   public void queryComponentsWithCompoundAssetRestriction() {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM testcomponent WHERE (assets contains ( path = '/test/path/1' ) OR assets contains ( contentType = 'text/plain' ))
+    // SELECT FROM testcomponent WHERE (assets contains ( downloadCount = 1 ) OR assets contains ( contentType = 'text/plain' ))
     MetadataQueryRestriction restriction = or(
-        assetPropertyEquals(AssetEntityAdapter.P_PATH, testPath(1)),
+        assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1),
         assetPropertyEquals(AssetEntityAdapter.P_CONTENT_TYPE, "text/plain"));
 
     // count should be 2
-    assertThat(queryService.countComponents(TestComponent.class, restriction), is(2L));
+    assertThat(queryService.count(TestComponent.class, restriction), is(2L));
 
-    MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(ComponentEntityAdapter.P_ID,
-        false);
-    List<TestComponent> results = queryService.findComponents(TestComponent.class, query);
+    MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(ComponentEntityAdapter.P_ID, false);
+    List<TestComponent> results = queryService.find(TestComponent.class, query);
 
     // query should return component2 then component1 (since we ordered results DESCending this time)
     assertThat(results.size(), is(2));
@@ -318,17 +335,17 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithNoRestrictionOrderByTwoPropertys() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM asset
+    // SELECT FROM testasset
 
     // count should be 4
-    assertThat(queryService.countAssets(null), is(4L));
+    assertThat(queryService.count(TestAsset.class, null), is(4L));
 
     MetadataQuery query = new MetadataQuery()
         .orderBy(AssetEntityAdapter.P_COMPONENT, true)
-        .orderBy(AssetEntityAdapter.P_PATH, false);
-    List<Asset> results = queryService.findAssets(query);
+        .orderBy(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, false);
+    List<TestAsset> results = queryService.find(TestAsset.class, query);
 
-    // query should return all four assets in order of component ascending, then path descending
+    // query should return all four assets in order of component ascending, then downloadCount descending
     assertThat(results.size(), is(4));
     checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 2);
     checkAsset(results.get(1), TEST_COMPONENT_1.getId(), 1);
@@ -340,14 +357,14 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithSimpleAssetRestriction() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM asset WHERE path = 'test/path/1'
-    MetadataQueryRestriction restriction = assetPropertyEquals(AssetEntityAdapter.P_PATH, testPath(1));
+    // SELECT FROM testasset WHERE downloadCount = 1
+    MetadataQueryRestriction restriction = assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1);
 
     // count should be 1
-    assertThat(queryService.countAssets(restriction), is(1L));
+    assertThat(queryService.count(TestAsset.class, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<Asset> results = queryService.findAssets(query);
+    List<TestAsset> results = queryService.find(TestAsset.class, query);
 
     // query should return component1's first asset only
     assertThat(results.size(), is(1));
@@ -358,18 +375,18 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithCompoundAssetRestriction() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM asset WHERE (path = '/test/path/1' OR contentType = 'text/plain')
+    // SELECT FROM testasset WHERE (downloadCount = 1 OR contentType = 'text/plain')
     MetadataQueryRestriction restriction = or(
-        assetPropertyEquals(AssetEntityAdapter.P_PATH, testPath(1)),
+        assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1),
         assetPropertyEquals(AssetEntityAdapter.P_CONTENT_TYPE, "text/plain"));
 
     // count should be 2
-    assertThat(queryService.countAssets(restriction), is(4L));
+    assertThat(queryService.count(TestAsset.class, restriction), is(4L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(AssetEntityAdapter.P_ID, true);
-    List<Asset> results = queryService.findAssets(query);
+    List<TestAsset> results = queryService.find(TestAsset.class, query);
 
-    // query should return all four assets in ascending order of componentId:path
+    // query should return all four assets in ascending order of assetId
     assertThat(results.size(), is(4));
     checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 1);
     checkAsset(results.get(1), TEST_COMPONENT_1.getId(), 2);
@@ -381,14 +398,14 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithSimpleComponentRestriction() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM asset WHERE component.id = 'component1'
-    MetadataQueryRestriction restriction = componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_ID_1);
+    // SELECT FROM testasset WHERE component.id = 'component1'
+    MetadataQueryRestriction restriction = componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_1);
 
     // count should be 2
-    assertThat(queryService.countAssets(restriction), is(2L));
+    assertThat(queryService.count(TestAsset.class, restriction), is(2L));
 
-    MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(AssetEntityAdapter.P_PATH, true);
-    List<Asset> results = queryService.findAssets(query);
+    MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, true);
+    List<TestAsset> results = queryService.find(TestAsset.class, query);
 
     // query should return component1's assets in ascending order of path
     assertThat(results.size(), is(2));
@@ -400,16 +417,17 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithCompoundComponentAndAssetRestrictionUsingLike() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM asset WHERE (component.id = 'component1' AND path LIKE '%1')
+    // SELECT FROM testasset WHERE (component.id = 'component1' AND contentType LIKE '%plain' AND downloadCount = 1)
     MetadataQueryRestriction restriction = and(
-        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_ID_1),
-        assetPropertyLike(AssetEntityAdapter.P_PATH, "%1"));
+        componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_1),
+        assetPropertyLike(AssetEntityAdapter.P_CONTENT_TYPE, "%plain"),
+        assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1));
 
     // count should be 1
-    assertThat(queryService.countAssets(restriction), is(1L));
+    assertThat(queryService.count(TestAsset.class, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<Asset> results = queryService.findAssets(query);
+    List<TestAsset> results = queryService.find(TestAsset.class, query);
 
     // query should return component1's first asset only
     assertThat(results.size(), is(1));
@@ -422,31 +440,31 @@ public class MetadataQueryServiceImplIT
 
     MetadataQuery query = new MetadataQuery().limit(2);
 
-    List<Asset> page1 = queryService.findAssets(query);
+    List<TestAsset> page1 = queryService.find(TestAsset.class, query);
     assertThat(page1.size(), is(2));
 
-    List<Asset> page2 = queryService.findAssets(query.skip(2));
+    List<TestAsset> page2 = queryService.find(TestAsset.class, query.skip(2));
     assertThat(page2.size(), is(2));
 
-    List<Asset> page3 = queryService.findAssets(query.skip(4));
+    List<TestAsset> page3 = queryService.find(TestAsset.class, query.skip(4));
     assertThat(page3.size(), is(0));
   }
 
   @Test
-  public void pageAssetsUsingSkipComponentIdAndSkipAssetPath() {
+  public void pageAssetsUsingSkipEntityId() {
     addTwoTestComponentsWithTwoAssetsEach();
 
     MetadataQuery query = new MetadataQuery().limit(2);
 
-    List<Asset> page1 = queryService.findAssets(query);
+    List<TestAsset> page1 = queryService.find(TestAsset.class, query);
     assertThat(page1.size(), is(2));
 
-    query.skipComponentId(page1.get(1).getComponentId()).skipAssetPath(page1.get(1).getPath());
-    List<Asset> page2 = queryService.findAssets(query);
+    query.skipEntityId(page1.get(1).getId());
+    List<TestAsset> page2 = queryService.find(TestAsset.class, query);
     assertThat(page2.size(), is(2));
 
-    query.skipComponentId(page2.get(1).getComponentId()).skipAssetPath(page2.get(1).getPath());
-    List<Asset> page3 = queryService.findAssets(query);
+    query.skipEntityId(page2.get(1).getId());
+    List<TestAsset> page3 = queryService.find(TestAsset.class, query);
     assertThat(page3.size(), is(0));
   }
 
@@ -456,36 +474,37 @@ public class MetadataQueryServiceImplIT
 
     MetadataQuery query = new MetadataQuery().limit(1);
 
-    List<TestComponent> page1 = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> page1 = queryService.find(TestComponent.class, query);
     assertThat(page1.size(), is(1));
 
-    List<TestComponent> page2 = queryService.findComponents(TestComponent.class, query.skip(1));
+    List<TestComponent> page2 = queryService.find(TestComponent.class, query.skip(1));
     assertThat(page2.size(), is(1));
 
-    List<TestComponent> page3 = queryService.findComponents(TestComponent.class, query.skip(2));
+    List<TestComponent> page3 = queryService.find(TestComponent.class, query.skip(2));
     assertThat(page3.size(), is(0));
   }
 
   @Test
-  public void pageComponentsUsingSkipComponentId() {
+  public void pageComponentsUsingSkipEntityId() {
     addTwoTestComponentsWithTwoAssetsEach();
 
     MetadataQuery query = new MetadataQuery().limit(1);
 
-    List<TestComponent> page1 = queryService.findComponents(TestComponent.class, query);
+    List<TestComponent> page1 = queryService.find(TestComponent.class, query);
     assertThat(page1.size(), is(1));
 
-    query.skipComponentId(page1.get(0).getId());
-    List<TestComponent> page2 = queryService.findComponents(TestComponent.class, query);
+    query.skipEntityId(page1.get(0).getId());
+    List<TestComponent> page2 = queryService.find(TestComponent.class, query);
     assertThat(page2.size(), is(1));
 
-    query.skipComponentId(page2.get(0).getId());
-    List<TestComponent> page3 = queryService.findComponents(TestComponent.class, query);
+    query.skipEntityId(page2.get(0).getId());
+    List<TestComponent> page3 = queryService.find(TestComponent.class, query);
     assertThat(page3.size(), is(0));
   }
 
   private void addTwoTestComponentsWithTwoAssetsEach() {
     adapterRegistry.registerAdapter(testComponentEntityAdapter);
+    adapterRegistry.registerAdapter(testAssetEntityAdapter);
 
     try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
       // add test components and assets in a transaction
@@ -502,9 +521,9 @@ public class MetadataQueryServiceImplIT
     }
   }
 
-  private void checkAsset(Asset actual, ComponentId expectedComponentId, int n) throws IOException {
+  private void checkAsset(TestAsset actual, EntityId expectedComponentId, int n) throws IOException {
     assertThat(actual.getComponentId().asUniqueString(), is(expectedComponentId.asUniqueString()));
-    assertThat(actual.getPath(), is(testPath(n)));
+    assertThat(actual.getDownloadCount(), is((long) n));
     assertThat(actual.getContentLength(), is((long) testContent(n).length()));
     assertThat(actual.getContentType(), is("text/plain"));
     assertThat(actual.getFirstCreated(), notNullValue());
@@ -552,19 +571,18 @@ public class MetadataQueryServiceImplIT
     componentDocument.save();
   }
 
-  private ORID addTestAsset(ODatabaseDocumentTx db, ORID componentDocumentRid, ComponentId componentId, int n) {
+  private ORID addTestAsset(ODatabaseDocumentTx db, ORID componentDocumentRid, EntityId componentId, int n) {
     // create the blob
-    String assetPath = testPath(n);
-    String assetId = AssetEntityAdapter.assetId(componentId, assetPath);
+    String assetId = "asset" + n;
     Blob blob = blobStore.create(toStream(testContent(n)), ImmutableMap.of(
         BlobStore.BLOB_NAME_HEADER, assetId,
         BlobStore.CREATED_BY_HEADER, "Test"));
 
     // create the asset document
-    ODocument assetDocument = db.newInstance(AssetEntityAdapter.ORIENT_CLASS_NAME);
+    ODocument assetDocument = db.newInstance(TestAssetEntityAdapter.ORIENT_CLASS_NAME);
     assetDocument.field(AssetEntityAdapter.P_ID, assetId);
     assetDocument.field(AssetEntityAdapter.P_COMPONENT, componentDocumentRid);
-    assetDocument.field(AssetEntityAdapter.P_PATH, assetPath);
+    assetDocument.field(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, n);
     assetDocument.field(AssetEntityAdapter.P_FIRST_CREATED, blob.getMetrics().getCreationTime().toDate());
     assetDocument.field(AssetEntityAdapter.P_CONTENT_TYPE, "text/plain");
     Map<String, String> blobRefs = ImmutableMap.of("someBlobStoreId", blob.getId().asUniqueString());
@@ -579,19 +597,9 @@ public class MetadataQueryServiceImplIT
     return "Test Content " + n;
   }
 
-  private static String testPath(int n) {
-    return "test/path/" + n;
-  }
-
   private static TestComponent createTestComponent(final String id, String stringValue, boolean populateOptionalProperties) {
     TestComponent component = new TestComponent();
-    component.setId(new ComponentId()
-    { // TODO: Switch to use ComponentId class when available
-      @Override
-      public String asUniqueString() {
-        return id;
-      }
-    });
+    component.setId(new EntityId(id));
     if (populateOptionalProperties) {
       component.setBinaryProp(TEST_BINARY);
       component.setBooleanProp(TEST_BOOLEAN);

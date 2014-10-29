@@ -10,29 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.adapter;
+package org.sonatype.nexus.component.services.internal.id;
+
+import java.util.UUID;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.eclipse.sisu.BeanEntry;
-import org.eclipse.sisu.Mediator;
+import org.sonatype.nexus.component.model.EntityId;
+import org.sonatype.nexus.component.services.id.EntityIdFactory;
 
 /**
- * Manages {@link ComponentEntityAdapter} registrations via Sisu component mediation.
+ * A simple, uuid-based factory for {@link EntityId}s.
  *
  * @since 3.0
  */
 @Named
-public class ComponentEntityAdapterMediator
-    implements Mediator<Named, ComponentEntityAdapter, ComponentEntityAdapterRegistry>
+@Singleton
+public class DefaultEntityIdFactory
+    implements EntityIdFactory
 {
   @Override
-  public void add(final BeanEntry<Named, ComponentEntityAdapter> entry, final ComponentEntityAdapterRegistry registry) {
-    registry.registerAdapter(entry.getValue());
-  }
-
-  @Override
-  public void remove(final BeanEntry<Named, ComponentEntityAdapter> entry, final ComponentEntityAdapterRegistry registry) {
-    registry.unregisterAdapter(entry.getValue().getComponentClass());
+  public EntityId newId() {
+    return new EntityId(UUID.randomUUID().toString());
   }
 }

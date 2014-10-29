@@ -10,27 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.internal.id;
-
-import org.sonatype.nexus.component.model.ComponentId;
+package org.sonatype.nexus.component.model;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A basic implementation of {@link ComponentId}.
- *
+ * Identifies a stored {@link Component} or {@link Asset}.
+ * 
  * @since 3.0
  */
-class DefaultComponentId
-    implements ComponentId
+public class EntityId
 {
   private final String uniqueString;
 
-  DefaultComponentId(final String uniqueString) {
+  /**
+   * Creates an instance using the given unique string.
+   */
+  public EntityId(String uniqueString) {
     this.uniqueString = checkNotNull(uniqueString);
   }
 
-  @Override
+  /**
+   * Gets the id as a unique string.
+   */
   public String asUniqueString() {
     return uniqueString;
   }
@@ -44,7 +46,7 @@ class DefaultComponentId
       return false;
     }
 
-    DefaultComponentId that = (DefaultComponentId) o;
+    EntityId that = (EntityId) o;
 
     return uniqueString.equals(that.uniqueString);
   }
@@ -56,6 +58,6 @@ class DefaultComponentId
 
   @Override
   public String toString() {
-    return ComponentId.class.getSimpleName() + "[" + uniqueString + "]";
+    return EntityId.class.getSimpleName() + "[" + uniqueString + "]";
   }
 }

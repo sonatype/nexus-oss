@@ -16,7 +16,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.ComponentId;
+import org.sonatype.nexus.component.model.EntityId;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -35,9 +35,7 @@ public class MetadataQuery
 
   private Integer skip;
 
-  private ComponentId skipComponentId;
-
-  private String skipAssetPath;
+  private EntityId skipEntityId;
 
   private Map<String, Boolean> orderBy = Maps.newLinkedHashMap();
 
@@ -71,7 +69,7 @@ public class MetadataQuery
    */
   public MetadataQuery skip(Integer skip) {
     checkArgument(checkNotNull(skip) >= 0, "Skip must be non-negative");
-    checkArgument(skipComponentId == null, "Cannot skip; skip component id is already specified");
+    checkArgument(skipEntityId == null, "Cannot skip; skip entity id is already specified");
     this.skip = skip;
     return this;
   }
@@ -85,51 +83,27 @@ public class MetadataQuery
   }
 
   /**
-   * Sets the component id to skip for paging.
+   * Sets the entity id to skip for paging.
    *
-   * Entity based paging is faster than skip-limit based paging, but it is only useful if the query results
+   * Entity id based paging is faster than skip-limit based paging, but it is only useful if the query results
    * occur in their natural (insertion) order. Callers should therefore be careful not to specify any {@code orderBy}
    * fields in conjunction with this, and should be careful to avoid using it with queries where the use of an index
    * may cause results to be iterated in non-natural order.
    */
-  public MetadataQuery skipComponentId(ComponentId skipComponentId) {
-    checkNotNull(skipComponentId);
-    checkArgument(skip == null, "Cannot skip component id; skip is already specified");
-    checkArgument(orderBy.isEmpty(), "Cannot skip component id; order by is already specified");
-    this.skipComponentId = skipComponentId;
+  public MetadataQuery skipEntityId(EntityId skipEntityId) {
+    checkNotNull(skipEntityId);
+    checkArgument(skip == null, "Cannot skip entity id; skip is already specified");
+    checkArgument(orderBy.isEmpty(), "Cannot skip entity id; order by is already specified");
+    this.skipEntityId = skipEntityId;
     return this;
   }
 
   /**
-   * Gets the component id to skip for paging, or {@code null} if unspecified.
+   * Gets the entity id to skip for paging, or {@code null} if unspecified.
    */
   @Nullable
-  public ComponentId skipComponentId() {
-    return skipComponentId;
-  }
-
-  /**
-   * Sets the asset path to skip for asset paging.
-   *
-   * When this is specified, a {@code skipComponentId} must also be specified in order to fully qualify the
-   * asset to be skipped.
-   *
-   * @see #skipComponentId(ComponentId)
-   */
-  public MetadataQuery skipAssetPath(String skipAssetPath) {
-    checkNotNull(skipAssetPath);
-    checkArgument(skip == null, "Cannot skip asset path; skip is already specified");
-    checkArgument(orderBy.isEmpty(), "Cannot skip asset path; order by is already specified");
-    this.skipAssetPath = skipAssetPath;
-    return this;
-  }
-
-  /**
-   * Gets the asset path to skip for asset paging, or {@code null} if unspecified.
-   */
-  @Nullable
-  public String skipAssetPath() {
-    return skipAssetPath;
+  public EntityId skipEntityId() {
+    return skipEntityId;
   }
 
   /**
@@ -140,8 +114,7 @@ public class MetadataQuery
    */
   public MetadataQuery orderBy(String propertyName, boolean ascending) {
     checkArgument(!Strings.isNullOrEmpty(propertyName), "Order by property name cannot be empty");
-    checkArgument(skipComponentId == null, "Cannot order by; skip component id is already specified");
-    checkArgument(skipAssetPath == null, "Cannot order by; skip asset path is already specified");
+    checkArgument(skipEntityId == null, "Cannot order by; skip entity id is already specified");
     this.orderBy.put(propertyName, ascending);
     return this;
   }

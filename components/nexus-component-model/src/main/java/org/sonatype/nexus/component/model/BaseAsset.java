@@ -10,61 +10,56 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.internal.adapter;
+package org.sonatype.nexus.component.model;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.ComponentId;
-
+import com.google.common.base.Supplier;
 import org.joda.time.DateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
- * {@link Blob}-based {@link Asset} implementation.
+ * Concrete base implementation of {@link Asset}.
  *
  * @since 3.0
  */
-class BlobAsset
+public class BaseAsset
+    extends BaseEntity
     implements Asset
 {
-  private final ComponentId componentId;
+  private EntityId componentId;
 
-  private final Blob blob;
+  private long contentLength = -1;
 
-  private final String path;
+  private String contentType;
 
-  private final String contentType;
+  private DateTime firstCreated;
 
-  private final DateTime firstCreated;
+  private DateTime lastModified;
 
-  public BlobAsset(ComponentId componentId, Blob blob, @Nullable String path, @Nullable String contentType,
-                   @Nullable DateTime firstCreated) {
-    this.componentId = checkNotNull(componentId);
-    this.blob = checkNotNull(blob);
-    this.path = path;
-    this.contentType = contentType;
-    this.firstCreated = firstCreated;
-  }
+  private Supplier<InputStream> streamSupplier;
 
+  @Nullable
   @Override
-  public ComponentId getComponentId() {
+  public EntityId getComponentId() {
     return componentId;
   }
 
   @Override
-  public String getPath() {
-    return path;
+  public void setComponentId(final EntityId componentId) {
+    this.componentId = componentId;
   }
 
   @Override
   public long getContentLength() {
-    return blob.getMetrics().getContentSize();
+    return contentLength;
+  }
+
+  @Override
+  public void setContentLength(final long contentLength) {
+    this.contentLength = contentLength;
   }
 
   @Nullable
@@ -73,20 +68,46 @@ class BlobAsset
     return contentType;
   }
 
+  @Override
+  public void setContentType(final String contentType) {
+    this.contentType = contentType;
+  }
+
   @Nullable
   @Override
   public DateTime getFirstCreated() {
     return firstCreated;
   }
 
+  @Override
+  public void setFirstCreated(final DateTime firstCreated) {
+    this.firstCreated = firstCreated;
+  }
+
   @Nullable
   @Override
   public DateTime getLastModified() {
-    return blob.getMetrics().getCreationTime();
+    return lastModified;
   }
 
   @Override
+  public void setLastModified(final DateTime lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Nullable
+  @Override
   public InputStream openStream() throws IOException {
-    return blob.getInputStream();
+    if (streamSupplier == null) {
+      return null;
+    }
+    else {
+      return streamSupplier.get();
+    }
+  }
+
+  @Override
+  public void setStreamSupplier(final Supplier<InputStream> streamSupplier) {
+    this.streamSupplier = streamSupplier;
   }
 }

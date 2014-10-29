@@ -15,41 +15,53 @@ package org.sonatype.nexus.component.services.adapter;
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.orient.OClassNameBuilder;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import org.slf4j.Logger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Adapter for converting between {@link Component} objects and OrientDB {@code ODocument}s.
+ * Helper class for adapters that convert between concrete {@link Component}s and OrientDB {@code ODocument}s.
  *
  * @since 3.0
  */
-public interface ComponentEntityAdapter<T extends Component>
+public abstract class ComponentEntityAdapter
 {
-  String ORIENT_BASE_CLASS_NAME = new OClassNameBuilder().type(Component.class).build();
+  public static String ORIENT_CLASS_NAME = new OClassNameBuilder().type(Component.class).build();
 
   /** OrientDB property name for the component's unique id, which is system-generated. */
-  String P_ID = "id";
+  public static String P_ID = "id";
 
   /** OrientDB property name for the set of assets that comprise the component. */
-  String P_ASSETS = "assets";
+  public static String P_ASSETS = "assets";
 
   /**
-   * Gets the {@link Component} subclass this adapter works with.
+   * Creates the base OrientDB class and associated indexes in the database if needed.
    */
-  Class<T> getComponentClass();
+  public static void registerBaseClass(OSchema schema, Logger log) {
+    checkNotNull(schema);
+    if (!schema.existsClass(ORIENT_CLASS_NAME)) {
+      OClass oClass = schema.createAbstractClass(ORIENT_CLASS_NAME);
+      EntityAdapter.createRequiredAutoIndexedProperty(oClass, P_ID, OType.STRING, true);
+      EntityAdapter.createRequiredProperty(oClass, P_ASSETS, OType.LINKSET);
+      EntityAdapter.logCreatedClassInfo(log, oClass);
+    }
+  }
 
   /**
-   * Creates the OrientDB class and associated indexes in the database if needed.
+   * Adds base properties from the given {@code Component} to the given {@code ODocument}
    */
-  void registerStorageClass(ODatabaseDocumentTx db);
+  public static void convertBasePropertiesToDocument(Component entity, ODocument document) {
+    EntityAdapter.setValueOrNull(document, P_ID, entity.getId());
+  }
 
   /**
-   * Converts a {@link Component} to an {@code ODocument}.
+   * Adds base properties from the given {@code ODocument} to the given {@code Component}.
    */
-  void convertToDocument(T component, ODocument document);
-
-  /**
-   * Converts an {@code ODocument} to a {@link Component}.
-   */
-  T convertToComponent(ODocument document);
+  public static void convertBasePropertiesToEntity(ODocument document, Component entity) {
+    entity.setId(EntityAdapter.getEntityIdOrNull(document, P_ID));
+  }
 }

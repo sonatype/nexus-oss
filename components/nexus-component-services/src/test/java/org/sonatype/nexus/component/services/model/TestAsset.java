@@ -10,25 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.id;
+package org.sonatype.nexus.component.services.model;
 
-import org.sonatype.nexus.component.model.ComponentId;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.BaseAsset;
 
 /**
- * A factory for creating new {@link ComponentId}s, necessary for new components.
- *
- * @since 3.0
+ * Asset subclass for testing.
  */
-public interface ComponentIdFactory
+public class TestAsset
+  extends BaseAsset
+  implements Asset
 {
-  /**
-   * Create a new {@link ComponentId} for a new component.
-   */
-  ComponentId newId();
+  private long downloadCount;
 
-  /**
-   * Restore a {@link ComponentId} from its "unique string" format, such as when deserializing component IDs stored
-   * as Strings.
-   */
-  ComponentId fromUniqueString(String uniqueString);
+  public long getDownloadCount() {
+    return downloadCount;
+  }
+
+  public void setDownloadCount(long downloadCount) {
+    this.downloadCount = downloadCount;
+  }
 }
