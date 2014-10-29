@@ -44,6 +44,9 @@ public class AssetEntityAdapter
   /** OrientDB property name for the asset's optional mime type. */
   public static final String P_CONTENT_TYPE = "contentType";
 
+  /** OrientDB property name for the asset's optional path. */
+  public static final String P_PATH = "path";
+
   /** OrientDB property name for the known locations of the asset content; a map of blob ids keyed by blobstore id. */
   public static final String P_BLOB_REFS = "blobRefs";
 
@@ -63,6 +66,7 @@ public class AssetEntityAdapter
       createRequiredAutoIndexedProperty(oClass, P_COMPONENT, OType.LINK, false);
       createRequiredProperty(oClass, P_FIRST_CREATED, OType.DATETIME);
       createOptionalProperty(oClass, P_CONTENT_TYPE, OType.STRING);
+      createOptionalProperty(oClass, P_PATH, OType.STRING);
       createRequiredProperty(oClass, P_BLOB_REFS, OType.EMBEDDEDMAP);
       logCreatedClassInfo(log, oClass);
     }
@@ -93,6 +97,7 @@ public class AssetEntityAdapter
     setValueOrNull(document, P_ID, entity.getId());
     setValueOrNull(document, P_FIRST_CREATED, entity.getFirstCreated());
     setValueOrNull(document, P_CONTENT_TYPE, entity.getContentType());
+    setValueOrNull(document, P_PATH, entity.getPath());
   }
 
   /**
@@ -102,5 +107,6 @@ public class AssetEntityAdapter
     asset.setId(getEntityIdOrNull(document, P_ID));
     asset.setFirstCreated(getDateTimeOrNull(document, P_FIRST_CREATED));
     asset.setContentType((String) document.field(P_CONTENT_TYPE));
+    asset.setPath((String) document.field(P_PATH));
   }
 }

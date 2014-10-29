@@ -35,6 +35,8 @@ public class BaseAsset
 
   private String contentType;
 
+  private String path;
+
   private DateTime firstCreated;
 
   private DateTime lastModified;
@@ -71,6 +73,17 @@ public class BaseAsset
   @Override
   public void setContentType(final String contentType) {
     this.contentType = contentType;
+  }
+
+  @Nullable
+  @Override
+  public String getPath() {
+    return path;
+  }
+
+  @Override
+  public void setPath(String path) {
+    this.path = path;
   }
 
   @Nullable

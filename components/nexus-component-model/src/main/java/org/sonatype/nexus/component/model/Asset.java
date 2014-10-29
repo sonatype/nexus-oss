@@ -61,6 +61,18 @@ public interface Asset
   void setContentType(String contentType);
 
   /**
+   * Gets the path of this asset within its component. This is an optional property and is used to
+   * disambiguate the asset from others within the same component, for view purposes.
+   */
+  @Nullable
+  String getPath();
+
+  /**
+   * @see #getPath()
+   */
+  void setPath(String path);
+
+  /**
    * @return when this asset was first created, {@code null} if unknown
    */
   @Nullable

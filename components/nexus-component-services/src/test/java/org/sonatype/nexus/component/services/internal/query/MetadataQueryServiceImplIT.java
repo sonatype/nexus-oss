@@ -417,11 +417,11 @@ public class MetadataQueryServiceImplIT
   public void queryAssetsWithCompoundComponentAndAssetRestrictionUsingLike() throws IOException {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    // SELECT FROM testasset WHERE (component.id = 'component1' AND contentType LIKE '%plain' AND downloadCount = 1)
+    // SELECT FROM testasset WHERE (component.id = 'component1' AND contentType LIKE '%plain' AND path = "1")
     MetadataQueryRestriction restriction = and(
         componentPropertyEquals(ComponentEntityAdapter.P_ID, TEST_COMPONENT_ID_1),
         assetPropertyLike(AssetEntityAdapter.P_CONTENT_TYPE, "%plain"),
-        assetPropertyEquals(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, 1));
+        assetPropertyEquals(AssetEntityAdapter.P_PATH, "1"));
 
     // count should be 1
     assertThat(queryService.count(TestAsset.class, restriction), is(1L));
@@ -585,6 +585,9 @@ public class MetadataQueryServiceImplIT
     assetDocument.field(TestAssetEntityAdapter.P_DOWNLOAD_COUNT, n);
     assetDocument.field(AssetEntityAdapter.P_FIRST_CREATED, blob.getMetrics().getCreationTime().toDate());
     assetDocument.field(AssetEntityAdapter.P_CONTENT_TYPE, "text/plain");
+    if (n % 2 == 1) {
+      assetDocument.field(AssetEntityAdapter.P_PATH, "" + n); // for variance, only set path if n is odd
+    }
     Map<String, String> blobRefs = ImmutableMap.of("someBlobStoreId", blob.getId().asUniqueString());
     assetDocument.field(AssetEntityAdapter.P_BLOB_REFS, blobRefs);
     assetDocument.save();
