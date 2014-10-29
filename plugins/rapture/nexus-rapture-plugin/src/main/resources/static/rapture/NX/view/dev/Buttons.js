@@ -1083,7 +1083,7 @@ Ext.define('NX.view.dev.Buttons', {
                 items: [
                   {
                     xtype: 'label',
-                    text: 'Source Code Pro Regular',
+                    text: 'Courier New',
                     cls: 'section-header'
                   },
                   {
@@ -1332,25 +1332,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color white' },
-                              { xtype: 'label', text: '$color-white' },
+                              { xtype: 'label', text: '$color-white', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color light-gainsboro' },
-                              { xtype: 'label', text: '$color-light-gainsboro' }
+                              { xtype: 'label', text: '$color-light-gainsboro', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
                       },
-                      {
-                        xtype: 'container',
-
-                        layout: {
-                          type: 'hbox'
-                        },
-
-                        items: [
-                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true, margin: "0 10 10 0" },
-                          { xtype: 'label', text: '50% Opacity' }
-                        ]
-                      },
+                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true, margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1370,9 +1359,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color light-gray' },
-                              { xtype: 'label', text: '$color-light-gray' },
+                              { xtype: 'label', text: '$color-light-gray', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color silver' },
-                              { xtype: 'label', text: '$color-silver' }
+                              { xtype: 'label', text: '$color-silver', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1397,9 +1386,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color suva-gray' },
-                              { xtype: 'label', text: '$color-suva-gray' },
+                              { xtype: 'label', text: '$color-suva-gray', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color gray' },
-                              { xtype: 'label', text: '$color-gray' }
+                              { xtype: 'label', text: '$color-gray', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1452,25 +1441,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color denim' },
-                              { xtype: 'label', text: '$color-denim' },
+                              { xtype: 'label', text: '$color-denim', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color light-cobalt' },
-                              { xtype: 'label', text: '$color-light-cobalt' }
+                              { xtype: 'label', text: '$color-light-cobalt', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
                       },
-                      {
-                        xtype: 'container',
-
-                        layout: {
-                          type: 'hbox'
-                        },
-
-                        items: [
-                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', disabled: true, margin: "0 10 10 0" },
-                          { xtype: 'label', text: '50% Opacity' }
-                        ]
-                      },
+                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', disabled: true, margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1490,9 +1468,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color dark-denim' },
-                              { xtype: 'label', text: '$color-dark-denim' },
+                              { xtype: 'label', text: '$color-dark-denim', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color smalt' },
-                              { xtype: 'label', text: '$color-smalt' }
+                              { xtype: 'label', text: '$color-smalt', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1517,9 +1495,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color dark-cerulean' },
-                              { xtype: 'label', text: '$color-dark-cerulean' },
+                              { xtype: 'label', text: '$color-dark-cerulean', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color prussian-blue' },
-                              { xtype: 'label', text: '$color-prussian-blue' }
+                              { xtype: 'label', text: '$color-prussian-blue', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1572,25 +1550,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color light-cerise' },
-                              { xtype: 'label', text: '$color-light-cerise' },
+                              { xtype: 'label', text: '$color-light-cerise', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color brick-red' },
-                              { xtype: 'label', text: '$color-brick-red' }
+                              { xtype: 'label', text: '$color-brick-red', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
                       },
-                      {
-                        xtype: 'container',
-
-                        layout: {
-                          type: 'hbox'
-                        },
-
-                        items: [
-                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', disabled: true, margin: "0 10 10 0" },
-                          { xtype: 'label', text: '50% Opacity' }
-                        ]
-                      },
+                      { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', disabled: true, margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1610,9 +1577,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color old-rose' },
-                              { xtype: 'label', text: '$color-old-rose' },
+                              { xtype: 'label', text: '$color-old-rose', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color fire-brick' },
-                              { xtype: 'label', text: '$color-fire-brick' }
+                              { xtype: 'label', text: '$color-fire-brick', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1637,9 +1604,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color shiraz' },
-                              { xtype: 'label', text: '$color-shiraz' },
+                              { xtype: 'label', text: '$color-shiraz', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color falu-red' },
-                              { xtype: 'label', text: '$color-falu-red' }
+                              { xtype: 'label', text: '$color-falu-red', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1692,25 +1659,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color sea-buckthorn' },
-                              { xtype: 'label', text: '$color-sea-buckthorn' },
+                              { xtype: 'label', text: '$color-sea-buckthorn', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color tahiti-gold' },
-                              { xtype: 'label', text: '$color-tahiti-gold' }
+                              { xtype: 'label', text: '$color-tahiti-gold', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
                       },
-                      {
-                        xtype: 'container',
-
-                        layout: {
-                          type: 'hbox'
-                        },
-
-                        items: [
-                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', disabled: true, margin: "0 10 10 0" },
-                          { xtype: 'label', text: '50% Opacity' }
-                        ]
-                      },
+                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', disabled: true, margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1730,9 +1686,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color zest' },
-                              { xtype: 'label', text: '$color-zest' },
+                              { xtype: 'label', text: '$color-zest', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color rich-gold' },
-                              { xtype: 'label', text: '$color-rich-gold' }
+                              { xtype: 'label', text: '$color-rich-gold', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1757,9 +1713,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color afghan-tan' },
-                              { xtype: 'label', text: '$color-afghan-tan' },
+                              { xtype: 'label', text: '$color-afghan-tan', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color russet' },
-                              { xtype: 'label', text: '$color-russet' }
+                              { xtype: 'label', text: '$color-russet', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1812,25 +1768,14 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color elf-green' },
-                              { xtype: 'label', text: '$color-elf-green' },
+                              { xtype: 'label', text: '$color-elf-green', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color dark-pigment-green' },
-                              { xtype: 'label', text: '$color-dark-pigment-green' }
+                              { xtype: 'label', text: '$color-dark-pigment-green', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
                       },
-                      {
-                        xtype: 'container',
-
-                        layout: {
-                          type: 'hbox'
-                        },
-
-                        items: [
-                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', disabled: true, margin: "0 10 10 0" },
-                          { xtype: 'label', text: '50% Opacity' }
-                        ]
-                      },
+                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', disabled: true, margin: "0 10 10 0" },
                       {
                         xtype: 'container',
 
@@ -1850,9 +1795,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color salem' },
-                              { xtype: 'label', text: '$color-salem' },
+                              { xtype: 'label', text: '$color-salem', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color jewel' },
-                              { xtype: 'label', text: '$color-jewel' }
+                              { xtype: 'label', text: '$color-jewel', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
@@ -1877,9 +1822,9 @@ Ext.define('NX.view.dev.Buttons', {
 
                             items: [
                               { xtype: 'container', width: 10, height: 10, cls: 'color fun-green' },
-                              { xtype: 'label', text: '$color-fun-green' },
+                              { xtype: 'label', text: '$color-fun-green', padding: '0 10px 0 0' },
                               { xtype: 'container', width: 10, height: 10, cls: 'color dark-jewel' },
-                              { xtype: 'label', text: '$color-dark-jewel' }
+                              { xtype: 'label', text: '$color-dark-jewel', padding: '0 10px 0 0' }
                             ]
                           }
                         ]
