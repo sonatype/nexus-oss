@@ -1273,284 +1273,653 @@ Ext.define('NX.view.dev.Buttons', {
           // Section title
           {
             xtype: 'label',
-            text: 'Buttons'
+            text: 'Buttons',
+            cls: 'category-title'
           },
 
           {
             xtype: 'container',
 
             layout: {
-              type: 'vbox',
-              padding: 4,
-              cls: 'category-title'
+              type: 'table',
+              columns: 3
             },
 
+            // Default buttons
             items: [
               {
                 xtype: 'container',
 
                 layout: {
-                  type: 'hbox'
+                  type: 'vbox'
                 },
 
                 items: [
                   {
+                    xtype: 'label',
+                    text: 'Default',
+                    cls: 'section-header'
+                  },
+                  {
                     xtype: 'container',
 
                     layout: {
-                      type: 'vbox'
+                      type: 'table',
+                      columns: 2
                     },
 
                     items: [
                       {
-                        xtype: 'label',
-                        text: 'Default'
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color white' },
+                              { xtype: 'label', text: '$color-white' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color light-gainsboro' },
+                              { xtype: 'label', text: '$color-light-gainsboro' }
+                            ]
+                          }
+                        ]
                       },
                       {
                         xtype: 'container',
 
                         layout: {
-                          type: 'table',
-                          columns: 2
+                          type: 'hbox'
                         },
 
                         items: [
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true },
+                          { xtype: 'label', text: '50% Opacity' }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
                           {
                             xtype: 'container',
 
                             layout: {
-                              type: 'hbox'
+                              type: 'table',
+                              columns: 2
                             },
 
                             items: [
-                              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
-                              {
-                                xtype: 'container',
-
-                                layout: {
-                                  type: 'vbox'
-                                },
-
-                                items: [
-                                  {
-                                    xtype: 'container',
-
-                                    layout: {
-                                      type: 'hbox'
-                                    },
-
-                                    items: [
-                                      {
-                                        xtype: 'container',
-                                        width: 10,
-                                        height: 10,
-                                        cls: 'color white'
-                                      },
-                                      {
-                                        xtype: 'label',
-                                        text: '$color-white'
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    xtype: 'container',
-
-                                    layout: {
-                                      type: 'hbox'
-                                    },
-
-                                    items: [
-                                      {
-                                        xtype: 'container',
-                                        width: 10,
-                                        height: 10,
-                                        cls: 'color light-gainsboro'
-                                      },
-                                      {
-                                        xtype: 'label',
-                                        text: '$color-light-gainsboro'
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
+                              { xtype: 'container', width: 10, height: 10, cls: 'color light-gray' },
+                              { xtype: 'label', text: '$color-light-gray' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color silver' },
+                              { xtype: 'label', text: '$color-silver' }
                             ]
-                          },
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome',  ui: 'default' },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default' },
                           {
                             xtype: 'container',
 
                             layout: {
-                              type: 'hbox'
+                              type: 'table',
+                              columns: 2
                             },
 
                             items: [
-                              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'default' },
                               {
                                 xtype: 'container',
-
-                                layout: {
-                                  type: 'vbox'
-                                },
-
-                                items: [
-                                  {
-                                    xtype: 'container',
-
-                                    layout: {
-                                      type: 'hbox'
-                                    },
-
-                                    items: [
-                                      {
-                                        xtype: 'container',
-                                        width: 10,
-                                        height: 10,
-                                        cls: 'color-light-gray'
-                                      },
-                                      {
-                                        xtype: 'label',
-                                        text: '$color-light-gray'
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    xtype: 'container',
-
-                                    layout: {
-                                      type: 'hbox'
-                                    },
-
-                                    items: [
-                                      {
-                                        xtype: 'container',
-                                        width: 10,
-                                        height: 10,
-                                        cls: 'color-silver'
-                                      },
-                                      {
-                                        xtype: 'label',
-                                        text: '$color-silver'
-                                      }
-                                    ]
-                                  }
-                                ]
+                                width: 10,
+                                height: 10,
+                                cls: 'color suva-gray'
+                              },
+                              {
+                                xtype: 'label',
+                                text: '$color-suva-gray'
+                              },
+                              {
+                                xtype: 'container',
+                                width: 10,
+                                height: 10,
+                                cls: 'color gray'
+                              },
+                              {
+                                xtype: 'label',
+                                text: '$color-gray'
                               }
                             ]
                           }
                         ]
-                      }
+                      },
+                      { xtype: 'button', text: 'Default', glyph: 'xf000@FontAwesome', ui: 'default', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
                     ]
                   }
+                ]
+              },
+
+              // Primary buttons
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Primary',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+
+                    layout: {
+                      type: 'table',
+                      columns: 2
+                    },
+
+                    items: [
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color denim' },
+                              { xtype: 'label', text: '$color-denim' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color light-cobalt' },
+                              { xtype: 'label', text: '$color-light-cobalt' }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', disabled: true },
+                          { xtype: 'label', text: '50% Opacity' }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color dark-denim' },
+                              { xtype: 'label', text: '$color-dark-denim' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color smalt' },
+                              { xtype: 'label', text: '$color-smalt' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color dark-cerulean' },
+                              { xtype: 'label', text: '$color-dark-cerulean' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color prussian-blue' },
+                              { xtype: 'label', text: '$color-prussian-blue' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Primary', glyph: 'xf000@FontAwesome', ui: 'primary', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                    ]
+                  }
+                ]
+              },
+
+              // Danger buttons
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Danger',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+
+                    layout: {
+                      type: 'table',
+                      columns: 2
+                    },
+
+                    items: [
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color light-cerise' },
+                              { xtype: 'label', text: '$color-light-cerise' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color brick-red' },
+                              { xtype: 'label', text: '$color-brick-red' }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', disabled: true },
+                          { xtype: 'label', text: '50% Opacity' }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color old-rose' },
+                              { xtype: 'label', text: '$color-old-rose' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color fire-brick' },
+                              { xtype: 'label', text: '$color-fire-brick' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color shiraz' },
+                              { xtype: 'label', text: '$color-shiraz' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color falu-red' },
+                              { xtype: 'label', text: '$color-falu-red' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Danger', glyph: 'xf000@FontAwesome', ui: 'danger', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                    ]
+                  }
+                ]
+              },
+
+              // Warning buttons
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Warning',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+
+                    layout: {
+                      type: 'table',
+                      columns: 2
+                    },
+
+                    items: [
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color sea-buckthorn' },
+                              { xtype: 'label', text: '$color-sea-buckthorn' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color tahiti-gold' },
+                              { xtype: 'label', text: '$color-tahiti-gold' }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', disabled: true },
+                          { xtype: 'label', text: '50% Opacity' }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color zest' },
+                              { xtype: 'label', text: '$color-zest' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color rich-gold' },
+                              { xtype: 'label', text: '$color-rich-gold' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color afghan-tan' },
+                              { xtype: 'label', text: '$color-afghan-tan' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color russet' },
+                              { xtype: 'label', text: '$color-russet' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Warning', glyph: 'xf000@FontAwesome', ui: 'warning', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                    ]
+                  }
+                ]
+              },
+
+              // Success buttons
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'vbox'
+                },
+
+                items: [
+                  {
+                    xtype: 'label',
+                    text: 'Success',
+                    cls: 'section-header'
+                  },
+                  {
+                    xtype: 'container',
+
+                    layout: {
+                      type: 'table',
+                      columns: 2
+                    },
+
+                    items: [
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color elf-green' },
+                              { xtype: 'label', text: '$color-elf-green' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color dark-pigment-green' },
+                              { xtype: 'label', text: '$color-dark-pigment-green' }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', disabled: true },
+                          { xtype: 'label', text: '50% Opacity' }
+                        ]
+                      },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color salem' },
+                              { xtype: 'label', text: '$color-salem' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color jewel' },
+                              { xtype: 'label', text: '$color-jewel' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                      {
+                        xtype: 'container',
+
+                        layout: {
+                          type: 'hbox'
+                        },
+
+                        items: [
+                          { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success' },
+                          {
+                            xtype: 'container',
+
+                            layout: {
+                              type: 'table',
+                              columns: 2
+                            },
+
+                            items: [
+                              { xtype: 'container', width: 10, height: 10, cls: 'color fun-green' },
+                              { xtype: 'label', text: '$color-fun-green' },
+                              { xtype: 'container', width: 10, height: 10, cls: 'color dark-jewel' },
+                              { xtype: 'label', text: '$color-dark-jewel' }
+                            ]
+                          }
+                        ]
+                      },
+                      { xtype: 'button', text: 'Success', glyph: 'xf000@FontAwesome', ui: 'success', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+                    ]
+                  }
+                ]
+              },
+              {
+                xtype: 'container',
+
+                layout: {
+                  type: 'table',
+                  columns: 3
+                },
+
+                items: [
+                  { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain' },
+                  { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain' },
+                  { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', menu: [ { text: 'First' }, '-', { text: 'Second' } ] },
+                  { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', disabled: true },
+                  { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', disabled: true },
+                  { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', disabled: true, menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
                 ]
               }
             ]
           },
-
-          // Default buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'default', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'default', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          },
-
-          // Primary buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'label', text: "ui: 'primary'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'primary' },
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'primary', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'primary', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          },
-
-          // Danger buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'label', text: "ui: 'danger'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'danger' },
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'danger', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'danger', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          },
-
-          // Warning buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'label', text: "ui: 'warning'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'warning' },
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'warning', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'warning', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          },
-
-          // Success buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'label', text: "ui: 'success'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'success' },
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'success', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'success', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          },
-
-          // Plain buttons
-          {
-            xtype: 'container',
-            layout: {
-              type: 'hbox',
-              padding: 4
-            },
-            defaults: {
-              width: 100
-            },
-            items: [
-              { xtype: 'label', text: "ui: 'plain'" },
-              { xtype: 'button', text: 'normal', glyph: 'xf000@FontAwesome', ui: 'plain' },
-              { xtype: 'button', text: 'disabled', glyph: 'xf000@FontAwesome',  ui: 'plain', disabled: true },
-              { xtype: 'button', text: 'menu', glyph: 'xf000@FontAwesome', ui: 'plain', menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
-            ]
-          }
         ]
       }
     );
