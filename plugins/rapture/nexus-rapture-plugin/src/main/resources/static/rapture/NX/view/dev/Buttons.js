@@ -1917,339 +1917,98 @@ Ext.define('NX.view.dev.Buttons', {
 
             items: [
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200,
-                    value: 'Text Input'
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                value: 'Text Input'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200,
-                    value: 'Text Input',
-                    allowBlank: false
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                value: 'Text Input',
+                allowBlank: false
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200,
-                    allowBlank: false
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                allowBlank: false
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200
-                  }
-                ]
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
+                xtype: 'textfield',
+                width: 200,
+                fieldLabel: '[Label]',
                 colspan: 2,
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textfield',
-                    width: 200
-                  }
-                ]
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200,
-                    value: 'Text Input'
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                value: 'Text Input'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200,
-                    value: 'Text Input',
-                    allowBlank: false
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                value: 'Text Input',
+                allowBlank: false
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200,
-                    allowBlank: false
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]',
+                allowBlank: false
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200
-                  }
-                ]
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
               },
               {
-                xtype: 'container',
-
-                colspan: 2,
-
-                layout: {
-                  type: 'vbox',
-                  padding: 4
-                },
-
-                items: [
-                  {
-                    xtype: 'label',
-                    text: '[Label]'
-                  },
-                  {
-                    xtype: 'label',
-                    text: '[Optional description text]'
-                  },
-                  {
-                    xtype: 'textarea',
-                    width: 200
-                  }
-                ]
-              }
+                xtype: 'textarea',
+                width: 200,
+                fieldLabel: '[Label]',
+                helpText: '[Optional description text]'
+              },
             ]
           },
           {
