@@ -2288,27 +2288,6 @@ Ext.define('NX.view.dev.Styles', {
      * Table
      */
 
-    /*me.items.push(
-      {
-        xtype: 'container',
-
-        layout: {
-          type: 'vbox',
-          padding: 4
-        },
-
-        cls: 'category',
-
-        items: [
-          {
-            xtype: 'label',
-            text: 'Table',
-            cls: 'category-title'
-          }
-        ]
-      }
-    );*/
-
     /*
      * Panels
      */
@@ -2338,7 +2317,7 @@ Ext.define('NX.view.dev.Styles', {
             xtype: 'tabpanel',
 
             width: 500,
-            height: 150,
+            height: 60,
             activeTab: 0,
             ui: 'light',
 
@@ -2373,6 +2352,38 @@ Ext.define('NX.view.dev.Styles', {
     /*
      * Picker
      */
+
+    me.items.push(
+      {
+        xtype: 'container',
+        layout: {
+          type: 'vbox',
+          padding: 4
+        },
+
+        cls: 'category',
+
+        items: [
+          {
+            xtype: 'label',
+            text: 'Picker',
+            cls: 'category-title'
+          },
+          {
+            xtype: 'nx-itemselector',
+
+            name: 'realms',
+            buttons: ['up', 'add', 'remove', 'down'],
+            fromTitle: 'Available',
+            toTitle: 'Active',
+            store: 'RealmType',
+            valueField: 'id',
+            displayField: 'name',
+            delimiter: null
+          }
+        ]
+      }
+    );
 
     me.callParent();
   }
