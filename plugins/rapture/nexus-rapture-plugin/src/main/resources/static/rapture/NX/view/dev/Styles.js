@@ -13,13 +13,13 @@
 /*global Ext*/
 
 /**
- * Shows examples of buttons in various styles.
+ * Visual style sheet for the application.
  *
  * @since 3.0
  */
-Ext.define('NX.view.dev.Buttons', {
+Ext.define('NX.view.dev.Styles', {
   extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-dev-buttons',
+  alias: 'widget.nx-dev-styles',
 
   title: 'Styles',
 

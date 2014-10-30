@@ -30,7 +30,7 @@ Ext.define('NX.controller.dev.Developer', {
   views: [
     'dev.Panel',
     'dev.Tests',
-    'dev.Buttons',
+    'dev.Styles',
     'dev.Icons',
     'dev.Messages',
     'dev.Features',
