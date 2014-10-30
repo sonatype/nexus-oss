@@ -14,7 +14,6 @@ package org.sonatype.nexus.proxy.registry;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -26,6 +25,11 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class RepositoryTypeDescriptor
 {
+  /**
+   * The constant denoting unlimited count of instances.
+   */
+  public static final int UNLIMITED_INSTANCES = -1;
+
   private final Class<? extends Repository> role;
 
   private final String hint;
@@ -37,7 +41,7 @@ public class RepositoryTypeDescriptor
   private AtomicInteger instanceCount = new AtomicInteger(0);
 
   public RepositoryTypeDescriptor(Class<? extends Repository> role, String hint, String prefix) {
-    this(role, hint, prefix, RepositoryType.UNLIMITED_INSTANCES);
+    this(role, hint, prefix, UNLIMITED_INSTANCES);
   }
 
   public RepositoryTypeDescriptor(Class<? extends Repository> role, String hint, String prefix,
@@ -108,6 +112,6 @@ public class RepositoryTypeDescriptor
   }
 
   public String toString() {
-    return "RepositoryType=(" + getRole().getName() + ":" + getHint() + ")";
+    return getClass().getSimpleName() + "=(" + getRole().getName() + ":" + getHint() + ")";
   }
 }

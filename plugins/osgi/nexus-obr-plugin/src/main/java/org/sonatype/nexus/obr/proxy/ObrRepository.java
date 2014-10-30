@@ -15,6 +15,7 @@ package org.sonatype.nexus.obr.proxy;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -61,10 +62,11 @@ import org.osgi.service.obr.Resource;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named(ObrRepository.ROLE_HINT)
+@Typed(Repository.class)
 @Description("OBR")
 public class ObrRepository
     extends AbstractProxyRepository
-    implements ObrProxyRepository, ObrHostedRepository, Repository
+    implements ObrProxyRepository, ObrHostedRepository
 {
   public static final String ROLE_HINT = "obr-proxy";
 

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.guice.AbstractInterceptorModule;
-import org.sonatype.nexus.guice.NexusTypeBinder;
 
 import com.google.common.base.Strings;
 import com.google.inject.Key;
@@ -93,7 +92,7 @@ public class NexusBundleModule
     if (hasPlexus) {
       return new PlexusSpaceModule(space, BeanScanning.GLOBAL_INDEX);
     }
-    return new SpaceModule(space, BeanScanning.GLOBAL_INDEX).with(NexusTypeBinder.STRATEGY);
+    return new SpaceModule(space, BeanScanning.GLOBAL_INDEX);
   }
 
   private void maybeAddShiroAOP(List<Module> modules) {

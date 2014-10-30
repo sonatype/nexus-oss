@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.sonatype.nexus.guice.NexusTypeBinder;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -56,7 +55,7 @@ public abstract class AbstractPluginTestCase
       final ClassSpace annSpace =
           new URLClassSpace(getContainer().getContainerRealm(), scanList.toArray(new URL[scanList.size()]));
       final PlexusBeanModule nexusPluginModule =
-          new PlexusAnnotatedBeanModule(annSpace, new HashMap<String, String>()).with(NexusTypeBinder.STRATEGY);
+          new PlexusAnnotatedBeanModule(annSpace, new HashMap<String, String>());
       final List<PlexusBeanModule> modules = Arrays.<PlexusBeanModule>asList(nexusPluginModule);
 
       // register new injector

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -75,10 +76,11 @@ import org.eclipse.tycho.model.UpdateSite.SiteFeatureRef;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named(UpdateSiteProxyRepositoryImpl.ROLE_HINT)
+@Typed(Repository.class)
 @Description("Eclipse Update Site")
 public class UpdateSiteProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements UpdateSiteProxyRepository, Repository
+    implements UpdateSiteProxyRepository
 {
   private static final String DEFAULT_FEATURES_DIR = "features/";
 
