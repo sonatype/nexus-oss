@@ -1857,21 +1857,19 @@ Ext.define('NX.view.dev.Buttons', {
                       columns: 3
                     },
 
+                    defaults: {
+                      text: 'Default',
+                      ui: 'plain',
+                      margin: '0 10 10 0'
+                    },
+
                     items: [
-                      { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', margin: "0 10 10 0" },
-                      { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', margin: "0 10 10 0" },
-                      { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', menu: [
-                        { text: 'First' },
-                        '-',
-                        { text: 'Second' }
-                      ], margin: "0 10 10 0" },
-                      { xtype: 'button', text: 'Default', glyph: 'xf055@FontAwesome', ui: 'plain', disabled: true, margin: "0 10 10 0" },
-                      { xtype: 'button', text: 'Default', glyph: 'xf057@FontAwesome', ui: 'plain', disabled: true, margin: "0 10 10 0" },
-                      { xtype: 'button', text: 'Default', glyph: 'xf036@FontAwesome', ui: 'plain', disabled: true, menu: [
-                        { text: 'First' },
-                        '-',
-                        { text: 'Second' }
-                      ], margin: "0 10 10 0" }
+                      { xtype: 'button', glyph: 'xf055@FontAwesome' },
+                      { xtype: 'button', glyph: 'xf057@FontAwesome' },
+                      { xtype: 'button', glyph: 'xf036@FontAwesome', menu: [ { text: 'First' }, '-', { text: 'Second' } ] },
+                      { xtype: 'button', glyph: 'xf055@FontAwesome', disabled: true },
+                      { xtype: 'button', glyph: 'xf057@FontAwesome', disabled: true },
+                      { xtype: 'button', glyph: 'xf036@FontAwesome', disabled: true, menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
                     ]
                   }
                 ]
@@ -1915,100 +1913,28 @@ Ext.define('NX.view.dev.Buttons', {
               columns: 4
             },
 
+            defaults: {
+              width: 200,
+              fieldLabel: '[Label]',
+              helpText: '[Optional description text]'
+            },
+
             items: [
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                value: 'Text Input'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                value: 'Text Input',
-                allowBlank: false
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                allowBlank: false
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textfield',
-                width: 200,
-                fieldLabel: '[Label]',
-                colspan: 2,
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                value: 'Text Input'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                value: 'Text Input',
-                allowBlank: false
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]',
-                allowBlank: false
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
-              {
-                xtype: 'textarea',
-                width: 200,
-                fieldLabel: '[Label]',
-                helpText: '[Optional description text]'
-              },
+              { xtype: 'textfield' },
+              { xtype: 'textfield', value: 'Text Input' },
+              { xtype: 'textfield', value: 'Text Input', allowBlank: false },
+              { xtype: 'textfield', allowBlank: false },
+              { xtype: 'textfield' },
+              { xtype: 'textfield' },
+              { xtype: 'textfield', colspan: 2 },
+
+              { xtype: 'textarea' },
+              { xtype: 'textarea', value: 'Text Input' },
+              { xtype: 'textarea', value: 'Text Input', allowBlank: false },
+              { xtype: 'textarea', allowBlank: false },
+              { xtype: 'textarea' },
+              { xtype: 'textarea' },
+              { xtype: 'textarea' }
             ]
           },
           {
@@ -2021,42 +1947,15 @@ Ext.define('NX.view.dev.Buttons', {
             },
 
             items: [
-              {
-                xtype: 'checkbox',
-                boxLabel: 'Checkbox'
-              },
-              {
-                xtype: 'checkbox',
-                boxLabel: 'Checkbox'
-              },
-              {
-                xtype: 'checkbox',
-                boxLabel: 'Checkbox',
-                checked: true
-              },
-              {
-                xtype: 'checkbox',
-                boxLabel: 'Checkbox',
-                checked: true
-              },
-              {
-                xtype: 'radio',
-                boxLabel: 'Radio Button'
-              },
-              {
-                xtype: 'radio',
-                boxLabel: 'Radio Button'
-              },
-              {
-                xtype: 'radio',
-                boxLabel: 'Radio Button',
-                checked: true
-              },
-              {
-                xtype: 'radio',
-                boxLabel: 'Radio Button',
-                checked: true
-              }
+              { xtype: 'checkbox', boxLabel: 'Checkbox' },
+              { xtype: 'checkbox', boxLabel: 'Checkbox' },
+              { xtype: 'checkbox', boxLabel: 'Checkbox', checked: true },
+              { xtype: 'checkbox', boxLabel: 'Checkbox', checked: true },
+
+              { xtype: 'radio', boxLabel: 'Radio Button' },
+              { xtype: 'radio', boxLabel: 'Radio Button' },
+              { xtype: 'radio', boxLabel: 'Radio Button', checked: true },
+              { xtype: 'radio', boxLabel: 'Radio Button', checked: true }
             ]
           }
         ]
