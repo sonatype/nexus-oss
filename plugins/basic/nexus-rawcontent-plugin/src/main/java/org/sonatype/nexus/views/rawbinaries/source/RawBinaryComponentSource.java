@@ -33,7 +33,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,9 +50,15 @@ public class RawBinaryComponentSource
 
   private final String urlPrefix;
 
-  public RawBinaryComponentSource(final ComponentSourceId sourceName, final String urlPrefix) {
+  private CloseableHttpClient httpClient;
+
+  public RawBinaryComponentSource(final ComponentSourceId sourceName,
+                                  final CloseableHttpClient httpClient,
+                                  final String urlPrefix)
+  {
     this.sourceName = checkNotNull(sourceName);
     this.urlPrefix = checkNotNull(urlPrefix);
+    this.httpClient = checkNotNull(httpClient);
   }
 
   @Nullable
@@ -61,13 +66,11 @@ public class RawBinaryComponentSource
   public Iterable<ComponentEnvelope<RawComponent>> fetchComponents(final ComponentRequest request)
       throws IOException
   {
-    final CloseableHttpClient httpclient = HttpClients.createDefault();
-
     final String uri = urlPrefix + request.getQuery().get("path");
 
     final HttpGet httpGet = new HttpGet(uri);
 
-    final CloseableHttpResponse response = httpclient.execute(httpGet);
+    final CloseableHttpResponse response = httpClient.execute(httpGet);
 
     return asList(ComponentEnvelope.simpleEnvelope(new RawComponent(), new RequestClosingAsset(response)));
   }

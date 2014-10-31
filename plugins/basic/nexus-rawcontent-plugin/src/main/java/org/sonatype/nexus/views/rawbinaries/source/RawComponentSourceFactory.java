@@ -12,12 +12,17 @@
  */
 package org.sonatype.nexus.views.rawbinaries.source;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
+import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
+
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,10 +40,20 @@ public class RawComponentSourceFactory
 
   public static final String REMOTE_URL_PARAM = "remote-url";
 
+  private HttpClientFactory httpClientFactory;
+
+  @Inject
+  public RawComponentSourceFactory(final HttpClientFactory httpClientFactory) {
+    this.httpClientFactory = checkNotNull(httpClientFactory);
+  }
+
   @Override
   public ComponentSource createSource(final ComponentSourceConfig config) {
     checkNotNull(config);
-    return new RawBinaryComponentSource(config.getSourceId(),
-        (String) config.getConfiguration().get(REMOTE_URL_PARAM));
+    return new RawBinaryComponentSource(
+        config.getSourceId(),
+        (CloseableHttpClient) httpClientFactory.create(HttpClientConfig.fromMap(config.getConfiguration())),
+        (String) config.getConfiguration().get(REMOTE_URL_PARAM)
+    );
   }
 }
