@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.httpclient;
+package org.sonatype.nexus.httpclient;
 
 import java.net.URI;
 import java.util.Locale;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *      slash</a>
  * @since 3.0
  */
-public class NexusRedirectStrategy
+public class IndexRedirectStrategy
     extends DefaultRedirectStrategy
 {
 
@@ -61,9 +61,9 @@ public class NexusRedirectStrategy
    * HttpContext key marking request is about content retrieval, hence, the special redirection strategy should
    * be applied.
    */
-  public static final String CONTENT_RETRIEVAL_MARKER_KEY = NexusRedirectStrategy.class.getName() + "#retrieveItem";
+  public static final String CONTENT_RETRIEVAL_MARKER_KEY = IndexRedirectStrategy.class.getName() + "#retrieveItem";
 
-  private static final Logger log = LoggerFactory.getLogger(NexusRedirectStrategy.class);
+  private static final Logger log = LoggerFactory.getLogger(IndexRedirectStrategy.class);
 
   @Override
   public boolean isRedirected(final HttpRequest request, final HttpResponse response, final HttpContext context)

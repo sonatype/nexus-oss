@@ -10,13 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.httpclient;
+package org.sonatype.nexus.httpclient;
 
-import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.http.HttpResponse;
@@ -36,28 +31,11 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link NexusRedirectStrategy} UTs.
+ * {@link IndexRedirectStrategy} UTs.
  */
-public class NexusRequestStrategyTest
+public class IndexRedirectStrategyTest
     extends TestSupport
 {
-  @Mock
-  private ProxyRepository proxyRepository;
-
-  @Mock
-  private EventBus eventBus;
-
-  @Mock
-  private SystemStatus systemStatus;
-
-  @Mock
-  private RemoteStorageContext globalRemoteStorageContext;
-
-  @Mock
-  private RemoteProxySettings remoteProxySettings;
-
-  @Mock
-  private PoolingClientConnectionManagerMBeanInstaller jmxInstaller;
 
   @Mock
   private HttpResponse response;
@@ -74,20 +52,20 @@ public class NexusRequestStrategyTest
   {
     when(response.getStatusLine()).thenReturn(statusLine);
 
-    final RedirectStrategy underTest = new NexusRedirectStrategy();
+    final RedirectStrategy underTest = new IndexRedirectStrategy();
     HttpContext httpContext;
 
     // no location header
     request = new HttpGet("http://localhost/dir/fileA");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
 
     // redirect to file
     request = new HttpGet("http://localhost/dir/fileA");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(
         new BasicHeader("location", "http://localhost/dir/fileB"));
@@ -96,7 +74,7 @@ public class NexusRequestStrategyTest
     // redirect to dir
     request = new HttpGet("http://localhost/dir");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(new BasicHeader("location", "http://localhost/dir/"));
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
@@ -108,7 +86,7 @@ public class NexusRequestStrategyTest
   {
     when(response.getStatusLine()).thenReturn(statusLine);
 
-    final RedirectStrategy underTest = new NexusRedirectStrategy();
+    final RedirectStrategy underTest = new IndexRedirectStrategy();
 
     // simple cross redirect
     request = new HttpGet("http://hostA/dir");
