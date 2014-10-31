@@ -31,9 +31,9 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link IndexRedirectStrategy} UTs.
+ * {@link NexusRedirectStrategy} UTs.
  */
-public class IndexRedirectStrategyTest
+public class NexusRedirectStrategyTest
     extends TestSupport
 {
 
@@ -52,20 +52,20 @@ public class IndexRedirectStrategyTest
   {
     when(response.getStatusLine()).thenReturn(statusLine);
 
-    final RedirectStrategy underTest = new IndexRedirectStrategy();
+    final RedirectStrategy underTest = new NexusRedirectStrategy();
     HttpContext httpContext;
 
     // no location header
     request = new HttpGet("http://localhost/dir/fileA");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
 
     // redirect to file
     request = new HttpGet("http://localhost/dir/fileA");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(
         new BasicHeader("location", "http://localhost/dir/fileB"));
@@ -74,7 +74,7 @@ public class IndexRedirectStrategyTest
     // redirect to dir
     request = new HttpGet("http://localhost/dir");
     httpContext = new BasicHttpContext();
-    httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+    httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
     when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_MOVED_TEMPORARILY);
     when(response.getFirstHeader("location")).thenReturn(new BasicHeader("location", "http://localhost/dir/"));
     assertThat(underTest.isRedirected(request, response, httpContext), is(false));
@@ -86,7 +86,7 @@ public class IndexRedirectStrategyTest
   {
     when(response.getStatusLine()).thenReturn(statusLine);
 
-    final RedirectStrategy underTest = new IndexRedirectStrategy();
+    final RedirectStrategy underTest = new NexusRedirectStrategy();
 
     // simple cross redirect
     request = new HttpGet("http://hostA/dir");

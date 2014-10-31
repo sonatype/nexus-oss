@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
-import org.sonatype.nexus.httpclient.IndexRedirectStrategy;
+import org.sonatype.nexus.httpclient.NexusRedirectStrategy;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -68,7 +68,7 @@ public class HttpClientManagerImpl
    */
   protected void configure(final Builder builder) {
     // set proxy redirect strategy
-    builder.getHttpClientBuilder().setRedirectStrategy(new IndexRedirectStrategy());
+    builder.getHttpClientBuilder().setRedirectStrategy(new NexusRedirectStrategy());
   }
 
 }

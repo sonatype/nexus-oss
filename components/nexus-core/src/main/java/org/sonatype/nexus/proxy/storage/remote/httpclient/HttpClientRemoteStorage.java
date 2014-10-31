@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.httpclient.HttpClientFactory;
-import org.sonatype.nexus.httpclient.IndexRedirectStrategy;
+import org.sonatype.nexus.httpclient.NexusRedirectStrategy;
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.httpclient.Page.PageContext;
 import org.sonatype.nexus.internal.httpclient.RepositoryPageContext;
@@ -542,7 +542,7 @@ public class HttpClientRemoteStorage
       final BasicHttpContext httpContext = new BasicHttpContext();
       httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, repository);
       if (contentRequest) {
-        httpContext.setAttribute(IndexRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+        httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
       }
 
       httpResponse = httpClient.execute(httpRequest, httpContext);
