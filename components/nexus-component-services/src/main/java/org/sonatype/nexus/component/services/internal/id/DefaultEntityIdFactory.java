@@ -10,19 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.views.rawbinaries.internal;
+package org.sonatype.nexus.component.services.internal.id;
 
-import org.sonatype.nexus.component.model.BaseComponent;
-import org.sonatype.nexus.component.model.Component;
+import java.util.UUID;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.component.model.EntityId;
+import org.sonatype.nexus.component.services.id.EntityIdFactory;
 
 /**
- * An essentially placebo implementation of {@link Component} so this plugin has the same structure as other formats for
- * example purposes.
+ * A simple, uuid-based factory for {@link EntityId}s.
  *
  * @since 3.0
  */
-public class RawComponent
-    extends BaseComponent
-    implements Component
+@Named
+@Singleton
+public class DefaultEntityIdFactory
+    implements EntityIdFactory
 {
+  @Override
+  public EntityId newId() {
+    return new EntityId(UUID.randomUUID().toString());
+  }
 }

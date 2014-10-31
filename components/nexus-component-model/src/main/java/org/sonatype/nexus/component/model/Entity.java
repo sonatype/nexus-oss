@@ -10,19 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.views.rawbinaries.internal;
+package org.sonatype.nexus.component.model;
 
-import org.sonatype.nexus.component.model.BaseComponent;
-import org.sonatype.nexus.component.model.Component;
+import javax.annotation.Nullable;
 
 /**
- * An essentially placebo implementation of {@link Component} so this plugin has the same structure as other formats for
- * example purposes.
- *
- * @since 3.0
+ * A stored {@link Component} or {@link Asset}.
  */
-public class RawComponent
-    extends BaseComponent
-    implements Component
+public interface Entity
 {
+  /**
+   * Gets the canonical id, or {@code null} if it hasn't been stored yet.
+   */
+  @Nullable
+  EntityId getId();
+
+  /**
+   * @see #getId()
+   */
+  void setId(EntityId id);
 }

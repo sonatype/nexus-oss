@@ -10,9 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.query;
+package org.sonatype.nexus.component.services.adapter;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -20,27 +19,32 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.component.model.Entity;
 
 /**
- * Search interface for finding components and assets.
- *
- * Results represent the state of the stored items at the time of the query are are divorced from the session
- * from which they originated by the time they are returned.
+ * A registry of {@link EntityAdapter}s, keyed by {@link Entity} domain class.
  *
  * @since 3.0
  */
-public interface MetadataQueryService
+public interface EntityAdapterRegistry
 {
   /**
-   * Gets all entity classes known to the service.
+   * Registers an adapter and creates the OrientDB class in the database if it doesn't already exist.
+   *
+   * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
+   */
+  <T extends Entity> void registerAdapter(EntityAdapter<T> adapter);
+
+  /**
+   * Unregisters the adapter for the given component class. If no such adapter is registered, this is a no-op.
+   */
+  <T extends Entity> void unregisterAdapter(Class<T> entityClass);
+
+  /**
+   * Gets the registered adapter for the given component class, or {@code null} if it doesn't exist.
+   */
+  @Nullable
+  <T extends Entity> EntityAdapter<T> getAdapter(Class<T> entityClass);
+
+  /**
+   * Gets all entity classes for which a registered adapter exists.
    */
   Set<Class<? extends Entity>> entityClasses();
-
-  /**
-   * Gets the number of entities of the given class matching the given restriction.
-   */
-  <T extends Entity> long count(Class<T> entityClass, @Nullable MetadataQueryRestriction restriction);
-
-  /**
-   * Gets the list of entities of the given class matching the given query.
-   */
-  <T extends Entity> List<T> find(Class<T> entityClass, @Nullable MetadataQuery metadataQuery);
 }
