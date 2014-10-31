@@ -20,13 +20,17 @@ import java.io.InputStream;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.model.ComponentId;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
+import org.sonatype.nexus.component.source.api.support.AutoBlockStrategy;
+import org.sonatype.nexus.component.source.api.support.PullComponentSourceSupport;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteStreams;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -45,21 +49,20 @@ import static java.util.Arrays.asList;
  * @since 3.0
  */
 public class RawBinaryComponentSource
-    implements PullComponentSource
+    extends PullComponentSourceSupport
 {
-  private final ComponentSourceId sourceName;
-
   private final String urlPrefix;
 
-  public RawBinaryComponentSource(final ComponentSourceId sourceName, final String urlPrefix) {
-    this.sourceName = checkNotNull(sourceName);
+  public RawBinaryComponentSource(final ComponentSourceId id, final AutoBlockStrategy autoBlockStrategy,
+                                  final String urlPrefix)
+  {
+    super(id, autoBlockStrategy);
     this.urlPrefix = checkNotNull(urlPrefix);
   }
 
-  @Nullable
   @Override
-  public Iterable<ComponentEnvelope<RawComponent>> fetchComponents(final ComponentRequest request)
-      throws IOException
+  protected <T extends Component> Iterable<ComponentEnvelope<T>> doFetchComponents(final ComponentRequest<T> request)
+      throws Exception
   {
     final CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -69,7 +72,24 @@ public class RawBinaryComponentSource
 
     final CloseableHttpResponse response = httpclient.execute(httpGet);
 
-    return asList(ComponentEnvelope.simpleEnvelope(new RawComponent(), new RequestClosingAsset(response)));
+    return asList(ComponentEnvelope.simpleEnvelope((T) new RawComponent(), new RequestClosingAsset(response)));
+  }
+
+  /**
+   * Test the connection by hitting the proxy's root, and downloading everything.
+   *
+   */
+  @Override
+  public void testConnection() throws IOException {
+    final ComponentRequest<RawComponent> request = new ComponentRequest<RawComponent>(ImmutableMap.of("path", "."));
+    final Iterable<ComponentEnvelope<RawComponent>> componentEnvelopes = fetchComponents(request);
+    for (ComponentEnvelope<RawComponent> e : componentEnvelopes) {
+      for (Asset a : e.getAssets()) {
+        try (InputStream stream = a.openStream()) {
+          ByteStreams.copy(stream, ByteStreams.nullOutputStream());
+        }
+      }
+    }
   }
 
   /**
@@ -146,11 +166,5 @@ public class RawBinaryComponentSource
       super.close();
       IOUtils.closeQuietly(needsClosing);
     }
-
-  }
-
-  @Override
-  public ComponentSourceId getId() {
-    return sourceName;
   }
 }

@@ -14,8 +14,6 @@ package org.sonatype.nexus.component.source.api;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
 
@@ -30,7 +28,7 @@ import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
  * @since 3.0
  */
 public interface PullComponentSource
-    extends ComponentSource
+    extends ComponentSource, ConnectionStatus
 {
   /**
    * Query the source for matching components.
@@ -40,8 +38,6 @@ public interface PullComponentSource
    * storing some or all of the binary assets of the component.
    *
    * If no component(s) match the query, the returned {@link Iterable} is empty.
-   *
-   * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
    */
   <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }

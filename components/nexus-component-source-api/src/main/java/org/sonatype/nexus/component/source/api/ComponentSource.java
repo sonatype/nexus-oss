@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.component.source.api;
 
-import org.sonatype.nexus.component.model.ComponentOriginId;
-
 /**
  * A remote source for components.
  *
@@ -25,4 +23,14 @@ public interface ComponentSource
    * A cluster-wide unique name for this source.
    */
   ComponentSourceId getId();
+
+  /**
+   * Is the source enabled or has it been manually disabled?
+   */
+  boolean isEnabled();
+
+  /**
+   * Manually enable or disable the source.
+   */
+  void setEnabled(boolean enabled);
 }

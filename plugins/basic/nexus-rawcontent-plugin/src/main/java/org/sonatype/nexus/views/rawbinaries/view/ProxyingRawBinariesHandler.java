@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
@@ -46,13 +47,13 @@ public class ProxyingRawBinariesHandler
 {
   private final RawBinaryStore binaryStore;
 
-  private final PullComponentSource source;
+  private final Provider<PullComponentSource> sourceProvider;
 
   public ProxyingRawBinariesHandler(final RawBinaryStore binaryStore,
-                                    final PullComponentSource source)
+                                    final Provider<PullComponentSource> sourceProvider)
   {
+    this.sourceProvider = sourceProvider;
     this.binaryStore = checkNotNull(binaryStore);
-    this.source = checkNotNull(source);
   }
 
 
@@ -82,7 +83,7 @@ public class ProxyingRawBinariesHandler
           final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
 
           // Here we presume we're getting Component back, since we don't actually use the component metadata
-          final Iterable<ComponentEnvelope<RawComponent>> envelopes = source.fetchComponents(path);
+          final Iterable<ComponentEnvelope<RawComponent>> envelopes = sourceProvider.get().fetchComponents(path);
 
           for (ComponentEnvelope<RawComponent> envelope : envelopes) {
             for (Asset asset : envelope.getAssets()) {

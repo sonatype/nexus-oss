@@ -18,6 +18,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.api.support.BlockOnException;
+import org.sonatype.nexus.util.sequence.FibonacciNumberSequence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,7 +40,11 @@ public class RawComponentSourceFactory
   @Override
   public ComponentSource createSource(final ComponentSourceConfig config) {
     checkNotNull(config);
-    return new RawBinaryComponentSource(config.getSourceId(),
+
+    final BlockOnException autoBlockStrategy = new BlockOnException(config.getSourceId().getName(),
+        new FibonacciNumberSequence(1, 1));
+
+    return new RawBinaryComponentSource(config.getSourceId(), autoBlockStrategy,
         (String) config.getConfiguration().get(REMOTE_URL_PARAM));
   }
 }

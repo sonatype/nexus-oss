@@ -14,12 +14,12 @@ package org.sonatype.nexus.views.rawbinaries.view;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
 import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
-import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
@@ -29,7 +29,6 @@ import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Arrays.asList;
 
 /**
@@ -55,9 +54,9 @@ public class RawBinaryProxyViewFactory
   public RawBinaryProxyViewFactory(final RawBinaryStore binaryStore, final NotFoundHandler notFoundHandler,
                                    final ComponentSourceRegistry sourceRegistry)
   {
-    this.binaryStore = binaryStore;
-    this.notFoundHandler = notFoundHandler;
-    this.sourceRegistry = sourceRegistry;
+    this.binaryStore = checkNotNull(binaryStore);
+    this.notFoundHandler = checkNotNull(notFoundHandler);
+    this.sourceRegistry = checkNotNull(sourceRegistry);
   }
 
   @Override
@@ -76,11 +75,9 @@ public class RawBinaryProxyViewFactory
 
     checkNotNull(sourceName, "Source name cannot be null for proxy config");
 
-    final PullComponentSource source = sourceRegistry.getSource(sourceName);
+    final Provider<PullComponentSource> sourceProvider = sourceRegistry.getSourceProvider(sourceName);
 
-    checkState(source != null, "PullComponentSource %s not found while trying to create view %s.", sourceName, config);
-
-    final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(binaryStore, source);
+    final ProxyingRawBinariesHandler proxyingWrapper = new ProxyingRawBinariesHandler(binaryStore, sourceProvider);
     final HostedRawBinariesHandler hosted = new HostedRawBinariesHandler(binaryStore);
 
     router.addRoute(binariesRequestMatcher, asList(proxyingWrapper, hosted));

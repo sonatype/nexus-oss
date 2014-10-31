@@ -14,6 +14,8 @@ package org.sonatype.nexus.views.rawbinaries.view;
 
 import java.util.Collections;
 
+import javax.inject.Provider;
+
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
@@ -55,7 +57,13 @@ public class ProxyingRawBinariesHandlerTest
     store = mock(RawBinaryStore.class);
     source = mock(PullComponentSource.class);
 
-    handler = new TestableRawProxyHandler(store, source);
+    handler = new TestableRawProxyHandler(store, new Provider<PullComponentSource>()
+    {
+      @Override
+      public PullComponentSource get() {
+        return source;
+      }
+    });
   }
 
   @Test
@@ -113,9 +121,9 @@ public class ProxyingRawBinariesHandlerTest
     private RawBinary streamed;
 
     private TestableRawProxyHandler(final RawBinaryStore binaryStore,
-                                    final PullComponentSource source)
+                                    final Provider<PullComponentSource> sourceProvider)
     {
-      super(binaryStore, source);
+      super(binaryStore, sourceProvider);
     }
 
     @Override

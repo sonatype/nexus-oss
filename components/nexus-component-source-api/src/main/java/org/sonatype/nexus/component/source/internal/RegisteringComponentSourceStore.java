@@ -73,16 +73,10 @@ public class RegisteringComponentSourceStore
     return id;
   }
 
-
   @Override
   public void update(final ComponentSourceConfigId id, final ComponentSourceConfig config) throws IOException {
-    final ComponentSource oldSource = registry.getSource(config.getSourceId());
-    registry.unregister(oldSource);
-
     inner.update(id, config);
-
-    final ComponentSource source = create(config);
-    registry.register(source);
+    registry.update(create(config));
   }
 
   @Override

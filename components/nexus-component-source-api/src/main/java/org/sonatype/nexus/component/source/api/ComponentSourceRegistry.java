@@ -13,6 +13,7 @@
 package org.sonatype.nexus.component.source.api;
 
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 
 /**
  * A registry of the currently available component sources.
@@ -22,14 +23,28 @@ import javax.annotation.Nullable;
 public interface ComponentSourceRegistry
 {
   /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
+   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered. References to sources
+   * should not be retained, as instances may be disposed of (and disabled) if the source configuration changes.
    */
   @Nullable
-  public <T extends ComponentSource> T getSource(String name);
+  <T extends ComponentSource> T getSource(String name);
 
   /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
+   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered. References to sources
+   * should not be retained, as instances may be disposed of (and disabled) if the source configuration changes.
    */
   @Nullable
-  public <T extends ComponentSource> T getSource(ComponentSourceId sourceId);
+  <T extends ComponentSource> T getSource(ComponentSourceId sourceId);
+
+  /**
+   * Obtains a reusable provider for a source, to be used each time a source is queried. This allows redefinition so
+   * that the source can be reloaded/redefined.
+   */
+  <T extends ComponentSource> Provider<T> getSourceProvider(ComponentSourceId sourceId);
+
+  /**
+   * Obtains a reusable provider for a source, to be used each time a source is queried. This allows redefinition so
+   * that the source can be reloaded/redefined.
+   */
+  <T extends ComponentSource> Provider<T> getSourceProvider(String sourceName);
 }
