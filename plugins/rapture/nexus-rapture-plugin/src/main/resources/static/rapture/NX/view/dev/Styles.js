@@ -522,10 +522,6 @@ Ext.define('NX.view.dev.Styles', {
     );
 
     /*
-     * Icons
-     */
-
-    /*
      * Form Elements
      */
 
@@ -596,8 +592,91 @@ Ext.define('NX.view.dev.Styles', {
     me.items.push(
       styleSection('Modals',
         styleRow(
-          modalBlock('nx-signin'),
-          modalBlock('nx-expire-session')
+          {
+            xtype: 'window',
+
+            title: 'Sign In',
+
+            hidden: false,
+            collapsible: false,
+            floating: false,
+            closable: false,
+            draggable: false,
+            resizable: false,
+            width: 320,
+            cls: 'fixed-modal',
+
+            items: {
+              xtype: 'form',
+              bodyPadding: 10,
+              defaultType: 'textfield',
+              defaults: {
+                labelAlign: 'left',
+                labelWidth: 100,
+                anchor: '100%'
+              },
+              items: [
+                {
+                  name: 'username',
+                  itemId: 'username',
+                  fieldLabel: 'Username',
+                  emptyText: 'enter your username',
+                  allowBlank: false,
+                  validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
+                },
+                {
+                  name: 'password',
+                  itemId: 'password',
+                  fieldLabel: 'Password',
+                  inputType: 'password',
+                  emptyText: 'enter your password',
+                  allowBlank: false,
+                  validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
+                },
+                {
+                  xtype: 'checkbox',
+                  fieldLabel: 'Remember me',
+                  name: 'remember'
+                }
+              ],
+
+              buttonAlign: 'left',
+              buttons: [
+                { text: 'Sign In', formBind: true, bindToEnter: true, ui: 'primary' },
+                { text: 'Cancel', scope: me }
+              ]
+            }
+          },
+          {
+            xtype: 'window',
+
+            title: 'Session',
+
+            hidden: false,
+            collapsible: false,
+            floating: false,
+            closable: false,
+            draggable: false,
+            resizable: false,
+            width: 320,
+            cls: 'fixed-modal',
+
+            items: [
+              {
+                xtype: 'label',
+                id: 'expire',
+                text: 'Session is about to expire',
+                style: {
+                  'color': 'red',
+                  'font-size': '20px',
+                  'margin': '10px'
+                }
+              }
+            ],
+            buttons: [
+              { text: 'Cancel' }
+            ]
+          }
         )
       )
     );
@@ -671,11 +750,39 @@ Ext.define('NX.view.dev.Styles', {
           ' ',
           { xtype: 'nx-header-quicksearch', hidden: true },
           '->',
-          { xtype: 'nx-header-messages', ui: 'header' },
+          {
+            xtype: 'button',
+            ui: 'header',
+            glyph: 'xf0f3@FontAwesome',
+            tooltip: 'Toggle messages display'
+          },
           { xtype: 'nx-header-refresh', ui: 'header' },
-          { xtype: 'nx-header-signin', ui: 'header' },
-          { xtype: 'nx-header-user-mode', ui: 'header', hidden: true },
-          { xtype: 'nx-header-signout', ui: 'header' },
+          {
+            xtype: 'button',
+            ui: 'header',
+            text: 'Sign In',
+            tooltip: 'Have an account?',
+            glyph: 'xf090@FontAwesome'
+          },
+          {
+            xtype: 'nx-header-mode',
+            ui: 'header',
+            hidden: true,
+            mode: 'user',
+            title: 'User',
+            text: 'User',
+            tooltip: 'User profile and options',
+            glyph: 'xf007@FontAwesome',
+            autoHide: false,
+            collapseMenu: false
+          },
+          {
+            xtype: 'button',
+            ui: 'header',
+            tooltip: "Sign out",
+            hidden: true,
+            glyph: 'xf08b@FontAwesome'
+          },
           { xtype: 'nx-header-help', ui: 'header' }
         )
       }
@@ -719,14 +826,6 @@ Ext.define('NX.view.dev.Styles', {
         )
       )
     );
-
-    /*
-     * Table
-     */
-
-    /*
-     * Panels
-     */
 
     /*
      * Tabs
