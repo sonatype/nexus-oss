@@ -176,7 +176,7 @@ public class HttpClientConfig
     if (httpProxyConfig != null) {
       proxyConfig = new ProxyConfig();
       proxyConfig.withHttpProxyConfig(httpProxyConfig);
-      proxyConfig.withHttpProxyConfig(httpProxyFromMap(config, "http.proxy.https"));
+      proxyConfig.withHttpsProxyConfig(httpProxyFromMap(config, "http.proxy.https"));
       if (config.containsKey("http.proxy.nonProxyHosts")) {
         proxyConfig.withNonProxyHosts(((String) config.get("http.proxy.nonProxyHosts")).split(","));
       }
