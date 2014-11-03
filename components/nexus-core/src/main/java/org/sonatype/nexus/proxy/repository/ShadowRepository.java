@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -22,7 +21,6 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  *
  * @author cstamas
  */
-@RepositoryType(pathPrefix = "shadows")
 public interface ShadowRepository
     extends Repository
 {

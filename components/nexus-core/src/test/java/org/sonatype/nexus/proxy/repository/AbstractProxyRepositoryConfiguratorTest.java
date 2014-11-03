@@ -20,7 +20,6 @@ import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettin
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.plugins.RepositoryCustomizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
@@ -80,8 +79,7 @@ public class AbstractProxyRepositoryConfiguratorTest
   public void setup() {
     underTest = new AbstractProxyRepositoryConfigurator() {};
     underTest.populateAbstractRepositoryConfigurator(Mockito.mock(RepositoryRegistry.class),
-        Collections.<String, LocalRepositoryStorage>emptyMap(),
-        Collections.<String, RepositoryCustomizer>emptyMap());
+        Collections.<String, LocalRepositoryStorage>emptyMap());
     underTest.populateAbstractProxyRepositoryConfigurator(authInfoConverter, connSettings, providerHints,
         Collections.<String, RemoteRepositoryStorage>emptyMap());
 

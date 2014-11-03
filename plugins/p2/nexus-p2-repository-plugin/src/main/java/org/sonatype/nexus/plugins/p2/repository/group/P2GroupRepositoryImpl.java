@@ -15,6 +15,7 @@ package org.sonatype.nexus.plugins.p2.repository.group;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -48,10 +49,11 @@ import org.eclipse.sisu.Description;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named(P2GroupRepositoryImpl.ROLE_HINT)
+@Typed(GroupRepository.class)
 @Description("Eclipse P2 Artifaxcts")
 public class P2GroupRepositoryImpl
     extends AbstractGroupRepository
-    implements P2GroupRepository, GroupRepository
+    implements P2GroupRepository
 {
   public static final String ROLE_HINT = "p2";
 

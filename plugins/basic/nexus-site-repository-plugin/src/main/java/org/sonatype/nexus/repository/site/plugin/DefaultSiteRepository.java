@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.site.plugin;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -39,9 +40,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 @Named(SiteRepository.ID)
+@Typed(WebSiteRepository.class)
 public class DefaultSiteRepository
     extends AbstractWebSiteRepository
-    implements SiteRepository, WebSiteRepository
+    implements SiteRepository
 {
 
   private final ContentClass contentClass;

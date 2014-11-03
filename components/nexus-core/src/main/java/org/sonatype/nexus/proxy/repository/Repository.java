@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.mime.MimeRulesSource;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -45,7 +44,6 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
  *
  * @author cstamas
  */
-@RepositoryType(pathPrefix = "repositories")
 public interface Repository
     extends ResourceStore
 {

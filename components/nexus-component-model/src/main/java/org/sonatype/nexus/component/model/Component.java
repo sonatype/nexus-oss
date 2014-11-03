@@ -12,16 +12,24 @@
  */
 package org.sonatype.nexus.component.model;
 
+import java.util.Set;
+
 import javax.annotation.Nullable;
 
 /**
- * A domain object representing a component.
+ * An {@link Entity} that may contain any number of {@link Asset}s.
  */
 public interface Component
+    extends Entity
 {
   /**
-   * Gets the canonical id, or {@code null} if it hasn't been stored yet.
+   * Gets the ids of the {@link Asset}s that belong to this component, or {@code null} if it hasn't been stored yet.
    */
   @Nullable
-  ComponentId getId();
+  Set<EntityId> getAssetIds();
+
+  /**
+   * @see #getAssetIds()
+   */
+  void setAssetIds(Set<EntityId> assetIds);
 }

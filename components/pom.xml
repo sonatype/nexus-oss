@@ -34,9 +34,7 @@
     <module>nexus-blobstore-file</module>
     <module>nexus-bootstrap</module>
     <module>nexus-client-core</module>
-    <module>nexus-component-assetstore</module>
     <module>nexus-component-model</module>
-    <module>nexus-component-recordstore</module>
     <module>nexus-component-services</module>
     <module>nexus-component-source-api</module>
     <module>nexus-configuration-model</module>

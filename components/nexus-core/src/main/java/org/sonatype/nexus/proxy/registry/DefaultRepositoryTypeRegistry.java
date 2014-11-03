@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
@@ -69,19 +68,19 @@ public class DefaultRepositoryTypeRegistry
     Class<? extends Repository> role = null;
     role = Repository.class;
     result.put(role, new RepositoryTypeDescriptor(role, M1Repository.ID, "repositories",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     result.put(role, new RepositoryTypeDescriptor(role, M2Repository.ID, "repositories",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     role = ShadowRepository.class;
     result.put(role, new RepositoryTypeDescriptor(role, M1LayoutedM2ShadowRepository.ID, "shadows",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     result.put(role, new RepositoryTypeDescriptor(role, M2LayoutedM1ShadowRepository.ID, "shadows",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     role = GroupRepository.class;
     result.put(role, new RepositoryTypeDescriptor(role, M1GroupRepository.ID, "groups",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     result.put(role, new RepositoryTypeDescriptor(role, M2GroupRepository.ID, "groups",
-        RepositoryType.UNLIMITED_INSTANCES));
+        RepositoryTypeDescriptor.UNLIMITED_INSTANCES));
     logger.info("Registered default repository types.");
     this.repositoryTypeDescriptorsMap = result;
   }
@@ -100,7 +99,7 @@ public class DefaultRepositoryTypeRegistry
     boolean added = getRepositoryTypeDescriptors().put(d.getRole(), d);
 
     if (added) {
-      if (d.getRepositoryMaxInstanceCount() == RepositoryType.UNLIMITED_INSTANCES) {
+      if (d.getRepositoryMaxInstanceCount() == RepositoryTypeDescriptor.UNLIMITED_INSTANCES) {
         logger.info("Registered Repository type " + d.toString() + ".");
       }
       else {

@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -76,10 +77,11 @@ import org.eclipse.sisu.Description;
 import static org.sonatype.nexus.util.DigesterUtils.getSha1Digest;
 
 @Named(P2ProxyRepositoryImpl.ROLE_HINT)
+@Typed(Repository.class)
 @Description("Eclipse P2 Proxy Repository")
 public class P2ProxyRepositoryImpl
     extends AbstractProxyRepository
-    implements P2ProxyRepository, Repository
+    implements P2ProxyRepository
 {
   public static final String ROLE_HINT = "p2";
 

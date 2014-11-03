@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
+import org.sonatype.nexus.component.model.BaseComponent;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentId;
 
 import org.joda.time.DateTime;
 
@@ -27,9 +25,9 @@ import org.joda.time.DateTime;
  * Component subclass for testing.
  */
 public class TestComponent
+    extends BaseComponent
     implements Component
 {
-  private ComponentId id;
   private byte[] binaryProp;
   private Boolean booleanProp;
   private Byte byteProp;
@@ -44,21 +42,6 @@ public class TestComponent
   private Short shortProp;
   private String stringProp;
   private Object unregisteredProp;
-
-  @Nullable
-  @Override
-  public ComponentId getId() {
-    return new ComponentId() {
-      @Override
-      public String asUniqueString() {
-        return id.asUniqueString();
-      }
-    };
-  }
-
-  public void setId(final ComponentId id) {
-    this.id = id;
-  }
 
   public byte[] getBinaryProp() {
     return binaryProp;

@@ -50,7 +50,6 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
-import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
@@ -798,7 +797,7 @@ public class DefaultNexusConfiguration
       return;
     }
 
-    if (rtd.getRepositoryMaxInstanceCount() != RepositoryType.UNLIMITED_INSTANCES) {
+    if (rtd.getRepositoryMaxInstanceCount() != RepositoryTypeDescriptor.UNLIMITED_INSTANCES) {
       maxCount = rtd.getRepositoryMaxInstanceCount();
     }
     else {

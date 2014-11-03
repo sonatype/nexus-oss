@@ -14,12 +14,14 @@ package org.sonatype.nexus.component.services.internal.query;
 
 import java.util.Map;
 
-import org.sonatype.nexus.component.services.internal.adapter.AssetEntityAdapter;
+import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.Entity;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction.EntityType;
 import org.sonatype.nexus.component.services.query.CompoundMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
+import org.sonatype.nexus.orient.OClassNameBuilder;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
@@ -47,8 +49,8 @@ public class OrientQueryBuilder
     this.query = checkNotNull(query);
     this.skipRid = null;
 
-    checkArgument(query.skipComponentId() == null,
-        "Metadata query specifies a skipComponentId; OrientDB query must specify a skipRid");
+    checkArgument(query.skipEntityId() == null,
+        "Metadata query specifies a skipEntityId; OrientDB query must specify a skipRid");
   }
 
   /**
@@ -58,8 +60,8 @@ public class OrientQueryBuilder
     this.query = checkNotNull(query);
     this.skipRid = checkNotNull(skipRid);
 
-    checkArgument(query.skipComponentId() != null,
-        "Metadata query does not specify a skipComponentId; OriendDB query must not specify a skipRid");
+    checkArgument(query.skipEntityId() != null,
+        "Metadata query does not specify a skipEntityId; OriendDB query must not specify a skipRid");
   }
 
   /**
@@ -69,20 +71,12 @@ public class OrientQueryBuilder
     return parameters;
   }
 
-  /**
-   * Gets the query text that will select matching assets.
-   */
-  public String buildAssetQuery(boolean isCountQuery) {
-    parameters.clear();
-    return buildQuery(AssetEntityAdapter.ORIENT_CLASS_NAME, isCountQuery, false);
-  }
+  public <T extends Entity> String buildQuery(final Class<T> entityClass, final boolean isCountQuery) {
+    checkNotNull(entityClass);
 
-  /**
-   * Gets the query text that will select matching components.
-   */
-  public String buildComponentQuery(String componentClassName, boolean isCountQuery) {
     parameters.clear();
-    return buildQuery(checkNotNull(componentClassName), isCountQuery, true);
+    final boolean isComponentQuery = Component.class.isAssignableFrom(entityClass);
+    return buildQuery(new OClassNameBuilder().type(entityClass).build(), isCountQuery, isComponentQuery);
   }
 
   private String buildQuery(String className, boolean isCountQuery, boolean isComponentQuery) {
