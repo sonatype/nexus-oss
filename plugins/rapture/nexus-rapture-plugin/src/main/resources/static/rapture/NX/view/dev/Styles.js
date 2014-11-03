@@ -82,6 +82,55 @@ Ext.define('NX.view.dev.Styles', {
     }
 
     // Create a horizontal row of containers
+    var rowTemplate = Ext.create('Ext.XTemplate',
+      '<div>',
+        '<tpl for=".">',
+          '<div class="hbox">{.}</div>',
+        '</tpl>',
+      '</div>'
+    );
+
+    // Create a vertical column of containers
+    var columnTemplate = Ext.create('Ext.XTemplate',
+      '<div>',
+        '<tpl for=".">',
+          '<div class="vbox">{.}</div>',
+        '</tpl>',
+      '</div>'
+    );
+
+    // Create a table
+    var tableTemplate = Ext.create('Ext.XTemplate',
+      '<table>',
+        '<thead>{thead}</thead>',
+        '<tbody>{tbody}</tbody>',
+      '</table>'
+    );
+
+    // Create a table head
+    var theadTemplate = Ext.create('Ext.XTemplate',
+      '<tpl for=".">',
+        '<th>{.}</th>',
+      '</tpl>'
+    );
+
+    // Create a table body
+    var tbodyTemplate = Ext.create('Ext.XTemplate',
+      '<tpl foreach=".">',
+        '<tr>',
+          '<td>{$}</td>',
+          '<tpl for=".">',
+            '<tpl if="class">',
+              '<td class="{class}">{text}</td>',
+            '<tpl else>',
+              '<td>{.}</td>',
+            '</tpl>',
+          '</tpl>',
+        '</tr>',
+      '</tpl>'
+    );
+
+    // Create a horizontal row of containers
     function styleRow() {
       if (arguments.length == 1) {
         return arguments[0]
@@ -139,6 +188,11 @@ Ext.define('NX.view.dev.Styles', {
       }
     }
 
+    // Create a label
+    var labelTemplate = Ext.create('Ext.XTemplate',
+      '<span class="{class}">{text}</span>'
+    );
+
     /*
      * Logo
      */
@@ -154,160 +208,134 @@ Ext.define('NX.view.dev.Styles', {
      * Colors
      */
 
-    function colorPalette() {
-      return {
-        xtype: 'container',
+    var paletteTemplate = Ext.create('Ext.XTemplate',
+      '<div style="margins: 0 20px 20px 0">',
+        '<tpl for="."><div style="float: left;">{.}</div></tpl>',
+      '</div>'
+    );
 
-        layout: {
-          type: 'vbox'
-        },
-
-        margins: '0 20px 20px 0',
-
-        items: [
-          {
-            xtype: 'container',
-
-            layout: {
-              type: 'hbox'
-            },
-
-            items: sanitizeArguments(Array.prototype.slice.call(arguments, 0))
-          }
-        ]
-      }
-    }
-
-    function colorBlock(classes, name, value) {
-      return {
-        xtype: 'container',
-
-        layout: {
-          type: 'vbox'
-        },
-
-        items: [
-          { xtype: 'container', height: 40, width: 80, cls: classes },
-          { xtype: 'label', text: name },
-          { xtype: 'label', text: value }
-        ]
-      }
-    }
+    var colorTemplate = Ext.create('Ext.XTemplate',
+      '<div>',
+        '<div height="40" width="80" class="{class}"></div>',
+        '<div>{name}</div>',
+        '<div>{value}</div>',
+      '</div>'
+    );
 
     me.items.push(
       styleSection('Colors',
-        styleColumn(
-          { xtype: 'label', text: 'Shell', cls: 'section-header' },
-          colorPalette(
-            colorBlock('color black', 'Black', '#000000'),
-            colorBlock('color night-rider', 'Night Rider', '#333333'),
-            colorBlock('color charcoal', 'Charcoal', '#444444'),
-            colorBlock('color dark-gray', 'Dark Gray', '#777777'),
-            colorBlock('color gray', 'Gray', '#AAAAAA'),
-            colorBlock('color light-gray', 'Light Gray', '#CBCBCB'),
-            colorBlock('color gainsboro', 'Gainsboro', '#DDDDDD'),
-            colorBlock('color smoke', 'Smoke', '#EBEBEB'),
-            colorBlock('color light-smoke', 'Light Smoke', '#F4F4F4'),
-            colorBlock('color white', 'White', '#FFFFFF')
-          )
-        ),
-        styleRow(
-          styleColumn(
-            { xtype: 'label', text: 'Severity', cls: 'section-header' },
-            colorPalette(
-              colorBlock('color cerise', 'Cerise', '#DB2852'),
-              colorBlock('color sun', 'Sun', '#F2862F'),
-              colorBlock('color energy-yellow', 'Energy Yellow', '#F5C649'),
-              colorBlock('color cobalt', 'Cobalt', '#0047B2'),
-              colorBlock('color cerulean-blue', 'Cerulean Blue', '#2476C3')
-            )
-          ),
-          styleColumn(
-            { xtype: 'label', text: 'Forms', cls: 'section-header' },
-            colorPalette(
-              colorBlock('color citrus', 'Citrus', '#84C900'),
-              colorBlock('color free-speech-red', 'Free Speech Red', '#C70000')
-            )
-          ),
-          styleColumn(
-            { xtype: 'label', text: 'Tooltip', cls: 'section-header' },
-            colorPalette(
-              colorBlock('color energy-yellow', 'Energy Yellow', '#F5C649'),
-              colorBlock('color floral-white', 'Floral White', '#FFFAEE')
-            )
-          )
-        ),
-        styleColumn(
-          { xtype: 'label', text: 'Dashboard', cls: 'section-header' },
-          colorPalette(
-            colorBlock('color pigment-green', 'Pigment Green', '#0B9743'),
-            colorBlock('color madang', 'Madang', '#B6E9AB'),
-            colorBlock('color venetian-red', 'Venetian Red', '#BC0430'),
-            colorBlock('color beauty-bush', 'Beauty Bush', '#EDB2AF'),
-            colorBlock('color navy-blue', 'Navy Blue', '#006BBF'),
-            colorBlock('color cornflower', 'Cornflower', '#96CAEE'),
-            colorBlock('color east-side', 'East Side', '#B087B9'),
-            colorBlock('color blue-chalk', 'Blue Chalk', '#DAC5DF')
-          )
-        ),
-        styleRow(
-          styleColumn(
-            { xtype: 'label', text: 'Buttons', cls: 'section-header' },
-            colorPalette(
-              colorBlock('color white', 'White', '#FFFFFF'),
-              colorBlock('color light-gainsboro', 'Light Gainsboro', '#E6E6E6'),
-              colorBlock('color light-gray', 'Light Gray', '#CBCBCB'),
-              colorBlock('color silver', 'Silver', '#B8B8B8'),
-              colorBlock('color suva-gray', 'Suva Gray', '#919191'),
-              colorBlock('color gray', 'Gray', '#808080')
-            ),
-            colorPalette(
-              colorBlock('color denim', 'Denim', '#197AC5'),
-              colorBlock('color light-cobalt', 'Light Cobalt', '#0161AD'),
-              colorBlock('color dark-denim', 'Dark Denim', '#14629E'),
-              colorBlock('color smalt', 'Smalt', '#014E8A'),
-              colorBlock('color dark-cerulean', 'Dark Cerulean', '#0F4976'),
-              colorBlock('color prussian-blue', 'Prussian Blue', '#013A68')
-            ),
-            colorPalette(
-              colorBlock('color light-cerise', 'Light Cerise', '#DE3D63'),
-              colorBlock('color brick-red', 'Brick Red', '#C6254B'),
-              colorBlock('color old-rose', 'Old Rose', '#B2314F'),
-              colorBlock('color fire-brick', 'Fire Brick', '#9E1E3C'),
-              colorBlock('color shiraz', 'Shiraz', '#85253B'),
-              colorBlock('color falu-red', 'Falu Red', '#77162D')
-            ),
-            colorPalette(
-              colorBlock('color sea-buckthorn', 'Sea Buckthorn', '#F39244'),
-              colorBlock('color tahiti-gold', 'Tahiti Gold', '#DA792B'),
-              colorBlock('color zest', 'Zest', '#C17536'),
-              colorBlock('color rich-gold', 'Rich Gold', '#AE6122'),
-              colorBlock('color afghan-tan', 'Afghan Tan', '#925829'),
-              colorBlock('color russet', 'Russet', '#83491A')
-            ),
-            colorPalette(
-              colorBlock('color elf-green', 'Elf Green', '#23A156'),
-              colorBlock('color dark-pigment-green', 'Dark Pigment Green', '#0B893D'),
-              colorBlock('color salem', 'Salem', '#1C8145'),
-              colorBlock('color jewel', 'Jewel', '#096E31'),
-              colorBlock('color fun-green', 'Fun Green', '#156134'),
-              colorBlock('color dark-jewel', 'Dark Jewel', '#0C4F26')
-            )
-          ),
-          styleColumn(
-            { xtype: 'label', text: 'Font Awesome Icons', cls: 'section-header' },
-            colorPalette(
-              colorBlock('color navy-blue', 'Navy Blue', '#006BBF'),
-              colorBlock('color smalt', 'Smalt', '#014E8A'),
-              colorBlock('color prussian-blue', 'Prussian Blue', '#013A68')
-            ),
-            colorPalette(
-              colorBlock('color white', 'White', '#FFFFFF'),
-              colorBlock('color gainsboro', 'Gainsboro', '#DDDDDD'),
-              colorBlock('color gray', 'Gray', '#AAAAAA')
-            )
-          )
-        )
+        columnTemplate.apply([
+          labelTemplate.apply({text: 'Shell', class: 'section-header' }),
+          paletteTemplate.apply([
+            colorTemplate.apply({class: 'color black', name: 'Black', value: '#000000'}),
+            colorTemplate.apply({class: 'color night-rider', name: 'Night Rider', value: '#333333'}),
+            colorTemplate.apply({class: 'color charcoal', name: 'Charcoal', value: '#444444'}),
+            colorTemplate.apply({class: 'color dark-gray', name: 'Dark Gray', value: '#777777'}),
+            colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#AAAAAA'}),
+            colorTemplate.apply({class: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
+            colorTemplate.apply({class: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
+            colorTemplate.apply({class: 'color smoke', name: 'Smoke', value: '#EBEBEB'}),
+            colorTemplate.apply({class: 'color light-smoke', name: 'Light Smoke', value: '#F4F4F4'}),
+            colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'})
+          ])
+        ]),
+        rowTemplate.apply([
+          columnTemplate.apply([
+            labelTemplate.apply({text: 'Severity', class: 'section-header' }),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color cerise', name: 'Cerise', value: '#DB2852'}),
+              colorTemplate.apply({class: 'color sun', name: 'Sun', value: '#F2862F'}),
+              colorTemplate.apply({class: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
+              colorTemplate.apply({class: 'color cobalt', name: 'Cobalt', value: '#0047B2'}),
+              colorTemplate.apply({class: 'color cerulean-blue', name: 'Cerulean Blue', value: '#2476C3'})
+            ])
+          ]),
+          columnTemplate.apply([
+            labelTemplate.apply({text: 'Forms', class: 'section-header' }),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color citrus', name: 'Citrus', value: '#84C900'}),
+              colorTemplate.apply({class: 'color free-speech-red', name: 'Free Speech Red', value: '#C70000'})
+            ])
+          ]),
+          columnTemplate.apply([
+            labelTemplate.apply({text: 'Tooltip', class: 'section-header' }),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
+              colorTemplate.apply({class: 'color floral-white', name: 'Floral White', value: '#FFFAEE'})
+            ])
+          ])
+        ]),
+        columnTemplate.apply([
+          labelTemplate.apply({text: 'Dashboard', class: 'section-header' }),
+          paletteTemplate.apply([
+            colorTemplate.apply({class: 'color pigment-green', name: 'Pigment Green', value: '#0B9743'}),
+            colorTemplate.apply({class: 'color madang', name: 'Madang', value: '#B6E9AB'}),
+            colorTemplate.apply({class: 'color venetian-red', name: 'Venetian Red', value: '#BC0430'}),
+            colorTemplate.apply({class: 'color beauty-bush', name: 'Beauty Bush', value: '#EDB2AF'}),
+            colorTemplate.apply({class: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
+            colorTemplate.apply({class: 'color cornflower', name: 'Cornflower', value: '#96CAEE'}),
+            colorTemplate.apply({class: 'color east-side', name: 'East Side', value: '#B087B9'}),
+            colorTemplate.apply({class: 'color blue-chalk', name: 'Blue Chalk', value: '#DAC5DF'})
+          ])
+        ]),
+        rowTemplate.apply([
+          columnTemplate.apply([
+            labelTemplate.apply({text: 'Buttons', class: 'section-header' }),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'}),
+              colorTemplate.apply({class: 'color light-gainsboro', name: 'Light Gainsboro', value: '#E6E6E6'}),
+              colorTemplate.apply({class: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
+              colorTemplate.apply({class: 'color silver', name: 'Silver', value: '#B8B8B8'}),
+              colorTemplate.apply({class: 'color suva-gray', name: 'Suva Gray', value: '#919191'}),
+              colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#808080'})
+            ]),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color denim', name: 'Denim', value: '#197AC5'}),
+              colorTemplate.apply({class: 'color light-cobalt', name: 'Light Cobalt', value: '#0161AD'}),
+              colorTemplate.apply({class: 'color dark-denim', name: 'Dark Denim', value: '#14629E'}),
+              colorTemplate.apply({class: 'color smalt', name: 'Smalt', value: '#014E8A'}),
+              colorTemplate.apply({class: 'color dark-cerulean', name: 'Dark Cerulean', value: '#0F4976'}),
+              colorTemplate.apply({class: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
+            ]),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color light-cerise', name: 'Light Cerise', value: '#DE3D63'}),
+              colorTemplate.apply({class: 'color brick-red', name: 'Brick Red', value: '#C6254B'}),
+              colorTemplate.apply({class: 'color old-rose', name: 'Old Rose', value: '#B2314F'}),
+              colorTemplate.apply({class: 'color fire-brick', name: 'Fire Brick', value: '#9E1E3C'}),
+              colorTemplate.apply({class: 'color shiraz', name: 'Shiraz', value: '#85253B'}),
+              colorTemplate.apply({class: 'color falu-red', name: 'Falu Red', value: '#77162D'})
+            ]),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color sea-buckthorn', name: 'Sea Buckthorn', value: '#F39244'}),
+              colorTemplate.apply({class: 'color tahiti-gold', name: 'Tahiti Gold', value: '#DA792B'}),
+              colorTemplate.apply({class: 'color zest', name: 'Zest', value: '#C17536'}),
+              colorTemplate.apply({class: 'color rich-gold', name: 'Rich Gold', value: '#AE6122'}),
+              colorTemplate.apply({class: 'color afghan-tan', name: 'Afghan Tan', value: '#925829'}),
+              colorTemplate.apply({class: 'color russet', name: 'Russet', value: '#83491A'})
+            ]),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color elf-green', name: 'Elf Green', value: '#23A156'}),
+              colorTemplate.apply({class: 'color dark-pigment-green', name: 'Dark Pigment Green', value: '#0B893D'}),
+              colorTemplate.apply({class: 'color salem', name: 'Salem', value: '#1C8145'}),
+              colorTemplate.apply({class: 'color jewel', name: 'Jewel', value: '#096E31'}),
+              colorTemplate.apply({class: 'color fun-green', name: 'Fun Green', value: '#156134'}),
+              colorTemplate.apply({class: 'color dark-jewel', name: 'Dark Jewel', value: '#0C4F26'})
+            ])
+          ]),
+          columnTemplate.apply([
+            labelTemplate.apply({text: 'Font Awesome Icons', class: 'section-header' }),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
+              colorTemplate.apply({class: 'color smalt', name: 'Smalt', value: '#014E8A'}),
+              colorTemplate.apply({class: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
+            ]),
+            paletteTemplate.apply([
+              colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'}),
+              colorTemplate.apply({class: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
+              colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#AAAAAA'})
+            ])
+          ])
+        ])
       )
     );
 
@@ -315,48 +343,20 @@ Ext.define('NX.view.dev.Styles', {
      * Fonts
      */
 
-    function fontBlock(name, classes) {
-      return {
-        xtype: 'container',
-
-        layout: {
-          type: 'vbox'
-        },
-
-        padding: "0 8px 4x 0",
-
-        items: [
-          {
-            xtype: 'label',
-            text: name,
-            cls: 'section-header'
-          },
-          {
-            xtype: 'container',
-            cls: classes,
-
-            layout: {
-              type: 'vbox'
-            },
-
-            items: [
-              { xtype: 'label', text: 'Trusted applications at the speed of deployment' },
-              { xtype: 'label', text: 'abcdefghijklmnopqrstuvwxyz' },
-              { xtype: 'label', text: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
-              { xtype: 'label', text: '1234567890?¿¡;.:*@#£$%&/()=[]+'}
-            ]
-          }
-        ]
-      }
-    }
+    var fontTemplate = Ext.create('Ext.XTemplate',
+      '<div>',
+        '<span class="section-header">{text}</span>',
+        '<p class="{class}">Trusted applications at the speed of deployment<br/>abcdefghijklmnopqrstuvwxyz<br/>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br/>,1234567890?¿¡;.:*@#£$%&/()=[]+</p>',
+      '</div>'
+    );
 
     me.items.push(
       styleSection('Fonts',
-        styleRow(
-          fontBlock('Proxima Nova Regular', 'proxima-nova-regular'),
-          fontBlock('Proxima Nova Bold', 'proxima-nova-bold'),
-          fontBlock('Courier New', 'courier-new-regular')
-        )
+        rowTemplate.apply([
+          fontTemplate.apply({text: 'Proxima Nova Regular', class: 'proxima-nova-regular'}),
+          fontTemplate.apply({text: 'Proxima Nova Bold', class: 'proxima-nova-bold'}),
+          fontTemplate.apply({text: 'Courier New', class: 'courier-new-regular'})
+        ])
       )
     );
 
@@ -366,28 +366,54 @@ Ext.define('NX.view.dev.Styles', {
 
     me.items.push(
       styleSection('Type Styles',
-        styleTable(6,
-          { html: 'Name', baseCls: 'column-header' },
-          { html: 'Description', baseCls: 'column-header' },
-          { html: 'Font & Weight', baseCls: 'column-header' },
-          { html: 'Use Cases', baseCls: 'column-header' },
-          { html: 'Pixels', baseCls: 'column-header' },
-          { html: 'Sample', baseCls: 'column-header' },
-          'h1', 'Page Title', 'Proxima Nova Light', 'Header', '40', { html: 'Sonatype Nexus', baseCls: 'sample-h1' },
-          'h2', 'Header', 'Proxima Nova Bold', 'Header', '26', { html: 'Development', baseCls: 'sample-h2' },
-          'h3', 'Header', 'Proxima Nova Bold', 'Header', '22', { html: 'Development', baseCls: 'sample-h3' },
-          'h4', 'Sub-Header', 'Proxima Nova Bold', 'Sub-Header', '18', { html: 'Development', baseCls: 'sample-h4' },
-          'h5', 'Sub-Header', 'Proxima Nova Bold', 'Sub-Header', '13', { html: 'Development', baseCls: 'sample-h5' },
-          'p/ul/ol', 'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { html: 'Development', baseCls: 'sample-body' },
-          'code', 'Code', 'Courier New Regular', 'Code examples', '13', { html: 'Development', baseCls: 'sample-code' },
-          'utility', 'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { html: 'Development', baseCls: 'sample-utility' }
-        )
+        tableTemplate.apply({
+          thead: theadTemplate.apply(['Name', 'Description', 'Font & Weight', 'Use Cases', 'Pixels', 'Sample']),
+          tbody: tbodyTemplate.apply({
+            'h1': [
+              'Page Title', 'Proxima Nova Light', 'Header', '40', { text: 'Sonatype Nexus', class: 'sample-h1' }
+             ],
+            'h2': [
+              'Header', 'Proxima Nova Bold', 'Header', '26', { text: 'Development', class: 'sample-h2' }
+            ],
+            'h3': [
+              'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', class: 'sample-h3' }
+            ],
+            'h4': [
+              'Header', 'Proxima Nova Bold', 'Sub-Header', '18', { text: 'Development', class: 'sample-h4' }
+            ],
+            'h5': [
+              'Header', 'Proxima Nova Bold', 'Sub-Header', '13', { text: 'Development', class: 'sample-h5' }
+            ],
+            'p/ul/ol': [
+              'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { text: 'Development', class: 'sample-body' }
+            ],
+            'code': [
+              'Code', 'Courier New Regular', 'Code examples', '13', { text: 'Development', class: 'sample-code' }
+            ],
+            'utility': [
+              'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { text: 'Development', class: 'sample-utility' }
+            ]
+          })
+        })
       )
     );
 
     /*
      * Buttons
      */
+
+    var sampleTemplate = Ext.create('Ext.XTemplate',
+      '<table>',
+        '<tr>',
+          '<td><div class="color {gradient1}"></div></td>',
+          '<td><div style="padding: 0 10px 0 0">$color-{gradient1}</div></td>',
+        '</tr>',
+        '<tr>',
+          '<td><div class="color {gradient2}"></div></td>',
+          '<td><div style="padding: 0 10px 0 0">$color-{gradient2}</div></td>',
+        '</tr>',
+      '</table>'
+    );
 
     function buttonBlock(ui, text, disabled, pressed, menu, gradient1, gradient2) {
       var button = { xtype: 'button', text: text, ui: ui, margin: "0 10 10 0" };
@@ -410,25 +436,12 @@ Ext.define('NX.view.dev.Styles', {
 
       // Add a sample section if requested
       if (gradient1 && gradient2) {
-        var samples = {
-            xtype: 'container',
-
-            layout: {
-              type: 'table',
-              columns: 2
-            },
-
-            items: [
-              { xtype: 'container', width: 10, height: 10, cls: 'color ' + gradient1 },
-              { xtype: 'label', text: '$color-' + gradient1, padding: '0 10px 0 0' },
-              { xtype: 'container', width: 10, height: 10, cls: 'color ' + gradient2 },
-              { xtype: 'label', text: '$color-' + gradient2, padding: '0 10px 0 0' }
-            ]
-          };
+        var samples = sampleTemplate.apply({gradient1: gradient1, gradient2: gradient2});
+        console.log(samples);
         return {
           xtype: 'container',
           layout: { type: 'hbox' },
-          items: [button, samples]
+          items: [button, {xtype: 'container', html: samples}]
         }
       } else {
         // Return just the button otherwise
