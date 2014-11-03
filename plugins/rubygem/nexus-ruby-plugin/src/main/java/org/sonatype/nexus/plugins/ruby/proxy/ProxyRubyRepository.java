@@ -36,4 +36,6 @@ public interface ProxyRubyRepository
   void setMetadataMaxAge(int metadataMaxAge);
 
   void syncMetadata() throws IllegalOperationException, ItemNotFoundException, IOException;
+
+  void purgeBrokenMetadataFiles() throws IllegalOperationException, ItemNotFoundException, IOException;
 }

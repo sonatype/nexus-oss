@@ -23,16 +23,16 @@ import org.sonatype.nexus.formfields.RepoComboFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 /**
- * {@link SyncRubygemsMetadataTask} descriptor.
+ * {@link PurgeBrokenRubygemsMetadata} descriptor.
  *
  * @since 2.11
  */
 @Singleton
-@Named("SyncRubygemsMetadata")
-public class SyncRubygemsMetadataTaskDescriptor
+@Named("PurgeBrokenRubygemsMetadata")
+public class PurgeBrokenRubygemsMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-  public static final String ID = "SyncRubygemsMetadataTask";
+  public static final String ID = "PurgeBrokenRubygemsMetadataTask";
 
   public static final String REPO_FIELD_ID = "repositoryId";
 
@@ -43,7 +43,7 @@ public class SyncRubygemsMetadataTaskDescriptor
   }
 
   public String getName() {
-    return "Synchronize Proxied Rubygems Metadata Files";
+    return "Purge Broken Proxied Rubygems Metadata";
   }
 
   @SuppressWarnings("rawtypes")
