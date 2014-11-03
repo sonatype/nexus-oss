@@ -52,6 +52,8 @@ public class DefaultMimeSupport
     implements MimeSupport
 {
 
+  private final TikaConfig tikaConfig;
+
   /**
    * "Low" level Tika detector, as {@link org.apache.tika.Tika} hides too much.
    */
@@ -69,7 +71,8 @@ public class DefaultMimeSupport
 
   @VisibleForTesting
   public DefaultMimeSupport(final NexusMimeTypes nexusMimeTypes) {
-    this.detector = TikaConfig.getDefaultConfig().getDetector();
+    this.tikaConfig = TikaConfig.getDefaultConfig();
+    this.detector = tikaConfig.getDetector();
 
     // create the cache
     extensionToMimeTypeCache =
@@ -95,7 +98,7 @@ public class DefaultMimeSupport
             // unravel to least specific
             while (mediaType != null) {
               detected.add(mediaType.getBaseType().toString());
-              mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+              mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
             }
             return detected;
           }
@@ -162,7 +165,7 @@ public class DefaultMimeSupport
     // unravel to least specific
     while (mediaType != null) {
       detected.add(mediaType.getBaseType().toString());
-      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+      mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
     }
     return detected;
   }
@@ -181,7 +184,7 @@ public class DefaultMimeSupport
     // unravel to least specific
     while (mediaType != null) {
       detected.add(mediaType.getBaseType().toString());
-      mediaType = MediaTypeRegistry.getDefaultRegistry().getSupertype(mediaType);
+      mediaType = tikaConfig.getMediaTypeRegistry().getSupertype(mediaType);
     }
     return detected;
   }
