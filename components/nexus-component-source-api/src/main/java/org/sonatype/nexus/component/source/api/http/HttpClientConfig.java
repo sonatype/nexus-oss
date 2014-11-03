@@ -70,6 +70,7 @@ public class HttpClientConfig
     if (connectionConfig != null) {
       putIfNotNull(config, "http.connection.timeout", connectionConfig.getTimeout());
       putIfNotNull(config, "http.connection.retries", connectionConfig.getRetries());
+      putIfNotNull(config, "http.connection.urlParameters", connectionConfig.getUrlParameters());
       putIfNotNull(config, "http.connection.userAgentCustomization", connectionConfig.getUserAgentCustomisation());
       putIfNotNull(config, "http.connection.useTrustStore", connectionConfig.getUseTrustStore());
     }
@@ -137,6 +138,10 @@ public class HttpClientConfig
     if (config.containsKey("http.connection.retries")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
       connectionConfig.withRetries((Integer) config.get("http.connection.retries"));
+    }
+    if (config.containsKey("http.connection.urlParameters")) {
+      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
+      connectionConfig.withUrlParameters((String) config.get("http.connection.urlParameters"));
     }
     if (config.containsKey("http.connection.userAgentCustomization")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;

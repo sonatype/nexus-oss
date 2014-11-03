@@ -13,6 +13,8 @@
 package org.sonatype.nexus.component.source.internal.http;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,16 +43,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
 import org.apache.http.message.BasicHeader;
@@ -117,23 +122,16 @@ public class HttpClientFactoryImpl
     // Apply optional context-specific user-agent suffix
     if (config.getConnectionConfig() != null) {
       String userAgentSuffix = config.getConnectionConfig().getUserAgentCustomisation();
-      if (!StringUtils.isEmpty(userAgentSuffix)) {
-        final String customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
+      String customizedUserAgent = null;
+      if (StringUtils.isNotBlank(userAgentSuffix)) {
+        customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
         builder.setUserAgent(customizedUserAgent);
-        builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
-        {
-          @Override
-          public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
-              throws HttpException, IOException
-          {
-            // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
-            if (!request.containsHeader(HTTP.USER_AGENT)) {
-              request.addHeader(new BasicHeader(HTTP.USER_AGENT, customizedUserAgent));
-            }
-            super.preProcess(request, processor, ctx);
-          }
-        });
       }
+      String urlParameters = config.getConnectionConfig().getUrlParameters();
+      if (StringUtils.isBlank(urlParameters)) {
+        urlParameters = null;
+      }
+      applyRequestExecutor(builder, customizedUserAgent, urlParameters);
     }
     if (config.getConnectionConfig() != null && config.getConnectionConfig().getUseTrustStore()) {
       builder.getHttpClientBuilder().addInterceptorFirst(new HttpRequestInterceptor()
@@ -229,6 +227,60 @@ public class HttpClientFactoryImpl
 
   private void applyRedirectStrategy(final Builder builder) {
     builder.getHttpClientBuilder().setRedirectStrategy(new NexusRedirectStrategy());
+  }
+
+  private void applyRequestExecutor(final Builder builder, final String userAgent, final String urlParameters) {
+    if (userAgent != null || urlParameters != null) {
+      builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
+      {
+        @Override
+        public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
+            throws HttpException, IOException
+        {
+          if (userAgent != null) {
+            // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+            if (!request.containsHeader(HTTP.USER_AGENT)) {
+              request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgent));
+            }
+          }
+          super.preProcess(request, processor, ctx);
+        }
+
+        @Override
+        public HttpResponse execute(final HttpRequest request, final HttpClientConnection conn,
+                                    final HttpContext context)
+            throws IOException, HttpException
+        {
+          if (urlParameters != null) {
+            HttpRequestWrapper wrappedRequest = HttpRequestWrapper.wrap(request);
+            if (wrappedRequest.getURI() != null) {
+              try {
+                wrappedRequest.setURI(new URI(
+                    wrappedRequest.getURI().toASCIIString()
+                        + (wrappedRequest.getURI().getQuery() == null ? "?" : "&")
+                        + urlParameters
+                ));
+              }
+              catch (URISyntaxException e) {
+                throw new HttpException(
+                    "Unable to add url parameters " + urlParameters + " to " + wrappedRequest.getURI().toASCIIString(),
+                    e
+                );
+              }
+              return super.execute(wrappedRequest, conn, context);
+            }
+            else {
+              return super.execute(request, conn, context);
+            }
+          }
+          else {
+            return super.execute(request, conn, context);
+          }
+
+        }
+      });
+    }
+
   }
 
 }

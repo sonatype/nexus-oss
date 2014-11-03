@@ -21,6 +21,8 @@ public class ConnectionConfig
 {
   private String userAgentCustomisation;
 
+  private String urlParameters;
+
   private Integer timeout;
 
   private Integer retries;
@@ -29,6 +31,10 @@ public class ConnectionConfig
 
   public String getUserAgentCustomisation() {
     return userAgentCustomisation;
+  }
+
+  public String getUrlParameters() {
+    return urlParameters;
   }
 
   public Integer getTimeout() {
@@ -45,6 +51,11 @@ public class ConnectionConfig
 
   public ConnectionConfig withUserAgentCustomisation(final String userAgentCustomisation) {
     this.userAgentCustomisation = userAgentCustomisation;
+    return this;
+  }
+
+  public ConnectionConfig withUrlParameters(final String urlParameters) {
+    this.urlParameters = urlParameters;
     return this;
   }
 
