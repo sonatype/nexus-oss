@@ -23,251 +23,92 @@ import com.google.common.collect.Maps;
  */
 public class HttpClientConfig
 {
-  private String userAgentCustomisation;
 
-  private String urlParameters;
+  private ConnectionConfig connectionConfig;
 
-  private Integer timeout;
+  private AuthenticationConfig authenticationConfig;
 
-  private Integer retries;
+  private ProxyConfig proxyConfig;
 
-  private String authUsername;
-
-  private String authPassword;
-
-  private String authNtlmHost;
-
-  private String authNtlmDomain;
-
-  private String httpProxyHost;
-
-  private Integer httpProxyPort;
-
-  private String httpProxyAuthUsername;
-
-  private String httpProxyAuthPassword;
-
-  private String httpProxyAuthNtlmHost;
-
-  private String httpProxyAuthNtlmDomain;
-
-  private String httpsProxyHost;
-
-  private Integer httpsProxyPort;
-
-  private String httpsProxyAuthUsername;
-
-  private String httpsProxyAuthPassword;
-
-  private String httpsProxyAuthNtlmHost;
-
-  private String httpsProxyAuthNtlmDomain;
-
-  private String[] nonProxyHosts;
-
-  public String getUserAgentCustomisation() {
-    return userAgentCustomisation;
+  public ConnectionConfig getConnectionConfig() {
+    return connectionConfig;
   }
 
-  public String getUrlParameters() {
-    return urlParameters;
+  public AuthenticationConfig getAuthenticationConfig() {
+    return authenticationConfig;
   }
 
-  public Integer getTimeout() {
-    return timeout;
+  public ProxyConfig getProxyConfig() {
+    return proxyConfig;
   }
 
-  public Integer getRetries() {
-    return retries;
-  }
-
-  public String getAuthUsername() {
-    return authUsername;
-  }
-
-  public String getAuthPassword() {
-    return authPassword;
-  }
-
-  public String getAuthNtlmHost() {
-    return authNtlmHost;
-  }
-
-  public String getAuthNtlmDomain() {
-    return authNtlmDomain;
-  }
-
-  public String getHttpProxyHost() {
-    return httpProxyHost;
-  }
-
-  public Integer getHttpProxyPort() {
-    return httpProxyPort;
-  }
-
-  public String getHttpProxyAuthUsername() {
-    return httpProxyAuthUsername;
-  }
-
-  public String getHttpProxyAuthPassword() {
-    return httpProxyAuthPassword;
-  }
-
-  public String getHttpProxyAuthNtlmHost() {
-    return httpProxyAuthNtlmHost;
-  }
-
-  public String getHttpProxyAuthNtlmDomain() {
-    return httpProxyAuthNtlmDomain;
-  }
-
-  public String getHttpsProxyHost() {
-    return httpsProxyHost;
-  }
-
-  public Integer getHttpsProxyPort() {
-    return httpsProxyPort;
-  }
-
-  public String getHttpsProxyAuthUsername() {
-    return httpsProxyAuthUsername;
-  }
-
-  public String getHttpsProxyAuthPassword() {
-    return httpsProxyAuthPassword;
-  }
-
-  public String getHttpsProxyAuthNtlmHost() {
-    return httpsProxyAuthNtlmHost;
-  }
-
-  public String getHttpsProxyAuthNtlmDomain() {
-    return httpsProxyAuthNtlmDomain;
-  }
-
-  public String[] getNonProxyHosts() {
-    return nonProxyHosts;
-  }
-
-  public HttpClientConfig withUserAgentCustomisation(final String userAgentCustomisation) {
-    this.userAgentCustomisation = userAgentCustomisation;
+  public HttpClientConfig withConnectionConfig(final ConnectionConfig connectionConfig) {
+    this.connectionConfig = connectionConfig;
     return this;
   }
 
-  public HttpClientConfig withUrlParameters(final String urlParameters) {
-    this.urlParameters = urlParameters;
+  public HttpClientConfig withAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
+    this.authenticationConfig = authenticationConfig;
     return this;
   }
 
-  public HttpClientConfig withTimeout(final Integer timeout) {
-    this.timeout = timeout;
-    return this;
-  }
-
-  public HttpClientConfig withRetries(final Integer retries) {
-    this.retries = retries;
-    return this;
-  }
-
-  public HttpClientConfig withNonProxyHosts(final String[] nonProxyHosts) {
-    this.nonProxyHosts = nonProxyHosts;
-    return this;
-  }
-
-  public HttpClientConfig withAuthentication(final String username, final String password) {
-    this.authUsername = username;
-    this.authPassword = password;
-    return this;
-  }
-
-  public HttpClientConfig withAuthentication(final String username, final String password,
-                                             final String ntlmHost, final String ntlmDomain)
-  {
-    withAuthentication(username, password);
-    this.authNtlmHost = ntlmHost;
-    this.authNtlmDomain = ntlmDomain;
-    return this;
-  }
-
-  public HttpClientConfig withHttpProxy(final String host, final Integer port) {
-    this.httpProxyHost = host;
-    this.httpProxyPort = port;
-    return this;
-  }
-
-  public HttpClientConfig withHttpProxy(final String host, final Integer port,
-                                        final String username, final String password)
-  {
-    this.withHttpProxy(host, port);
-    this.httpProxyAuthUsername = username;
-    this.httpProxyAuthPassword = password;
-    return this;
-  }
-
-  public HttpClientConfig withHttpProxy(final String host, final Integer port,
-                                        final String username, final String password,
-                                        final String ntlmHost, final String ntlmDomain)
-  {
-    this.withHttpProxy(host, port, username, password);
-    this.httpProxyAuthNtlmHost = ntlmHost;
-    this.httpProxyAuthNtlmDomain = ntlmDomain;
-    return this;
-  }
-
-  public HttpClientConfig withHttpsProxy(final String host, final Integer port) {
-    this.httpsProxyHost = host;
-    this.httpsProxyPort = port;
-    return this;
-  }
-
-  public HttpClientConfig withHttpsProxy(final String host, final Integer port,
-                                         final String username, final String password)
-  {
-    this.withHttpsProxy(host, port);
-    this.httpsProxyAuthUsername = username;
-    this.httpsProxyAuthPassword = password;
-    return this;
-  }
-
-  public HttpClientConfig withHttpsProxy(final String host, final Integer port,
-                                         final String username, final String password,
-                                         final String ntlmHost, final String ntlmDomain)
-  {
-    this.withHttpsProxy(host, port, username, password);
-    this.httpsProxyAuthNtlmHost = ntlmHost;
-    this.httpsProxyAuthNtlmDomain = ntlmDomain;
+  public HttpClientConfig withProxyConfig(final ProxyConfig proxyConfig) {
+    this.proxyConfig = proxyConfig;
     return this;
   }
 
   public Map<String, Object> toMap() {
     Map<String, Object> config = Maps.newHashMap();
-    putIfNotNull(config, "http.connection.timeout", timeout);
-    putIfNotNull(config, "http.connection.retries", retries);
-    putIfNotNull(config, "http.connection.urlParameters", urlParameters);
-    putIfNotNull(config, "http.connection.userAgentCustomization", userAgentCustomisation);
-
-    putIfNotNull(config, "http.authentication.username", authUsername);
-    putIfNotNull(config, "http.authentication.password", authPassword);
-    putIfNotNull(config, "http.authentication.ntlmHost", authNtlmHost);
-    putIfNotNull(config, "http.authentication.ntlmDomain", authNtlmDomain);
-
-    putIfNotNull(config, "http.proxy.http.host", httpProxyHost);
-    putIfNotNull(config, "http.proxy.http.port", httpProxyPort);
-    putIfNotNull(config, "http.proxy.http.authentication.username", httpProxyAuthUsername);
-    putIfNotNull(config, "http.proxy.http.authentication.password", httpProxyAuthPassword);
-    putIfNotNull(config, "http.proxy.http.authentication.ntlmHost", httpProxyAuthNtlmHost);
-    putIfNotNull(config, "http.proxy.http.authentication.ntlmDomain", httpProxyAuthNtlmDomain);
-
-    putIfNotNull(config, "http.proxy.https.host", httpsProxyHost);
-    putIfNotNull(config, "http.proxy.https.port", httpsProxyPort);
-    putIfNotNull(config, "http.proxy.https.authentication.username", httpsProxyAuthUsername);
-    putIfNotNull(config, "http.proxy.https.authentication.password", httpsProxyAuthPassword);
-    putIfNotNull(config, "http.proxy.https.authentication.ntlmHost", httpsProxyAuthNtlmHost);
-    putIfNotNull(config, "http.proxy.https.authentication.ntlmDomain", httpsProxyAuthNtlmDomain);
-
-    putIfNotNull(config, "http.proxy.nonProxyHosts", nonProxyHosts);
-
+    connectionToMap(config);
+    authenticationToMap(config, authenticationConfig, "http");
+    proxyToMap(config);
     return config;
+  }
+
+  private void connectionToMap(final Map<String, Object> config) {
+    if (connectionConfig != null) {
+      putIfNotNull(config, "http.connection.timeout", connectionConfig.getTimeout());
+      putIfNotNull(config, "http.connection.retries", connectionConfig.getRetries());
+      putIfNotNull(config, "http.connection.urlParameters", connectionConfig.getUrlParameters());
+      putIfNotNull(config, "http.connection.userAgentCustomization", connectionConfig.getUserAgentCustomisation());
+    }
+  }
+
+  private void authenticationToMap(final Map<String, Object> config,
+                                   final AuthenticationConfig authenticationConfig,
+                                   final String prefix)
+  {
+    if (authenticationConfig != null) {
+      if (authenticationConfig instanceof UsernameAuthenticationConfig) {
+        UsernameAuthenticationConfig uac = (UsernameAuthenticationConfig) authenticationConfig;
+        putIfNotNull(config, prefix + ".authentication.username", uac.getUsername());
+        putIfNotNull(config, prefix + ".authentication.password", uac.getPassword());
+        if (authenticationConfig instanceof NtlmAuthenticationConfig) {
+          NtlmAuthenticationConfig nac = (NtlmAuthenticationConfig) authenticationConfig;
+          putIfNotNull(config, prefix + ".authentication.ntlmHost", nac.getNtlmHost());
+          putIfNotNull(config, prefix + ".authentication.ntlmDomain", nac.getNtlmDomain());
+        }
+      }
+    }
+  }
+
+  private void proxyToMap(final Map<String, Object> config) {
+    if (proxyConfig != null) {
+      httpProxyToMap(config, proxyConfig.getHttpProxyConfig(), "http.proxy.http");
+      httpProxyToMap(config, proxyConfig.getHttpsProxyConfig(), "http.proxy.https");
+      putIfNotNull(config, "http.proxy.nonProxyHosts", proxyConfig.getNonProxyHosts());
+    }
+  }
+
+  private void httpProxyToMap(final Map<String, Object> config,
+                              final HttpProxyConfig httpProxyConfig,
+                              final String prefix)
+  {
+    if (httpProxyConfig != null) {
+      putIfNotNull(config, prefix + ".hostname", httpProxyConfig.getHostname());
+      putIfNotNull(config, prefix + ".port", httpProxyConfig.getPort());
+      authenticationToMap(config, httpProxyConfig.getAuthenticationConfig(), prefix);
+    }
   }
 
   private void putIfNotNull(final Map<String, Object> config, final String key, final Object value) {
@@ -278,114 +119,79 @@ public class HttpClientConfig
 
   public static HttpClientConfig fromMap(final Map<String, Object> config) {
     HttpClientConfig clientConfig = new HttpClientConfig();
-    applyConnection(config, clientConfig);
-    applyAuthentication(config, clientConfig);
-    applyProxy(config, clientConfig);
+    clientConfig.withConnectionConfig(connectionFromMap(config));
+    clientConfig.withAuthenticationConfig(authenticationFromMap(config, "http"));
+    clientConfig.withProxyConfig(proxyFromMap(config));
     return clientConfig;
   }
 
-  private static void applyConnection(final Map<String, Object> config, final HttpClientConfig clientConfig) {
+  private static ConnectionConfig connectionFromMap(final Map<String, Object> config) {
+    ConnectionConfig connectionConfig = null;
     if (config.containsKey("http.connection.timeout")) {
-      clientConfig.withTimeout((Integer) config.get("http.connection.timeout"));
+      connectionConfig = new ConnectionConfig();
+      connectionConfig.withTimeout((Integer) config.get("http.connection.timeout"));
     }
     if (config.containsKey("http.connection.retries")) {
-      clientConfig.withRetries((Integer) config.get("http.connection.retries"));
+      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
+      connectionConfig.withRetries((Integer) config.get("http.connection.retries"));
     }
     if (config.containsKey("http.connection.urlParameters")) {
-      clientConfig.withUrlParameters((String) config.get("http.connection.urlParameters"));
+      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
+      connectionConfig.withUrlParameters((String) config.get("http.connection.urlParameters"));
     }
     if (config.containsKey("http.connection.userAgentCustomization")) {
-      clientConfig.withUserAgentCustomisation((String) config.get("http.connection.userAgentCustomization"));
+      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
+      connectionConfig.withUserAgentCustomisation((String) config.get("http.connection.userAgentCustomization"));
     }
+    return connectionConfig;
   }
 
-  private static void applyAuthentication(final Map<String, Object> config, final HttpClientConfig clientConfig) {
-    if (config.containsKey("http.authentication.username")) {
-      if (config.containsKey("http.authentication.ntlmDomain")) {
-        clientConfig.withAuthentication(
-            (String) config.get("http.authentication.username"),
-            (String) config.get("http.authentication.password"),
-            (String) config.get("http.authentication.ntlmHost"),
-            (String) config.get("http.authentication.ntlmDomain")
+  private static AuthenticationConfig authenticationFromMap(final Map<String, Object> config, final String prefix) {
+    AuthenticationConfig authenticationConfig = null;
+    if (config.containsKey(prefix + ".authentication.username")) {
+      if (config.containsKey(prefix + ".authentication.ntlmDomain")) {
+        authenticationConfig = new NtlmAuthenticationConfig(
+            (String) config.get(prefix + ".authentication.username"),
+            (String) config.get(prefix + ".authentication.password"),
+            (String) config.get(prefix + ".authentication.ntlmHost"),
+            (String) config.get(prefix + ".authentication.ntlmDomain")
         );
       }
       else {
-        clientConfig.withAuthentication(
-            (String) config.get("http.authentication.username"),
-            (String) config.get("http.authentication.password")
+        authenticationConfig = new UsernameAuthenticationConfig(
+            (String) config.get(prefix + ".authentication.username"),
+            (String) config.get(prefix + ".authentication.password")
         );
       }
     }
+    return authenticationConfig;
   }
 
-  private static void applyProxy(final Map<String, Object> config, final HttpClientConfig clientConfig) {
-    applyHttpProxy(config, clientConfig);
-    applyHttpsProxy(config, clientConfig);
-    if (config.containsKey("http.proxy.nonProxyHosts")) {
-      clientConfig.withNonProxyHosts(((String) config.get("http.connection.userAgentCustomization")).split(","));
+  private static ProxyConfig proxyFromMap(final Map<String, Object> config) {
+    ProxyConfig proxyConfig = null;
+    HttpProxyConfig httpProxyConfig = httpProxyFromMap(config, "http.proxy.http");
+    if (httpProxyConfig != null) {
+      proxyConfig = new ProxyConfig();
+      proxyConfig.withHttpProxyConfig(httpProxyConfig);
+      proxyConfig.withHttpProxyConfig(httpProxyFromMap(config, "http.proxy.https"));
+      if (config.containsKey("http.proxy.nonProxyHosts")) {
+        proxyConfig.withNonProxyHosts(((String) config.get("http.proxy.nonProxyHosts")).split(","));
+      }
     }
+    return proxyConfig;
   }
 
-  private static void applyHttpProxy(final Map<String, Object> config, final HttpClientConfig clientConfig) {
-    if (config.containsKey("http.proxy.http.host")) {
-      if (config.containsKey("http.proxy.http.authentication.username")) {
-        if (config.containsKey("http.proxy.http.authentication.ntlmDomain")) {
-          clientConfig.withHttpProxy(
-              (String) config.get("http.proxy.http.host"),
-              (Integer) config.get("http.proxy.http.port"),
-              (String) config.get("http.proxy.http.authentication.username"),
-              (String) config.get("http.proxy.http.authentication.password"),
-              (String) config.get("http.proxy.http.authentication.ntlmHost"),
-              (String) config.get("http.proxy.http.authentication.ntlmDomain")
-          );
-        }
-        else {
-          clientConfig.withHttpProxy(
-              (String) config.get("http.proxy.http.host"),
-              (Integer) config.get("http.proxy.http.port"),
-              (String) config.get("http.proxy.http.authentication.username"),
-              (String) config.get("http.proxy.http.authentication.password")
-          );
-        }
-      }
-      else {
-        clientConfig.withHttpProxy(
-            (String) config.get("http.proxy.http.host"),
-            (Integer) config.get("http.proxy.http.port")
-        );
-      }
+  private static HttpProxyConfig httpProxyFromMap(final Map<String, Object> config,
+                                                  final String prefix)
+  {
+    HttpProxyConfig httpProxyConfig = null;
+    if (config.containsKey(prefix + ".hostname")) {
+      httpProxyConfig = new HttpProxyConfig();
+      httpProxyConfig.withHostname((String) config.get(prefix + ".hostname"));
+      httpProxyConfig.withPort((Integer) config.get(prefix + ".port"));
+      httpProxyConfig.withAuthenticationConfig(authenticationFromMap(config, prefix));
     }
-  }
-
-  private static void applyHttpsProxy(final Map<String, Object> config, final HttpClientConfig clientConfig) {
-    if (config.containsKey("http.proxy.https.host")) {
-      if (config.containsKey("http.proxy.https.authentication.username")) {
-        if (config.containsKey("http.proxy.https.authentication.ntlmDomain")) {
-          clientConfig.withHttpProxy(
-              (String) config.get("http.proxy.https.host"),
-              (Integer) config.get("http.proxy.https.port"),
-              (String) config.get("http.proxy.https.authentication.username"),
-              (String) config.get("http.proxy.https.authentication.password"),
-              (String) config.get("http.proxy.https.authentication.ntlmHost"),
-              (String) config.get("http.proxy.https.authentication.ntlmDomain")
-          );
-        }
-        else {
-          clientConfig.withHttpProxy(
-              (String) config.get("http.proxy.https.host"),
-              (Integer) config.get("http.proxy.https.port"),
-              (String) config.get("http.proxy.https.authentication.username"),
-              (String) config.get("http.proxy.https.authentication.password")
-          );
-        }
-      }
-      else {
-        clientConfig.withHttpProxy(
-            (String) config.get("http.proxy.https.host"),
-            (Integer) config.get("http.proxy.https.port")
-        );
-      }
-    }
+    return httpProxyConfig;
   }
 
 }

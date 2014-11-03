@@ -22,6 +22,7 @@ import org.sonatype.nexus.component.source.api.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigContributor;
 import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.api.http.ConnectionConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
 import org.sonatype.nexus.views.rawbinaries.source.RawComponentSourceFactory;
 
@@ -47,12 +48,11 @@ public class RawSourceConfigContribution
     if (store.get(SOURCE_NAME) == null) {
       Map<String, Object> config = Maps.newHashMap();
       config.put(RawComponentSourceFactory.REMOTE_URL_PARAM, "http://search.maven.org/");
-      config.putAll(new HttpClientConfig()
+      config.putAll(new HttpClientConfig().withConnectionConfig(new ConnectionConfig()
           .withTimeout(500)
           .withRetries(5)
           .withUserAgentCustomisation("NX3")
-          .toMap()
-      );
+      ).toMap());
 
       store.add(new ComponentSourceConfig(
           new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),

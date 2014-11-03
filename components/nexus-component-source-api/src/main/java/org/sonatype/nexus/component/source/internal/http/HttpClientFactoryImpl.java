@@ -23,8 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.http.AuthenticationConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
+import org.sonatype.nexus.component.source.api.http.HttpProxyConfig;
+import org.sonatype.nexus.component.source.api.http.NtlmAuthenticationConfig;
+import org.sonatype.nexus.component.source.api.http.UsernameAuthenticationConfig;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.httpclient.NexusHttpRoutePlanner;
@@ -90,48 +94,53 @@ public class HttpClientFactoryImpl
                                   final HttpClientConfig config)
   {
     // connection/socket timeouts
-    int timeout = config.getTimeout() != null ? config.getTimeout() : 1000;
+    int timeout = 1000;
+    if (config.getConnectionConfig() != null && config.getConnectionConfig().getTimeout() != null) {
+      timeout = config.getConnectionConfig().getTimeout();
+    }
     builder.getSocketConfigBuilder().setSoTimeout(timeout);
     builder.getRequestConfigBuilder().setConnectTimeout(timeout);
     builder.getRequestConfigBuilder().setSocketTimeout(timeout);
 
     // obey the given retries count and apply it to client.
-    int retries = config.getRetries() != null ? config.getRetries() : 0;
+    int retries = 0;
+    if (config.getConnectionConfig() != null && config.getConnectionConfig().getRetries() != null) {
+      retries = config.getConnectionConfig().getRetries();
+    }
     builder.getHttpClientBuilder().setRetryHandler(new StandardHttpRequestRetryHandler(retries, false));
 
-    applyAuthenticationConfig(builder,
-        config.getAuthUsername(), config.getAuthPassword(), config.getAuthNtlmHost(), config.getAuthNtlmDomain(), null
-    );
+    applyAuthenticationConfig(builder, config.getAuthenticationConfig(), null);
     applyProxyConfig(builder, config);
 
     // Apply optional context-specific user-agent suffix
-    String userAgentSuffix = config.getUserAgentCustomisation();
-    if (!StringUtils.isEmpty(userAgentSuffix)) {
-      final String customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
-      builder.setUserAgent(customizedUserAgent);
-      builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
-      {
-        @Override
-        public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
-            throws HttpException, IOException
+    if (config.getConnectionConfig() != null && config.getConnectionConfig().getUserAgentCustomisation() != null) {
+      String userAgentSuffix = config.getConnectionConfig().getUserAgentCustomisation();
+      if (!StringUtils.isEmpty(userAgentSuffix)) {
+        final String customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
+        builder.setUserAgent(customizedUserAgent);
+        builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
         {
-          // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
-          if (!request.containsHeader(HTTP.USER_AGENT)) {
-            request.addHeader(new BasicHeader(HTTP.USER_AGENT, customizedUserAgent));
+          @Override
+          public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
+              throws HttpException, IOException
+          {
+            // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
+            if (!request.containsHeader(HTTP.USER_AGENT)) {
+              request.addHeader(new BasicHeader(HTTP.USER_AGENT, customizedUserAgent));
+            }
+            super.preProcess(request, processor, ctx);
           }
-          super.preProcess(request, processor, ctx);
-        }
-      });
+        });
+      }
     }
   }
 
   @VisibleForTesting
   public void applyAuthenticationConfig(final Builder builder,
-                                        final String username, final String password,
-                                        final String ntlmHost, final String ntlmDomain,
+                                        final AuthenticationConfig authenticationConfig,
                                         final HttpHost proxyHost)
   {
-    if (username != null) {
+    if (authenticationConfig != null) {
       String authScope = "target";
       if (proxyHost != null) {
         authScope = proxyHost.toHostString() + " proxy";
@@ -141,15 +150,20 @@ public class HttpClientFactoryImpl
       authorisationPreference.add(AuthSchemes.DIGEST);
       authorisationPreference.add(AuthSchemes.BASIC);
       Credentials credentials;
-      if (ntlmDomain != null) {
+      if (authenticationConfig instanceof NtlmAuthenticationConfig) {
+        NtlmAuthenticationConfig nac = (NtlmAuthenticationConfig) authenticationConfig;
         // Using NTLM auth, adding it as first in policies
         authorisationPreference.add(0, AuthSchemes.NTLM);
-        log.debug("{} authentication setup for NTLM domain '{}'", authScope, ntlmDomain);
-        credentials = new NTCredentials(username, password, ntlmHost, ntlmDomain);
+        log.debug("{} authentication setup for NTLM domain '{}'", authScope, nac.getNtlmDomain());
+        credentials = new NTCredentials(nac.getUsername(), nac.getPassword(), nac.getNtlmHost(), nac.getNtlmDomain());
+      }
+      else if (authenticationConfig instanceof UsernameAuthenticationConfig) {
+        UsernameAuthenticationConfig uac = (UsernameAuthenticationConfig) authenticationConfig;
+        log.debug("{} authentication setup for remote storage with username '{}'", authScope, uac.getUsername());
+        credentials = new UsernamePasswordCredentials(uac.getUsername(), uac.getPassword());
       }
       else {
-        log.debug("{} authentication setup for remote storage with username '{}'", authScope, username);
-        credentials = new UsernamePasswordCredentials(username, password);
+        throw new IllegalArgumentException("Unsupported authentication config: " + authenticationConfig.getClass());
       }
 
       if (proxyHost != null) {
@@ -165,36 +179,28 @@ public class HttpClientFactoryImpl
 
   @VisibleForTesting
   public void applyProxyConfig(final Builder builder, final HttpClientConfig config) {
-    if (config.getHttpProxyHost() != null) {
+    if (config.getProxyConfig() != null && config.getProxyConfig().getHttpProxyConfig() != null) {
       Map<String, HttpHost> proxies = Maps.newHashMap();
 
-      HttpHost httpProxy = new HttpHost(config.getHttpProxyHost(), config.getHttpProxyPort());
-      applyAuthenticationConfig(
-          builder,
-          config.getHttpProxyAuthUsername(), config.getHttpProxyAuthPassword(),
-          config.getHttpProxyAuthNtlmHost(), config.getHttpProxyAuthNtlmDomain(),
-          httpProxy
-      );
+      HttpProxyConfig httpProxyConfig = config.getProxyConfig().getHttpProxyConfig();
+      HttpHost httpProxy = new HttpHost(httpProxyConfig.getHostname(), httpProxyConfig.getPort());
+      applyAuthenticationConfig(builder, httpProxyConfig.getAuthenticationConfig(), httpProxy);
 
-      log.debug("http proxy setup with host '{}'", config.getHttpProxyHost());
+      log.debug("http proxy setup with host '{}'", httpProxyConfig.getHostname());
       proxies.put("http", httpProxy);
       proxies.put("https", httpProxy);
 
-      if (config.getHttpsProxyHost() != null) {
-        final HttpHost httpsProxy = new HttpHost(config.getHttpsProxyHost(), config.getHttpsProxyPort());
-        applyAuthenticationConfig(
-            builder,
-            config.getHttpsProxyAuthUsername(), config.getHttpsProxyAuthPassword(),
-            config.getHttpsProxyAuthNtlmHost(), config.getHttpsProxyAuthNtlmDomain(),
-            httpsProxy
-        );
-        log.debug("https proxy setup with host '{}'", config.getHttpsProxyHost());
+      if (config.getProxyConfig().getHttpsProxyConfig() != null) {
+        HttpProxyConfig httpsProxyConfig = config.getProxyConfig().getHttpsProxyConfig();
+        HttpHost httpsProxy = new HttpHost(httpsProxyConfig.getHostname(), httpsProxyConfig.getPort());
+        applyAuthenticationConfig(builder, httpsProxyConfig.getAuthenticationConfig(), httpsProxy);
+        log.debug("https proxy setup with host '{}'", httpsProxy.getHostName());
         proxies.put("https", httpsProxy);
       }
 
       final Set<Pattern> nonProxyHostPatterns = Sets.newHashSet();
-      if (config.getNonProxyHosts() != null) {
-        for (String nonProxyHostRegex : config.getNonProxyHosts()) {
+      if (config.getProxyConfig().getNonProxyHosts() != null) {
+        for (String nonProxyHostRegex : config.getProxyConfig().getNonProxyHosts()) {
           try {
             nonProxyHostPatterns.add(Pattern.compile(nonProxyHostRegex, Pattern.CASE_INSENSITIVE));
           }
