@@ -917,9 +917,11 @@ public abstract class AbstractRepository
 
         // if we are deleting a collection, perform recursive notification about this too
         if (item instanceof StorageCollectionItem) {
-          if (log.isDebugEnabled()) {
-            log.debug(
-                "We are deleting a collection, starting a walker to send delete notifications per-file.");
+          log.debug("deleting a collection '{}'", item.getPath());
+
+          // NEXUS-7628: If collection is being deleted, purge all of it's children from NFC
+          if (isNotFoundCacheActive()) {
+            getNotFoundCache().removeWithChildren(request.getRequestPath());
           }
 
           // it is collection, walk it and below and fire events for all files
