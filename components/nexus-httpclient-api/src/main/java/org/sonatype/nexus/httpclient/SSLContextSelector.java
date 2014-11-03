@@ -23,6 +23,14 @@ import org.apache.http.protocol.HttpContext;
  */
 public interface SSLContextSelector
 {
+
+  /**
+   * {@link HttpContext} attribute to be used to enable usage of nexus trust store.
+   *
+   * @since 3.0
+   */
+  final static String USE_TRUST_STORE = HttpClientFactory.class.getName() + ".useTrustStore";
+
   /**
    * Returns the desired {@link SSLContext} to be used or {@code null} if no selection possible (or available).
    *

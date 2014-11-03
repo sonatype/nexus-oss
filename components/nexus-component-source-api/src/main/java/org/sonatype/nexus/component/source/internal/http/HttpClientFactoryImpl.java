@@ -33,6 +33,7 @@ import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.httpclient.NexusHttpRoutePlanner;
 import org.sonatype.nexus.httpclient.NexusRedirectStrategy;
+import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -43,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
@@ -132,6 +134,15 @@ public class HttpClientFactoryImpl
           }
         });
       }
+    }
+    if (config.getConnectionConfig() != null && config.getConnectionConfig().getUseTrustStore()) {
+      builder.getHttpClientBuilder().addInterceptorFirst(new HttpRequestInterceptor()
+      {
+        @Override
+        public void process(final HttpRequest request, final HttpContext context) {
+          context.setAttribute(SSLContextSelector.USE_TRUST_STORE, Boolean.TRUE);
+        }
+      });
     }
   }
 

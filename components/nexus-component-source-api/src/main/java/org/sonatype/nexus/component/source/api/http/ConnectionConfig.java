@@ -25,6 +25,8 @@ public class ConnectionConfig
 
   private Integer retries;
 
+  private Boolean useTrustStore;
+
   public String getUserAgentCustomisation() {
     return userAgentCustomisation;
   }
@@ -35,6 +37,10 @@ public class ConnectionConfig
 
   public Integer getRetries() {
     return retries;
+  }
+
+  public Boolean getUseTrustStore() {
+    return useTrustStore;
   }
 
   public ConnectionConfig withUserAgentCustomisation(final String userAgentCustomisation) {
@@ -49,6 +55,11 @@ public class ConnectionConfig
 
   public ConnectionConfig withRetries(final Integer retries) {
     this.retries = retries;
+    return this;
+  }
+
+  public ConnectionConfig withUseTrustStore(final Boolean useTrustStore) {
+    this.useTrustStore = useTrustStore;
     return this;
   }
 

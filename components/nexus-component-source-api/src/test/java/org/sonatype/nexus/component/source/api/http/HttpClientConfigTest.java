@@ -42,6 +42,7 @@ public class HttpClientConfigTest
             .withTimeout(1)
             .withRetries(2)
             .withUserAgentCustomisation("ua")
+            .withUseTrustStore(true)
         )
         .withAuthenticationConfig(new UsernameAuthenticationConfig("foo", "bar"))
         .withProxyConfig(new ProxyConfig()
@@ -62,6 +63,7 @@ public class HttpClientConfigTest
     assertThat((Integer) map.get("http.connection.timeout"), is(1));
     assertThat((Integer) map.get("http.connection.retries"), is(2));
     assertThat((String) map.get("http.connection.userAgentCustomization"), is("ua"));
+    assertThat((Boolean) map.get("http.connection.useTrustStore"), is(true));
 
     assertThat((String) map.get("http.authentication.username"), is("foo"));
     assertThat((String) map.get("http.authentication.password"), is("bar"));
@@ -94,6 +96,7 @@ public class HttpClientConfigTest
     map.put("http.connection.timeout", 1);
     map.put("http.connection.retries", 2);
     map.put("http.connection.userAgentCustomization", "ua");
+    map.put("http.connection.useTrustStore", Boolean.TRUE);
 
     map.put("http.authentication.username", "foo");
     map.put("http.authentication.password", "bar");
@@ -117,6 +120,7 @@ public class HttpClientConfigTest
     assertThat(config.getConnectionConfig().getTimeout(), is(1));
     assertThat(config.getConnectionConfig().getRetries(), is(2));
     assertThat(config.getConnectionConfig().getUserAgentCustomisation(), is("ua"));
+    assertThat(config.getConnectionConfig().getUseTrustStore(), is(true));
 
     UsernameAuthenticationConfig a1 = (UsernameAuthenticationConfig) config.getAuthenticationConfig();
     assertThat(a1.getUsername(), is("foo"));

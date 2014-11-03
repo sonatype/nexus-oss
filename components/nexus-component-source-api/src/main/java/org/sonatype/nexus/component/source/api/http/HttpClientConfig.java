@@ -71,6 +71,7 @@ public class HttpClientConfig
       putIfNotNull(config, "http.connection.timeout", connectionConfig.getTimeout());
       putIfNotNull(config, "http.connection.retries", connectionConfig.getRetries());
       putIfNotNull(config, "http.connection.userAgentCustomization", connectionConfig.getUserAgentCustomisation());
+      putIfNotNull(config, "http.connection.useTrustStore", connectionConfig.getUseTrustStore());
     }
   }
 
@@ -140,6 +141,10 @@ public class HttpClientConfig
     if (config.containsKey("http.connection.userAgentCustomization")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
       connectionConfig.withUserAgentCustomisation((String) config.get("http.connection.userAgentCustomization"));
+    }
+    if (config.containsKey("http.connection.useTrustStore")) {
+      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
+      connectionConfig.withUseTrustStore((Boolean) config.get("http.connection.useTrustStore"));
     }
     return connectionConfig;
   }
