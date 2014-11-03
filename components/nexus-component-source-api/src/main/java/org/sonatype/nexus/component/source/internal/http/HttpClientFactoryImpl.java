@@ -113,7 +113,7 @@ public class HttpClientFactoryImpl
     applyProxyConfig(builder, config);
 
     // Apply optional context-specific user-agent suffix
-    if (config.getConnectionConfig() != null && config.getConnectionConfig().getUserAgentCustomisation() != null) {
+    if (config.getConnectionConfig() != null) {
       String userAgentSuffix = config.getConnectionConfig().getUserAgentCustomisation();
       if (!StringUtils.isEmpty(userAgentSuffix)) {
         final String customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
