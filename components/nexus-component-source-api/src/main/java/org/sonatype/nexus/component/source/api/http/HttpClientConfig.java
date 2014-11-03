@@ -14,6 +14,7 @@ package org.sonatype.nexus.component.source.api.http;
 
 import java.util.Map;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 
 /**
@@ -96,7 +97,9 @@ public class HttpClientConfig
     if (proxyConfig != null) {
       httpProxyToMap(config, proxyConfig.getHttpProxyConfig(), "http.proxy.http");
       httpProxyToMap(config, proxyConfig.getHttpsProxyConfig(), "http.proxy.https");
-      putIfNotNull(config, "http.proxy.nonProxyHosts", proxyConfig.getNonProxyHosts());
+      if (proxyConfig.getNonProxyHosts() != null) {
+        putIfNotNull(config, "http.proxy.nonProxyHosts", Joiner.on(",").join(proxyConfig.getNonProxyHosts()));
+      }
     }
   }
 
