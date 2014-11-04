@@ -17,7 +17,7 @@ import java.util.Collections;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
+import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewRequest.HttpMethod;
@@ -46,14 +46,14 @@ public class ProxyingRawBinariesHandlerTest
 
   private RawBinaryStore store;
 
-  private PullComponentSource source;
+  private ComponentSource source;
 
   private static final String PATH = "/path/foo";
 
   @Before
   public void initMocks() {
     store = mock(RawBinaryStore.class);
-    source = mock(PullComponentSource.class);
+    source = mock(ComponentSource.class);
 
     handler = new TestableRawProxyHandler(store, source);
   }
@@ -113,7 +113,7 @@ public class ProxyingRawBinariesHandlerTest
     private RawBinary streamed;
 
     private TestableRawProxyHandler(final RawBinaryStore binaryStore,
-                                    final PullComponentSource source)
+                                    final ComponentSource source)
     {
       super(binaryStore, source);
     }

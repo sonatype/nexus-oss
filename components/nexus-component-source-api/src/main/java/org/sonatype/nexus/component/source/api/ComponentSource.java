@@ -12,10 +12,18 @@
  */
 package org.sonatype.nexus.component.source.api;
 
-import org.sonatype.nexus.component.model.ComponentOriginId;
+import java.io.IOException;
+
+import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
 
 /**
- * A remote source for components.
+ * A source of remote components, which provides components on request (e.g. when a component is not found in the local
+ * nexus cluster).
+ *
+ * Filtering implementations of this interface may provide interceptor-like functionality - e.g. banning (filtering
+ * out) certain components or automatically tagging component metadata with the name of the source. These should be
+ * applied by the format-specific {@link ComponentSourceFactory}.
  *
  * @since 3.0
  */
@@ -25,4 +33,17 @@ public interface ComponentSource
    * A cluster-wide unique name for this source.
    */
   ComponentSourceId getId();
+
+  /**
+   * Query the source for matching components.
+   *
+   * Formats are responsible for encoding all of their various request types into the query, whether these are mere
+   * checks for the existence of a component, downloading just the metadata (partially or fully), or retrieving and
+   * storing some or all of the binary assets of the component.
+   *
+   * If no component(s) match the query, the returned {@link Iterable} is empty.
+   *
+   * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
+   */
+  <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }

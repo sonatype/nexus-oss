@@ -16,10 +16,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
-import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;
 import org.sonatype.nexus.componentviews.View;
@@ -76,7 +75,7 @@ public class RawBinaryProxyViewFactory
 
     checkNotNull(sourceName, "Source name cannot be null for proxy config");
 
-    final PullComponentSource source = sourceRegistry.getSource(sourceName);
+    final ComponentSource source = sourceRegistry.getSource(sourceName);
 
     checkState(source != null, "PullComponentSource %s not found while trying to create view %s.", sourceName, config);
 

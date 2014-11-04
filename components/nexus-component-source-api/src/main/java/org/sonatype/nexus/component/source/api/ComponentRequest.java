@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A request for one or more Components from a {@link PullComponentSource}.
+ * A request for one or more Components from a {@link ComponentSource}.
  *
  * @since 3.0
  */

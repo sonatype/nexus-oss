@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
+import org.sonatype.nexus.component.source.api.ComponentSource;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
@@ -46,10 +46,10 @@ public class ProxyingRawBinariesHandler
 {
   private final RawBinaryStore binaryStore;
 
-  private final PullComponentSource source;
+  private final ComponentSource source;
 
   public ProxyingRawBinariesHandler(final RawBinaryStore binaryStore,
-                                    final PullComponentSource source)
+                                    final ComponentSource source)
   {
     this.binaryStore = checkNotNull(binaryStore);
     this.source = checkNotNull(source);
