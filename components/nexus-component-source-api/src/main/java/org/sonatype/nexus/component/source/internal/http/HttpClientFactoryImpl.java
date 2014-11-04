@@ -133,7 +133,7 @@ public class HttpClientFactoryImpl
       }
       applyRequestExecutor(builder, customizedUserAgent, urlParameters);
     }
-    if (config.getConnectionConfig() != null && config.getConnectionConfig().getUseTrustStore()) {
+    if (config.getConnectionConfig() != null && Boolean.TRUE.equals(config.getConnectionConfig().getUseTrustStore())) {
       builder.getHttpClientBuilder().addInterceptorFirst(new HttpRequestInterceptor()
       {
         @Override
