@@ -61,6 +61,11 @@ public class InMemorySourceRegistry
     return removed != null;
   }
 
+  public void update(ComponentSource source) {
+    unregister(source);
+    register(source);
+  }
+
   @Override
   public ComponentSource getSource(String name) {
     final ComponentSource source = sources.get(name);

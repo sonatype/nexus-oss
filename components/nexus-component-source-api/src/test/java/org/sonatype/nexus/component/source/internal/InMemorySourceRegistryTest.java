@@ -1,10 +1,12 @@
 package org.sonatype.nexus.component.source.internal;
 
 import org.sonatype.nexus.component.source.api.ComponentSourceId;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
 
 public class InMemorySourceRegistryTest
+    extends TestSupport
 {
 
   @Test(expected = RuntimeException.class)

@@ -21,6 +21,7 @@ import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.api.ComponentEnvelope;
 import org.sonatype.nexus.component.source.api.ComponentRequest;
 import org.sonatype.nexus.component.source.api.ComponentSource;
+import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
@@ -29,7 +30,9 @@ import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 
@@ -41,20 +44,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class ProxyingRawBinariesHandler
+    extends ComponentSupport
     implements Handler
 
 {
   private final RawBinaryStore binaryStore;
 
-  private final ComponentSource source;
+  private final String sourceName;
 
-  public ProxyingRawBinariesHandler(final RawBinaryStore binaryStore,
-                                    final ComponentSource source)
+  private final ComponentSourceRegistry sourceRegistry;
+
+  public ProxyingRawBinariesHandler(final RawBinaryStore binaryStore, final String sourceName,
+                                    final ComponentSourceRegistry sourceRegistry)
   {
     this.binaryStore = checkNotNull(binaryStore);
-    this.source = checkNotNull(source);
+    this.sourceName = checkNotNull(sourceName);
+    this.sourceRegistry = checkNotNull(sourceRegistry);
   }
-
 
   @Override
   public ViewResponse handle(final HandlerContext context) throws Exception {
@@ -82,7 +88,7 @@ public class ProxyingRawBinariesHandler
           final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
 
           // Here we presume we're getting Component back, since we don't actually use the component metadata
-          final Iterable<ComponentEnvelope<RawComponent>> envelopes = source.fetchComponents(path);
+          final Iterable<ComponentEnvelope<RawComponent>> envelopes = getSource().fetchComponents(path);
 
           for (ComponentEnvelope<RawComponent> envelope : envelopes) {
             for (Asset asset : envelope.getAssets()) {
@@ -101,6 +107,7 @@ public class ProxyingRawBinariesHandler
     }
   }
 
+  @VisibleForTesting
   ViewResponse createStreamResponse(final RawBinary binary) {
     return Responses
         .streamResponse(binary.getInputStream(), binary.getContentType(), binary.getModifiedDate().toDate());
@@ -119,5 +126,9 @@ public class ProxyingRawBinariesHandler
 
   private String ensureLeadingSlash(String path) {
     return path.startsWith("/") ? path : "/" + path;
+  }
+
+  private ComponentSource getSource() {
+    return sourceRegistry.getSource(sourceName);
   }
 }
