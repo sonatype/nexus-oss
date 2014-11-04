@@ -52,6 +52,10 @@ public class DefaultNexusBundleConfiguration
     extends DefaultWebBundleConfiguration<NexusBundleConfiguration>
     implements NexusBundleConfiguration
 {
+  /**
+   * Default start timeout value in seconds.
+   */
+  public static final int DEFAULT_START_TIMEOUT = 120;
 
   /**
    * Start timeout configuration property key.
@@ -107,7 +111,7 @@ public class DefaultNexusBundleConfiguration
 
   /**
    * Sets number of seconds to wait for Nexus to boot. If injected will use the timeout bounded to
-   * {@link #START_TIMEOUT} with a default of {@link #START_TIMEOUT_DEFAULT} seconds.
+   * {@link #START_TIMEOUT} with a default of {@link #DEFAULT_START_TIMEOUT} seconds.
    * <p/>
    * {@inheritDoc}
    *
@@ -115,7 +119,7 @@ public class DefaultNexusBundleConfiguration
    */
   @Inject
   protected void configureNexusStartTimeout(
-      final @Nullable @Named("${" + START_TIMEOUT + "}") Integer startTimeout)
+      final @Nullable @Named("${" + START_TIMEOUT + ":-" + DEFAULT_START_TIMEOUT + "}") Integer startTimeout)
   {
     if (startTimeout != null) {
       super.setStartTimeout(startTimeout);
