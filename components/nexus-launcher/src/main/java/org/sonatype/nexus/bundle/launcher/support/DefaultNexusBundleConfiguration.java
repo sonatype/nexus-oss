@@ -284,6 +284,12 @@ public class DefaultNexusBundleConfiguration
       );
     }
 
+    // disable Karaf's random shutdown port as we don't use it when testing
+    overlays.add(
+        fileTaskBuilder.properties(path("nexus/etc/custom.properties"))
+            .property("karaf.shutdown.port", "-1")
+    );
+
     if (getLogLevel() != null || getLogPattern() != null) {
       overlays.add(
           fileTaskBuilder.properties(path("sonatype-work/nexus/etc/logback.properties"))
