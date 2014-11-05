@@ -42,8 +42,6 @@ public interface ComponentSource
    * storing some or all of the binary assets of the component.
    *
    * If no component(s) match the query, the returned {@link Iterable} is empty.
-   *
-   * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
    */
   <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }
