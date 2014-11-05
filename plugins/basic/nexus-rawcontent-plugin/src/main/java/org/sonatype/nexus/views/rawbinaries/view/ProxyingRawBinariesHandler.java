@@ -18,10 +18,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.source.api.ComponentEnvelope;
-import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
+import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;

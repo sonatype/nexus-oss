@@ -21,10 +21,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.BaseAsset;
-import org.sonatype.nexus.component.source.api.ComponentEnvelope;
-import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
+import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
 import com.google.common.base.Supplier;

@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;

@@ -15,10 +15,10 @@ package org.sonatype.nexus.views.rawbinaries.view;
 import java.util.Collections;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.source.api.ComponentEnvelope;
-import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
+import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewRequest.HttpMethod;

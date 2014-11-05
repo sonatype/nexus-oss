@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.AllRequestMatcher;
 import org.sonatype.nexus.componentviews.NotFoundHandler;
 import org.sonatype.nexus.componentviews.Router;

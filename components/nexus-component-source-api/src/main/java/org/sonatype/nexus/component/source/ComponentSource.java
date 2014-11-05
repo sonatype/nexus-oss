@@ -10,12 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source;
 
 import java.io.IOException;
 
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 /**
  * A source of remote components, which provides components on request (e.g. when a component is not found in the local

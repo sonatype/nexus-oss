@@ -20,11 +20,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigContributor;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceRegistryInitializedEvent;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigContributor;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.config.ComponentSourceRegistryInitializedEvent;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
