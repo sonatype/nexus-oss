@@ -14612,3 +14612,19 @@
   border-bottom: 1px solid white;
   border-left: 1px solid #cbcbcb;
 }
+
+/**
+* @class Ext.ux.form.MultiSelect
+*/
+/* line 6, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+.nx-multiselect .x-panel-header {
+  background-color: transparent;
+  border: none;
+  padding-left: 0;
+  padding-bottom: 0;
+  padding-right: 0;
+}
+/* line 14, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+.nx-multiselect .x-form-item {
+  padding-bottom: 9px;
+}

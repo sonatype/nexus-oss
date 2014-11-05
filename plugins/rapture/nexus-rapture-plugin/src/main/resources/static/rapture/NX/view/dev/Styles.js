@@ -120,8 +120,8 @@ Ext.define('NX.view.dev.Styles', {
         '<tr>',
           '<td>{$}</td>',
           '<tpl for=".">',
-            '<tpl if="class">',
-              '<td class="{class}">{text}</td>',
+            '<tpl if="cls">',
+              '<td class="{cls}">{text}</td>',
             '<tpl else>',
               '<td>{.}</td>',
             '</tpl>',
@@ -190,7 +190,7 @@ Ext.define('NX.view.dev.Styles', {
 
     // Create a label
     var labelTemplate = Ext.create('Ext.XTemplate',
-      '<span class="{class}">{text}</span>'
+      '<span class="{clz}">{text}</span>'
     );
 
     /*
@@ -216,7 +216,7 @@ Ext.define('NX.view.dev.Styles', {
 
     var colorTemplate = Ext.create('Ext.XTemplate',
       '<div>',
-        '<div height="40" width="80" class="{class}"></div>',
+        '<div height="40" width="80" class="{clz}"></div>',
         '<div>{name}</div>',
         '<div>{value}</div>',
       '</div>'
@@ -225,114 +225,114 @@ Ext.define('NX.view.dev.Styles', {
     me.items.push(
       styleSection('Colors',
         columnTemplate.apply([
-          labelTemplate.apply({text: 'Shell', class: 'section-header' }),
+          labelTemplate.apply({text: 'Shell', clz: 'section-header' }),
           paletteTemplate.apply([
-            colorTemplate.apply({class: 'color black', name: 'Black', value: '#000000'}),
-            colorTemplate.apply({class: 'color night-rider', name: 'Night Rider', value: '#333333'}),
-            colorTemplate.apply({class: 'color charcoal', name: 'Charcoal', value: '#444444'}),
-            colorTemplate.apply({class: 'color dark-gray', name: 'Dark Gray', value: '#777777'}),
-            colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#AAAAAA'}),
-            colorTemplate.apply({class: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
-            colorTemplate.apply({class: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
-            colorTemplate.apply({class: 'color smoke', name: 'Smoke', value: '#EBEBEB'}),
-            colorTemplate.apply({class: 'color light-smoke', name: 'Light Smoke', value: '#F4F4F4'}),
-            colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'})
+            colorTemplate.apply({clz: 'color black', name: 'Black', value: '#000000'}),
+            colorTemplate.apply({clz: 'color night-rider', name: 'Night Rider', value: '#333333'}),
+            colorTemplate.apply({clz: 'color charcoal', name: 'Charcoal', value: '#444444'}),
+            colorTemplate.apply({clz: 'color dark-gray', name: 'Dark Gray', value: '#777777'}),
+            colorTemplate.apply({clz: 'color gray', name: 'Gray', value: '#AAAAAA'}),
+            colorTemplate.apply({clz: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
+            colorTemplate.apply({clz: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
+            colorTemplate.apply({clz: 'color smoke', name: 'Smoke', value: '#EBEBEB'}),
+            colorTemplate.apply({clz: 'color light-smoke', name: 'Light Smoke', value: '#F4F4F4'}),
+            colorTemplate.apply({clz: 'color white', name: 'White', value: '#FFFFFF'})
           ])
         ]),
         rowTemplate.apply([
           columnTemplate.apply([
-            labelTemplate.apply({text: 'Severity', class: 'section-header' }),
+            labelTemplate.apply({text: 'Severity', clz: 'section-header' }),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color cerise', name: 'Cerise', value: '#DB2852'}),
-              colorTemplate.apply({class: 'color sun', name: 'Sun', value: '#F2862F'}),
-              colorTemplate.apply({class: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
-              colorTemplate.apply({class: 'color cobalt', name: 'Cobalt', value: '#0047B2'}),
-              colorTemplate.apply({class: 'color cerulean-blue', name: 'Cerulean Blue', value: '#2476C3'})
+              colorTemplate.apply({clz: 'color cerise', name: 'Cerise', value: '#DB2852'}),
+              colorTemplate.apply({clz: 'color sun', name: 'Sun', value: '#F2862F'}),
+              colorTemplate.apply({clz: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
+              colorTemplate.apply({clz: 'color cobalt', name: 'Cobalt', value: '#0047B2'}),
+              colorTemplate.apply({clz: 'color cerulean-blue', name: 'Cerulean Blue', value: '#2476C3'})
             ])
           ]),
           columnTemplate.apply([
-            labelTemplate.apply({text: 'Forms', class: 'section-header' }),
+            labelTemplate.apply({text: 'Forms', clz: 'section-header' }),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color citrus', name: 'Citrus', value: '#84C900'}),
-              colorTemplate.apply({class: 'color free-speech-red', name: 'Free Speech Red', value: '#C70000'})
+              colorTemplate.apply({clz: 'color citrus', name: 'Citrus', value: '#84C900'}),
+              colorTemplate.apply({clz: 'color free-speech-red', name: 'Free Speech Red', value: '#C70000'})
             ])
           ]),
           columnTemplate.apply([
-            labelTemplate.apply({text: 'Tooltip', class: 'section-header' }),
+            labelTemplate.apply({text: 'Tooltip', clz: 'section-header' }),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
-              colorTemplate.apply({class: 'color floral-white', name: 'Floral White', value: '#FFFAEE'})
+              colorTemplate.apply({clz: 'color energy-yellow', name: 'Energy Yellow', value: '#F5C649'}),
+              colorTemplate.apply({clz: 'color floral-white', name: 'Floral White', value: '#FFFAEE'})
             ])
           ])
         ]),
         columnTemplate.apply([
-          labelTemplate.apply({text: 'Dashboard', class: 'section-header' }),
+          labelTemplate.apply({text: 'Dashboard', clz: 'section-header' }),
           paletteTemplate.apply([
-            colorTemplate.apply({class: 'color pigment-green', name: 'Pigment Green', value: '#0B9743'}),
-            colorTemplate.apply({class: 'color madang', name: 'Madang', value: '#B6E9AB'}),
-            colorTemplate.apply({class: 'color venetian-red', name: 'Venetian Red', value: '#BC0430'}),
-            colorTemplate.apply({class: 'color beauty-bush', name: 'Beauty Bush', value: '#EDB2AF'}),
-            colorTemplate.apply({class: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
-            colorTemplate.apply({class: 'color cornflower', name: 'Cornflower', value: '#96CAEE'}),
-            colorTemplate.apply({class: 'color east-side', name: 'East Side', value: '#B087B9'}),
-            colorTemplate.apply({class: 'color blue-chalk', name: 'Blue Chalk', value: '#DAC5DF'})
+            colorTemplate.apply({clz: 'color pigment-green', name: 'Pigment Green', value: '#0B9743'}),
+            colorTemplate.apply({clz: 'color madang', name: 'Madang', value: '#B6E9AB'}),
+            colorTemplate.apply({clz: 'color venetian-red', name: 'Venetian Red', value: '#BC0430'}),
+            colorTemplate.apply({clz: 'color beauty-bush', name: 'Beauty Bush', value: '#EDB2AF'}),
+            colorTemplate.apply({clz: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
+            colorTemplate.apply({clz: 'color cornflower', name: 'Cornflower', value: '#96CAEE'}),
+            colorTemplate.apply({clz: 'color east-side', name: 'East Side', value: '#B087B9'}),
+            colorTemplate.apply({clz: 'color blue-chalk', name: 'Blue Chalk', value: '#DAC5DF'})
           ])
         ]),
         rowTemplate.apply([
           columnTemplate.apply([
-            labelTemplate.apply({text: 'Buttons', class: 'section-header' }),
+            labelTemplate.apply({text: 'Buttons', clz: 'section-header' }),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'}),
-              colorTemplate.apply({class: 'color light-gainsboro', name: 'Light Gainsboro', value: '#E6E6E6'}),
-              colorTemplate.apply({class: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
-              colorTemplate.apply({class: 'color silver', name: 'Silver', value: '#B8B8B8'}),
-              colorTemplate.apply({class: 'color suva-gray', name: 'Suva Gray', value: '#919191'}),
-              colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#808080'})
+              colorTemplate.apply({clz: 'color white', name: 'White', value: '#FFFFFF'}),
+              colorTemplate.apply({clz: 'color light-gainsboro', name: 'Light Gainsboro', value: '#E6E6E6'}),
+              colorTemplate.apply({clz: 'color light-gray', name: 'Light Gray', value: '#CBCBCB'}),
+              colorTemplate.apply({clz: 'color silver', name: 'Silver', value: '#B8B8B8'}),
+              colorTemplate.apply({clz: 'color suva-gray', name: 'Suva Gray', value: '#919191'}),
+              colorTemplate.apply({clz: 'color gray', name: 'Gray', value: '#808080'})
             ]),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color denim', name: 'Denim', value: '#197AC5'}),
-              colorTemplate.apply({class: 'color light-cobalt', name: 'Light Cobalt', value: '#0161AD'}),
-              colorTemplate.apply({class: 'color dark-denim', name: 'Dark Denim', value: '#14629E'}),
-              colorTemplate.apply({class: 'color smalt', name: 'Smalt', value: '#014E8A'}),
-              colorTemplate.apply({class: 'color dark-cerulean', name: 'Dark Cerulean', value: '#0F4976'}),
-              colorTemplate.apply({class: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
+              colorTemplate.apply({clz: 'color denim', name: 'Denim', value: '#197AC5'}),
+              colorTemplate.apply({clz: 'color light-cobalt', name: 'Light Cobalt', value: '#0161AD'}),
+              colorTemplate.apply({clz: 'color dark-denim', name: 'Dark Denim', value: '#14629E'}),
+              colorTemplate.apply({clz: 'color smalt', name: 'Smalt', value: '#014E8A'}),
+              colorTemplate.apply({clz: 'color dark-cerulean', name: 'Dark Cerulean', value: '#0F4976'}),
+              colorTemplate.apply({clz: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
             ]),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color light-cerise', name: 'Light Cerise', value: '#DE3D63'}),
-              colorTemplate.apply({class: 'color brick-red', name: 'Brick Red', value: '#C6254B'}),
-              colorTemplate.apply({class: 'color old-rose', name: 'Old Rose', value: '#B2314F'}),
-              colorTemplate.apply({class: 'color fire-brick', name: 'Fire Brick', value: '#9E1E3C'}),
-              colorTemplate.apply({class: 'color shiraz', name: 'Shiraz', value: '#85253B'}),
-              colorTemplate.apply({class: 'color falu-red', name: 'Falu Red', value: '#77162D'})
+              colorTemplate.apply({clz: 'color light-cerise', name: 'Light Cerise', value: '#DE3D63'}),
+              colorTemplate.apply({clz: 'color brick-red', name: 'Brick Red', value: '#C6254B'}),
+              colorTemplate.apply({clz: 'color old-rose', name: 'Old Rose', value: '#B2314F'}),
+              colorTemplate.apply({clz: 'color fire-brick', name: 'Fire Brick', value: '#9E1E3C'}),
+              colorTemplate.apply({clz: 'color shiraz', name: 'Shiraz', value: '#85253B'}),
+              colorTemplate.apply({clz: 'color falu-red', name: 'Falu Red', value: '#77162D'})
             ]),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color sea-buckthorn', name: 'Sea Buckthorn', value: '#F39244'}),
-              colorTemplate.apply({class: 'color tahiti-gold', name: 'Tahiti Gold', value: '#DA792B'}),
-              colorTemplate.apply({class: 'color zest', name: 'Zest', value: '#C17536'}),
-              colorTemplate.apply({class: 'color rich-gold', name: 'Rich Gold', value: '#AE6122'}),
-              colorTemplate.apply({class: 'color afghan-tan', name: 'Afghan Tan', value: '#925829'}),
-              colorTemplate.apply({class: 'color russet', name: 'Russet', value: '#83491A'})
+              colorTemplate.apply({clz: 'color sea-buckthorn', name: 'Sea Buckthorn', value: '#F39244'}),
+              colorTemplate.apply({clz: 'color tahiti-gold', name: 'Tahiti Gold', value: '#DA792B'}),
+              colorTemplate.apply({clz: 'color zest', name: 'Zest', value: '#C17536'}),
+              colorTemplate.apply({clz: 'color rich-gold', name: 'Rich Gold', value: '#AE6122'}),
+              colorTemplate.apply({clz: 'color afghan-tan', name: 'Afghan Tan', value: '#925829'}),
+              colorTemplate.apply({clz: 'color russet', name: 'Russet', value: '#83491A'})
             ]),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color elf-green', name: 'Elf Green', value: '#23A156'}),
-              colorTemplate.apply({class: 'color dark-pigment-green', name: 'Dark Pigment Green', value: '#0B893D'}),
-              colorTemplate.apply({class: 'color salem', name: 'Salem', value: '#1C8145'}),
-              colorTemplate.apply({class: 'color jewel', name: 'Jewel', value: '#096E31'}),
-              colorTemplate.apply({class: 'color fun-green', name: 'Fun Green', value: '#156134'}),
-              colorTemplate.apply({class: 'color dark-jewel', name: 'Dark Jewel', value: '#0C4F26'})
+              colorTemplate.apply({clz: 'color elf-green', name: 'Elf Green', value: '#23A156'}),
+              colorTemplate.apply({clz: 'color dark-pigment-green', name: 'Dark Pigment Green', value: '#0B893D'}),
+              colorTemplate.apply({clz: 'color salem', name: 'Salem', value: '#1C8145'}),
+              colorTemplate.apply({clz: 'color jewel', name: 'Jewel', value: '#096E31'}),
+              colorTemplate.apply({clz: 'color fun-green', name: 'Fun Green', value: '#156134'}),
+              colorTemplate.apply({clz: 'color dark-jewel', name: 'Dark Jewel', value: '#0C4F26'})
             ])
           ]),
           columnTemplate.apply([
-            labelTemplate.apply({text: 'Font Awesome Icons', class: 'section-header' }),
+            labelTemplate.apply({text: 'Font Awesome Icons', clz: 'section-header' }),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
-              colorTemplate.apply({class: 'color smalt', name: 'Smalt', value: '#014E8A'}),
-              colorTemplate.apply({class: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
+              colorTemplate.apply({clz: 'color navy-blue', name: 'Navy Blue', value: '#006BBF'}),
+              colorTemplate.apply({clz: 'color smalt', name: 'Smalt', value: '#014E8A'}),
+              colorTemplate.apply({clz: 'color prussian-blue', name: 'Prussian Blue', value: '#013A68'})
             ]),
             paletteTemplate.apply([
-              colorTemplate.apply({class: 'color white', name: 'White', value: '#FFFFFF'}),
-              colorTemplate.apply({class: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
-              colorTemplate.apply({class: 'color gray', name: 'Gray', value: '#AAAAAA'})
+              colorTemplate.apply({clz: 'color white', name: 'White', value: '#FFFFFF'}),
+              colorTemplate.apply({clz: 'color gainsboro', name: 'Gainsboro', value: '#DDDDDD'}),
+              colorTemplate.apply({clz: 'color gray', name: 'Gray', value: '#AAAAAA'})
             ])
           ])
         ])
@@ -346,16 +346,16 @@ Ext.define('NX.view.dev.Styles', {
     var fontTemplate = Ext.create('Ext.XTemplate',
       '<div>',
         '<span class="section-header">{text}</span>',
-        '<p class="{class}">Trusted applications at the speed of deployment<br/>abcdefghijklmnopqrstuvwxyz<br/>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br/>,1234567890?¿¡;.:*@#£$%&/()=[]+</p>',
+        '<p class="{clz}">Trusted applications at the speed of deployment<br/>abcdefghijklmnopqrstuvwxyz<br/>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br/>,1234567890?¿¡;.:*@#£$%&/()=[]+</p>',
       '</div>'
     );
 
     me.items.push(
       styleSection('Fonts',
         rowTemplate.apply([
-          fontTemplate.apply({text: 'Proxima Nova Regular', class: 'proxima-nova-regular'}),
-          fontTemplate.apply({text: 'Proxima Nova Bold', class: 'proxima-nova-bold'}),
-          fontTemplate.apply({text: 'Courier New', class: 'courier-new-regular'})
+          fontTemplate.apply({text: 'Proxima Nova Regular', clz: 'proxima-nova-regular'}),
+          fontTemplate.apply({text: 'Proxima Nova Bold', clz: 'proxima-nova-bold'}),
+          fontTemplate.apply({text: 'Courier New', clz: 'courier-new-regular'})
         ])
       )
     );
@@ -370,28 +370,28 @@ Ext.define('NX.view.dev.Styles', {
           thead: theadTemplate.apply(['Name', 'Description', 'Font & Weight', 'Use Cases', 'Pixels', 'Sample']),
           tbody: tbodyTemplate.apply({
             'h1': [
-              'Page Title', 'Proxima Nova Light', 'Header', '40', { text: 'Sonatype Nexus', class: 'sample-h1' }
+              'Page Title', 'Proxima Nova Light', 'Header', '40', { text: 'Sonatype Nexus', clz: 'sample-h1' }
              ],
             'h2': [
-              'Header', 'Proxima Nova Bold', 'Header', '26', { text: 'Development', class: 'sample-h2' }
+              'Header', 'Proxima Nova Bold', 'Header', '26', { text: 'Development', clz: 'sample-h2' }
             ],
             'h3': [
-              'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', class: 'sample-h3' }
+              'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', clz: 'sample-h3' }
             ],
             'h4': [
-              'Header', 'Proxima Nova Bold', 'Sub-Header', '18', { text: 'Development', class: 'sample-h4' }
+              'Header', 'Proxima Nova Bold', 'Sub-Header', '18', { text: 'Development', clz: 'sample-h4' }
             ],
             'h5': [
-              'Header', 'Proxima Nova Bold', 'Sub-Header', '13', { text: 'Development', class: 'sample-h5' }
+              'Header', 'Proxima Nova Bold', 'Sub-Header', '13', { text: 'Development', clz: 'sample-h5' }
             ],
             'p/ul/ol': [
-              'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { text: 'Development', class: 'sample-body' }
+              'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { text: 'Development', clz: 'sample-body' }
             ],
             'code': [
-              'Code', 'Courier New Regular', 'Code examples', '13', { text: 'Development', class: 'sample-code' }
+              'Code', 'Courier New Regular', 'Code examples', '13', { text: 'Development', clz: 'sample-code' }
             ],
             'utility': [
-              'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { text: 'Development', class: 'sample-utility' }
+              'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { text: 'Development', clz: 'sample-utility' }
             ]
           })
         })
