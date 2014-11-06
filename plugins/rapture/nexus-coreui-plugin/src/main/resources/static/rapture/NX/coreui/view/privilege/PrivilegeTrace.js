@@ -63,6 +63,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         xtype: 'treepanel',
         itemId: 'privilegeTree',
         title: 'Privileges',
+        ui: 'treepanel',
         rootVisible: false,
         lines: false,
         width: '50%',
@@ -77,14 +78,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
         xtype: 'treepanel',
         itemId: 'roleTree',
         title: 'Role Containment',
-        tools: [
-          { type: 'collapse', tooltip: 'Collapse all', callback: function(panel) {
-            panel.collapseAll();
-          }},
-          { type: 'expand', tooltip: 'Expand all', callback: function(panel) {
-            panel.expandAll();
-          }}
-        ],
+        ui: 'treepanel',
         rootVisible: false,
         lines: false,
         region: 'center',
