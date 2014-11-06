@@ -13730,12 +13730,6 @@
 /**
 * @class Ext.ux.form.MultiSelect
 */
-/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
-.nx-multiselect {
-  /*.x-boundlist-list-ct {
-    border-top: 1px $color-night-rider solid;
-  }*/
-}
 /* line 6, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
 .nx-multiselect .x-panel-header {
   background-color: transparent;
