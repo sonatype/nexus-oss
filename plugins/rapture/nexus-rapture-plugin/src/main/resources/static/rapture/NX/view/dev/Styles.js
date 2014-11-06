@@ -437,7 +437,6 @@ Ext.define('NX.view.dev.Styles', {
       // Add a sample section if requested
       if (gradient1 && gradient2) {
         var samples = sampleTemplate.apply({gradient1: gradient1, gradient2: gradient2});
-        console.log(samples);
         return {
           xtype: 'container',
           layout: { type: 'hbox' },
