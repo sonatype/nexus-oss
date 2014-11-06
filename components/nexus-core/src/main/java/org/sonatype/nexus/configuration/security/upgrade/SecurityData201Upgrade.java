@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.configuration.security.upgrade;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -33,11 +30,13 @@ import org.sonatype.security.model.v2_0_2.CPrivilege;
 import org.sonatype.security.model.v2_0_2.CProperty;
 import org.sonatype.security.model.v2_0_2.CRole;
 import org.sonatype.security.model.v2_0_2.Configuration;
-import org.sonatype.security.model.v2_0_2.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Typed(value = SecurityDataUpgrader.class)
@@ -48,6 +47,13 @@ public class SecurityData201Upgrade
 {
 
   private static final Logger logger = LoggerFactory.getLogger(SecurityData201Upgrade.class);
+
+  private final List<StaticSecurityResource> staticSecurityResources;
+
+  @Inject
+  public SecurityData201Upgrade(final List<StaticSecurityResource> staticSecurityResources) {
+    this.staticSecurityResources = checkNotNull(staticSecurityResources);
+  }
 
   @Override
   public void doUpgrade(Configuration configuration)
@@ -132,27 +138,27 @@ public class SecurityData201Upgrade
   }
 
   private Map<String, CPrivilege> getStaticPrivilages() {
-    String staticSecurityPath = "/META-INF/nexus/static-security.xml";
     Map<String, CPrivilege> privilegeMap = new HashMap<String, CPrivilege>();
 
-    try (InputStream is = getClass().getResourceAsStream(staticSecurityPath);
-         Reader fr = new InputStreamReader(is)) {
-      SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-      Configuration staticConfig = reader.read(fr);
-
-      for (CPrivilege privilege : (List<CPrivilege>) staticConfig.getPrivileges()) {
+    for (StaticSecurityResource resource : staticSecurityResources) {
+      for (org.sonatype.security.model.CPrivilege privilege : resource.getConfiguration().getPrivileges()) {
         if ("target".equals(privilege.getType())) {
-          privilegeMap.put(privilege.getId(), privilege);
+          CPrivilege priv = new CPrivilege();
+          priv.setId(privilege.getId());
+          priv.setType(privilege.getType());
+          priv.setName(privilege.getName());
+          priv.setDescription(privilege.getDescription());
+          if (privilege.getProperties() != null) {
+            for (org.sonatype.security.model.CProperty property : privilege.getProperties()) {
+              CProperty prop = new CProperty();
+              prop.setKey(property.getKey());
+              prop.setValue(property.getValue());
+              priv.addProperty(prop);
+            }
+          }
+          privilegeMap.put(privilege.getId(), priv);
         }
       }
-
-    }
-    catch (IOException e) {
-      logger.error("IOException while retrieving configuration file", e);
-    }
-    catch (org.codehaus.plexus.util.xml.pull.XmlPullParserException e) {
-      logger.error("Invalid XML Configuration", e);
     }
 
     return privilegeMap;
