@@ -1,0 +1,29 @@
+/**
+* @class Ext.ux.form.MultiSelect
+*/
+
+.nx-multiselect {
+  .x-panel-header {
+    background-color: transparent;
+    border: none;
+    padding-left: 0;
+    padding-bottom: 9px;
+    padding-right: 0;
+
+    .x-header-text {
+      color: $color-night-rider;
+    }
+  }
+
+  .x-form-item .x-form-trigger-wrap {
+    margin-bottom: 9px;
+  }
+
+  .x-panel-body {
+    border: 1px $color-gainsboro solid !important;
+  }
+
+  /*.x-boundlist-list-ct {
+    border-top: 1px $color-night-rider solid;
+  }*/
+}

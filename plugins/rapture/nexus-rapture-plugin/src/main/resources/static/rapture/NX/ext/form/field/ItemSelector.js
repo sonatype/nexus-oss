@@ -113,6 +113,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
       getModelData: function () {
         return null;
       },
+      cls: 'nx-multiselect',
       flex: 1,
       dragGroup: me.ddGroup,
       dropGroup: me.ddGroup,
