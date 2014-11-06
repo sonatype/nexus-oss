@@ -81,7 +81,7 @@ implements StaticSecurityResource
                 id: 'ssl-truststore-view',
                 name: 'Nexus SSL: Trust Store View',
                 description: 'Gives access to view Nexus SSL Trust Store',
-                privileges: ['ssl-truststore-read', 'ssl-certificates-read']
+                privileges: ['ssl-truststore-read']
             ),
             new CRole(
                 id: 'ssl-truststore-admin',
