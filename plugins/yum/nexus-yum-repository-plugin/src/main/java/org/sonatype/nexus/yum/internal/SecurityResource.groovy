@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:yumVersionedRepositories')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'yum-alias-read',
                 type: 'method',
@@ -53,8 +53,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:yumAlias')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'yum-alias-create-read',
                 type: 'method',
@@ -63,7 +63,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,update,read'),
                     new CProperty(key: 'permission', value: 'nexus:yumAlias')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -71,8 +72,7 @@ implements StaticSecurityResource
                 name: 'Nexus Yum Reader',
                 description: 'Gives access to read versioned yum repositories',
                 privileges: ['yum-repository-read']
-            )
-            ,
+            ),
             new CRole(
                 id: 'nexus-yum-admin',
                 name: 'Nexus Yum Admin',

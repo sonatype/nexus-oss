@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:capabilities')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'capabilities-read',
                 type: 'method',
@@ -53,8 +53,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:capabilities')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'capabilities-update-read',
                 type: 'method',
@@ -63,8 +63,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:capabilities')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'capabilities-delete-read',
                 type: 'method',
@@ -73,8 +73,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:capabilities')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'capability-types-read',
                 type: 'method',
@@ -83,7 +83,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:capabilityTypes')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(

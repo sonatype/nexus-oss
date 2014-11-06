@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'ssl-truststore-create',
                 type: 'method',
@@ -53,8 +53,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'ssl-truststore-update',
                 type: 'method',
@@ -63,8 +63,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'ssl-truststore-delete',
                 type: 'method',
@@ -73,7 +73,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -81,8 +82,7 @@ implements StaticSecurityResource
                 name: 'Nexus SSL: Trust Store View',
                 description: 'Gives access to view Nexus SSL Trust Store',
                 privileges: ['ssl-truststore-read', 'ssl-certificates-read']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ssl-truststore-admin',
                 name: 'Nexus SSL: Trust Store Administration',

@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create'),
                     new CProperty(key: 'permission', value: 'security:ldapconfig')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'enterprise-ldap-read',
                 type: 'method',
@@ -53,8 +53,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:ldapconfig')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'enterprise-ldap-update',
                 type: 'method',
@@ -63,8 +63,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update'),
                     new CProperty(key: 'permission', value: 'security:ldapconfig')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'enterprise-ldap-delete',
                 type: 'method',
@@ -73,7 +73,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'security:ldapconfig')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(

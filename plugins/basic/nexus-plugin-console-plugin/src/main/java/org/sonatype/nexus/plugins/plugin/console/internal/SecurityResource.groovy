@@ -43,7 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:pluginconsoleplugininfos')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(

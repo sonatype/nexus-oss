@@ -45,8 +45,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'p2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'p2-read',
                 type: 'target',
@@ -57,8 +57,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'p2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'p2-update',
                 type: 'target',
@@ -69,8 +69,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'p2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'p2-delete',
                 type: 'target',
@@ -81,7 +81,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'p2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -90,8 +91,7 @@ implements StaticSecurityResource
                 description: 'Gives access to read ALL content of ALL P2 Repositories in Nexus.',
                 privileges: ['p2-read'],
                 roles: ['p2-all-view']
-            )
-            ,
+            ),
             new CRole(
                 id: 'p2-all-full',
                 name: 'Repo: All P2 Repositories (Full Control)',

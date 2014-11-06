@@ -45,8 +45,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'site'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'site-read',
                 type: 'target',
@@ -57,8 +57,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'site'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'site-update',
                 type: 'target',
@@ -69,8 +69,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'site'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'site-delete',
                 type: 'target',
@@ -81,7 +81,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'site'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -89,8 +90,7 @@ implements StaticSecurityResource
                 name: 'Repo: All Site Repositories (Read)',
                 description: 'Gives access to read ALL content of ALL Site Repositories in Nexus.',
                 privileges: ['site-read', 'repository-all']
-            )
-            ,
+            ),
             new CRole(
                 id: 'site-all-full',
                 name: 'Repo: All Site Repositories (Full Control)',

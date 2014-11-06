@@ -45,8 +45,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'obr'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'obr-read',
                 type: 'target',
@@ -57,8 +57,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'obr'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'obr-update',
                 type: 'target',
@@ -69,8 +69,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'obr'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'obr-delete',
                 type: 'target',
@@ -81,7 +81,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'obr'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -90,8 +91,7 @@ implements StaticSecurityResource
                 description: 'Gives access to read ALL content of ALL OBR Repositories in Nexus.',
                 privileges: ['obr-read'],
                 roles: ['obr-all-view']
-            )
-            ,
+            ),
             new CRole(
                 id: 'obr-all-full',
                 name: 'Repo: All OBRs (Full Control)',

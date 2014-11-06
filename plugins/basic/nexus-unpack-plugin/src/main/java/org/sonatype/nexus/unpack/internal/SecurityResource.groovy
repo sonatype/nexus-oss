@@ -43,7 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,update,delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:contentcompressed')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(

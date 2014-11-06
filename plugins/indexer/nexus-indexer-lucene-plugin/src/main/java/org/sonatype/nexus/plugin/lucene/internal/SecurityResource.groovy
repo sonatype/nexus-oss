@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:index')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '18',
                 type: 'method',
@@ -53,8 +53,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:index')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '19',
                 type: 'method',
@@ -63,7 +63,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:identify')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -71,8 +72,7 @@ implements StaticSecurityResource
                 name: 'UI: Search',
                 description: 'Gives access to the Search screen in Nexus UI',
                 privileges: ['17', '19', '54']
-            )
-            ,
+            ),
             new CRole(
                 id: 'anonymous',
                 name: '',

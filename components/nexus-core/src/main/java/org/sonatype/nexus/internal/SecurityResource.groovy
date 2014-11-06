@@ -43,8 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: '*'),
                     new CProperty(key: 'permission', value: 'nexus:metrics-endpoints')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T1',
                 type: 'target',
@@ -55,8 +55,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '1'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T2',
                 type: 'target',
@@ -67,8 +67,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T3',
                 type: 'target',
@@ -79,8 +79,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '1'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T4',
                 type: 'target',
@@ -91,8 +91,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T5',
                 type: 'target',
@@ -103,8 +103,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '1'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T6',
                 type: 'target',
@@ -115,8 +115,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T7',
                 type: 'target',
@@ -127,8 +127,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '1'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T8',
                 type: 'target',
@@ -139,8 +139,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: '2'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T9',
                 type: 'target',
@@ -151,8 +151,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'any'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T10',
                 type: 'target',
@@ -163,8 +163,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'any'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T11',
                 type: 'target',
@@ -175,8 +175,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'any'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: 'T12',
                 type: 'target',
@@ -187,8 +187,8 @@ implements StaticSecurityResource
                     new CProperty(key: 'repositoryTargetId', value: 'any'),
                     new CProperty(key: 'repositoryId', value: ''),
                     new CProperty(key: 'repositoryGroupId', value: '')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '1000',
                 type: 'method',
@@ -197,8 +197,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: '*'),
                     new CProperty(key: 'permission', value: 'nexus:*')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '1',
                 type: 'method',
@@ -207,8 +207,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:status')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '2',
                 type: 'method',
@@ -217,8 +217,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:authentication')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '3',
                 type: 'method',
@@ -227,8 +227,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:settings')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '4',
                 type: 'method',
@@ -237,8 +237,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:settings')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '5',
                 type: 'method',
@@ -247,8 +247,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:repositories')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '6',
                 type: 'method',
@@ -257,8 +257,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repositories')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '7',
                 type: 'method',
@@ -267,8 +267,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:repositories')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '8',
                 type: 'method',
@@ -277,8 +277,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:repositories')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '9',
                 type: 'method',
@@ -287,8 +287,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:repotemplates')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '10',
                 type: 'method',
@@ -297,8 +297,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repotemplates')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '11',
                 type: 'method',
@@ -307,8 +307,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:repotemplates')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '12',
                 type: 'method',
@@ -317,8 +317,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:repotemplates')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '13',
                 type: 'method',
@@ -327,8 +327,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:repogroups')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '14',
                 type: 'method',
@@ -337,8 +337,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repogroups')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '15',
                 type: 'method',
@@ -347,8 +347,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:repogroups')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '16',
                 type: 'method',
@@ -357,8 +357,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:repogroups')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '20',
                 type: 'method',
@@ -367,8 +367,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:attributes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '21',
                 type: 'method',
@@ -377,8 +377,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:cache')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '22',
                 type: 'method',
@@ -387,8 +387,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:routes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '23',
                 type: 'method',
@@ -397,8 +397,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:routes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '24',
                 type: 'method',
@@ -407,8 +407,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:routes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '25',
                 type: 'method',
@@ -417,8 +417,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:routes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '26',
                 type: 'method',
@@ -427,8 +427,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:tasks')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '27',
                 type: 'method',
@@ -437,8 +437,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:tasks')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '28',
                 type: 'method',
@@ -447,8 +447,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:tasks')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '29',
                 type: 'method',
@@ -457,8 +457,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:tasks')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '42',
                 type: 'method',
@@ -467,8 +467,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:logs')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '43',
                 type: 'method',
@@ -477,8 +477,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:configuration')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '45',
                 type: 'method',
@@ -487,8 +487,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:targets')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '46',
                 type: 'method',
@@ -497,8 +497,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:targets')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '47',
                 type: 'method',
@@ -507,8 +507,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:targets')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '48',
                 type: 'method',
@@ -517,8 +517,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:targets')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '49',
                 type: 'method',
@@ -527,8 +527,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:status')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '50',
                 type: 'method',
@@ -537,8 +537,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:wastebasket')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '51',
                 type: 'method',
@@ -547,8 +547,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:wastebasket')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '54',
                 type: 'method',
@@ -557,8 +557,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:artifact')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '55',
                 type: 'method',
@@ -567,8 +567,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repostatus')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '56',
                 type: 'method',
@@ -577,8 +577,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update'),
                     new CProperty(key: 'permission', value: 'nexus:repostatus')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '65',
                 type: 'method',
@@ -587,8 +587,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:artifact')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '66',
                 type: 'method',
@@ -597,8 +597,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'nexus:command')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '67',
                 type: 'method',
@@ -607,8 +607,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repometa')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '68',
                 type: 'method',
@@ -617,8 +617,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read,delete'),
                     new CProperty(key: 'permission', value: 'nexus:tasksrun')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '69',
                 type: 'method',
@@ -627,8 +627,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:tasktypes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '70',
                 type: 'method',
@@ -637,8 +637,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:componentscontentclasses')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '71',
                 type: 'method',
@@ -647,8 +647,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:componentscheduletypes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '73',
                 type: 'method',
@@ -657,8 +657,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:componentrealmtypes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '74',
                 type: 'method',
@@ -667,8 +667,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:componentsrepotypes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '76',
                 type: 'method',
@@ -677,8 +677,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'nexus:metadata')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '77',
                 type: 'method',
@@ -687,8 +687,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read,update'),
                     new CProperty(key: 'permission', value: 'nexus:logconfig')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '78',
                 type: 'method',
@@ -697,8 +697,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repositorymirrors')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '79',
                 type: 'method',
@@ -707,8 +707,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'nexus:repositorymirrors')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '81',
                 type: 'method',
@@ -717,8 +717,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repositorypredefinedmirrors')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '82',
                 type: 'method',
@@ -727,8 +727,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'nexus:repositorymirrorsstatus')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '83',
                 type: 'method',
@@ -737,7 +737,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: '*'),
                     new CProperty(key: 'permission', value: 'apikey:access')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(
@@ -745,152 +746,131 @@ implements StaticSecurityResource
                 name: 'Nexus Administrator Role',
                 description: 'Administration role for Nexus',
                 privileges: ['1000', '1001', '83']
-            )
-            ,
+            ),
             new CRole(
                 id: 'nx-deployment',
                 name: 'Nexus Deployment Role',
                 description: 'Deployment role for Nexus',
                 privileges: ['83'],
                 roles: ['anonymous', 'ui-basic']
-            )
-            ,
+            ),
             new CRole(
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
                 privileges: ['1', '54', '57', '58', '70', '74'],
                 roles: ['ui-repo-browser']
-            )
-            ,
+            ),
             new CRole(
                 id: 'nx-developer',
                 name: 'Nexus Developer Role',
                 description: 'Developer role for Nexus',
                 roles: ['ui-basic', 'nx-deployment']
-            )
-            ,
+            ),
             new CRole(
                 id: 'repo-all-read',
                 name: 'Repo: All Maven Repositories (Read)',
                 description: 'Gives access to read ALL content of ALL Maven1 and Maven2 repositories in Nexus.',
                 privileges: ['T1', 'T2', 'repository-all']
-            )
-            ,
+            ),
             new CRole(
                 id: 'repo-all-full',
                 name: 'Repo: All Maven Repositories (Full Control)',
                 description: 'Gives access to create/read/update/delete ALL content of ALL Maven1 and Maven2 repositories in Nexus.',
                 privileges: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'repository-all']
-            )
-            ,
+            ),
             new CRole(
                 id: 'repository-any-read',
                 name: 'Repo: All Repositories (Read)',
                 description: 'Gives access to read ALL content of ALL repositories in Nexus.',
                 privileges: ['T9', 'repository-all']
-            )
-            ,
+            ),
             new CRole(
                 id: 'repository-any-full',
                 name: 'Repo: All Repositories (Full Control)',
                 description: 'Gives access to create/read/update/delete ALL content of ALL repositories in Nexus.',
                 privileges: ['T9', 'T10', 'T11', 'T12', 'repository-all']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-repo-browser',
                 name: 'UI: Repository Browser',
                 description: 'Gives access to the Repository Browser screen in Nexus UI',
                 privileges: ['6', '14', '55']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-logs-config-files',
                 name: 'UI: Logs and Config Files',
                 description: 'Gives access to the Logs and Config Files screen in Nexus UI',
                 privileges: ['42', '43']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-server-admin',
                 name: 'UI: Server Administration',
                 description: 'Gives access to the Server Administration screen in Nexus UI',
                 privileges: ['3', '4', '73']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
                 privileges: ['5', '6', '7', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
                 roles: ['ui-repo-browser']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-group-admin',
                 name: 'UI: Group Administration',
                 description: 'Gives access to the Group Administration screen in Nexus UI',
                 privileges: ['6', '13', '14', '15', '16', 'repository-all'],
                 roles: ['ui-repo-browser']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-routing-admin',
                 name: 'UI: Routing Administration',
                 description: 'Gives access to the Routing Administration screen in Nexus UI',
                 privileges: ['6', '14', '22', '23', '24', '25']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
                 name: 'UI: Scheduled Task Administration',
                 description: 'Gives access to the Scheduled Task Administration screen in Nexus UI',
                 privileges: ['6', '14', '26', '27', '28', '29', '68', '69', '71']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
                 privileges: ['45', '46', '47', '48', '70', '74']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-users-admin',
                 name: 'UI: User Administration',
                 description: 'Gives access to the User Administration screen in Nexus UI',
                 privileges: ['35', '38', '39', '40', '41', '72', '75']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-roles-admin',
                 name: 'UI: Role Administration',
                 description: 'Gives access to the Role Administration screen in Nexus UI',
                 privileges: ['31', '34', '35', '36', '37']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-privileges-admin',
                 name: 'UI: Privilege Administration',
                 description: 'Gives access to the Privilege Administration screen in Nexus UI',
                 privileges: ['6', '14', '30', '31', '32', '33', '46', '80']
-            )
-            ,
+            ),
             new CRole(
                 id: 'ui-basic',
                 name: 'UI: Base UI Privileges',
                 description: 'Generic privileges for users in the Nexus UI',
                 privileges: ['1', '2', '64']
-            )
-            ,
+            ),
             new CRole(
                 id: 'nx-apikey-access',
                 name: 'Nexus API-Key Access',
                 description: 'API-Key Access role for Nexus.',
                 privileges: ['83']
-            )
-            ,
+            ),
             new CRole(
                 id: 'metrics-endpoints',
                 name: 'Metrics Endpoints',

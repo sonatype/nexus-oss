@@ -43,7 +43,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: '*'),
                     new CProperty(key: 'permission', value: 'nexus:atlas')
-                ])
+                ]
+            )
         ],
         roles: [
             new CRole(

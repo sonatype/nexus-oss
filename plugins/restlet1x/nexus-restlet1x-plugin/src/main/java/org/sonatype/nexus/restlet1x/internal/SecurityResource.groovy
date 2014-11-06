@@ -42,8 +42,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: '*'),
                     new CProperty(key: 'permission', value: 'security:*')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '30',
                 type: 'method',
@@ -52,8 +52,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:privileges')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '31',
                 type: 'method',
@@ -62,8 +62,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:privileges')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '32',
                 type: 'method',
@@ -72,8 +72,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'security:privileges')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '33',
                 type: 'method',
@@ -82,8 +82,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'security:privileges')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '34',
                 type: 'method',
@@ -92,8 +92,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:roles')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '35',
                 type: 'method',
@@ -102,8 +102,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:roles')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '36',
                 type: 'method',
@@ -112,8 +112,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'security:roles')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '37',
                 type: 'method',
@@ -122,8 +122,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'security:roles')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '38',
                 type: 'method',
@@ -132,8 +132,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:users')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '39',
                 type: 'method',
@@ -142,8 +142,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:users')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '40',
                 type: 'method',
@@ -152,8 +152,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'update,read'),
                     new CProperty(key: 'permission', value: 'security:users')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '41',
                 type: 'method',
@@ -162,8 +162,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'security:users')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '57',
                 type: 'method',
@@ -172,8 +172,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:usersforgotpw')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '58',
                 type: 'method',
@@ -182,8 +182,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:usersforgotid')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '59',
                 type: 'method',
@@ -192,8 +192,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'delete,read'),
                     new CProperty(key: 'permission', value: 'security:usersreset')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '64',
                 type: 'method',
@@ -202,8 +202,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:userschangepw')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '72',
                 type: 'method',
@@ -212,8 +212,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'create,read'),
                     new CProperty(key: 'permission', value: 'security:userssetpw')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '75',
                 type: 'method',
@@ -222,8 +222,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:componentsuserlocatortypes')
-                ])
-            ,
+                ]
+            ),
             new CPrivilege(
                 id: '80',
                 type: 'method',
@@ -232,7 +232,8 @@ implements StaticSecurityResource
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
                     new CProperty(key: 'permission', value: 'security:privilegetypes')
-                ])
+                ]
+            )
         ]
     )
   }
