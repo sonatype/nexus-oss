@@ -28,7 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat
  * <ul>
  * <li>have Git on the path</li>
  * </ul>
- * TODO: This is unfinished, versions will change but now are hardwired!
  */
 class Shoes4Scenario
     extends RubyScenarioSupport
@@ -43,6 +42,12 @@ class Shoes4Scenario
     exec(['git', 'clone', 'git@github.com:shoes/shoes4.git'])
     // cd into it
     cd 'shoes4'
+    // read version (is defined in src)
+    String version;
+    file('lib/shoes/version.rb').text.eachLine { if (it =~ /VERSION =/) version = it }
+    assert version != null
+    version = (version =~ /"([0-9a-zA-Z\.]+)"/)[0][1]
+    assert version != null
     // invoke bundle install
     bundle(['install'])
     // invoke rake build:all to have Gems built
@@ -50,14 +55,12 @@ class Shoes4Scenario
     // gems are in pkg/
     cd 'pkg'
     // deploy them
-    // TODO: version!
-    nexus 'shoes-dsl-4.0.0.pre2.gem'
-    nexus 'shoes-swt-4.0.0.pre2.gem'
-    nexus 'shoes-4.0.0.pre2.gem'
+    nexus "shoes-dsl-${version}.gem"
+    nexus "shoes-swt-${version}.gem"
+    nexus "shoes-${version}.gem"
     // install them
     gem(['install', 'shoes'])
 
-    // TODO: version!
-    assertThat(lastOutFile, FileMatchers.contains('Successfully installed shoes-4.0.0.pre2'))
+    assertThat(lastOutFile, FileMatchers.contains("Successfully installed shoes-${version}"))
   }
 }
