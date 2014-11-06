@@ -49,8 +49,6 @@ implements StaticSecurityResource
         roles: [
             new CRole(
                 id: 'ui-repo-browser',
-                name: '',
-                description: '',
                 privileges: ['browse-remote-repo']
             )
         ]

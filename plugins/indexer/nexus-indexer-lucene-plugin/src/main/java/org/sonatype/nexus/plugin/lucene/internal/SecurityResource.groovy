@@ -75,8 +75,6 @@ implements StaticSecurityResource
             ),
             new CRole(
                 id: 'anonymous',
-                name: '',
-                description: '',
                 roles: ['ui-search']
             )
         ]
