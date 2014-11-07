@@ -10,22 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source;
 
-import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.ComponentOriginId;
 
 /**
- * A callback interface to handle the arrival of components from a {@link PushComponentSource}.
+ * A unique identifier for component sources, with a user-friendly name and a uuid-type identifier.
  *
  * @since 3.0
  */
-public interface ComponentReceiver<T extends Component>
+public class ComponentSourceId
+    extends ComponentOriginId
 {
-  /**
-   * Receive components (possibly storing them). If storage of components or assets fails, this method
-   * should throw a {@link RuntimeException}, ideally, abandoning the storage of any
-   *
-   * @param source The {@link PushComponentSource} that pushed the components to us.
-   */
-  void receive(Iterable<ComponentEnvelope<T>> components, ComponentSource source);
+  public ComponentSourceId(final String name, final String internalId) {
+    super(name, internalId);
+  }
 }

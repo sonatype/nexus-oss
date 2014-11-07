@@ -17,10 +17,10 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigContributor;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigContributor;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
 import org.sonatype.nexus.views.rawbinaries.source.RawComponentSourceFactory;
 
 import com.google.common.collect.ImmutableMap;

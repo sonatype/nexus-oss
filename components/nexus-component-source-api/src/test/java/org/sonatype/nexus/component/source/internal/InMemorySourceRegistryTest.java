@@ -10,20 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api.config;
+package org.sonatype.nexus.component.source.internal;
 
-import javax.inject.Named;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import org.sonatype.nexus.component.source.api.ComponentSource;
+import org.junit.Test;
 
-/**
- * A factory for converting a {@link ComponentSourceConfig} into a {@link ComponentSource} that can be used.
- *
- * Format implementers should create an implementation and give it a unique {@link Named name}.
- *
- * @since 3.0
- */
-public interface ComponentSourceFactory
+public class InMemorySourceRegistryTest
+    extends TestSupport
 {
-  ComponentSource createSource(ComponentSourceConfig config);
+
+  @Test(expected = RuntimeException.class)
+  public void nameNotFoundCausesException() {
+    final InMemorySourceRegistry registry = new InMemorySourceRegistry();
+
+    registry.getSource("not found");
+  }
+
+
+  @Test(expected = RuntimeException.class)
+  public void idNotFoundCausesException() {
+    final InMemorySourceRegistry registry = new InMemorySourceRegistry();
+
+    registry.getSource(new ComponentSourceId("not found", "uuid"));
+  }
 }

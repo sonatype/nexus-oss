@@ -15,9 +15,10 @@ package org.sonatype.nexus.views.rawbinaries.view;
 import java.util.Collections;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.source.api.ComponentEnvelope;
-import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
+import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewRequest.HttpMethod;
@@ -41,21 +42,24 @@ import static org.mockito.Mockito.when;
 
 public class ProxyingRawBinariesHandlerTest
 {
-
   private TestableRawProxyHandler handler;
 
   private RawBinaryStore store;
 
-  private PullComponentSource source;
+  private ComponentSource source;
 
   private static final String PATH = "/path/foo";
+
+  private static final String SOURCE_NAME = "test source";
 
   @Before
   public void initMocks() {
     store = mock(RawBinaryStore.class);
-    source = mock(PullComponentSource.class);
+    source = mock(ComponentSource.class);
+    final ComponentSourceRegistry registry = mock(ComponentSourceRegistry.class);
+    when(registry.getSource(SOURCE_NAME)).thenReturn(source);
 
-    handler = new TestableRawProxyHandler(store, source);
+    handler = new TestableRawProxyHandler(store, SOURCE_NAME, registry);
   }
 
   @Test
@@ -112,10 +116,10 @@ public class ProxyingRawBinariesHandlerTest
   {
     private RawBinary streamed;
 
-    private TestableRawProxyHandler(final RawBinaryStore binaryStore,
-                                    final PullComponentSource source)
+    private TestableRawProxyHandler(final RawBinaryStore binaryStore, final String sourceName,
+                                    final ComponentSourceRegistry sourceRegistry)
     {
-      super(binaryStore, source);
+      super(binaryStore, sourceName, sourceRegistry);
     }
 
     @Override

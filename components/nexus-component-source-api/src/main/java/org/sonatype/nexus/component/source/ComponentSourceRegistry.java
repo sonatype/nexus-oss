@@ -10,9 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
-
-import javax.annotation.Nullable;
+package org.sonatype.nexus.component.source;
 
 /**
  * A registry of the currently available component sources.
@@ -22,14 +20,18 @@ import javax.annotation.Nullable;
 public interface ComponentSourceRegistry
 {
   /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
+   * Return a {@link ComponentSource} for the given name. References to sources should not be retained, as instances
+   * may be disposed of (and disabled) if the source configuration changes.
+   *
+   * @throws IllegalArgumentException if there is no source by that name.
    */
-  @Nullable
-  public <T extends ComponentSource> T getSource(String name);
+  ComponentSource getSource(String name);
 
   /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
+   * Return a {@link ComponentSource} for the given id. References to sources should not be retained, as instances
+   * may be disposed of (and disabled) if the source configuration changes.
+   *
+   * @throws IllegalArgumentException if there is no source by that name.
    */
-  @Nullable
-  public <T extends ComponentSource> T getSource(ComponentSourceId sourceId);
+  ComponentSource getSource(ComponentSourceId sourceId);
 }

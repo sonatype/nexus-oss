@@ -10,19 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source.config;
 
-import org.sonatype.nexus.component.model.ComponentOriginId;
+import javax.inject.Named;
+
+import org.sonatype.nexus.component.source.ComponentSource;
 
 /**
- * A remote source for components.
+ * A factory for converting a {@link ComponentSourceConfig} into a {@link ComponentSource} that can be used.
+ *
+ * Format implementers should create an implementation and give it a unique {@link Named name}.
  *
  * @since 3.0
  */
-public interface ComponentSource
+public interface ComponentSourceFactory
 {
-  /**
-   * A cluster-wide unique name for this source.
-   */
-  ComponentSourceId getId();
+  ComponentSource createSource(ComponentSourceConfig config);
 }
