@@ -59,8 +59,6 @@ public abstract class AbstractLdapTestCase
 
     getConfHomeDir().mkdirs();
 
-    copyResource(this.getSecurityXmlFilePath(), getNexusSecurityConfiguration());
-
     try (InterpolationFilterReader reader =
              new InterpolationFilterReader(new InputStreamReader(
                  getClass().getResourceAsStream(this.getLdapConfigXmlFilePath())), interpolationMap)) {
@@ -75,10 +73,6 @@ public abstract class AbstractLdapTestCase
 
   protected String getLdapConfigXmlFilePath() {
     return this.getFilePath("ldap.xml");
-  }
-
-  protected String getSecurityXmlFilePath() {
-    return this.getFilePath("security.xml");
   }
 
   private Object getTestLdifPath() {

@@ -17,6 +17,8 @@ import java.util.List;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -35,16 +37,31 @@ public abstract class SecurityTestSupport
       {
         @Override
         protected void configure() {
-
           bind(SecurityConfigurationSource.class)
               .annotatedWith(Names.named("file"))
               .toInstance(new TestSecurityConfigurationSource(securityConfig));
         }
       });
     }
+    final Configuration securityModelConfig = getSecurityModelConfig();
+    if (securityModelConfig != null) {
+      modules.add(new AbstractModule()
+      {
+        @Override
+        protected void configure() {
+          bind(SecurityModelConfigurationSource.class)
+              .annotatedWith(Names.named("file"))
+              .toInstance(new TestSecurityModelConfigurationSource(securityModelConfig));
+        }
+      });
+    }
   }
 
   protected SecurityConfiguration getSecurityConfig() {
+    return null;
+  }
+
+  protected Configuration getSecurityModelConfig() {
     return null;
   }
 

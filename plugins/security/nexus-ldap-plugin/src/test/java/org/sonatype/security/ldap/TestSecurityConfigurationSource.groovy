@@ -52,7 +52,7 @@ implements SecurityConfigurationSource
 
   @Override
   SecurityConfiguration loadConfiguration() throws ConfigurationException, IOException {
-    return config
+    return getConfiguration()
   }
 
   @Override

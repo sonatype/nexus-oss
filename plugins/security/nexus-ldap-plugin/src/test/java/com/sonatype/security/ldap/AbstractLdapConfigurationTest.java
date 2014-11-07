@@ -46,8 +46,6 @@ public abstract class AbstractLdapConfigurationTest
   {
     super.setUp();
     this.passwordHelper = this.lookup(PasswordHelper.class);
-
-    copyResource("/defaults/security.xml", getNexusSecurityConfiguration());
   }
 
   @Override
