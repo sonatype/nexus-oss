@@ -180,7 +180,7 @@ public class UserPrincipalsHelperTest
     try {
       helper().getUserStatus(new SimplePrincipalCollection("badUser", "badRealm"));
 
-      Assert.fail("Expected UserNotFoundException");
+      assertThat("Expected UserNotFoundException", false);
     }
     catch (final UserNotFoundException e) {
       // expected...
@@ -228,7 +228,7 @@ public class UserPrincipalsHelperTest
       try {
         helper().getUserStatus(principals);
 
-        Assert.fail("Expected UserNotFoundException");
+        assertThat("Expected UserNotFoundException", false);
       }
       catch (final UserNotFoundException e) {
         // expected...
