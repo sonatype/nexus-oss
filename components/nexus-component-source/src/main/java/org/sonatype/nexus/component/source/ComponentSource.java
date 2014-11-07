@@ -27,8 +27,19 @@ import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
  *
  * @since 3.0
  */
-public interface ComponentSource
+public interface ComponentSource<T extends Component>
 {
+  /*
+  Conceptual operations
+
+  - does component 'x' exist?
+  - does component/asset 'x','y' exist
+
+  - Fetch all the components and assets for component x
+  - Fetch component 'x', asset 'y'
+  - Search for component metadata
+   */
+
   /**
    * A cluster-wide unique name for this source.
    */
@@ -43,5 +54,5 @@ public interface ComponentSource
    *
    * If no component(s) match the query, the returned {@link Iterable} is empty.
    */
-  <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
+  Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }

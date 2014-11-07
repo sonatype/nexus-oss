@@ -23,7 +23,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-component-source-api</artifactId>
+  <artifactId>nexus-component-source</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
 

@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.views.rawbinaries.source;
 
-import java.io.Closeable;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,11 +23,11 @@ import org.sonatype.nexus.component.source.ComponentEnvelope;
 import org.sonatype.nexus.component.source.ComponentRequest;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.nexus.component.source.support.ExtraCloseableStream;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -91,27 +89,6 @@ public class RawBinaryComponentSource
     });
 
     return asList(ComponentEnvelope.simpleEnvelope(new RawComponent(), asset));
-  }
-
-  /**
-   * A way of attaching a Closeable to an input stream, so the auto is closed as soon as the stream is.
-   */
-  private static class ExtraCloseableStream
-      extends FilterInputStream
-  {
-    final Closeable needsClosing;
-
-    private ExtraCloseableStream(final InputStream in, final Closeable needsClosing) {
-      super(in);
-      this.needsClosing = needsClosing;
-    }
-
-    @Override
-    public void close() throws IOException {
-      super.close();
-      IOUtils.closeQuietly(needsClosing);
-    }
-
   }
 
   @Override
