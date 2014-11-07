@@ -17,9 +17,12 @@ import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 
+import javax.inject.Singleton
+
 /**
  * @since 3.0
  */
+@Singleton
 class StaticSecurityResource1
 implements StaticSecurityResource
 {

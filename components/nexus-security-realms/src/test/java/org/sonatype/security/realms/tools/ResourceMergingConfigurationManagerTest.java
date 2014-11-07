@@ -40,8 +40,7 @@ public class ResourceMergingConfigurationManagerTest
   @Override
   public void configure(Binder binder) {
     super.configure(binder);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("UnitTestSecurityResource"))
-        .to(UnitTestSecurityResource.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("s2")).to(StaticSecurityResource2.class);
     binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("s1")).to(StaticSecurityResource1.class);
   }
 

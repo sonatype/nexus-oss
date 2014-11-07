@@ -51,14 +51,14 @@ public class ResourceMergingManagerThreadedTest
   public void configure(Binder binder) {
     super.configure(binder);
 
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default")).to(UnitTestSecurityResource.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default")).to(StaticSecurityResource2.class);
     binder.bind(DynamicSecurityResource.class).annotatedWith(Names.named("default"))
         .to(UnitTestDynamicSecurityResource.class);
 
     int staticResourceCount = 100;
     for (int ii = 0; ii < staticResourceCount - 1; ii++) {
       binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("test-" + ii))
-          .to(UnitTestSecurityResource.class);
+          .to(StaticSecurityResource2.class);
     }
 
     int dynamicResourceCount = 100;
