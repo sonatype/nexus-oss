@@ -22,8 +22,10 @@ import com.sonatype.nexus.ldap.LdapPlugin;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.ldap.LdapTestSupport;
+import org.sonatype.security.ldap.TestSecurityConfigurations;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -34,7 +36,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 public class LdapUserManagerIT
     extends LdapTestSupport
@@ -50,7 +54,11 @@ public class LdapUserManagerIT
   {
     super.setUp();
     copyResourceToFile("/test-conf/etc/security-users-in-both-realms.xml", getNexusSecurityConfiguration());
-    copyResourceToFile("/test-conf/etc/security-configuration.xml", getSecurityConfiguration());
+  }
+
+  @Override
+  protected SecurityConfiguration getSecurityConfig() {
+    return TestSecurityConfigurations.getConfigWithLdapRealm();
   }
 
   private SecuritySystem getSecuritySystem()
