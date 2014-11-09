@@ -14,6 +14,7 @@ package org.sonatype.nexus.component.source;
 
 import java.util.Map;
 
+import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
 
 import com.google.common.collect.ImmutableMap;
@@ -25,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class ComponentRequest<T extends Component>
+public class ComponentRequest<C extends Component, A extends Asset>
 {
   private final Map<String, String> query;
 
