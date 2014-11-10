@@ -15,8 +15,9 @@ package org.sonatype.nexus.testsuite.support.filters;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.testsuite.support.Filter;
+
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

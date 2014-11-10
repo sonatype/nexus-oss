@@ -14,7 +14,7 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
-import org.sonatype.aether.util.version.GenericVersionScheme
+import org.eclipse.aether.util.version.GenericVersionScheme
 
 /**
  * Search result exchange object.

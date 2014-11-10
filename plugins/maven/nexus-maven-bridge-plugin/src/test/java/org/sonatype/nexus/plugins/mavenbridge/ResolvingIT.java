@@ -16,9 +16,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
@@ -30,6 +27,9 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.tests.http.server.fluent.Behaviours;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.junit.Assert;
 import org.junit.Test;
 

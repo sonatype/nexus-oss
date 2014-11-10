@@ -14,16 +14,17 @@ package org.sonatype.nexus.plugins.mavenbridge;
 
 import java.util.List;
 
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelSource;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 
 public interface NexusMavenBridge
 {
@@ -41,7 +42,7 @@ public interface NexusMavenBridge
   DependencyNode resolveDependencies(Dependency node,
                                      List<MavenRepository> repositories,
                                      RepositoryListener... listeners)
-      throws DependencyCollectionException, ArtifactResolutionException;
+      throws DependencyCollectionException, ArtifactResolutionException, DependencyResolutionException;
 
   DependencyNode collectDependencies(Model model,
                                      List<MavenRepository> repositories,
@@ -51,6 +52,6 @@ public interface NexusMavenBridge
   DependencyNode resolveDependencies(Model model,
                                      List<MavenRepository> repositories,
                                      RepositoryListener... listeners)
-      throws DependencyCollectionException, ArtifactResolutionException;
+      throws DependencyCollectionException, ArtifactResolutionException, DependencyResolutionException;
 
 }

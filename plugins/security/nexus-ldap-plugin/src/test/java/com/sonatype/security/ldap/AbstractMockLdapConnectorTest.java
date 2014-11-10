@@ -50,7 +50,7 @@ public abstract class AbstractMockLdapConnectorTest
     }
 
     getConfHomeDir().mkdirs();
-    Map<String, String> interpolationMap = new HashMap<String, String>();
+    Map<String, Object> interpolationMap = new HashMap<String, Object>();
     interpolationMap.put("default-ldap-port", "12345");
 
     try (InterpolationFilterReader reader = new InterpolationFilterReader(new InputStreamReader(
