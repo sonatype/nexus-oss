@@ -13743,6 +13743,7 @@
 }
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-treepanel .x-tool-img {
+  background-image: url(images/tools/tool-sprites-dark.png);
   background-color: white;
 }
 
