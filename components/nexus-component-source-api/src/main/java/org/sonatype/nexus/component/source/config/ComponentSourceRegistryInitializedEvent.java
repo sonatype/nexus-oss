@@ -10,19 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source.config;
 
-import org.sonatype.nexus.component.model.ComponentOriginId;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
+import org.sonatype.nexus.events.AbstractEvent;
 
 /**
- * A remote source for components.
+ * Fired when the {@link ComponentSourceRegistry} has been populated as Nexus starts.
  *
  * @since 3.0
  */
-public interface ComponentSource
+public class ComponentSourceRegistryInitializedEvent
+    extends AbstractEvent<ComponentSourceRegistry>
 {
-  /**
-   * A cluster-wide unique name for this source.
-   */
-  ComponentSourceId getId();
+  public ComponentSourceRegistryInitializedEvent(
+      final ComponentSourceRegistry component)
+  {
+    super(component);
+  }
 }

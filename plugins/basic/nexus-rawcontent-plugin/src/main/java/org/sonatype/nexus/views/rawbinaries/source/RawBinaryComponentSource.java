@@ -21,10 +21,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.BaseAsset;
-import org.sonatype.nexus.component.source.api.ComponentEnvelope;
-import org.sonatype.nexus.component.source.api.ComponentRequest;
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.PullComponentSource;
+import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
 import com.google.common.base.Supplier;
@@ -46,7 +46,7 @@ import static java.util.Arrays.asList;
  * @since 3.0
  */
 public class RawBinaryComponentSource
-    implements PullComponentSource
+    implements ComponentSource
 {
   private final ComponentSourceId sourceName;
 
@@ -77,7 +77,8 @@ public class RawBinaryComponentSource
       asset.setContentType(contentType.getValue());
     }
     asset.setContentLength(0);
-    asset.setStreamSupplier(new Supplier<InputStream>() {
+    asset.setStreamSupplier(new Supplier<InputStream>()
+    {
       @Override
       public InputStream get() {
         try {

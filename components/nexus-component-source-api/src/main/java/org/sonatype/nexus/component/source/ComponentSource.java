@@ -10,18 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 /**
- * A component source that provides components on request (e.g. when a component is not found in the local nexus
- * cluster).
+ * A source of remote components, which provides components on request (e.g. when a component is not found in the local
+ * nexus cluster).
  *
  * Filtering implementations of this interface may provide interceptor-like functionality - e.g. banning (filtering
  * out) certain components or automatically tagging component metadata with the name of the source. These should be
@@ -29,9 +27,13 @@ import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
  *
  * @since 3.0
  */
-public interface PullComponentSource
-    extends ComponentSource
+public interface ComponentSource
 {
+  /**
+   * A cluster-wide unique name for this source.
+   */
+  ComponentSourceId getId();
+
   /**
    * Query the source for matching components.
    *
@@ -40,8 +42,6 @@ public interface PullComponentSource
    * storing some or all of the binary assets of the component.
    *
    * If no component(s) match the query, the returned {@link Iterable} is empty.
-   *
-   * TODO: How would this handle directory listings? Is a subdirectory a type of 'component'?
    */
   <T extends Component> Iterable<ComponentEnvelope<T>> fetchComponents(ComponentRequest<T> request) throws IOException;
 }
