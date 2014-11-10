@@ -12,9 +12,10 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
+
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
 
 /**
  * Collection of static utility methods to bridge the "gap" between Aether and Nexus.

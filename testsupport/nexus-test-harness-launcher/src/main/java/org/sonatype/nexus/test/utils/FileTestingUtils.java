@@ -175,7 +175,7 @@ public class FileTestingUtils
     }
 
     FileReader fileReader = new FileReader(from);
-    InterpolationFilterReader filterReader = new InterpolationFilterReader(fileReader, variables);
+    InterpolationFilterReader filterReader = new InterpolationFilterReader(fileReader, (Map) variables);
 
     FileWriter fos = new FileWriter(dest);
 
@@ -213,7 +213,7 @@ public class FileTestingUtils
       else {
         try (FileReader reader = new FileReader(sourceFile);
              FileWriter writer = new FileWriter(destFile)) {
-          InterpolationFilterReader filterReader = new InterpolationFilterReader(reader, variables);
+          InterpolationFilterReader filterReader = new InterpolationFilterReader(reader, (Map) variables);
           IOUtils.copy(filterReader, writer);
         }
       }
