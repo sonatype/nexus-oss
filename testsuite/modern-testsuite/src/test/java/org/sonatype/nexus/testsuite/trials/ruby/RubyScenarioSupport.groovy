@@ -108,17 +108,17 @@ abstract class RubyScenarioSupport
 
   RubyHostedRepository createRubyHostedRepository(final String id) {
     checkNotNull(id)
-    return nx.repositories().create(RubyHostedRepository.class, id).withName(id).save()
+    return repositories().create(RubyHostedRepository.class, id).withName(id).save()
   }
 
   RubyProxyRepository createRubyProxyRepository(final String id, final String url) {
     checkNotNull(id)
     checkNotNull(url)
-    return nx.repositories().create(RubyProxyRepository.class, id).withName(id).asProxyOf(url).save()
+    return repositories().create(RubyProxyRepository.class, id).withName(id).asProxyOf(url).save()
   }
 
   RubyGroupRepository createRubyGroupRepository(final String id, final String... members) {
     checkNotNull(id)
-    return nx.repositories().create(RubyGroupRepository.class, id).withName(id).addMember(members).save()
+    return repositories().create(RubyGroupRepository.class, id).withName(id).addMember(members).save()
   }
 }
