@@ -13,12 +13,16 @@
 package org.sonatype.nexus.commands.orient;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.sonatype.nexus.commands.AbstractCompletableCommand;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -30,7 +34,9 @@ import org.apache.felix.service.command.Function;
 import org.apache.karaf.shell.commands.Action;
 import org.apache.karaf.shell.commands.CommandException;
 import org.apache.karaf.shell.commands.basic.AbstractCommand;
+import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.SubShellAction;
+import org.apache.karaf.shell.console.completer.NullCompleter;
 import org.eclipse.sisu.EagerSingleton;
 import org.osgi.framework.BundleContext;
 
@@ -73,7 +79,7 @@ public class OrientCommands
   }
 
   private AbstractCommand createOrientCommand(final Method method) {
-    return new AbstractCommand()
+    return new AbstractCompletableCommand()
     {
       // OrientDB expects the method name to be transformed from camel-case into lower-case with spaces
       private final String command = LOWER_CAMEL.to(LOWER_UNDERSCORE, method.getName()).replace('_', ' ');
@@ -86,6 +92,14 @@ public class OrientCommands
         catch (Throwable e) {
           throw new CommandException(e);
         }
+      }
+
+      public List<Completer> getCompleters() {
+        return Collections.<Completer> singletonList(NullCompleter.INSTANCE);
+      }
+
+      public Map<String, Completer> getOptionalCompleters() {
+        return Collections.emptyMap();
       }
 
       @Override

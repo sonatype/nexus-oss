@@ -23,10 +23,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigId;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;

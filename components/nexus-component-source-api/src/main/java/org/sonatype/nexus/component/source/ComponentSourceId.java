@@ -10,25 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source;
 
-import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.ComponentOriginId;
 
 /**
- * A remote source for components, where component transfers are initiated by the remote source, such as Smart Proxy.
+ * A unique identifier for component sources, with a user-friendly name and a uuid-type identifier.
  *
  * @since 3.0
  */
-public interface PushComponentSource<T extends Component>
-    extends ComponentSource
+public class ComponentSourceId
+    extends ComponentOriginId
 {
-  /**
-   * Register a {@link ComponentReceiver} with this source so it will receive components from this source.
-   */
-  void register(ComponentReceiver<T> receiver);
-
-  /**
-   * Unregister the receiver.
-   */
-  void unregister(ComponentReceiver<T> receiver);
+  public ComponentSourceId(final String name, final String internalId) {
+    super(name, internalId);
+  }
 }

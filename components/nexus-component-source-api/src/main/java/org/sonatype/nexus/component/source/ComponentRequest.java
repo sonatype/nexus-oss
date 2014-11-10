@@ -10,27 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api.config;
+package org.sonatype.nexus.component.source;
 
-import java.io.Serializable;
+import java.util.Map;
+
+import org.sonatype.nexus.component.model.Component;
+
+import com.google.common.collect.ImmutableMap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An identifier for {@link ComponentSourceConfigStore stored} {@link ComponentSourceConfig} objects.
+ * A request for one or more Components from a {@link ComponentSource}.
  *
  * @since 3.0
  */
-public class ComponentSourceConfigId
-    implements Serializable, Comparable<ComponentSourceConfigId>
+public class ComponentRequest<T extends Component>
 {
-  private final String id;
+  private final Map<String, String> query;
 
-  public ComponentSourceConfigId(final String id) {
-    this.id = id;
+  public ComponentRequest(final Map<String, String> query) {
+    this.query = ImmutableMap.copyOf(checkNotNull(query));
   }
 
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "[" + id + "]";
+  public Map<String, String> getQuery() {
+    return query;
   }
 
   @Override
@@ -38,21 +42,17 @@ public class ComponentSourceConfigId
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof ComponentRequest)) {
       return false;
     }
 
-    ComponentSourceConfigId blobId = (ComponentSourceConfigId) o;
+    ComponentRequest that = (ComponentRequest) o;
 
-    return id.equals(blobId.id);
+    return query.equals(that.query);
   }
 
   @Override
-  public int compareTo(final ComponentSourceConfigId o) {
-    return id.compareTo(o.id);
-  }
-
-  public String asUniqueString() {
-    return id;
+  public int hashCode() {
+    return query.hashCode();
   }
 }

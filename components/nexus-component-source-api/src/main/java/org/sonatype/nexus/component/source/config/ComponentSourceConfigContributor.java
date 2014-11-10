@@ -10,19 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source.config;
 
-import org.sonatype.nexus.component.model.ComponentOriginId;
+import java.io.IOException;
+
+import javax.inject.Named;
 
 /**
- * A unique identifier for component sources, with a user-friendly name and a uuid-type identifier.
+ * In the absence of a UI to define example sources, plugins can provide configuration at nexus start time by
+ * {@link Named naming} instances of this class.
  *
  * @since 3.0
  */
-public class ComponentSourceId
-    extends ComponentOriginId
+public interface ComponentSourceConfigContributor
 {
-  public ComponentSourceId(final String name, final String internalId) {
-    super(name, internalId);
-  }
+  void contributeTo(ComponentSourceConfigStore store) throws IOException;
 }

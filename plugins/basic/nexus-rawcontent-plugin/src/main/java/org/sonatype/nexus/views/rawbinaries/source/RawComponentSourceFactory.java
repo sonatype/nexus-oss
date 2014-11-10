@@ -15,9 +15,9 @@ package org.sonatype.nexus.views.rawbinaries.source;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
