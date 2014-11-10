@@ -14063,12 +14063,13 @@
 /* line 13, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
 .nx-multiselect .x-panel-header .x-header-text {
   color: #333333;
+  font-weight: normal;
 }
-/* line 18, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+/* line 19, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
 .nx-multiselect .x-form-item .x-form-trigger-wrap {
   margin-bottom: 9px;
 }
-/* line 22, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+/* line 23, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
 .nx-multiselect .x-panel-body {
   border: 1px #dddddd solid !important;
 }
