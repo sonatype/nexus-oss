@@ -755,12 +755,32 @@ Ext.define('NX.view.dev.Styles', {
       if (!logoOnly) {
         items.push(
           ' ', ' ', // 2x pad
-          { xtype: 'nx-header-dashboard-mode', ui: 'header' },
-          { xtype: 'nx-header-search-mode', ui: 'header' },
-          { xtype: 'nx-header-browse-mode', ui: 'header' },
-          { xtype: 'nx-header-admin-mode', ui: 'header' },
+          {
+            xtype: 'button',
+            ui: 'header',
+            cls: 'modebutton',
+            toggleGroup: 'examplemode',
+            title: 'Browse',
+            tooltip: 'Browse server contents',
+            glyph: 'xf1b2@FontAwesome' /* fa-cube */
+          },
+          {
+            xtype: 'button',
+            ui: 'header',
+            cls: 'modebutton',
+            toggleGroup: 'examplemode',
+            title: 'Administration',
+            tooltip: 'Server administration and configuration',
+            glyph: 'xf013@FontAwesome' /* fa-gear */
+          },
           ' ',
-          { xtype: 'nx-header-quicksearch', hidden: true },
+          {
+            xtype: 'nx-searchbox',
+            cls: 'quicksearch',
+            width: 200,
+            emptyText: 'Search…',
+            inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
+          },
           '->',
           {
             xtype: 'button',
@@ -768,7 +788,12 @@ Ext.define('NX.view.dev.Styles', {
             glyph: 'xf0f3@FontAwesome',
             tooltip: 'Toggle messages display'
           },
-          { xtype: 'nx-header-refresh', ui: 'header' },
+          {
+            xtype: 'button',
+            ui: 'header',
+            tooltip: 'Refresh current view and data',
+            glyph: 'xf021@FontAwesome' // fa-refresh
+          },
           {
             xtype: 'button',
             ui: 'header',
@@ -795,7 +820,25 @@ Ext.define('NX.view.dev.Styles', {
             hidden: true,
             glyph: 'xf08b@FontAwesome'
           },
-          { xtype: 'nx-header-help', ui: 'header' }
+          {
+            xtype: 'button',
+            ui: 'header',
+            tooltip: 'Help',
+            glyph: 'xf059@FontAwesome', // fa-question-circle
+            arrowCls: '', // hide the menu button arrow
+            menu: [
+              {
+                text: 'Menu item 1'
+              },
+              '-',
+              {
+                text: 'Menu item 2'
+              },
+              {
+                text: 'Menu item 3'
+              }
+            ]
+          }
         )
       }
 
