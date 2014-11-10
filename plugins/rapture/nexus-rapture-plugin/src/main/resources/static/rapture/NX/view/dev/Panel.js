@@ -40,8 +40,8 @@ Ext.define('NX.view.dev.Panel', {
     tabPosition: 'bottom',
 
     items: [
-      { xtype: 'nx-dev-styles' },
       { xtype: 'nx-dev-tests' },
+      { xtype: 'nx-dev-styles' },
       { xtype: 'nx-dev-icons' },
       { xtype: 'nx-dev-features' },
       { xtype: 'nx-dev-permissions' },
