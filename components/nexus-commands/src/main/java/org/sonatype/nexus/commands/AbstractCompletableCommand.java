@@ -10,22 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api.config;
+package org.sonatype.nexus.commands;
 
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
-import org.sonatype.nexus.events.AbstractEvent;
+import org.apache.karaf.shell.commands.basic.AbstractCommand;
+import org.apache.karaf.shell.console.CompletableFunction;
 
 /**
- * Fired when the {@link ComponentSourceRegistry} has been populated as Nexus starts.
- *
+ * Helper class that ties {@link AbstractCommand} and {@link CompletableFunction} together.
+ * 
  * @since 3.0
  */
-public class ComponentSourceRegistryInitializedEvent
-    extends AbstractEvent<ComponentSourceRegistry>
+public abstract class AbstractCompletableCommand
+    extends AbstractCommand
+    implements CompletableFunction
 {
-  public ComponentSourceRegistryInitializedEvent(
-      final ComponentSourceRegistry component)
-  {
-    super(component);
-  }
 }

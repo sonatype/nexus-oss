@@ -10,26 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api;
+package org.sonatype.nexus.component.source.internal;
 
-import javax.annotation.Nullable;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-/**
- * A registry of the currently available component sources.
- *
- * @since 3.0
- */
-public interface ComponentSourceRegistry
+import org.junit.Test;
+
+public class InMemorySourceRegistryTest
+    extends TestSupport
 {
-  /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
-   */
-  @Nullable
-  public <T extends ComponentSource> T getSource(String name);
 
-  /**
-   * Return a {@link ComponentSource} for the given name, or {@code null} if none is registered.
-   */
-  @Nullable
-  public <T extends ComponentSource> T getSource(ComponentSourceId sourceId);
+  @Test(expected = RuntimeException.class)
+  public void nameNotFoundCausesException() {
+    final InMemorySourceRegistry registry = new InMemorySourceRegistry();
+
+    registry.getSource("not found");
+  }
+
+
+  @Test(expected = RuntimeException.class)
+  public void idNotFoundCausesException() {
+    final InMemorySourceRegistry registry = new InMemorySourceRegistry();
+
+    registry.getSource(new ComponentSourceId("not found", "uuid"));
+  }
 }

@@ -20,13 +20,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.ComponentSourceRegistry;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigId;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfigStore;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.ComponentSource;
+import org.sonatype.nexus.component.source.ComponentSourceId;
+import org.sonatype.nexus.component.source.ComponentSourceRegistry;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigId;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -76,13 +76,8 @@ public class RegisteringComponentSourceStore
 
   @Override
   public void update(final ComponentSourceConfigId id, final ComponentSourceConfig config) throws IOException {
-    final ComponentSource oldSource = registry.getSource(config.getSourceId());
-    registry.unregister(oldSource);
-
     inner.update(id, config);
-
-    final ComponentSource source = create(config);
-    registry.register(source);
+    registry.update(create(config));
   }
 
   @Override

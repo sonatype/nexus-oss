@@ -16,11 +16,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.source.api.ComponentSource;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceConfig;
-import org.sonatype.nexus.component.source.api.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
+import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
+import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 

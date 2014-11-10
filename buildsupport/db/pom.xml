@@ -87,6 +87,20 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-tools</artifactId>
         <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-object</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
