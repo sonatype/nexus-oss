@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.component.source.api.http;
 
+import java.util.List;
+
+import org.apache.http.auth.Credentials;
+
 /**
  * HTTP client authentication configuration.
  *
@@ -19,5 +23,11 @@ package org.sonatype.nexus.component.source.api.http;
  */
 public interface AuthenticationConfig
 {
+
+  String getType();
+
+  Credentials getCredentials();
+
+  List<String> getPreferredAuthSchemes();
 
 }

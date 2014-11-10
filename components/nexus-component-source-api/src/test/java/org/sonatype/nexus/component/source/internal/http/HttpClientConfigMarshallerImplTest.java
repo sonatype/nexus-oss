@@ -10,13 +10,21 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.source.api.http;
+package org.sonatype.nexus.component.source.internal.http;
 
 import java.util.Map;
 
+import org.sonatype.nexus.component.source.api.http.AuthenticationConfigMarshaller;
+import org.sonatype.nexus.component.source.api.http.ConnectionConfig;
+import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
+import org.sonatype.nexus.component.source.api.http.HttpProxyConfig;
+import org.sonatype.nexus.component.source.api.http.NtlmAuthenticationConfig;
+import org.sonatype.nexus.component.source.api.http.ProxyConfig;
+import org.sonatype.nexus.component.source.api.http.UsernameAuthenticationConfig;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -24,20 +32,28 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * {@link HttpClientConfig} UTs.
+ * {@link HttpClientConfigMarshallerImpl} UTs.
  *
  * @since 3.0
  */
-public class HttpClientConfigTest
+public class HttpClientConfigMarshallerImplTest
     extends TestSupport
 {
+
+  private Map<String, AuthenticationConfigMarshaller> authMarshallers = Maps.newHashMap();
+
+  @Before
+  public void setUp() {
+    authMarshallers.put("username", new UsernameAuthenticationConfigMarshaller());
+    authMarshallers.put("ntlm", new NtlmAuthenticationConfigMarshaller());
+  }
 
   /**
    * Verify config marshalling to map.
    */
   @Test
   public void toMap() {
-    Map<String, Object> map = new HttpClientConfig()
+    Map<String, Object> map = new HttpClientConfigMarshallerImpl(authMarshallers).toMap(new HttpClientConfig()
         .withConnectionConfig(new ConnectionConfig()
             .withTimeout(1)
             .withRetries(2)
@@ -45,21 +61,31 @@ public class HttpClientConfigTest
             .withUserAgentCustomisation("ua")
             .withUseTrustStore(true)
         )
-        .withAuthenticationConfig(new UsernameAuthenticationConfig("foo", "bar"))
+        .withAuthenticationConfig(new UsernameAuthenticationConfig()
+            .withUsername("foo")
+            .withPassword("bar")
+        )
         .withProxyConfig(new ProxyConfig()
             .withHttpProxyConfig(new HttpProxyConfig()
                 .withHostname("httpHost")
                 .withPort(3)
-                .withAuthenticationConfig(new UsernameAuthenticationConfig("foo1", "bar1"))
+                .withAuthenticationConfig(new UsernameAuthenticationConfig()
+                    .withUsername("foo1")
+                    .withPassword("bar1")
+                )
             )
             .withHttpsProxyConfig(new HttpProxyConfig()
                 .withHostname("httpsHost")
                 .withPort(4)
-                .withAuthenticationConfig(new NtlmAuthenticationConfig("foo2", "bar2", "ntlmH", "ntlmD"))
+                .withAuthenticationConfig(new NtlmAuthenticationConfig()
+                    .withUsername("foo2")
+                    .withPassword("bar2")
+                    .withNtlmHost("ntlmH")
+                    .withNtlmDomain("ntlmD")
+                )
             )
             .withNonProxyHosts(new String[]{"h1", "h2"})
-        )
-        .toMap();
+        ));
 
     assertThat((Integer) map.get("http.connection.timeout"), is(1));
     assertThat((Integer) map.get("http.connection.retries"), is(2));
@@ -67,6 +93,7 @@ public class HttpClientConfigTest
     assertThat((String) map.get("http.connection.userAgentCustomization"), is("ua"));
     assertThat((Boolean) map.get("http.connection.useTrustStore"), is(true));
 
+    assertThat((String) map.get("http.authentication.type"), is("username"));
     assertThat((String) map.get("http.authentication.username"), is("foo"));
     assertThat((String) map.get("http.authentication.password"), is("bar"));
     assertThat(map.get("http.authentication.ntlmHost"), is(nullValue()));
@@ -74,6 +101,7 @@ public class HttpClientConfigTest
 
     assertThat((String) map.get("http.proxy.http.hostname"), is("httpHost"));
     assertThat((Integer) map.get("http.proxy.http.port"), is(3));
+    assertThat((String) map.get("http.proxy.http.authentication.type"), is("username"));
     assertThat((String) map.get("http.proxy.http.authentication.username"), is("foo1"));
     assertThat((String) map.get("http.proxy.http.authentication.password"), is("bar1"));
     assertThat(map.get("http.proxy.http.authentication.ntlmHost"), is(nullValue()));
@@ -81,6 +109,7 @@ public class HttpClientConfigTest
 
     assertThat((String) map.get("http.proxy.https.hostname"), is("httpsHost"));
     assertThat((Integer) map.get("http.proxy.https.port"), is(4));
+    assertThat((String) map.get("http.proxy.https.authentication.type"), is("ntlm"));
     assertThat((String) map.get("http.proxy.https.authentication.username"), is("foo2"));
     assertThat((String) map.get("http.proxy.https.authentication.password"), is("bar2"));
     assertThat((String) map.get("http.proxy.https.authentication.ntlmHost"), is("ntlmH"));
@@ -101,16 +130,19 @@ public class HttpClientConfigTest
     map.put("http.connection.userAgentCustomization", "ua");
     map.put("http.connection.useTrustStore", Boolean.TRUE);
 
+    map.put("http.authentication.type", "username");
     map.put("http.authentication.username", "foo");
     map.put("http.authentication.password", "bar");
 
     map.put("http.proxy.http.hostname", "httpHost");
     map.put("http.proxy.http.port", 3);
+    map.put("http.proxy.http.authentication.type", "username");
     map.put("http.proxy.http.authentication.username", "foo1");
     map.put("http.proxy.http.authentication.password", "bar1");
 
     map.put("http.proxy.https.hostname", "httpsHost");
     map.put("http.proxy.https.port", 4);
+    map.put("http.proxy.https.authentication.type", "ntlm");
     map.put("http.proxy.https.authentication.username", "foo2");
     map.put("http.proxy.https.authentication.password", "bar2");
     map.put("http.proxy.https.authentication.ntlmHost", "ntlmH");
@@ -118,7 +150,7 @@ public class HttpClientConfigTest
 
     map.put("http.proxy.nonProxyHosts", "h1,h2");
 
-    HttpClientConfig config = HttpClientConfig.fromMap(map);
+    HttpClientConfig config = new HttpClientConfigMarshallerImpl(authMarshallers).fromMap(map);
 
     assertThat(config.getConnectionConfig().getTimeout(), is(1));
     assertThat(config.getConnectionConfig().getRetries(), is(2));
@@ -143,6 +175,8 @@ public class HttpClientConfigTest
         .getAuthenticationConfig();
     assertThat(a3.getUsername(), is("foo2"));
     assertThat(a3.getPassword(), is("bar2"));
+    assertThat(a3.getNtlmHost(), is("ntlmH"));
+    assertThat(a3.getNtlmDomain(), is("ntlmD"));
 
     assertThat(config.getProxyConfig().getNonProxyHosts(), is(new String[]{"h1", "h2"}));
   }

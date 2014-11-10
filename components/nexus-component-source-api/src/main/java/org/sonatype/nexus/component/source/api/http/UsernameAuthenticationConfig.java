@@ -12,23 +12,30 @@
  */
 package org.sonatype.nexus.component.source.api.http;
 
+import java.util.List;
+
+import javax.inject.Named;
+
+import com.google.common.collect.Lists;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.config.AuthSchemes;
+
 /**
  * HTTP client username authentication configuration.
  *
  * @since 3.0
  */
+@Named(UsernameAuthenticationConfig.TYPE)
 public class UsernameAuthenticationConfig
     implements AuthenticationConfig
 {
 
+  public static final String TYPE = "username";
+
   private String username;
 
   private String password;
-
-  public UsernameAuthenticationConfig(final String username, final String password) {
-    this.username = username;
-    this.password = password;
-  }
 
   public String getUsername() {
     return username;
@@ -36,6 +43,38 @@ public class UsernameAuthenticationConfig
 
   public String getPassword() {
     return password;
+  }
+
+  public UsernameAuthenticationConfig withUsername(final String username) {
+    this.username = username;
+    return this;
+  }
+
+  public UsernameAuthenticationConfig withPassword(final String password) {
+    this.password = password;
+    return this;
+  }
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
+
+  @Override
+  public Credentials getCredentials() {
+    return new UsernamePasswordCredentials(username, password);
+  }
+
+  @Override
+  public List<String> getPreferredAuthSchemes() {
+    return Lists.newArrayList(AuthSchemes.DIGEST, AuthSchemes.BASIC);
+  }
+
+  @Override
+  public String toString() {
+    return "UsernameAuthenticationConfig{" +
+        "username='" + username + '\'' +
+        '}';
   }
 
 }

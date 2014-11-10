@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.ComponentSource;
-import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
+import org.sonatype.nexus.component.source.api.http.HttpClientConfigMarshaller;
 import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
@@ -40,11 +40,16 @@ public class RawComponentSourceFactory
 
   public static final String REMOTE_URL_PARAM = "remote-url";
 
-  private HttpClientFactory httpClientFactory;
+  private final HttpClientFactory httpClientFactory;
+
+  private final HttpClientConfigMarshaller httpClientConfigMarshaller;
 
   @Inject
-  public RawComponentSourceFactory(final HttpClientFactory httpClientFactory) {
+  public RawComponentSourceFactory(final HttpClientFactory httpClientFactory,
+                                   final HttpClientConfigMarshaller httpClientConfigMarshaller)
+  {
     this.httpClientFactory = checkNotNull(httpClientFactory);
+    this.httpClientConfigMarshaller = checkNotNull(httpClientConfigMarshaller);
   }
 
   @Override
@@ -52,7 +57,7 @@ public class RawComponentSourceFactory
     checkNotNull(config);
     return new RawBinaryComponentSource(
         config.getSourceId(),
-        (CloseableHttpClient) httpClientFactory.create(HttpClientConfig.fromMap(config.getConfiguration())),
+        (CloseableHttpClient) httpClientFactory.create(httpClientConfigMarshaller.fromMap(config.getConfiguration())),
         (String) config.getConfiguration().get(REMOTE_URL_PARAM)
     );
   }

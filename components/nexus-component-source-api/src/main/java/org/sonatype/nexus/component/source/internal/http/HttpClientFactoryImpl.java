@@ -29,8 +29,6 @@ import org.sonatype.nexus.component.source.api.http.AuthenticationConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
 import org.sonatype.nexus.component.source.api.http.HttpProxyConfig;
-import org.sonatype.nexus.component.source.api.http.NtlmAuthenticationConfig;
-import org.sonatype.nexus.component.source.api.http.UsernameAuthenticationConfig;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Builder;
 import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.httpclient.NexusHttpRoutePlanner;
@@ -39,7 +37,6 @@ import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -51,10 +48,7 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
@@ -144,10 +138,9 @@ public class HttpClientFactoryImpl
     }
   }
 
-  @VisibleForTesting
-  public void applyAuthenticationConfig(final Builder builder,
-                                        final AuthenticationConfig authenticationConfig,
-                                        final HttpHost proxyHost)
+  private void applyAuthenticationConfig(final Builder builder,
+                                         final AuthenticationConfig authenticationConfig,
+                                         final HttpHost proxyHost)
   {
     if (authenticationConfig != null) {
       String authScope = "target";
@@ -155,33 +148,18 @@ public class HttpClientFactoryImpl
         authScope = proxyHost.toHostString() + " proxy";
       }
 
-      final List<String> authorisationPreference = Lists.newArrayListWithExpectedSize(3);
-      authorisationPreference.add(AuthSchemes.DIGEST);
-      authorisationPreference.add(AuthSchemes.BASIC);
-      Credentials credentials;
-      if (authenticationConfig instanceof NtlmAuthenticationConfig) {
-        NtlmAuthenticationConfig nac = (NtlmAuthenticationConfig) authenticationConfig;
-        // Using NTLM auth, adding it as first in policies
-        authorisationPreference.add(0, AuthSchemes.NTLM);
-        log.debug("{} authentication setup for NTLM domain '{}'", authScope, nac.getNtlmDomain());
-        credentials = new NTCredentials(nac.getUsername(), nac.getPassword(), nac.getNtlmHost(), nac.getNtlmDomain());
-      }
-      else if (authenticationConfig instanceof UsernameAuthenticationConfig) {
-        UsernameAuthenticationConfig uac = (UsernameAuthenticationConfig) authenticationConfig;
-        log.debug("{} authentication setup for remote storage with username '{}'", authScope, uac.getUsername());
-        credentials = new UsernamePasswordCredentials(uac.getUsername(), uac.getPassword());
-      }
-      else {
-        throw new IllegalArgumentException("Unsupported authentication config: " + authenticationConfig.getClass());
-      }
+      log.debug("{} authentication setup using {}", authScope, authenticationConfig);
+
+      Credentials credentials = checkNotNull(authenticationConfig.getCredentials(), "credentials");
+      List<String> authSchemes = checkNotNull(authenticationConfig.getPreferredAuthSchemes(), "authentication schemes");
 
       if (proxyHost != null) {
         builder.setCredentials(new AuthScope(proxyHost), credentials);
-        builder.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authorisationPreference);
+        builder.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authSchemes);
       }
       else {
         builder.setCredentials(AuthScope.ANY, credentials);
-        builder.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authorisationPreference);
+        builder.getRequestConfigBuilder().setTargetPreferredAuthSchemes(authSchemes);
       }
     }
   }

@@ -12,27 +12,41 @@
  */
 package org.sonatype.nexus.component.source.api.http;
 
+import java.util.List;
+
+import javax.inject.Named;
+
+import com.google.common.collect.Lists;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.NTCredentials;
+import org.apache.http.client.config.AuthSchemes;
+
 /**
  * HTTP client NTLM authentication configuration.
  *
  * @since 3.0
  */
+@Named(NtlmAuthenticationConfig.TYPE)
 public class NtlmAuthenticationConfig
-    extends UsernameAuthenticationConfig
+    implements AuthenticationConfig
 {
+
+  public static final String TYPE = "ntlm";
+
+  private String username;
+
+  private String password;
 
   private String ntlmHost;
 
   private String ntlmDomain;
 
-  public NtlmAuthenticationConfig(final String username,
-                                  final String password,
-                                  final String ntlmHost,
-                                  final String ntlmDomain)
-  {
-    super(username, password);
-    this.ntlmHost = ntlmHost;
-    this.ntlmDomain = ntlmDomain;
+  public String getUsername() {
+    return username;
+  }
+
+  public String getPassword() {
+    return password;
   }
 
   public String getNtlmHost() {
@@ -41,6 +55,48 @@ public class NtlmAuthenticationConfig
 
   public String getNtlmDomain() {
     return ntlmDomain;
+  }
+
+  public NtlmAuthenticationConfig withUsername(final String username) {
+    this.username = username;
+    return this;
+  }
+
+  public NtlmAuthenticationConfig withPassword(final String password) {
+    this.password = password;
+    return this;
+  }
+
+  public NtlmAuthenticationConfig withNtlmHost(final String ntlmHost) {
+    this.ntlmHost = ntlmHost;
+    return this;
+  }
+
+  public NtlmAuthenticationConfig withNtlmDomain(final String ntlmDomain) {
+    this.ntlmDomain = ntlmDomain;
+    return this;
+  }
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
+
+  public Credentials getCredentials() {
+    return new NTCredentials(username, password, ntlmHost, ntlmDomain);
+  }
+
+  @Override
+  public List<String> getPreferredAuthSchemes() {
+    return Lists.newArrayList(AuthSchemes.NTLM, AuthSchemes.DIGEST, AuthSchemes.BASIC);
+  }
+
+  @Override
+  public String toString() {
+    return "NtlmAuthenticationConfig{" +
+        "ntlmDomain='" + ntlmDomain + '\'' +
+        ", username='" + username + '\'' +
+        '}';
   }
 
 }
