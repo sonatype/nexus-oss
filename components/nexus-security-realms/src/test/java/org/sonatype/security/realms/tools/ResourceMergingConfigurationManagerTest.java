@@ -14,11 +14,11 @@ package org.sonatype.security.realms.tools;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.Configuration;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
@@ -29,12 +29,8 @@ public class ResourceMergingConfigurationManagerTest
   private ConfigurationManager manager;
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-
-    //Overriding value set in parent
-    properties.put("security-xml-file",
-        "target/test-classes/org/sonatype/security/configuration/static-merging/security.xml");
+  protected Configuration getSecurityModelConfig() {
+    return ResourceMergingConfigurationManagerTestSecurity.securityModel();
   }
 
   @Override

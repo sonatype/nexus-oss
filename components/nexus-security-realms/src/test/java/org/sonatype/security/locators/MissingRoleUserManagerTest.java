@@ -13,11 +13,11 @@
 package org.sonatype.security.locators;
 
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 
@@ -27,33 +27,15 @@ public class MissingRoleUserManagerTest
     extends AbstractSecurityTestCase
 {
 
-  public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
-
-  private final String SECURITY_CONFIG_FILE_PATH = getBasedir()
-      + "/target/test-classes/org/sonatype/jsecurity/locators/missingRoleTest-security.xml";
-
   @Override
-  public void configure(Properties properties) {
-    properties.put(PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH);
-    super.configure(properties);
-  }
-
-  // private Set<String> getXMLRoles() throws Exception
-  // {
-  // PlexusRoleLocator locator = (PlexusRoleLocator) this.lookup( PlexusRoleLocator.class );
-  // return locator.listRoleIds();
-  // }
-
-  private SecuritySystem getSecuritySystem()
-      throws Exception
-  {
-    return (SecuritySystem) this.lookup(SecuritySystem.class);
+  protected Configuration getSecurityModelConfig() {
+    return MissingRoleUserManagerTestSecurity.securityModel();
   }
 
   public void testInvalidRoleMapping()
       throws Exception
   {
-    SecuritySystem userManager = this.getSecuritySystem();
+    SecuritySystem userManager = getSecuritySystem();
 
     User user = userManager.getUser("jcoder");
     Assert.assertNotNull(user);

@@ -12,9 +12,7 @@
  */
 package org.sonatype.security.realms;
 
-import java.io.File;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -39,19 +37,9 @@ public class XmlAuthorizingRealmTest
     extends AbstractSecurityTestCase
 {
 
-  private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/security/security.xml";
-
-  private File configFile = new File(SECURITY_CONFIG_FILE_PATH);
-
   private XmlAuthorizingRealm realm;
 
   private DefaultConfigurationManager configurationManager;
-
-  @Override
-  public void configure(Properties properties) {
-    properties.put(PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH);
-    super.configure(properties);
-  }
 
   @Override
   protected void setUp()
@@ -63,10 +51,7 @@ public class XmlAuthorizingRealmTest
     realm.setRolePermissionResolver(this.lookup(RolePermissionResolver.class));
 
     configurationManager = lookup(DefaultConfigurationManager.class);
-
     configurationManager.clearCache();
-
-    configFile.delete();
   }
 
   public void testAuthorization()

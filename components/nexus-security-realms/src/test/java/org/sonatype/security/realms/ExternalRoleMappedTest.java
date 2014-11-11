@@ -12,13 +12,11 @@
  */
 package org.sonatype.security.realms;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
@@ -38,20 +36,9 @@ public class ExternalRoleMappedTest
     extends AbstractSecurityTestCase
 {
 
-  private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/plexus-home/etc/security.xml";
-
-  @Override
-  public void configure(Properties properties) {
-    properties.put(PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH);
-    super.configure(properties);
-  }
-
   public void testUserHasPermissionFromExternalRole()
       throws Exception
   {
-    // delete the security conf first, start clean
-    new File(SECURITY_CONFIG_FILE_PATH).delete();
-
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 
     Map<String, String> properties = new HashMap<String, String>();
