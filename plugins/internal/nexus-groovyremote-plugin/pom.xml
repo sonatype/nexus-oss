@@ -35,12 +35,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-groovy-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-lifecycle</artifactId>
     </dependency>

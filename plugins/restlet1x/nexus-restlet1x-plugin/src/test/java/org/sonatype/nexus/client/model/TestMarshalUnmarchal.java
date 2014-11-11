@@ -116,6 +116,7 @@ import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.test.DeepEqualsBuilder;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;

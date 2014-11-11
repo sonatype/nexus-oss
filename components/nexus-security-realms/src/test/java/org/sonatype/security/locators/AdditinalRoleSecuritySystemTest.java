@@ -46,12 +46,6 @@ public class AdditinalRoleSecuritySystemTest
     properties.put(PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH);
   }
 
-  @Override
-  public void configure(Binder binder) {
-    super.configure(binder);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("mock")).to(MockStaticSecurityResource.class);
-  }
-
   private Set<String> getXMLRoles()
       throws Exception
   {
