@@ -1,3 +1,13 @@
+.x-btn-plain-small-disabled .x-btn-inner {
+  color: #777777;
+}
+
+/* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-plain-small-icon .x-btn-button,
+.x-btn-plain-small-noicon .x-btn-button {
+  height: 16px;
+}
+/* line 350, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-icon .x-btn-inner,
 .x-btn-plain-small-noicon .x-btn-inner {
   line-height: 16px;
