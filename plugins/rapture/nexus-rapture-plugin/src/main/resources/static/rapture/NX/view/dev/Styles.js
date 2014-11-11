@@ -127,7 +127,7 @@ Ext.define('NX.view.dev.Styles', {
 
     // Create a table
     var tableTemplate = Ext.create('Ext.XTemplate',
-      '<table>',
+      '<table cellpadding="5">',
         '<thead>{thead}</thead>',
         '<tbody>{tbody}</tbody>',
       '</table>'
@@ -167,7 +167,7 @@ Ext.define('NX.view.dev.Styles', {
 
         layout: {
           type: 'hbox',
-          defaultMargins: '0 20px 0 0'
+          defaultMargins: '0 20px 20px 0'
         },
 
         items: sanitizeArguments(Array.prototype.slice.call(arguments, 0))
@@ -559,21 +559,28 @@ Ext.define('NX.view.dev.Styles', {
       )
     );
 
-    /*
-     * Form Elements
-     */
+    //
+    // Forms
+    //
 
     items.push(
-      styleSection('Form Elements',
-        styleRow(
-          { xtype: 'textfield', value: 'Text Input', allowBlank: false, fieldLabel: '[Label]', helpText: '[Optional description text]', width: 200 },
-          { xtype: 'textarea', value: 'Text Input', allowBlank: false, fieldLabel: '[Label]', helpText: '[Optional description text]', width: 200 },
-          styleColumn(
-            { xtype: 'checkbox', boxLabel: 'Checkbox', checked: true, fieldLabel: null, helpText: null },
-            { xtype: 'radio', boxLabel: 'Radio Button', checked: true, fieldLabel: null, helpText: null }
-          )
+        styleSection('Forms',
+            styleRow(
+                {
+                  xtype: 'form',
+                  items: [
+                    { xtype: 'textfield', value: 'Text Input', allowBlank: false, fieldLabel: '[Label]', helpText: '[Optional description text]', width: 200 },
+                    { xtype: 'textarea', value: 'Text Input', allowBlank: false, fieldLabel: '[Label]', helpText: '[Optional description text]', width: 200 },
+                    { xtype: 'checkbox', boxLabel: 'Checkbox', checked: true, fieldLabel: null, helpText: null },
+                    { xtype: 'radio', boxLabel: 'Radio Button', checked: true, fieldLabel: null, helpText: null }
+                  ],
+                  buttons: [
+                    { text: 'Submit', ui: 'primary' },
+                    { text: 'Discard' }
+                  ]
+                }
+            )
         )
-      )
     );
 
     /*
@@ -971,6 +978,111 @@ Ext.define('NX.view.dev.Styles', {
           }
         )
       )
+    );
+
+    //
+    // Panels
+    //
+
+    items.push(
+        styleSection('Panels',
+            styleRow(
+                {
+                  xtype: 'panel',
+                  title: 'Normal',
+                  height: 100,
+                  width: 200,
+                  items: [
+                    {
+                      xtype: 'container',
+                      html: 'normal'
+                    }
+                  ]
+                },
+                {
+                  xtype: 'panel',
+                  title: 'Framed',
+                  frame: true,
+                  height: 100,
+                  width: 200,
+                  items: [
+                    {
+                      xtype: 'container',
+                      html: 'frame: true'
+                    }
+                  ]
+                }
+            ),
+
+            styleRow(
+                {
+                  xtype: 'panel',
+                  title: 'Light',
+                  ui: 'light',
+                  height: 100,
+                  width: 200,
+                  items: [
+                    {
+                      xtype: 'container',
+                      html: 'ui: light'
+                    }
+                  ]
+                },
+                {
+                  xtype: 'panel',
+                  title: 'Light Framed',
+                  ui: 'light',
+                  frame: true,
+                  height: 100,
+                  width: 200,
+                  items: [
+                    {
+                      xtype: 'container',
+                      html: 'ui: light, frame: true'
+                    }
+                  ]
+                }
+            )
+        )
+    );
+
+    //
+    // Toolbar
+    //
+
+    items.push(
+        styleSection('Toolbar',
+            styleRow(
+                {
+                  xtype: 'toolbar',
+                  items: [
+                    {
+                      xtype: 'button',
+                      text: 'button1',
+                      glyph: 'xf1b2@FontAwesome'
+                    },
+                    {
+                      xtype: 'button',
+                      text: 'button2'
+                    },
+                    ' ',
+                    {
+                      xtype: 'button',
+                      text: 'button menu',
+                      menu: [
+                        { text: 'item1' },
+                        { text: 'item2' }
+                      ]
+                    },
+                    '-',
+                    {
+                      xtype: 'nx-searchbox',
+                      width: 200
+                    }
+                  ]
+                }
+            )
+        )
     );
 
     return items;
