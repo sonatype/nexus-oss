@@ -29,7 +29,7 @@ abstract class ScenarioSupport
 
   protected final File workdir
 
-  protected final NexusClient client;
+  protected final NexusClient client
 
   private final AntBuilder ant
 
@@ -37,7 +37,7 @@ abstract class ScenarioSupport
 
   private File cwd
 
-  private String counter = '000';
+  private String counter = '000'
 
   ScenarioSupport(final String id, final File workdir, final NexusClient nexusClient) {
     assert id != null

@@ -43,7 +43,7 @@ class Shoes4Scenario
     // cd into it
     cd 'shoes4'
     // read version (is defined in src)
-    String version;
+    String version
     file('lib/shoes/version.rb').text.eachLine { if (it =~ /VERSION =/) version = it }
     assert version != null
     version = (version =~ /"([0-9a-zA-Z\.]+)"/)[0][1]
