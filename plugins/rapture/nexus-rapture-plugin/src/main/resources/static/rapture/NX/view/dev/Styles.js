@@ -145,8 +145,8 @@ Ext.define('NX.view.dev.Styles', {
         '<tr>',
           '<td>{$}</td>',
           '<tpl for=".">',
-            '<tpl if="cls">',
-              '<td class="{cls}">{text}</td>',
+            '<tpl if="clz">',
+              '<td class="{clz}">{text}</td>',
             '<tpl else>',
               '<td>{.}</td>',
             '</tpl>',
@@ -395,10 +395,10 @@ Ext.define('NX.view.dev.Styles', {
           thead: theadTemplate.apply(['Name', 'Description', 'Font & Weight', 'Use Cases', 'Pixels', 'Sample']),
           tbody: tbodyTemplate.apply({
             'h1': [
-              'Page Title', 'Proxima Nova Light', 'Header', '40', { text: 'Sonatype Nexus', clz: 'sample-h1' }
+              'Header', 'Proxima Nova Light', 'Logo', '20', { text: 'Sonatype Nexus', clz: 'sample-h1' }
              ],
             'h2': [
-              'Header', 'Proxima Nova Bold', 'Header', '26', { text: 'Development', clz: 'sample-h2' }
+              'Header', 'Proxima Nova Bold', 'Page Title', '26', { text: 'Development', clz: 'sample-h2' }
             ],
             'h3': [
               'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', clz: 'sample-h3' }
