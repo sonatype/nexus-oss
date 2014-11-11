@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -68,10 +69,11 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.creat
  * @since 2.6
  */
 @Named(P2CompositeGroupRepositoryImpl.ROLE_HINT)
+@Typed(GroupRepository.class)
 @Description("Eclipse P2 Composite")
 public class P2CompositeGroupRepositoryImpl
     extends AbstractGroupRepository
-    implements P2CompositeGroupRepository, GroupRepository
+    implements P2CompositeGroupRepository
 {
   public static final String ROLE_HINT = "p2-composite";
 

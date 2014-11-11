@@ -39,14 +39,19 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
     me.items = [
       {
         xtype: 'form',
-        margin: 10,
+        title: 'Package Source',
+        ui: 'subsection',
+        cls: 'no-border',
+
         items: [
+          {
+            xtype: 'label',
+            html: '<p>You can register this source with the following command:</p>'
+          },
           {
             xtype: 'textfield',
             name: 'packageSource',
             itemId: 'packageSource',
-            fieldLabel: 'Package Source',
-            helpText: 'You can register this source with the following command:',
             readOnly: true,
             submitValue: false,
             allowBlank: true,
@@ -56,45 +61,24 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
       },
       {
         xtype: 'form',
-        title: 'Access',
-        frame: true,
-
-        bodyPadding: 10,
-        margin: 10,
+        title: 'API Key',
+        ui: 'subsection',
 
         items: [
           {
             xtype: 'label',
-            html: '<p>A new user token will be created the first time it is accessed.</p>'
+            html: '<p>A new API Key will be created the first time it is accessed.</p>' +
+                '<p>Resetting your API Key will invalidate the current key.</p>'
           }
         ],
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Access API Key', action: 'access', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
-        ]
-      },
-      {
-        xtype: 'form',
-        title: 'Reset',
-        frame: true,
-
-        bodyPadding: 10,
-        margin: 10,
-
-        items: [
-          {
-            xtype: 'label',
-            html: '<p>Resetting your API Key will invalidate the current key.</p>'
-          }
-        ],
-
-        buttonAlign: 'left',
-        buttons: [
+          { text: 'Access API Key', action: 'access', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true },
           { text: 'Reset API Key', action: 'reset', ui: 'danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
         ]
       }
-    ]
+    ];
 
     me.callParent(arguments);
   },

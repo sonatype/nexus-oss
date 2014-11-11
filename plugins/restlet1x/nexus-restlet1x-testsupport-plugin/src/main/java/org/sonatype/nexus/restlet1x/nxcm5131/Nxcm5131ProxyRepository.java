@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.restlet1x.nxcm5131;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -35,9 +36,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * but with a different facet.
  */
 @Named("nxcm5131")
+@Typed(Repository.class)
 public class Nxcm5131ProxyRepository
     extends AbstractProxyRepository
-    implements Repository, Nxcm5131HostedRepository, ProxyRepository
+    implements Nxcm5131HostedRepository
 {
 
   private final RepositoryKind repositoryKind =

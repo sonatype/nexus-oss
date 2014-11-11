@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.rest;
 
 import javax.inject.Inject;
@@ -23,10 +24,13 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.web.BaseUrlHolder;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.restlet.data.Request;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named
 @Singleton
@@ -38,97 +42,43 @@ public class RestletRepositoryURLBuilder
 
   private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-  private final GlobalRestApiSettings globalRestApiSettings;
-
   @Inject
   public RestletRepositoryURLBuilder(final RepositoryRegistry repositoryRegistry,
-                                        final RepositoryTypeRegistry repositoryTypeRegistry,
-                                        final GlobalRestApiSettings globalRestApiSettings)
+                                     final RepositoryTypeRegistry repositoryTypeRegistry)
   {
-    this.repositoryRegistry = repositoryRegistry;
-    this.repositoryTypeRegistry = repositoryTypeRegistry;
-    this.globalRestApiSettings = globalRestApiSettings;
+    this.repositoryRegistry = checkNotNull(repositoryRegistry);
+    this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
   }
 
   @Override
-  public String getRepositoryContentUrl(final String repositoryId)
-      throws NoSuchRepositoryException
-  {
-    return getRepositoryContentUrl(repositoryId, false);
-  }
-
-  @Override
-  public String getRepositoryContentUrl(final String repositoryId, final boolean forceBaseURL)
-      throws NoSuchRepositoryException
-  {
-    return getRepositoryContentUrl(repositoryRegistry.getRepository(repositoryId), forceBaseURL);
+  public String getRepositoryContentUrl(final String repositoryId) throws NoSuchRepositoryException {
+    return getRepositoryContentUrl(repositoryRegistry.getRepository(repositoryId));
   }
 
   @Override
   public String getRepositoryContentUrl(final Repository repository) {
-    return getRepositoryContentUrl(repository, false);
-  }
+    RepositoryTypeDescriptor rtd =
+        repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.getProviderRole(), repository.getProviderHint());
 
-  @Override
-  public String getRepositoryContentUrl(final Repository repository, final boolean forceBaseURL) {
-    final boolean shouldForceBaseUrl = forceBaseURL ||
-        (globalRestApiSettings.isEnabled()
-            && globalRestApiSettings.isForceBaseUrl()
-            && StringUtils.isNotBlank(globalRestApiSettings.getBaseUrl())
-        );
-
-    String baseURL;
-
-    // if force, always use force
-    if (shouldForceBaseUrl) {
-      baseURL = globalRestApiSettings.isEnabled() ? globalRestApiSettings.getBaseUrl() : null;
+    String baseUrl;
+    try {
+      baseUrl = BaseUrlHolder.get();
     }
-    // next check if this thread has a restlet request
-    else if (Request.getCurrent() != null) {
-      // TODO: NEXUS-6045 hack, Restlet app root is now "/service/local", so going up 2 levels!
-      baseURL = Request.getCurrent().getRootRef().getParentRef().getParentRef().toString();
-    }
-    // as last resort, try to use the baseURL if set
-    else {
-      baseURL = globalRestApiSettings.getBaseUrl();
-    }
-
-    // if all else fails?
-    if (StringUtils.isBlank(baseURL)) {
-      log.info("Not able to build content URL of the repository {}, baseUrl not set!",
-          RepositoryStringUtils.getHumanizedNameString(repository));
-
+    catch (IllegalStateException e) {
+      log.warn(e.toString());
       return null;
     }
 
-    StringBuilder url = new StringBuilder(baseURL);
-
-    if (!baseURL.endsWith("/")) {
-      url.append("/");
-    }
-
-    final RepositoryTypeDescriptor rtd =
-        repositoryTypeRegistry.getRepositoryTypeDescriptor(repository.getProviderRole(),
-            repository.getProviderHint());
-
-    url.append("content/").append(rtd.getPrefix()).append("/").append(repository.getPathPrefix());
-
-    return url.toString();
+    return String.format("%s/content/%s/%s", baseUrl, rtd.getPrefix(), repository.getPathPrefix());
   }
 
   @Override
   public String getExposedRepositoryContentUrl(final Repository repository) {
-    return getExposedRepositoryContentUrl(repository, false);
-  }
-
-  @Override
-  public String getExposedRepositoryContentUrl(final Repository repository, final boolean forceBaseURL) {
     if (!repository.isExposed()) {
       return null;
     }
     else {
-      return getRepositoryContentUrl(repository, forceBaseURL);
+      return getRepositoryContentUrl(repository);
     }
   }
-
 }

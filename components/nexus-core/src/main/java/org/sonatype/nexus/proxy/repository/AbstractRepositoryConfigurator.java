@@ -28,7 +28,6 @@ import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.plugins.RepositoryCustomizer;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
@@ -45,16 +44,12 @@ public abstract class AbstractRepositoryConfigurator
 
   private Map<String, LocalRepositoryStorage> localRepositoryStorages;
 
-  private Map<String, RepositoryCustomizer> pluginRepositoryConfigurators;
-
   @Inject
   public void populateAbstractRepositoryConfigurator(final RepositoryRegistry repositoryRegistry,
-                                                     final Map<String, LocalRepositoryStorage> localRepositoryStorages,
-                                                     final Map<String, RepositoryCustomizer> pluginRepositoryConfigurators)
+                                                     final Map<String, LocalRepositoryStorage> localRepositoryStorages)
   {
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.localRepositoryStorages = checkNotNull(localRepositoryStorages);
-    this.pluginRepositoryConfigurators = checkNotNull(pluginRepositoryConfigurators);
   }
 
   @Override
@@ -64,15 +59,6 @@ public abstract class AbstractRepositoryConfigurator
       throws ConfigurationException
   {
     doApplyConfiguration(target, configuration, config);
-
-    // config done, apply customizations if needed
-    if (pluginRepositoryConfigurators != null) {
-      for (RepositoryCustomizer configurator : pluginRepositoryConfigurators.values()) {
-        if (configurator.isHandledRepository(target)) {
-          configurator.configureRepository(target);
-        }
-      }
-    }
   }
 
   public final void prepareForSave(Repository target, ApplicationConfiguration configuration,

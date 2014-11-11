@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.views.rawbinaries.internal;
 
+import org.sonatype.nexus.component.model.BaseComponent;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentId;
 
 /**
  * An essentially placebo implementation of {@link Component} so this plugin has the same structure as other formats for
@@ -22,10 +22,7 @@ import org.sonatype.nexus.component.model.ComponentId;
  * @since 3.0
  */
 public class RawComponent
+    extends BaseComponent
     implements Component
 {
-  @Override
-  public ComponentId getId() {
-    return null;
-  }
 }

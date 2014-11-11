@@ -17,8 +17,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.Entity;
 
 /**
  * Search interface for finding components and assets.
@@ -31,27 +30,17 @@ import org.sonatype.nexus.component.model.Component;
 public interface MetadataQueryService
 {
   /**
-   * Gets all component classes known to the service.
+   * Gets all entity classes known to the service.
    */
-  Set<Class<? extends Component>> componentClasses();
+  Set<Class<? extends Entity>> entityClasses();
 
   /**
-   * Gets the number of components of the given type matching the given restriction.
+   * Gets the number of entities of the given class matching the given restriction.
    */
-  <T extends Component> long countComponents(Class<T> componentClass, @Nullable MetadataQueryRestriction restriction);
+  <T extends Entity> long count(Class<T> entityClass, @Nullable MetadataQueryRestriction restriction);
 
   /**
-   * Gets the number of assets matching the given restriction.
+   * Gets the list of entities of the given class matching the given query.
    */
-  long countAssets(@Nullable MetadataQueryRestriction restriction);
-
-  /**
-   * Gets the list of components of the given type matching the given query.
-   */
-  <T extends Component> List<T> findComponents(Class<T> componentClass, @Nullable MetadataQuery query);
-
-  /**
-   * Gets the list of assets matching the given query.
-   */
-  List<Asset> findAssets(@Nullable MetadataQuery query);
+  <T extends Entity> List<T> find(Class<T> entityClass, @Nullable MetadataQuery metadataQuery);
 }

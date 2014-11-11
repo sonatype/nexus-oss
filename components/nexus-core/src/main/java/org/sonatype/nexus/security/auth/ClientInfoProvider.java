@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.security.auth;
 
+import javax.annotation.Nullable;
+
 /**
  * Manages and provides {@link ClientInfo} instances.
  *
@@ -27,5 +29,6 @@ public interface ClientInfoProvider
    *
    * @return the current thread's {@link ClientInfo} or {@code null} if none available.
    */
+  @Nullable
   ClientInfo getCurrentThreadClientInfo();
 }

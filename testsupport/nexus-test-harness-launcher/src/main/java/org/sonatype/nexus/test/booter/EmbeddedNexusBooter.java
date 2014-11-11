@@ -104,6 +104,9 @@ public class EmbeddedNexusBooter
     overrides.put("karaf.startRemoteShell", "false");
     overrides.put("karaf.clean.cache", "true");
 
+    // disable Karaf's random shutdown port as we don't use it when testing
+    overrides.put("karaf.shutdown.port", "-1");
+
     // move tmp under sonatype-work to avoid contamination between tests
     overrides.put("java.io.tmpdir", new File(workDir, "tmp").getPath());
 

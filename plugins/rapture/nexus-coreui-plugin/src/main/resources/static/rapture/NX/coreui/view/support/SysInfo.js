@@ -54,17 +54,17 @@ Ext.define('NX.coreui.view.support.SysInfo', {
 
     // simple named section with list of key-value properties
     me.sectionTpl = Ext.create('Ext.XTemplate',
-        '<div class="nx-atlas-view-sysinfo-section">',
+        '<tr>',
+        '<td colspan="2">',
         '<h2>{name}</h2>',
-        '<table>',
+        '</td>',
+        '</tr>',
         '<tpl for="props">',
         '<tr>',
         '<td class="property-name">{name}</td>',
         '<td class="property-value">{value}</td>',
         '</tr>',
         '</tpl>',
-        '</table>',
-        '</div>',
         {
           compiled: true
         }
@@ -72,20 +72,24 @@ Ext.define('NX.coreui.view.support.SysInfo', {
 
     // nested named section with list of child named sections
     me.nestedSectionTpl = Ext.create('Ext.XTemplate',
-        '<div class="nx-atlas-view-sysinfo-nestedsection">',
+        '<tr>',
+        '<td colspan="2">',
         '<h2>{name}</h2>',
+        '</td>',
+        '</tr>',
         '<tpl for="nested">',
+        '<tr>',
+        '<td colspan="2">',
         '<h3>{name}</h3>',
-        '<table>',
+        '</td>',
+        '</tr>',
         '<tpl for="props">',
         '<tr>',
         '<td class="property-name">{name}</td>',
         '<td class="property-value">{value}</td>',
         '</tr>',
         '</tpl>',
-        '</table>',
         '</tpl>',
-        '</div>',
         {
           compiled: true
         }
@@ -106,7 +110,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     // Main template renders all sections
     me.mainTpl = Ext.create('Ext.XTemplate',
         '<div class="nx-atlas-view-sysinfo-body">',
-        // TODO NX.Icons.img('sysinfo-default', 'x32'),
+        '<table>',
         // nexus details
         '{[ this.section("nexus-status", values) ]}',
         '{[ this.section("nexus-configuration", values) ]}',
@@ -120,6 +124,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
         '{[ this.section("system-runtime", values) ]}',
         '{[ this.nestedSection("system-network", values) ]}',
         '{[ this.nestedSection("system-filestores", values) ]}',
+        '</table>',
         '</div>',
         {
           compiled: true,

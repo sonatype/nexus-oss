@@ -17,6 +17,14 @@
             <Set name="keyStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
             <Set name="keyManagerPassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
             <Set name="trustStorePassword">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>
+            <Set name="excludeProtocols">
+              <Array type="java.lang.String">
+                <Item>SSL</Item>
+                <Item>SSLv2</Item>
+                <Item>SSLv2Hello</Item>
+                <Item>SSLv3</Item>
+              </Array>
+            </Set>
           </New>
         </Arg>
         <Set name="host"><Property name="application-host"/></Set>
