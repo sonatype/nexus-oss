@@ -1059,7 +1059,7 @@ Ext.define('NX.view.dev.Styles', {
           },
           {
             xtype: 'button',
-            text: 'with glpyh',
+            text: 'with glyph',
             glyph: 'xf1b2@FontAwesome'
           },
           {
