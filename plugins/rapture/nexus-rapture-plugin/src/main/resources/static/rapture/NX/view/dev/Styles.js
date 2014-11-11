@@ -65,17 +65,32 @@ Ext.define('NX.view.dev.Styles', {
 
     me.logDebug('Building visual guide components');
 
+    // Convert strings to { html: '' } objects
+    function sanitizeArguments(args) {
+      var items = [],
+          i;
+
+      for (i in args) {
+        if (args[i] instanceof Object) {
+          items.push(args[i])
+        } else {
+          items.push({html: args[i]})
+        }
+      }
+
+      return items;
+    }
+
     // Create a new section in the visual style guide
     function styleSection(name) {
       var content = sanitizeArguments(Array.prototype.slice.call(arguments, 1));
       var items = [];
-      var i = 0;
 
       items.push( { xtype: 'label', text: name, cls: 'category-title' } );
 
-      for (i in content) {
-        items.push(content[i]);
-      }
+      Ext.each(content, function(it) {
+        items.push(it);
+      });
 
       return {
         xtype: 'container',
@@ -89,22 +104,6 @@ Ext.define('NX.view.dev.Styles', {
 
         items: items
       }
-    }
-
-    // Convert strings to { html: '' } objects
-    function sanitizeArguments(args) {
-      var items = [],
-          i = 0;
-
-      for (i in args) {
-        if (args[i] instanceof Object) {
-          items.push(args[i])
-        } else {
-          items.push({html: args[i]})
-        }
-      }
-
-      return items;
     }
 
     // Create a horizontal row of containers
@@ -926,7 +925,7 @@ Ext.define('NX.view.dev.Styles', {
             xtype: 'tabpanel',
 
             width: 500,
-            height: 60,
+            height: 60,  // FIXME: This masks problem in current style in application in style guide
             activeTab: 0,
             ui: 'light',
 
@@ -1065,16 +1064,17 @@ Ext.define('NX.view.dev.Styles', {
                       xtype: 'button',
                       text: 'button2'
                     },
-                    ' ',
+                    ' ', // spacer
                     {
                       xtype: 'button',
                       text: 'button menu',
                       menu: [
-                        { text: 'item1' },
-                        { text: 'item2' }
+                        { text: 'plain' },
+                        { text: 'with glyph', glyph: 'xf059@FontAwesome' },
+                        { text: 'with icon', iconCls: 'nx-icon-help-kb-x16'}
                       ]
                     },
-                    '-',
+                    '-', // seperator
                     {
                       xtype: 'nx-searchbox',
                       width: 200
