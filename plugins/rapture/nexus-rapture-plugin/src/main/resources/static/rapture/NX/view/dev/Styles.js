@@ -920,9 +920,9 @@ Ext.define('NX.view.dev.Styles', {
       )
     );
 
-    /*
-     * Picker
-     */
+    //
+    // Picker
+    //
 
     var pickerStore = Ext.create('Ext.data.ArrayStore', {
       fields: [
@@ -1091,6 +1091,40 @@ Ext.define('NX.view.dev.Styles', {
                   scale: 'large'
                 }
               })
+            )
+        )
+    );
+
+    //
+    // Grid
+    //
+
+    var gridStore = Ext.create('Ext.data.ArrayStore', {
+      storeId: 'gridStore',
+      fields: [
+        'id',
+        'name'
+      ],
+      data: [
+        [ 'foo', 'Foo' ],
+        [ 'bar', 'Bar' ],
+        [ 'baz', 'Baz' ]
+      ]
+    });
+
+    items.push(
+        styleSection('Grid',
+            styleRow(
+                {
+                  xtype: 'grid',
+                  store: gridStore,
+                  height: 200,
+                  width: 200,
+                  columns: [
+                    { text: 'ID', dataIndex: 'id' },
+                    { text: 'Name', dataIndex: 'name' }
+                  ]
+                }
             )
         )
     );
