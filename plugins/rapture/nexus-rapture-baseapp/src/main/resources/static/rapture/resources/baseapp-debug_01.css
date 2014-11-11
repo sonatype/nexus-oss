@@ -24304,21 +24304,21 @@ a.x-color-picker-item:hover {
 
 /*</if slicer>*/
 /* */
-/* line 29, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .x-btn.x-pressed .x-btn-glyph {
   color: white;
 }
 
 /**
- * ui: 'primary'
+ * ui: 'plain'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small {
-  border-color: #333333;
+.x-btn-plain-small {
+  border-color: #919191;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small {
+.x-btn-plain-small {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -24329,29 +24329,29 @@ a.x-color-picker-item:hover {
   border-style: solid;
   background-image: none;
   background-color: #606060;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #197ac5), color-stop(100%, #0161ad));
-  background-image: -webkit-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -moz-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -o-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -ms-linear-gradient(top, #197ac5, #0161ad);
-  background-image: linear-gradient(top, #197ac5, #0161ad);
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-mc {
-  background-image: url(images/btn/btn-primary-small-fbg.gif);
+.x-btn-plain-small-mc {
+  background-image: url(images/btn/btn-plain-small-fbg.gif);
   background-position: 0 top;
   background-color: #606060;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nlg .x-btn-primary-small {
-  background-image: url(images/btn/btn-primary-small-bg.gif);
+.x-nlg .x-btn-plain-small {
+  background-image: url(images/btn/btn-plain-small-bg.gif);
   background-position: 0 top;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nbr .x-btn-primary-small {
+.x-nbr .x-btn-plain-small {
   padding: 0 !important;
   border-width: 0 !important;
   -webkit-border-radius: 0px;
@@ -24364,160 +24364,160 @@ a.x-color-picker-item:hover {
 }
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-frameInfo {
+.x-btn-plain-small-frameInfo {
   font-family: th-3-3-3-3-1-1-1-1-3-3-3-3;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tl {
+.x-btn-plain-small-tl {
   background-position: 0 -6px;
 }
 
 /* line 319, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tr {
+.x-btn-plain-small-tr {
   background-position: right -9px;
 }
 
 /* line 323, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-bl {
+.x-btn-plain-small-bl {
   background-position: 0 -12px;
 }
 
 /* line 327, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-br {
+.x-btn-plain-small-br {
   background-position: right -15px;
 }
 
 /* line 331, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-ml {
+.x-btn-plain-small-ml {
   background-position: 0 top;
 }
 
 /* line 335, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-mr {
+.x-btn-plain-small-mr {
   background-position: right top;
 }
 
 /* line 339, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tc {
+.x-btn-plain-small-tc {
   background-position: 0 0;
 }
 
 /* line 343, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-bc {
+.x-btn-plain-small-bc {
   background-position: 0 -3px;
 }
 
 /* line 350, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tr,
-.x-btn-primary-small-br,
-.x-btn-primary-small-mr {
+.x-btn-plain-small-tr,
+.x-btn-plain-small-br,
+.x-btn-plain-small-mr {
   padding-right: 3px;
 }
 
 /* line 356, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tl,
-.x-btn-primary-small-bl,
-.x-btn-primary-small-ml {
+.x-btn-plain-small-tl,
+.x-btn-plain-small-bl,
+.x-btn-plain-small-ml {
   padding-left: 3px;
 }
 
 /* line 360, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tc {
+.x-btn-plain-small-tc {
   height: 3px;
 }
 
 /* line 363, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-bc {
+.x-btn-plain-small-bc {
   height: 3px;
 }
 
 /* line 374, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-tl,
-.x-btn-primary-small-bl,
-.x-btn-primary-small-tr,
-.x-btn-primary-small-br,
-.x-btn-primary-small-tc,
-.x-btn-primary-small-bc,
-.x-btn-primary-small-ml,
-.x-btn-primary-small-mr {
+.x-btn-plain-small-tl,
+.x-btn-plain-small-bl,
+.x-btn-plain-small-tr,
+.x-btn-plain-small-br,
+.x-btn-plain-small-tc,
+.x-btn-plain-small-bc,
+.x-btn-plain-small-ml,
+.x-btn-plain-small-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-primary-small-corners.gif);
+  background-image: url(images/btn/btn-plain-small-corners.gif);
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-ml,
-.x-btn-primary-small-mr {
+.x-btn-plain-small-ml,
+.x-btn-plain-small-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-primary-small-sides.gif);
+  background-image: url(images/btn/btn-plain-small-sides.gif);
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-primary-small-mc {
+.x-btn-plain-small-mc {
   padding: 1px 1px 1px 1px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-strict .x-ie7 .x-btn-primary-small-tl,
-.x-strict .x-ie7 .x-btn-primary-small-bl {
+.x-strict .x-ie7 .x-btn-plain-small-tl,
+.x-strict .x-ie7 .x-btn-plain-small-bl {
   position: relative;
   right: 0;
 }
 
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-primary-small:after {
+.x-btn-plain-small:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-primary-small-fbg.gif), bg:url(images/btn/btn-primary-small-bg.gif), corners:url(images/btn/btn-primary-small-corners.gif), sides:url(images/btn/btn-primary-small-sides.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-plain-small-fbg.gif), bg:url(images/btn/btn-plain-small-bg.gif), corners:url(images/btn/btn-plain-small-corners.gif), sides:url(images/btn/btn-plain-small-sides.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small .x-btn-inner {
+.x-btn-plain-small .x-btn-inner {
   font-size: 13px;
   font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: white;
+  color: #333333;
   padding: 0 5px;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small .x-btn-arrow {
-  background-image: url(images/button/primary-small-arrow.png);
+.x-btn-plain-small .x-btn-arrow {
+  background-image: url(images/button/plain-small-arrow.png);
 }
 /* line 278, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small .x-btn-arrow-right {
+.x-btn-plain-small .x-btn-arrow-right {
   padding-right: 21px;
 }
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small .x-btn-arrow-bottom {
+.x-btn-plain-small .x-btn-arrow-bottom {
   padding-bottom: 18px;
 }
 /* line 293, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small .x-btn-glyph {
+.x-btn-plain-small .x-btn-glyph {
   font-size: 16px;
   line-height: 16px;
-  color: white;
+  color: #333333;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie8m .x-btn-primary-small .x-btn-glyph {
-  color: white;
+.x-ie8m .x-btn-plain-small .x-btn-glyph {
+  color: #333333;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small-disabled {
+.x-btn-plain-small-disabled {
   background-image: none;
   background-color: #444444;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #197ac5), color-stop(100%, #0161ad));
-  background-image: -webkit-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -moz-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -o-linear-gradient(top, #197ac5, #0161ad);
-  background-image: -ms-linear-gradient(top, #197ac5, #0161ad);
-  background-image: linear-gradient(top, #197ac5, #0161ad);
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-primary-small-icon .x-btn-button,
-.x-btn-primary-small-noicon .x-btn-button {
+.x-btn-plain-small-icon .x-btn-button,
+.x-btn-plain-small-noicon .x-btn-button {
   height: 16px;
 }
