@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.timeline.internal.DefaultTimeline;
 
 import org.eclipse.sisu.launch.InjectedTestCase;
@@ -41,6 +42,8 @@ public abstract class AbstractTimelineTestCase
           + "id faucibus ligula condimentum id. Aenean augue odio, auctor fermentum sodales non, gravida sit amet "
           + "diam. Maecenas ac dolor at lorem ullamcorper pretium convallis ut felis. Mauris ut nisi ut leo "
           + "fringilla auctor sed et lectus.";
+
+  protected TestUtil testUtil = new TestUtil(this);
 
   protected DefaultTimeline timeline;
 

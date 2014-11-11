@@ -176,7 +176,7 @@ public class DefaultTimeline
             // FIXME: but do we want to abort the purge?
             log.warn("Failed to purge a timeline persisted records", e);
           }
-          return indexer.purge(0l, System.currentTimeMillis() - (days * TimeUnit.DAYS.toMillis(days)), null, null);
+          return indexer.purge(0l, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days), null, null);
         }
       });
     }

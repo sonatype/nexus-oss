@@ -19,9 +19,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
+
+import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 public class TimelineTest
     extends AbstractTimelineTestCase
@@ -204,5 +211,66 @@ public class TimelineTest
         TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
         Integer.MAX_VALUE));
     assertEquals(47, timeline.purgeOlderThan(0));
+  }
+
+
+  @Test
+  public void testDaysOfPurge()
+      throws Exception
+  {
+    final File tmpDir = testUtil.createTempDir();
+
+    timeline.start(new TimelineConfiguration(tmpDir));
+
+    final long now = System.currentTimeMillis();
+    { // -3
+      final Map<String, String> data = Maps.newHashMap();
+      data.put("k1", "v1");
+      timeline.add(createTimelineRecord(now - TimeUnit.DAYS.toMillis(3), "typeA", "subType", data));
+    }
+    { // -2
+      final Map<String, String> data = Maps.newHashMap();
+      data.put("k1", "v1");
+      timeline.add(createTimelineRecord(now - TimeUnit.DAYS.toMillis(2), "typeA", "subType", data));
+    }
+    { // -1
+      final Map<String, String> data = Maps.newHashMap();
+      data.put("k1", "v1");
+      timeline.add(createTimelineRecord(now - TimeUnit.DAYS.toMillis(1), "typeA", "subType", data));
+    }
+    { // now
+      final Map<String, String> data = Maps.newHashMap();
+      data.put("k1", "v1");
+      timeline.add(createTimelineRecord(now, "typeA", "subType", data));
+    }
+
+    AsList cb = new AsList();
+    timeline.retrieve(0, 1000, Collections.singleton("typeA"), null, null, cb);
+    assertThat(cb.getRecords(), hasSize(4));
+    cb.getRecords().clear();
+
+    timeline.purgeOlderThan(3);
+
+    timeline.retrieve(0, 1000, Collections.singleton("typeA"), null, null, cb);
+    assertThat(cb.getRecords(), hasSize(3));
+    cb.getRecords().clear();
+
+    timeline.purgeOlderThan(2);
+
+    timeline.retrieve(0, 1000, Collections.singleton("typeA"), null, null, cb);
+    assertThat(cb.getRecords(), hasSize(2));
+    cb.getRecords().clear();
+
+    timeline.purgeOlderThan(1);
+
+    timeline.retrieve(0, 1000, Collections.singleton("typeA"), null, null, cb);
+    assertThat(cb.getRecords(), hasSize(1));
+    cb.getRecords().clear();
+
+    timeline.purgeOlderThan(0); // means "all"
+
+    timeline.retrieve(0, 1000, Collections.singleton("typeA"), null, null, cb);
+    assertThat(cb.getRecords(), hasSize(0));
+    cb.getRecords().clear();
   }
 }
