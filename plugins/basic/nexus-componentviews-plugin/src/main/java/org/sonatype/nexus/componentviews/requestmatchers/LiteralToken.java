@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.componentviews.requestmatchers;
 
+import java.util.regex.Pattern;
+
 /**
  * A token representing an unchanging portion of a path.
  *
@@ -26,7 +28,7 @@ public class LiteralToken
 
   @Override
   public String toRegexp() {
-    return escapeRegexpChars(value);
+    return Pattern.quote(value);
   }
 
   public String toString() {

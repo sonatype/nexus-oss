@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -173,10 +174,7 @@ public class OrientViewConfigStore
   public ViewConfig get(final String viewName) {
     try (ODatabaseDocumentTx db = openDb()) {
 
-      OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
-          "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE " + ViewConfigEntityAdapter.P_VIEWNAME + " = ?");
-
-      final List<ODocument> results = db.command(query).execute(viewName);
+      final List<ODocument> results = findByName(viewName, db);
 
       if (results.isEmpty()) {
         return null;
@@ -185,4 +183,28 @@ public class OrientViewConfigStore
       return entityAdapter.read(results.get(0));
     }
   }
+
+  @Nullable
+  @Override
+  public ViewConfigId getId(final String viewName) throws IOException {
+    try (ODatabaseDocumentTx db = openDb()) {
+
+      final List<ODocument> results = findByName(viewName, db);
+
+      if (results.isEmpty()) {
+        return null;
+      }
+
+      return convertId(results.get(0).getIdentity());
+    }
+  }
+
+  private List<ODocument> findByName(final String viewName, final ODatabaseDocumentTx db) {
+    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<ODocument>(
+        "SELECT FROM " + ViewConfigEntityAdapter.DB_CLASS + " WHERE " + ViewConfigEntityAdapter.P_VIEWNAME + " = ?");
+
+    return db.command(query).execute(viewName);
+  }
+
+
 }

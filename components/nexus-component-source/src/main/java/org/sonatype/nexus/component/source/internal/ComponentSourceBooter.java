@@ -34,6 +34,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Ensures that all defined views are created as Nexus starts.
@@ -90,14 +91,11 @@ public class ComponentSourceBooter
     log.debug("Creating component sources.");
     for (ComponentSourceConfig config : sourceConfigStore.getAll().values()) {
       final ComponentSourceFactory factory = factories.get(config.getFactoryName());
-      if (factory != null) {
-        log.debug("Creating source {}", config.getSourceId());
 
-        sourceRegistry.register(factory.createSource(config));
-      }
-      else {
-        throw new IllegalStateException("No source factory found for view config " + config);
-      }
+      checkState(factory != null, "No source factory found for source config %s", config);
+
+      log.debug("Creating source {}", config.getSourceId());
+      sourceRegistry.register(factory.createSource(config));
     }
   }
 }

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Ensures that there's a view config defined to
+ * Manages the lifecycle of the RawBinaryStore.
  *
  * @since 3.0
  */

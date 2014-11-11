@@ -29,17 +29,6 @@ import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
  */
 public interface ComponentSource<T extends Component>
 {
-  /*
-  Conceptual operations
-
-  - does component 'x' exist?
-  - does component/asset 'x','y' exist
-
-  - Fetch all the components and assets for component x
-  - Fetch component 'x', asset 'y'
-  - Search for component metadata
-   */
-
   /**
    * A cluster-wide unique name for this source.
    */
