@@ -429,18 +429,16 @@ Ext.define('NX.view.dev.Styles', {
 
     var sampleTemplate = Ext.create('Ext.XTemplate',
       '<table>',
-        '<tr>',
-          '<td><div class="color {gradient1}"></div></td>',
-          '<td><div style="padding: 0 10px 0 0">$color-{gradient1}</div></td>',
-        '</tr>',
-        '<tr>',
-          '<td><div class="color {gradient2}"></div></td>',
-          '<td><div style="padding: 0 10px 0 0">$color-{gradient2}</div></td>',
-        '</tr>',
+        '<tpl for=".">',
+          '<tr>',
+            '<td><div class="color {.}"></div></td>',
+            '<td><div style="padding: 0 10px 0 0">$color-{.}</div></td>',
+          '</tr>',
+        '</tpl>',
       '</table>'
     );
 
-    function buttonBlock(ui, text, disabled, pressed, menu, gradient1, gradient2) {
+    function buttonBlock(ui, text, disabled, pressed, menu) {
       var button = { xtype: 'button', text: text, ui: ui, margin: "0 10 10 0" };
 
       // Initialize optional button parameters
@@ -457,20 +455,11 @@ Ext.define('NX.view.dev.Styles', {
           '-',
           { text: 'Second' }
         ];
+      } else {
+        button['glyph'] = 'xf036@FontAwesome';
       }
 
-      // Add a sample section if requested
-      if (gradient1 && gradient2) {
-        var samples = sampleTemplate.apply({gradient1: gradient1, gradient2: gradient2});
-        return {
-          xtype: 'container',
-          layout: { type: 'hbox' },
-          items: [button, {xtype: 'container', html: samples}]
-        }
-      } else {
-        // Return just the button otherwise
-        return button
-      }
+      return button;
     }
 
     items.push(
@@ -480,78 +469,65 @@ Ext.define('NX.view.dev.Styles', {
           // Default buttons
           styleColumn(
             { xtype: 'label', text: 'Default', cls: 'section-header' },
-            styleTable(2,
-              buttonBlock('default', 'Default', false, false, false, 'white', 'light-gainsboro'),
-              buttonBlock('default', 'Default', true, false, false),
-              buttonBlock('default', 'Default', false, false, false, 'light-gray', 'silver'),
-              buttonBlock('default', 'Default', false, false, false),
-              buttonBlock('default', 'Default', false, true, false, 'suva-gray', 'gray'),
-              buttonBlock('default', 'Default', false, false, true)
+            styleRow(
+              styleColumn(
+                buttonBlock('default', 'Default', false, false, false),
+                buttonBlock('default', 'Default', true, false, false),
+                buttonBlock('default', 'Default', false, false, true)
+              ),
+              sampleTemplate.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray'])
             )
           ),
 
           // Primary buttons
           styleColumn(
             { xtype: 'label', text: 'Primary', cls: 'section-header' },
-            styleTable(2,
-              buttonBlock('primary', 'Primary', false, false, false, 'denim', 'light-cobalt'),
-              buttonBlock('primary', 'Primary', true, false, false),
-              buttonBlock('primary', 'Primary', false, false, false, 'dark-denim', 'smalt'),
-              buttonBlock('primary', 'Primary', false, false, false),
-              buttonBlock('primary', 'Primary', false, true, false, 'dark-cerulean', 'prussian-blue'),
-              buttonBlock('primary', 'Primary', false, false, true)
+            styleRow(
+              styleColumn(
+                buttonBlock('primary', 'Primary', false, false, false),
+                buttonBlock('primary', 'Primary', true, false, false),
+                buttonBlock('primary', 'Primary', false, false, true)
+              ),
+              sampleTemplate.apply(['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue'])
             )
           ),
 
           // Danger buttons
           styleColumn(
             { xtype: 'label', text: 'Danger', cls: 'section-header' },
-            styleTable(2,
-              buttonBlock('danger', 'Danger', false, false, false, 'light-cerise', 'brick-red'),
-              buttonBlock('danger', 'Danger', true, false, false),
-              buttonBlock('danger', 'Danger', false, false, false, 'old-rose', 'fire-brick'),
-              buttonBlock('danger', 'Danger', false, false, false),
-              buttonBlock('danger', 'Danger', false, true, false, 'shiraz', 'falu-red'),
-              buttonBlock('danger', 'Danger', false, false, true)
+            styleRow(
+              styleColumn(
+                buttonBlock('danger', 'Danger', false, false, false),
+                buttonBlock('danger', 'Danger', true, false, false),
+                buttonBlock('danger', 'Danger', false, false, true)
+              ),
+              sampleTemplate.apply(['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red'])
             )
           ),
 
           // Warning buttons
           styleColumn(
             { xtype: 'label', text: 'Warning', cls: 'section-header' },
-            styleTable(2,
-              buttonBlock('warning', 'Warning', false, false, false, 'sea-buckthorn', 'tahiti-gold'),
-              buttonBlock('warning', 'Warning', true, false, false),
-              buttonBlock('warning', 'Warning', false, false, false, 'zest', 'rich-gold'),
-              buttonBlock('warning', 'Warning', false, false, false),
-              buttonBlock('warning', 'Warning', false, true, false, 'afghan-tan', 'russet'),
-              buttonBlock('warning', 'Warning', false, false, true)
+            styleRow(
+              styleColumn(
+                buttonBlock('warning', 'Warning', false, false, false),
+                buttonBlock('warning', 'Warning', true, false, false),
+                buttonBlock('warning', 'Warning', false, false, true)
+              ),
+              sampleTemplate.apply(['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet'])
             )
           ),
 
           // Success buttons
           styleColumn(
             { xtype: 'label', text: 'Success', cls: 'section-header' },
-            styleTable(2,
-              buttonBlock('success', 'Success', false, false, false, 'elf-green', 'dark-pigment-green'),
-              buttonBlock('success', 'Success', true, false, false),
-              buttonBlock('success', 'Success', false, false, false, 'salem', 'jewel'),
-              buttonBlock('success', 'Success', false, false, false),
-              buttonBlock('success', 'Success', false, true, false, 'fun-green', 'dark-jewel'),
-              buttonBlock('success', 'Success', false, false, true)
-            )
-          ),
-
-          // Buttons without icons
-          styleColumn(
-            { xtype: 'label', text: 'w/ Icons', cls: 'section-header' },
-            styleTable(2,
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf055@FontAwesome' },
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf055@FontAwesome', disabled: true },
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf057@FontAwesome' },
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf057@FontAwesome', disabled: true },
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf036@FontAwesome', menu: [ { text: 'First' }, '-', { text: 'Second' } ] },
-              { xtype: 'button', ui: 'plain', text: 'Default', margin: '0 10 10 0', glyph: 'xf036@FontAwesome', disabled: true, menu: [ { text: 'First' }, '-', { text: 'Second' } ] }
+            styleRow(
+              styleColumn(
+                buttonBlock('success', 'Success', false, false, false),
+                buttonBlock('success', 'Success', true, false, false),
+                buttonBlock('success', 'Success', false, false, true)
+              ),
+              sampleTemplate.apply(['elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'])
             )
           )
         )
