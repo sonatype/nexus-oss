@@ -1049,38 +1049,72 @@ Ext.define('NX.view.dev.Styles', {
     // Toolbar
     //
 
+    function toolbar(cfg) {
+      var defaults = {
+        xtype: 'toolbar',
+        items: [
+          {
+            xtype: 'button',
+            text: 'plain'
+          },
+          {
+            xtype: 'button',
+            text: 'with glpyh',
+            glyph: 'xf1b2@FontAwesome'
+          },
+          {
+            xtype: 'button',
+            text: 'with icon',
+            iconCls: 'nx-icon-help-kb-x16'
+          },
+          ' ', // spacer
+          {
+            xtype: 'button',
+            text: 'button menu',
+            menu: [
+              { text: 'plain' },
+              { text: 'with glyph', glyph: 'xf059@FontAwesome' },
+              { text: 'with icon', iconCls: 'nx-icon-help-kb-x16'}
+            ]
+          },
+          '-', // seperator
+          {
+            xtype: 'nx-searchbox',
+            width: 200
+          }
+        ]
+      };
+
+      return Ext.applyIf(defaults, cfg);
+    }
+
     items.push(
         styleSection('Toolbar',
             styleRow(
-                {
-                  xtype: 'toolbar',
-                  items: [
-                    {
-                      xtype: 'button',
-                      text: 'button1',
-                      glyph: 'xf1b2@FontAwesome'
-                    },
-                    {
-                      xtype: 'button',
-                      text: 'button2'
-                    },
-                    ' ', // spacer
-                    {
-                      xtype: 'button',
-                      text: 'button menu',
-                      menu: [
-                        { text: 'plain' },
-                        { text: 'with glyph', glyph: 'xf059@FontAwesome' },
-                        { text: 'with icon', iconCls: 'nx-icon-help-kb-x16'}
-                      ]
-                    },
-                    '-', // seperator
-                    {
-                      xtype: 'nx-searchbox',
-                      width: 200
-                    }
-                  ]
+              'normal'
+            ),
+            styleRow(
+              toolbar()
+            ),
+            styleRow(
+              'medium'
+            ),
+            styleRow(
+              toolbar({
+                defaults: {
+                  scale: 'medium'
                 }
+              })
+            ),
+            styleRow(
+              'large'
+            ),
+            styleRow(
+              toolbar({
+                defaults: {
+                  scale: 'large'
+                }
+              })
             )
         )
     );
