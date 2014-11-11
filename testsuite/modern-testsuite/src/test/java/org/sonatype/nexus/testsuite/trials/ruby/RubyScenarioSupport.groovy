@@ -44,8 +44,8 @@ abstract class RubyScenarioSupport
 
   protected RubyScenarioSupport(final String id, final File workdir, final NexusClient nexusClient) {
     super(id, workdir, nexusClient)
-    this.gemConfigFile = new File(workdir, "gem.cfg")
-    this.nexusGemConfigFile = new File(workdir, "nexus-gem.cfg")
+    this.gemConfigFile = new File(workdir, 'gem.cfg')
+    this.nexusGemConfigFile = new File(workdir, 'nexus-gem.cfg')
   }
 
 
@@ -53,7 +53,7 @@ abstract class RubyScenarioSupport
    * Invokes "bundler".
    */
   void bundle(List<String> args) {
-    exec(['bundle'] + args as List<String>)
+    exec(['bundle'] + args)
   }
 
   /**
@@ -61,7 +61,7 @@ abstract class RubyScenarioSupport
    * the arguments for invocation.
    */
   void gem(List<String> args) {
-    exec(["gem", "--config-file", gemConfigFile.absolutePath] + args as List<String>)
+    exec(['gem', '--config-file', gemConfigFile.absolutePath] + args)
   }
 
   /**
@@ -69,7 +69,7 @@ abstract class RubyScenarioSupport
    * Gem file to be installed resides and the parameter should be the filename of the Gem to be deployed.
    */
   void nexus(String gem) {
-    exec(["gem", "--config-file", gemConfigFile.absolutePath, "nexus", "--nexus-config",
+    exec(['gem', '--config-file', gemConfigFile.absolutePath, 'nexus', '--nexus-config',
           nexusGemConfigFile.absolutePath, file(gem).absolutePath])
   }
 
@@ -92,8 +92,7 @@ abstract class RubyScenarioSupport
     exec(['rvm', "jruby@trial-${id}"])
 
     gem(['install', 'nexus'])
-    nexusGemConfigFile.text = "---\n:url: ${hosted.contentUri()}\n:authorization: Basic " +
-        "ZGVwbG95bWVudDpkZXBsb3ltZW50MTIz"
+    nexusGemConfigFile.text = "---\n:url: ${hosted.contentUri()}\n:authorization: Basic ZGVwbG95bWVudDpkZXBsb3ltZW50MTIz"
 
     gem(['install', 'bundler'])
     // TODO: figue out bundler config, I see no way to make it use "private" (non-shared) conf!!!

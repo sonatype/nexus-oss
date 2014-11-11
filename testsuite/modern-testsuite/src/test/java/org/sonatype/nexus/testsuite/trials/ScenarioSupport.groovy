@@ -63,7 +63,7 @@ abstract class ScenarioSupport
    * Main entry point for scenario. Normal return from this method is considered as "scenario succeeded", problems
    * should be signalled using exception.
    */
-  abstract void perform();
+  abstract void perform()
 
   // ==
 
@@ -85,11 +85,10 @@ abstract class ScenarioSupport
     // args are basically 2nd argument passed to bash
     String argLine = commands.collect { "\"${it}\"" }.join(' ')
     new File(execLog, "${counter}-cmd.txt").text = "CMD: ${argLine}\nCWD: ${cwd}"
-    ant.exec(executable: 'bash', dir: cwd, output: lastOutFile, failOnError: true)
-        {
-          arg(value: '-lc')
-          arg(value: argLine)
-        }
+    ant.exec(executable: 'bash', dir: cwd, output: lastOutFile, failOnError: true) {
+      arg(value: '-lc')
+      arg(value: argLine)
+    }
   }
 
   /**
@@ -103,7 +102,7 @@ abstract class ScenarioSupport
    * Returns the CWD.
    */
   File file() {
-    return cwd;
+    return cwd
   }
 
   /**
@@ -121,7 +120,7 @@ abstract class ScenarioSupport
       cwd = cwd.parentFile
     }
     else {
-      File newWorkDir = new File(cwd, pathelem);
+      File newWorkDir = new File(cwd, pathelem)
       assert newWorkDir.directory
       cwd = newWorkDir
     }
