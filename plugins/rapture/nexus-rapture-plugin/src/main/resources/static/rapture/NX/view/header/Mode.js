@@ -19,6 +19,7 @@
  */
 Ext.define('NX.view.header.Mode', {
   extend: 'Ext.button.Button',
+  alias: 'widget.nx-header-mode',
 
   toggleGroup: 'mode',
   cls: 'modebutton',
