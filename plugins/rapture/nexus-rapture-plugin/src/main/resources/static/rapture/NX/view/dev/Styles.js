@@ -20,6 +20,9 @@
 Ext.define('NX.view.dev.Styles', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-dev-styles',
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
   title: 'Styles',
 
@@ -37,14 +40,36 @@ Ext.define('NX.view.dev.Styles', {
    * @protected
    */
   initComponent: function () {
-    var me = this, i = 0;
+    var me = this;
 
-    me.items = [];
+    // build guide components on activate as this is a heavy view
+    me.on('activate', function() {
+      Ext.each(me.buildItems(), function(it) {
+        me.add(it);
+      });
+    });
+    // and destroy on deactivate to save memory
+    me.on('deactivate', function() {
+      me.removeAll(true);
+    });
+
+    me.callParent();
+  },
+
+  /**
+   * @private
+   */
+  buildItems: function () {
+    var me = this,
+        items = [];
+
+    me.logDebug('Building visual guide components');
 
     // Create a new section in the visual style guide
     function styleSection(name) {
       var content = sanitizeArguments(Array.prototype.slice.call(arguments, 1));
       var items = [];
+      var i = 0;
 
       items.push( { xtype: 'label', text: name, cls: 'category-title' } );
 
@@ -68,7 +93,8 @@ Ext.define('NX.view.dev.Styles', {
 
     // Convert strings to { html: '' } objects
     function sanitizeArguments(args) {
-      var items = [];
+      var items = [],
+          i = 0;
 
       for (i in args) {
         if (args[i] instanceof Object) {
@@ -196,7 +222,7 @@ Ext.define('NX.view.dev.Styles', {
     /*
      * Logo
      */
-    me.items.push(
+    items.push(
       styleSection('Logo',
         styleRow(
           toolbarBlock(true)
@@ -222,7 +248,7 @@ Ext.define('NX.view.dev.Styles', {
       '</div>'
     );
 
-    me.items.push(
+    items.push(
       styleSection('Colors',
         columnTemplate.apply([
           labelTemplate.apply({text: 'Shell', clz: 'section-header' }),
@@ -350,7 +376,7 @@ Ext.define('NX.view.dev.Styles', {
       '</div>'
     );
 
-    me.items.push(
+    items.push(
       styleSection('Fonts',
         rowTemplate.apply([
           fontTemplate.apply({text: 'Proxima Nova Regular', clz: 'proxima-nova-regular'}),
@@ -364,7 +390,7 @@ Ext.define('NX.view.dev.Styles', {
      * Type Styles
      */
 
-    me.items.push(
+    items.push(
       styleSection('Type Styles',
         tableTemplate.apply({
           thead: theadTemplate.apply(['Name', 'Description', 'Font & Weight', 'Use Cases', 'Pixels', 'Sample']),
@@ -448,7 +474,7 @@ Ext.define('NX.view.dev.Styles', {
       }
     }
 
-    me.items.push(
+    items.push(
       styleSection('Buttons',
         styleTable(3,
 
@@ -537,7 +563,7 @@ Ext.define('NX.view.dev.Styles', {
      * Form Elements
      */
 
-    me.items.push(
+    items.push(
       styleSection('Form Elements',
         styleRow(
           { xtype: 'textfield', value: 'Text Input', allowBlank: false, fieldLabel: '[Label]', helpText: '[Optional description text]', width: 200 },
@@ -572,7 +598,7 @@ Ext.define('NX.view.dev.Styles', {
       };
     }
 
-    me.items.push(
+    items.push(
       styleSection('Notifications',
         styleRow(
           notificationWindow('default'),
@@ -601,7 +627,7 @@ Ext.define('NX.view.dev.Styles', {
       }
     }
 
-    me.items.push(
+    items.push(
       styleSection('Modals',
         styleRow(
           {
@@ -706,7 +732,7 @@ Ext.define('NX.view.dev.Styles', {
       }
     }
 
-    me.items.push(
+    items.push(
       styleSection('Menu',
         styleRow(
           {
@@ -862,7 +888,7 @@ Ext.define('NX.view.dev.Styles', {
       }
     }
 
-    me.items.push(
+    items.push(
       styleSection('Header',
         styleRow(
           toolbarBlock()
@@ -874,7 +900,7 @@ Ext.define('NX.view.dev.Styles', {
      * Tooltip
      */
 
-    me.items.push(
+    items.push(
       styleSection('Tooltip',
         styleRow(
           { xtype: 'button', text: 'Mouse over me', tooltip: 'This is a tooltip' }
@@ -886,7 +912,7 @@ Ext.define('NX.view.dev.Styles', {
      * Tabs
      */
 
-    me.items.push(
+    items.push(
       styleSection('Tabs',
         styleRow(
           {
@@ -916,7 +942,19 @@ Ext.define('NX.view.dev.Styles', {
      * Picker
      */
 
-    me.items.push(
+    var pickerStore = Ext.create('Ext.data.ArrayStore', {
+      fields: [
+        'id',
+        'name'
+      ],
+      data: [
+          [ 'foo', 'Foo' ],
+          [ 'bar', 'Bar' ],
+          [ 'baz', 'Baz' ]
+      ]
+    });
+
+    items.push(
       styleSection('Picker',
         styleRow(
           {
@@ -925,8 +963,8 @@ Ext.define('NX.view.dev.Styles', {
             name: 'realms',
             buttons: ['up', 'add', 'remove', 'down'],
             fromTitle: 'Available',
-            toTitle: 'Active',
-            store: 'RealmType',
+            toTitle: 'Selected',
+            store: pickerStore,
             valueField: 'id',
             displayField: 'name',
             delimiter: null
@@ -935,6 +973,6 @@ Ext.define('NX.view.dev.Styles', {
       )
     );
 
-    me.callParent();
+    return items;
   }
 });
