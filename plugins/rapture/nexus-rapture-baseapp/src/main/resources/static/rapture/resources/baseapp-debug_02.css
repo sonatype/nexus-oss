@@ -2642,7 +2642,7 @@
 .x-btn-header-toolbar-medium-pressed {
   border-color: #cecece;
   background-image: none;
-  background-color: transparent;
+  background-color: #096e31;
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -2710,7 +2710,7 @@
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-menu-active .x-frame-mc,
 .x-btn-header-toolbar-medium-pressed .x-frame-mc {
-  background-color: transparent;
+  background-color: #096e31;
   background-image: url(images/btn/btn-header-toolbar-medium-pressed-fbg.gif);
 }
 

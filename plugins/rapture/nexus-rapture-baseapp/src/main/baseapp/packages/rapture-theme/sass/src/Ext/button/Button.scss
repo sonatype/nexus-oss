@@ -124,8 +124,11 @@
 @include extjs-button-toolbar-medium-ui(
   $ui: 'header',
 
+  $background-color: transparent,
   $background-color-over: $color-salem,
   $background-color-focus: $color-salem,
+  $background-color-pressed: $color-jewel,
+  $background-color-disabled: transparent,
 
   $color: $color-white,
   $color-over: $color-white,
@@ -140,9 +143,6 @@
   $background-gradient-focus: transparent,
   $background-gradient-pressed: transparent,
   $background-gradient-disabled: transparent,
-
-  $background-color: transparent,
-  $background-color-disabled: transparent,
 
   $glyph-color: $color-white,
   $glyph-opacity: 1
