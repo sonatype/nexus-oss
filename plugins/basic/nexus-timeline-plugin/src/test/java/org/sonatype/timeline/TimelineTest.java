@@ -186,37 +186,6 @@ public class TimelineTest
   }
 
   @Test
-  @Ignore("Unreal scenario")
-  public void _testRepairIndexCouldNotPurge()
-      throws Exception
-  {
-    File persistDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/persist");
-    File goodIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/index-good");
-    File crashedIndexDir = new File(getBasedir(), "target/test-classes/crashed-could-not-purge/index-broken");
-    FileUtils.copyDirectory(persistDir, persistDirectory);
-    FileUtils.copyDirectory(goodIndexDir, indexDirectory);
-
-    // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
-    timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
-        TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
-        Integer.MAX_VALUE));
-
-    // here, the "good" index really contains 6 records only
-    assertEquals(6, timeline.purgeOlderThan(0));
-
-    // pretend that when timeline is running, the index is manually changed
-    timeline.stop();
-    cleanDirectory(indexDirectory);
-    FileUtils.copyDirectory(crashedIndexDir, indexDirectory);
-    // as time passes, the timestamps in test persist files will fall out of default 30 day, so we say restore all
-    timeline.start(new TimelineConfiguration(persistDirectory, indexDirectory,
-        TimelineConfiguration.DEFAULT_ROLLING_INTERVAL_MILLIS,
-        Integer.MAX_VALUE));
-    assertEquals(47, timeline.purgeOlderThan(0));
-  }
-
-
-  @Test
   public void testDaysOfPurge()
       throws Exception
   {
