@@ -479,6 +479,19 @@ Ext.define('NX.view.dev.Styles', {
             )
           ),
 
+          // Plain buttons
+          styleColumn(
+            { xtype: 'label', text: 'Plain', cls: 'section-header' },
+            styleRow(
+              styleColumn(
+                buttonBlock('plain', 'Plain', false, false, false),
+                buttonBlock('plain', 'Plain', true, false, false),
+                buttonBlock('plain', 'Plain', false, false, true)
+              ),
+              sampleTemplate.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray'])
+            )
+          ),
+
           // Primary buttons
           styleColumn(
             { xtype: 'label', text: 'Primary', cls: 'section-header' },
