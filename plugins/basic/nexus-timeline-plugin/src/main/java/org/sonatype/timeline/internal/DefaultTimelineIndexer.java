@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.timeline.TimelineCallback;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
@@ -40,12 +41,14 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -55,6 +58,7 @@ import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 
 public class DefaultTimelineIndexer
+    extends ComponentSupport
 {
 
   private static final String TIMESTAMP = "_t";
@@ -91,7 +95,8 @@ public class DefaultTimelineIndexer
    * By default, Lucene selects FSDirectory implementation based on specifics of the operating system and JRE used,
    * but this configuration parameter allows override.
    */
-  public DefaultTimelineIndexer(final String luceneFSDirectoryType) {
+  public DefaultTimelineIndexer(final String luceneFSDirectoryType)
+  {
     this.luceneFSDirectoryType = luceneFSDirectoryType;
   }
 
@@ -251,6 +256,8 @@ public class DefaultTimelineIndexer
     }
   }
 
+  private static final int PURGE_BATCH_SIZE = 1_000_000;
+
   protected int purge(final long fromTime, final long toTime, final Set<String> types, final Set<String> subTypes)
       throws IOException
   {
@@ -263,18 +270,34 @@ public class DefaultTimelineIndexer
       }
 
       final Query q = buildQuery(fromTime, toTime, types, subTypes);
-      // just to know how many will we delete, will not actually load 'em up
-      final TopFieldDocs topDocs =
-          searcher.search(q, null, searcher.maxDoc(),
-              new Sort(new SortField(TIMESTAMP, SortField.LONG, true)));
-      if (topDocs.scoreDocs.length == 0) {
-        // nothing matched to be purged
+      log.debug("purge query='{}'", q);
+      int deletedCount = 0;
+      TopDocs topDocs = searcher.search(q, PURGE_BATCH_SIZE);
+      // NEXUS-7671: Purge in batches, to conserve heap memory and not OOM
+      while (topDocs.scoreDocs.length > 0) {
+        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+          final Document doc = searcher.doc(scoreDoc.doc);
+          indexWriter.deleteDocuments(new Term(TIMESTAMP, doc.get(TIMESTAMP)));
+          deletedCount++;
+        }
+        log.debug("purged so far: {}", deletedCount);
+        topDocs = searcher.searchAfter(topDocs.scoreDocs[topDocs.scoreDocs.length - 1], q, PURGE_BATCH_SIZE);
+        if (topDocs.scoreDocs.length == 0) {
+          // nothing matched to be purged in this iteration, break out
+          break;
+        }
+      }
+
+      // avoid potentially expensive operations below if nothing done
+      if (deletedCount == 0) {
         return 0;
       }
-      indexWriter.deleteDocuments(q);
+
       indexWriter.commit();
       indexWriter.optimize();
-      return topDocs.scoreDocs.length;
+      indexWriter.deleteUnusedFiles();
+      // Since NEXUS-7671 fix, the returned count is not EXACT document count anymore!
+      return deletedCount;
     }
     finally {
       searcherManager.release(searcher);
