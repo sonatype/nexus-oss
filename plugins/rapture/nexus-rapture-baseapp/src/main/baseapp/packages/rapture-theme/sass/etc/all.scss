@@ -120,7 +120,7 @@ $font-weight-utility:   normal;
  * Links
  */
 
-a:not(.x-btn) {
+a:not([class*="x-"]) {
   color: $color-navy-blue;
   text-decoration: none;
 
