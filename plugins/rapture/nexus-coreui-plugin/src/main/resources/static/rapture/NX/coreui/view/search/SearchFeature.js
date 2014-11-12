@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-searchfeature',
 
-  layout: 'border',
+  layout: 'card',
 
   initComponent: function() {
     var me = this;
@@ -29,103 +29,94 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
     me.items = [
       {
         xtype: 'panel',
-        itemId: 'criteria',
 
-        region: 'north',
-        header: false,
+        layout: 'border',
 
-        style: {
-          'border-bottom': '1px solid #000000'
-        },
+        items: [
+          {
+            xtype: 'panel',
+            itemId: 'criteria',
 
-        layout: {
-          type: 'hbox',
-          align: 'bottom'
-        },
-        bodyPadding: 10
+            region: 'north',
+            header: false,
 
-        // disable saving for now
-        //tbar: [
-        //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
-        //],
+            style: {
+              'border-bottom': '1px solid #000000'
+            },
+
+            layout: {
+              type: 'hbox',
+              align: 'bottom'
+            },
+            bodyPadding: 10
+
+            // disable saving for now
+            //tbar: [
+            //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
+            //],
+          },
+          {
+            xtype: 'nx-coreui-search-result-list',
+            region: 'center',
+            //flex: 0.3,
+            header: false
+            //split: true,
+            //collapsible: true,
+            //collapseMode: 'mini'
+          }
+        ]
       },
       {
         xtype: 'panel',
-        region: 'center',
-        layout: 'border',
+        //region: 'center',
+        layout: 'fit',
+        //flex: 0.5,
         items: [
           {
-            xtype: 'nx-coreui-search-result-list',
-            region: 'west',
-            flex: 0.3,
-            header: false,
-            split: true,
-            collapsible: true,
-            collapseMode: 'mini'
-          },
-          {
-            xtype: 'panel',
-            itemId: 'rightPanel',
+            type: 'panel',
             region: 'center',
-            layout: 'border',
-            flex: 0.7,
-            header: false,
+            layout: {
+              type: 'vbox',
+              align: 'stretch',
+              pack: 'start'
+            },
             items: [
               {
+                itemId: 'searchResultDetails',
                 xtype: 'panel',
-                region: 'center',
-                layout: 'fit',
-                flex: 0.5,
+                layout: {
+                  type: 'vbox',
+                  align: 'stretch',
+                  pack: 'start'
+                },
                 items: [
                   {
-                    type: 'panel',
-                    region: 'center',
-                    layout: {
-                      type: 'vbox',
-                      align: 'stretch',
-                      pack: 'start'
-                    },
-                    items: [
-                      {
-                        itemId: 'searchResultDetails',
-                        xtype: 'panel',
-                        layout: {
-                          type: 'vbox',
-                          align: 'stretch',
-                          pack: 'start'
-                        },
-                        items: [
-                          {
-                            html: '<div class="x-grid-empty">Select a component to view details</div>'
-                          },
-                          {
-                            xtype: 'nx-coreui-search-result-details',
-                            hidden: true
-                          }
-                        ]
-                      },
-                      {
-                        xtype: 'nx-coreui-search-result-version-list',
-                        hidden: true,
-                        flex: 1
-                      }
-                    ]
+                    html: '<div class="x-grid-empty">Select a component to view details</div>'
+                  },
+                  {
+                    xtype: 'nx-coreui-search-result-details',
+                    hidden: true
                   }
                 ]
               },
               {
-                xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-                region: 'south',
-                split: true,
-                flex: 0.5,
-                collapsible: true,
-                collapsed: false,
-                collapseMode: 'mini',
-                hidden: true
+                xtype: 'nx-coreui-search-result-version-list',
+                hidden: true,
+                flex: 1
               }
             ]
           }
         ]
+      },
+      {
+        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'//,
+        //region: 'south',
+        //split: true,
+        //flex: 0.5,
+        //collapsible: true,
+        //collapsed: false,
+        //collapseMode: 'mini',
+        //hidden: true
       }
     ];
 
