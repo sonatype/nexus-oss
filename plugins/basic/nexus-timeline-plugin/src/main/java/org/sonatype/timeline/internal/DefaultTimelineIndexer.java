@@ -301,7 +301,6 @@ public class DefaultTimelineIndexer
     }
     finally {
       searcherManager.release(searcher);
-      searcherManager.maybeRefresh();
     }
   }
 
