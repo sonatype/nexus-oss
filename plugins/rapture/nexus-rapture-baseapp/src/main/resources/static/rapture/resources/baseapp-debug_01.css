@@ -24250,11 +24250,6 @@ a.x-color-picker-item:hover {
 
 /*</if slicer>*/
 /* */
-/* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.x-btn.x-pressed .x-btn-glyph {
-  color: white;
-}
-
 /**
  * ui: 'plain'
  */
@@ -24492,5 +24487,10 @@ a.x-color-picker-item:hover {
 /* line 381, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-icon .x-btn-icon-el {
   width: 16px;
+  height: 16px;
+}
+
+/* line 388, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-plain-small-icon-text-left .x-btn-button {
   height: 16px;
 }
