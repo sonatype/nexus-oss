@@ -115,3 +115,25 @@ $font-weight-h5:        bold;
 $font-weight-body:      normal;
 $font-weight-code:      normal;
 $font-weight-utility:   normal;
+
+/**
+ * Links
+ */
+
+a:not(.x-btn) {
+  color: $color-navy-blue;
+  text-decoration: none;
+
+  &:visited {
+    color: $color-smalt;
+  }
+
+  &:focus, &:hover {
+    color: $color-falu-red;
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: $color-cornflower;
+  }
+}

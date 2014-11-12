@@ -75,6 +75,28 @@
 /**
  * Type styles
  */
+/**
+ * Links
+ */
+/* line 123, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+a:not(.x-btn) {
+  color: #006bbf;
+  text-decoration: none;
+}
+/* line 127, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+a:not(.x-btn):visited {
+  color: #014e8a;
+}
+/* line 131, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+a:not(.x-btn):focus, a:not(.x-btn):hover {
+  color: #77162d;
+  text-decoration: underline;
+}
+/* line 136, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+a:not(.x-btn):active {
+  color: #96caee;
+}
+
 /* including package rapture-theme */
 /**
  * @class Ext.Component
@@ -24492,34 +24514,4 @@ a.x-color-picker-item:hover {
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small .x-btn-arrow {
   background-image: url(images/button/plain-small-arrow.png);
-}
-/* line 278, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small .x-btn-arrow-right {
-  padding-right: 21px;
-}
-/* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small .x-btn-arrow-bottom {
-  padding-bottom: 18px;
-}
-/* line 293, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small .x-btn-glyph {
-  font-size: 16px;
-  line-height: 16px;
-  color: #333333;
-}
-/* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie8m .x-btn-plain-small .x-btn-glyph {
-  color: #333333;
-}
-
-/* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-plain-small-disabled {
-  background-image: none;
-  background-color: #444444;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
-  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: linear-gradient(top, #ffffff, #e6e6e6);
 }
