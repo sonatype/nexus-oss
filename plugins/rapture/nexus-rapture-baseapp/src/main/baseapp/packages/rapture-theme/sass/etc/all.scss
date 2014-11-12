@@ -125,11 +125,11 @@ a:not([class*="x-"]) {
   text-decoration: none;
 
   &:visited {
-    color: $color-smalt;
+    color: $color-dark-denim;
   }
 
   &:focus, &:hover {
-    color: $color-falu-red;
+    color: $color-dark-cerulean;
     text-decoration: underline;
   }
 

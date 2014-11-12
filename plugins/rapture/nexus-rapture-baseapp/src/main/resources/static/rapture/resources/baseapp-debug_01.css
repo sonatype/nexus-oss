@@ -85,11 +85,11 @@ a:not([class*="x-"]) {
 }
 /* line 127, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
 a:not([class*="x-"]):visited {
-  color: #014e8a;
+  color: #14629e;
 }
 /* line 131, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
 a:not([class*="x-"]):focus, a:not([class*="x-"]):hover {
-  color: #77162d;
+  color: #0f4976;
   text-decoration: underline;
 }
 /* line 136, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
