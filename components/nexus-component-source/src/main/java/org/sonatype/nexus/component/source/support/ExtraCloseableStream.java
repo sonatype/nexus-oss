@@ -5,8 +5,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-
 /**
  * A decorator that gives an InputStream the ability to close an additional {@link Closeable} resource when the
  * InputStream is closed.
@@ -23,7 +21,11 @@ public class ExtraCloseableStream
 
   @Override
   public void close() throws IOException {
-    super.close();
-    IOUtils.closeQuietly(needsClosing);
+    try {
+      super.close();
+    }
+    finally {
+      needsClosing.close();
+    }
   }
 }
