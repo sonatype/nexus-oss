@@ -277,15 +277,14 @@ public class DefaultTimelineIndexer
       while (topDocs.scoreDocs.length > 0) {
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
           final Document doc = searcher.doc(scoreDoc.doc);
+          // NEXUS-7671: This will delete by timestamp and will neglect the set of types/subtypes
+          // But, except for UTs, production is NOT using this feature at all (see Timeline#purgeOlderThan method)
+          // purge in production is invoked always with types == subTypes == null
           indexWriter.deleteDocuments(new Term(TIMESTAMP, doc.get(TIMESTAMP)));
           deletedCount++;
         }
         log.debug("purged so far: {}", deletedCount);
         topDocs = searcher.searchAfter(topDocs.scoreDocs[topDocs.scoreDocs.length - 1], q, PURGE_BATCH_SIZE);
-        if (topDocs.scoreDocs.length == 0) {
-          // nothing matched to be purged in this iteration, break out
-          break;
-        }
       }
 
       // avoid potentially expensive operations below if nothing done
