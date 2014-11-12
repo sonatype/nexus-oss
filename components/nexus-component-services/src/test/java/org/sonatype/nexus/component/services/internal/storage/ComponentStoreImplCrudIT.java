@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.model.EntityId;
-import org.sonatype.nexus.component.services.model.TestAsset;
-import org.sonatype.nexus.component.services.model.TestComponent;
+import org.sonatype.nexus.component.model.Envelope;
+import org.sonatype.nexus.component.services.internal.adapter.TestAssetAdapter;
+import org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapter;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -29,6 +31,10 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.nexus.component.services.adapter.ComponentAdapter.P_ASSETS;
+import static org.sonatype.nexus.component.services.adapter.EntityAdapter.P_ID;
+import static org.sonatype.nexus.component.services.internal.adapter.TestAssetAdapter.P_DOWNLOAD_COUNT;
+import static org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapter.P_STRING;
 
 /**
  * Integration tests for {@link ComponentStoreImpl}'s CRUD functionality.
@@ -45,19 +51,12 @@ public class ComponentStoreImplCrudIT
     componentStore.createComponent(testComponent());
   }
 
-  @Test(expected = RuntimeException.class)
-  public void createComponentRequiredPropertyUnspecified() {
-    registerTestAdapters();
-
-    componentStore.createComponent(new TestComponent());
-  }
-
   @Test
   public void createComponent() {
     registerTestAdapters();
 
-    TestComponent sourceComponent = testComponent();
-    TestComponent storedComponent = componentStore.createComponent(sourceComponent);
+    Component sourceComponent = testComponent();
+    Component storedComponent = componentStore.createComponent(sourceComponent);
 
     checkComponent(storedComponent, sourceComponent);
   }
@@ -68,22 +67,23 @@ public class ComponentStoreImplCrudIT
 
   @Test(expected = RuntimeException.class)
   public void createAssetNoAdapter() {
-    adapterRegistry.registerComponentAdapter(testComponentAdapter);
+    adapterRegistry.registerAdapter(testComponentAdapter);
+    componentStore.prepareStorage(TestComponentAdapter.CLASS_NAME);
 
-    TestComponent storedComponent = componentStore.createComponent(testComponent());
-    TestAsset asset = testAsset(1);
+    Component storedComponent = componentStore.createComponent(testComponent());
+    Asset asset = testAsset(1);
 
-    componentStore.createAsset(storedComponent.getId(), asset);
+    componentStore.createAsset(storedComponent.get(P_ID, EntityId.class), asset);
   }
 
   @Test
   public void createAsset() throws Exception {
     registerTestAdapters();
 
-    TestComponent storedComponent = componentStore.createComponent(testComponent());
-    TestAsset storedAsset = componentStore.createAsset(storedComponent.getId(), testAsset(1));
+    Component storedComponent = componentStore.createComponent(testComponent());
+    Asset storedAsset = componentStore.createAsset(storedComponent.get(P_ID, EntityId.class), testAsset(1));
 
-    checkAsset(storedAsset, storedComponent.getId(), 1);
+    checkAsset(storedAsset, storedComponent.get(P_ID, EntityId.class), 1);
   }
 
   // createComponentWithAssets
@@ -92,18 +92,19 @@ public class ComponentStoreImplCrudIT
   public void createComponentWithAssets() {
     registerTestAdapters();
 
-    ComponentEnvelope<TestComponent, TestAsset> sourceEnvelope = testEnvelope(10);
+    Envelope sourceEnvelope = testEnvelope(10);
 
-    TestComponent storedComponent = componentStore.createComponentWithAssets(sourceEnvelope);
+    Component storedComponent = componentStore.createComponentWithAssets(sourceEnvelope).getComponent();
 
     checkComponent(storedComponent, sourceEnvelope.getComponent());
-    Set<EntityId> assetIds = storedComponent.getAssetIds();
+    Set<EntityId> assetIds = getAssetIds(storedComponent);
 
     assertThat(assetIds.size(), is(10));
 
     for (EntityId assetId: assetIds) {
-      TestAsset storedAsset = componentStore.readAsset(TestAsset.class, assetId);
-      checkAsset(storedAsset, storedComponent.getId(), (int) storedAsset.getDownloadCount());
+      Asset storedAsset = componentStore.readAsset(TestAssetAdapter.CLASS_NAME, assetId);
+      long downloadCount = storedAsset.get(P_DOWNLOAD_COUNT, Long.class);
+      checkAsset(storedAsset, storedComponent.get(P_ID, EntityId.class), (int) downloadCount);
     }
   }
 
@@ -113,7 +114,7 @@ public class ComponentStoreImplCrudIT
   public void createComponentsWithAssetsOneTransaction() {
     registerTestAdapters();
 
-    Set<ComponentEnvelope<TestComponent, TestAsset>> sourceEnvelopes = Sets.newHashSet();
+    Set<Envelope> sourceEnvelopes = Sets.newHashSet();
     for (int i = 0; i < 10; i++) {
       sourceEnvelopes.add(testEnvelope(2));
     }
@@ -136,7 +137,7 @@ public class ComponentStoreImplCrudIT
   public void createComponentsWithAssetsTwoTransactions() {
     registerTestAdapters();
 
-    Set<ComponentEnvelope<TestComponent, TestAsset>> sourceEnvelopes = Sets.newHashSet();
+    Set<Envelope> sourceEnvelopes = Sets.newHashSet();
     for (int i = 0; i < 10; i++) {
       sourceEnvelopes.add(testEnvelope(2));
     }
@@ -161,24 +162,24 @@ public class ComponentStoreImplCrudIT
   public void readNonExistingComponent() {
     registerTestAdapters();
 
-    componentStore.readComponent(TestComponent.class, new EntityId("bogusId"));
+    componentStore.readComponent(TestComponentAdapter.CLASS_NAME, new EntityId("bogusId"));
   }
 
   @Test(expected = IllegalStateException.class)
   public void readNonExistingAsset() {
     registerTestAdapters();
 
-    componentStore.readAsset(TestAsset.class, new EntityId("bogusId"));
+    componentStore.readAsset(TestAssetAdapter.CLASS_NAME, new EntityId("bogusId"));
   }
 
   @Test
   public void readComponent() {
     registerTestAdapters();
 
-    TestComponent sourceComponent = testComponent(TEST_STRING_1, true);
-    EntityId componentId = componentStore.createComponent(sourceComponent).getId();
+    Component sourceComponent = testComponent(TEST_STRING_1, true);
+    EntityId componentId = componentStore.createComponent(sourceComponent).get(P_ID, EntityId.class);
 
-    TestComponent storedComponent = componentStore.readComponent(TestComponent.class, componentId);
+    Component storedComponent = componentStore.readComponent(TestComponentAdapter.CLASS_NAME, componentId);
 
     checkComponent(storedComponent, sourceComponent);
   }
@@ -187,30 +188,31 @@ public class ComponentStoreImplCrudIT
   public void readAsset() {
     registerTestAdapters();
 
-    EntityId componentId = componentStore.createComponent(testComponent()).getId();
-    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).getId();
+    EntityId componentId = componentStore.createComponent(testComponent()).get(P_ID, EntityId.class);
+    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).get(P_ID, EntityId.class);
 
-    TestAsset storedAsset = componentStore.readAsset(TestAsset.class, assetId);
+    Asset storedAsset = componentStore.readAsset(TestAssetAdapter.CLASS_NAME, assetId);
 
     checkAsset(storedAsset, componentId, 1);
   }
 
-  // readComponentWithAssets
+  // readWithAssets
 
   @Test
   public void readComponentWithAssets() {
     registerTestAdapters();
 
-    TestComponent storedComponent = componentStore.createComponentWithAssets(testEnvelope(10));
+    Component storedComponent = componentStore.createComponentWithAssets(testEnvelope(10)).getComponent();
 
-    ComponentEnvelope<TestComponent, TestAsset> storedEnvelope =
-        componentStore.readComponentWithAssets(TestComponent.class, TestAsset.class, storedComponent.getId());
+    Envelope storedEnvelope = componentStore.readComponentWithAssets(TestComponentAdapter.CLASS_NAME,
+        storedComponent.get(P_ID, EntityId.class));
 
     checkComponent(storedEnvelope.getComponent(), storedComponent);
-    assertThat(storedEnvelope.getComponent().getAssetIds(), is(storedComponent.getAssetIds()));
+    assertThat(getAssetIds(storedEnvelope.getComponent()), is(getAssetIds(storedComponent)));
     assertThat(Iterables.size(storedEnvelope.getAssets()), is(10));
-    for (TestAsset storedAsset: storedEnvelope.getAssets()) {
-      checkAsset(storedAsset, storedComponent.getId(), (int) storedAsset.getDownloadCount());
+    for (Asset storedAsset: storedEnvelope.getAssets()) {
+      long downloadCount = storedAsset.get(P_DOWNLOAD_COUNT, Long.class);
+      checkAsset(storedAsset, storedComponent.get(P_ID, EntityId.class), (int) downloadCount);
     }
   }
 
@@ -234,13 +236,13 @@ public class ComponentStoreImplCrudIT
   public void updateComponent() {
     registerTestAdapters();
 
-    EntityId componentId = componentStore.createComponent(testComponent()).getId();
+    EntityId componentId = componentStore.createComponent(testComponent()).get(P_ID, EntityId.class);
 
-    TestComponent sourceComponent = testComponent();
-    sourceComponent.setStringProp(TEST_STRING_2);
-    TestComponent updatedComponent = componentStore.updateComponent(componentId, sourceComponent);
+    Component sourceComponent = testComponent();
+    sourceComponent.put(P_STRING, TEST_STRING_2);
+    Component updatedComponent = componentStore.updateComponent(componentId, sourceComponent);
 
-    assertThat(updatedComponent.getStringProp(), is(TEST_STRING_2));
+    assertThat(updatedComponent.get(P_STRING, String.class), is(TEST_STRING_2));
     checkComponent(updatedComponent, sourceComponent);
   }
 
@@ -248,12 +250,12 @@ public class ComponentStoreImplCrudIT
   public void updateAsset() throws Exception {
     registerTestAdapters();
 
-    EntityId componentId = componentStore.createComponent(testComponent()).getId();
-    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).getId();
+    EntityId componentId = componentStore.createComponent(testComponent()).get(P_ID, EntityId.class);
+    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).get(P_ID, EntityId.class);
 
-    TestAsset sourceAsset = testAsset(2);
+    Asset sourceAsset = testAsset(2);
     Thread.sleep(1000); // ensure different modified date
-    TestAsset updatedAsset = componentStore.updateAsset(assetId, sourceAsset);
+    Asset updatedAsset = componentStore.updateAsset(assetId, sourceAsset);
 
     checkAsset(updatedAsset, componentId, 2, false);
   }
@@ -262,14 +264,14 @@ public class ComponentStoreImplCrudIT
   public void updateAssetWithoutModifyingStream() throws IOException {
     registerTestAdapters();
 
-    EntityId componentId = componentStore.createComponent(testComponent()).getId();
-    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).getId();
+    EntityId componentId = componentStore.createComponent(testComponent()).get(P_ID, EntityId.class);
+    EntityId assetId = componentStore.createAsset(componentId, testAsset(1)).get(P_ID, EntityId.class);
 
-    TestAsset sourceAsset = testAsset(2);
+    Asset sourceAsset = testAsset(2);
     sourceAsset.setStreamSupplier(null);
-    TestAsset updatedAsset = componentStore.updateAsset(assetId, sourceAsset);
+    Asset updatedAsset = componentStore.updateAsset(assetId, sourceAsset);
 
-    assertThat(updatedAsset.getDownloadCount(), is(2L));
+    assertThat(updatedAsset.get(P_DOWNLOAD_COUNT, Long.class), is(2L));
     assertThat(IOUtils.toString(updatedAsset.openStream()), is(IOUtils.toString(testAsset(1).openStream())));
   }
 
@@ -279,39 +281,45 @@ public class ComponentStoreImplCrudIT
   public void deleteNonExistingComponent() {
     registerTestAdapters();
 
-    assertThat(componentStore.deleteComponent(TestComponent.class, new EntityId("bogusId")), is(false));
+    assertThat(componentStore.delete(TestComponentAdapter.CLASS_NAME, new EntityId("bogusId")), is(false));
   }
 
   @Test
   public void deleteNonExistingAsset() {
     registerTestAdapters();
 
-    assertThat(componentStore.deleteAsset(TestAsset.class, new EntityId("bogusId")), is(false));
+    assertThat(componentStore.delete(TestAssetAdapter.CLASS_NAME, new EntityId("bogusId")), is(false));
   }
 
   @Test
   public void deleteComponent() {
     registerTestAdapters();
 
-    ComponentEnvelope<TestComponent, TestAsset> sourceEnvelope = testEnvelope(1);
-    TestComponent storedComponent = componentStore.createComponentWithAssets(sourceEnvelope);
-    EntityId assetId = storedComponent.getAssetIds().iterator().next();
+    Envelope sourceEnvelope = testEnvelope(1);
+    Component storedComponent = componentStore.createComponentWithAssets(sourceEnvelope).getComponent();
+    EntityId assetId = getAssetIds(storedComponent).iterator().next();
 
-    assertThat(componentStore.deleteComponent(TestComponent.class, storedComponent.getId()), is(true));
-    assertThat(componentStore.deleteComponent(TestComponent.class, storedComponent.getId()), is(false));
-    assertThat(componentStore.deleteAsset(TestAsset.class, assetId), is(false));
+    assertThat(componentStore.delete(TestComponentAdapter.CLASS_NAME, storedComponent.get(P_ID, EntityId.class)), is(true));
+    assertThat(componentStore.delete(TestComponentAdapter.CLASS_NAME, storedComponent.get(P_ID, EntityId.class)), is(false));
+    assertThat(componentStore.delete(TestAssetAdapter.CLASS_NAME, assetId), is(false));
   }
 
   @Test
   public void deleteAsset() {
     registerTestAdapters();
 
-    ComponentEnvelope<TestComponent, TestAsset> sourceEnvelope = testEnvelope(1);
-    TestComponent storedComponent = componentStore.createComponentWithAssets(sourceEnvelope);
-    EntityId assetId = storedComponent.getAssetIds().iterator().next();
+    Envelope sourceEnvelope = testEnvelope(1);
+    Component storedComponent = componentStore.createComponentWithAssets(sourceEnvelope).getComponent();
+    EntityId assetId = getAssetIds(storedComponent).iterator().next();
 
-    assertThat(componentStore.deleteAsset(TestAsset.class, assetId), is(true));
-    TestComponent updatedComponent = componentStore.readComponent(TestComponent.class, storedComponent.getId());
-    assertThat(updatedComponent.getAssetIds().size(), is(0));
+    assertThat(componentStore.delete(TestAssetAdapter.CLASS_NAME, assetId), is(true));
+    Component updatedComponent = componentStore.readComponent(TestComponentAdapter.CLASS_NAME, storedComponent.get(P_ID,
+        EntityId.class));
+    assertThat(getAssetIds(updatedComponent).size(), is(0));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Set<EntityId> getAssetIds(Component component) {
+    return component.get(P_ASSETS, Set.class);
   }
 }

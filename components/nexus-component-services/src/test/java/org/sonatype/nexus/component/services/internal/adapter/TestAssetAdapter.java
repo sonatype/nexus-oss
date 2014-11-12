@@ -13,37 +13,26 @@
 package org.sonatype.nexus.component.services.internal.adapter;
 
 import org.sonatype.nexus.component.services.adapter.AssetAdapter;
-import org.sonatype.nexus.component.services.model.TestAsset;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * Entity adapter for {@link TestAsset}.
+ * Entity adapter for test assets.
  */
 public class TestAssetAdapter
-    extends AssetAdapter<TestAsset>
+    extends AssetAdapter
 {
+  public static final String CLASS_NAME = "testasset";
+
   public static final String P_DOWNLOAD_COUNT = "downloadCount";
 
-  @Override
-  public Class<TestAsset> getEntityClass() {
-    return TestAsset.class;
+  public TestAssetAdapter() {
+    super(CLASS_NAME);
   }
 
   @Override
-  public void initStorageClass(final OClass oClass) {
+  public void initClass(final OClass oClass) {
     createRequiredAutoIndexedProperty(oClass, P_DOWNLOAD_COUNT, OType.LONG, false);
-  }
-
-  @Override
-  public void populateDocument(final TestAsset entity, final ODocument document) {
-    setValueOrNull(document, P_DOWNLOAD_COUNT, entity.getDownloadCount());
-  }
-
-  @Override
-  public void populateEntity(final ODocument document, final TestAsset entity) {
-    entity.setDownloadCount((Long) document.field(P_DOWNLOAD_COUNT));
   }
 }

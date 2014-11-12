@@ -10,19 +10,38 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.views.rawbinaries.internal;
+package org.sonatype.nexus.component.model;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.BaseAsset;
+import java.util.Arrays;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An essentially placebo implementation of {@link Asset} so this plugin has the same structure as other formats for
- * example purposes.
+ * A handle on a component and its constituent assets, which are not necessarily stored,
+ * and therefore may have {@code null} ids.
  *
  * @since 3.0
  */
-public class RawAsset
-    extends BaseAsset
-    implements Asset
+public class Envelope
 {
+  private final Component component;
+
+  private final Iterable<Asset> assets;
+
+  public Envelope(final Component component, final Iterable<Asset> assets) {
+    this.component = checkNotNull(component);
+    this.assets = checkNotNull(assets);
+  }
+
+  public Envelope(final Component component, final Asset... assets) {
+    this(component, Arrays.asList(assets));
+  }
+
+  public Component getComponent() {
+    return component;
+  }
+
+  public Iterable<Asset> getAssets() {
+    return assets;
+  }
 }

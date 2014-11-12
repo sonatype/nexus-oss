@@ -16,19 +16,24 @@ import java.io.IOException;
 import java.util.Formatter;
 import java.util.List;
 
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Entity;
 import org.sonatype.nexus.componentviews.Handler;
 import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
 import org.sonatype.nexus.componentviews.responses.StatusResponse;
-import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
 import com.google.common.base.Throwables;
 import com.google.common.html.HtmlEscapers;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_TYPE;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_LAST_MODIFIED;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_PATH;
 
 /**
  * The handler that implements the runtime logic of this format - receiving, listing, serving, and deleting binary
@@ -46,7 +51,8 @@ public class HostedRawBinariesHandler
   }
 
   @Override
-  public ViewResponse handle(final HandlerContext context) {
+  public ViewResponse handle(final HandlerContext context) throws IOException {
+
     ViewRequest req = context.getRequest();
 
     String binaryPath = ensureLeadingSlash(
@@ -55,7 +61,7 @@ public class HostedRawBinariesHandler
 
       case PUT:
         try {
-          final RawBinary created = binaryStore.create(binaryPath, req.getContentType(), req.getInputStream());
+          final Entity created = binaryStore.create(binaryPath, req.getContentType(), req.getInputStream());
 
           if (created != null) {
             return Responses.created();
@@ -78,13 +84,14 @@ public class HostedRawBinariesHandler
         }
 
       case GET:
-        final List<RawBinary> binaries = binaryStore.getForPath(binaryPath);
+        final List<Asset> binaries = binaryStore.getForPath(binaryPath);
 
         // Do we have a single result whose path matches the request exactly?
         if (isSuccesfulRequestForSingleArtifact(binaryPath, binaries)) {
-          final RawBinary binary = binaries.get(0);
+          final Asset binary = binaries.get(0);
           return Responses
-              .streamResponse(binary.getInputStream(), binary.getContentType(), binary.getModifiedDate().toDate());
+              .streamResponse(binary.openStream(), binary.get(P_CONTENT_TYPE, String.class),
+                  binary.get(P_LAST_MODIFIED, DateTime.class).toDate());
         }
 
         StringBuilder html = new StringBuilder();
@@ -94,11 +101,10 @@ public class HostedRawBinariesHandler
         html.append("<h1>").append(HtmlEscapers.htmlEscaper().escape(binaryPath)).append("</h1>");
         html.append("<ul>");
 
-        for (RawBinary binary : binaries) {
+        for (Entity binary : binaries) {
 
-          html.append(
-              new Formatter()
-                  .format("<li><a href=\"%s\">%s</a></li>", stripLeadingSlash(binary.getPath()), binary.getPath()));
+          html.append(new Formatter().format("<li><a href=\"%s\">%s</a></li>",
+              stripLeadingSlash(binary.get(P_PATH, String.class)), binary.get(P_PATH, String.class)));
         }
         html.append("</ul>");
         html.append("</body></html>");
@@ -117,7 +123,7 @@ public class HostedRawBinariesHandler
     return path.startsWith("/") ? path : "/" + path;
   }
 
-  private boolean isSuccesfulRequestForSingleArtifact(final String requestedPath, final List<RawBinary> forPath) {
-    return forPath.size() == 1 && forPath.get(0).getPath().equals(requestedPath);
+  private boolean isSuccesfulRequestForSingleArtifact(final String requestedPath, final List<Asset> forPath) {
+    return forPath.size() == 1 && forPath.get(0).get(P_PATH, String.class).equals(requestedPath);
   }
 }

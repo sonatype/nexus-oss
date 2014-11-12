@@ -17,7 +17,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Envelope;
 import org.sonatype.nexus.component.source.ComponentRequest;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceRegistry;
@@ -26,17 +27,18 @@ import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
-import org.sonatype.nexus.views.rawbinaries.internal.RawAsset;
-import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
-import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_TYPE;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_LAST_MODIFIED;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_PATH;
 
 /**
  * A proxying handler for raw binary assets.
@@ -73,11 +75,11 @@ public class ProxyingRawBinariesHandler
       case GET:
         // Check locally.
 
-        final List<RawBinary> localBinaries = binaryStore.getForPath(requestPath);
+        final List<Asset> localBinaries = binaryStore.getForPath(requestPath);
 
         // Do we have a single result whose path matches the request exactly?
 
-        final RawBinary exactMatch = exactMatch(localBinaries, requestPath);
+        final Asset exactMatch = exactMatch(localBinaries, requestPath);
         if (exactMatch != null) {
           return createStreamResponse(exactMatch);
         }
@@ -88,11 +90,11 @@ public class ProxyingRawBinariesHandler
           final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
 
           // Here we presume we're getting Component back, since we don't actually use the component metadata
-          final Iterable<ComponentEnvelope<RawComponent, RawAsset>> envelopes = getSource().fetchComponents(path);
+          final Iterable<Envelope> envelopes = getSource().fetchComponents(path);
 
-          for (ComponentEnvelope<RawComponent, RawAsset> envelope : envelopes) {
-            for (RawAsset asset : envelope.getAssets()) {
-              binaryStore.create(requestPath, asset.getContentType(), asset.openStream());
+          for (Envelope envelope : envelopes) {
+            for (Asset asset : envelope.getAssets()) {
+              binaryStore.create(requestPath, asset.get(P_CONTENT_TYPE, String.class), asset.openStream());
             }
           }
         }
@@ -108,16 +110,16 @@ public class ProxyingRawBinariesHandler
   }
 
   @VisibleForTesting
-  ViewResponse createStreamResponse(final RawBinary binary) {
-    return Responses
-        .streamResponse(binary.getInputStream(), binary.getContentType(), binary.getModifiedDate().toDate());
+  ViewResponse createStreamResponse(final Asset binary) throws IOException {
+    return Responses.streamResponse(binary.openStream(), binary.get(P_CONTENT_TYPE, String.class),
+        binary.get(P_LAST_MODIFIED, DateTime.class).toDate());
   }
 
 
   @Nullable
-  private RawBinary exactMatch(final List<RawBinary> binaries, final String path) {
-    for (RawBinary binary : binaries) {
-      if (binary.getPath().equals(path)) {
+  private Asset exactMatch(final List<Asset> binaries, final String path) {
+    for (Asset binary : binaries) {
+      if (binary.get(P_PATH, String.class).equals(path)) {
         return binary;
       }
     }
