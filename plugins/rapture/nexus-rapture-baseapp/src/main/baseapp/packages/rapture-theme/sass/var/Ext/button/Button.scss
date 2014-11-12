@@ -10,7 +10,7 @@ $button-default-color-disabled: $color-white;
 
 $button-default-border-color: $color-night-rider;
 $button-default-border-color-over: $color-night-rider;
-$button-default-border-color-focus: $color-night-rider;
+$button-default-border-color-focus: $color-cornflower;
 $button-default-border-color-pressed: $color-night-rider;
 $button-default-border-color-disabled: $color-night-rider;
 
@@ -34,6 +34,8 @@ $button-toolbar-color-over: $color-night-rider;
 $button-toolbar-color-focus: $color-night-rider;
 $button-toolbar-color-pressed: $color-white;
 $button-toolbar-color-disabled: $color-night-rider;
+
+$button-toolbar-border-color-focus: $color-cornflower;
 
 $button-toolbar-glyph-color: $color-night-rider;
 $button-toolbar-glyph-opacity: 1;

@@ -1,3 +1,22 @@
+/* line 388, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-plain-small-icon-text-left .x-btn-button {
+  height: 16px;
+}
+/* line 393, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-plain-small-icon-text-left .x-btn-inner {
+  line-height: 16px;
+  padding-left: 21px;
+}
+/* line 409, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-plain-small-icon-text-left .x-btn-icon-el {
+  width: 16px;
+  right: auto;
+}
+/* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-ie6 .x-btn-plain-small-icon-text-left .x-btn-icon-el, .x-quirks .x-ie .x-btn-plain-small-icon-text-left .x-btn-icon-el {
+  height: 16px;
+}
+
 /* line 430, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small-icon-text-right .x-btn-button {
   height: 16px;
@@ -560,6 +579,7 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-primary-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #197ac5), color-stop(100%, #0161ad));
@@ -1067,6 +1087,7 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-danger-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #de3d63), color-stop(100%, #c6254b));
@@ -1574,6 +1595,7 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-warning-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f39244), color-stop(100%, #da792b));
@@ -2081,6 +2103,7 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-success-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #23a156), color-stop(100%, #0b893d));
@@ -2574,7 +2597,7 @@
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-header-toolbar-medium-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #1c8145;
 }
