@@ -26,6 +26,9 @@ import org.sonatype.nexus.orient.OClassNameBuilder;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
 
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_COMPONENT;
+import static org.sonatype.nexus.component.services.adapter.ComponentAdapter.P_ASSETS;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -178,14 +181,14 @@ public class OrientQueryBuilder
       else {
         // Component restriction in a query for assets:
         // "component.propertyName operator value"
-        builder.append("component.").append(expression);
+        builder.append(P_COMPONENT).append(".").append(expression);
       }
     }
     else {
       if (isComponentQuery) {
         // Asset restriction in a query for components:
         // "assets contains ( propertyName operator value )"
-        builder.append("assets contains ( ").append(expression).append(" )");
+        builder.append(P_ASSETS).append(" contains ( ").append(expression).append(" )");
       }
       else {
         // Asset restriction in a query for assets:
