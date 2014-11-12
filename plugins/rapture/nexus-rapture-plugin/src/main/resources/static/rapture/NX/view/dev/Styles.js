@@ -23,6 +23,10 @@ Ext.define('NX.view.dev.Styles', {
   mixins: {
     logAware: 'NX.LogAware'
   },
+  requires: [
+    'NX.view.dev.styles.Toolbars',
+    'NX.view.dev.styles.Grids'
+  ],
 
   title: 'Styles',
 
@@ -1038,109 +1042,13 @@ Ext.define('NX.view.dev.Styles', {
     // Toolbar
     //
 
-    function toolbar(cfg) {
-      var defaults = {
-        xtype: 'toolbar',
-        items: [
-          {
-            xtype: 'button',
-            text: 'plain'
-          },
-          {
-            xtype: 'button',
-            text: 'with glyph',
-            glyph: 'xf1b2@FontAwesome'
-          },
-          {
-            xtype: 'button',
-            text: 'with icon',
-            iconCls: 'nx-icon-help-kb-x16'
-          },
-          ' ', // spacer
-          {
-            xtype: 'button',
-            text: 'button menu',
-            menu: [
-              { text: 'plain' },
-              { text: 'with glyph', glyph: 'xf059@FontAwesome' },
-              { text: 'with icon', iconCls: 'nx-icon-help-kb-x16'}
-            ]
-          },
-          '-', // seperator
-          {
-            xtype: 'nx-searchbox',
-            width: 200
-          }
-        ]
-      };
-
-      return Ext.applyIf(defaults, cfg);
-    }
-
-    items.push(
-        styleSection('Toolbar',
-            styleRow(
-              'normal'
-            ),
-            styleRow(
-              toolbar()
-            ),
-            styleRow(
-              'medium'
-            ),
-            styleRow(
-              toolbar({
-                defaults: {
-                  scale: 'medium'
-                }
-              })
-            ),
-            styleRow(
-              'large'
-            ),
-            styleRow(
-              toolbar({
-                defaults: {
-                  scale: 'large'
-                }
-              })
-            )
-        )
-    );
+    items.push(Ext.create('NX.view.dev.styles.Toolbars'));
 
     //
     // Grid
     //
 
-    var gridStore = Ext.create('Ext.data.ArrayStore', {
-      storeId: 'gridStore',
-      fields: [
-        'id',
-        'name'
-      ],
-      data: [
-        [ 'foo', 'Foo' ],
-        [ 'bar', 'Bar' ],
-        [ 'baz', 'Baz' ]
-      ]
-    });
-
-    items.push(
-        styleSection('Grid',
-            styleRow(
-                {
-                  xtype: 'grid',
-                  store: gridStore,
-                  height: 200,
-                  width: 200,
-                  columns: [
-                    { text: 'ID', dataIndex: 'id' },
-                    { text: 'Name', dataIndex: 'name' }
-                  ]
-                }
-            )
-        )
-    );
+    items.push(Ext.create('NX.view.dev.styles.Grids'));
 
     return items;
   }
