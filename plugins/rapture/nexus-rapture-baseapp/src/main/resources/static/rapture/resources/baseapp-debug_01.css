@@ -88,6 +88,9 @@
 /**
  * @class Ext.tip.QuickTip
  */
+/**
+ * @class Ext.form.field.Base
+ */
 /* including package ext-theme-neptune */
 /** @class Global_CSS */
 /** @class Ext.LoadMask */
@@ -7587,6 +7590,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #515151), color-stop(50%, #3e3e3e), color-stop(51%, #3a3a3a), color-stop(100%, #3e3e3e));
@@ -8091,6 +8095,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-medium-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #515151), color-stop(50%, #3e3e3e), color-stop(51%, #3a3a3a), color-stop(100%, #3e3e3e));
@@ -8595,6 +8600,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-large-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #515151), color-stop(50%, #3e3e3e), color-stop(51%, #3a3a3a), color-stop(100%, #3e3e3e));
@@ -9099,7 +9105,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-toolbar-small-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -9606,7 +9612,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-toolbar-medium-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -10113,7 +10119,7 @@ a.x-tab .x-tab-inner-right {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-toolbar-large-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -15421,7 +15427,7 @@ div.x-lbl-top-err-icon {
 
 /* line 34, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Text.scss */
 .x-form-focus {
-  border-color: #3892d3;
+  border-color: #96caee;
 }
 
 /* line 39, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/field/Text.scss */
@@ -20415,7 +20421,7 @@ a.x-color-picker-item:hover {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-toolbar-small-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -20908,7 +20914,7 @@ a.x-color-picker-item:hover {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-toolbar-medium-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -21401,7 +21407,7 @@ a.x-color-picker-item:hover {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-toolbar-large-focus {
-  border-color: #d8d8d8;
+  border-color: #96caee;
   background-image: none;
   background-color: #ebebeb;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ededed), color-stop(50%, #ebebeb), color-stop(51%, #dfdfdf), color-stop(100%, #ebebeb));
@@ -23661,7 +23667,7 @@ a.x-color-picker-item:hover {
 }
 /* line 22, ../../../baseapp/ext/packages/ext-theme-neptune/sass/src/form/field/Trigger.scss */
 .x-form-trigger-wrap-focus .x-form-trigger-wrap {
-  border-color: #3892d3;
+  border-color: #96caee;
 }
 /* line 26, ../../../baseapp/ext/packages/ext-theme-neptune/sass/src/form/field/Trigger.scss */
 .x-form-invalid .x-form-trigger-wrap {
@@ -24097,6 +24103,7 @@ a.x-color-picker-item:hover {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-small-focus {
+  border-color: #96caee;
   background-image: none;
   background-color: #3e3e3e;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
