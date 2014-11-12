@@ -24345,7 +24345,7 @@ a.x-color-picker-item:hover {
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-small {
-  border-color: #919191;
+  border-color: #dddddd;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */

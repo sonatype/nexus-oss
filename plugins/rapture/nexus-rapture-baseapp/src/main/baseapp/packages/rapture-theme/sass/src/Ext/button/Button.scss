@@ -39,11 +39,10 @@
 @include extjs-button-small-ui(
   $ui: 'plain',
 
-  $border-color: $color-suva-gray,
-  $border-color-over: $color-suva-gray,
-  $border-color-focus: $color-suva-gray,
-  $border-color-pressed: $color-suva-gray,
-  $border-color-disabled: $color-suva-gray,
+  $border-color: $color-gainsboro,
+  $border-color-over: $color-gainsboro,
+  $border-color-pressed: $color-gainsboro,
+  $border-color-disabled: $color-gainsboro,
 
   $background-gradient: $color-white $color-light-gainsboro,
   $background-gradient-over: $color-light-gray $color-silver,
