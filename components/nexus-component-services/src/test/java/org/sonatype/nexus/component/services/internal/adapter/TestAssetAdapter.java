@@ -12,27 +12,19 @@
  */
 package org.sonatype.nexus.component.services.internal.adapter;
 
-import org.sonatype.nexus.component.services.adapter.AssetEntityAdapter;
-import org.sonatype.nexus.component.services.adapter.EntityAdapter;
+import org.sonatype.nexus.component.services.adapter.AssetAdapter;
 import org.sonatype.nexus.component.services.model.TestAsset;
-import org.sonatype.nexus.orient.OClassNameBuilder;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Entity adapter for {@link TestAsset}.
  */
-public class TestAssetEntityAdapter
-  extends EntityAdapter<TestAsset>
+public class TestAssetAdapter
+    extends AssetAdapter<TestAsset>
 {
-  public static final String ORIENT_CLASS_NAME = new OClassNameBuilder().type(TestAsset.class).build();
-
   public static final String P_DOWNLOAD_COUNT = "downloadCount";
 
   @Override
@@ -41,28 +33,17 @@ public class TestAssetEntityAdapter
   }
 
   @Override
-  public void registerStorageClass(final ODatabaseDocumentTx db) {
-    OSchema schema = checkNotNull(db).getMetadata().getSchema();
-    AssetEntityAdapter.registerBaseClass(schema, log);
-    if (!schema.existsClass(ORIENT_CLASS_NAME)) {
-      OClass baseClass = schema.getClass(AssetEntityAdapter.ORIENT_CLASS_NAME);
-      OClass oClass = schema.createClass(ORIENT_CLASS_NAME, baseClass);
-      createRequiredAutoIndexedProperty(oClass, P_DOWNLOAD_COUNT, OType.LONG, false);
-      logCreatedClassInfo(log, oClass);
-    }
+  public void initStorageClass(final OClass oClass) {
+    createRequiredAutoIndexedProperty(oClass, P_DOWNLOAD_COUNT, OType.LONG, false);
   }
 
   @Override
-  public void convertToDocument(final TestAsset entity, final ODocument document) {
-    AssetEntityAdapter.convertBasePropertiesToDocument(entity, document);
+  public void populateDocument(final TestAsset entity, final ODocument document) {
     setValueOrNull(document, P_DOWNLOAD_COUNT, entity.getDownloadCount());
   }
 
   @Override
-  public TestAsset convertToEntity(final ODocument document) {
-    TestAsset entity = new TestAsset();
-    AssetEntityAdapter.convertBasePropertiesToEntity(document, entity);
+  public void populateEntity(final ODocument document, final TestAsset entity) {
     entity.setDownloadCount((Long) document.field(P_DOWNLOAD_COUNT));
-    return entity;
   }
 }

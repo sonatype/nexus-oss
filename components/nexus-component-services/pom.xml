@@ -35,18 +35,17 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-blobstore-file</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-component-model</artifactId>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-blobstore-file</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>

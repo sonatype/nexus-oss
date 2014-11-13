@@ -10,29 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.adapter;
+package org.sonatype.nexus.views.rawbinaries.internal;
 
-import javax.inject.Named;
-
-import org.eclipse.sisu.BeanEntry;
-import org.eclipse.sisu.Mediator;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.BaseAsset;
 
 /**
- * Manages {@link EntityAdapter} registrations via Sisu component mediation.
+ * An essentially placebo implementation of {@link Asset} so this plugin has the same structure as other formats for
+ * example purposes.
  *
  * @since 3.0
  */
-@Named
-public class EntityAdapterMediator
-    implements Mediator<Named, EntityAdapter, EntityAdapterRegistry>
+public class RawAsset
+    extends BaseAsset
+    implements Asset
 {
-  @Override
-  public void add(final BeanEntry<Named, EntityAdapter> entry, final EntityAdapterRegistry registry) {
-    registry.registerAdapter(entry.getValue());
-  }
-
-  @Override
-  public void remove(final BeanEntry<Named, EntityAdapter> entry, final EntityAdapterRegistry registry) {
-    registry.unregisterAdapter(entry.getValue().getEntityClass());
-  }
 }

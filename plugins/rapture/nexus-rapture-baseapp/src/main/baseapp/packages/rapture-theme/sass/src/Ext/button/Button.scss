@@ -3,6 +3,57 @@
  */
 
 /**
+ * ui: 'default'
+ */
+
+@include extjs-button-small-ui(
+  $ui: 'default',
+
+  $background-gradient: $color-white $color-light-gainsboro,
+  $background-gradient-over: $color-light-gray $color-silver,
+  $background-gradient-focus: $color-white $color-light-gainsboro,
+  $background-gradient-pressed: $color-suva-gray $color-gray,
+  $background-gradient-disabled: $color-white $color-light-gainsboro,
+
+  $color: $color-night-rider,
+  $color-over: $color-night-rider,
+  $color-focus: $color-night-rider,
+  $color-pressed: $color-white,
+  $color-disabled: $color-dark-gray,
+
+  $glyph-color: $color-night-rider,
+  $glyph-opacity: 1
+);
+
+/**
+ * ui: 'plain'
+ */
+
+@include extjs-button-small-ui(
+  $ui: 'plain',
+
+  $border-color: $color-gainsboro,
+  $border-color-over: $color-gainsboro,
+  $border-color-pressed: $color-gainsboro,
+  $border-color-disabled: $color-gainsboro,
+
+  $background-gradient: $color-white $color-light-gainsboro,
+  $background-gradient-over: $color-light-gray $color-silver,
+  $background-gradient-focus: $color-white $color-light-gainsboro,
+  $background-gradient-pressed: $color-suva-gray $color-gray,
+  $background-gradient-disabled: $color-white $color-light-gainsboro,
+
+  $color: $color-night-rider,
+  $color-over: $color-night-rider,
+  $color-focus: $color-night-rider,
+  $color-pressed: $color-white,
+  $color-disabled: $color-dark-gray,
+
+  $glyph-color: $color-night-rider,
+  $glyph-opacity: 1
+);
+
+/**
  * ui: 'primary'
  */
 
@@ -59,42 +110,17 @@
 );
 
 /**
- * ui: 'plain'
- */
-
-@include extjs-button-small-ui(
-  $ui: 'plain',
-
-  $border-color: $color-suva-gray,
-  $border-color-over: $color-suva-gray,
-  $border-color-focus: $color-suva-gray,
-  $border-color-pressed: $color-suva-gray,
-  $border-color-disabled: $color-suva-gray,
-
-  $background-gradient: $color-white $color-light-gainsboro,
-  $background-gradient-over: $color-light-gray $color-silver,
-  $background-gradient-focus: $color-white $color-light-gainsboro,
-  $background-gradient-pressed: $color-suva-gray $color-gray,
-  $background-gradient-disabled: $color-white $color-light-gainsboro,
-
-  $color: $color-night-rider,
-  $color-over: $color-night-rider,
-  $color-focus: $color-night-rider,
-  $color-disabled: $color-night-rider,
-
-  $glyph-color: $color-night-rider,
-  $glyph-opacity: 1
-);
-
-/**
  * ui: 'header'
  */
 
 @include extjs-button-toolbar-medium-ui(
   $ui: 'header',
 
+  $background-color: transparent,
   $background-color-over: $color-salem,
   $background-color-focus: $color-salem,
+  $background-color-pressed: $color-jewel,
+  $background-color-disabled: transparent,
 
   $color: $color-white,
   $color-over: $color-white,
@@ -109,9 +135,6 @@
   $background-gradient-focus: transparent,
   $background-gradient-pressed: transparent,
   $background-gradient-disabled: transparent,
-
-  $background-color: transparent,
-  $background-color-disabled: transparent,
 
   $glyph-color: $color-white,
   $glyph-opacity: 1

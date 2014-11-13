@@ -13,6 +13,7 @@
 package org.sonatype.nexus.views.rawbinaries.example;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,9 +22,11 @@ import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigContributor;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.http.ConnectionConfig;
+import org.sonatype.nexus.component.source.http.HttpClientConfig;
 import org.sonatype.nexus.views.rawbinaries.source.RawComponentSourceFactory;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -42,12 +45,20 @@ public class RawSourceConfigContribution
 
   @Override
   public void contributeTo(final ComponentSourceConfigStore store) throws IOException {
-    final ComponentSourceConfig config = new ComponentSourceConfig(new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),
-        RawComponentSourceFactory.NAME, ImmutableMap.of(RawComponentSourceFactory.REMOTE_URL_PARAM,
-        (Object) "http://search.maven.org/"));
-
     if (store.get(SOURCE_NAME) == null) {
-      store.add(config);
+      Map<String, Object> config = Maps.newHashMap();
+      config.put(RawComponentSourceFactory.REMOTE_URL_PARAM, "http://search.maven.org/");
+      config.putAll(new HttpClientConfig().withConnectionConfig(new ConnectionConfig()
+              .withTimeout(500)
+              .withRetries(5)
+              .withUserAgentCustomisation("NX3")
+      ).toMap());
+
+      store.add(new ComponentSourceConfig(
+          new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),
+          RawComponentSourceFactory.NAME,
+          config
+      ));
     }
   }
 }
