@@ -36,7 +36,7 @@ Ext.define('NX.view.dev.styles.Tabs', {
       var proto = {
         xtype: 'tabpanel',
         width: 400,
-        height: 30,
+        height: 30, // HACK this is very important for the 'light' style ATM :-(
         activeTab: 0,
         ui: name,
         items: [
