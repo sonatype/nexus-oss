@@ -21,5 +21,20 @@ Ext.define('NX.view.dev.styles.StyleSection', {
   extend: 'Ext.panel.Panel',
 
   ui: 'light',
-  bodyPadding: '5px 5px 5px 5px'
+  bodyPadding: '5px 5px 5px 5px',
+
+  /**
+   * Render a block of HTML.
+   *
+   * @protected
+   *
+   * @param html
+   * @returns {{xtype: string, html: *}}
+   */
+  html: function(html) {
+    return {
+      xtype: 'container',
+      html: html
+    };
+  }
 });

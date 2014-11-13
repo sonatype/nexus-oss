@@ -48,13 +48,11 @@ Ext.define('NX.view.dev.styles.Fonts', {
     );
 
     function font(name, clz) {
-      return {
-        xtype: 'container',
-        html: template.apply({
+      return me.html(template.apply({
           text: name,
           clz: clz
         })
-      }
+      );
     }
 
     me.items = [

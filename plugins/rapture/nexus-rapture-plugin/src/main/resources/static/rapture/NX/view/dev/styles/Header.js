@@ -20,7 +20,8 @@
 Ext.define('NX.view.dev.styles.Header', {
   extend: 'NX.view.dev.styles.StyleSection',
   requires: [
-    'Ext.XTemplate'
+    'Ext.XTemplate',
+    'NX.State'
   ],
 
   title: 'Header',

@@ -26,6 +26,7 @@ Ext.define('NX.view.dev.Styles', {
   requires: [
     'NX.view.dev.styles.Header',
     'NX.view.dev.styles.Fonts',
+    'NX.view.dev.styles.Buttons',
     'NX.view.dev.styles.Forms',
     'NX.view.dev.styles.Messages',
     'NX.view.dev.styles.Modals',
@@ -409,130 +410,7 @@ Ext.define('NX.view.dev.Styles', {
       )
     );
 
-    /*
-     * Buttons
-     */
-
-    var sampleTemplate = Ext.create('Ext.XTemplate',
-      '<table>',
-        '<tpl for=".">',
-          '<tr>',
-            '<td><div class="color {.}"></div></td>',
-            '<td><div style="padding: 0 10px 0 0">$color-{.}</div></td>',
-          '</tr>',
-        '</tpl>',
-      '</table>'
-    );
-
-    function buttonBlock(ui, text, disabled, pressed, menu) {
-      var button = { xtype: 'button', text: text, ui: ui, margin: "0 10 10 0" };
-
-      // Initialize optional button parameters
-      if (disabled) {
-        button['disabled'] = true;
-      }
-      if (pressed) {
-        button['pressed'] = true;
-        button['enableToggle'] = true;
-      }
-      if (menu) {
-        button['menu'] = [
-          { text: 'First' },
-          '-',
-          { text: 'Second' }
-        ];
-      } else {
-        button['glyph'] = 'xf036@FontAwesome';
-      }
-
-      return button;
-    }
-
-    items.push(
-      styleSection('Buttons',
-        styleTable(3,
-
-          // Default buttons
-          styleColumn(
-            { xtype: 'label', text: 'Default', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('default', 'Default', false, false, false),
-                buttonBlock('default', 'Default', true, false, false),
-                buttonBlock('default', 'Default', false, false, true)
-              ),
-              sampleTemplate.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray'])
-            )
-          ),
-
-          // Plain buttons
-          styleColumn(
-            { xtype: 'label', text: 'Plain', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('plain', 'Plain', false, false, false),
-                buttonBlock('plain', 'Plain', true, false, false),
-                buttonBlock('plain', 'Plain', false, false, true)
-              ),
-              sampleTemplate.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray'])
-            )
-          ),
-
-          // Primary buttons
-          styleColumn(
-            { xtype: 'label', text: 'Primary', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('primary', 'Primary', false, false, false),
-                buttonBlock('primary', 'Primary', true, false, false),
-                buttonBlock('primary', 'Primary', false, false, true)
-              ),
-              sampleTemplate.apply(['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue'])
-            )
-          ),
-
-          // Danger buttons
-          styleColumn(
-            { xtype: 'label', text: 'Danger', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('danger', 'Danger', false, false, false),
-                buttonBlock('danger', 'Danger', true, false, false),
-                buttonBlock('danger', 'Danger', false, false, true)
-              ),
-              sampleTemplate.apply(['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red'])
-            )
-          ),
-
-          // Warning buttons
-          styleColumn(
-            { xtype: 'label', text: 'Warning', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('warning', 'Warning', false, false, false),
-                buttonBlock('warning', 'Warning', true, false, false),
-                buttonBlock('warning', 'Warning', false, false, true)
-              ),
-              sampleTemplate.apply(['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet'])
-            )
-          ),
-
-          // Success buttons
-          styleColumn(
-            { xtype: 'label', text: 'Success', cls: 'section-header' },
-            styleRow(
-              styleColumn(
-                buttonBlock('success', 'Success', false, false, false),
-                buttonBlock('success', 'Success', true, false, false),
-                buttonBlock('success', 'Success', false, false, true)
-              ),
-              sampleTemplate.apply(['elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'])
-            )
-          )
-        )
-      )
-    );
-
+    items.push(Ext.create('NX.view.dev.styles.Buttons'));
     items.push(Ext.create('NX.view.dev.styles.Forms'));
     items.push(Ext.create('NX.view.dev.styles.Messages'));
     items.push(Ext.create('NX.view.dev.styles.Modals'));
