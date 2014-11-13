@@ -12,9 +12,6 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,8 +22,6 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -36,7 +31,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.credential.PasswordService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,29 +42,16 @@ public class UserManagerTest
   private PasswordService passwordService;
 
   @Override
+  protected Configuration getSecurityModelConfig() {
+    return UserManagerTestSecurity.securityModel();
+  }
+
+  @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    // copy the securityConf into place
-    String securityXml = this.getClass().getName().replaceAll("\\.", "\\/") + "-security.xml";
-    FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(securityXml),
-        new File(CONFIG_DIR, "security.xml"));
-
     passwordService = lookup(PasswordService.class, "default");
-  }
-
-  public SecuritySystem getSecuritySystem()
-      throws Exception
-  {
-    return this.lookup(SecuritySystem.class);
-  }
-
-  public UserManager getUserManager()
-      throws Exception
-  {
-    return this.lookup(UserManager.class);
   }
 
   public ConfigurationManager getConfigurationManager()
@@ -310,37 +291,6 @@ public class UserManagerTest
     }
 
     Assert.assertTrue("did not find anon user in role mapping", found);
-  }
-
-  public void testLoadConfigWithInvalidEmail()
-      throws Exception
-  {
-    File securityXML = new File(CONFIG_DIR, "security.xml");
-    Configuration config = null;
-
-    String userId = null;
-
-    try (FileInputStream fis = new FileInputStream(securityXML)) {
-      SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-      config = reader.read(fis);
-    }
-
-    try (FileWriter fileWriter = new FileWriter(securityXML)) {
-      config.getUsers().get(0).setEmail("testLoadConfigWithInvalidEmail");
-      userId = config.getUsers().get(0).getId();
-
-      SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-      writer.write(fileWriter, config);
-    }
-
-    // FIXME: unsure about the intent of this test...
-    // now restart the security
-    // this.getSecuritySystem().start();
-
-    // that should have went well,
-    User user = this.getSecuritySystem().getUser(userId, "default");
-    Assert.assertEquals("testLoadConfigWithInvalidEmail", user.getEmailAddress());
-
   }
 
   private List<String> getRoleIds(User user) {

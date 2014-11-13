@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.authorization.xml;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,25 +26,18 @@ import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 
 public class AuthorizationManagerTest
     extends AbstractSecurityTestCase
 {
 
   @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    // copy the securityConf into place
-    String securityXml = this.getClass().getName().replaceAll("\\.", "\\/") + "-security.xml";
-    FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(securityXml),
-        new File(CONFIG_DIR, "security.xml"));
+  protected Configuration getSecurityModelConfig() {
+    return AuthorizationManagerTestSecurity.securityModel();
   }
 
   public AuthorizationManager getAuthorizationManager()

@@ -14,33 +14,24 @@ package org.sonatype.security.locators;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
 import junit.framework.Assert;
 
 public class SecurityXmlUserLocatorTest
     extends AbstractSecurityTestCase
 {
-  @Override
-  public void configure(Binder binder) {
-    super.configure(binder);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("mock")).to(MockStaticSecurityResource.class);
-  }
 
-  public UserManager getUserManager()
-      throws Exception
-  {
-    return (UserManager) this.lookup(UserManager.class);
+  @Override
+  protected Configuration getSecurityModelConfig() {
+    return SecurityXmlUserLocatorTestSecurity.securityModel();
   }
 
   public void testListUserIds()
@@ -138,13 +129,6 @@ public class SecurityXmlUserLocatorTest
       results.put(plexusUser.getUserId(), plexusUser);
     }
     return results;
-  }
-
-  @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-    properties.put("security-xml-file", "target/test-classes/"
-        + this.getClass().getPackage().getName().replaceAll("\\.", "\\/") + "/security.xml");
   }
 
 }
