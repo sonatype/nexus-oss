@@ -23,8 +23,8 @@ Ext.define('NX.view.dev.styles.Panels', {
   title: 'Panels',
 
   layout: {
-    type: 'hbox',
-    defaultMargins: {top: 0, right: 4, bottom: 0, left: 0}
+    type: 'vbox',
+    defaultMargins: {top: 4, right: 0, bottom: 0, left: 0}
   },
 
   /**
@@ -33,63 +33,50 @@ Ext.define('NX.view.dev.styles.Panels', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
-      // normal
-      {
-        xtype: 'panel',
-        title: 'Normal',
-        height: 100,
-        width: 200,
-        items: [
-          {
-            xtype: 'container',
-            html: 'normal'
-          }
-        ]
-      },
-      {
-        xtype: 'panel',
-        title: 'Framed',
-        frame: true,
-        height: 100,
-        width: 200,
-        items: [
-          {
-            xtype: 'container',
-            html: 'frame: true'
-          }
-        ]
-      },
+    function panelStyle(ui) {
+      return {
+        layout: {
+          type: 'hbox',
+          defaultMargins: {top: 0, right: 4, bottom: 0, left: 0}
+        },
 
-      // light
-      {
-        xtype: 'panel',
-        title: 'Light',
-        ui: 'light',
-        height: 100,
-        width: 200,
         items: [
           {
-            xtype: 'container',
-            html: 'ui: light'
-          }
-        ]
-      },
-      {
-        xtype: 'panel',
-        title: 'Light Framed',
-        ui: 'light',
-        frame: true,
-        height: 100,
-        width: 200,
-        items: [
+            xtype: 'panel',
+            title: ui,
+            ui: ui,
+            height: 100,
+            width: 200,
+            items: [
+              {
+                xtype: 'container',
+                html: 'ui: ' + ui
+              }
+            ]
+          },
           {
-            xtype: 'container',
-            html: 'ui: light, frame: true'
+            xtype: 'panel',
+            title: ui + ' framed',
+            ui: ui,
+            frame: true,
+            height: 100,
+            width: 200,
+            items: [
+              {
+                xtype: 'container',
+                html: 'ui: ' + ui + '; frame: true'
+              }
+            ]
           }
         ]
       }
-    ]
+    }
+
+    me.items = [
+      panelStyle('default'),
+      panelStyle('light'),
+      panelStyle('subsection')
+    ];
 
     me.callParent();
   }
