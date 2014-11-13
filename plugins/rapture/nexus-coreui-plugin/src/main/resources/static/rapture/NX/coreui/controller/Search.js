@@ -398,6 +398,7 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
     if (searchResultModel) {
+      searchResultDetails.up('#searchfeature').layout.setActiveItem(1);
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
       searchResultDetails.items.get(1).items.get(1).showInfo({
@@ -438,6 +439,7 @@ Ext.define('NX.coreui.controller.Search', {
         storageFileContainer = me.getStorageFileContainer();
 
     if (searchResultVersionModel) {
+      me.getSearchResultVersion().up('#searchfeature').layout.setActiveItem(2);
       storageFileContainer.showStorageFile(
           searchResultVersionModel.get('repositoryId'),
           searchResultVersionModel.get('path'),

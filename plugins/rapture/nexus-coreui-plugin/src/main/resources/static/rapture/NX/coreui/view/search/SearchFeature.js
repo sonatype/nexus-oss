@@ -20,6 +20,7 @@
 Ext.define('NX.coreui.view.search.SearchFeature', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-searchfeature',
+  itemId: 'searchfeature',
 
   layout: 'card',
 
