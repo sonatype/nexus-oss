@@ -51,5 +51,5 @@ Ext.define('NX.view.dev.styles.StyleSection', {
       xtype: 'label',
       html: html
     }
-  },
+  }
 });
