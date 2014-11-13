@@ -22,6 +22,8 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineRecord;
 
+import org.junit.Ignore;
+
 /**
  * Test the timeline indexer
  *
@@ -322,150 +324,6 @@ public class TimelineIndexerTest
     assertEquals("4", results.get(0).getData().get("t"));
     assertEquals("1", results.get(1).getData().get("t"));
     assertEquals(2, indexer.purge(0, 4500000L, null, null));
-    assertEquals(0, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-  }
-
-  public void testPurgeByType()
-      throws Exception
-  {
-    TimelineRecord rec1 = createTimelineRecord(System.currentTimeMillis(), "typeA", "foo", null);
-    TimelineRecord rec2 = createTimelineRecord(System.currentTimeMillis(), "typeB", "foo", null);
-    TimelineRecord rec3 = createTimelineRecord(System.currentTimeMillis(), "typeB", "foo", null);
-    TimelineRecord rec4 = createTimelineRecord(System.currentTimeMillis(), "typeC", "foo", null);
-    indexer.add(rec1);
-    indexer.add(rec2);
-    indexer.add(rec3);
-    indexer.add(rec4);
-
-    Set<String> types = new HashSet<String>();
-    types.add("typeA");
-    assertEquals(1, indexer.purge(0, System.currentTimeMillis(), types, null));
-    assertEquals(3, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec1);
-    types.clear();
-    types.add("typeB");
-    assertEquals(2, indexer.purge(0, System.currentTimeMillis(), types, null));
-    assertEquals(2, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec2);
-    indexer.add(rec3);
-    types.clear();
-    types.add("typeB");
-    types.add("typeC");
-    assertEquals(3, indexer.purge(0, System.currentTimeMillis(), types, null));
-    assertEquals(1, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    types.clear();
-    types.add("typeA");
-    assertEquals(1, indexer.purge(0, System.currentTimeMillis(), types, null));
-    assertEquals(0, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    types.clear();
-    types.add("typeA");
-    types.add("typeB");
-    types.add("typeC");
-    assertEquals(0, indexer.purge(0, System.currentTimeMillis(), types, null));
-  }
-
-  public void testPurgeBySubType()
-      throws Exception
-  {
-    TimelineRecord rec1 = createTimelineRecord(System.currentTimeMillis(), "type", "typeA", null);
-    TimelineRecord rec2 = createTimelineRecord(System.currentTimeMillis(), "type", "typeB", null);
-    TimelineRecord rec3 = createTimelineRecord(System.currentTimeMillis(), "type", "typeB", null);
-    TimelineRecord rec4 = createTimelineRecord(System.currentTimeMillis(), "type", "typeC", null);
-    indexer.add(rec1);
-    indexer.add(rec2);
-    indexer.add(rec3);
-    indexer.add(rec4);
-
-    Set<String> subTypes = new HashSet<String>();
-    subTypes.add("typeA");
-    assertEquals(1, indexer.purge(0, System.currentTimeMillis(), null, subTypes));
-    assertEquals(3, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec1);
-    subTypes.clear();
-    subTypes.add("typeB");
-    assertEquals(2, indexer.purge(0, System.currentTimeMillis(), null, subTypes));
-    assertEquals(2, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec2);
-    indexer.add(rec3);
-    subTypes.clear();
-    subTypes.add("typeB");
-    subTypes.add("typeC");
-    assertEquals(3, indexer.purge(0, System.currentTimeMillis(), null, subTypes));
-    assertEquals(1, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    subTypes.clear();
-    subTypes.add("typeA");
-    assertEquals(1, indexer.purge(0, System.currentTimeMillis(), null, subTypes));
-    assertEquals(0, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    subTypes.clear();
-    subTypes.add("typeA");
-    subTypes.add("typeB");
-    subTypes.add("typeC");
-    assertEquals(0, indexer.purge(0, System.currentTimeMillis(), null, subTypes));
-  }
-
-  public void testPurgeByTypeAndSubType()
-      throws Exception
-  {
-    TimelineRecord rec1 = createTimelineRecord(System.currentTimeMillis(), "typeA", "subX", null);
-    TimelineRecord rec2 = createTimelineRecord(System.currentTimeMillis(), "typeB", "subX", null);
-    TimelineRecord rec3 = createTimelineRecord(System.currentTimeMillis(), "typeB", "subY", null);
-    TimelineRecord rec4 = createTimelineRecord(System.currentTimeMillis(), "typeA", "subX", null);
-    TimelineRecord rec5 = createTimelineRecord(System.currentTimeMillis(), "typeC", "subY", null);
-    indexer.add(rec1);
-    indexer.add(rec2);
-    indexer.add(rec3);
-    indexer.add(rec4);
-    indexer.add(rec5);
-
-    Set<String> types = new HashSet<String>();
-    Set<String> subTypes = new HashSet<String>();
-    types.add("typeA");
-    subTypes.add("subX");
-    assertEquals(2, indexer.purge(0, System.currentTimeMillis(), types, subTypes));
-    assertEquals(3, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec1);
-    indexer.add(rec4);
-    types.clear();
-    subTypes.clear();
-    types.add("typeA");
-    types.add("typeB");
-    subTypes.add("subX");
-    assertEquals(3, indexer.purge(0, System.currentTimeMillis(), types, subTypes));
-    assertEquals(2, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec1);
-    indexer.add(rec2);
-    indexer.add(rec4);
-    types.clear();
-    subTypes.clear();
-    types.add("typeA");
-    types.add("typeB");
-    subTypes.add("subX");
-    subTypes.add("subY");
-    assertEquals(4, indexer.purge(0, System.currentTimeMillis(), types, subTypes));
-    assertEquals(1, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
-
-    indexer.add(rec1);
-    indexer.add(rec2);
-    indexer.add(rec3);
-    indexer.add(rec4);
-    types.clear();
-    subTypes.clear();
-    types.add("typeA");
-    types.add("typeB");
-    types.add("typeC");
-    subTypes.add("subX");
-    subTypes.add("subY");
-    assertEquals(5, indexer.purge(0, System.currentTimeMillis(), types, subTypes));
     assertEquals(0, sizeOf(asList(0, System.currentTimeMillis(), null, null, 0, 100, null)));
   }
 
