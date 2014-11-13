@@ -251,42 +251,11 @@ public class SecurityConfigUtil
         fr.close();
       }
 
-      Configuration staticConfiguration = null;
-
-      fr =
-          new InputStreamReader(
-              SecurityConfigUtil.class.getResourceAsStream("/META-INF/nexus/static-security.xml"));
-
-      try {
-        staticConfiguration = reader.read(fr);
-      }
-      finally {
-        fr.close();
-      }
-
-      for (CUser user : staticConfiguration.getUsers()) {
-        configuration.addUser(user);
-      }
-      for (CRole role : staticConfiguration.getRoles()) {
-        configuration.addRole(role);
-      }
-      for (CPrivilege priv : staticConfiguration.getPrivileges()) {
-        configuration.addPrivilege(priv);
-      }
-
       List<StaticSecurityResource> resources =
           TestContainer.getInstance().getPlexusContainer().lookupList(StaticSecurityResource.class);
       for (StaticSecurityResource resource : resources) {
         addStaticSecurity(configuration, resource.getConfiguration());
       }
-
-      /**
-       * This is really really hacky, as we are manually joining together roles here. I don't like it but it makes
-       * the IT pass. TODO: Come up with some other means to do this. Need guice to handle this properly
-       */
-      addStaticSecurity(configuration, reader, "/META-INF/nexus-indexer-lucene-static-security.xml");
-      addStaticSecurity(configuration, reader, "/META-INF/nexus-archive-browser-plugin-security.xml");
-      addStaticSecurity(configuration, reader, "/META-INF/nexus-rrb-plugin-security.xml");
 
       List<DynamicSecurityResource> dynamic =
           TestContainer.getInstance().getPlexusContainer().lookupList(DynamicSecurityResource.class);

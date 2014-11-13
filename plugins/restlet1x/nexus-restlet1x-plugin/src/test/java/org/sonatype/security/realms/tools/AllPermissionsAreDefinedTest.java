@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.sonatype.nexus.restlet1x.internal.SecurityResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.model.CPrivilege;
@@ -91,8 +92,7 @@ public class AllPermissionsAreDefinedTest
 
     // now we have a list of permissions, we need to make sure all of these are in the static security xml.
 
-    StaticSecurityResource restResource =
-        this.lookup(StaticSecurityResource.class, "SecurityRestStaticSecurityResource");
+    StaticSecurityResource restResource = new SecurityResource();
     Configuration staticConfig = restResource.getConfiguration();
 
     List<CPrivilege> privs = staticConfig.getPrivileges();
