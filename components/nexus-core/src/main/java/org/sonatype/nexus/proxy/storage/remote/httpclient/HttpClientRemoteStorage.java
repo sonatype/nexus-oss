@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.httpclient.HttpClientFactory;
+import org.sonatype.nexus.httpclient.NexusRedirectStrategy;
 import org.sonatype.nexus.httpclient.Page;
 import org.sonatype.nexus.httpclient.Page.PageContext;
 import org.sonatype.nexus.internal.httpclient.RepositoryPageContext;
@@ -158,17 +159,6 @@ public class HttpClientRemoteStorage
   public String getProviderId() {
     return PROVIDER_STRING;
   }
-
-  /**
-   * Key used in HttpGet method parameters in {@link #retrieveItem(ProxyRepository, ResourceStoreRequest, String)}
-   * method
-   * that this request is about content retrieval, hence, the special redirection strategy set up in
-   * {@link HttpClientManagerImpl#getProxyRepositoryRedirectStrategy(ProxyRepository, RemoteStorageContext)} should
-   * be applied. See that method for more.
-   *
-   * @since 2.7.0
-   */
-  public static final String CONTENT_RETRIEVAL_MARKER_KEY = HttpClientRemoteStorage.class.getName() + "#retrieveItem";
 
   /**
    * Verifies that path carried by {@link ResourceStoreRequest} is a valid HTTP path segment candidate. If not,
@@ -414,7 +404,7 @@ public class HttpClientRemoteStorage
         if (newerThen > 0) {
           // we have newer if this below is true
           return makeDateFromHeader(httpResponse.getFirstHeader("last-modified")) > newerThen;
-        } 
+        }
         else {
           // say true as we don't care about actual timestamp
           return true;
@@ -552,7 +542,7 @@ public class HttpClientRemoteStorage
       final BasicHttpContext httpContext = new BasicHttpContext();
       httpContext.setAttribute(HttpClientFactory.HTTP_CTX_KEY_REPOSITORY, repository);
       if (contentRequest) {
-        httpContext.setAttribute(CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
+        httpContext.setAttribute(NexusRedirectStrategy.CONTENT_RETRIEVAL_MARKER_KEY, Boolean.TRUE);
       }
 
       httpResponse = httpClient.execute(httpRequest, httpContext);

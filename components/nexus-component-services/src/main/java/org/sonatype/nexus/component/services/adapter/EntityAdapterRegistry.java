@@ -16,6 +16,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.model.Entity;
 
 /**
@@ -26,25 +28,48 @@ import org.sonatype.nexus.component.model.Entity;
 public interface EntityAdapterRegistry
 {
   /**
-   * Registers an adapter and creates the OrientDB class in the database if it doesn't already exist.
+   * Registers an asset adapter and creates the OrientDB class in the database if it doesn't already exist.
    *
    * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
    */
-  <T extends Entity> void registerAdapter(EntityAdapter<T> adapter);
+  <T extends Asset> void registerAssetAdapter(AssetAdapter<T> adapter);
+
+  /**
+   * Registers a component adapter and creates the OrientDB class in the database if it doesn't already exist.
+   *
+   * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
+   */
+  <T extends Component> void registerComponentAdapter(ComponentAdapter<T> adapter);
+
+  /**
+   * Unregisters the adapter for the given asset class. If no such adapter is registered, this is a no-op.
+   */
+  <T extends Asset> void unregisterAssetAdapter(Class<T> entityClass);
 
   /**
    * Unregisters the adapter for the given component class. If no such adapter is registered, this is a no-op.
    */
-  <T extends Entity> void unregisterAdapter(Class<T> entityClass);
+  <T extends Component> void unregisterComponentAdapter(Class<T> entityClass);
+
+  /**
+   * Gets the registered adapter for the given asset class, or {@code null} if it doesn't exist.
+   */
+  @Nullable
+  <T extends Asset> AssetAdapter<T> getAssetAdapter(Class<T> entityClass);
 
   /**
    * Gets the registered adapter for the given component class, or {@code null} if it doesn't exist.
    */
   @Nullable
-  <T extends Entity> EntityAdapter<T> getAdapter(Class<T> entityClass);
+  <T extends Component> ComponentAdapter<T> getComponentAdapter(Class<T> entityClass);
 
   /**
-   * Gets all entity classes for which a registered adapter exists.
+   * Gets all asset classes for which a registered adapter exists.
    */
-  Set<Class<? extends Entity>> entityClasses();
+  Set<Class<? extends Asset>> assetClasses();
+
+  /**
+   * Gets all component classes for which a registered adapter exists.
+   */
+  Set<Class<? extends Component>> componentClasses();
 }

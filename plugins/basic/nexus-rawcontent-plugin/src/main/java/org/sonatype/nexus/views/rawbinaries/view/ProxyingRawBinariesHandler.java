@@ -17,8 +17,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.source.ComponentEnvelope;
+import org.sonatype.nexus.component.model.ComponentEnvelope;
 import org.sonatype.nexus.component.source.ComponentRequest;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceRegistry;
@@ -27,6 +26,7 @@ import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewResponse;
 import org.sonatype.nexus.componentviews.responses.Responses;
+import org.sonatype.nexus.views.rawbinaries.internal.RawAsset;
 import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
@@ -88,10 +88,10 @@ public class ProxyingRawBinariesHandler
           final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
 
           // Here we presume we're getting Component back, since we don't actually use the component metadata
-          final Iterable<ComponentEnvelope<RawComponent>> envelopes = getSource().fetchComponents(path);
+          final Iterable<ComponentEnvelope<RawComponent, RawAsset>> envelopes = getSource().fetchComponents(path);
 
-          for (ComponentEnvelope<RawComponent> envelope : envelopes) {
-            for (Asset asset : envelope.getAssets()) {
+          for (ComponentEnvelope<RawComponent, RawAsset> envelope : envelopes) {
+            for (RawAsset asset : envelope.getAssets()) {
               binaryStore.create(requestPath, asset.getContentType(), asset.openStream());
             }
           }

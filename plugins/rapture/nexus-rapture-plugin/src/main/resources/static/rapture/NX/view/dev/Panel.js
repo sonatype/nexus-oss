@@ -20,7 +20,7 @@
 Ext.define('NX.view.dev.Panel', {
   extend: 'Ext.panel.Panel',
   requires: [
-    'NX.view.dev.Buttons'
+    'NX.view.dev.Styles'
   ],
   alias: 'widget.nx-dev-panel',
 
@@ -30,6 +30,10 @@ Ext.define('NX.view.dev.Panel', {
   stateful: true,
   stateId: 'nx-dev-panel',
 
+  tools: [
+    { type: 'maximize', tooltip: 'Maximize' }
+  ],
+
   layout: 'fit',
   items: {
     xtype: 'tabpanel',
@@ -37,7 +41,7 @@ Ext.define('NX.view.dev.Panel', {
 
     items: [
       { xtype: 'nx-dev-tests' },
-      { xtype: 'nx-dev-buttons' },
+      { xtype: 'nx-dev-styles' },
       { xtype: 'nx-dev-icons' },
       { xtype: 'nx-dev-features' },
       { xtype: 'nx-dev-permissions' },
