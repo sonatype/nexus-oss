@@ -182,10 +182,12 @@ Ext.define('NX.coreui.controller.SslCertificates', {
   loadCertificateByServer: function (button) {
     var me = this,
         win = button.up('window'),
-        parsed = me.parseHostAndPort(button.up('form').getForm().getFieldValues().server);
+        server = button.up('form').getForm().getFieldValues()['server'],
+        parsed = me.parseHostAndPort(server),
+        protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
 
     win.getEl().mask('Loading certificate...');
-    NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], undefined, function (response) {
+    NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
