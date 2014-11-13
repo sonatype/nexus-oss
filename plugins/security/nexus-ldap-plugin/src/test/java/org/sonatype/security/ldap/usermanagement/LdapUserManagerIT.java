@@ -23,8 +23,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.ldap.LdapTestSupport;
-import org.sonatype.security.ldap.TestSecurityConfigurations;
-import org.sonatype.security.ldap.TestSecurityModelConfigurations;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -46,12 +45,12 @@ public class LdapUserManagerIT
 
   @Override
   protected SecurityConfiguration getSecurityConfig() {
-    return TestSecurityConfigurations.getConfigWithLdapRealm();
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   @Override
   protected Configuration getSecurityModelConfig() {
-    return TestSecurityModelConfigurations.getUsersInBothRealms();
+    return LdapUserManagerITSecurity.securityModel();
   }
 
   private SecuritySystem getSecuritySystem()

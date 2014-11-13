@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.ldap.TestSecurityConfigurations;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.io.IOUtils;
@@ -68,7 +68,7 @@ public abstract class AbstractLdapTestCase
 
   @Override
   protected SecurityConfiguration getSecurityConfig() {
-    return TestSecurityConfigurations.getConfigWithLdapRealm();
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   protected String getLdapConfigXmlFilePath() {

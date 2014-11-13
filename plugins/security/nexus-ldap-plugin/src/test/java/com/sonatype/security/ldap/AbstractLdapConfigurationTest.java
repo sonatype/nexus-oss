@@ -28,7 +28,7 @@ import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfiguration
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 
 import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.ldap.TestSecurityConfigurations;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
 
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.StringUtils;
@@ -50,7 +50,7 @@ public abstract class AbstractLdapConfigurationTest
 
   @Override
   protected SecurityConfiguration getSecurityConfig() {
-    return TestSecurityConfigurations.getConfigWithLdapRealm();
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   protected CUserAndGroupAuthConfiguration buildUserAndGroupAuthConfiguration() {
