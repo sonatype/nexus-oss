@@ -15,12 +15,14 @@ package org.sonatype.nexus.views.rawbinaries.example;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.nexus.component.source.api.http.ConnectionConfig;
 import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
+import org.sonatype.nexus.component.source.api.http.HttpClientConfigMarshaller;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigContributor;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
@@ -43,16 +45,25 @@ public class RawSourceConfigContribution
 
   public static final String INTERNAL_ID = "foo_2f32wdf23r";
 
+  private final HttpClientConfigMarshaller httpClientConfigMarshaller;
+
+  @Inject
+  public RawSourceConfigContribution(final HttpClientConfigMarshaller httpClientConfigMarshaller) {
+    this.httpClientConfigMarshaller = httpClientConfigMarshaller;
+  }
+
   @Override
   public void contributeTo(final ComponentSourceConfigStore store) throws IOException {
     if (store.get(SOURCE_NAME) == null) {
       Map<String, Object> config = Maps.newHashMap();
       config.put(RawComponentSourceFactory.REMOTE_URL_PARAM, "http://search.maven.org/");
-      config.putAll(new HttpClientConfig().withConnectionConfig(new ConnectionConfig()
-          .withTimeout(500)
-          .withRetries(5)
-          .withUserAgentCustomisation("NX3")
-      ).toMap());
+      config.putAll(httpClientConfigMarshaller.toMap(
+          new HttpClientConfig().withConnectionConfig(new ConnectionConfig()
+              .withTimeout(500)
+              .withRetries(5)
+              .withUserAgentCustomisation("NX3")
+          )
+      ));
 
       store.add(new ComponentSourceConfig(
           new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),
