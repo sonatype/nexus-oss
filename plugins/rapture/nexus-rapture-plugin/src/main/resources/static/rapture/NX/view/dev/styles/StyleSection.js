@@ -27,29 +27,31 @@ Ext.define('NX.view.dev.styles.StyleSection', {
    * Render a block of HTML.
    *
    * @protected
-   *
-   * @param html
-   * @returns {{xtype: string, html: *}}
    */
-  html: function(html) {
-    return {
+  html: function(html, cfg) {
+    var obj = {
       xtype: 'container',
       html: html
     };
+    if (cfg) {
+      Ext.apply(obj, cfg);
+    }
+    return obj;
   },
 
   /**
    * Render a label with HTML.
    *
    * @protected
-   *
-   * @param html
-   * @returns {{xtype: string, html: *}}
    */
-  label: function(html) {
-    return {
+  label: function(html, cfg) {
+    var obj = {
       xtype: 'label',
       html: html
+    };
+    if (cfg) {
+      Ext.apply(obj, cfg);
     }
+    return obj;
   }
 });

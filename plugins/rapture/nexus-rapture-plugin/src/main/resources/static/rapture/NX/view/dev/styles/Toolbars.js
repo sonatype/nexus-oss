@@ -32,6 +32,7 @@ Ext.define('NX.view.dev.styles.Toolbars', {
       var obj = {
         xtype: 'toolbar',
         items: [
+          me.label('ui: default; scale: ' + scale, { width: 180 }),
           {
             xtype: 'button',
             text: 'plain'
@@ -76,7 +77,7 @@ Ext.define('NX.view.dev.styles.Toolbars', {
     }
 
     me.items = [
-      toolbar(null),
+      toolbar(undefined),
       toolbar('medium'),
       toolbar('large')
     ];

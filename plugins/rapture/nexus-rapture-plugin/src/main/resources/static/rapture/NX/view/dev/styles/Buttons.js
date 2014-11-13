@@ -85,12 +85,7 @@ Ext.define('NX.view.dev.styles.Buttons', {
           defaultMargins: {top: 0, right: 4, bottom: 0, left: 0}
         },
         items: [
-          {
-            xtype: 'label',
-            text: name,
-            cls: 'section-header',
-            width: 80
-          },
+          me.label('ui: ' + name, { width: 80 }),
           button(name, name, false, false, false),
           button(name, name, true, false, false),
           button(name, name, false, false, true),
