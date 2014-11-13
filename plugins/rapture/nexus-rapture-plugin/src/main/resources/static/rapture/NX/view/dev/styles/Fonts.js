@@ -93,7 +93,7 @@ Ext.define('NX.view.dev.styles.Fonts', {
         ui: 'subsection',
         layout: {
           type: 'hbox',
-          defaultMargins: {top: 0, right: 4, bottom: 0, left: 0}
+          defaultMargins: {top: 0, right: 20, bottom: 0, left: 0}
         },
         items: [
           faceExample('Proxima Nova Regular', 'proxima-nova-regular'),
