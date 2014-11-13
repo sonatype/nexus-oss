@@ -90,7 +90,7 @@ public class HttpClientConfigMarshallerImplTest
     assertThat((Integer) map.get("http.connection.timeout"), is(1));
     assertThat((Integer) map.get("http.connection.retries"), is(2));
     assertThat((String) map.get("http.connection.urlParameters"), is("params"));
-    assertThat((String) map.get("http.connection.userAgentCustomization"), is("ua"));
+    assertThat((String) map.get("http.connection.userAgentCustomisation"), is("ua"));
     assertThat((Boolean) map.get("http.connection.useTrustStore"), is(true));
 
     assertThat((String) map.get("http.authentication.type"), is("username"));

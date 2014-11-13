@@ -71,7 +71,7 @@ public class HttpClientConfigMarshallerImpl
       putIfNotNull(configMap, "http.connection.timeout", connectionConfig.getTimeout());
       putIfNotNull(configMap, "http.connection.retries", connectionConfig.getRetries());
       putIfNotNull(configMap, "http.connection.urlParameters", connectionConfig.getUrlParameters());
-      putIfNotNull(configMap, "http.connection.userAgentCustomization", connectionConfig.getUserAgentCustomisation());
+      putIfNotNull(configMap, "http.connection.userAgentCustomisation", connectionConfig.getUserAgentCustomisation());
       putIfNotNull(configMap, "http.connection.useTrustStore", connectionConfig.getUseTrustStore());
     }
   }
