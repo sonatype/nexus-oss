@@ -43,8 +43,8 @@ import static java.util.Arrays.asList;
  *
  * @since 3.0
  */
-public abstract class RawBinaryComponentSource
-    implements ComponentSource
+public class RawBinaryComponentSource
+    implements ComponentSource<RawComponent>
 {
   private final ComponentSourceId sourceName;
 
@@ -61,14 +61,16 @@ public abstract class RawBinaryComponentSource
     this.httpClient = checkNotNull(httpClient);
   }
 
-   @Nullable
-  //@Override
+  @Nullable
+  @Override
   @SuppressWarnings("unchecked")
   // TODO: The method is parameterized, but we're assuming specific types in the implementation.
   //       Consider either changing the *class* (interface) to be parameterized instead of the method,
   //       or making the construction of Component and Asset subclasses in the impl less presumptious.
-  public <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents2(
+  public <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents(
       final ComponentRequest<C, A> request) throws IOException
+  //public Iterable<ComponentEnvelope<RawComponent, RawAsset>> fetchComponents2(
+  //    final ComponentRequest<RawComponent, RawAsset> request) throws IOException
   {
     final String uri = urlPrefix + request.getQuery().get("path");
 
@@ -76,7 +78,7 @@ public abstract class RawBinaryComponentSource
 
     final CloseableHttpResponse response = httpClient.execute(httpGet);
 
-    A asset = (A) new RawAsset();
+    RawAsset asset = new RawAsset();
     final HttpEntity httpEntity = response.getEntity();
     final Header contentType = httpEntity.getContentType();
     if (contentType != null) {
@@ -96,7 +98,7 @@ public abstract class RawBinaryComponentSource
       }
     });
 
-    return asList(ComponentEnvelope.simpleEnvelope((C) new RawComponent(), asset));
+    return asList(ComponentEnvelope.simpleEnvelope((C) new RawComponent(), (A) asset));
   }
 
   @Override
