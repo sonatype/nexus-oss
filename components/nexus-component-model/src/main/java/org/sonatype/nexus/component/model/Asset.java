@@ -84,7 +84,7 @@ public interface Asset
   void setFirstCreated(DateTime firstCreated);
 
   /**
-   * @return when this asset was last modified, {@code null} if unknown
+   * @return when this asset's content was last modified, {@code null} if unknown
    */
   @Nullable
   DateTime getLastModified();

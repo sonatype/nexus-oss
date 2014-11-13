@@ -24,6 +24,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
     'NX.util.DateFormat'
   ],
 
+  title: 'Summary',
+
   buttons: undefined,
 
   /**
