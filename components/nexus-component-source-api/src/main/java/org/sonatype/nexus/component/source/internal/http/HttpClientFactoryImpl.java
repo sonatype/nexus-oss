@@ -229,32 +229,25 @@ public class HttpClientFactoryImpl
                                     final HttpContext context)
             throws IOException, HttpException
         {
+          HttpResponse response = null;
           if (urlParameters != null) {
             HttpRequestWrapper wrappedRequest = HttpRequestWrapper.wrap(request);
-            if (wrappedRequest.getURI() != null) {
+            URI uri = wrappedRequest.getURI();
+            if (uri != null) {
+              String uriString = uri.toASCIIString();
               try {
-                wrappedRequest.setURI(new URI(
-                    wrappedRequest.getURI().toASCIIString()
-                        + (wrappedRequest.getURI().getQuery() == null ? "?" : "&")
-                        + urlParameters
-                ));
+                wrappedRequest.setURI(new URI(uriString + (uri.getQuery() == null ? "?" : "&") + urlParameters));
               }
               catch (URISyntaxException e) {
-                throw new HttpException(
-                    "Unable to add url parameters " + urlParameters + " to " + wrappedRequest.getURI().toASCIIString(),
-                    e
-                );
+                throw new HttpException("Unable to add url parameters " + urlParameters + " to " + uriString, e);
               }
-              return super.execute(wrappedRequest, conn, context);
-            }
-            else {
-              return super.execute(request, conn, context);
+              response = super.execute(wrappedRequest, conn, context);
             }
           }
-          else {
-            return super.execute(request, conn, context);
+          if (response == null) {
+            response = super.execute(request, conn, context);
           }
-
+          return response;
         }
       });
     }
