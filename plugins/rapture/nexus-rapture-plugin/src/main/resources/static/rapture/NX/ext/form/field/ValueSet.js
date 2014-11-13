@@ -19,7 +19,7 @@
  */
 Ext.define('NX.ext.form.field.ValueSet', {
   extend: 'Ext.form.FieldContainer',
-  alias: 'widget.nx-valueset',
+    alias: 'widget.nx-valueset',
   requires: [
     'Ext.data.SequentialIdGenerator',
     'Ext.data.Store',

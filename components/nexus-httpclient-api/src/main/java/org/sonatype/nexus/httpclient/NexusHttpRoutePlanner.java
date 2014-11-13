@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.storage.remote.httpclient;
+package org.sonatype.nexus.httpclient;
 
 import java.util.Map;
 import java.util.Set;
@@ -58,9 +58,9 @@ public class NexusHttpRoutePlanner
   /**
    * @since 2.5
    */
-  NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
-                        final Set<Pattern> nonProxyHostPatterns,
-                        final SchemePortResolver schemePortResolver)
+  public NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
+                               final Set<Pattern> nonProxyHostPatterns,
+                               final SchemePortResolver schemePortResolver)
   {
     super(schemePortResolver);
     this.proxies = checkNotNull(proxies);
