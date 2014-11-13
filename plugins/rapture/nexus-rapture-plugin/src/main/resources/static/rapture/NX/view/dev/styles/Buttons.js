@@ -47,7 +47,13 @@ Ext.define('NX.view.dev.styles.Buttons', {
     );
 
     function button(ui, text, disabled, pressed, menu) {
-      var button = { xtype: 'button', text: text, ui: ui, margin: "0 10 10 0" };
+      var button = {
+        xtype: 'button',
+        text: text,
+        ui: ui,
+        margin: "0 10 10 0",
+        width: 80
+      };
 
       // Initialize optional button parameters
       if (disabled) {
@@ -71,76 +77,35 @@ Ext.define('NX.view.dev.styles.Buttons', {
       return button;
     }
 
-    function group(/** items... */) {
-      var items = Array.prototype.slice.call(arguments, 0);
+    function buttonStyle(name, colors) {
       return {
         xtype: 'container',
         layout: {
           type: 'hbox',
           defaultMargins: {top: 0, right: 4, bottom: 0, left: 0}
         },
-        items: items
+        items: [
+          {
+            xtype: 'label',
+            text: name,
+            cls: 'section-header',
+            width: 80
+          },
+          button(name, name, false, false, false),
+          button(name, name, true, false, false),
+          button(name, name, false, false, true),
+          me.html(colorSampleTpl.apply(colors))
+        ]
       }
     }
 
     me.items = [
-      // Default buttons
-      group(
-          { xtype: 'label', text: 'Default', cls: 'section-header' },
-          button('default', 'Default', false, false, false),
-          button('default', 'Default', true, false, false),
-          button('default', 'Default', false, false, true),
-          me.html(colorSampleTpl.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']))
-      ),
-
-      // Plain buttons
-      group(
-          { xtype: 'label', text: 'Plain', cls: 'section-header' },
-          button('plain', 'Plain', false, false, false),
-          button('plain', 'Plain', true, false, false),
-          button('plain', 'Plain', false, false, true),
-          me.html(colorSampleTpl.apply(['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']))
-      ),
-
-      // Primary buttons
-      group(
-          { xtype: 'label', text: 'Primary', cls: 'section-header' },
-          button('primary', 'Primary', false, false, false),
-          button('primary', 'Primary', true, false, false),
-          button('primary', 'Primary', false, false, true),
-          me.html(colorSampleTpl.apply([
-            'denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue'
-          ]))
-      ),
-
-      // Danger buttons
-      group(
-          { xtype: 'label', text: 'Danger', cls: 'section-header' },
-          button('danger', 'Danger', false, false, false),
-          button('danger', 'Danger', true, false, false),
-          button('danger', 'Danger', false, false, true),
-          me.html(colorSampleTpl.apply(['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red']))
-      ),
-
-      // Warning buttons
-      group(
-          { xtype: 'label', text: 'Warning', cls: 'section-header' },
-          button('warning', 'Warning', false, false, false),
-          button('warning', 'Warning', true, false, false),
-          button('warning', 'Warning', false, false, true),
-          me.html(colorSampleTpl.apply(['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet']))
-      ),
-
-      // Success buttons
-      group(
-          { xtype: 'label', text: 'Success', cls: 'section-header' },
-          button('success', 'Success', false, false, false),
-          button('success', 'Success', true, false, false),
-          button('success', 'Success', false, false, true),
-          me.html(colorSampleTpl.apply([
-            'elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'
-          ]))
-      )
+      buttonStyle('default', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
+      buttonStyle('plain', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
+      buttonStyle('primary', ['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue']),
+      buttonStyle('danger', ['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red']),
+      buttonStyle('warning', ['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet']),
+      buttonStyle('success', ['elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'])
     ];
 
     me.callParent();
