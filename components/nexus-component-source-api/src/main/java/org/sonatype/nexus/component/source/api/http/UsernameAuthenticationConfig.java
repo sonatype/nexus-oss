@@ -14,8 +14,6 @@ package org.sonatype.nexus.component.source.api.http;
 
 import java.util.List;
 
-import javax.inject.Named;
-
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,7 +24,6 @@ import org.apache.http.client.config.AuthSchemes;
  *
  * @since 3.0
  */
-@Named(UsernameAuthenticationConfig.TYPE)
 public class UsernameAuthenticationConfig
     implements AuthenticationConfig
 {
