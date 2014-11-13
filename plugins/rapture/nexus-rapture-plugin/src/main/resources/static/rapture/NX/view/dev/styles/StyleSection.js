@@ -36,5 +36,20 @@ Ext.define('NX.view.dev.styles.StyleSection', {
       xtype: 'container',
       html: html
     };
-  }
+  },
+
+  /**
+   * Render a label with HTML.
+   *
+   * @protected
+   *
+   * @param html
+   * @returns {{xtype: string, html: *}}
+   */
+  label: function(html) {
+    return {
+      xtype: 'label',
+      html: html
+    }
+  },
 });

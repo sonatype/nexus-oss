@@ -21,6 +21,10 @@ Ext.define('NX.view.dev.styles.Tabs', {
   extend: 'NX.view.dev.styles.StyleSection',
 
   title: 'Tabs',
+  layout: {
+    type: 'vbox',
+    defaultMargins: {top: 4, right: 0, bottom: 0, left: 0}
+  },
 
   /**
    * @protected
@@ -28,26 +32,40 @@ Ext.define('NX.view.dev.styles.Tabs', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
-      {
+    function tabStyle(name) {
+      var proto = {
         xtype: 'tabpanel',
-
-        width: 500,
-        height: 60,  // FIXME: This masks problem in current style in application in style guide
+        width: 400,
+        height: 30,
         activeTab: 0,
-        ui: 'light',
-
-        header: {
-          height: 30
-        },
-
+        ui: name,
         items: [
           { title: 'Settings', bodyPadding: 10, html: 'A simple tab' },
           { title: 'Routing', html: 'Another one' },
           { title: 'Smart Proxy', html: 'Yet another' },
           { title: 'Health Check', html: 'And one more' }
         ]
+      };
+
+      return {
+        xtype: 'container',
+        layout: {
+          type: 'vbox',
+          defaultMargins: {top: 4, right: 0, bottom: 0, left: 0}
+        },
+
+        items: [
+          me.label('ui: ' + name),
+          Ext.clone(proto),
+          me.label('ui: ' + name + '; plain: true'),
+          Ext.apply(proto, { plain: true })
+        ]
       }
+    }
+
+    me.items = [
+      tabStyle('default'),
+      tabStyle('light')
     ];
 
     me.callParent();

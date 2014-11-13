@@ -56,43 +56,34 @@ Ext.define('NX.view.dev.Styles', {
 
     // build guide components on activate as this is a heavy view
     me.on('activate', function () {
-      Ext.each(me.buildItems(), function (it) {
-        me.add(it);
+      var sections = [
+        'Header',
+        'Colors',
+        'Fonts',
+        'Buttons',
+        'Forms',
+        'Messages',
+        'Modals',
+        'Menus',
+        'Tooltips',
+        'Tabs',
+        'Pickers',
+        'Panels',
+        'Toolbars',
+        'Grids'
+      ];
+
+      Ext.each(sections, function (section) {
+        var component = Ext.create('NX.view.dev.styles.' + section);
+        me.add(component);
       });
     });
+
     // and destroy on deactivate to save memory
     me.on('deactivate', function () {
       me.removeAll(true);
     });
 
     me.callParent();
-  },
-
-  /**
-   * @private
-   */
-  buildItems: function () {
-    var me = this;
-
-    function section(name) {
-      return Ext.create('NX.view.dev.styles.' + name);
-    }
-
-    return [
-      section('Header'),
-      section('Colors'),
-      section('Fonts'),
-      section('Buttons'),
-      section('Forms'),
-      section('Messages'),
-      section('Modals'),
-      section('Menus'),
-      section('Tooltips'),
-      section('Tabs'),
-      section('Pickers'),
-      section('Panels'),
-      section('Toolbars'),
-      section('Grids')
-    ];
   }
 });
