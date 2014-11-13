@@ -12964,7 +12964,8 @@
  */
 /* line 35, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .feature-description {
-  font-size: 10px;
+  font-size: 13px;
+  font-weight: normal;
   top: 21px !important;
 }
 
