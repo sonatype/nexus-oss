@@ -15,6 +15,7 @@ package org.sonatype.nexus.apachehttpclient;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -151,6 +152,17 @@ public class NexusSSLConnectionSocketFactory
   private SSLSocket configure(final SSLSocket socket) {
     if (supportedProtocols != null) {
       socket.setEnabledProtocols(supportedProtocols);
+    }
+    else {
+      // If supported protocols are not explicitly set, remove all SSL protocol versions
+      String[] allProtocols = socket.getSupportedProtocols();
+      List<String> enabledProtocols = new ArrayList<>(allProtocols.length);
+      for (String protocol : allProtocols) {
+        if (!protocol.startsWith("SSL")) {
+          enabledProtocols.add(protocol);
+        }
+      }
+      socket.setEnabledProtocols(enabledProtocols.toArray(new String[enabledProtocols.size()]));
     }
     if (supportedCipherSuites != null) {
       socket.setEnabledCipherSuites(supportedCipherSuites);
