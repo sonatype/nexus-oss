@@ -10,31 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.httpclient;
+package org.sonatype.nexus.component.source.api.http;
 
-import javax.net.ssl.SSLContext;
+import java.util.List;
 
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.auth.Credentials;
 
 /**
- * Selects SSLContext to be used for given HTTP context.
+ * HTTP client authentication configuration.
  *
- * @since 2.8
+ * @since 3.0
  */
-public interface SSLContextSelector
+public interface AuthenticationConfig
 {
 
-  /**
-   * {@link HttpContext} attribute to be used to enable usage of nexus trust store.
-   *
-   * @since 3.0
-   */
-  final static String USE_TRUST_STORE = HttpClientFactory.class.getName() + ".useTrustStore";
+  String getType();
 
-  /**
-   * Returns the desired {@link SSLContext} to be used or {@code null} if no selection possible (or available).
-   *
-   * In this case, HTTP client will use the "default" SSL context.
-   */
-  SSLContext select(HttpContext context);
+  Credentials getCredentials();
+
+  List<String> getPreferredAuthSchemes();
+
 }

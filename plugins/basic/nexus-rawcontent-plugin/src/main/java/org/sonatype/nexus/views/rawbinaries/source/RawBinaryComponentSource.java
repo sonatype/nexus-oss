@@ -36,7 +36,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
@@ -53,9 +52,15 @@ public class RawBinaryComponentSource
 
   private final String urlPrefix;
 
-  public RawBinaryComponentSource(final ComponentSourceId sourceName, final String urlPrefix) {
+  private CloseableHttpClient httpClient;
+
+  public RawBinaryComponentSource(final ComponentSourceId sourceName,
+                                  final CloseableHttpClient httpClient,
+                                  final String urlPrefix)
+  {
     this.sourceName = checkNotNull(sourceName);
     this.urlPrefix = checkNotNull(urlPrefix);
+    this.httpClient = checkNotNull(httpClient);
   }
 
   @Nullable
@@ -67,13 +72,11 @@ public class RawBinaryComponentSource
   public <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents(
       final ComponentRequest<C, A> request) throws IOException
   {
-    final CloseableHttpClient httpclient = HttpClients.createDefault();
-
     final String uri = urlPrefix + request.getQuery().get("path");
 
     final HttpGet httpGet = new HttpGet(uri);
 
-    final CloseableHttpResponse response = httpclient.execute(httpGet);
+    final CloseableHttpResponse response = httpClient.execute(httpGet);
 
     A asset = (A) new RawAsset();
     final HttpEntity httpEntity = response.getEntity();
