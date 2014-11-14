@@ -112,6 +112,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       xtype: 'panel',
       title: 'Memory Distribution',
       frame: true,
+      ui: 'subsection',
       height: 240,
       width: 300,
       layout: 'fit',
@@ -154,6 +155,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       xtype: 'panel',
       title: 'Thread States',
       frame: true,
+      ui: 'subsection',
       height: 340,
       width: 420,
 
