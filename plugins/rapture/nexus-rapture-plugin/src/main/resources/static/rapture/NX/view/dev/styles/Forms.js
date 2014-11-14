@@ -51,6 +51,38 @@ Ext.define('NX.view.dev.styles.Forms', {
       // form example from extjs example/themes
       {
         xtype: 'form',
+        frame: true,
+        collapsible: true,
+
+        tools: [
+          {type:'toggle'},
+          {type:'close'},
+          {type:'minimize'},
+          {type:'maximize'},
+          {type:'restore'},
+          {type:'gear'},
+          {type:'pin'},
+          {type:'unpin'},
+          {type:'right'},
+          {type:'left'},
+          {type:'down'},
+          {type:'refresh'},
+          {type:'minus'},
+          {type:'plus'},
+          {type:'help'},
+          {type:'search'},
+          {type:'save'},
+          {type:'print'}
+        ],
+
+        bodyPadding: '10 20',
+
+        defaults: {
+          anchor    : '98%',
+          msgTarget : 'side',
+          allowBlank: false
+        },
+
         items: [
           {
             xtype: 'label',
