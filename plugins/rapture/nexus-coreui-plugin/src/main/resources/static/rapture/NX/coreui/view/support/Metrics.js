@@ -153,7 +153,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
               ],
 
               legend: {
-                position: 'right'
+                position: 'right',
+                boxStrokeWidth: 0
               }
             }
           ]
@@ -200,7 +201,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
           ],
 
           legend: {
-            position: 'right'
+            position: 'right',
+            boxStrokeWidth: 0
           }
         }
       ]
