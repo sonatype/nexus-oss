@@ -62,6 +62,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       xtype: 'panel',
       title: 'Memory Usage',
       frame: true,
+      ui: 'subsection',
       height: 240,
       width: 300,
       layout: 'fit',

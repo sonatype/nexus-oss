@@ -29,7 +29,6 @@ Ext.define('NX.view.feature.Content', {
     xtype: 'toolbar',
     height: 50,
     items: [
-      ' ',
       {
         xtype: 'image',
         itemId: 'icon',
