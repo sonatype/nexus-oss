@@ -58,11 +58,11 @@ public abstract class SecurityTestSupport
   }
 
   protected SecurityConfiguration getSecurityConfig() {
-    return SecurityTestSupportSecurity.security();
+    return null;
   }
 
   protected Configuration getSecurityModelConfig() {
-    return SecurityTestSupportSecurity.securityModel();
+    return null;
   }
 
 }
