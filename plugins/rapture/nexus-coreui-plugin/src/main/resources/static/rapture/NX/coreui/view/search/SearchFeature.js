@@ -27,8 +27,6 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   initComponent: function() {
     var me = this;
 
-    //me.addEvents(drilldownChange)
-
     me.items = [
       {
         xtype: 'panel',
@@ -68,18 +66,12 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                   {
                     xtype: 'nx-coreui-search-result-list',
                     region: 'center',
-                    //flex: 0.3,
                     header: false
-                    //split: true,
-                    //collapsible: true,
-                    //collapseMode: 'mini'
                   }
                 ]
               },
               {
                 xtype: 'panel',
-                //region: 'center',
-                //flex: 0.5,
                 items: [
                   {
                     type: 'panel',
@@ -119,13 +111,6 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
               },
               {
                 xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'
-                //region: 'south',
-                //split: true,
-                //flex: 0.5,
-                //collapsible: true,
-                //collapsed: false,
-                //collapseMode: 'mini',
-                //hidden: true
               }
             ]
           }

@@ -419,7 +419,7 @@ Ext.define('NX.coreui.controller.Search', {
           value: searchResultModel.get('artifactId')
         }
       ]);
-      
+
       // Show the component version panel
       searchResultDetails.up('#nx-drilldown').showChild(1);
     }
