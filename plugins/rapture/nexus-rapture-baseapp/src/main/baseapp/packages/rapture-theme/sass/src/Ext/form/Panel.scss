@@ -3,36 +3,37 @@
 */
 
 /**
-* Style for the user reset token panel
+* Style for the "transparent" inter-page panels
 *
-* ui: 'reset-tokens'
+* ui: 'subsection'
 */
 
 @include extjs-panel-ui(
   $ui: 'subsection',
 
   $ui-header-color: $color-night-rider,
-  $ui-header-padding: 25px 0 0 0 !important,
-  $ui-header-font-size: 16px,
+  $ui-header-font-size: $font-size-h4,
   $ui-header-background-color: $color-white,
-  $ui-header-line-height: 20px
+  $ui-header-line-height: 22px
 );
 
-.feature-content {
-  .x-panel-subsection {
-    border-top: 1px $color-gainsboro solid;
-    margin: 0 10px 20px 10px !important;
-    left: 0 !important;
-    .x-toolbar {
-      padding-left: 0;
-    }
+@include extjs-panel-ui(
+  $ui: 'subsection-framed',
 
-    &.no-border {
-      border-top: none;
+  $ui-header-color: $color-night-rider,
+  $ui-padding: 10px !important,
+  $ui-header-font-size: $font-size-h4,
+  $ui-header-background-color: $color-white,
+  $ui-header-line-height: 22px
+);
 
-      .x-panel-header {
-        padding: 0 !important;
-      }
-    }
+.x-panel-subsection {
+
+  .x-panel-header {
+    padding: 10px 0 10px 0 !important;
   }
+}
+
+.x-panel-subsection-framed {
+  border: 1px $color-night-rider solid;
 }
