@@ -34,7 +34,8 @@ Ext.define('NX.view.dev.Styles', {
     'NX.view.dev.styles.Tooltips',
     'NX.view.dev.styles.Panels',
     'NX.view.dev.styles.Toolbars',
-    'NX.view.dev.styles.Grids'
+    'NX.view.dev.styles.Grids',
+    'NX.view.dev.styles.Other'
   ],
 
   title: 'Styles',
@@ -70,7 +71,8 @@ Ext.define('NX.view.dev.Styles', {
         'Pickers',
         'Panels',
         'Toolbars',
-        'Grids'
+        'Grids',
+        'Other'
       ];
 
       Ext.each(sections, function (section) {
