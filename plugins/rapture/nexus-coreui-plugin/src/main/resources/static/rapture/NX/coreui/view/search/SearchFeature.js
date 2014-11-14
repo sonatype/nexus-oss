@@ -22,106 +22,117 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   alias: 'widget.nx-searchfeature',
   itemId: 'searchfeature',
 
-  layout: 'card',
+  layout: 'fit',
 
   initComponent: function() {
     var me = this;
 
+    //me.addEvents(drilldownChange)
+
     me.items = [
       {
         xtype: 'panel',
-
-        layout: 'border',
-
         items: [
           {
-            xtype: 'panel',
-            itemId: 'criteria',
+            xtype: 'nx-drilldown',
 
-            region: 'north',
-            header: false,
-
-            style: {
-              'border-bottom': '1px solid #000000'
-            },
-
-            layout: {
-              type: 'hbox',
-              align: 'bottom'
-            },
-            bodyPadding: 10
-
-            // disable saving for now
-            //tbar: [
-            //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
-            //],
-          },
-          {
-            xtype: 'nx-coreui-search-result-list',
-            region: 'center',
-            //flex: 0.3,
-            header: false
-            //split: true,
-            //collapsible: true,
-            //collapseMode: 'mini'
-          }
-        ]
-      },
-      {
-        xtype: 'panel',
-        //region: 'center',
-        layout: 'fit',
-        //flex: 0.5,
-        items: [
-          {
-            type: 'panel',
-            region: 'center',
-            layout: {
-              type: 'vbox',
-              align: 'stretch',
-              pack: 'start'
-            },
             items: [
               {
-                itemId: 'searchResultDetails',
                 xtype: 'panel',
-                layout: {
-                  type: 'vbox',
-                  align: 'stretch',
-                  pack: 'start'
-                },
+
+                layout: 'border',
+
                 items: [
                   {
-                    html: '<div class="x-grid-empty">Select a component to view details</div>'
+                    xtype: 'panel',
+                    itemId: 'criteria',
+
+                    region: 'north',
+                    header: false,
+
+                    style: {
+                      'border-bottom': '1px solid #000000'
+                    },
+
+                    layout: {
+                      type: 'hbox',
+                      align: 'bottom'
+                    },
+                    bodyPadding: 10
+
+                    // disable saving for now
+                    //tbar: [
+                    //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome', action: 'save' },
+                    //],
                   },
                   {
-                    xtype: 'nx-coreui-search-result-details',
-                    hidden: true
+                    xtype: 'nx-coreui-search-result-list',
+                    region: 'center',
+                    //flex: 0.3,
+                    header: false
+                    //split: true,
+                    //collapsible: true,
+                    //collapseMode: 'mini'
                   }
                 ]
               },
               {
-                xtype: 'nx-coreui-search-result-version-list',
-                hidden: true,
-                flex: 1
+                xtype: 'panel',
+                //region: 'center',
+                //flex: 0.5,
+                items: [
+                  {
+                    type: 'panel',
+                    region: 'center',
+                    layout: {
+                      type: 'vbox',
+                      align: 'stretch',
+                      pack: 'start'
+                    },
+                    items: [
+                      {
+                        itemId: 'searchResultDetails',
+                        xtype: 'panel',
+                        layout: {
+                          type: 'vbox',
+                          align: 'stretch',
+                          pack: 'start'
+                        },
+                        items: [
+                          {
+                            html: '<div class="x-grid-empty">Select a component to view details</div>'
+                          },
+                          {
+                            xtype: 'nx-coreui-search-result-details',
+                            hidden: true
+                          }
+                        ]
+                      },
+                      {
+                        xtype: 'nx-coreui-search-result-version-list',
+                        hidden: true,
+                        flex: 1
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'
+                //region: 'south',
+                //split: true,
+                //flex: 0.5,
+                //collapsible: true,
+                //collapsed: false,
+                //collapseMode: 'mini',
+                //hidden: true
               }
             ]
           }
         ]
-      },
-      {
-        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'//,
-        //region: 'south',
-        //split: true,
-        //flex: 0.5,
-        //collapsible: true,
-        //collapsed: false,
-        //collapseMode: 'mini',
-        //hidden: true
       }
     ];
 
     me.callParent(arguments);
   }
-
 });

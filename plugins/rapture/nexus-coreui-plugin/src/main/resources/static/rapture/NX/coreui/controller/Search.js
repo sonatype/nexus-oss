@@ -41,7 +41,8 @@ Ext.define('NX.coreui.controller.Search', {
     'search.SearchResultList',
     'search.SearchResultVersionList',
     'search.TextSearchCriteria',
-    'search.SaveSearchFilter'
+    'search.SaveSearchFilter',
+    'search.Drilldown'
   ],
 
   refs: [
@@ -398,7 +399,6 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
     if (searchResultModel) {
-      searchResultDetails.up('#searchfeature').layout.setActiveItem(1);
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
       searchResultDetails.items.get(1).items.get(1).showInfo({
@@ -419,6 +419,9 @@ Ext.define('NX.coreui.controller.Search', {
           value: searchResultModel.get('artifactId')
         }
       ]);
+      
+      // Show the component version panel
+      searchResultDetails.up('#nx-drilldown').showChild(1);
     }
     else {
       searchResultDetails.items.get(0).show();
@@ -439,13 +442,15 @@ Ext.define('NX.coreui.controller.Search', {
         storageFileContainer = me.getStorageFileContainer();
 
     if (searchResultVersionModel) {
-      me.getSearchResultVersion().up('#searchfeature').layout.setActiveItem(2);
       storageFileContainer.showStorageFile(
           searchResultVersionModel.get('repositoryId'),
           searchResultVersionModel.get('path'),
           searchResultVersionModel.get('type')
       );
       storageFileContainer.expand();
+
+      // Show the version detail panel
+      storageFileContainer.up('#nx-drilldown').showChild(2);
     }
     else {
       storageFileContainer.showStorageFile();
