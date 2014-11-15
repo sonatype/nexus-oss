@@ -20,49 +20,25 @@ Ext.define('NX.coreui.view.search.Drilldown', {
     me.refreshBreadcrumb = function() {
       var me = this;
       var content = me.up('#feature-content');
-      var toolbar = content.down('#breadcrumb');
-
-      toolbar.removeAll();
+      var root = content.down('#feature-root');
+      var breadcrumb = content.down('#breadcrumb');
 
       if (me.currentIndex == 0) {
         // Feature's home page, no breadcrumb required
-        toolbar.add(
-          '',
-          {
-            xtype: 'image',
-            itemId: 'icon',
-            height: 32,
-            width: 32
-          },
-          {
-            xtype: 'tbtext',
-            cls: 'feature-name',
-            itemId: 'title'
-          },
-          {
-            xtype: 'tbtext',
-            cls: 'feature-description',
-            itemId: 'description'
-          }
-        );
-
-        content.setIconCls(NX.Icons.cls('search-default', 'x32'));
-        content.setTitle('Search');
-        content.setDescription('Search for components');
+        breadcrumb.hide();
+        root.show();
       } else {
-        // Make a breadcrumb
-        toolbar.add(
+        breadcrumb.removeAll();
+
+        // Make a breadcrumb (including icon and 'home' link)
+        breadcrumb.add(
           '',
           {
             xtype: 'image',
-            itemId: 'icon',
             height: 32,
-            width: 32
-          }
-        );
-
-        // Create the 'home' link
-        toolbar.add(
+            width: 32,
+            cls: 'nx-icon-search-default-x32'
+          },
           {
             xtype: 'nx-drilldown-link',
             scale: 'large',
@@ -75,7 +51,7 @@ Ext.define('NX.coreui.view.search.Drilldown', {
 
         // Create the rest of the links
         for (var i = 1; i <= me.currentIndex && i < me.items.items.length; ++i) {
-          toolbar.add(
+          breadcrumb.add(
             // Separator
             {
               xtype: 'tbtext',
@@ -96,7 +72,9 @@ Ext.define('NX.coreui.view.search.Drilldown', {
             })(i)
           );
         }
-        content.setIconCls(NX.Icons.cls('search-default', 'x32'));
+
+        root.hide();
+        breadcrumb.show();
       }
     },
 

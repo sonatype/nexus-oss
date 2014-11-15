@@ -27,26 +27,37 @@ Ext.define('NX.view.feature.Content', {
   layout: 'fit',
 
   header: {
-    xtype: 'toolbar',
-    itemId: 'breadcrumb',
-    height: 50,
+    xtype: 'panel',
     items: [
-      '',
       {
-        xtype: 'image',
-        itemId: 'icon',
-        height: 32,
-        width: 32
+        xtype: 'toolbar',
+        itemId: 'breadcrumb',
+        height: 50,
+        hidden: true
       },
       {
-        xtype: 'tbtext',
-        cls: 'feature-name',
-        itemId: 'title'
-      },
-      {
-        xtype: 'tbtext',
-        cls: 'feature-description',
-        itemId: 'description'
+        xtype: 'toolbar',
+        itemId: 'feature-root',
+        height: 50,
+        items: [
+          '',
+          {
+            xtype: 'image',
+            itemId: 'icon',
+            height: 32,
+            width: 32
+          },
+          {
+            xtype: 'tbtext',
+            cls: 'feature-name',
+            itemId: 'title'
+          },
+          {
+            xtype: 'tbtext',
+            cls: 'feature-description',
+            itemId: 'description'
+          }
+        ]
       }
     ]
   },

@@ -23748,8 +23748,8 @@ a.x-color-picker-item:hover {
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  padding: 3px 3px 3px 3px;
-  border-width: 1px;
+  padding: 3px 3px 3px 4px;
+  border-width: 0;
   border-style: solid;
   background-image: none;
   background-color: transparent;
@@ -23783,7 +23783,7 @@ a.x-color-picker-item:hover {
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-large-frameInfo {
-  font-family: th-3-3-3-3-1-1-1-1-3-3-3-3;
+  font-family: th-3-3-3-3-0-0-0-0-3-3-3-4;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -23870,7 +23870,7 @@ a.x-color-picker-item:hover {
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-large-mc {
-  padding: 1px 1px 1px 1px;
+  padding: 0px 0px 0px 1px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -24232,7 +24232,7 @@ a.x-color-picker-item:hover {
   -o-border-radius: 3px;
   border-radius: 3px;
   padding: 3px 3px 3px 3px;
-  border-width: 1px;
+  border-width: 0;
   border-style: solid;
   background-image: none;
   background-color: transparent;
@@ -24266,7 +24266,7 @@ a.x-color-picker-item:hover {
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-medium-frameInfo {
-  font-family: th-3-3-3-3-1-1-1-1-3-3-3-3;
+  font-family: th-3-3-3-3-0-0-0-0-3-3-3-3;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -24353,7 +24353,7 @@ a.x-color-picker-item:hover {
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-medium-mc {
-  padding: 1px 1px 1px 1px;
+  padding: 0px 0px 0px 0px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
