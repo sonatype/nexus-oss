@@ -9,10 +9,12 @@
 @include extjs-button-toolbar-large-ui(
   $ui: 'drilldown',
 
-  $color: $color-night-rider,
-  $color-over: $color-night-rider,
-  $color-focus: $color-night-rider,
-  $color-pressed: $color-night-rider,
+  $text-padding: 0,
+
+  $color: $color-navy-blue,
+  $color-over: $color-dark-cerulean,
+  $color-focus: $color-dark-cerulean,
+  $color-pressed: $color-cornflower,
   $color-disabled: $color-night-rider,
 
   $font-size: $font-size-h2,
@@ -23,40 +25,60 @@
   $background-gradient-pressed: transparent,
   $background-gradient-disabled: transparent,
 
-  $background-color: $color-white,
-  $background-color-over: $color-light-gainsboro,
-  $background-color-focus: $color-white,
-  $background-color-pressed: $color-light-gray,
-  $background-color-disabled: $color-white,
+  $background-color: transparent,
+  $background-color-over: transparent,
+  $background-color-focus: transparent,
+  $background-color-pressed: transparent,
+  $background-color-disabled: transparent,
 
-  $border-color-disabled: $color-white
+  $border-color: transparent,
+  $border-color-over: transparent,
+  $border-color-focus: transparent,
+  $border-color-pressed: transparent,
+  $border-color-disabled: transparent,
+
+  $opacity-disabled: 1,
+  $inner-opacity-disabled: 1
 );
 
 @include extjs-button-toolbar-medium-ui(
-$ui: 'drilldown',
+  $ui: 'drilldown',
 
-$color: $color-night-rider,
-$color-over: $color-night-rider,
-$color-focus: $color-night-rider,
-$color-pressed: $color-night-rider,
-$color-disabled: $color-night-rider,
+  $text-padding: 0,
 
-$font-size: $font-size-h4,
+  $color: $color-navy-blue,
+  $color-over: $color-dark-cerulean,
+  $color-focus: $color-dark-cerulean,
+  $color-pressed: $color-cornflower,
+  $color-disabled: $color-night-rider,
 
-$background-gradient: transparent,
-$background-gradient-over: transparent,
-$background-gradient-focus: transparent,
-$background-gradient-pressed: transparent,
-$background-gradient-disabled: transparent,
+  $font-size: $font-size-h4,
 
-$background-color: $color-white,
-$background-color-over: $color-light-gainsboro,
-$background-color-focus: $color-white,
-$background-color-pressed: $color-light-gray,
-$background-color-disabled: $color-white,
+  $background-gradient: transparent,
+  $background-gradient-over: transparent,
+  $background-gradient-focus: transparent,
+  $background-gradient-pressed: transparent,
+  $background-gradient-disabled: transparent,
 
-$border-color-disabled: $color-white
+  $background-color: transparent,
+  $background-color-over: transparent,
+  $background-color-focus: transparent,
+  $background-color-pressed: transparent,
+  $background-color-disabled: transparent,
+
+  $border-color: transparent,
+  $border-color-over: transparent,
+  $border-color-focus: transparent,
+  $border-color-pressed: transparent,
+  $border-color-disabled: transparent,
+
+  $opacity-disabled: 1,
+  $inner-opacity-disabled: 1
 );
+
+.feature-content .x-panel-header .x-btn-drilldown-toolbar-medium {
+  top: 12px !important;
+}
 
 /**
  * ui: 'default'

@@ -23738,7 +23738,7 @@ a.x-color-picker-item:hover {
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large {
-  border-color: #e1e1e1;
+  border-color: transparent;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -23752,14 +23752,14 @@ a.x-color-picker-item:hover {
   border-width: 1px;
   border-style: solid;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-large-mc {
   background-image: url(images/btn/btn-drilldown-toolbar-large-fbg.gif);
   background-position: 0 top;
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -23860,14 +23860,12 @@ a.x-color-picker-item:hover {
 .x-btn-drilldown-toolbar-large-ml,
 .x-btn-drilldown-toolbar-large-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-drilldown-toolbar-large-corners.gif);
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-large-ml,
 .x-btn-drilldown-toolbar-large-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-drilldown-toolbar-large-sides.gif);
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -23886,7 +23884,7 @@ a.x-color-picker-item:hover {
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
 .x-btn-drilldown-toolbar-large:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-toolbar-large-fbg.gif), bg:url(images/btn/btn-drilldown-toolbar-large-bg.gif), corners:url(images/btn/btn-drilldown-toolbar-large-corners.gif), sides:url(images/btn/btn-drilldown-toolbar-large-sides.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-toolbar-large-fbg.gif), bg:url(images/btn/btn-drilldown-toolbar-large-bg.gif)";
 }
 
 /*</if slicer>*/
@@ -23896,8 +23894,8 @@ a.x-color-picker-item:hover {
   font-size: 26px;
   font-weight: bold;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333333;
-  padding: 0 10px;
+  color: #006bbf;
+  padding: 0 0;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large .x-btn-arrow {
@@ -23924,9 +23922,12 @@ a.x-color-picker-item:hover {
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-disabled {
-  border-color: white;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
+}
+/* line 328, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-drilldown-toolbar-large-disabled .x-btn-inner {
+  color: #333333;
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -24026,24 +24027,34 @@ a.x-color-picker-item:hover {
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-focus {
-  border-color: #96caee;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
+}
+/* line 515, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-drilldown-toolbar-large-focus .x-btn-inner {
+  color: #0f4976;
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-over {
-  border-color: #d8d8d8;
   background-image: none;
-  background-color: #e6e6e6;
+  background-color: transparent;
+}
+/* line 539, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-drilldown-toolbar-large-over .x-btn-inner {
+  color: #0f4976;
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-menu-active,
 .x-btn-drilldown-toolbar-large-pressed {
-  border-color: #cecece;
   background-image: none;
-  background-color: #cbcbcb;
+  background-color: transparent;
+}
+/* line 564, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-drilldown-toolbar-large-menu-active .x-btn-inner,
+.x-btn-drilldown-toolbar-large-pressed .x-btn-inner {
+  color: #96caee;
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -24062,7 +24073,7 @@ a.x-color-picker-item:hover {
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-focus .x-frame-mc {
-  background-color: white;
+  background-color: transparent;
   background-image: url(images/btn/btn-drilldown-toolbar-large-focus-fbg.gif);
 }
 
@@ -24082,7 +24093,7 @@ a.x-color-picker-item:hover {
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-over .x-frame-mc {
-  background-color: #e6e6e6;
+  background-color: transparent;
   background-image: url(images/btn/btn-drilldown-toolbar-large-over-fbg.gif);
 }
 
@@ -24111,7 +24122,7 @@ a.x-color-picker-item:hover {
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-menu-active .x-frame-mc,
 .x-btn-drilldown-toolbar-large-pressed .x-frame-mc {
-  background-color: #cbcbcb;
+  background-color: transparent;
   background-image: url(images/btn/btn-drilldown-toolbar-large-pressed-fbg.gif);
 }
 
@@ -24131,7 +24142,7 @@ a.x-color-picker-item:hover {
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-large-disabled .x-frame-mc {
-  background-color: white;
+  background-color: transparent;
   background-image: url(images/btn/btn-drilldown-toolbar-large-disabled-fbg.gif);
 }
 
@@ -24172,12 +24183,6 @@ a.x-color-picker-item:hover {
   padding-bottom: 34px;
 }
 
-/* line 758, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-toolbar-large-disabled {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-  opacity: 0.5;
-}
-
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
 .x-btn-drilldown-toolbar-large-focus:after {
@@ -24216,7 +24221,7 @@ a.x-color-picker-item:hover {
 /* */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-medium {
-  border-color: #e1e1e1;
+  border-color: transparent;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -24230,14 +24235,14 @@ a.x-color-picker-item:hover {
   border-width: 1px;
   border-style: solid;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-medium-mc {
   background-image: url(images/btn/btn-drilldown-toolbar-medium-fbg.gif);
   background-position: 0 top;
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -24338,14 +24343,12 @@ a.x-color-picker-item:hover {
 .x-btn-drilldown-toolbar-medium-ml,
 .x-btn-drilldown-toolbar-medium-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-drilldown-toolbar-medium-corners.gif);
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
 .x-btn-drilldown-toolbar-medium-ml,
 .x-btn-drilldown-toolbar-medium-mr {
   zoom: 1;
-  background-image: url(images/btn/btn-drilldown-toolbar-medium-sides.gif);
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
@@ -24364,7 +24367,7 @@ a.x-color-picker-item:hover {
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
 .x-btn-drilldown-toolbar-medium:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-toolbar-medium-fbg.gif), bg:url(images/btn/btn-drilldown-toolbar-medium-bg.gif), corners:url(images/btn/btn-drilldown-toolbar-medium-corners.gif), sides:url(images/btn/btn-drilldown-toolbar-medium-sides.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-toolbar-medium-fbg.gif), bg:url(images/btn/btn-drilldown-toolbar-medium-bg.gif)";
 }
 
 /*</if slicer>*/
@@ -24374,8 +24377,8 @@ a.x-color-picker-item:hover {
   font-size: 18px;
   font-weight: bold;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333333;
-  padding: 0 8px;
+  color: #006bbf;
+  padding: 0 0;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-medium .x-btn-arrow {
@@ -24402,9 +24405,12 @@ a.x-color-picker-item:hover {
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-medium-disabled {
-  border-color: white;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
+}
+/* line 328, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
+.x-btn-drilldown-toolbar-medium-disabled .x-btn-inner {
+  color: #333333;
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
@@ -24433,24 +24439,5 @@ a.x-color-picker-item:hover {
 /* line 381, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-drilldown-toolbar-medium-icon .x-btn-icon-el {
   width: 24px;
-  height: 24px;
-}
-
-/* line 388, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-toolbar-medium-icon-text-left .x-btn-button {
-  height: 24px;
-}
-/* line 393, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-toolbar-medium-icon-text-left .x-btn-inner {
-  line-height: 24px;
-  padding-left: 29px;
-}
-/* line 409, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-toolbar-medium-icon-text-left .x-btn-icon-el {
-  width: 24px;
-  right: auto;
-}
-/* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-drilldown-toolbar-medium-icon-text-left .x-btn-icon-el, .x-quirks .x-ie .x-btn-drilldown-toolbar-medium-icon-text-left .x-btn-icon-el {
   height: 24px;
 }
