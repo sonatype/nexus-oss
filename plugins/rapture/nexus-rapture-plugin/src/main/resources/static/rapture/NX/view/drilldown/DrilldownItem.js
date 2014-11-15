@@ -1,4 +1,4 @@
-Ext.define('NX.coreui.view.search.DrilldownItem', {
+Ext.define('NX.view.drilldown.DrilldownItem', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-drilldown-item',
   itemName: 'item',

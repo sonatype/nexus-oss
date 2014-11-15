@@ -22,7 +22,10 @@ Ext.define('NX.coreui.controller.Search', {
   requires: [
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.view.drilldown.Drilldown',
+    'NX.view.drilldown.DrilldownItem',
+    'NX.view.drilldown.DrilldownLink'
   ],
 
   stores: [
@@ -42,9 +45,6 @@ Ext.define('NX.coreui.controller.Search', {
     'search.SearchResultVersionList',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter',
-    'search.Drilldown',
-    'search.DrilldownLink',
-    'search.DrilldownItem'
   ],
 
   refs: [
