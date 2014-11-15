@@ -21,15 +21,17 @@ Ext.define('NX.view.feature.Content', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-feature-content',
 
+  itemId: 'feature-content',
   ui: 'feature-content',
   cls: 'feature-content',
   layout: 'fit',
 
   header: {
     xtype: 'toolbar',
+    itemId: 'breadcrumb',
     height: 50,
     items: [
-      ' ',
+      '',
       {
         xtype: 'image',
         itemId: 'icon',

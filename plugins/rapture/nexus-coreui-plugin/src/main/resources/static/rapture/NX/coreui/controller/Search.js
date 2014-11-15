@@ -42,7 +42,9 @@ Ext.define('NX.coreui.controller.Search', {
     'search.SearchResultVersionList',
     'search.TextSearchCriteria',
     'search.SaveSearchFilter',
-    'search.Drilldown'
+    'search.Drilldown',
+    'search.DrilldownLink',
+    'search.DrilldownItem'
   ],
 
   refs: [
@@ -421,6 +423,7 @@ Ext.define('NX.coreui.controller.Search', {
       ]);
 
       // Show the component version panel
+      searchResultDetails.up('#nx-drilldown').setItemName(1, selected[0].internalId);
       searchResultDetails.up('#nx-drilldown').showChild(1);
     }
     else {
@@ -450,6 +453,7 @@ Ext.define('NX.coreui.controller.Search', {
       storageFileContainer.expand();
 
       // Show the version detail panel
+      storageFileContainer.up('#nx-drilldown').setItemName(2, selected[0].internalId);
       storageFileContainer.up('#nx-drilldown').showChild(2);
     }
     else {

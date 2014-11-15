@@ -37,3 +37,10 @@
   font-weight: $font-weight-body;
   top: 21px !important;
 }
+
+/**
+ * cls: 'breadcrumb-separator'
+ */
+.breadcrumb-separator {
+  font-size: $font-size-h2;
+}
