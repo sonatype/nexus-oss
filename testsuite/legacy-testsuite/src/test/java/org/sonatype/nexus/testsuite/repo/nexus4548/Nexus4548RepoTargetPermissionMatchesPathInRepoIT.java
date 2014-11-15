@@ -14,14 +14,17 @@ package org.sonatype.nexus.testsuite.repo.nexus4548;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
+import com.google.common.collect.Lists;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.FileEntity;
@@ -43,11 +46,21 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithSta
  * The nexus config is set up to allow the user test/test access to ^/g/a/.* via a repo target permission.
  */
 public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
 
   public Nexus4548RepoTargetPermissionMatchesPathInRepoIT() {
     super("releases");
+  }
+
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    List<String> rolePrivileges = Lists.newArrayList();
+    rolePrivileges.add("65"); //artifact upload
+    rolePrivileges.addAll(privilegeIds(createPrivileges("GAV", "119035e2c095")));
+    createRole("GAV", rolePrivileges);
+    createUser(TEST_USER_NAME, TEST_USER_PASSWORD, "GAV");
   }
 
   @Before
@@ -56,8 +69,8 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
   {
     TestContext ctx = TestContainer.getInstance().getTestContext();
     ctx.setSecureTest(true);
-    ctx.setUsername("test");
-    ctx.setPassword("test");
+    ctx.setUsername(TEST_USER_NAME);
+    ctx.setPassword(TEST_USER_PASSWORD);
   }
 
   @Override

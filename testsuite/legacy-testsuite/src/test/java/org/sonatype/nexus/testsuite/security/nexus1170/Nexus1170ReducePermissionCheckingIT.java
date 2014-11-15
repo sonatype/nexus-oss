@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -37,8 +37,13 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 
 public class Nexus1170ReducePermissionCheckingIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
+
+  @Override
+  protected void prepareSecurity() throws Exception {
+    createUser(TEST_USER_NAME, TEST_USER_PASSWORD, "anonymous", "nx-deployment", "ui-basic");
+  }
 
   @BeforeClass
   public static void setSecureTest() {

@@ -12,79 +12,66 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus3011;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
-import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
-import org.sonatype.nexus.test.utils.RoleMessageUtil;
-import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.rest.model.RoleResource;
 
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.restlet.data.MediaType;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 
 public class Nexus3011DeletePrivilegeIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
 
   private static final String ROLE_ID = "nexus3011-role";
-
-  private PrivilegesMessageUtil privUtil = new PrivilegesMessageUtil(XStreamFactory.getXmlXStream(),
-      MediaType.APPLICATION_XML);
-
-  private RoleMessageUtil roleUtil = new RoleMessageUtil(XStreamFactory.getXmlXStream(),
-      MediaType.APPLICATION_XML);
-
-  private static final String READ_PRIV_ID = "999a27d0bf1";
-
-  private static final String CREATE_PRIV_ID = "999a15cfb91";
-
-  private static final String UPDATE_PRIV_ID = "999a2d10b38";
-
-  private static final String DELETE_PRIV_ID = "999a35c0ab5";
-
-  private static final String[] PRIVS = new String[]{READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID};
 
   @Test
   @Category(SECURITY.class)
   public void deletePriv()
       throws Exception
   {
-    RoleResource role = roleUtil.getRole(ROLE_ID);
+    String readPrivId = createPrivileges("nexus3011-priv", "1", asList("read")).get(0).getId();
+    String createPrivId = createPrivileges("nexus3011-priv", "1", asList("create")).get(0).getId();
+    String updatePrivId = createPrivileges("nexus3011-priv", "1", asList("update")).get(0).getId();
+    String deletePrivId = createPrivileges("nexus3011-priv", "1", asList("delete")).get(0).getId();
+    String[] privs = new String[]{readPrivId, createPrivId, updatePrivId, deletePrivId};
+
+    RoleResource role = createRole(ROLE_ID, asList(privs));
     Assert.assertNotNull(role);
-    MatcherAssert.assertThat(role.getPrivileges(), hasItems(PRIVS));
-    privUtil.assertExists(PRIVS);
+    MatcherAssert.assertThat(role.getPrivileges(), hasItems(privs));
+    privUtil.assertExists(privs);
 
     // remove read
-    Assert.assertTrue(privUtil.delete(READ_PRIV_ID).getStatus().isSuccess());
+    Assert.assertTrue(privUtil.delete(readPrivId).getStatus().isSuccess());
     role = roleUtil.getRole(ROLE_ID);
-    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(READ_PRIV_ID)));
-    MatcherAssert.assertThat(role.getPrivileges(), hasItems(CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID));
+    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(readPrivId)));
+    MatcherAssert.assertThat(role.getPrivileges(), hasItems(createPrivId, updatePrivId, deletePrivId));
 
     // remove create
-    Assert.assertTrue(privUtil.delete(CREATE_PRIV_ID).getStatus().isSuccess());
+    Assert.assertTrue(privUtil.delete(createPrivId).getStatus().isSuccess());
     role = roleUtil.getRole(ROLE_ID);
-    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(READ_PRIV_ID, CREATE_PRIV_ID)));
-    MatcherAssert.assertThat(role.getPrivileges(), hasItems(UPDATE_PRIV_ID, DELETE_PRIV_ID));
+    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(readPrivId, createPrivId)));
+    MatcherAssert.assertThat(role.getPrivileges(), hasItems(updatePrivId, deletePrivId));
 
     // remove update
-    Assert.assertTrue(privUtil.delete(UPDATE_PRIV_ID).getStatus().isSuccess());
+    Assert.assertTrue(privUtil.delete(updatePrivId).getStatus().isSuccess());
     role = roleUtil.getRole(ROLE_ID);
-    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID)));
-    MatcherAssert.assertThat(role.getPrivileges(), hasItems(DELETE_PRIV_ID));
+    MatcherAssert.assertThat(role.getPrivileges(), not(hasItems(readPrivId, createPrivId, updatePrivId)));
+    MatcherAssert.assertThat(role.getPrivileges(), hasItems(deletePrivId));
 
     // remove delete
-    Assert.assertTrue(privUtil.delete(DELETE_PRIV_ID).getStatus().isSuccess());
+    Assert.assertTrue(privUtil.delete(deletePrivId).getStatus().isSuccess());
     role = roleUtil.getRole(ROLE_ID);
     MatcherAssert.assertThat(role.getPrivileges(),
-        not(hasItems(READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID)));
+        not(hasItems(readPrivId, createPrivId, updatePrivId, deletePrivId)));
     Assert.assertTrue(role.getPrivileges().isEmpty());
 
-    privUtil.assertNotExists(PRIVS);
+    privUtil.assertNotExists(privs);
   }
 }

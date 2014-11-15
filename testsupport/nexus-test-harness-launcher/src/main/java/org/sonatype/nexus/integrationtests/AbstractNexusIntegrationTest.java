@@ -55,7 +55,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * Support for legacy (embedded-server) integration tests.
  */
 public abstract class AbstractNexusIntegrationTest
-  extends TestSupport
+    extends TestSupport
 {
   /**
    * Default start timeout value in seconds.
@@ -254,11 +254,13 @@ public abstract class AbstractNexusIntegrationTest
         startNexus();
 
         // set security enabled/disabled as expected by current IT
-        final boolean testRequiresSecurityEnabled =
-            TestContainer.getInstance().getTestContext().isSecureTest()
-                || Boolean.valueOf(System.getProperty("secure.test"));
+        final boolean isSecureTest = TestContainer.getInstance().getTestContext().isSecureTest();
+        TestContainer.getInstance().getTestContext().setSecureTest(true);
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        prepareSecurity();
+        TestContainer.getInstance().getTestContext().setSecureTest(isSecureTest);
         new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML)
-            .makeAnonymousAdministrator(!testRequiresSecurityEnabled);
+            .makeAnonymousAdministrator(isSecureTest && Boolean.getBoolean("secure.test"));
 
         // deploy artifacts
         deployArtifacts();
@@ -271,6 +273,10 @@ public abstract class AbstractNexusIntegrationTest
 
       getEventInspectorsUtil().waitForCalmPeriod();
     }
+  }
+
+
+  protected void prepareSecurity() throws Exception {
   }
 
   /**
@@ -536,8 +542,11 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   @Deprecated
-  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type, String classifier, String targetDirectory) throws IOException {
-    return new DownloadHelper().downloadArtifact(baseUrl, groupId, artifact, version, type, classifier, targetDirectory);
+  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type,
+                                  String classifier, String targetDirectory) throws IOException
+  {
+    return new DownloadHelper()
+        .downloadArtifact(baseUrl, groupId, artifact, version, type, classifier, targetDirectory);
   }
 
   @Deprecated

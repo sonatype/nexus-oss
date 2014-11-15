@@ -12,19 +12,17 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus504;
 
+import java.util.Arrays;
+
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 
-import com.thoughtworks.xstream.XStream;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,19 +43,16 @@ public class Nexus504ChangeRoleIT
 
   private static final String NEXUS504_ROLE = "nexus504-role";
 
-  private RoleMessageUtil roleUtil;
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    createRole(NEXUS504_ROLE, Arrays.asList("1", "3"));
+    createUser(NEXUS504_USER, TEST_USER_PASSWORD, NEXUS504_ROLE);
+  }
 
   @BeforeClass
   public static void setSecureTest() {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
-  }
-
-  @Before
-  public void init() {
-    XStream xstream = this.getXMLXStream();
-
-    this.userUtil = new UserMessageUtil(xstream, MediaType.APPLICATION_XML);
-    this.roleUtil = new RoleMessageUtil(xstream, MediaType.APPLICATION_XML);
   }
 
   @Test
