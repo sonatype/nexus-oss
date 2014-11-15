@@ -71,7 +71,6 @@ Ext.define('NX.coreui.view.search.Drilldown', {
       );
 
       // Create the rest of the links
-      console.log(me.currentItem);
       for (var i = 1; i <= me.currentItem && i < me.items.items.length; ++i) {
         toolbar.add(
           // Separator

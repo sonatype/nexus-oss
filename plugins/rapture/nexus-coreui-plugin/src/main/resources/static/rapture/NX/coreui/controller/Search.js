@@ -149,10 +149,10 @@ Ext.define('NX.coreui.controller.Search', {
           criteriaremoved: me.removeCriteria
         },
         'nx-coreui-search-result-list': {
-          selectionchange: me.onSearchResultSelectionChange
+          cellclick: me.onSearchResultCellClick
         },
         'nx-coreui-search-result-version-list': {
-          selectionchange: me.onSearchResultVersionSelectionChange
+          cellclick: me.onSearchResultVersionCellClick
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -381,7 +381,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
-      me.onSearchResultSelectionChange(me.getSearchResult().getSelectionModel(), []);
+      me.onSearchResultCellClick(me.getSearchResult().getSelectionModel(), null, null, null);
       me.bookmarkFilters();
     }
   },
@@ -390,16 +390,17 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show details and load version of selected search result.
    * @param selectionModel search result grid selection model
-   * @param selected selected search result
+   * @param record selected search result
    */
-  onSearchResultSelectionChange: function(selectionModel, selected) {
+  onSearchResultCellClick: function(selectionModel, td, cellIndex, record) {
     var me = this,
-        searchResultModel = selected[0],
+        searchResultModel = record,
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
         searchResultVersionStore = me.getSearchResultVersionStore();
 
-    me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
+    me.onSearchResultVersionCellClick(me.getSearchResultVersion().getSelectionModel(), null, null, null);
+
     if (searchResultModel) {
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
@@ -423,7 +424,7 @@ Ext.define('NX.coreui.controller.Search', {
       ]);
 
       // Show the component version panel
-      searchResultDetails.up('#nx-drilldown').setItemName(1, selected[0].internalId);
+      searchResultDetails.up('#nx-drilldown').setItemName(1, record.internalId);
       searchResultDetails.up('#nx-drilldown').showChild(1);
     }
     else {
@@ -437,11 +438,11 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show storage file of selected version of search result.
    * @param selectionModel search result grid selection model
-   * @param selected selected search result
+   * @param record selected search result
    */
-  onSearchResultVersionSelectionChange: function(selectionModel, selected) {
+  onSearchResultVersionCellClick: function(selectionModel, td, cellIndex, record) {
     var me = this,
-        searchResultVersionModel = selected[0],
+        searchResultVersionModel = record,
         storageFileContainer = me.getStorageFileContainer();
 
     if (searchResultVersionModel) {
@@ -453,7 +454,7 @@ Ext.define('NX.coreui.controller.Search', {
       storageFileContainer.expand();
 
       // Show the version detail panel
-      storageFileContainer.up('#nx-drilldown').setItemName(2, selected[0].internalId);
+      storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
       storageFileContainer.up('#nx-drilldown').showChild(2);
     }
     else {
