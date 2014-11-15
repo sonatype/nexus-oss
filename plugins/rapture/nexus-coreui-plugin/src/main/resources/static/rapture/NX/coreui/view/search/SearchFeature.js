@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
     me.items = [
       {
-        xtype: 'panel',
+        xtype: 'container',
         items: [
           {
             xtype: 'nx-drilldown',

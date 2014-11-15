@@ -104,16 +104,24 @@ Ext.define('NX.coreui.view.search.Drilldown', {
       var me = this;
       if (me.ownerCt) {
         me.setSize(me.ownerCt.el.getWidth() * me.items.items.length, me.ownerCt.el.getHeight());
+        me.showChild(me.currentIndex);
       }
     },
 
     me.showChild = function (index) {
       var me = this;
-      var left = me.items.items[index].el.getLeft() - me.el.getLeft();
-      me.el.first().move('l', left, true);
-      me.currentIndex = index;
 
-      me.refreshBreadcrumb();
+      if (me.items.items[index].el) {
+        var left = me.items.items[index].el.getLeft() - me.el.getLeft();
+        if (index == me.currentIndex) {
+          me.el.first().move('l', left, false);
+        } else {
+          me.el.first().move('l', left, true);
+        }
+        me.currentIndex = index;
+
+        me.refreshBreadcrumb();
+      }
     },
 
     me.setItemName = function (index, text) {
