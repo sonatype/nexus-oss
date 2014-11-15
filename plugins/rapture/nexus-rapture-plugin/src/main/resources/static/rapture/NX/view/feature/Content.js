@@ -74,6 +74,18 @@ Ext.define('NX.view.feature.Content', {
   },
 
   /**
+   * Show the feature root (hide the breadcrumb)
+   */
+  showRoot: function() {
+    var me = this;
+    var root = me.down('#feature-root');
+    var breadcrumb = me.down('#breadcrumb');
+
+    root.show();
+    breadcrumb.hide();
+  },
+
+  /**
    * Custom handling for title since we are using custom header component.
    *
    * @override

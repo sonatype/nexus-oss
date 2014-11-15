@@ -44,7 +44,7 @@ Ext.define('NX.coreui.view.search.Drilldown', {
             scale: 'large',
             text: me.items.items[0].itemName,
             handler: function() {
-              me.showChild(0);
+              me.showChild(0, true);
             }
           }
         );
@@ -66,7 +66,7 @@ Ext.define('NX.coreui.view.search.Drilldown', {
                 disabled: (i == me.currentIndex ? true : false), // Disabled if it’s the last item in the breadcrumb
                 text: me.items.items[j].itemName,
                 handler: function() {
-                  me.showChild(j);
+                  me.showChild(j, true);
                 }
               }
             })(i)
@@ -82,20 +82,23 @@ Ext.define('NX.coreui.view.search.Drilldown', {
       var me = this;
       if (me.ownerCt) {
         me.setSize(me.ownerCt.el.getWidth() * me.items.items.length, me.ownerCt.el.getHeight());
-        me.showChild(me.currentIndex);
+        me.showChild(me.currentIndex, false);
       }
     },
 
-    me.showChild = function (index) {
+    me.showChild = function (index, animate) {
       var me = this;
 
       if (me.items.items[index].el) {
-        var left = me.items.items[index].el.getLeft() - me.el.getLeft();
-        if (index == me.currentIndex) {
-          me.el.first().move('l', left, false);
-        } else {
-          me.el.first().move('l', left, true);
+
+        // Hack to prevent resize events until the animation is complete
+        if (animate) {
+          me.ownerCt.suspendEvents(false);
+          setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
         }
+
+        var left = me.items.items[index].el.getLeft() - me.el.getLeft();
+        me.el.first().move('l', left, animate);
         me.currentIndex = index;
 
         me.refreshBreadcrumb();

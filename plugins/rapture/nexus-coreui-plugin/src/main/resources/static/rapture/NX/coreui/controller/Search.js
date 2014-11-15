@@ -425,7 +425,7 @@ Ext.define('NX.coreui.controller.Search', {
 
       // Show the component version panel
       searchResultDetails.up('#nx-drilldown').setItemName(1, record.internalId);
-      searchResultDetails.up('#nx-drilldown').showChild(1);
+      searchResultDetails.up('#nx-drilldown').showChild(1, true);
     }
     else {
       searchResultDetails.items.get(0).show();
@@ -455,7 +455,7 @@ Ext.define('NX.coreui.controller.Search', {
 
       // Show the version detail panel
       storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
-      storageFileContainer.up('#nx-drilldown').showChild(2);
+      storageFileContainer.up('#nx-drilldown').showChild(2, true);
     }
     else {
       storageFileContainer.showStorageFile();
