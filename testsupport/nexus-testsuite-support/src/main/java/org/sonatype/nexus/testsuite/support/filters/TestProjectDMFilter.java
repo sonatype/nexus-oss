@@ -19,13 +19,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.nexus.testsuite.support.Filter;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
 import com.google.common.collect.Maps;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.sisu.Parameters;
 
 /**

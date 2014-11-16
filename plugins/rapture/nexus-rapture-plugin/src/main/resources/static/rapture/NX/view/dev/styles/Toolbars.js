@@ -32,7 +32,7 @@ Ext.define('NX.view.dev.styles.Toolbars', {
       var obj = {
         xtype: 'toolbar',
         items: [
-          me.label('ui: default; scale: ' + scale, { width: 180 }),
+          'text',
           {
             xtype: 'button',
             text: 'plain'
@@ -57,7 +57,24 @@ Ext.define('NX.view.dev.styles.Toolbars', {
               { text: 'with icon', iconCls: 'nx-icon-help-kb-x16'}
             ]
           },
-          '-', // seperator
+          '-', // sep
+          {
+            xtype: 'splitbutton',
+            text: 'split button',
+            menu: Ext.widget('menu', {
+              items: [
+                {text: 'Item 1'},
+                {text: 'Item 2'}
+              ]
+            })
+          },
+          {
+            xtype: 'button',
+            enableToggle: true,
+            pressed: true,
+            text: 'toggle button'
+          },
+          '->', // spring
           {
             xtype: 'nx-searchbox',
             width: 200
@@ -77,8 +94,11 @@ Ext.define('NX.view.dev.styles.Toolbars', {
     }
 
     me.items = [
+      me.label('default'),
       toolbar(undefined),
+      me.label('scale: medium'),
       toolbar('medium'),
+      me.label('scale: large'),
       toolbar('large')
     ];
 
