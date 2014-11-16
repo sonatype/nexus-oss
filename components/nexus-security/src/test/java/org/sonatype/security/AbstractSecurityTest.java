@@ -21,11 +21,10 @@ import com.google.inject.Binder;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
-import org.eclipse.sisu.launch.InjectedTestCase;
 import org.eclipse.sisu.space.BeanScanning;
 
 public abstract class AbstractSecurityTest
-    extends InjectedTestCase
+    extends SecurityTestSupport
 {
 
   protected File PLEXUS_HOME = new File("./target/plexus-home/");
@@ -40,6 +39,7 @@ public abstract class AbstractSecurityTest
 
   @Override
   public void configure(final Binder binder) {
+    super.configure(binder);
     binder.install(new SecurityModule());
   }
 
