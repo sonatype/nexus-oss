@@ -30,6 +30,7 @@ import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.nexus.util.DigesterUtils;
+import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -50,16 +51,20 @@ public class DefaultNexusTaskScheduler
 {
   private final NexusTaskFactory nexusTaskFactory;
 
+  private final NexusUberClassloader nexusUberClassloader;
+
   private final List<TaskDescriptor> taskDescriptors;
 
   private final List<NexusTaskExecutorSPI> schedulers;
 
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
+                                   final NexusUberClassloader nexusUberClassloader,
                                    final List<TaskDescriptor> taskDescriptors,
                                    final List<NexusTaskExecutorSPI> schedulers)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.nexusUberClassloader = checkNotNull(nexusUberClassloader);
     this.taskDescriptors = checkNotNull(taskDescriptors);
     this.schedulers = checkNotNull(schedulers);
   }
@@ -136,6 +141,18 @@ public class DefaultNexusTaskScheduler
     taskConfiguration.setType(taskType.getName());
     taskConfiguration.setVisible(false); // tasks w/o descriptors are invisible in UI by default
     return taskConfiguration;
+  }
+
+  @Override
+  public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
+    try {
+      final Class<?> taskClass = nexusUberClassloader.loadClass(taskType);
+      checkArgument(Task.class.isAssignableFrom(taskClass));
+      return createTaskConfigurationInstance((Class<? extends Task>) taskClass);
+    }
+    catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException("No task of FCQN '" + taskType + "' found", e);
+    }
   }
 
   /**

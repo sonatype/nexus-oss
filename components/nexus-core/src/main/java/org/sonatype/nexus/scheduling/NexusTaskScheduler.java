@@ -31,6 +31,16 @@ public interface NexusTaskScheduler
       throws IllegalArgumentException;
 
   /**
+   * A factory for task configurations (by FQCN as string). It will honor descriptor if exists for given type, otherwise
+   * will use sane default values. It also uses "uber" classloader to load the class, and will check is the class
+   * actually a {@link Task}. Use of this method is discouraged, only in cases when "type" of task is geting over
+   * wire like in case of UI.
+   * // TODO: really? why not enapsulate uberCL here, and only here? Is uberCL "okay" to use or is going away?
+   */
+  TaskConfiguration createTaskConfigurationInstance(String taskType)
+      throws IllegalArgumentException;
+
+  /**
    * A factory for tasks (by actual type). Delegates to {@link NexusTaskFactory}. This method should be rarely used, as
    * it will return a "live" configured task instance that is not scheduled! To be used in cases when task as-is
    * should be executed synchronously, in caller thread using {@link Task#call()} method directly.
@@ -66,11 +76,11 @@ public interface NexusTaskScheduler
 
   // -- tests
 
-  // TODO: remove
+  // TODO: remove, used in UTs only
   @Deprecated
   void killAll();
 
-  // TODO: remove
+  // TODO: remove, used in UTs only
   @Deprecated
   int getRunningTaskCount();
 }
