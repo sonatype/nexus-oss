@@ -39,6 +39,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                 xtype: 'nx-drilldown-item',
 
                 itemName: 'Search',
+                itemClass: 'nx-icon-search-default-x32',
 
                 layout: 'border',
 
@@ -74,6 +75,9 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
               },
               {
                 xtype: 'nx-drilldown-item',
+
+                itemClass: 'nx-icon-search-component-detail-x16',
+
                 items: [
                   {
                     type: 'panel',
@@ -113,6 +117,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
               },
               {
                 xtype: 'nx-drilldown-item',
+
                 items: [
                   {
                     xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'

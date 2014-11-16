@@ -37,7 +37,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
             xtype: 'image',
             height: 32,
             width: 32,
-            cls: 'nx-icon-search-default-x32'
+            cls: me.items.items[0].itemClass
           },
           {
             xtype: 'nx-drilldown-link',
@@ -57,6 +57,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
               xtype: 'tbtext',
               cls: 'breadcrumb-separator',
               text: '/'
+            },
+            {
+              xtype: 'image',
+              height: 16,
+              width: 16,
+              cls: me.items.items[i].itemClass
             },
 
             // Create a closure within a closure to decouple 'i' from the current context
@@ -108,6 +114,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
     me.setItemName = function (index, text) {
       var me = this;
       me.items.items[index].setItemName(text);
+    },
+
+    me.setItemClass = function (index, cls) {
+      var me = this;
+      me.items.items[index].setItemClass(cls);
     },
 
     me.callParent(arguments);

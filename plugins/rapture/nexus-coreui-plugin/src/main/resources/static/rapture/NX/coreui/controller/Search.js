@@ -44,7 +44,7 @@ Ext.define('NX.coreui.controller.Search', {
     'search.SearchResultList',
     'search.SearchResultVersionList',
     'search.TextSearchCriteria',
-    'search.SaveSearchFilter',
+    'search.SaveSearchFilter'
   ],
 
   refs: [
@@ -454,6 +454,7 @@ Ext.define('NX.coreui.controller.Search', {
       storageFileContainer.expand();
 
       // Show the version detail panel
+      storageFileContainer.up('#nx-drilldown').setItemClass(2, 'nx-icon-repository-item-type-' + searchResultVersionModel.get('type') + '-x16');
       storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
       storageFileContainer.up('#nx-drilldown').showChild(2, true);
     }
