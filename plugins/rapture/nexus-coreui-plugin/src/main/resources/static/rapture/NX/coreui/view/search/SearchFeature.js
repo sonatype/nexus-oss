@@ -118,11 +118,23 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
               {
                 xtype: 'nx-drilldown-item',
 
+                layout: 'border',
+
+                style: {
+                  'background-color': 'white'
+                },
+
                 items: [
                   {
                     xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
                     header: false,
-                    plain: true
+                    plain: true,
+                    region: 'center',
+
+                    style: {
+                      'background-color': 'white',
+                      'padding-top': '10px'
+                    }
                   }
                 ]
               }
