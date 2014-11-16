@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus504;
 
-import java.util.Arrays;
-
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
@@ -25,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Status;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.StatusMatchers.hasStatusCode;
 import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
@@ -46,8 +45,8 @@ public class Nexus504ChangeRoleIT
   @Override
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
-    createRole(NEXUS504_ROLE, Arrays.asList("1", "3"));
-    createUser(NEXUS504_USER, TEST_USER_PASSWORD, NEXUS504_ROLE);
+    createRole(NEXUS504_ROLE, asList("1", "3"));
+    createUser(NEXUS504_USER, TEST_USER_PASSWORD, asList(NEXUS504_ROLE));
   }
 
   @BeforeClass

@@ -50,14 +50,6 @@ public abstract class AbstractSecurityTest
 {
   protected static Logger LOG = LoggerFactory.getLogger(AbstractSecurityTest.class);
 
-  public static final String TEST_USER_NAME = "test-user";
-
-  public static final String TEST_USER_PASSWORD = "admin123";
-
-  protected UserMessageUtil userUtil;
-
-  protected RoleMessageUtil roleUtil;
-
   protected PrivilegesMessageUtil privUtil;
 
   protected TargetMessageUtil targetUtil;
@@ -93,8 +85,6 @@ public abstract class AbstractSecurityTest
   {
     XStream xstream = this.getXMLXStream();
 
-    this.userUtil = new UserMessageUtil(xstream, MediaType.APPLICATION_XML);
-    this.roleUtil = new RoleMessageUtil(xstream, MediaType.APPLICATION_XML);
     this.privUtil = new PrivilegesMessageUtil(xstream, MediaType.APPLICATION_XML);
     this.targetUtil = new TargetMessageUtil(xstream, MediaType.APPLICATION_XML);
     TestContainer.getInstance().getTestContext().setSecureTest(true);
@@ -396,25 +386,6 @@ public abstract class AbstractSecurityTest
     addPrivilege(userName, stat.get(0).getId());
   }
 
-  protected void createUserFull(final String userId, final String password, final String firstName,
-                                final String lastName, final String email, final String status, final String... roles)
-      throws Exception
-  {
-    UserResource user = new UserResource();
-    user.setUserId(userId);
-    user.setPassword(password);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    user.setStatus(status);
-    user.setRoles(Arrays.asList(roles));
-    userUtil.createUser(user);
-  }
-
-  protected void createUser(final String userId, final String password, final String... roles) throws Exception {
-    createUserFull(userId, password, userId, userId, userId + "@foo.bar", "active", roles);
-  }
-
   protected List<PrivilegeStatusResource> createPrivileges(final String name,
                                                            final String repositoryTargetId)
       throws Exception
@@ -446,15 +417,6 @@ public abstract class AbstractSecurityTest
     privilege.setRepositoryGroupId(repositoryGroupId);
     privilege.setMethod(methods);
     return privUtil.createPrivileges(privilege);
-  }
-
-  protected RoleResource createRole(final String id, List<String> privileges) throws Exception {
-    RoleResource role = new RoleResource();
-    role.setId(id);
-    role.setName(id);
-    role.setDescription(id);
-    role.setPrivileges(privileges);
-    return roleUtil.createRole(role);
   }
 
   protected List<String> privilegeIds(final List<PrivilegeStatusResource> privileges) {

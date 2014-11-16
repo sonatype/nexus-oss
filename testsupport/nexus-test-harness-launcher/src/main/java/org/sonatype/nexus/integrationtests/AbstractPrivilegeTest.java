@@ -28,11 +28,6 @@ public abstract class AbstractPrivilegeTest
   public AbstractPrivilegeTest() {
   }
 
-  @Override
-  protected void prepareSecurity() throws Exception {
-    createUser(TEST_USER_NAME, TEST_USER_PASSWORD, "anonymous");
-  }
-
   @BeforeClass
   public static void enableSecurity() {
     // turn on security for the test

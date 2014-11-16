@@ -28,6 +28,7 @@ import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.sonatype.security.rest.model.UserResource;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -36,13 +37,18 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static java.util.Arrays.asList;
+
 public class Nexus1170ReducePermissionCheckingIT
     extends AbstractSecurityTest
 {
 
   @Override
   protected void prepareSecurity() throws Exception {
-    createUser(TEST_USER_NAME, TEST_USER_PASSWORD, "anonymous", "nx-deployment", "ui-basic");
+    super.prepareSecurity();
+    UserResource deployment = userUtil.getUser(TEST_USER_NAME);
+    deployment.setRoles(asList("anonymous", "nx-deployment", "ui-basic"));
+    userUtil.updateUser(deployment);
   }
 
   @BeforeClass

@@ -23,6 +23,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.sonatype.security.rest.model.UserResource;
 
 import com.google.common.collect.Lists;
 import org.apache.http.HttpResponse;
@@ -33,6 +34,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
@@ -60,7 +62,10 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
     rolePrivileges.add("65"); //artifact upload
     rolePrivileges.addAll(privilegeIds(createPrivileges("GAV", "119035e2c095")));
     createRole("GAV", rolePrivileges);
-    createUser(TEST_USER_NAME, TEST_USER_PASSWORD, "GAV");
+
+    UserResource deployment = userUtil.getUser(TEST_USER_NAME);
+    deployment.setRoles(asList("GAV"));
+    userUtil.updateUser(deployment);
   }
 
   @Before

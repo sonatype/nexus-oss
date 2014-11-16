@@ -34,6 +34,7 @@ public class Nexus1563ExternalRealmsLoginIT
 
   @Override
   protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
     settings.setSecurityRealms(asList("Simple", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
     SettingsMessageUtil.save(settings);
