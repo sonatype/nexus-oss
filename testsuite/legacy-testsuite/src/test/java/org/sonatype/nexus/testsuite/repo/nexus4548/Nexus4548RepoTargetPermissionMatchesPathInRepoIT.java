@@ -63,9 +63,9 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
     rolePrivileges.addAll(privilegeIds(createPrivileges("GAV", "119035e2c095")));
     createRole("GAV", rolePrivileges);
 
-    UserResource deployment = userUtil.getUser(TEST_USER_NAME);
-    deployment.setRoles(asList("GAV"));
-    userUtil.updateUser(deployment);
+    UserResource test = userUtil.getUser(TEST_USER_NAME);
+    test.setRoles(asList("GAV"));
+    userUtil.updateUser(test);
   }
 
   @Before

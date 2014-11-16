@@ -46,9 +46,9 @@ public class Nexus1170ReducePermissionCheckingIT
   @Override
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
-    UserResource deployment = userUtil.getUser(TEST_USER_NAME);
-    deployment.setRoles(asList("anonymous", "nx-deployment", "ui-basic"));
-    userUtil.updateUser(deployment);
+    UserResource test = userUtil.getUser(TEST_USER_NAME);
+    test.setRoles(asList("anonymous", "nx-deployment", "ui-basic"));
+    userUtil.updateUser(test);
   }
 
   @BeforeClass
