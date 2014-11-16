@@ -14,12 +14,13 @@ package org.sonatype.nexus.plugins.mavenbridge;
 
 import java.util.List;
 
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.nexus.plugins.mavenbridge.workspace.NexusWorkspace;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Component providing Nexus integrated Aether services, like Nexus-enabled Sessions and WorkspaceReaders. It also

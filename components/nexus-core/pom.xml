@@ -210,17 +210,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
+      <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
+      <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-util</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
+      <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-spi</artifactId>
     </dependency>
 
@@ -397,6 +397,11 @@
       <optional>true</optional>
     </dependency>
 
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -419,6 +424,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerId>groovy-eclipse-compiler</compilerId>
+        </configuration>
+      </plugin>
       <!--
       FIXME: Get rid of test-jar, these artifacts cause problems with transitive dependencies.
       -->

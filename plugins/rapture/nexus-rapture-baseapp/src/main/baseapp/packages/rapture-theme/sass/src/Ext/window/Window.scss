@@ -5,81 +5,43 @@
 @include extjs-window-ui(
   $ui: 'message-default',
 
-  $ui-padding: 4px,
-
-  $ui-border-width: 2px,
-  $ui-border-color: $color-night-rider,
-
-  $ui-header-border-width: 2px,
-  $ui-header-color: $color-black,
-  $ui-header-background-color: $color-smoke,
-
-  $ui-body-color: $color-black,
-  $ui-body-background-color: $color-white
+  $ui-padding: 10px
 );
 
 @include extjs-window-ui(
   $ui: 'message-primary',
 
-  $ui-padding: 4px,
-
-  $ui-border-width: 2px,
-  $ui-border-color: $color-night-rider,
-
-  $ui-header-border-width: 2px,
+  $ui-padding: 10px,
+  $ui-tool-background-image: 'tools/tool-sprites',
   $ui-header-color: $color-white,
-  $ui-header-background-color: $color-cobalt,
-
-  $ui-body-color: $color-black,
-  $ui-body-background-color: $color-white
+  $ui-header-background-color: $color-cobalt
 );
 
 @include extjs-window-ui(
   $ui: 'message-danger',
 
-  $ui-padding: 4px,
-
-  $ui-border-width: 2px,
-  $ui-border-color: $color-night-rider,
-
-  $ui-header-border-width: 2px,
+  $ui-padding: 10px,
+  $ui-tool-background-image: 'tools/tool-sprites',
   $ui-header-color: $color-white,
-  $ui-header-background-color: $color-cerise,
-
-  $ui-body-color: $color-black,
-  $ui-body-background-color: $color-white
+  $ui-header-background-color: $color-cerise
 );
 
 @include extjs-window-ui(
   $ui: 'message-warning',
 
-  $ui-padding: 4px,
-
-  $ui-border-width: 2px,
-  $ui-border-color: $color-night-rider,
-
-  $ui-header-border-width: 2px,
+  $ui-padding: 10px,
+  $ui-tool-background-image: 'tools/tool-sprites',
   $ui-header-color: $color-white,
-  $ui-header-background-color: $color-sun,
-
-  $ui-body-color: $color-black,
-  $ui-body-background-color: $color-white
+  $ui-header-background-color: $color-sun
 );
 
 @include extjs-window-ui(
   $ui: 'message-success',
 
-  $ui-padding: 4px,
-
-  $ui-border-width: 2px,
-  $ui-border-color: $color-black,
-
-  $ui-header-border-width: 2px,
+  $ui-padding: 10px,
+  $ui-tool-background-image: 'tools/tool-sprites',
   $ui-header-color: $color-white,
-  $ui-header-background-color: $color-pigment-green,
-
-  $ui-body-color: $color-black,
-  $ui-body-background-color: $color-white
+  $ui-header-background-color: $color-pigment-green
 );
 
 

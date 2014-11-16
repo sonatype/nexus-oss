@@ -15,8 +15,9 @@ package org.sonatype.nexus.plugins.mavenbridge.workspace;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+
+import org.eclipse.aether.repository.WorkspaceReader;
 
 public class NexusWorkspace
 {

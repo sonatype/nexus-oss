@@ -15,14 +15,14 @@ package org.sonatype.nexus.testsuite.support;
 import java.io.File;
 import java.util.List;
 
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
 import com.google.common.base.Throwables;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;

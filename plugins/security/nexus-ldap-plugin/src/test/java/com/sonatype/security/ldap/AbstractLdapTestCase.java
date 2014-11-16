@@ -52,7 +52,7 @@ public abstract class AbstractLdapTestCase
 
     super.setUp();
 
-    Map<String, String> interpolationMap = new HashMap<String, String>();
+    Map<String, Object> interpolationMap = new HashMap<String, Object>();
 
     for (Entry<String, LdapServer> entry : this.getLdapServerMap().entrySet()) {
       interpolationMap.put(entry.getKey() + "-ldap-port", Integer.toString(entry.getValue().getPort()));

@@ -19,14 +19,20 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.model.Entity;
-import org.sonatype.nexus.component.services.adapter.EntityAdapter;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.services.adapter.AssetAdapter;
+import org.sonatype.nexus.component.services.adapter.ComponentAdapter;
 import org.sonatype.nexus.component.services.adapter.EntityAdapterRegistry;
+import org.sonatype.nexus.component.services.adapter.EntityAdapterSupport;
+import org.sonatype.nexus.component.services.internal.storage.ComponentMetadataDatabase;
 import org.sonatype.nexus.orient.DatabaseInstance;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -36,41 +42,78 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
+@Named
+@Singleton
 public class EntityAdapterRegistryImpl
+    extends EntityAdapterSupport
     implements EntityAdapterRegistry
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final ConcurrentMap<Class<? extends Entity>, EntityAdapter> map = Maps.newConcurrentMap();
+  private final ConcurrentMap<Class<? extends Asset>, AssetAdapter<? extends Asset>>
+      assetAdapters = Maps.newConcurrentMap();
+
+  private final ConcurrentMap<Class<? extends Component>, ComponentAdapter<? extends Component>>
+      componentAdapters = Maps.newConcurrentMap();
 
   @Inject
-  public EntityAdapterRegistryImpl(@Named("componentMetadata") Provider<DatabaseInstance> databaseInstance) {
+  public EntityAdapterRegistryImpl(@Named(ComponentMetadataDatabase.NAME) Provider<DatabaseInstance> databaseInstance) {
     this.databaseInstance = checkNotNull(databaseInstance);
   }
 
   @Override
-  public <T extends Entity> void registerAdapter(final EntityAdapter<T> adapter) {
-    checkState(map.putIfAbsent(adapter.getEntityClass(), adapter) == null,
-        "Adapter already registered for class %s", adapter.getEntityClass());
+  public Set<Class<? extends Asset>> assetClasses() {
+    return assetAdapters.keySet();
+  }
+
+  @Override
+  public Set<Class<? extends Component>> componentClasses() {
+    return componentAdapters.keySet();
+  }
+
+  @Override
+  public <T extends Asset> void registerAssetAdapter(final AssetAdapter<T> adapter) {
+    Class<T> entityClass = checkNotNull(adapter).getEntityClass();
+    checkState(assetAdapters.putIfAbsent(entityClass, adapter) == null,
+        "Asset adapter already registered for class %s", adapter.getEntityClass());
     try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
-      adapter.registerStorageClass(db);
+      OSchema schema = db.getMetadata().getSchema();
+      adapter.createStorageClass(schema);
     }
   }
 
   @Override
-  public <T extends Entity> void unregisterAdapter(final Class<T> entityClass) {
-    map.remove(entityClass);
+  public <T extends Component> void registerComponentAdapter(final ComponentAdapter<T> adapter) {
+    Class<T> entityClass = checkNotNull(adapter).getEntityClass();
+    checkState(componentAdapters.putIfAbsent(entityClass, adapter) == null,
+        "Component adapter already registered for class %s", adapter.getEntityClass());
+    try (ODatabaseDocumentTx db = databaseInstance.get().acquire()) {
+      OSchema schema = db.getMetadata().getSchema();
+      adapter.createStorageClass(schema);
+    }
+  }
+
+  @Override
+  public <T extends Asset> void unregisterAssetAdapter(final Class<T> entityClass) {
+    assetAdapters.remove(entityClass);
+  }
+
+  @Override
+  public <T extends Component> void unregisterComponentAdapter(final Class<T> entityClass) {
+    componentAdapters.remove(entityClass);
   }
 
   @Nullable
   @Override
   @SuppressWarnings({"unchecked"})
-  public <T extends Entity> EntityAdapter<T> getAdapter(final Class<T> entityClass) {
-    return map.get(entityClass);
+  public <T extends Asset> AssetAdapter<T> getAssetAdapter(final Class<T> entityClass) {
+    return (AssetAdapter<T>) assetAdapters.get(entityClass);
   }
 
+  @Nullable
   @Override
-  public Set<Class<? extends Entity>> entityClasses() {
-    return map.keySet();
+  @SuppressWarnings({"unchecked"})
+  public <T extends Component> ComponentAdapter<T> getComponentAdapter(final Class<T> entityClass) {
+    return (ComponentAdapter<T>) componentAdapters.get(entityClass);
   }
 }
