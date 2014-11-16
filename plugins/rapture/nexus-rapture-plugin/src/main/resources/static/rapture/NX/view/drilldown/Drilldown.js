@@ -62,7 +62,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
               xtype: 'image',
               height: 16,
               width: 16,
-              cls: me.items.items[i].itemClass
+              cls: 'breadcrumb-icon ' + me.items.items[i].itemClass
             },
 
             // Create a closure within a closure to decouple 'i' from the current context

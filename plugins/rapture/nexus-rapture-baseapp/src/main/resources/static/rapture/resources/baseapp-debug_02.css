@@ -14006,6 +14006,15 @@
 }
 
 /**
+ * cls: 'breadcrumb-icon'
+ */
+/* line 52, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+.breadcrumb-icon {
+  top: 13px !important;
+  margin-left: 11px;
+}
+
+/**
  * @class Ext.tab.Panel
  */
 /**
