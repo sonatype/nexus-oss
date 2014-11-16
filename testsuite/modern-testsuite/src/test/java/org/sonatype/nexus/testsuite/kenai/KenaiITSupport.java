@@ -13,12 +13,15 @@
 package org.sonatype.nexus.testsuite.kenai;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
+import org.sonatype.nexus.client.core.subsystem.config.Security;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
@@ -31,6 +34,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
+import static java.util.Arrays.asList;
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
@@ -106,6 +110,12 @@ public class KenaiITSupport
 
   public Content content() {
     return client().getSubsystem(Content.class);
+  }
+
+  void configureKenaiRealm() {
+    Security security = client().getSubsystem(ServerConfiguration.class).security();
+    security.settings().setRealms(asList("XmlAuthenticatingRealm", "XmlAuthorizingRealm", "kenai"));
+    security.save();
   }
 
 }

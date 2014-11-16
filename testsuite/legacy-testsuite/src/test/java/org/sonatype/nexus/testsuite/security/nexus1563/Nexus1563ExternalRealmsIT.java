@@ -14,30 +14,27 @@ package org.sonatype.nexus.testsuite.security.nexus1563;
 
 import java.util.List;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.RoleMessageUtil;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
+import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.restlet.data.MediaType;
+
+import static java.util.Arrays.asList;
 
 public class Nexus1563ExternalRealmsIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
 
-  private UserMessageUtil userUtil;
-
-  private RoleMessageUtil roleUtil;
-
-  @Before
-  public void init() {
-    this.userUtil = new UserMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
-    this.roleUtil = new RoleMessageUtil(XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML);
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+    settings.setSecurityRealms(asList("Simple", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
+    SettingsMessageUtil.save(settings);
   }
 
   @Test
