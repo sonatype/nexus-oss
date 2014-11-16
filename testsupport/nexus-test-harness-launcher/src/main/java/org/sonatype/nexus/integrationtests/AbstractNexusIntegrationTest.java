@@ -149,9 +149,9 @@ public abstract class AbstractNexusIntegrationTest
 
   private String testRepositoryId;
 
-  protected UserMessageUtil userUtil;
+  protected static UserMessageUtil userUtil;
 
-  protected RoleMessageUtil roleUtil;
+  protected static RoleMessageUtil roleUtil;
 
   protected AbstractNexusIntegrationTest() {
     this("nexus-test-harness-repo");
@@ -648,9 +648,9 @@ public abstract class AbstractNexusIntegrationTest
     return deleted;
   }
 
-  protected void createUserFull(final String userId, final String password, final String firstName,
-                                final String lastName, final String email, final String status,
-                                final List<String> roles)
+  protected void createUser(final String userId, final String password, final String firstName,
+                            final String lastName, final String email, final String status,
+                            final List<String> roles)
       throws Exception
   {
     UserResource user = new UserResource();
@@ -665,7 +665,7 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   protected void createUser(final String userId, final String password, final List<String> roles) throws Exception {
-    createUserFull(userId, password, userId, userId, userId + "@foo.bar", "active", roles);
+    createUser(userId, password, userId, userId, userId + "@foo.bar", "active", roles);
   }
 
   protected RoleResource createRole(final String id, List<String> privileges) throws Exception {
