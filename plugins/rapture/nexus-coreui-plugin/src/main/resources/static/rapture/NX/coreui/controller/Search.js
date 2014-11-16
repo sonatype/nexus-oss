@@ -404,7 +404,7 @@ Ext.define('NX.coreui.controller.Search', {
     if (searchResultModel) {
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
-      searchResultDetails.items.get(1).items.get(1).showInfo({
+      searchResultDetails.items.get(1).items.get(0).showInfo({
         'Group': searchResultModel.get('groupId'),
         'Name': searchResultModel.get('artifactId'),
         'Format': searchResultModel.get('format')

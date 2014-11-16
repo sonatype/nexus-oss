@@ -120,7 +120,8 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
                 items: [
                   {
-                    xtype: 'nx-coreui-repositorybrowse-storagefilecontainer'
+                    xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+                    header: false
                   }
                 ]
               }
