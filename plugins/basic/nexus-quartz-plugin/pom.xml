@@ -63,6 +63,16 @@
     </dependency>
 
     <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
+    <!--
+      Note: quartz depends on c3p0 but we don't use it
+      Still, did not exclude it as it would introduce OSGi errors
+      TODO: Stuart?
+    -->
+    <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>

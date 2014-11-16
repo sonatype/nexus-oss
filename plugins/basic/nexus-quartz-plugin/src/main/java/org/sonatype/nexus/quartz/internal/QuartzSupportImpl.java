@@ -13,16 +13,13 @@
 
 package org.sonatype.nexus.quartz.internal;
 
-import java.io.File;
 import java.sql.Connection;
 import java.util.List;
-import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
@@ -47,7 +44,6 @@ import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.utils.DBConnectionManager;
-import org.quartz.utils.PoolingConnectionProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -62,7 +58,7 @@ public class QuartzSupportImpl
     extends LifecycleSupport
     implements QuartzSupport, JobFactory
 {
-  private final ApplicationDirectories directories;
+  private final H2ConnectionProvider h2ConnectionProvider;
 
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
 
@@ -75,12 +71,12 @@ public class QuartzSupportImpl
   private int threadPoolSize;
 
   @Inject
-  public QuartzSupportImpl(final ApplicationDirectories directories,
+  public QuartzSupportImpl(final H2ConnectionProvider h2ConnectionProvider,
                            final Iterable<BeanEntry<Named, Job>> jobEntries,
                            final List<QuartzCustomizer> quartzCustomizers)
       throws Exception
   {
-    this.directories = checkNotNull(directories);
+    this.h2ConnectionProvider = checkNotNull(h2ConnectionProvider);
     this.jobEntries = checkNotNull(jobEntries);
     this.quartzCustomizers = checkNotNull(quartzCustomizers);
     this.active = true;
@@ -97,21 +93,14 @@ public class QuartzSupportImpl
     jobStoreTX.setTablePrefix("QRTZ_");
     jobStoreTX.setIsClustered(false);
 
-    final File dir = directories.getWorkDirectory("db/quartz");
-    final File file = new File(dir, dir.getName());
-    final Properties dbProperties = new Properties();
-    dbProperties.setProperty(PoolingConnectionProvider.DB_DRIVER, "org.h2.Driver");
-    dbProperties.setProperty(PoolingConnectionProvider.DB_URL, "jdbc:h2:" + file.getAbsolutePath() + ";MVCC=true");
-    dbProperties.setProperty(PoolingConnectionProvider.DB_USER, "root");
-    dbProperties.setProperty(PoolingConnectionProvider.DB_PASSWORD, "not_really_used");
-    dbProperties.setProperty(PoolingConnectionProvider.DB_MAX_CONNECTIONS, "25");
-    final PoolingConnectionProvider connectionProvider = new PoolingConnectionProvider(dbProperties);
+    // start the pool
+    h2ConnectionProvider.initialize();
 
     // create schema if needed
-    mayCreateDBSchema(connectionProvider.getConnection());
+    mayCreateDBSchema(h2ConnectionProvider.getConnection());
 
     // register ConnectionProvider
-    DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, connectionProvider);
+    DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, h2ConnectionProvider);
 
     // create Scheduler
     DirectSchedulerFactory.getInstance()
@@ -128,10 +117,17 @@ public class QuartzSupportImpl
   }
 
   private void mayCreateDBSchema(final Connection connection) throws Exception {
-    final String sqlScript = Resources.toString(Resources.getResource("tables_h2.sql"), Charsets.UTF_8);
-    connection.createStatement().execute(sqlScript);
-    connection.commit();
-    connection.close();
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+    try {
+      final String sqlScript = Resources.toString(Resources.getResource("/org/sonatype/nexus/quartz/internal/tables_h2.sql"), Charsets.UTF_8);
+      connection.createStatement().execute(sqlScript);
+      connection.commit();
+      connection.close();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(cl);
+    }
   }
 
   @Override
@@ -142,6 +138,7 @@ public class QuartzSupportImpl
     }
     scheduler.shutdown();
     scheduler = null;
+    h2ConnectionProvider.shutdown();
     log.info("Quartz Scheduler stopped.");
   }
 
