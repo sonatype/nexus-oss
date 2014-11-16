@@ -38,6 +38,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import com.google.common.collect.Maps;
@@ -77,6 +78,10 @@ public class ProtectedRepositoryRegistryIT
 
         final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
         binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
+
+        binder.bind(SecurityConfigurationSource.class)
+            .annotatedWith(Names.named("file"))
+            .toInstance(new TestSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
       }
     });
   }
@@ -91,18 +96,6 @@ public class ProtectedRepositoryRegistryIT
       throws Exception
   {
     super.setUp();
-
-    // copy the security-configuration
-    String resource = this.getClass().getName().replaceAll("\\.", "\\/") + "-security-configuration.xml";
-    URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
-    try {
-      File securityConfigFile = new File(getConfHomeDir(), "security-configuration.xml");
-      securityConfigFile.getParentFile().mkdirs();
-      FileUtils.copyURLToFile(url, securityConfigFile);
-    }
-    catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
 
     // this will trigger config load!
     startNx();
@@ -127,14 +120,6 @@ public class ProtectedRepositoryRegistryIT
 
     // setup security
     this.securitySystem = this.lookup(SecuritySystem.class);
-    // this.securitySystem.setSecurityEnabled( true );
-
-    // copy the security-configuration
-    // String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
-    // URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-    // FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
-
-    // this.securitySystem.start();
 
     waitForTasksToStop();
   }
