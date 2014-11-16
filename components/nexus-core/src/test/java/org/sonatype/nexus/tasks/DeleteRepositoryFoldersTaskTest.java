@@ -15,10 +15,12 @@ package org.sonatype.nexus.tasks;
 import java.io.File;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.nexus.scheduling.Task;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test if the repo folders(storage, indexer, proxy attributes) were deleted correctly
@@ -36,9 +38,9 @@ public class DeleteRepositoryFoldersTaskTest
 
     String repoId = snapshots.getId();
 
-    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(SchedulerTask.class,
-        DeleteRepositoryFoldersTask.class.getSimpleName());
-    task.setRepository(snapshots);
+    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(Task.class,
+        DeleteRepositoryFoldersTask.class.getName());
+    task.getConfiguration().setRepositoryId(repoId);
     task.setDeleteForever(false);
 
     task.call();
@@ -64,9 +66,9 @@ public class DeleteRepositoryFoldersTaskTest
 
     String repoId = snapshots.getId();
 
-    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(SchedulerTask.class,
-        DeleteRepositoryFoldersTask.class.getSimpleName());
-    task.setRepository(snapshots);
+    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(Task.class,
+        DeleteRepositoryFoldersTask.class.getName());
+    task.getConfiguration().setRepositoryId(repoId);
     task.setDeleteForever(true);
 
     task.call();

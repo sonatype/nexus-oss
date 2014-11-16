@@ -97,7 +97,7 @@
       <type>EmptyTrashTask</type>
       <status>SUBMITTED</status>
       <lastRun>1111111111111</lastRun>
-      <nextRun>1230777000000</nextRun>
+      <getNextRun>1230777000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>
@@ -116,7 +116,7 @@
       <type>SnapshotRemoverTask</type>
       <status>SUBMITTED</status>
       <lastRun>1111111111111</lastRun>
-      <nextRun>1230777000000</nextRun>
+      <getNextRun>1230777000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>
@@ -147,7 +147,7 @@
       <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
       <lastRun>1111111111111</lastRun>
-      <nextRun>1230777000000</nextRun>
+      <getNextRun>1230777000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>
@@ -165,7 +165,7 @@
       <enabled>true</enabled>
       <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1230777000000</nextRun>
+      <getNextRun>1230777000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>

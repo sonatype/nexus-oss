@@ -20,35 +20,28 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.Task;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-public abstract class AbstractIndexTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+import com.google.common.collect.Lists;
+
+public abstract class AbstractIndexTaskDescriptor<T extends Task>
+    extends TaskDescriptorSupport<T>
 {
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
   private final FormField repoField;
 
-  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
+  private final StringTextFormField resourceStorePathField = new StringTextFormField(
+      TaskConfiguration.PATH_KEY,
       "Repository path",
       "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
       FormField.OPTIONAL);
 
-  private String id;
 
-  private String name;
-
-  public AbstractIndexTaskDescriptor(String id, String name) {
-    super();
-
-    this.id = id;
-    this.name = name;
-
+  public AbstractIndexTaskDescriptor(Class<T> type, String name) {
+    super(type, name);
     repoField = new RepositoryCombobox(
-        REPO_OR_GROUP_FIELD_ID,
+        TaskConfiguration.REPOSITORY_ID_KEY,
         "Repository",
         "Select the Maven repository to " + name.toLowerCase() + " the index.",
         FormField.MANDATORY
@@ -56,21 +49,11 @@ public abstract class AbstractIndexTaskDescriptor
         .includingAnyOfContentClasses(Maven2ContentClass.ID);
   }
 
-  public String getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name + " Repositories Index";
-  }
-
   @Override
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
+    List<FormField> fields = Lists.newArrayList();
     fields.add(repoField);
     fields.add(resourceStorePathField);
-
     return fields;
   }
 

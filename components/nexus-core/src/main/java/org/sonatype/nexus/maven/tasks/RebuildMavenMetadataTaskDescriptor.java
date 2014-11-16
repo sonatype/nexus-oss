@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.maven.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -23,47 +22,39 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("RebuildMavenMetadata")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class RebuildMavenMetadataTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "RebuildMavenMetadataTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+  public RebuildMavenMetadataTaskDescriptor() {
+    super(RebuildMavenMetadataTask.class, "Rebuild Maven Metadata Files");
+  }
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the Maven repository to rebuild metadata.",
       FormField.MANDATORY
   ).includeAnEntryForAllRepositories()
       .includingAnyOfFacets(MavenRepository.class);
 
-  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
+  private final StringTextFormField resourceStorePathField = new StringTextFormField(
+      TaskConfiguration.PATH_KEY,
       "Repository path",
       "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
       FormField.OPTIONAL);
 
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Rebuild Maven Metadata Files";
-  }
-
+  @Override
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
+    List<FormField> fields = Lists.newArrayList();
     fields.add(repoField);
-
     fields.add(resourceStorePathField);
-
     return fields;
   }
 }

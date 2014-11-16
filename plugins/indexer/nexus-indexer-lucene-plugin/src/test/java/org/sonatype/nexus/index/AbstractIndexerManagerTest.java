@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 
 import org.apache.lucene.search.Query;
 import org.apache.maven.index.ArtifactInfo;
@@ -28,14 +27,13 @@ import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.context.IndexingContext;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.fail;
 
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
   protected DefaultIndexerManager indexerManager;
-
-  protected NexusScheduler nexusScheduler;
 
   @Override
   protected void setUp()
@@ -44,8 +42,6 @@ public abstract class AbstractIndexerManagerTest
     super.setUp();
 
     indexerManager = (DefaultIndexerManager) lookup(IndexerManager.class);
-
-    nexusScheduler = lookup(NexusScheduler.class);
   }
 
   @Override

@@ -16,27 +16,27 @@ import java.io.File;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
 {
-  protected NexusScheduler nexusScheduler;
+  protected NexusTaskScheduler nexusScheduler;
 
   protected void setUp()
       throws Exception
   {
     super.setUp();
 
-    nexusScheduler = lookup(NexusScheduler.class);
+    nexusScheduler = lookup(NexusTaskScheduler.class);
   }
 
   protected void tearDown()
@@ -74,15 +74,11 @@ public class RebuildMavenMetadataTaskTest
     final int countTotalBefore =
         countFiles(snapshots, new String[]{"**/maven-metadata.xml"}, new String[]{".nexus/**"});
 
-    RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
-        RebuildMavenMetadataTask.class);
-
-    task.setRepositoryId(snapshots.getId());
-
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
-
-    // block until it finishes
-    handle.get();
+    TaskConfiguration taskConfiguration = nexusScheduler
+        .createTaskConfigurationInstance(RebuildMavenMetadataTask.class);
+    taskConfiguration.setRepositoryId(snapshots.getId());
+    // submit and block until it finishes
+    nexusScheduler.submit(taskConfiguration).getCurrentState().getFuture().get();
 
     // count it again
     final int countTotalAfter =
@@ -112,16 +108,11 @@ public class RebuildMavenMetadataTaskTest
     final int countProcessedSubBefore =
         countFiles(snapshots, new String[]{"org/sonatype/**/maven-metadata.xml"}, new String[]{".nexus/**"});
 
-    RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
-        RebuildMavenMetadataTask.class);
-
-    task.setRepositoryId(snapshots.getId());
-    task.setResourceStorePath("/org/sonatype");
-
-    ScheduledTask<Object> handle = nexusScheduler.submit("task", task);
-
-    // block until it finishes
-    handle.get();
+    TaskConfiguration taskConfiguration = nexusScheduler
+        .createTaskConfigurationInstance(RebuildMavenMetadataTask.class);
+    taskConfiguration.setRepositoryId(snapshots.getId());
+    taskConfiguration.setPath("/org/sonatype");
+    nexusScheduler.submit(taskConfiguration).getCurrentState().getFuture().get();
 
     // count it again
     final int countTotalAfter =
@@ -139,9 +130,9 @@ public class RebuildMavenMetadataTaskTest
         "We should have more md's after rebuilding them, since we have some of them missing! (%s, %s)",
         new Object[]{countTotalBefore, countTotalAfter}), countTotalBefore < countTotalAfter);
     assertTrue(String.format(
-        "We should have same count of md's after rebuilding them for non-processed ones! (%s, %s)", new Object[]{
-        countNonProcessedSubBefore, countNonProcessedSubAfter
-    }),
+            "We should have same count of md's after rebuilding them for non-processed ones! (%s, %s)", new Object[]{
+                countNonProcessedSubBefore, countNonProcessedSubAfter
+            }),
         countNonProcessedSubBefore == countNonProcessedSubAfter);
     assertTrue(
         String.format(
@@ -161,9 +152,10 @@ public class RebuildMavenMetadataTaskTest
   {
     fillInRepo();
 
-    final RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance(RebuildMavenMetadataTask.class);
-    task.setRepositoryId(snapshots.getId());
-    nexusScheduler.submit("task", task).get();
+    TaskConfiguration taskConfiguration = nexusScheduler
+        .createTaskConfigurationInstance(RebuildMavenMetadataTask.class);
+    taskConfiguration.setRepositoryId(snapshots.getId());
+    nexusScheduler.submit(taskConfiguration).getCurrentState().getFuture().get();
 
     final File mdFile = retrieveFile(snapshots, "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml");
     assertThat(mdFile, FileMatchers.exists());

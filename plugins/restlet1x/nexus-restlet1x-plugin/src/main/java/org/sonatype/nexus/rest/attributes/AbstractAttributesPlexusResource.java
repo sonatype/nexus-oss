@@ -13,6 +13,7 @@
 package org.sonatype.nexus.rest.attributes;
 
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 
 import org.restlet.Context;
@@ -32,7 +33,7 @@ public abstract class AbstractAttributesPlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    RebuildAttributesTask task = getNexusScheduler().createTaskInstance(RebuildAttributesTask.class);
+    TaskConfiguration task = getNexusScheduler().createTaskConfigurationInstance(RebuildAttributesTask.class);
 
     String repositoryId = getRepositoryId(request);
     if (repositoryId == null) {
@@ -40,7 +41,7 @@ public abstract class AbstractAttributesPlexusResource
     }
     task.setRepositoryId(repositoryId);
 
-    task.setResourceStorePath(getResourceStorePath(request));
+    task.setPath(getResourceStorePath(request));
 
     this.handleDelete(task, request);
   }

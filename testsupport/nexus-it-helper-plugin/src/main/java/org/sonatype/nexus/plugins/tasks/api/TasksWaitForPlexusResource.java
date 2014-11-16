@@ -12,23 +12,22 @@
  */
 package org.sonatype.nexus.plugins.tasks.api;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -47,10 +46,11 @@ public class TasksWaitForPlexusResource
 
   private static final String RESOURCE_URI = "/tasks/waitFor";
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
 
   @Inject
-  public TasksWaitForPlexusResource(final NexusScheduler nexusScheduler) {
+  public TasksWaitForPlexusResource(final NexusTaskScheduler nexusScheduler)
+  {
     this.nexusScheduler = checkNotNull(nexusScheduler);
   }
 
@@ -79,7 +79,7 @@ public class TasksWaitForPlexusResource
     final long window = Long.parseLong(form.getFirstValue("window", "10000"));
     final long timeout = Long.parseLong(form.getFirstValue("timeout", "60000"));
 
-    final ScheduledTask<?> namedTask = getTaskByName(nexusScheduler, name);
+    final TaskInfo<?> namedTask = getTaskByName(nexusScheduler, name);
 
     if (name != null && namedTask == null) {
       // task wasn't found, so bounce on outta here
@@ -107,15 +107,15 @@ public class TasksWaitForPlexusResource
     return "Tasks Not Finished";
   }
 
-  static boolean isTaskCompleted(final NexusScheduler nexusScheduler,
+  static boolean isTaskCompleted(final NexusTaskScheduler nexusScheduler,
                                  final String taskType,
-                                 final ScheduledTask<?> namedTask)
+                                 final TaskInfo<?> namedTask)
   {
     if (namedTask != null) {
       return isTaskCompleted(namedTask);
     }
     else {
-      for (final ScheduledTask<?> task : getTasks(nexusScheduler, taskType)) {
+      for (final TaskInfo<?> task : getTasks(nexusScheduler, taskType)) {
         if (!isTaskCompleted(task)) {
           return false;
         }
@@ -124,18 +124,15 @@ public class TasksWaitForPlexusResource
     }
   }
 
-  static ScheduledTask<?> getTaskByName(final NexusScheduler nexusScheduler, final String name) {
+  static TaskInfo<?> getTaskByName(final NexusTaskScheduler nexusScheduler, final String name) {
     if (name == null) {
       return null;
     }
 
-    final Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
-
-    for (List<ScheduledTask<?>> taskList : taskMap.values()) {
-      for (ScheduledTask<?> task : taskList) {
-        if (task.getName().equals(name)) {
-          return task;
-        }
+    final List<TaskInfo<?>> tasks = nexusScheduler.listsTasks();
+    for (TaskInfo<?> task : tasks) {
+      if (task.getName().equals(name)) {
+        return task;
       }
     }
 
@@ -151,47 +148,26 @@ public class TasksWaitForPlexusResource
     }
   }
 
-  private static boolean isTaskCompleted(ScheduledTask<?> task) {
-    if (task.getSchedule() instanceof RunNowSchedule) {
+  private static boolean isTaskCompleted(TaskInfo<?> task) {
+    if (task.getSchedule() instanceof Now) {
       // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
       // means they are not YET complete
       return false;
     }
     else {
-      final TaskState state = task.getTaskState();
-
-      if (task.getSchedule() instanceof ManualRunSchedule) {
-        // MnuallRunSchedule stuff goes back to SUBMITTED state and sit there for next "kick"
-        // but we _know_ it ran once at least if lastRun date != null AND is in some of the following
-        // states
-        // Note: I _think_ ManualRunScheduled task never go into WAITING state! (unverified claim)
-        return task.getLastRun() != null
-            && (TaskState.SUBMITTED.equals(state) || TaskState.WAITING.equals(state)
-            || TaskState.FINISHED.equals(state) || TaskState.BROKEN.equals(state)
-            || TaskState.CANCELLED.equals(state));
-      }
-      else {
-        // the rest of tasks are completed if in any of these statuses
-        return TaskState.WAITING.equals(state) || TaskState.FINISHED.equals(state)
-            || TaskState.BROKEN.equals(state) || TaskState.CANCELLED.equals(state);
-      }
+      return State.WAITING == task.getCurrentState().getState() && task.getLastRunState() != null;
     }
   }
 
-  private static Set<ScheduledTask<?>> getTasks(final NexusScheduler nexusScheduler, final String taskType) {
-    Set<ScheduledTask<?>> tasks = new HashSet<ScheduledTask<?>>();
-
-    Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
-
-    for (List<ScheduledTask<?>> taskList : taskMap.values()) {
-      for (ScheduledTask<?> task : taskList) {
-        if (taskType == null || task.getType().equals(taskType)) {
-          tasks.add(task);
-        }
+  private static List<TaskInfo<?>> getTasks(final NexusTaskScheduler nexusScheduler, final String taskType) {
+    final List<TaskInfo<?>> tasks = nexusScheduler.listsTasks();
+    return Lists.newArrayList(Iterables.filter(tasks, new Predicate<TaskInfo<?>>()
+    {
+      @Override
+      public boolean apply(final TaskInfo<?> input) {
+        return taskType == null || taskType.equals(input.getConfiguration().getType());
       }
-    }
-
-    return tasks;
+    }));
   }
 
 }

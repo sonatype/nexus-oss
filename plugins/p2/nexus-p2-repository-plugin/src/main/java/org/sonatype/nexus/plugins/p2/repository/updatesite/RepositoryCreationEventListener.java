@@ -21,8 +21,7 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -38,11 +37,11 @@ public class RepositoryCreationEventListener
 {
   private final Provider<SystemStatus> systemStatusProvider;
 
-  private final NexusScheduler scheduler;
+  private final NexusTaskScheduler scheduler;
 
   @Inject
   public RepositoryCreationEventListener(final Provider<SystemStatus> systemStatusProvider,
-                                         final NexusScheduler scheduler)
+                                         final NexusTaskScheduler scheduler)
   {
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
     this.scheduler = checkNotNull(scheduler);
@@ -55,12 +54,12 @@ public class RepositoryCreationEventListener
       return;
     }
     final UpdateSiteProxyRepository updateSite =
-        ((RepositoryRegistryEventAdd) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
+        evt.getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
 
     if (updateSite != null) {
       updateSite.setExposed(false);
-      final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, true);
-      log.debug("Submitted " + mirrorTask.getName());
+      UpdateSiteMirrorTask.submit(scheduler, updateSite, true);
+      log.debug("Submitted UpdateSiteMirrorTask for {}", updateSite);
     }
   }
 }

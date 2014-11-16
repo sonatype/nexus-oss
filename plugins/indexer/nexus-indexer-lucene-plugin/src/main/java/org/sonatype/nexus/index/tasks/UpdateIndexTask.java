@@ -19,7 +19,7 @@ import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 /**
  * Update index task.
  */
-@Named(UpdateIndexTaskDescriptor.ID)
+@Named
 public class UpdateIndexTask
     extends AbstractIndexerTask
 {

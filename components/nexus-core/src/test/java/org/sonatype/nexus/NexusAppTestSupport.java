@@ -14,7 +14,6 @@ package org.sonatype.nexus;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -23,16 +22,14 @@ import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.threads.FakeAlmightySubject;
-import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.shiro.util.ThreadContext;
@@ -42,7 +39,7 @@ public abstract class NexusAppTestSupport
     extends NexusProxyTestSupport
 {
 
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   private EventSubscriberHost eventSubscriberHost;
 
@@ -129,7 +126,7 @@ public abstract class NexusAppTestSupport
     super.setUp();
 
     eventBus = lookup(EventBus.class);
-    nexusScheduler = lookup(NexusScheduler.class);
+    nexusScheduler = lookup(NexusTaskScheduler.class);
     eventSubscriberHost = lookup(EventSubscriberHost.class);
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);
@@ -189,13 +186,7 @@ public abstract class NexusAppTestSupport
   protected void killActiveTasks()
       throws Exception
   {
-    Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
-
-    for (List<ScheduledTask<?>> taskList : taskMap.values()) {
-      for (ScheduledTask<?> task : taskList) {
-        task.cancel();
-      }
-    }
+    nexusScheduler.killAll();
   }
 
   protected void wairForAsyncEventsToCalmDown()
@@ -218,30 +209,15 @@ public abstract class NexusAppTestSupport
 
     int counter = 0;
 
-    while (nexusScheduler.getActiveTasks().size() > 0) {
+    while (nexusScheduler.getRunningTaskCount() > 0) {
       Thread.sleep(100);
       counter++;
 
       if (counter > 300) {
         System.out.println("TIMEOUT WAITING FOR TASKS TO COMPLETE!!!  Will kill them.");
-        printActiveTasks();
         killActiveTasks();
         break;
       }
     }
   }
-
-  protected void printActiveTasks()
-      throws Exception
-  {
-    Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
-
-    for (List<ScheduledTask<?>> taskList : taskMap.values()) {
-      for (ScheduledTask<?> task : taskList) {
-        System.out.println(task.getName() + " with id " + task.getId() + " is in state "
-            + task.getTaskState().toString());
-      }
-    }
-  }
-
 }

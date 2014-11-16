@@ -12,12 +12,11 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
  * Event fired when a task failed with some error.
  *
- * @author cstamas
  * @since 2.0
  */
 public class NexusTaskEventStoppedFailed<T>
@@ -28,10 +27,10 @@ public class NexusTaskEventStoppedFailed<T>
    */
   private final Throwable throwable;
 
-  public NexusTaskEventStoppedFailed(final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent,
+  public NexusTaskEventStoppedFailed(final TaskInfo<T> taskInfo,
                                      final Throwable throwable)
   {
-    super(task, startedEvent);
+    super(taskInfo);
     this.throwable = throwable;
   }
 

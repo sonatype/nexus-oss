@@ -34,6 +34,7 @@
     <module>nexus-groovy-plugin</module>
     <module>nexus-logging-plugin</module>
     <module>nexus-plugin-console-plugin</module>
+    <module>nexus-quartz-plugin</module>
     <module>nexus-rawcontent-plugin</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-siesta-plugin</module>

@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.maven.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -25,16 +24,19 @@ import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("SnapshotRemoval")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class SnapshotRemovalTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "SnapshotRemoverTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
+  public SnapshotRemovalTaskDescriptor() {
+    super(SnapshotRemovalTask.class, "Remove Snapshots From Repository");
+  }
 
   public static final String MIN_TO_KEEP_FIELD_ID = "minSnapshotsToKeep";
 
@@ -47,7 +49,7 @@ public class SnapshotRemovalTaskDescriptor
   public static final String DELETE_IMMEDIATELY = "deleteImmediately";
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the Maven repository to remove snapshots.",
       FormField.MANDATORY
@@ -85,17 +87,9 @@ public class SnapshotRemovalTaskDescriptor
       new CheckboxFormField(DELETE_IMMEDIATELY, "Delete immediately",
           "The job will not move deleted items into the repository trash but delete immediately.", FormField.OPTIONAL);
 
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Remove Snapshots From Repository";
-  }
-
+  @Override
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
+    List<FormField> fields = Lists.newArrayList();
 
     fields.add(repoField);
     fields.add(minToKeepField);

@@ -19,62 +19,48 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.tasks.descriptors.PublishIndexesTaskDescriptor;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Publish indexes task.
  */
-@Named(PublishIndexesTaskDescriptor.ID)
+@Named
 public class PublishIndexesTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: publish indexes
-   */
-  public static final String ACTION = "PUBLISHINDEX";
-
   private final IndexerManager indexerManager;
 
   @Inject
-  public PublishIndexesTask(final IndexerManager indexerManager) {
+  public PublishIndexesTask(final IndexerManager indexerManager)
+  {
     this.indexerManager = checkNotNull(indexerManager);
   }
 
   @Override
-  protected String getRepositoryFieldId() {
-    return PublishIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
     try {
-      if (getRepositoryId() != null) {
-        indexerManager.publishRepositoryIndex(getRepositoryId());
+      if (getConfiguration().getRepositoryId() != null) {
+        indexerManager.publishRepositoryIndex(getConfiguration().getRepositoryId());
       }
       else {
         indexerManager.publishAllIndex();
       }
     }
     catch (IOException e) {
-      getLogger().error("Cannot publish indexes!", e);
+      log.error("Cannot publish indexes!", e);
     }
 
     return null;
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
   protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Publishing indexes for repository " + getRepositoryName();
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Publishing indexes for repository " + getConfiguration().getRepositoryId();
     }
     else {
       return "Publishing indexes for all registered repositories";

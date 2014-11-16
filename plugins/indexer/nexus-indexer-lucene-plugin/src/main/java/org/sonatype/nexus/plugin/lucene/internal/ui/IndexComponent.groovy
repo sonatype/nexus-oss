@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.plugin.lucene.internal.ui
 
+import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskConfiguration
+
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
@@ -25,7 +28,6 @@ import org.sonatype.nexus.index.tasks.UpdateIndexTask
 import org.sonatype.nexus.proxy.maven.MavenRepository
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.Repository
-import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
@@ -49,7 +51,7 @@ extends DirectComponentSupport
   RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
-  NexusScheduler nexusScheduler
+  NexusTaskScheduler nexusScheduler
 
   @DirectMethod
   @RequiresAuthentication
@@ -60,11 +62,12 @@ extends DirectComponentSupport
   {
     Repository repository = protectedRepositoryRegistry.getRepositoryWithFacet(id, MavenRepository)
 
-    RepairIndexTask task = nexusScheduler.createTaskInstance(RepairIndexTask)
+    TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(RepairIndexTask.class)
     task.setRepositoryId(id)
-    task.setResourceStorePath(path ?: '/')
+    task.setPath(path ?: '/')
+    task.setName("Repair ${repository.name} index")
 
-    nexusScheduler.submit("Repair ${repository.name} index", task)
+    nexusScheduler.submit(task)
   }
 
   @DirectMethod
@@ -76,11 +79,12 @@ extends DirectComponentSupport
   {
     Repository repository = protectedRepositoryRegistry.getRepositoryWithFacet(id, MavenRepository)
 
-    UpdateIndexTask task = nexusScheduler.createTaskInstance(UpdateIndexTask)
+    TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(UpdateIndexTask)
     task.setRepositoryId(id)
-    task.setResourceStorePath(path ?: '/')
+    task.setPath(path ?: '/')
+    task.setName("Update ${repository.name} index")
 
-    nexusScheduler.submit("Update ${repository.name} index", task)
+    nexusScheduler.submit(task)
   }
 
 }

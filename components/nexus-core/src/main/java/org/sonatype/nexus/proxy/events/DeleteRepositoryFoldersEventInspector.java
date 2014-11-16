@@ -18,9 +18,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -38,11 +38,12 @@ public class DeleteRepositoryFoldersEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusTaskExecutor;
 
   @Inject
-  public DeleteRepositoryFoldersEventInspector(final NexusScheduler nexusScheduler) {
-    this.nexusScheduler = nexusScheduler;
+  public DeleteRepositoryFoldersEventInspector(final NexusTaskScheduler nexusTaskExecutor)
+  {
+    this.nexusTaskExecutor = nexusTaskExecutor;
   }
 
   @Subscribe
@@ -52,12 +53,10 @@ public class DeleteRepositoryFoldersEventInspector
 
     try {
       // remove the storage folders for the repository
-      DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance(DeleteRepositoryFoldersTask.class);
-
-      task.setRepository(repository);
-
-      nexusScheduler.submit("Deleting repository folder for repository \"" + repository.getName() + "\" (id="
-          + repository.getId() + ").", task);
+      final TaskConfiguration taskConfiguration = nexusTaskExecutor
+          .createTaskConfigurationInstance(DeleteRepositoryFoldersTask.class);
+      taskConfiguration.setRepositoryId(repository.getId());
+      nexusTaskExecutor.submit(taskConfiguration);
     }
     catch (Exception e) {
       log.warn("Could not remove repository folders for repository {}", repository, e);

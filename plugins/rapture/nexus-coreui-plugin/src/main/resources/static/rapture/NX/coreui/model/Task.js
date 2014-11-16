@@ -28,7 +28,7 @@ Ext.define('NX.coreui.model.Task', {
     'status',
     'statusDescription',
     'schedule',
-    { name: 'nextRun', type: 'date', dateFormat: 'c' },
+    { name: 'getNextRun', type: 'date', dateFormat: 'c' },
     { name: 'lastRun', type: 'date', dateFormat: 'c' },
     'lastRunResult',
     'runnable',

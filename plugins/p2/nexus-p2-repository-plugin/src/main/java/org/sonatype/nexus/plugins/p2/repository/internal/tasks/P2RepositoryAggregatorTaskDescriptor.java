@@ -23,48 +23,34 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 @Named
 @Singleton
 public class P2RepositoryAggregatorTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends TaskDescriptorSupport<P2RepositoryAggregatorTask>
 {
-
-  public static final String ID = "P2RepositoryAggregatorTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the repository to generate P2 repository.",
       FormField.MANDATORY
   ).includeAnEntryForAllRepositories()
       .excludingAnyOfFacets(GroupRepository.class);
 
-  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
+  private final StringTextFormField resourceStorePathField = new StringTextFormField(
+      TaskConfiguration.PATH_KEY,
       "Repository path",
       "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
       FormField.OPTIONAL);
 
-  @Override
-  public String getId() {
-    return ID;
-  }
-
-  @Override
-  public String getName() {
-    return "Rebuild P2 repository";
+  public P2RepositoryAggregatorTaskDescriptor() {
+    super(P2RepositoryAggregatorTask.class, "Rebuild P2 repository");
   }
 
   @Override
   public List<FormField> formFields() {
-    return Arrays.<FormField>asList(repoField, resourceStorePathField);
+    return Arrays.asList(repoField, resourceStorePathField);
   }
-
 }

@@ -12,19 +12,18 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
  * Event fired when a task is cancelled (more precisely, not WHEN is cancelled, but when task detected that is being
  * canceled and gives up the work).
  *
- * @author cstamas
  * @since 2.0
  */
 public class NexusTaskEventStoppedCanceled<T>
     extends NexusTaskEventStopped<T>
 {
-  public NexusTaskEventStoppedCanceled(final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent) {
-    super(task, startedEvent);
+  public NexusTaskEventStoppedCanceled(final TaskInfo<T> taskInfo) {
+    super(taskInfo);
   }
 }

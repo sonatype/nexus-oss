@@ -29,6 +29,7 @@ import org.sonatype.nexus.configuration.model.v2_7_0.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v2_7_0.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v2_7_0.Configuration;
 import org.sonatype.nexus.configuration.model.v2_7_0.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.EmptyTrashTaskDescriptor;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -95,10 +96,11 @@ public class Upgrade250to270
   protected void upgradeEmptyTrashTaskConfiguration(final Configuration conf) {
     final List<CScheduledTask> tasks = conf.getTasks();
     for (CScheduledTask task : tasks) {
-      if (EmptyTrashTaskDescriptor.ID.equals(task.getType())) {
+      if ("EmptyTrashTask".equals(task.getType())) {
         final Map<String, String> taskConfig = getMapFromConfigList(task.getProperties());
-        if (!taskConfig.containsKey(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID)) {
-          taskConfig.put(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID, "all_repo");
+        // TODO: Humm? EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID)
+        if (!taskConfig.containsKey(TaskConfiguration.REPOSITORY_ID_KEY)) {
+          taskConfig.put(TaskConfiguration.REPOSITORY_ID_KEY, "all_repo");
           task.setProperties(getConfigListFromMap(taskConfig));
         }
       }

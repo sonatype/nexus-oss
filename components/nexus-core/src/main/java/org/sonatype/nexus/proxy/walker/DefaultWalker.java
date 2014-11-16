@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
-import org.sonatype.scheduling.TaskInterruptedException;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -130,8 +128,8 @@ public class DefaultWalker
       else if (context.getStopCause() instanceof TaskInterruptedException) {
         log.info(
             "Canceled walking on repository {} from path \"{}\", cause: {}",
-                RepositoryStringUtils.getHumanizedNameString(context.getRepository()), fromPath,
-                context.getStopCause().getMessage());
+            RepositoryStringUtils.getHumanizedNameString(context.getRepository()), fromPath,
+            context.getStopCause().getMessage());
       }
       else {
         // we have a cause, report any non-ItemNotFounds with stack trace
@@ -139,14 +137,14 @@ public class DefaultWalker
         if (context.getStopCause() instanceof ItemNotFoundException) {
           log.debug(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
-                  RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
-                  fromPath, context.getStopCause().getMessage());
+              RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
+              fromPath, context.getStopCause().getMessage());
         }
         else {
           log.warn(
               "Aborted walking on repository {} from path \"{}\", cause: {}",
-                  RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
-                  fromPath, context.getStopCause().getMessage(), context.getStopCause());
+              RepositoryStringUtils.getHumanizedNameString(context.getRepository()),
+              fromPath, context.getStopCause().getMessage(), context.getStopCause());
         }
 
         throw new WalkerException(context, "Aborted walking on repository ID='"
@@ -210,7 +208,8 @@ public class DefaultWalker
               if (context.isStopped()) {
                 return collCount;
               }
-            } else {
+            }
+            else {
               collections.add((StorageCollectionItem) i);
             }
           }

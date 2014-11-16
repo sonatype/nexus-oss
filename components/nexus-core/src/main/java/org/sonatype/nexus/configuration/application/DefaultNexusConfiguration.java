@@ -66,7 +66,7 @@ import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -122,7 +122,7 @@ public class DefaultNexusConfiguration
 
   private final RepositoryRegistry repositoryRegistry;
 
-  private final List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
+  private final List<TaskDescriptor> scheduledTaskDescriptors;
 
   private final SecuritySystem securitySystem;
 
@@ -178,7 +178,7 @@ public class DefaultNexusConfiguration
                                    final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
                                    final RepositoryTypeRegistry repositoryTypeRegistry,
                                    final RepositoryRegistry repositoryRegistry,
-                                   final List<ScheduledTaskDescriptor> scheduledTaskDescriptors,
+                                   final List<TaskDescriptor> scheduledTaskDescriptors,
                                    final SecuritySystem securitySystem,
                                    final VetoFormatter vetoFormatter,
                                    final List<ConfigurationModifier> configurationModifiers,
@@ -451,13 +451,13 @@ public class DefaultNexusConfiguration
   }
 
   @Override
-  public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors() {
+  public List<TaskDescriptor> listScheduledTaskDescriptors() {
     return Collections.unmodifiableList(scheduledTaskDescriptors);
   }
 
   @Override
-  public ScheduledTaskDescriptor getScheduledTaskDescriptor(String id) {
-    for (ScheduledTaskDescriptor descriptor : scheduledTaskDescriptors) {
+  public TaskDescriptor getScheduledTaskDescriptor(String id) {
+    for (TaskDescriptor descriptor : scheduledTaskDescriptors) {
       if (descriptor.getId().equals(id)) {
         return descriptor;
       }

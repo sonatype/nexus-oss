@@ -14,7 +14,7 @@ package org.sonatype.nexus.testsuite.task.nexus1719;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -44,6 +44,6 @@ public class Nexus1719OOSRepoEvictUnusedTaskIT
     age.setKey("evictOlderCacheItemsThen");
     age.setValue(String.valueOf(10));
 
-    TaskScheduleUtil.runTask(EvictUnusedItemsTaskDescriptor.ID, prop, age);
+    TaskScheduleUtil.runTask(EvictUnusedProxiedItemsTaskDescriptor.ID, prop, age);
   }
 }

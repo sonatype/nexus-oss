@@ -23,25 +23,26 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class EvictUnusedProxiedItemsTaskTest
     extends AbstractMavenRepoContentTests
 {
   private static final long A_DAY = 24L * 60L * 60L * 1000L;
 
-  NexusScheduler scheduler;
+  NexusTaskScheduler scheduler;
 
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    scheduler = (NexusScheduler) lookup(NexusScheduler.class);
+    scheduler = lookup(NexusTaskScheduler.class);
   }
 
   @Override
@@ -54,8 +55,7 @@ public class EvictUnusedProxiedItemsTaskTest
       throws Exception
   {
     fillInRepo();
-
-    while (scheduler.getActiveTasks().size() > 0) {
+    while (scheduler.getRunningTaskCount() > 0) {
       Thread.sleep(100);
     }
 
@@ -140,9 +140,9 @@ public class EvictUnusedProxiedItemsTaskTest
       fail("Item should not have been deleted: " + item);
     }
   }
-  
+
   // ==
-  
+
   protected Collection<String> evictAllUnusedProxiedItems(ResourceStoreRequest req, long timestamp)
       throws IOException
   {

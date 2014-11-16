@@ -19,91 +19,58 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Rebuild Maven metadata task.
  */
-@Named(RebuildMavenMetadataTaskDescriptor.ID)
+@Named
 public class RebuildMavenMetadataTask
-    extends AbstractNexusRepositoriesPathAwareTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-
-  public static final String REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
-
   @Override
-  protected String getRepositoryFieldId() {
-    return RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected String getRepositoryPathFieldId() {
-    return RebuildMavenMetadataTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
-  }
-
-  @Override
-  public Object doRun()
+  public Void execute()
       throws Exception
   {
-    ResourceStoreRequest req = new ResourceStoreRequest(getResourceStorePath());
+    ResourceStoreRequest req = new ResourceStoreRequest(getConfiguration().getPath());
 
     // no repo id, then do all repos
-    if (StringUtils.isEmpty(getRepositoryId())) {
+    if (StringUtils.isEmpty(getConfiguration().getRepositoryId())) {
       List<MavenRepository> reposes = getRepositoryRegistry().getRepositoriesWithFacet(MavenRepository.class);
-
-      TaskUtil.getCurrentProgressListener().beginTask("Recreating Maven Metadata on all Maven repositories",
-          reposes.size());
-
       for (MavenRepository repo : reposes) {
-        TaskUtil.getCurrentProgressListener().working(
-            RepositoryStringUtils.getFormattedMessage("Recreating Maven Metadata on %s", repo), 1);
+        log.info("Recreating Maven Metadata on {}", repo);
         repo.recreateMavenMetadata(req);
       }
-
-      TaskUtil.getCurrentProgressListener().endTask("Done");
     }
     else {
-      Repository repository = getRepositoryRegistry().getRepository(getRepositoryId());
+      Repository repository = getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
 
       // is this a Maven repository at all?
       if (repository.getRepositoryKind().isFacetAvailable(MavenRepository.class)) {
-        MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
-
-        TaskUtil.getCurrentProgressListener().beginTask(
-            RepositoryStringUtils.getFormattedMessage("Recreating Maven Metadata on %s", mavenRepository));
-
-        mavenRepository.recreateMavenMetadata(req);
-
-        TaskUtil.getCurrentProgressListener().endTask("Done");
+        MavenRepository repo = repository.adaptToFacet(MavenRepository.class);
+        log.info("Recreating Maven Metadata on {}", repo);
+        repo.recreateMavenMetadata(req);
       }
       else {
-        getLogger().info(
-            RepositoryStringUtils.getFormattedMessage(
-                "Repository %s is not a Maven repository. Will not rebuild maven metadata, but the task seems wrongly configured!",
-                repository));
+        log.info(
+            "Repository {} is not a Maven repository. Will not rebuild maven metadata, but the task seems wrongly configured!",
+            repository);
       }
     }
-
     return null;
   }
 
   @Override
-  protected String getAction() {
-    return REBUILD_MAVEN_METADATA_ACTION;
-  }
-
-  @Override
   protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Rebuilding maven metadata of repository " + getRepositoryName() + " from path "
-          + getResourceStorePath() + " and below.";
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Rebuilding maven metadata of repository " + getConfiguration().getRepositoryId() + " from path "
+          + getConfiguration().getPath() + " and below.";
     }
     else {
-      return "Rebuilding maven metadata of all registered repositories";
+      return "Rebuilding maven metadata of all registered repositories from path " + getConfiguration().getPath() +
+          " and below.";
     }
   }
 }

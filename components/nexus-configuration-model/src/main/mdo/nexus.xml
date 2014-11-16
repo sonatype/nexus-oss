@@ -1065,7 +1065,7 @@
           <description>The date the task last ran</description>
         </field>
         <field>
-          <name>nextRun</name>
+          <name>getNextRun</name>
           <type>long</type>
           <version>1.4.0+</version>
           <required>true</required>

@@ -19,7 +19,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.Task;
 
 import org.hamcrest.Matcher;
 import org.restlet.data.Response;
@@ -115,7 +115,7 @@ public class TaskScheduleUtil
    *
    * @param taskClass task type
    */
-  public static void waitForAllTasksToStop(Class<? extends NexusTask<?>> taskClass)
+  public static void waitForAllTasksToStop(Class<? extends Task<?>> taskClass)
       throws Exception
   {
     nexusTasksRestClient.waitForAllTasksToStop(taskClass);

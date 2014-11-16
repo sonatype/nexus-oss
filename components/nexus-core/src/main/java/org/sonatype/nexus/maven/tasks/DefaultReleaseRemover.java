@@ -53,7 +53,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -61,7 +61,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.maven.tasks.ReleaseRemovalTaskDescriptor.ID;
 
 /**
  * @since 2.5
@@ -111,10 +110,10 @@ public class DefaultReleaseRemover
     }
 
     if (!process(request, result, repository, repositoryTarget)) {
-      throw new IllegalArgumentException("The repository with ID=" + repository.getId() + " is not valid for "
-          + ID);
+      throw new IllegalArgumentException(
+          "The repository with ID=" + repository.getId() + " is not valid for release removal");
     }
-    log.debug("Results of {} are: {}", ReleaseRemovalTaskDescriptor.ID, result);
+    log.debug("Results of release removal are: {}", result);
     return result;
   }
 
@@ -162,7 +161,7 @@ public class DefaultReleaseRemover
                                                  final ReleaseRemovalResult result,
                                                  final Target repositoryTarget)
   {
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
 
     if (!repository.getLocalStatus().shouldServiceRequest()) {
       return;
@@ -254,7 +253,7 @@ public class DefaultReleaseRemover
       }
       catch (Exception e) {
         // we always simply log the exception and continue
-        log.warn("{} failed to process path: '{}'.", ID, coll.getPath(), e);
+        log.warn("Release removal failed to process path: '{}'.", coll.getPath(), e);
       }
     }
 
@@ -293,7 +292,7 @@ public class DefaultReleaseRemover
     private void maybeAddStorageFileItemToMap(final Gav gav, final StorageFileItem item) {
       if (repositoryTarget != null && !repositoryTarget.isPathContained(
           item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item
-          .getPath())) {
+              .getPath())) {
         log.debug("Excluding file: {} from deletion due to repositoryTarget: {}.", item.getName(),
             repositoryTarget.getName());
         return;
@@ -351,8 +350,7 @@ public class DefaultReleaseRemover
       for (Map.Entry<Gav, Map<Version, List<StorageFileItem>>> gavListEntry : groupArtifactToVersions.entrySet()) {
         Map<Version, List<StorageFileItem>> versions = gavListEntry.getValue();
         if (versions.size() > request.getNumberOfVersionsToKeep()) {
-          log.debug("{} will delete {} versions of artifact with g={} a={}",
-              ReleaseRemovalTaskDescriptor.ID,
+          log.debug("Release removal will delete {} versions of artifact with g={} a={}",
               versions.size() - request.getNumberOfVersionsToKeep(),
               gavListEntry.getKey().getGroupId(), gavListEntry.getKey().getArtifactId());
 

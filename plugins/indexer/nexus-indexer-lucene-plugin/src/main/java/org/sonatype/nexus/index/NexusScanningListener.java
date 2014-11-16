@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -103,7 +103,7 @@ public class NexusScanningListener
 
   @Override
   public void artifactDiscovered(final ArtifactContext ac) {
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
     final String uinfo = ac.getArtifactInfo().getUinfo();
     if (!processedUinfos.add(uinfo)) {
       return; // skip individual snapshots, this skips like unique timestamped snapshots as indexer uses baseVersion
@@ -147,7 +147,7 @@ public class NexusScanningListener
 
   @Override
   public void scanningFinished(final IndexingContext ctx, final ScanningResult result) {
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
     int removed = 0;
     try {
       if (!fullReindex && !isProxy) {

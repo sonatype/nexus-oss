@@ -13,34 +13,31 @@
 package org.sonatype.nexus.scheduling.events;
 
 import org.sonatype.nexus.events.AbstractEvent;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
  * Abstract super class for task related events.
  *
- * @author cstamas
  * @since 2.0
  */
 public abstract class NexusTaskEvent<T>
-    extends AbstractEvent<NexusTask<T>>
+    extends AbstractEvent<TaskInfo<T>>
 {
-  public NexusTaskEvent(final NexusTask<T> task) {
-    super(task);
+  public NexusTaskEvent(final TaskInfo<T> taskInfo) {
+    super(taskInfo);
   }
 
   /**
-   * Returns the newxus task that failed.
-   *
-   * @return failing nexus task
+   * Returns the task that failed.
    */
-  public NexusTask<T> getNexusTask() {
+  public TaskInfo<T> getNexusTaskInfo() {
     return getEventSender();
   }
 
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "nexusTask=" + getNexusTask() +
+        "nexusTask=" + getNexusTaskInfo().getConfiguration() +
         '}';
   }
 }

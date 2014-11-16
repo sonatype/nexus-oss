@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +29,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.TaskSupport;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
@@ -44,7 +42,6 @@ import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.lang.StringUtils;
@@ -68,10 +65,9 @@ import static org.sonatype.scheduling.TaskState.SUBMITTED;
  */
 @Named(GenerateMetadataTask.ID)
 public class GenerateMetadataTask
-    extends AbstractNexusTask<YumRepository>
+    extends TaskSupport<YumRepository>
     implements ListFileFactory
 {
-
   public static final String ID = "GenerateMetadataTask";
 
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
@@ -107,15 +103,12 @@ public class GenerateMetadataTask
   private final CommandLineExecutor commandLineExecutor;
 
   @Inject
-  public GenerateMetadataTask(final EventBus eventBus,
-                              final RepositoryRegistry repositoryRegistry,
+  public GenerateMetadataTask(final RepositoryRegistry repositoryRegistry,
                               final YumRegistry yumRegistry,
                               final RpmScanner scanner,
                               final Manager routingManager,
                               final CommandLineExecutor commandLineExecutor)
   {
-    super(eventBus, null);
-
     this.yumRegistry = checkNotNull(yumRegistry);
     this.scanner = checkNotNull(scanner);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
@@ -126,7 +119,7 @@ public class GenerateMetadataTask
   }
 
   @Override
-  protected YumRepository doRun()
+  protected YumRepository execute()
       throws Exception
   {
     String repositoryId = getRepositoryId();
@@ -175,7 +168,7 @@ public class GenerateMetadataTask
             routingManager.forceUpdatePrefixFile(mavenRepository);
           }
           catch (Exception e) {
-            logger.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
+            log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
           }
         }
       }
@@ -219,44 +212,6 @@ public class GenerateMetadataTask
     return format("Generate Yum metadata of repository '%s'", getRepositoryId());
   }
 
-  @Override
-  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
-
-    if (activeTasks.containsKey(ID)) {
-      int activeRunningTasks = 0;
-      for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
-        if (RUNNING.equals(scheduledTask.getTaskState())) {
-          if (conflictsWith((GenerateMetadataTask) scheduledTask.getTask())) {
-            return false;
-          }
-          activeRunningTasks++;
-        }
-      }
-      return activeRunningTasks < yumRegistry.maxNumberOfParallelThreads();
-    }
-
-    return true;
-  }
-
-  @Override
-  public boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> activeTasks) {
-    if (activeTasks.containsKey(ID)) {
-      for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
-        if (isSubmitted(scheduledTask)
-            && conflictsWith((GenerateMetadataTask) scheduledTask.getTask())
-            && scheduledTask.getSchedule() instanceof RunNowSchedule) {
-          throw new TaskAlreadyScheduledException(scheduledTask, "Found same task in scheduler queue.");
-        }
-      }
-    }
-
-    return true;
-  }
-
-  private boolean isSubmitted(ScheduledTask<?> scheduledTask) {
-    return SUBMITTED.equals(scheduledTask.getTaskState()) || SLEEPING.equals(scheduledTask.getTaskState());
-  }
-
   private void regenerateMetadataForGroups() {
     if (StringUtils.isBlank(getVersion())) {
       try {
@@ -269,19 +224,12 @@ public class GenerateMetadataTask
         }
       }
       catch (NoSuchRepositoryException e) {
-        logger.warn(
+        log.warn(
             "Repository '{}' does not exist anymore. Backing out from triggering group merge for it.",
             getRepositoryId()
         );
       }
     }
-  }
-
-  private boolean conflictsWith(GenerateMetadataTask task) {
-    if (StringUtils.equals(getRepositoryId(), task.getRepositoryId())) {
-      return StringUtils.equals(getVersion(), task.getVersion());
-    }
-    return false;
   }
 
   private File createRpmListFile()

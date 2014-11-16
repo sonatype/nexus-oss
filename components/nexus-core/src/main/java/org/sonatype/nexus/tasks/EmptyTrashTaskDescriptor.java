@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -22,17 +21,21 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("EmptyTrash")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class EmptyTrashTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "EmptyTrashTask";
+  public EmptyTrashTaskDescriptor() {
+    super(EmptyTrashTask.class, "Empty Trash");
+  }
 
   public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
   private final NumberTextFormField olderThanField =
       new NumberTextFormField(
@@ -42,22 +45,14 @@ public class EmptyTrashTaskDescriptor
           FormField.OPTIONAL);
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the repository to empty the trash.",
       FormField.MANDATORY
   ).includeAnEntryForAllRepositories();
 
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Empty Trash";
-  }
-
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
+    List<FormField> fields = Lists.newArrayList();
 
     fields.add(repoField);
     fields.add(olderThanField);

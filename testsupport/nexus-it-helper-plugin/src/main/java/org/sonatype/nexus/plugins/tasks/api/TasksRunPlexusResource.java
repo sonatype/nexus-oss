@@ -13,16 +13,19 @@
 package org.sonatype.nexus.plugins.tasks.api;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.Task;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -44,11 +47,16 @@ public class TasksRunPlexusResource
 
   private static final String RESOURCE_URI = "/tasks/run/{taskType}";
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
+
+  private final NexusUberClassloader nexusUberClassloader;
 
   @Inject
-  public TasksRunPlexusResource(final NexusScheduler nexusScheduler) {
+  public TasksRunPlexusResource(final NexusTaskScheduler nexusScheduler,
+                                final NexusUberClassloader nexusUberClassloader)
+  {
     this.nexusScheduler = checkNotNull(nexusScheduler);
+    this.nexusUberClassloader = checkNotNull(nexusUberClassloader);
   }
 
   @Override
@@ -78,22 +86,26 @@ public class TasksRunPlexusResource
     final String taskType = request.getAttributes().get("taskType").toString();
 
     if (taskType != null) {
-      final NexusTask<?> taskInstance = nexusScheduler.createTaskInstance(taskType);
-      final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
-      if (valuesMap != null && !valuesMap.isEmpty()) {
-        for (Map.Entry<String, String> entry : valuesMap.entrySet()) {
-          taskInstance.addParameter(entry.getKey(), entry.getValue());
-        }
-      }
-      final ScheduledTask<?> scheduledTask = nexusScheduler.submit(taskType, taskInstance);
       try {
-        scheduledTask.get();
+        final Class<? extends Task> serviceClass = (Class<? extends Task>) nexusUberClassloader.loadClass(taskType);
+        TaskConfiguration taskInstance = nexusScheduler.createTaskConfigurationInstance(serviceClass);
+
+        final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
+        if (valuesMap != null && !valuesMap.isEmpty()) {
+          for (Map.Entry<String, String> entry : valuesMap.entrySet()) {
+            taskInstance.getMap().put(entry.getKey(), entry.getValue());
+          }
+        }
+        final TaskInfo<?> scheduledTask = nexusScheduler.submit(taskInstance);
+        final Future<?> future = scheduledTask.getCurrentState().getFuture();
+        if (future != null) {
+          future.get();
+        }
       }
       catch (Exception e) {
         throw new ResourceException(e);
       }
     }
-
     return null;
   }
 

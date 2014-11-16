@@ -57,8 +57,8 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext.TraversalType;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.util.PathUtils;
-import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -171,7 +171,7 @@ public class DefaultSnapshotRemover
   protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository(MavenRepository repository,
                                                                                SnapshotRemovalRequest request)
   {
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
 
     SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult(repository.getId(), 0, 0, true);
 
@@ -240,7 +240,7 @@ public class DefaultSnapshotRemover
           new RecreateMavenMetadataWalkerProcessor(log, getDeleteOperation(request));
 
       for (String path : parentOMatic.getMarkedPaths()) {
-        TaskUtil.checkInterruption();
+        CancelableSupport.checkCancellation();
 
         DefaultWalkerContext ctxMd =
             new DefaultWalkerContext(repository, new ResourceStoreRequest(path),

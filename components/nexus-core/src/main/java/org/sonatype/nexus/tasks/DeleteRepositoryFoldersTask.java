@@ -19,36 +19,25 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Delete repository folders.
  */
-@Named("DeleteRepositoryFoldersTask")
+@Named
 public class DeleteRepositoryFoldersTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: remove repository folder
-   */
-  public static final String ACTION = "REMOVE_REPO_FOLDER";
-
   private final RepositoryFolderRemover repositoryFolderRemover;
 
   private boolean deleteForever = false;
 
-  private Repository repository = null;
-
   @Inject
-  public DeleteRepositoryFoldersTask(final RepositoryFolderRemover repositoryFolderRemover) {
+  public DeleteRepositoryFoldersTask(final RepositoryFolderRemover repositoryFolderRemover)
+  {
     this.repositoryFolderRemover = checkNotNull(repositoryFolderRemover);
-  }
-
-  public void setRepository(Repository repository) {
-    this.repository = repository;
-    setRepositoryId(repository.getId());
   }
 
   public boolean isDeleteForever() {
@@ -60,42 +49,26 @@ public class DeleteRepositoryFoldersTask
   }
 
   @Override
-  public boolean isExposed() {
-    return false;
-  }
-
-  @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
+    final Repository repository = getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
     if (repository != null) {
       try {
         repositoryFolderRemover.deleteRepositoryFolders(repository, deleteForever);
       }
       catch (IOException e) {
-        getLogger().warn("Unable to delete repository folders ", e);
+        log.warn("Unable to delete repository folders ", e);
       }
     }
-
     return null;
-  }
-
-  @Override
-  protected String getAction() {
-    return ACTION;
   }
 
   @Override
   protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Deleting folders with repository ID: " + getRepositoryId();
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Deleting storage folders of repository ID: " + getConfiguration().getRepositoryId();
     }
     return null;
   }
-
-  @Override
-  public String getRepositoryName() {
-    return repository.getName();
-  }
-
 }

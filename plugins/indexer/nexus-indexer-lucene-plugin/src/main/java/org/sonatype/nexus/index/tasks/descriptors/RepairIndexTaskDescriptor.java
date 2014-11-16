@@ -15,14 +15,14 @@ package org.sonatype.nexus.index.tasks.descriptors;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Named("RepairIndex")
+import org.sonatype.nexus.index.tasks.RepairIndexTask;
+
+@Named
 @Singleton
 public class RepairIndexTaskDescriptor
-    extends AbstractIndexTaskDescriptor
+    extends AbstractIndexTaskDescriptor<RepairIndexTask>
 {
-  public static final String ID = "RepairIndexTask";
-
   public RepairIndexTaskDescriptor() {
-    super(ID, "Repair");
+    super(RepairIndexTask.class, "Repair index");
   }
 }

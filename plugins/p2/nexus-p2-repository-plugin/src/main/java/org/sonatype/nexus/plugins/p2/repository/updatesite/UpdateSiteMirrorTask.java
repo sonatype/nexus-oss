@@ -20,38 +20,33 @@ import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 import com.google.common.collect.Lists;
 
 /**
  * Update Site mirror task.
  */
-@Named(UpdateSiteMirrorTask.ROLE_HINT)
+@Named
 public class UpdateSiteMirrorTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-
-  public static final String ROLE_HINT = "UpdateSiteMirrorTask";
-
-  public static ScheduledTask<?> submit(final NexusScheduler scheduler, final UpdateSiteProxyRepository updateSite,
-                                        final boolean force)
+  public static TaskInfo<Void> submit(final NexusTaskScheduler scheduler,
+                                      final UpdateSiteProxyRepository updateSite,
+                                      final boolean force)
   {
-    final UpdateSiteMirrorTask task = scheduler.createTaskInstance(UpdateSiteMirrorTask.class);
+    final TaskConfiguration task = scheduler.createTaskConfigurationInstance(UpdateSiteMirrorTask.class);
     task.setRepositoryId(updateSite.getId());
-    task.setForce(force);
-    return scheduler.submit("Eclipse Update Site Mirror (" + updateSite.getId() + ")", task);
+    task.setBoolean(UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID, force);
+    task.setName("Eclipse Update Site Mirror (" + updateSite.getId() + ")");
+    return scheduler.submit(task);
   }
 
   @Override
-  protected String getRepositoryFieldId() {
-    return UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
     List<UpdateSiteProxyRepository> repos = getRepositories();
@@ -65,8 +60,8 @@ public class UpdateSiteMirrorTask
   private List<UpdateSiteProxyRepository> getRepositories()
       throws NoSuchRepositoryException
   {
-    if (getRepositoryId() != null) {
-      Repository repo = getRepositoryRegistry().getRepository(getRepositoryId());
+    if (getConfiguration().getRepositoryId() != null) {
+      Repository repo = getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
       if (repo.getRepositoryKind().isFacetAvailable(UpdateSiteProxyRepository.class)) {
         return Lists.newArrayList(repo.adaptToFacet(UpdateSiteProxyRepository.class));
       }
@@ -74,7 +69,7 @@ public class UpdateSiteMirrorTask
         return updateSites(repo.adaptToFacet(GroupRepository.class));
       }
       else {
-        throw new IllegalStateException(ROLE_HINT + " only applicable to Eclipse Update Sites");
+        throw new IllegalStateException("Update site mirror task only applicable to Eclipse Update Sites");
       }
     }
 
@@ -91,27 +86,22 @@ public class UpdateSiteMirrorTask
     }
 
     if (us.isEmpty()) {
-      getLogger().warn(
-          "Group '" + group.getId() + "' has no UpdateSite repositories members. " + ROLE_HINT
-              + " will be silent skipped!");
+      log.warn(
+          "Group '{}' has no UpdateSite repositories members. Update site mirror task will be silent skipped!",
+          group.getId());
     }
 
     return us;
   }
 
   @Override
-  protected String getAction() {
-    return ROLE_HINT;
-  }
-
-  @Override
   protected String getMessage() {
-    if (getRepositoryId() == null) {
+    if (getConfiguration().getRepositoryId() == null) {
       return "Mirroring content of All Eclipse Update Sites.";
     }
     Repository repo;
     try {
-      repo = getRepositoryRegistry().getRepository(getRepositoryId());
+      repo = getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
     }
     catch (NoSuchRepositoryException e) {
       return "Repository not found";
@@ -124,7 +114,6 @@ public class UpdateSiteMirrorTask
     return "Mirroring content of Eclipse Update Site ID='" + repo.getId() + "'.";
   }
 
-  @Override
   public void setRepositoryId(final String repositoryId) {
     try {
       getRepositoryRegistry().getRepository(repositoryId);
@@ -132,16 +121,10 @@ public class UpdateSiteMirrorTask
     catch (final NoSuchRepositoryException e) {
       throw new IllegalStateException(e);
     }
-
-    super.setRepositoryId(repositoryId);
-  }
-
-  public void setForce(final boolean force) {
-    addParameter(UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID, Boolean.toString(force));
+    getConfiguration().setRepositoryId(repositoryId);
   }
 
   public boolean getForce() {
-    return Boolean.parseBoolean(getParameter(UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID));
+    return getConfiguration().getBoolean(UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID, false);
   }
-
 }

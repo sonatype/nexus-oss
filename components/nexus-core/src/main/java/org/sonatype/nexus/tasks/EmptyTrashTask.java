@@ -12,28 +12,23 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Empty trash.
  */
-@Named(EmptyTrashTaskDescriptor.ID)
+@Named
 public class EmptyTrashTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: empty trash
-   */
-  public static final String ACTION = "EMPTY_TRASH";
-
   public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
   /**
@@ -42,61 +37,49 @@ public class EmptyTrashTask
   private final Wastebasket wastebasket;
 
   @Inject
-  public EmptyTrashTask(final Wastebasket wastebasket) {
+  public EmptyTrashTask(final Wastebasket wastebasket)
+  {
     this.wastebasket = checkNotNull(wastebasket);
   }
 
+  public int getEmptyOlderCacheItemsThan() {
+    return getConfiguration().getInteger(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, DEFAULT_OLDER_THAN_DAYS);
+  }
+
+  public void setEmptyOlderCacheItemsThan(int emptyOlderCacheItemsThan) {
+    getConfiguration().getMap().put(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, String.valueOf(
+        emptyOlderCacheItemsThan));
+  }
+
   @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
-    final String repositoryId = getRepositoryId();
+    final String repositoryId = getConfiguration().getRepositoryId();
     if (getEmptyOlderCacheItemsThan() == DEFAULT_OLDER_THAN_DAYS) {
       if (repositoryId == null) {
         // all
         wastebasket.purgeAll();
-      } else {
+      }
+      else {
         wastebasket.purge(getRepositoryRegistry().getRepository(repositoryId));
       }
     }
     else {
       if (repositoryId == null) {
         // all
-        wastebasket.purgeAll(getEmptyOlderCacheItemsThan() * A_DAY);
-      } else {
-        wastebasket.purge(getRepositoryRegistry().getRepository(repositoryId), getEmptyOlderCacheItemsThan() * A_DAY);
+        wastebasket.purgeAll(TimeUnit.DAYS.toMillis(getEmptyOlderCacheItemsThan()));
+      }
+      else {
+        wastebasket.purge(getRepositoryRegistry().getRepository(repositoryId),
+            TimeUnit.DAYS.toMillis(getEmptyOlderCacheItemsThan()));
       }
     }
-
     return null;
-  }
-
-  @Override
-  protected String getAction() {
-    return ACTION;
   }
 
   @Override
   protected String getMessage() {
     return "Emptying Trash.";
-  }
-
-  @Override
-  protected String getRepositoryFieldId() {
-    return EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  public int getEmptyOlderCacheItemsThan() {
-    String days = getParameters().get(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
-
-    if (StringUtils.isEmpty(days)) {
-      return DEFAULT_OLDER_THAN_DAYS;
-    }
-
-    return Integer.parseInt(days);
-  }
-
-  public void setEmptyOlderCacheItemsThan(int emptyOlderCacheItemsThan) {
-    getParameters().put(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString(emptyOlderCacheItemsThan));
   }
 }

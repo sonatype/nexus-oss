@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -25,7 +26,7 @@ import javax.ws.rs.Produces;
 import org.sonatype.nexus.rest.model.FormFieldResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;
@@ -45,6 +46,13 @@ public class ScheduledServiceTypePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
   public static final String RESOURCE_URI = "/schedule_types";
+
+  private List<TaskDescriptor> taskDescriptors;
+
+  @Inject
+  public void setTaskDescriptors(final List<TaskDescriptor> taskDescriptors) {
+    this.taskDescriptors = taskDescriptors;
+  }
 
   @Override
   public Object getPayloadInstance() {
@@ -73,9 +81,7 @@ public class ScheduledServiceTypePlexusResource
   {
     ScheduledServiceTypeResourceResponse result = new ScheduledServiceTypeResourceResponse();
 
-    List<ScheduledTaskDescriptor> taskDescriptors = getNexusConfiguration().listScheduledTaskDescriptors();
-
-    for (ScheduledTaskDescriptor taskDescriptor : taskDescriptors) {
+    for (TaskDescriptor taskDescriptor : taskDescriptors) {
       if (taskDescriptor.isExposed()) {
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
         type.setId(taskDescriptor.getId());

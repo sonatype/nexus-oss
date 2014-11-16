@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.obr.task;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,27 +20,18 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.util.ObrUtils;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.walker.Walker;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Named("PublishObrDescriptorTask")
 public class PublishObrDescriptorTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-
-  /**
-   * System event action: publish indexes
-   */
-  public static final String ACTION = "PUBLISHINDEX";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
   private final ObrMetadataSource obrMetadataSource;
 
   private final Walker walker;
@@ -53,18 +45,13 @@ public class PublishObrDescriptorTask
   }
 
   @Override
-  protected String getRepositoryFieldId() {
-    return REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
 
     Repository repo;
-    if (getRepositoryId() != null) {
-      repo = getRepositoryRegistry().getRepository(getRepositoryId());
+    if (getConfiguration().getRepositoryId() != null) {
+      repo = getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
     }
     else {
       throw new IllegalArgumentException("Target repository must be set.");
@@ -76,7 +63,7 @@ public class PublishObrDescriptorTask
   }
 
   private void buildObr(final GroupRepository repo)
-      throws StorageException
+      throws IOException
   {
     final List<Repository> members = repo.getMemberRepositories();
     for (final Repository repository : members) {
@@ -85,7 +72,7 @@ public class PublishObrDescriptorTask
   }
 
   private void buildObr(final Repository repo)
-      throws StorageException
+      throws IOException
   {
     if (repo.getRepositoryKind().isFacetAvailable(GroupRepository.class)) {
       buildObr(repo.adaptToFacet(GroupRepository.class));
@@ -99,13 +86,7 @@ public class PublishObrDescriptorTask
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
   protected String getMessage() {
-    return "Publishing obr.xml for repository " + getRepositoryName();
+    return "Publishing obr.xml for repository " + getConfiguration().getRepositoryId();
   }
-
 }

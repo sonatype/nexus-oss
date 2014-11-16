@@ -24,7 +24,8 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -52,10 +53,11 @@ public class WastebasketPlexusResource
 
   private final Wastebasket wastebasket;
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
 
   @Inject
-  public WastebasketPlexusResource(final Wastebasket wastebasket, final NexusScheduler nexusScheduler) {
+  public WastebasketPlexusResource(final Wastebasket wastebasket, final NexusTaskScheduler nexusScheduler)
+  {
     this.wastebasket = wastebasket;
     this.nexusScheduler = nexusScheduler;
   }
@@ -111,9 +113,9 @@ public class WastebasketPlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    EmptyTrashTask task = nexusScheduler.createTaskInstance(EmptyTrashTask.class);
+    TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(EmptyTrashTask.class);
 
-    nexusScheduler.submit("Internal", task);
+    nexusScheduler.submit(task);
 
     response.setStatus(Status.SUCCESS_NO_CONTENT);
   }

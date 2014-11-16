@@ -16,22 +16,21 @@ import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 
 import org.junit.Test;
 
 public class ExpireCacheTaskTest
     extends AbstractMavenRepoContentTests
 {
-  NexusScheduler scheduler;
+  NexusTaskScheduler scheduler;
 
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-
-    scheduler = lookup(NexusScheduler.class);
+    scheduler = lookup(NexusTaskScheduler.class);
   }
 
   @Override
@@ -46,7 +45,7 @@ public class ExpireCacheTaskTest
   {
     fillInRepo();
 
-    while (scheduler.getActiveTasks().size() > 0) {
+    while (scheduler.getRunningTaskCount() > 0) {
       Thread.sleep(100);
     }
 

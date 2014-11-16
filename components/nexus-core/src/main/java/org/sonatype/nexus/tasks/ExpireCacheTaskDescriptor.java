@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -24,20 +23,22 @@ import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("ExpireCache")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class ExpireCacheTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "ExpireCacheTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+  public ExpireCacheTaskDescriptor() {
+    super(ExpireCacheTask.class, "Expire Repository Caches");
+  }
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the proxy repository to expire cache.",
       FormField.MANDATORY
@@ -46,21 +47,13 @@ public class ExpireCacheTaskDescriptor
 
   private final StringTextFormField resourceStorePathField =
       new StringTextFormField(
-          RESOURCE_STORE_PATH_FIELD_ID,
+          TaskConfiguration.PATH_KEY,
           "Repository path",
           "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
           FormField.OPTIONAL);
 
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Expire Repository Caches";
-  }
-
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
+    List<FormField> fields = Lists.newArrayList();
 
     fields.add(repoField);
     fields.add(resourceStorePathField);

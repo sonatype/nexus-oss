@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -22,33 +21,29 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("SynchronizeShadow")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class SynchronizeShadowTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "SynchronizeShadowsTask";
-
-  public static final String REPO_FIELD_ID = "shadowRepositoryId";
+  public SynchronizeShadowTaskDescriptor() {
+    super(SynchronizeShadowsTask.class, "Synchronize Shadow Repository");
+  }
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Shadow Repository",
       "Select the shadow repository to synchronize.",
       FormField.MANDATORY
   ).includingAnyOfFacets(ShadowRepository.class);
 
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Synchronize Shadow Repository";
-  }
-
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
+    List<FormField> fields = Lists.newArrayList();
 
     fields.add(repoField);
 

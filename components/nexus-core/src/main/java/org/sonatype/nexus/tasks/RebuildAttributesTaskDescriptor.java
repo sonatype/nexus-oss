@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
@@ -22,20 +21,22 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("RebuildAttributes")
+import com.google.common.collect.Lists;
+
+@Named
 @Singleton
 public class RebuildAttributesTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "RebuildAttributesTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+  public RebuildAttributesTaskDescriptor() {
+    super(RebuildAttributesTask.class, "Rebuild Repository Attributes");
+  }
 
   private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository",
       "Select the repository to rebuild attributes",
       FormField.MANDATORY
@@ -43,29 +44,19 @@ public class RebuildAttributesTaskDescriptor
 
   private final StringTextFormField resourceStorePathField =
       new StringTextFormField(
-          RESOURCE_STORE_PATH_FIELD_ID,
+          TaskConfiguration.PATH_KEY,
           "Repository path",
           "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
           FormField.OPTIONAL);
 
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Rebuild Repository Attributes";
-  }
-
   public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
+    List<FormField> fields = Lists.newArrayList();
     fields.add(repoField);
-
     fields.add(resourceStorePathField);
-
     return fields;
   }
 
+  // TODO: this is internal task, not meant for users. But why does it have descriptor then?
   @Override
   public boolean isExposed() {
     return false;

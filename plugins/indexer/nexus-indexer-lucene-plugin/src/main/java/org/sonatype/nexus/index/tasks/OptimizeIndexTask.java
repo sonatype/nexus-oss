@@ -17,57 +17,42 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.tasks.descriptors.OptimizeIndexTaskDescriptor;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * OptimizeIndex task.
  */
-@Named(OptimizeIndexTaskDescriptor.ID)
+@Named
 public class OptimizeIndexTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: optimize index
-   */
-  public static final String ACTION = "OPTIMIZE_INDEX";
-
   private final IndexerManager indexManager;
 
   @Inject
-  public OptimizeIndexTask(final IndexerManager indexManager) {
+  public OptimizeIndexTask(final IndexerManager indexManager)
+  {
     this.indexManager = checkNotNull(indexManager);
   }
 
   @Override
-  protected String getRepositoryFieldId() {
-    return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  public Object doRun()
+  public Void execute()
       throws Exception
   {
-    if (getRepositoryId() != null) {
-      indexManager.optimizeRepositoryIndex(getRepositoryId());
+    if (getConfiguration().getRepositoryId() != null) {
+      indexManager.optimizeRepositoryIndex(getConfiguration().getRepositoryId());
     }
     else {
       indexManager.optimizeAllRepositoriesIndex();
     }
-
     return null;
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
   protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Optimizing repository " + getRepositoryName() + " index.";
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Optimizing repository " + getConfiguration().getRepositoryId() + " index.";
     }
     else {
       return "Optimizing all maven repositories indexes";

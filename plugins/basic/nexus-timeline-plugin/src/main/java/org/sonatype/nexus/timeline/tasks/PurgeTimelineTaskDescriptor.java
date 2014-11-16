@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 import com.google.common.collect.ImmutableList;
 
@@ -29,13 +29,11 @@ import com.google.common.collect.ImmutableList;
  *
  * @since 3.0
  */
-@Named(PurgeTimelineTaskDescriptor.ID)
+@Named
 @Singleton
 public class PurgeTimelineTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport<PurgeTimelineTask>
 {
-  public static final String ID = "PurgeTimelineTask";
-
   public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
   private final NumberTextFormField olderThanField;
@@ -43,21 +41,12 @@ public class PurgeTimelineTaskDescriptor
   private final List<FormField> formFields;
 
   public PurgeTimelineTaskDescriptor() {
+    super(PurgeTimelineTask.class, "Purge Timeline");
     this.olderThanField = new NumberTextFormField(OLDER_THAN_FIELD_ID,
         "Purge items older than (days)",
         "Set the number of days, to purge all items that were trashed before the given number of days.",
         FormField.MANDATORY);
     this.formFields = ImmutableList.<FormField>of(olderThanField);
-  }
-
-  @Override
-  public String getId() {
-    return ID;
-  }
-
-  @Override
-  public String getName() {
-    return "Purge Timeline";
   }
 
   @Override

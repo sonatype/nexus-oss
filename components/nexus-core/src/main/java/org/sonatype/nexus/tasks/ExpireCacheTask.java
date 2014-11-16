@@ -16,38 +16,23 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 /**
  * Clear caches task.
  */
-@Named(ExpireCacheTaskDescriptor.ID)
+@Named
 public class ExpireCacheTask
-    extends AbstractNexusRepositoriesPathAwareTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: expire cache
-   */
-  public static final String ACTION = "EXPIRE_CACHE";
-
   @Override
-  protected String getRepositoryFieldId() {
-    return ExpireCacheTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected String getRepositoryPathFieldId() {
-    return ExpireCacheTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
-  }
-
-  @Override
-  public Object doRun()
+  public Void execute()
       throws Exception
   {
-    ResourceStoreRequest req = new ResourceStoreRequest(getResourceStorePath());
+    ResourceStoreRequest req = new ResourceStoreRequest(getConfiguration().getPath());
 
-    if (getRepositoryId() != null) {
-      getRepositoryRegistry().getRepository(getRepositoryId()).expireCaches(req);
+    if (getConfiguration().getRepositoryId() != null) {
+      getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId()).expireCaches(req);
     }
     else {
       for (Repository repository : getRepositoryRegistry().getRepositories()) {
@@ -61,20 +46,15 @@ public class ExpireCacheTask
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
   protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Expiring caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Expiring caches for repository " + getConfiguration().getRepositoryId() + " from path " +
+          getConfiguration().getPath()
           + " and below.";
     }
     else {
-      return "Expiring caches for all registered repositories from path " + getResourceStorePath()
+      return "Expiring caches for all registered repositories from path " + getConfiguration().getPath()
           + " and below.";
     }
   }
-
 }

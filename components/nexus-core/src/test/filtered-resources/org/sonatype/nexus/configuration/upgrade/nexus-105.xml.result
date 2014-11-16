@@ -643,7 +643,7 @@
       <enabled>true</enabled>
       <type>ExpireCacheTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1225168020000</nextRun>
+      <getNextRun>1225168020000</getNextRun>
       <schedule>
         <type>weekly</type>
         <startDate>1225081620000</startDate>
