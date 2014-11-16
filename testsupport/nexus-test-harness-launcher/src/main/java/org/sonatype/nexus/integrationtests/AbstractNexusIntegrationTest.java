@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
@@ -254,13 +255,19 @@ public abstract class AbstractNexusIntegrationTest
         startNexus();
 
         // set security enabled/disabled as expected by current IT
-        final boolean isSecureTest = TestContainer.getInstance().getTestContext().isSecureTest();
-        TestContainer.getInstance().getTestContext().setSecureTest(true);
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        prepareSecurity();
-        TestContainer.getInstance().getTestContext().setSecureTest(isSecureTest);
-        new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML)
-            .makeAnonymousAdministrator(isSecureTest && Boolean.getBoolean("secure.test"));
+        final boolean testRequiresSecurityEnabled =
+            TestContainer.getInstance().getTestContext().isSecureTest()
+                || Boolean.valueOf(System.getProperty("secure.test"));
+        UserMessageUtil userUtil = new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML);
+        userUtil.makeAnonymousAdministrator(!testRequiresSecurityEnabled);
+
+        userUtil.invokeAsAdministrator(new Callable<Object>() {
+          @Override
+          public Object call() throws Exception {
+            prepareSecurity();
+            return null;
+          }
+        });
 
         // deploy artifacts
         deployArtifacts();
