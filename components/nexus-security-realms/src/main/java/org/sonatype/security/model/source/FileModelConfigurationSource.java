@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
-import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
@@ -57,11 +56,6 @@ public class FileModelConfigurationSource
   private final File configurationFile;
 
   /**
-   * The configuration upgrader.
-   */
-  private final SecurityConfigurationUpgrader configurationUpgrader;
-
-  /**
    * The defaults configuration source.
    */
   private final SecurityModelConfigurationSource securityDefaults;
@@ -73,12 +67,10 @@ public class FileModelConfigurationSource
 
   @Inject
   public FileModelConfigurationSource(@Named("${security-xml-file}") File configurationFile,
-                                      @Named("static") SecurityModelConfigurationSource securityDefaults,
-                                      SecurityConfigurationUpgrader configurationUpgrader)
+                                      @Named("static") SecurityModelConfigurationSource securityDefaults)
   {
     this.configurationFile = configurationFile;
     this.securityDefaults = securityDefaults;
-    this.configurationUpgrader = configurationUpgrader;
   }
 
   /**
@@ -127,8 +119,6 @@ public class FileModelConfigurationSource
 
     // check for loaded model
     if (getConfiguration() == null) {
-      upgradeConfiguration(getConfigurationFile());
-
       loadConfiguration(getConfigurationFile());
     }
 
@@ -150,30 +140,6 @@ public class FileModelConfigurationSource
   @Override
   public SecurityModelConfigurationSource getDefaultsSource() {
     return securityDefaults;
-  }
-
-  protected void upgradeConfiguration(File file)
-      throws IOException, ConfigurationException
-  {
-    getLogger().info("Trying to upgrade the configuration file " + file.getAbsolutePath());
-
-    setConfiguration(configurationUpgrader.loadOldConfiguration(file));
-
-    // after all we should have a configuration
-    if (getConfiguration() == null) {
-      throw new ConfigurationException("Could not upgrade Security configuration! Please replace the "
-          + file.getAbsolutePath() + " file with a valid Security configuration file.");
-    }
-
-    getLogger().info("Creating backup from the old file and saving the upgraded configuration.");
-
-    // backup the file
-    backupConfiguration();
-
-    // set the upgradeInstance to warn the application about this
-    setConfigurationUpgraded(true);
-
-    saveConfiguration(file);
   }
 
   /**
