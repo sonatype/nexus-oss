@@ -24,6 +24,7 @@ import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDataMap;
 import org.quartz.PersistJobDataAfterExecution;
@@ -38,6 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @PersistJobDataAfterExecution
+@DisallowConcurrentExecution
 @Named
 public class NexusTaskJobSupport<T>
     extends JobSupport
