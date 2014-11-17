@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.ruby.trials
 
+import org.apache.tools.ant.Project
 import org.sonatype.nexus.client.core.NexusClient
 import org.sonatype.nexus.client.core.subsystem.content.Content
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories
@@ -43,6 +44,8 @@ abstract class ScenarioSupport
     this.workdir = workdir
     this.client = nexusClient
     this.ant = new AntBuilder()
+    // make ant produce verbose output
+    this.ant.project.buildListeners[0].messageOutputLevel = Project.MSG_VERBOSE
     this.execLog = new File(workdir, '.log')
     assert execLog.mkdirs()
     this.cwd = workdir
