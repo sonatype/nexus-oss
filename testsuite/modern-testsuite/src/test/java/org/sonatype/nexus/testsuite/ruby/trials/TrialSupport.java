@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.trials;
+package org.sonatype.nexus.testsuite.ruby.trials;
 
 import java.util.Collection;
 

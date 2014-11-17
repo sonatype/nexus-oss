@@ -10,13 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.trials.ruby.hola
-
-import org.sonatype.nexus.client.core.NexusClient
-import org.sonatype.nexus.testsuite.trials.ruby.RubyScenarioSupport
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers
+package org.sonatype.nexus.testsuite.ruby.trials
 
 import org.apache.commons.codec.digest.DigestUtils
+import org.sonatype.nexus.client.core.NexusClient
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers
 
 import static org.hamcrest.MatcherAssert.assertThat
 

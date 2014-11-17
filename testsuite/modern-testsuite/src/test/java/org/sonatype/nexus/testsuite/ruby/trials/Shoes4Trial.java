@@ -11,12 +11,9 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.testsuite.trials.ruby.shoes4;
+package org.sonatype.nexus.testsuite.ruby.trials;
 
 import java.io.File;
-
-import org.sonatype.nexus.testsuite.trials.TrialSupport;
-import org.sonatype.nexus.testsuite.trials.ScenarioSupport;
 
 /**
  * The "Shoes4 roundtrip" scenario trial.

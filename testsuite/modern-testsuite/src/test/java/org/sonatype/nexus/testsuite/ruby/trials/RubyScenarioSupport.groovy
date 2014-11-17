@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.testsuite.trials.ruby
+package org.sonatype.nexus.testsuite.ruby.trials
 
 import org.sonatype.nexus.client.core.NexusClient
 import org.sonatype.nexus.ruby.client.RubyGroupRepository
 import org.sonatype.nexus.ruby.client.RubyHostedRepository
 import org.sonatype.nexus.ruby.client.RubyProxyRepository
-import org.sonatype.nexus.testsuite.trials.ScenarioSupport
 
 import static com.google.common.base.Preconditions.checkNotNull
 
