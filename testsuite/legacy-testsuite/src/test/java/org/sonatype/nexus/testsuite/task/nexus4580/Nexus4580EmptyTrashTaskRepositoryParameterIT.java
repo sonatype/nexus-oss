@@ -17,6 +17,8 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.EmptyTrashTaskDescriptor;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -65,9 +67,9 @@ public class Nexus4580EmptyTrashTaskRepositoryParameterIT
     age.setKey(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
     age.setValue("0");
     ScheduledServicePropertyResource repository = new ScheduledServicePropertyResource();
-    age.setKey(EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    age.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     age.setValue(REPO_TEST_HARNESS_SNAPSHOT_REPO);
-    TaskScheduleUtil.runTask("Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, age, repository);
+    TaskScheduleUtil.runTask("Empty Trash Older Than", EmptyTrashTask.class.getName(), age, repository);
 
     // verify that only releases trash has the file (other was nuked)
     assertThat(releaseTrashFile, FileMatchers.isFile());

@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -40,7 +41,7 @@ public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("g4");
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-snapshot", RebuildMavenMetadataTask.class.getName(), repo);
 
     File metadataFile =
         downloadFile(new URL(nexusBaseUrl + "content/repositories/g4/"

@@ -17,6 +17,7 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -83,7 +84,7 @@ public class Nexus635ExpireCacheTaskIT
     // prop.setValue( "/" );
 
     // This is THE important part
-    TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(ExpireCacheTask.class.getName(), prop);
 
     File thirdDownload = downloadSnapshotArtifact("tasks-snapshot-repo", GAV, new File("target/download"));
     Assert.assertTrue("After ExpireCache should download artifact 2", //

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -27,8 +28,10 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Tasks are not in nexus.xml anymore")
 public class Nexus810PackageNamesInNexusConfIT
     extends AbstractNexusIntegrationTest
 {
@@ -54,7 +57,7 @@ public class Nexus810PackageNamesInNexusConfIT
     startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
     scheduledTask.setCronCommand("0 0 12 ? * WED");
 
-    scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
+    scheduledTask.setTypeId(UpdateIndexTask.class.getName());
 
     ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");

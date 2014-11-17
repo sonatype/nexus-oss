@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
@@ -104,7 +105,7 @@ public class Nexus3626SimpleSearchIT
 
     repo.setValue(REPO_TEST_HARNESS_REPO);
 
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTask.class.getName(), repo);
 
     RepositoryMessageUtil.updateIndexes(REPO_TEST_HARNESS_REPO);
     TaskScheduleUtil.waitForAllTasksToStop();

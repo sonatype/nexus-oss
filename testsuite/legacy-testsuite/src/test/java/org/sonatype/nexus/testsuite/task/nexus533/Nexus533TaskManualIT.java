@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.task.nexus533;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -39,7 +40,7 @@ public class Nexus533TaskManualIT
       Date startDate = DateUtils.addDays(new Date(), 10);
       startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
 
-      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
+      scheduledTask.setTypeId(UpdateIndexTask.class.getName());
 
       ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
       prop.setKey("repositoryId");

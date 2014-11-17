@@ -18,8 +18,10 @@ import java.io.InputStream;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.apache.commons.io.FileUtils;
@@ -58,13 +60,13 @@ public class Nexus4218MetadataModelVersionPerClientIT
     FileUtils.copyDirectory(repo, new File(nexusWorkDir, "storage/nexus-test-harness-snapshot-repo"));
 
     ScheduledServicePropertyResource r = new ScheduledServicePropertyResource();
-    r.setKey(RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    r.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     r.setValue(REPO_TEST_HARNESS_SNAPSHOT_REPO);
 
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus4218-snapshot", RebuildMavenMetadataTaskDescriptor.ID, r);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus4218-snapshot", RebuildMavenMetadataTask.class.getName(), r);
 
     r.setValue("fake-central");
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus4218-central", RebuildMavenMetadataTaskDescriptor.ID, r);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus4218-central", RebuildMavenMetadataTask.class.getName(), r);
     TaskScheduleUtil.waitForAllTasksToStop();
   }
 

@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalTask;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -97,7 +98,7 @@ public class Nexus1650MultipleManualTaskIT
     scheduledTask.setEnabled(true);
     scheduledTask.setId(null);
     scheduledTask.setName(name);
-    scheduledTask.setTypeId(SnapshotRemovalTaskDescriptor.ID);
+    scheduledTask.setTypeId(SnapshotRemovalTask.class.getName());
     scheduledTask.setSchedule("manual");
     scheduledTask.addProperty(repositoryProp);
     scheduledTask.addProperty(keepSnapshotsProp);

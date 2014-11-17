@@ -27,7 +27,9 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
 import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -70,7 +72,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
     ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");
     prop.setValue(this.getTestRepositoryId());
-    TaskScheduleUtil.runTask(RebuildAttributesTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(RebuildAttributesTask.class.getName(), prop);
 
   }
 
@@ -151,7 +153,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
     age.setValue(String.valueOf(cacheAge));
 
     // clean unused
-    TaskScheduleUtil.runTask(taskName, EvictUnusedProxiedItemsTaskDescriptor.ID, repo, age);
+    TaskScheduleUtil.runTask(taskName, EvictUnusedProxiedItemsTask.class.getName(), repo, age);
   }
 
   private Marshaller getMarshaller() {

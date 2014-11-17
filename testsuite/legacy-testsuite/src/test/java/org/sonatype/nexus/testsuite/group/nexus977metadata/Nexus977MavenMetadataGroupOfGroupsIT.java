@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -42,17 +43,17 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("release");
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-release", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-release", RebuildMavenMetadataTask.class.getName(), repo);
 
     repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("release2");
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-release2", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-release2", RebuildMavenMetadataTask.class.getName(), repo);
 
     repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("snapshot");
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-snapshot", RebuildMavenMetadataTask.class.getName(), repo);
   }
 
   @SuppressWarnings("unchecked")

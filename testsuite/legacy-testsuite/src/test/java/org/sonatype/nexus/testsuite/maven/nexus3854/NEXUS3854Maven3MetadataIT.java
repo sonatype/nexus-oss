@@ -17,9 +17,11 @@ import java.io.FileInputStream;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -43,9 +45,9 @@ public class NEXUS3854Maven3MetadataIT
     copyDirectoryToDirectory(getTestFile("org"), repo);
 
     ScheduledServicePropertyResource props = new ScheduledServicePropertyResource();
-    props.setKey(RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    props.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     props.setValue(REPO_TEST_HARNESS_SNAPSHOT_REPO);
-    TaskScheduleUtil.runTask(RebuildMavenMetadataTaskDescriptor.ID, props);
+    TaskScheduleUtil.runTask(RebuildMavenMetadataTask.class.getName(), props);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     Metadata m1 = getMetadata(new File(repo, "org/sonatype/nexus/nexus-api/maven-metadata.xml"));

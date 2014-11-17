@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -44,7 +45,7 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
 
     repo.setValue(REPO_TEST_HARNESS_REPO);
 
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTask.class.getName(), repo);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     File artifactDirMd =

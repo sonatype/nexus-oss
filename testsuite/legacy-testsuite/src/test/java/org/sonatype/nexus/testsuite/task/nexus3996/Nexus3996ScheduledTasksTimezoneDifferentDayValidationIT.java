@@ -19,6 +19,7 @@ import java.util.Calendar;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.EmptyTrashTaskDescriptor;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -60,7 +61,7 @@ public class Nexus3996ScheduledTasksTimezoneDifferentDayValidationIT
     final ScheduledServiceOnceResource task = new ScheduledServiceOnceResource();
     task.setName("name");
     task.setSchedule("once");
-    task.setTypeId(EmptyTrashTaskDescriptor.ID);
+    task.setTypeId(EmptyTrashTask.class.getName());
     ScheduledServicePropertyResource property = new ScheduledServicePropertyResource();
     property.setKey(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
     task.setProperties(Lists.newArrayList(property));

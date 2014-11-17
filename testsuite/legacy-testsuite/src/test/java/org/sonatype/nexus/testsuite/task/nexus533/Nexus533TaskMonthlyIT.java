@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -43,7 +44,7 @@ public class Nexus533TaskMonthlyIT
       scheduledTask.setRecurringTime("03:30");
       scheduledTask.setRecurringDay(Arrays.asList(new String[]{"1", "9", "17", "25"}));
 
-      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
+      scheduledTask.setTypeId(UpdateIndexTask.class.getName());
 
       ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
       prop.setKey("repositoryId");

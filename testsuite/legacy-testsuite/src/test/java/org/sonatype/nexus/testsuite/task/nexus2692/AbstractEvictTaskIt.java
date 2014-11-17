@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
 import org.sonatype.nexus.proxy.attributes.Marshaller;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -137,7 +138,7 @@ public class AbstractEvictTaskIt
     age.setKey("evictOlderCacheItemsThen");
     age.setValue(String.valueOf(days));
 
-    TaskScheduleUtil.runTask(EvictUnusedProxiedItemsTaskDescriptor.ID, EvictUnusedProxiedItemsTaskDescriptor.ID, 300, true,
+    TaskScheduleUtil.runTask(EvictUnusedProxiedItemsTask.class.getName(), EvictUnusedProxiedItemsTask.class.getName(), 300, true,
         prop, age);
 
     getEventInspectorsUtil().waitForCalmPeriod();

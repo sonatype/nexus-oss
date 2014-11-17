@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -68,7 +69,7 @@ public class Nexus641ReindexTaskIT
     prop.setValue(this.getTestRepositoryId());
 
     // reindex
-    TaskScheduleUtil.runTask(UpdateIndexTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(UpdateIndexTask.class.getName(), prop);
 
     // try to download again and success
     search = getSearchMessageUtil().searchFor("nexus641");

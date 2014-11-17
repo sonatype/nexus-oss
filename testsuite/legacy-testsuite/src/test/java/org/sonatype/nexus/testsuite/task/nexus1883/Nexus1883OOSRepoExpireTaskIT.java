@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.task.nexus1883;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -40,6 +41,6 @@ public class Nexus1883OOSRepoExpireTaskIT
     prop.setKey("repositoryId");
     prop.setValue(REPO_TEST_HARNESS_SHADOW);
 
-    TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(ExpireCacheTask.class.getName(), prop);
   }
 }

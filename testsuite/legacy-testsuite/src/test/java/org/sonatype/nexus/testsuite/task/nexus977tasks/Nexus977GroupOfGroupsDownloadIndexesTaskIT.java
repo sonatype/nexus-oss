@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.testsuite.task.nexus977tasks;
 
+import org.sonatype.nexus.index.tasks.DownloadIndexesTask;
 import org.sonatype.nexus.index.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -34,7 +35,7 @@ public class Nexus977GroupOfGroupsDownloadIndexesTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("g4");
-    TaskScheduleUtil.runTask("DownloadIndexesTaskDescriptor-snapshot", DownloadIndexesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("DownloadIndexesTaskDescriptor-snapshot", DownloadIndexesTask.class.getName(), repo);
 
     Assert.assertFalse(getSearchMessageUtil().searchForGav(getTestId(), "project", "0.8").isEmpty());
     Assert.assertFalse(getSearchMessageUtil().searchForGav(getTestId(), "project", "2.1").isEmpty());

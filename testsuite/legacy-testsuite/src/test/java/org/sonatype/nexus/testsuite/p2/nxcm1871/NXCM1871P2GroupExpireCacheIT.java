@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -67,7 +68,7 @@ public class NXCM1871P2GroupExpireCacheIT
     prop.setKey("repositoryId");
     prop.setValue(getTestRepositoryId());
 
-    TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(ExpireCacheTask.class.getName(), prop);
 
     // make sure nexus has the right content after reindex
     final File f2 = downloadFile(

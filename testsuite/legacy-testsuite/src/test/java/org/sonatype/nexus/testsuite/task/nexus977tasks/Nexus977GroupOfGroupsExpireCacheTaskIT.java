@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -49,7 +50,7 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("g4");
-    TaskScheduleUtil.runTask("ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("ExpireCacheTaskDescriptor-snapshot", ExpireCacheTask.class.getName(), repo);
 
     downloadArtifactFromRepository("g4", gav, "target/downloads/nexus977tasks");
   }

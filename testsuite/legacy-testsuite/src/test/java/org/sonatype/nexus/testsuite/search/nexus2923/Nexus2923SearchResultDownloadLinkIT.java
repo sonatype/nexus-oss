@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -54,7 +55,7 @@ public class Nexus2923SearchResultDownloadLinkIT
     prop.setKey("repositoryId");
     prop.setValue(this.getTestRepositoryId());
 
-    TaskScheduleUtil.runTask(UpdateIndexTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(UpdateIndexTask.class.getName(), prop);
   }
 
   @Test
