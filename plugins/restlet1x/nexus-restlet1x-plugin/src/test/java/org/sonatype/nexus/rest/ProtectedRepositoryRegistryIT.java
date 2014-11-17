@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,7 +44,6 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
@@ -80,7 +76,7 @@ public class ProtectedRepositoryRegistryIT
         binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
 
         binder.bind(SecurityConfigurationSource.class)
-            .annotatedWith(Names.named("file"))
+            .annotatedWith(Names.named("static"))
             .toInstance(new TestSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
       }
     });

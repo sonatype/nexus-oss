@@ -104,7 +104,7 @@ public class SecurityModuleTest
       @Override
       protected void configure() {
         bind(SecurityConfigurationSource.class)
-            .annotatedWith(Names.named("file"))
+            .annotatedWith(Names.named("static"))
             .toInstance(new TestSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
       }
     };
