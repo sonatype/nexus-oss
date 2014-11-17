@@ -72,6 +72,7 @@ public class NexusTaskJobSupport<T>
     }
     if (nexusTask instanceof Cancelable) {
       ((Cancelable) nexusTask).cancel();
+      // TODO: flag cancellation in context
     }
     else {
       throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
