@@ -19,6 +19,11 @@ package org.sonatype.nexus.scheduling;
 public interface NexusTaskFactory
 {
   /**
+   * Test whether taskType belongs to a known task implementation.
+   */
+  boolean isTask(String taskType);
+
+  /**
    * A factory for tasks based on passed in task configuration. Returns a configured task instance.
    */
   <T extends Task> T createTaskInstance(TaskConfiguration taskConfiguration)

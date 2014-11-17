@@ -31,7 +31,6 @@ import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.nexus.util.DigesterUtils;
-import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
@@ -52,20 +51,17 @@ public class DefaultNexusTaskScheduler
 {
   private final NexusTaskFactory nexusTaskFactory;
 
-  private final NexusUberClassloader nexusUberClassloader;
-
   private final List<TaskDescriptor> taskDescriptors;
 
   private final List<NexusTaskExecutorSPI> schedulers;
 
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
-                                   final NexusUberClassloader nexusUberClassloader,
                                    final List<TaskDescriptor> taskDescriptors,
+                                   final List<Task> tasks,
                                    final List<NexusTaskExecutorSPI> schedulers)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
-    this.nexusUberClassloader = checkNotNull(nexusUberClassloader);
     this.taskDescriptors = checkNotNull(taskDescriptors);
     this.schedulers = checkNotNull(schedulers);
   }
@@ -128,32 +124,27 @@ public class DefaultNexusTaskScheduler
       throws IllegalArgumentException
   {
     checkNotNull(taskType);
-    // try to match a descriptor for class, and use that
-    for (TaskDescriptor taskDescriptor : taskDescriptors) {
-      if (taskDescriptor.getType().equals(taskType)) {
-        return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
-      }
-    }
-    // sane fallback for internal tasks not having descriptor
-    log.debug("Creating task configuration for task class: {}", taskType.getName());
-    final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setId(generateId(taskType, taskConfiguration));
-    taskConfiguration.setName(taskType.getSimpleName());
-    taskConfiguration.setType(taskType.getName());
-    taskConfiguration.setVisible(false); // tasks w/o descriptors are invisible in UI by default
-    return taskConfiguration;
+    return createTaskConfigurationInstance(taskType.getName());
   }
 
   @Override
   public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
-    try {
-      final Class<?> taskClass = nexusUberClassloader.loadClass(taskType);
-      checkArgument(Task.class.isAssignableFrom(taskClass));
-      return createTaskConfigurationInstance((Class<? extends Task>) taskClass);
+    checkNotNull(taskType);
+    checkArgument(nexusTaskFactory.isTask(taskType), "Type '%s' is not a task", taskType);
+    // try to match a descriptor for class, and use that
+    for (TaskDescriptor taskDescriptor : taskDescriptors) {
+      if (taskDescriptor.getType().getName().equals(taskType)) {
+        return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
+      }
     }
-    catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException("No task of FCQN '" + taskType + "' found", e);
-    }
+    // sane fallback for internal tasks not having descriptor
+    log.debug("Creating task configuration for task class: {}", taskType);
+    final TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId(generateId(taskType, taskConfiguration));
+    taskConfiguration.setName(taskType);
+    taskConfiguration.setType(taskType);
+    taskConfiguration.setVisible(false); // tasks w/o descriptors are invisible in UI by default
+    return taskConfiguration;
   }
 
   /**
@@ -164,7 +155,7 @@ public class DefaultNexusTaskScheduler
   {
     log.debug("Creating task configuration for task descriptor: {}", taskDescriptor.getId());
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setId(generateId(taskDescriptor.getType(), taskConfiguration));
+    taskConfiguration.setId(generateId(taskDescriptor.getType().getName(), taskConfiguration));
     taskConfiguration.setName(taskDescriptor.getName());
     taskConfiguration.setType(taskDescriptor.getType().getName());
     taskConfiguration.setVisible(taskDescriptor.isVisible());
@@ -174,12 +165,12 @@ public class DefaultNexusTaskScheduler
   /**
    * Creates a unique ID for the task.
    */
-  private String generateId(final Class<? extends Task> taskClass,
+  private String generateId(final String taskFQCName,
                             final TaskConfiguration taskConfiguration)
   {
     // TODO: call into quartz for this? Must not clash with existing persisted job IDs!
     return DigesterUtils.getSha1Digest(
-        taskClass.getName()
+        taskFQCName
             + System.identityHashCode(taskConfiguration)
             + System.nanoTime()
     );

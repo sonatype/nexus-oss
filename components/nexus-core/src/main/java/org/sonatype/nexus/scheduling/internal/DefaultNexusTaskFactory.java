@@ -48,6 +48,16 @@ public class DefaultNexusTaskFactory
   }
 
   @Override
+  public boolean isTask(final String taskType) {
+    checkNotNull(taskType);
+    final BeanEntry<Named, Task> taskEntry = locateTask(taskType);
+    if (taskEntry != null) {
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public Task<?> createTaskInstance(final TaskConfiguration taskConfiguration)
       throws IllegalArgumentException
   {
@@ -55,13 +65,24 @@ public class DefaultNexusTaskFactory
     checkArgument(!Strings.isNullOrEmpty(taskConfiguration.getId()), "Invalid task configuration: id");
     checkArgument(!Strings.isNullOrEmpty(taskConfiguration.getType()), "Invalid task configuration: type");
     log.debug("Creating task by hint: {}", taskConfiguration);
-    for (BeanEntry<Named, Task> entry : tasks) {
-      if (entry.getImplementationClass().getName().equals(taskConfiguration.getType())) {
-        final Task task = entry.getProvider().get();
-        task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
-        return task;
-      }
+    final BeanEntry<Named, Task> taskEntry = locateTask(taskConfiguration.getType());
+    if (taskEntry != null) {
+      final Task task = taskEntry.getProvider().get();
+      task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
+      return task;
     }
     throw new IllegalArgumentException("No Task type \'" + taskConfiguration.getType() + "\' found");
+  }
+
+  // ==
+
+  private BeanEntry<Named, Task> locateTask(final String taskType) {
+    for (BeanEntry<Named, Task> entry : tasks) {
+      // TODO: consider other strategies? like by @Name?
+      if (entry.getImplementationClass().getName().equals(taskType)) {
+        return entry;
+      }
+    }
+    return null;
   }
 }
