@@ -25,6 +25,9 @@ Ext.define('NX.view.drilldown.DrilldownItem', {
   itemName: 'item',
   itemClass: null,
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 

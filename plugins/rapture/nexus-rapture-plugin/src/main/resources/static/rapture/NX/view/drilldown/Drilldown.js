@@ -34,6 +34,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
   rootName: 'default',
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
@@ -144,6 +147,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
     me.callParent(arguments);
   },
 
+  /**
+   * @override
+   */
   onRender: function () {
     var me = this;
 
