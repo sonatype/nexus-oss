@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus450;
 
+import javax.mail.Address;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -87,6 +89,19 @@ public class Nexus450UserCreationIT
     Assert.assertTrue("No emails recieved.", msgs.length > 0);
 
     for (MimeMessage mimeMessage : msgs) {
+
+      boolean toVelo = false;
+      Address[] recipients = mimeMessage.getAllRecipients();
+      for (Address address : recipients) {
+        InternetAddress addr = (InternetAddress) address;
+        if ("velo@earth.com".equals(addr.getAddress())) {
+          toVelo = true;
+        }
+      }
+      if (!toVelo) {
+        continue;
+      }
+
       emailsContent.append(GreenMailUtil.getHeaders(mimeMessage)).append('\n');
 
       // Sample body: Your new password is ********
