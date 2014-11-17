@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.configuration.SecurityConfigurationManager;
-
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.HashingPasswordService;
 import org.apache.shiro.authc.credential.PasswordService;
@@ -44,12 +42,7 @@ public class DefaultSecurityPasswordService
 {
   private static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
 
-  /**
-   * Provides access to password hashing policy
-   * Currently only provides hash iterations, but could be extended
-   * at some point to include hashing algorithm, salt policy, etc
-   */
-  private final SecurityConfigurationManager securityConfiguration;
+  private static final int DEFAULT_HASH_ITERATIONS = 1024;
 
   /**
    * Provides the actual implementation of PasswordService.
@@ -63,17 +56,14 @@ public class DefaultSecurityPasswordService
   private final PasswordService legacyPasswordService;
 
   @Inject
-  public DefaultSecurityPasswordService(SecurityConfigurationManager securityConfiguration,
-                                        @Named("legacy") PasswordService legacyPasswordService)
-  {
-    this.securityConfiguration = securityConfiguration;
+  public DefaultSecurityPasswordService(@Named("legacy") PasswordService legacyPasswordService) {
     this.passwordService = new DefaultPasswordService();
     this.legacyPasswordService = legacyPasswordService;
 
     //Create and set a hash service according to our hashing policies
     DefaultHashService hashService = new DefaultHashService();
     hashService.setHashAlgorithmName(DEFAULT_HASH_ALGORITHM);
-    hashService.setHashIterations(this.securityConfiguration.getHashIterations());
+    hashService.setHashIterations(DEFAULT_HASH_ITERATIONS);
     hashService.setGeneratePublicSalt(true);
     this.passwordService.setHashService(hashService);
   }
