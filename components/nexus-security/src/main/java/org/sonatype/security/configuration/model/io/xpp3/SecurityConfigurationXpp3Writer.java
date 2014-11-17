@@ -5,121 +5,109 @@
 
 package org.sonatype.security.configuration.model.io.xpp3;
 
-  //---------------------------------/
- //- Imported classes and packages -/
+//---------------------------------/
+//- Imported classes and packages -/
 //---------------------------------/
 
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Iterator;
+
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
  * Class SecurityConfigurationXpp3Writer.
- * 
+ *
  * @version $Revision$ $Date$
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public class SecurityConfigurationXpp3Writer
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
 
-    /**
-     * Field NAMESPACE.
-     */
-    private static final String NAMESPACE = null;
+  /**
+   * Field NAMESPACE.
+   */
+  private static final String NAMESPACE = null;
 
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+  //-----------/
+  //- Methods -/
+  //-----------/
 
-    /**
-     * Method write.
-     * 
-     * @param writer
-     * @param securityConfiguration
-     * @throws java.io.IOException
-     */
-    public void write( Writer writer, SecurityConfiguration securityConfiguration )
-        throws java.io.IOException
-    {
-        XmlSerializer serializer = new MXSerializer();
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        serializer.setOutput( writer );
-        serializer.startDocument( securityConfiguration.getModelEncoding(), null );
-        writeSecurityConfiguration( securityConfiguration, "security-configuration", serializer );
-        serializer.endDocument();
-    } //-- void write( Writer, SecurityConfiguration )
+  /**
+   * Method write.
+   */
+  public void write(Writer writer, SecurityConfiguration securityConfiguration)
+      throws java.io.IOException
+  {
+    XmlSerializer serializer = new MXSerializer();
+    serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
+    serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
+    serializer.setOutput(writer);
+    serializer.startDocument(securityConfiguration.getModelEncoding(), null);
+    writeSecurityConfiguration(securityConfiguration, "security-configuration", serializer);
+    serializer.endDocument();
+  } //-- void write( Writer, SecurityConfiguration )
 
-    /**
-     * Method write.
-     * 
-     * @param stream
-     * @param securityConfiguration
-     * @throws java.io.IOException
-     */
-    public void write( OutputStream stream, SecurityConfiguration securityConfiguration )
-        throws java.io.IOException
-    {
-        XmlSerializer serializer = new MXSerializer();
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        serializer.setOutput( stream, securityConfiguration.getModelEncoding() );
-        serializer.startDocument( securityConfiguration.getModelEncoding(), null );
-        writeSecurityConfiguration( securityConfiguration, "security-configuration", serializer );
-        serializer.endDocument();
-    } //-- void write( OutputStream, SecurityConfiguration )
+  /**
+   * Method write.
+   */
+  public void write(OutputStream stream, SecurityConfiguration securityConfiguration)
+      throws java.io.IOException
+  {
+    XmlSerializer serializer = new MXSerializer();
+    serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  ");
+    serializer.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
+    serializer.setOutput(stream, securityConfiguration.getModelEncoding());
+    serializer.startDocument(securityConfiguration.getModelEncoding(), null);
+    writeSecurityConfiguration(securityConfiguration, "security-configuration", serializer);
+    serializer.endDocument();
+  } //-- void write( OutputStream, SecurityConfiguration )
 
-    /**
-     * Method writeSecurityConfiguration.
-     * 
-     * @param securityConfiguration
-     * @param serializer
-     * @param tagName
-     * @throws java.io.IOException
-     */
-    private void writeSecurityConfiguration( SecurityConfiguration securityConfiguration, String tagName, XmlSerializer serializer )
-        throws java.io.IOException
-    {
-        serializer.startTag( NAMESPACE, tagName );
-        if ( securityConfiguration.getVersion() != null )
-        {
-            serializer.startTag( NAMESPACE, "version" ).text( securityConfiguration.getVersion() ).endTag( NAMESPACE, "version" );
-        }
-        if ( securityConfiguration.isAnonymousAccessEnabled() != false )
-        {
-            serializer.startTag( NAMESPACE, "anonymousAccessEnabled" ).text( String.valueOf( securityConfiguration.isAnonymousAccessEnabled() ) ).endTag( NAMESPACE, "anonymousAccessEnabled" );
-        }
-        if ( securityConfiguration.getAnonymousUsername() != null )
-        {
-            serializer.startTag( NAMESPACE, "anonymousUsername" ).text( securityConfiguration.getAnonymousUsername() ).endTag( NAMESPACE, "anonymousUsername" );
-        }
-        if ( securityConfiguration.getAnonymousPassword() != null )
-        {
-            serializer.startTag( NAMESPACE, "anonymousPassword" ).text( securityConfiguration.getAnonymousPassword() ).endTag( NAMESPACE, "anonymousPassword" );
-        }
-        if ( ( securityConfiguration.getRealms() != null ) && ( securityConfiguration.getRealms().size() > 0 ) )
-        {
-            serializer.startTag( NAMESPACE, "realms" );
-            for ( Iterator iter = securityConfiguration.getRealms().iterator(); iter.hasNext(); )
-            {
-                String realm = (String) iter.next();
-                serializer.startTag( NAMESPACE, "realm" ).text( realm ).endTag( NAMESPACE, "realm" );
-            }
-            serializer.endTag( NAMESPACE, "realms" );
-        }
-        if ( securityConfiguration.getHashIterations() != 0 )
-        {
-            serializer.startTag( NAMESPACE, "hashIterations" ).text( String.valueOf( securityConfiguration.getHashIterations() ) ).endTag( NAMESPACE, "hashIterations" );
-        }
-        serializer.endTag( NAMESPACE, tagName );
-    } //-- void writeSecurityConfiguration( SecurityConfiguration, String, XmlSerializer )
+  /**
+   * Method writeSecurityConfiguration.
+   */
+  private void writeSecurityConfiguration(SecurityConfiguration securityConfiguration, String tagName,
+                                          XmlSerializer serializer)
+      throws java.io.IOException
+  {
+    serializer.startTag(NAMESPACE, tagName);
+    if (securityConfiguration.getVersion() != null) {
+      serializer.startTag(NAMESPACE, "version").text(securityConfiguration.getVersion()).endTag(NAMESPACE, "version");
+    }
+    if (securityConfiguration.isAnonymousAccessEnabled() != false) {
+      serializer.startTag(NAMESPACE, "anonymousAccessEnabled")
+          .text(String.valueOf(securityConfiguration.isAnonymousAccessEnabled()))
+          .endTag(NAMESPACE, "anonymousAccessEnabled");
+    }
+    if (securityConfiguration.getAnonymousUsername() != null) {
+      serializer.startTag(NAMESPACE, "anonymousUsername").text(securityConfiguration.getAnonymousUsername())
+          .endTag(NAMESPACE, "anonymousUsername");
+    }
+    if (securityConfiguration.getAnonymousPassword() != null) {
+      serializer.startTag(NAMESPACE, "anonymousPassword").text(securityConfiguration.getAnonymousPassword())
+          .endTag(NAMESPACE, "anonymousPassword");
+    }
+    if ((securityConfiguration.getRealms() != null) && (securityConfiguration.getRealms().size() > 0)) {
+      serializer.startTag(NAMESPACE, "realms");
+      for (Iterator iter = securityConfiguration.getRealms().iterator(); iter.hasNext(); ) {
+        String realm = (String) iter.next();
+        serializer.startTag(NAMESPACE, "realm").text(realm).endTag(NAMESPACE, "realm");
+      }
+      serializer.endTag(NAMESPACE, "realms");
+    }
+    if (securityConfiguration.getHashIterations() != 0) {
+      serializer.startTag(NAMESPACE, "hashIterations").text(String.valueOf(securityConfiguration.getHashIterations()))
+          .endTag(NAMESPACE, "hashIterations");
+    }
+    serializer.endTag(NAMESPACE, tagName);
+  } //-- void writeSecurityConfiguration( SecurityConfiguration, String, XmlSerializer )
 
 }
