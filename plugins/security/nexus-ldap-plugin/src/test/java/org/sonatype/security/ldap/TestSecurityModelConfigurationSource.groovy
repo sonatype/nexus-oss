@@ -13,7 +13,6 @@
 package org.sonatype.security.ldap
 
 import org.sonatype.configuration.ConfigurationException
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.model.source.SecurityModelConfigurationSource
 
@@ -28,11 +27,6 @@ implements SecurityModelConfigurationSource
 
   TestSecurityModelConfigurationSource(final Configuration config) {
     this.config = config;
-  }
-
-  @Override
-  ValidationResponse getValidationResponse() {
-    return null
   }
 
   @Override
@@ -56,23 +50,9 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  InputStream getConfigurationAsStream() throws IOException {
-    throw new UnsupportedOperationException()
-  }
-
-  @Override
   void backupConfiguration() throws IOException {
     throw new UnsupportedOperationException()
   }
 
-  @Override
-  boolean isConfigurationUpgraded() {
-    return false
-  }
-
-  @Override
-  boolean isConfigurationDefaulted() {
-    return false
-  }
 }
 

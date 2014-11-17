@@ -137,16 +137,10 @@ public class FileModelConfigurationSource
     return new BufferedInputStream(new FileInputStream(getConfigurationFile()));
   }
 
-  @Override
-  public SecurityModelConfigurationSource getDefaultsSource() {
-    return securityDefaults;
-  }
-
   /**
    * Load configuration.
    *
    * @param file the file
-   * @return the configuration
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private void loadConfiguration(File file)

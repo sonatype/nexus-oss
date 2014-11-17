@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.model.source
 
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
 import org.sonatype.security.model.Configuration
@@ -83,11 +82,6 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  ValidationResponse getValidationResponse() {
-    return null
-  }
-
-  @Override
   void storeConfiguration() {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
   }
@@ -108,23 +102,8 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  InputStream getConfigurationAsStream() {
-    throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
   void backupConfiguration() {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
-  boolean isConfigurationUpgraded() {
-    return false
-  }
-
-  @Override
-  boolean isConfigurationDefaulted() {
-    return false
   }
 
 }

@@ -60,8 +60,6 @@ public abstract class AbstractSecurityModelConfigurationSource
   /**
    * Load configuration.
    *
-   * @param file the file
-   * @return the configuration
    * @throws IOException Signals that an I/O exception has occurred.
    */
   protected void loadConfiguration(InputStream is)
@@ -99,13 +97,6 @@ public abstract class AbstractSecurityModelConfigurationSource
     if (getConfiguration() != null) {
       getLogger().debug("Configuration loaded succesfully.");
     }
-  }
-
-  /**
-   * Returns the default source of ConfigurationSource. May be null.
-   */
-  public SecurityModelConfigurationSource getDefaultsSource() {
-    return null;
   }
 
 }
