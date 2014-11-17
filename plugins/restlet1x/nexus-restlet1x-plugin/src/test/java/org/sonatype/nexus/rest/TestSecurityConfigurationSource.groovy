@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.rest
 
-import org.sonatype.configuration.ConfigurationException
 import org.sonatype.security.configuration.model.SecurityConfiguration
 import org.sonatype.security.configuration.source.SecurityConfigurationSource
 
@@ -30,7 +29,7 @@ implements SecurityConfigurationSource
   }
 
   @Override
-  void storeConfiguration() throws IOException {
+  void storeConfiguration() {
     // do nothing
   }
 
@@ -45,7 +44,7 @@ implements SecurityConfigurationSource
   }
 
   @Override
-  SecurityConfiguration loadConfiguration() throws ConfigurationException, IOException {
+  SecurityConfiguration loadConfiguration() {
     return getConfiguration()
   }
 

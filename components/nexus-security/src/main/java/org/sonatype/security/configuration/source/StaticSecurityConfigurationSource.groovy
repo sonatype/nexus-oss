@@ -41,7 +41,7 @@ implements SecurityConfigurationSource
   }
 
   @Override
-  void storeConfiguration() throws IOException {
+  void storeConfiguration() {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
   }
 

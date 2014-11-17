@@ -12,9 +12,6 @@
  */
 package org.sonatype.security.configuration.source;
 
-import java.io.IOException;
-
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
@@ -30,8 +27,7 @@ public interface SecurityConfigurationSource
   /**
    * Persists the current configuration.
    */
-  void storeConfiguration()
-      throws IOException;
+  void storeConfiguration();
 
   /**
    * Gets the current configuration.
@@ -47,7 +43,6 @@ public interface SecurityConfigurationSource
    *
    * @return the configuration
    */
-  SecurityConfiguration loadConfiguration()
-      throws ConfigurationException, IOException;
+  SecurityConfiguration loadConfiguration();
 
 }
