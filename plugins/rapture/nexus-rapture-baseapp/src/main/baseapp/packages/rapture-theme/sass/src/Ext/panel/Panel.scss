@@ -22,9 +22,6 @@
   .x-toolbar {
     background-color: $color-white;
   }
-  .x-toolbar-footer {
-    padding: 6px 0 6px 0;
-  }
 }
 
 /**
@@ -33,8 +30,14 @@
 @include extjs-panel-ui(
   $ui: 'inset',
 
-  $ui-padding: 0 0 0 10px
+  $ui-padding: 0 0 0 20px
 );
+
+.x-panel-inset {
+  .x-toolbar {
+    padding: 6px 0 6px 0;
+  }
+}
 
 /**
  * ui: 'feature-menu'
