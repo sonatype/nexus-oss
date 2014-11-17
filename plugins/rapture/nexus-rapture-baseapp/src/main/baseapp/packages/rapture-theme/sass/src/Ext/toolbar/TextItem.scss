@@ -35,5 +35,21 @@
 .feature-description {
   font-size: $font-size-body;
   font-weight: $font-weight-body;
-  top: 21px !important;
+  top: 15px !important;
+}
+
+/**
+ * cls: 'breadcrumb-separator'
+ */
+.breadcrumb-separator {
+  font-size: $font-size-h4;
+  top: 15px !important;
+}
+
+/**
+ * cls: 'breadcrumb-icon'
+ */
+.breadcrumb-icon {
+  top: 13px !important;
+  margin-left: 11px;
 }

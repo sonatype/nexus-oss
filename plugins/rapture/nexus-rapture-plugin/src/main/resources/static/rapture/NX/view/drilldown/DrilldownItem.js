@@ -10,24 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+/*global Ext*/
 
 /**
- * Search result details panel.
+ * A single panel in a drilldown series
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.search.SearchResultDetails', {
-  extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-coreui-search-result-details',
-  requires: [
-    'NX.Icons'
-  ],
 
-  layout: {
-    type: 'hbox',
-    align: 'stretch'
-  },
+Ext.define('NX.view.drilldown.DrilldownItem', {
+  extend: 'Ext.panel.Panel',
+  alias: 'widget.nx-drilldown-item',
+
+  itemName: 'item',
+  itemClass: null,
 
   /**
    * @override
@@ -35,19 +31,14 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
   initComponent: function () {
     var me = this;
 
-    me.items = [
-      {
-        xtype: 'nx-info',
-        itemId: 'mainInfo',
-        flex: 1
-      },
-      {
-        xtype: 'nx-info',
-        itemId: 'secondaryInfo',
-        flex: 1
-      }
-    ];
+    me.setItemName = function(text) {
+      this.itemName = text;
+    }
 
-    me.callParent();
+    me.setItemClass = function(cls) {
+      this.itemClass = cls;
+    }
+
+    me.callParent(arguments);
   }
 });
