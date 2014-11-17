@@ -66,7 +66,7 @@ public class DefaultSecurityConfigurationSource
   private SecurityConfiguration configuration;
 
   @Inject
-  public DefaultSecurityConfigurationSource(final @Named("config") Provider<DatabaseInstance> databaseInstance,
+  public DefaultSecurityConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
                                             final @Named("static") SecurityConfigurationSource securityDefaults,
                                             final SecurityConfigurationEntityAdapter entityAdapter)
   {
