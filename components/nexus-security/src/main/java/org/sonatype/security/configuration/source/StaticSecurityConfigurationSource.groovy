@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.configuration.source
 
-import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.security.configuration.model.SecurityConfiguration
 
 import javax.inject.Named
@@ -42,11 +41,6 @@ implements SecurityConfigurationSource
   }
 
   @Override
-  ValidationResponse getValidationResponse() {
-    return null
-  }
-
-  @Override
   void storeConfiguration() throws IOException {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
   }
@@ -64,21 +58,6 @@ implements SecurityConfigurationSource
   @Override
   SecurityConfiguration loadConfiguration() {
     return getConfiguration()
-  }
-
-  @Override
-  InputStream getConfigurationAsStream() {
-    throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
-  boolean isConfigurationUpgraded() {
-    return false
-  }
-
-  @Override
-  boolean isConfigurationDefaulted() {
-    return false
   }
 
 }

@@ -133,10 +133,6 @@ public class FileSecurityConfigurationSource
     return new FileInputStream(getConfigurationFile());
   }
 
-  public SecurityConfigurationSource getDefaultsSource() {
-    return securityDefaults;
-  }
-
   /**
    * Load configuration.
    */
