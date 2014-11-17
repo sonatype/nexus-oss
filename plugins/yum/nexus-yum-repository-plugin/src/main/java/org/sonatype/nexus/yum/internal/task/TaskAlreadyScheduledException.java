@@ -14,7 +14,7 @@ package org.sonatype.nexus.yum.internal.task;
 
 import java.util.concurrent.RejectedExecutionException;
 
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
  * @since yum 3.0
@@ -25,14 +25,14 @@ public class TaskAlreadyScheduledException
 
   private static final long serialVersionUID = 1L;
 
-  private final ScheduledTask<?> original;
+  private final TaskInfo<?> original;
 
-  public TaskAlreadyScheduledException(ScheduledTask<?> original, String message) {
+  public TaskAlreadyScheduledException(TaskInfo<?> original, String message) {
     super(message);
     this.original = original;
   }
 
-  public ScheduledTask<?> getOriginal() {
+  public TaskInfo<?> getOriginal() {
     return original;
   }
 }

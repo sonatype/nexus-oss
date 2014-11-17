@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,9 +33,10 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.RepositoryTaskConfiguration;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.MetadataProcessor;
@@ -54,17 +54,15 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 /**
  * @since yum 3.0
  */
-@Named(MergeMetadataTask.ID)
+@Named
 public class MergeMetadataTask
     extends RepositoryTaskSupport<YumRepository>
 {
-  public static final String ID = "MergeMetadataTask";
-
-  private GroupRepository groupRepository;
-
   private final YumRegistry yumRegistry;
 
   private final CommandLineExecutor commandLineExecutor;
+
+  private GroupRepository groupRepository;
 
   @Inject
   public MergeMetadataTask(final YumRegistry yumRegistry,
@@ -74,14 +72,11 @@ public class MergeMetadataTask
     this.commandLineExecutor = checkNotNull(commandLineExecutor);
   }
 
-  public void setGroupRepository(final GroupRepository groupRepository) {
-    this.groupRepository = groupRepository;
-  }
-
   @Override
   protected YumRepository execute()
       throws Exception
   {
+    groupRepository = getRepositoryRegistry().getRepositoryWithFacet(getConfiguration().getRepositoryId(), GroupRepository.class);
     if (isValidRepository()) {
       deleteYumTempDirs();
 
@@ -178,11 +173,7 @@ public class MergeMetadataTask
 
   @Override
   protected String getMessage() {
-    return format("Merging Yum metadata in repository '%s'", groupRepository.getId());
-  }
-
-  public GroupRepository getGroupRepository() {
-    return groupRepository;
+    return format("Merging Yum metadata in repository '%s'", getConfiguration().getRepositoryId());
   }
 
   private boolean isValidRepository() {
@@ -203,13 +194,11 @@ public class MergeMetadataTask
     );
   }
 
-  public static Future<YumRepository> createTaskFor(final NexusTaskScheduler nexusScheduler,
-                                                    final GroupRepository groupRepository)
+  public static TaskInfo<YumRepository> createTaskFor(final NexusTaskScheduler nexusScheduler,
+                                                      final GroupRepository groupRepository)
   {
-    final MergeMetadataTask task = nexusScheduler.createTaskInstance(
-        MergeMetadataTask.class
-    );
-    task.setGroupRepository(groupRepository);
+    TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(MergeMetadataTask.class);
+    task.setRepositoryId(groupRepository.getId());
     return nexusScheduler.submit(task);
   }
 

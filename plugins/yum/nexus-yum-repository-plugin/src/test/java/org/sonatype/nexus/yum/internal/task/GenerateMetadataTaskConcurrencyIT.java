@@ -13,11 +13,11 @@
 package org.sonatype.nexus.yum.internal.task;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -32,16 +32,17 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.code.tempusfugit.temporal.Condition;
+import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +56,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
 public class GenerateMetadataTaskConcurrencyIT
     extends YumNexusTestSupport
@@ -72,7 +72,7 @@ public class GenerateMetadataTaskConcurrencyIT
   private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
 
   @Inject
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   @Inject
   private RepositoryRegistry repositoryRegistry;
@@ -90,7 +90,7 @@ public class GenerateMetadataTaskConcurrencyIT
     {
       @Override
       public boolean isSatisfied() {
-        return nexusScheduler.getActiveTasks().isEmpty();
+        return nexusScheduler.listsTasks().isEmpty();
       }
     });
   }
@@ -99,10 +99,10 @@ public class GenerateMetadataTaskConcurrencyIT
   public void shouldExecuteSeveralThreadInParallel()
       throws Exception
   {
-    List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
+    List<TaskInfo<?>> futures = Lists.newArrayList();
 
     for (int repositoryId = 0; repositoryId < PARALLEL_THREAD_COUNT; repositoryId++) {
-      futures.add(nexusScheduler.submit(ID, createYumRepositoryTask(repositoryId)));
+      futures.add(nexusScheduler.submit(createYumRepositoryTask(repositoryId).getConfiguration()));
     }
 
     waitFor(futures);
@@ -138,9 +138,9 @@ public class GenerateMetadataTaskConcurrencyIT
     final File rpm2 = createDummyRpm(RPM_NAME_2, "2", new File(tmpDir, "rpm2"));
 
     // given executions blocking all thread of the scheduler
-    final List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
+    final List<TaskInfo<?>> futures = Lists.newArrayList();
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
-      futures.add(nexusScheduler.submit("WaitTask", nexusScheduler.createTaskInstance(WaitTask.class)));
+      futures.add(nexusScheduler.submit(nexusScheduler.createTaskConfigurationInstance(WaitTask.class)));
     }
     repositoryRegistry.addRepository(repository);
     final YumHosted yum = (YumHosted) yumRegistry.register(repository);
@@ -149,22 +149,26 @@ public class GenerateMetadataTaskConcurrencyIT
     final String file1 = "rpm1/" + rpm1.getName();
     final String file2 = "rpm2/" + rpm2.getName();
 
-    final ScheduledTask<YumRepository> first = yum.addRpmAndRegenerate(file1);
-    final ScheduledTask<YumRepository> second = yum.addRpmAndRegenerate(file2);
+    final TaskInfo<YumRepository> first = yum.addRpmAndRegenerate(file1);
+    final TaskInfo<YumRepository> second = yum.addRpmAndRegenerate(file2);
     futures.add(first);
     futures.add(second);
 
     waitFor(futures);
     // then
     assertThat(second, is(first));
-    assertThat(((GenerateMetadataTask) first.getTask()).getAddedFiles(), is(file1 + pathSeparator + file2));
+    assertThat(first.getConfiguration().getString(GenerateMetadataTask.PARAM_ADDED_FILES),
+        is(file1 + pathSeparator + file2));
   }
 
-  private void waitFor(List<ScheduledTask<?>> futures)
+  private void waitFor(List<TaskInfo<?>> futures)
       throws ExecutionException, InterruptedException
   {
-    for (ScheduledTask<?> future : futures) {
-      future.get();
+    for (TaskInfo<?> future : futures) {
+      Future<?> f = future.getCurrentState().getFuture();
+      if (f != null) {
+        f.get();
+      }
     }
   }
 
@@ -172,8 +176,6 @@ public class GenerateMetadataTaskConcurrencyIT
       throws Exception
   {
     final GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        mock(RepositoryRegistry.class),
         yumRegistry,
         mock(RpmScanner.class),
         mock(Manager.class),
@@ -181,7 +183,7 @@ public class GenerateMetadataTaskConcurrencyIT
     )
     {
       @Override
-      protected YumRepository doRun()
+      protected YumRepository execute()
           throws Exception
       {
         String threadName = Thread.currentThread().getName();
@@ -193,6 +195,8 @@ public class GenerateMetadataTaskConcurrencyIT
         return null;
       }
     };
+    final TaskConfiguration taskCfg = nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class);
+    task.getConfiguration().getMap().putAll(taskCfg.getMap());
     task.setRepositoryId("REPO_" + repositoryId);
     return task;
   }

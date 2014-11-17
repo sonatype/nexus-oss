@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,11 +27,11 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.TaskSupport;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
@@ -40,8 +42,6 @@ import org.sonatype.nexus.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.yum.internal.RpmListWriter;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.lang.StringUtils;
@@ -54,29 +54,22 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
-import static org.sonatype.scheduling.TaskState.RUNNING;
-import static org.sonatype.scheduling.TaskState.SLEEPING;
-import static org.sonatype.scheduling.TaskState.SUBMITTED;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
  *
  * @since yum 3.0
  */
-@Named(GenerateMetadataTask.ID)
+@Named
 public class GenerateMetadataTask
-    extends TaskSupport<YumRepository>
+    extends RepositoryTaskSupport<YumRepository>
     implements ListFileFactory
 {
-  public static final String ID = "GenerateMetadataTask";
-
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
 
   private static final String CACHE_DIR_PREFIX = ".cache-";
 
   private static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTask.class);
-
-  public static final String PARAM_REPO_ID = "repoId";
 
   public static final String PARAM_RPM_DIR = "rpmDir";
 
@@ -92,8 +85,6 @@ public class GenerateMetadataTask
 
   public static final String PARAM_YUM_GROUPS_DEFINITION_FILE = "yumGroupsDefinitionFile";
 
-  private final RepositoryRegistry repositoryRegistry;
-
   private final RpmScanner scanner;
 
   private final YumRegistry yumRegistry;
@@ -103,19 +94,32 @@ public class GenerateMetadataTask
   private final CommandLineExecutor commandLineExecutor;
 
   @Inject
-  public GenerateMetadataTask(final RepositoryRegistry repositoryRegistry,
-                              final YumRegistry yumRegistry,
+  public GenerateMetadataTask(final YumRegistry yumRegistry,
                               final RpmScanner scanner,
                               final Manager routingManager,
                               final CommandLineExecutor commandLineExecutor)
   {
     this.yumRegistry = checkNotNull(yumRegistry);
     this.scanner = checkNotNull(scanner);
-    this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.routingManager = checkNotNull(routingManager);
     this.commandLineExecutor = checkNotNull(commandLineExecutor);
 
-    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
+    getConfiguration().getMap().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
+  }
+
+  @Override
+  public boolean isBlocked(List<TaskInfo<?>> taskInfos) {
+    if (super.isBlocked(taskInfos)) {
+      for (TaskInfo<?> taskInfo : taskInfos) {
+        if (Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION),
+            getConfiguration().getString(
+                GenerateMetadataTask.PARAM_VERSION))) {
+          // type + repoId + version equal, it does block us
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
@@ -188,23 +192,18 @@ public class GenerateMetadataTask
     if (isBlank(getRpmDir()) && repository != null) {
       setRpmDir(RepositoryUtils.getBaseDir(repository).getAbsolutePath());
     }
-    if (isBlank(getParameter(PARAM_REPO_DIR)) && isNotBlank(getRpmDir())) {
+    if (isBlank(getConfiguration().getString(PARAM_REPO_DIR)) && isNotBlank(getRpmDir())) {
       setRepoDir(new File(getRpmDir()));
     }
   }
 
   private Repository findRepository() {
     try {
-      return repositoryRegistry.getRepository(getRepositoryId());
+      return getRepositoryRegistry().getRepository(getRepositoryId());
     }
     catch (NoSuchRepositoryException e) {
       return null;
     }
-  }
-
-  @Override
-  protected String getAction() {
-    return "GENERATE_YUM_METADATA";
   }
 
   @Override
@@ -215,8 +214,8 @@ public class GenerateMetadataTask
   private void regenerateMetadataForGroups() {
     if (StringUtils.isBlank(getVersion())) {
       try {
-        final Repository repository = repositoryRegistry.getRepository(getRepositoryId());
-        for (GroupRepository groupRepository : repositoryRegistry.getGroupsOfRepository(repository)) {
+        final Repository repository = getRepositoryRegistry().getRepository(getRepositoryId());
+        for (GroupRepository groupRepository : getRepositoryRegistry().getGroupsOfRepository(repository)) {
           Yum yum = yumRegistry.get(groupRepository.getId());
           if (yum != null && yum instanceof YumGroup) {
             ((YumGroup) yum).markDirty();
@@ -315,62 +314,62 @@ public class GenerateMetadataTask
   }
 
   public String getRepositoryId() {
-    return getParameter(PARAM_REPO_ID);
+    return getConfiguration().getRepositoryId();
   }
 
   public void setRepositoryId(String repositoryId) {
-    getParameters().put(PARAM_REPO_ID, repositoryId);
+    getConfiguration().setRepositoryId(repositoryId);
   }
 
   public String getAddedFiles() {
-    return getParameter(PARAM_ADDED_FILES);
+    return getConfiguration().getString(PARAM_ADDED_FILES);
   }
 
   public void setAddedFiles(String addedFiles) {
-    getParameters().put(PARAM_ADDED_FILES, addedFiles);
+    getConfiguration().getMap().put(PARAM_ADDED_FILES, addedFiles);
   }
 
   public File getRepoDir() {
-    return new File(getParameter(PARAM_REPO_DIR));
+    return new File(getConfiguration().getString(PARAM_REPO_DIR));
   }
 
   public void setRepoDir(File repoDir) {
-    getParameters().put(PARAM_REPO_DIR, repoDir.getAbsolutePath());
+    getConfiguration().getMap().put(PARAM_REPO_DIR, repoDir.getAbsolutePath());
   }
 
   public String getRpmDir() {
-    return getParameter(PARAM_RPM_DIR);
+    return getConfiguration().getString(PARAM_RPM_DIR);
   }
 
   public void setRpmDir(String rpmDir) {
-    getParameters().put(PARAM_RPM_DIR, rpmDir);
+    getConfiguration().getMap().put(PARAM_RPM_DIR, rpmDir);
   }
 
   public String getVersion() {
-    return getParameter(PARAM_VERSION);
+    return getConfiguration().getString(PARAM_VERSION);
   }
 
   public void setVersion(String version) {
-    getParameters().put(PARAM_VERSION, version);
+    getConfiguration().getMap().put(PARAM_VERSION, version);
   }
 
   public String getYumGroupsDefinitionFile() {
-    return getParameter(PARAM_YUM_GROUPS_DEFINITION_FILE);
+    return getConfiguration().getString(PARAM_YUM_GROUPS_DEFINITION_FILE);
   }
 
   public void setYumGroupsDefinitionFile(String file) {
-    getParameters().put(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
+    getConfiguration().getMap().put(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
   }
 
   public boolean isSingleRpmPerDirectory() {
-    return Boolean.valueOf(getParameter(PARAM_SINGLE_RPM_PER_DIR));
+    return getConfiguration().getBoolean(PARAM_SINGLE_RPM_PER_DIR, false);
   }
 
   public boolean shouldForceFullScan() {
-    return Boolean.valueOf(getParameter(PARAM_FORCE_FULL_SCAN));
+    return getConfiguration().getBoolean(PARAM_FORCE_FULL_SCAN, false);
   }
 
   public void setSingleRpmPerDirectory(boolean singleRpmPerDirectory) {
-    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(singleRpmPerDirectory));
+    getConfiguration().setBoolean(PARAM_SINGLE_RPM_PER_DIR, singleRpmPerDirectory);
   }
 }

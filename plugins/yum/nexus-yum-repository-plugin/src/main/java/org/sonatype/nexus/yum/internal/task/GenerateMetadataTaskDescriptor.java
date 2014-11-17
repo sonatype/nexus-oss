@@ -25,28 +25,28 @@ import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_FORCE_FULL_SCAN;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_ID;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_SINGLE_RPM_PER_DIR;
 
 /**
  * @since yum 3.0
  */
-@Named(GenerateMetadataTask.ID)
+@Named
 @Singleton
 public class GenerateMetadataTaskDescriptor
-    extends TaskDescriptorSupport
+    extends TaskDescriptorSupport<GenerateMetadataTask>
 {
 
   public static final String NAME = "Yum: Generate Metadata";
 
   private final FormField repoField = new RepositoryCombobox(
-      PARAM_REPO_ID,
+      TaskConfiguration.REPOSITORY_ID_KEY,
       "Repository for createrepo",
       "Maven Repository for which the yum metadata is generated via createrepo.",
       MANDATORY
@@ -74,19 +74,14 @@ public class GenerateMetadataTaskDescriptor
       OPTIONAL
   ).withInitialValue(false);
 
-  @Override
-  public String getId() {
-    return GenerateMetadataTask.ID;
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
+  public GenerateMetadataTaskDescriptor()
+  {
+    super(GenerateMetadataTask.class, NAME);
   }
 
   @Override
   public List<FormField> formFields() {
-    return Arrays.<FormField>asList(repoField, outputField, singleRpmPerDir, forceFullScan);
+    return Arrays.asList(repoField, outputField, singleRpmPerDir, forceFullScan);
   }
 
 }

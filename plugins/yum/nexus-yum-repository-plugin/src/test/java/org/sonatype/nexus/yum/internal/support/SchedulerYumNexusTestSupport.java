@@ -12,25 +12,19 @@
  */
 package org.sonatype.nexus.yum.internal.support;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 import javax.inject.Inject;
 
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 
 import com.google.code.tempusfugit.temporal.Condition;
 import org.junit.After;
-
-import static org.sonatype.scheduling.TaskState.RUNNING;
 
 public abstract class SchedulerYumNexusTestSupport
     extends YumNexusTestSupport
 {
 
   @Inject
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   @After
   public void waitForThreadPool()
@@ -40,15 +34,7 @@ public abstract class SchedulerYumNexusTestSupport
     {
       @Override
       public boolean isSatisfied() {
-        int running = 0;
-        for (Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet()) {
-          for (ScheduledTask<?> task : entry.getValue()) {
-            if (RUNNING.equals(task.getTaskState())) {
-              running++;
-            }
-          }
-        }
-        return running == 0;
+        return 0 == nexusScheduler.getRunningTaskCount();
       }
     });
   }

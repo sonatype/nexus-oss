@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 
@@ -53,8 +52,6 @@ public class YumRegistryImpl
 
   private final NexusConfiguration nexusConfiguration;
 
-  private final NexusScheduler nexusScheduler;
-
   private final YumFactory yumFactory;
 
   private int maxNumberOfParallelThreads;
@@ -65,11 +62,9 @@ public class YumRegistryImpl
 
   @Inject
   public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
-                         final NexusScheduler nexusScheduler,
                          final YumFactory yumFactory)
   {
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
-    this.nexusScheduler = checkNotNull(nexusScheduler);
     this.yumFactory = checkNotNull(yumFactory);
     this.maxNumberOfParallelThreads = DEFAULT_MAX_NUMBER_PARALLEL_THREADS;
   }
