@@ -30,11 +30,9 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
-import org.sonatype.security.configuration.upgrade.SecurityConfigurationUpgrader;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,11 +55,6 @@ public class FileSecurityConfigurationSource
   private File configurationFile;
 
   /**
-   * The configuration upgrader.
-   */
-  private SecurityConfigurationUpgrader configurationUpgrader;
-
-  /**
    * The defaults configuration source.
    */
   private final SecurityConfigurationSource securityDefaults;
@@ -77,13 +70,11 @@ public class FileSecurityConfigurationSource
   public FileSecurityConfigurationSource(@Named("static") SecurityConfigurationSource securityDefaults,
                                          @Named("${application-conf}/security-configuration.xml")
                                          File configurationFile,
-                                         PasswordHelper passwordHelper,
-                                         SecurityConfigurationUpgrader configurationUpgrader)
+                                         PasswordHelper passwordHelper)
   {
     this.securityDefaults = securityDefaults;
     this.configurationFile = configurationFile;
     this.passwordHelper = passwordHelper;
-    this.configurationUpgrader = configurationUpgrader;
   }
 
   /**
@@ -124,8 +115,6 @@ public class FileSecurityConfigurationSource
 
     // check for loaded model
     if (getConfiguration() == null) {
-      upgradeConfiguration(getConfigurationFile());
-
       loadConfiguration(getConfigurationFile());
     }
 
@@ -146,47 +135,6 @@ public class FileSecurityConfigurationSource
 
   public SecurityConfigurationSource getDefaultsSource() {
     return securityDefaults;
-  }
-
-  protected void upgradeConfiguration(File file)
-      throws IOException,
-             ConfigurationException
-  {
-    this.getLogger().info("Trying to upgrade the security configuration file {}", file.getAbsolutePath());
-
-    setConfiguration(configurationUpgrader.loadOldConfiguration(file));
-
-    // after all we should have a configuration
-    if (getConfiguration() == null) {
-      throw new ConfigurationException("Could not upgrade Security configuration! Please replace the "
-          + file.getAbsolutePath() + " file with a valid Security configuration file.");
-    }
-
-    // Need to decrypt the anonymous user's password
-    SecurityConfiguration configuration = this.getConfiguration();
-    if (StringUtils.isNotEmpty(configuration.getAnonymousPassword())) {
-      String encryptedPassword = configuration.getAnonymousPassword();
-      try {
-        configuration.setAnonymousPassword(this.passwordHelper.decrypt(encryptedPassword));
-      }
-      catch (Exception e) {
-        this.getLogger().error(
-            "Failed to decrypt anonymous user's password in security-configuration.xml, password might be encrypted in memory.",
-            e);
-      }
-    }
-
-    this.getLogger().info("Creating backup from the old file and saving the upgraded security configuration.");
-
-    // backup the file
-    File backup = new File(file.getParentFile(), file.getName() + ".bak");
-
-    FileUtils.copyFile(file, backup);
-
-    // set the upgradeInstance to warn the application about this
-    setConfigurationUpgraded(true);
-
-    saveConfiguration(file);
   }
 
   /**
