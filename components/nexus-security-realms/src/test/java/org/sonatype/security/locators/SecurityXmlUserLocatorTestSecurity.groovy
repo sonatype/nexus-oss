@@ -27,6 +27,7 @@ class SecurityXmlUserLocatorTestSecurity
 
   static Configuration securityModel() {
     return new Configuration(
+        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
                 id: 'admin',

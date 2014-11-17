@@ -38,7 +38,7 @@ public abstract class SecurityTestSupport
         @Override
         protected void configure() {
           bind(SecurityConfigurationSource.class)
-              .annotatedWith(Names.named("file"))
+              .annotatedWith(Names.named("static"))
               .toInstance(new TestSecurityConfigurationSource(securityConfig));
         }
       });
@@ -50,7 +50,7 @@ public abstract class SecurityTestSupport
         @Override
         protected void configure() {
           bind(SecurityModelConfigurationSource.class)
-              .annotatedWith(Names.named("file"))
+              .annotatedWith(Names.named("static"))
               .toInstance(new TestSecurityModelConfigurationSource(securityModelConfig));
         }
       });

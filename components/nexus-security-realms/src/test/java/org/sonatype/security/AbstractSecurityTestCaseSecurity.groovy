@@ -25,6 +25,7 @@ class AbstractSecurityTestCaseSecurity
 
   static SecurityConfiguration security() {
     return new SecurityConfiguration(
+        version: SecurityConfiguration.MODEL_VERSION,
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [
@@ -36,6 +37,7 @@ class AbstractSecurityTestCaseSecurity
 
   static Configuration securityModel() {
     return new Configuration(
+        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
                 id: 'admin',

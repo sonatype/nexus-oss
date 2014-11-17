@@ -12,6 +12,9 @@
  */
 package org.sonatype.security;
 
+import java.io.File;
+import java.util.Properties;
+
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
@@ -22,6 +25,7 @@ import org.sonatype.security.usermanagement.UserManager;
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.sisu.launch.InjectedTestCase;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -29,14 +33,25 @@ public abstract class AbstractSecurityTestCase
     extends InjectedTestCase
 {
 
+  protected File PLEXUS_HOME = new File("./target/plexus_home");
+
+  protected File CONFIG_DIR = new File(PLEXUS_HOME, "etc");
+
+  @Override
+  public void configure(Properties properties) {
+    properties.put("application-conf", CONFIG_DIR.getAbsolutePath());
+    properties.put("security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml");
+    super.configure(properties);
+  }
+
   @Override
   public void configure(final Binder binder) {
     binder.install(new SecurityModule());
     binder.bind(SecurityConfigurationSource.class)
-        .annotatedWith(Names.named("file"))
+        .annotatedWith(Names.named("static"))
         .toInstance(new TestSecurityConfigurationSource(getSecurityConfig()));
     binder.bind(SecurityModelConfigurationSource.class)
-        .annotatedWith(Names.named("file"))
+        .annotatedWith(Names.named("static"))
         .toInstance(new TestSecurityModelConfigurationSource(getSecurityModelConfig()));
   }
 
@@ -57,7 +72,9 @@ public abstract class AbstractSecurityTestCase
   protected void setUp()
       throws Exception
   {
+    FileUtils.deleteDirectory(PLEXUS_HOME);
     super.setUp();
+    CONFIG_DIR.mkdirs();
     lookup(SecuritySystem.class).start();
   }
 

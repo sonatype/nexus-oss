@@ -22,6 +22,7 @@ class ProtectedRepositoryRegistryITSecurity
 
   static SecurityConfiguration security() {
     return new SecurityConfiguration(
+        version: SecurityConfiguration.MODEL_VERSION,
         anonymousAccessEnabled: true,
         anonymousUsername: 'anonymous',
         anonymousPassword: 'anonymous',

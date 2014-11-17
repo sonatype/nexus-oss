@@ -13,9 +13,6 @@
 package org.sonatype.security.ldap
 
 import org.sonatype.security.configuration.model.SecurityConfiguration
-import org.sonatype.security.model.CUser
-import org.sonatype.security.model.CUserRoleMapping
-import org.sonatype.security.model.Configuration
 
 /**
  * @since 3.0
@@ -25,6 +22,7 @@ class SecurityTestSupportSecurity
 
   static SecurityConfiguration securityWithLdapRealm() {
     return new SecurityConfiguration(
+        version: SecurityConfiguration.MODEL_VERSION,
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [
