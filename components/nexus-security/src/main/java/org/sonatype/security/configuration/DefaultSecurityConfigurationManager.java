@@ -48,7 +48,7 @@ public class DefaultSecurityConfigurationManager
   private ReentrantLock lock = new ReentrantLock();
 
   @Inject
-  public DefaultSecurityConfigurationManager(@Named("file") SecurityConfigurationSource configurationSource,
+  public DefaultSecurityConfigurationManager(SecurityConfigurationSource configurationSource,
                                              SecurityConfigurationValidator validator)
   {
     this.configurationSource = configurationSource;
