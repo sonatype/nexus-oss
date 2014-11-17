@@ -22,7 +22,6 @@ class SecurityTestSupportSecurity
 
   static SecurityConfiguration securityWithLdapRealm() {
     return new SecurityConfiguration(
-        version: SecurityConfiguration.MODEL_VERSION,
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [

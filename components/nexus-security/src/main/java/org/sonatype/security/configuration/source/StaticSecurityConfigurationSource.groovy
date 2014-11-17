@@ -32,7 +32,6 @@ implements SecurityConfigurationSource
 
   StaticSecurityConfigurationSource() {
     config = new SecurityConfiguration(
-        version: SecurityConfiguration.MODEL_VERSION,
         anonymousAccessEnabled: true,
         anonymousUsername: 'anonymous',
         anonymousPassword: 'anonymous',
