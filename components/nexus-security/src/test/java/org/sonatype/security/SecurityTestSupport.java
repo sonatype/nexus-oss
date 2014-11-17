@@ -27,7 +27,7 @@ public abstract class SecurityTestSupport
   public void configure(final Binder binder) {
     binder.install(new SecurityModule());
     binder.bind(SecurityConfigurationSource.class)
-        .annotatedWith(Names.named("static"))
+        .annotatedWith(Names.named("default"))
         .toInstance(new TestSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
   }
 

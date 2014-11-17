@@ -76,7 +76,7 @@ public class ProtectedRepositoryRegistryIT
         binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
 
         binder.bind(SecurityConfigurationSource.class)
-            .annotatedWith(Names.named("static"))
+            .annotatedWith(Names.named("default"))
             .toInstance(new TestSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
       }
     });
