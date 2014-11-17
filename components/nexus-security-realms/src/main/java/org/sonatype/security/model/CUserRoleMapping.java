@@ -8,150 +8,127 @@ package org.sonatype.security.model;
 /**
  * Defines the mapping between users and roles, if LDAP groups are
  * not used.
- * 
+ *
  * @version $Revision$ $Date$
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public class CUserRoleMapping
     implements java.io.Serializable, java.lang.Cloneable
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
 
-    /**
-     * User ID.  The id of the user.
-     */
-    private String userId;
+  /**
+   * User ID.  The id of the user.
+   */
+  private String userId;
 
-    /**
-     * The source or realm id, of the user.  For example an CROWD
-     * realm might have a source id of CROWD.
-     */
-    private String source;
+  /**
+   * The source or realm id, of the user.  For example an CROWD
+   * realm might have a source id of CROWD.
+   */
+  private String source;
 
-    /**
-     * Field roles.
-     */
-    private java.util.List<String> roles;
+  /**
+   * Field roles.
+   */
+  private java.util.List<String> roles;
 
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+  //-----------/
+  //- Methods -/
+  //-----------/
 
-    /**
-     * Method addRole.
-     * 
-     * @param string
-     */
-    public void addRole( String string )
-    {
-        getRoles().add( string );
-    } //-- void addRole( String )
+  /**
+   * Method addRole.
+   */
+  public void addRole(String string) {
+    getRoles().add(string);
+  } //-- void addRole( String )
 
-    /**
-     * Method clone.
-     * 
-     * @return CUserRoleMapping
-     */
-    public CUserRoleMapping clone()
-    {
-        try
-        {
-            CUserRoleMapping copy = (CUserRoleMapping) super.clone();
+  /**
+   * Method clone.
+   *
+   * @return CUserRoleMapping
+   */
+  public CUserRoleMapping clone() {
+    try {
+      CUserRoleMapping copy = (CUserRoleMapping) super.clone();
 
-            if ( this.roles != null )
-            {
-                copy.roles = new java.util.ArrayList<String>();
-                copy.roles.addAll( this.roles );
-            }
+      if (this.roles != null) {
+        copy.roles = new java.util.ArrayList<String>();
+        copy.roles.addAll(this.roles);
+      }
 
-            return copy;
-        }
-        catch ( java.lang.Exception ex )
-        {
-            throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException( getClass().getName()
-                + " does not support clone()" ).initCause( ex );
-        }
-    } //-- CUserRoleMapping clone()
+      return copy;
+    }
+    catch (java.lang.Exception ex) {
+      throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
+          + " does not support clone()").initCause(ex);
+    }
+  } //-- CUserRoleMapping clone()
 
-    /**
-     * Method getRoles.
-     * 
-     * @return List
-     */
-    public java.util.List<String> getRoles()
-    {
-        if ( this.roles == null )
-        {
-            this.roles = new java.util.ArrayList<String>();
-        }
+  /**
+   * Method getRoles.
+   *
+   * @return List
+   */
+  public java.util.List<String> getRoles() {
+    if (this.roles == null) {
+      this.roles = new java.util.ArrayList<String>();
+    }
 
-        return this.roles;
-    } //-- java.util.List<String> getRoles()
+    return this.roles;
+  } //-- java.util.List<String> getRoles()
 
-    /**
-     * Get the source or realm id, of the user.  For example an
-     * CROWD realm might have a source id of CROWD.
-     * 
-     * @return String
-     */
-    public String getSource()
-    {
-        return this.source;
-    } //-- String getSource()
+  /**
+   * Get the source or realm id, of the user.  For example an
+   * CROWD realm might have a source id of CROWD.
+   *
+   * @return String
+   */
+  public String getSource() {
+    return this.source;
+  } //-- String getSource()
 
-    /**
-     * Get user ID.  The id of the user.
-     * 
-     * @return String
-     */
-    public String getUserId()
-    {
-        return this.userId;
-    } //-- String getUserId()
+  /**
+   * Get user ID.  The id of the user.
+   *
+   * @return String
+   */
+  public String getUserId() {
+    return this.userId;
+  } //-- String getUserId()
 
-    /**
-     * Method removeRole.
-     * 
-     * @param string
-     */
-    public void removeRole( String string )
-    {
-        getRoles().remove( string );
-    } //-- void removeRole( String )
+  /**
+   * Method removeRole.
+   */
+  public void removeRole(String string) {
+    getRoles().remove(string);
+  } //-- void removeRole( String )
 
-    /**
-     * Set list of the users roles.
-     * 
-     * @param roles
-     */
-    public void setRoles( java.util.List<String> roles )
-    {
-        this.roles = roles;
-    } //-- void setRoles( java.util.List )
+  /**
+   * Set list of the users roles.
+   */
+  public void setRoles(java.util.List<String> roles) {
+    this.roles = roles;
+  } //-- void setRoles( java.util.List )
 
-    /**
-     * Set the source or realm id, of the user.  For example an
-     * CROWD realm might have a source id of CROWD.
-     * 
-     * @param source
-     */
-    public void setSource( String source )
-    {
-        this.source = source;
-    } //-- void setSource( String )
+  /**
+   * Set the source or realm id, of the user.  For example an
+   * CROWD realm might have a source id of CROWD.
+   */
+  public void setSource(String source) {
+    this.source = source;
+  } //-- void setSource( String )
 
-    /**
-     * Set user ID.  The id of the user.
-     * 
-     * @param userId
-     */
-    public void setUserId( String userId )
-    {
-        this.userId = userId;
-    } //-- void setUserId( String )
+  /**
+   * Set user ID.  The id of the user.
+   */
+  public void setUserId(String userId) {
+    this.userId = userId;
+  } //-- void setUserId( String )
 
 }

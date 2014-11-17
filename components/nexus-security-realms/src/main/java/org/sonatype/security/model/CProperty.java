@@ -7,91 +7,80 @@ package org.sonatype.security.model;
 
 /**
  * A simple key value pair.
- * 
+ *
  * @version $Revision$ $Date$
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public class CProperty
     implements java.io.Serializable, java.lang.Cloneable
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
 
-    /**
-     * Unique key used as identifier.
-     */
-    private String key;
+  /**
+   * Unique key used as identifier.
+   */
+  private String key;
 
-    /**
-     * Value associated to the key.
-     */
-    private String value;
+  /**
+   * Value associated to the key.
+   */
+  private String value;
 
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+  //-----------/
+  //- Methods -/
+  //-----------/
 
-    /**
-     * Method clone.
-     * 
-     * @return CProperty
-     */
-    public CProperty clone()
-    {
-        try
-        {
-            CProperty copy = (CProperty) super.clone();
+  /**
+   * Method clone.
+   *
+   * @return CProperty
+   */
+  public CProperty clone() {
+    try {
+      CProperty copy = (CProperty) super.clone();
 
-            return copy;
-        }
-        catch ( java.lang.Exception ex )
-        {
-            throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException( getClass().getName()
-                + " does not support clone()" ).initCause( ex );
-        }
-    } //-- CProperty clone()
+      return copy;
+    }
+    catch (java.lang.Exception ex) {
+      throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
+          + " does not support clone()").initCause(ex);
+    }
+  } //-- CProperty clone()
 
-    /**
-     * Get unique key used as identifier.
-     * 
-     * @return String
-     */
-    public String getKey()
-    {
-        return this.key;
-    } //-- String getKey()
+  /**
+   * Get unique key used as identifier.
+   *
+   * @return String
+   */
+  public String getKey() {
+    return this.key;
+  } //-- String getKey()
 
-    /**
-     * Get value associated to the key.
-     * 
-     * @return String
-     */
-    public String getValue()
-    {
-        return this.value;
-    } //-- String getValue()
+  /**
+   * Get value associated to the key.
+   *
+   * @return String
+   */
+  public String getValue() {
+    return this.value;
+  } //-- String getValue()
 
-    /**
-     * Set unique key used as identifier.
-     * 
-     * @param key
-     */
-    public void setKey( String key )
-    {
-        this.key = key;
-    } //-- void setKey( String )
+  /**
+   * Set unique key used as identifier.
+   */
+  public void setKey(String key) {
+    this.key = key;
+  } //-- void setKey( String )
 
-    /**
-     * Set value associated to the key.
-     * 
-     * @param value
-     */
-    public void setValue( String value )
-    {
-        this.value = value;
-    } //-- void setValue( String )
+  /**
+   * Set value associated to the key.
+   */
+  public void setValue(String value) {
+    this.value = value;
+  } //-- void setValue( String )
 
 }

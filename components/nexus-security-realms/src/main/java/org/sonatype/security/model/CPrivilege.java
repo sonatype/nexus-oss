@@ -8,226 +8,190 @@ package org.sonatype.security.model;
 /**
  * Base privilege class contains items common to all types of
  * privileges.
- * 
+ *
  * @version $Revision$ $Date$
  */
-@SuppressWarnings( "all" )
+@SuppressWarnings("all")
 public class CPrivilege
     implements java.io.Serializable, java.lang.Cloneable
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
 
-    /**
-     * The ID used to reference this privilege.
-     */
-    private String id;
+  /**
+   * The ID used to reference this privilege.
+   */
+  private String id;
 
-    /**
-     * A descriptive name for the privilege.
-     */
-    private String name;
+  /**
+   * A descriptive name for the privilege.
+   */
+  private String name;
 
-    /**
-     * A description of the privilege.
-     */
-    private String description;
+  /**
+   * A description of the privilege.
+   */
+  private String description;
 
-    /**
-     * The type of privilege.
-     */
-    private String type;
+  /**
+   * The type of privilege.
+   */
+  private String type;
 
-    /**
-     * Field properties.
-     */
-    private java.util.List<CProperty> properties;
+  /**
+   * Field properties.
+   */
+  private java.util.List<CProperty> properties;
 
-    /**
-     * Marks if this privilege is editable.
-     */
-    private boolean readOnly = false;
+  /**
+   * Marks if this privilege is editable.
+   */
+  private boolean readOnly = false;
 
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+  //-----------/
+  //- Methods -/
+  //-----------/
 
-    /**
-     * Method addProperty.
-     * 
-     * @param cProperty
-     */
-    public void addProperty( CProperty cProperty )
-    {
-        getProperties().add( cProperty );
-    } //-- void addProperty( CProperty )
+  /**
+   * Method addProperty.
+   */
+  public void addProperty(CProperty cProperty) {
+    getProperties().add(cProperty);
+  } //-- void addProperty( CProperty )
 
-    /**
-     * Method clone.
-     * 
-     * @return CPrivilege
-     */
-    public CPrivilege clone()
-    {
-        try
-        {
-            CPrivilege copy = (CPrivilege) super.clone();
+  /**
+   * Method clone.
+   *
+   * @return CPrivilege
+   */
+  public CPrivilege clone() {
+    try {
+      CPrivilege copy = (CPrivilege) super.clone();
 
-            if ( this.properties != null )
-            {
-                copy.properties = new java.util.ArrayList<CProperty>();
-                for ( CProperty item : this.properties )
-                {
-                    copy.properties.add( ( (CProperty) item).clone() );
-                }
-            }
-
-            return copy;
+      if (this.properties != null) {
+        copy.properties = new java.util.ArrayList<CProperty>();
+        for (CProperty item : this.properties) {
+          copy.properties.add(((CProperty) item).clone());
         }
-        catch ( java.lang.Exception ex )
-        {
-            throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException( getClass().getName()
-                + " does not support clone()" ).initCause( ex );
-        }
-    } //-- CPrivilege clone()
+      }
 
-    /**
-     * Get a description of the privilege.
-     * 
-     * @return String
-     */
-    public String getDescription()
-    {
-        return this.description;
-    } //-- String getDescription()
+      return copy;
+    }
+    catch (java.lang.Exception ex) {
+      throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
+          + " does not support clone()").initCause(ex);
+    }
+  } //-- CPrivilege clone()
 
-    /**
-     * Get the ID used to reference this privilege.
-     * 
-     * @return String
-     */
-    public String getId()
-    {
-        return this.id;
-    } //-- String getId()
+  /**
+   * Get a description of the privilege.
+   *
+   * @return String
+   */
+  public String getDescription() {
+    return this.description;
+  } //-- String getDescription()
 
-    /**
-     * Get a descriptive name for the privilege.
-     * 
-     * @return String
-     */
-    public String getName()
-    {
-        return this.name;
-    } //-- String getName()
+  /**
+   * Get the ID used to reference this privilege.
+   *
+   * @return String
+   */
+  public String getId() {
+    return this.id;
+  } //-- String getId()
 
-    /**
-     * Method getProperties.
-     * 
-     * @return List
-     */
-    public java.util.List<CProperty> getProperties()
-    {
-        if ( this.properties == null )
-        {
-            this.properties = new java.util.ArrayList<CProperty>();
-        }
+  /**
+   * Get a descriptive name for the privilege.
+   *
+   * @return String
+   */
+  public String getName() {
+    return this.name;
+  } //-- String getName()
 
-        return this.properties;
-    } //-- java.util.List<CProperty> getProperties()
+  /**
+   * Method getProperties.
+   *
+   * @return List
+   */
+  public java.util.List<CProperty> getProperties() {
+    if (this.properties == null) {
+      this.properties = new java.util.ArrayList<CProperty>();
+    }
 
-    /**
-     * Get the type of privilege.
-     * 
-     * @return String
-     */
-    public String getType()
-    {
-        return this.type;
-    } //-- String getType()
+    return this.properties;
+  } //-- java.util.List<CProperty> getProperties()
 
-    /**
-     * Get marks if this privilege is editable.
-     * 
-     * @return boolean
-     */
-    public boolean isReadOnly()
-    {
-        return this.readOnly;
-    } //-- boolean isReadOnly()
+  /**
+   * Get the type of privilege.
+   *
+   * @return String
+   */
+  public String getType() {
+    return this.type;
+  } //-- String getType()
 
-    /**
-     * Method removeProperty.
-     * 
-     * @param cProperty
-     */
-    public void removeProperty( CProperty cProperty )
-    {
-        getProperties().remove( cProperty );
-    } //-- void removeProperty( CProperty )
+  /**
+   * Get marks if this privilege is editable.
+   *
+   * @return boolean
+   */
+  public boolean isReadOnly() {
+    return this.readOnly;
+  } //-- boolean isReadOnly()
 
-    /**
-     * Set a description of the privilege.
-     * 
-     * @param description
-     */
-    public void setDescription( String description )
-    {
-        this.description = description;
-    } //-- void setDescription( String )
+  /**
+   * Method removeProperty.
+   */
+  public void removeProperty(CProperty cProperty) {
+    getProperties().remove(cProperty);
+  } //-- void removeProperty( CProperty )
 
-    /**
-     * Set the ID used to reference this privilege.
-     * 
-     * @param id
-     */
-    public void setId( String id )
-    {
-        this.id = id;
-    } //-- void setId( String )
+  /**
+   * Set a description of the privilege.
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  } //-- void setDescription( String )
 
-    /**
-     * Set a descriptive name for the privilege.
-     * 
-     * @param name
-     */
-    public void setName( String name )
-    {
-        this.name = name;
-    } //-- void setName( String )
+  /**
+   * Set the ID used to reference this privilege.
+   */
+  public void setId(String id) {
+    this.id = id;
+  } //-- void setId( String )
 
-    /**
-     * Set properties assigned to this privilege, used to define a
-     * permission.
-     * 
-     * @param properties
-     */
-    public void setProperties( java.util.List<CProperty> properties )
-    {
-        this.properties = properties;
-    } //-- void setProperties( java.util.List )
+  /**
+   * Set a descriptive name for the privilege.
+   */
+  public void setName(String name) {
+    this.name = name;
+  } //-- void setName( String )
 
-    /**
-     * Set marks if this privilege is editable.
-     * 
-     * @param readOnly
-     */
-    public void setReadOnly( boolean readOnly )
-    {
-        this.readOnly = readOnly;
-    } //-- void setReadOnly( boolean )
+  /**
+   * Set properties assigned to this privilege, used to define a
+   * permission.
+   */
+  public void setProperties(java.util.List<CProperty> properties) {
+    this.properties = properties;
+  } //-- void setProperties( java.util.List )
 
-    /**
-     * Set the type of privilege.
-     * 
-     * @param type
-     */
-    public void setType( String type )
-    {
-        this.type = type;
-    } //-- void setType( String )
+  /**
+   * Set marks if this privilege is editable.
+   */
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
+  } //-- void setReadOnly( boolean )
+
+  /**
+   * Set the type of privilege.
+   */
+  public void setType(String type) {
+    this.type = type;
+  } //-- void setType( String )
 
 }
