@@ -375,11 +375,25 @@ public final class TaskConfiguration
    * Returns string parameter by key or {@code defaultValue} if no such key mapped..
    */
   public String getString(final String key, final String defaultValue) {
+    checkNotNull(key);
     if (getMap().containsKey(key)) {
       return getMap().get(key);
     }
     else {
       return defaultValue;
+    }
+  }
+
+  /**
+   * Sets or clears a string value.
+   */
+  public void setString(final String key, final String value) {
+    checkNotNull(key);
+    if (value == null) {
+      getMap().remove(key);
+    }
+    else {
+      getMap().put(key, value);
     }
   }
 

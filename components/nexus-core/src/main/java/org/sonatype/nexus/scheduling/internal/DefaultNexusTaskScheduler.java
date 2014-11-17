@@ -26,6 +26,7 @@ import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
@@ -195,7 +196,13 @@ public class DefaultNexusTaskScheduler
   @Override
   @Deprecated
   public int getRunningTaskCount() {
-    // TODO: nop, used in UTs only
-    return 0;
+    int running = 0;
+    final List<TaskInfo<?>> tasks = getScheduler().listsTasks();
+    for (TaskInfo<?> task : tasks) {
+      if (State.RUNNING == task.getCurrentState().getState()) {
+        running++;
+      }
+    }
+    return running;
   }
 }

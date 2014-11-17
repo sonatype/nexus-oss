@@ -80,7 +80,5 @@ public interface NexusTaskScheduler
   @Deprecated
   void killAll();
 
-  // TODO: remove, used in UTs only
-  @Deprecated
   int getRunningTaskCount();
 }
