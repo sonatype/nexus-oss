@@ -79,8 +79,6 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
 
-    new SecurityConfigUtil().verifyUser(user);
-
     return user;
   }
 
@@ -121,8 +119,6 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getStatus(), user.getStatus());
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
-
-    new SecurityConfigUtil().verifyUser(user);
 
     return responseResource;
   }
