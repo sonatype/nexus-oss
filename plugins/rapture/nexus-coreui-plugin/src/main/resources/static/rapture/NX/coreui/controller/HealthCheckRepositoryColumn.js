@@ -191,6 +191,22 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
 
   /**
    * @private
+   * Render Health Check button based on corresponding {NX.coreui.model.HealthCheckRepositoryStatus}.
+   * @param el Where the button is rendered
+   * @param val (not used)
+   * @param record (not used)
+   */
+  /*renderHealthCheckButton: function(el, val, record) {
+    var button = Ext.create('Ext.button.Button', {
+      ui: 'plain',
+      disable: val,
+      text: 'Analyze',
+      renderTo: el
+    });
+  },*/
+
+  /**
+   * @private
    * Update Health Check column tooltip based on {NX.coreui.model.HealthCheckRepositoryStatus}.
    * @param {Ext.Tooltip} tip
    * @returns {boolean} true if tooltip should be shown
