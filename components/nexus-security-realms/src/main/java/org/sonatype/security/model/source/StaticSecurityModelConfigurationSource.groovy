@@ -91,11 +91,6 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  void setConfiguration(final Configuration configuration) {
-    throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
   Configuration loadConfiguration() {
     return getConfiguration()
   }

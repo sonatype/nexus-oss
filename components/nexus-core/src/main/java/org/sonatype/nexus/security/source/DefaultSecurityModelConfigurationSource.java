@@ -107,11 +107,6 @@ public class DefaultSecurityModelConfigurationSource
   }
 
   @Override
-  public void setConfiguration(final Configuration configuration) {
-    this.configuration = configuration;
-  }
-
-  @Override
   public Configuration loadConfiguration() {
     try (ODatabaseDocumentTx db = openDb()) {
       List<CUser> users = Lists.newArrayList(userEntityAdapter.getAll(db));

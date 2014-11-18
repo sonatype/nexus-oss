@@ -89,11 +89,6 @@ public class DefaultSecurityConfigurationSource
   }
 
   @Override
-  public void setConfiguration(final SecurityConfiguration configuration) {
-    this.configuration = configuration;
-  }
-
-  @Override
   public SecurityConfiguration loadConfiguration() {
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = get(db);

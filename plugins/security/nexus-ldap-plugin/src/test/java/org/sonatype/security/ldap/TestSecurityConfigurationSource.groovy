@@ -39,11 +39,6 @@ implements SecurityConfigurationSource
   }
 
   @Override
-  void setConfiguration(final SecurityConfiguration configuration) {
-    this.config = configuration
-  }
-
-  @Override
   SecurityConfiguration loadConfiguration() {
     return getConfiguration()
   }

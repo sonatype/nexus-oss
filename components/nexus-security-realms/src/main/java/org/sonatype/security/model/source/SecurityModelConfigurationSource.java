@@ -36,8 +36,6 @@ public interface SecurityModelConfigurationSource
    */
   Configuration getConfiguration();
 
-  void setConfiguration(Configuration configuration);
-
   /**
    * Forces reloading the user configuration.
    *
