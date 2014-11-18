@@ -27,6 +27,7 @@ import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
+import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 import org.apache.maven.index.artifact.Gav;
@@ -492,19 +493,19 @@ public class Nexus537RepoTargetsIT
     for (Iterator<PrivilegeStatusResource> iter = fooPrivs.iterator(); iter.hasNext(); ) {
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-      if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("create,read")) {
         fooPrivCreateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("read")) {
         fooPrivReadId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("update,read")) {
         fooPrivUpdateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("delete,read")) {
         fooPrivDeleteId = privilegeBaseStatusResource.getId();
       }
@@ -512,7 +513,7 @@ public class Nexus537RepoTargetsIT
         Assert.fail("Unknown Privilege found, id: "
             + privilegeBaseStatusResource.getId()
             + " method: "
-            + getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+            + getPrivilegeProperty(privilegeBaseStatusResource,
             ApplicationPrivilegeMethodPropertyDescriptor.ID));
       }
     }
@@ -534,19 +535,19 @@ public class Nexus537RepoTargetsIT
     for (Iterator<PrivilegeStatusResource> iter = barPrivs.iterator(); iter.hasNext(); ) {
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-      if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("create,read")) {
         barPrivCreateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("read")) {
         barPrivReadId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("update,read")) {
         barPrivUpdateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("delete,read")) {
         barPrivDeleteId = privilegeBaseStatusResource.getId();
       }
@@ -554,7 +555,7 @@ public class Nexus537RepoTargetsIT
         Assert.fail("Unknown Privilege found, id: "
             + privilegeBaseStatusResource.getId()
             + " method: "
-            + getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+            + getPrivilegeProperty(privilegeBaseStatusResource,
             ApplicationPrivilegeMethodPropertyDescriptor.ID));
       }
     }
@@ -579,19 +580,19 @@ public class Nexus537RepoTargetsIT
     for (Iterator<PrivilegeStatusResource> iter = groupPrivs.iterator(); iter.hasNext(); ) {
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-      if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("create,read")) {
         groupFooPrivCreateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("read")) {
         groupFooPrivReadId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("update,read")) {
         groupFooPrivUpdateId = privilegeBaseStatusResource.getId();
       }
-      else if (getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+      else if (getPrivilegeProperty(privilegeBaseStatusResource,
           ApplicationPrivilegeMethodPropertyDescriptor.ID).equals("delete,read")) {
         groupFooPrivDeleteId = privilegeBaseStatusResource.getId();
       }
@@ -599,10 +600,20 @@ public class Nexus537RepoTargetsIT
         Assert.fail("Unknown Privilege found, id: "
             + privilegeBaseStatusResource.getId()
             + " method: "
-            + getSecurityConfigUtil().getPrivilegeProperty(privilegeBaseStatusResource,
+            + getPrivilegeProperty(privilegeBaseStatusResource,
             ApplicationPrivilegeMethodPropertyDescriptor.ID));
       }
     }
 
   }
+
+  public String getPrivilegeProperty(PrivilegeStatusResource priv, String key) {
+    for (PrivilegeProperty prop : priv.getProperties()) {
+      if (prop.getKey().equals(key)) {
+        return prop.getValue();
+      }
+    }
+    return null;
+  }
+
 }

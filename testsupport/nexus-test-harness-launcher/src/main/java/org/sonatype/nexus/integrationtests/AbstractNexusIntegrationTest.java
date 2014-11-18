@@ -28,7 +28,6 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
@@ -404,12 +403,6 @@ public abstract class AbstractNexusIntegrationTest
 
   protected NexusConfigUtil getNexusConfigUtil() {
     return nexusConfigUtil;
-  }
-
-  private final SecurityConfigUtil securityConfigUtil = new SecurityConfigUtil();
-
-  protected SecurityConfigUtil getSecurityConfigUtil() {
-    return securityConfigUtil;
   }
 
   private final DeployUtils deployUtils = new DeployUtils();

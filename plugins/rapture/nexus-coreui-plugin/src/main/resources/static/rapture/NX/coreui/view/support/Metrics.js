@@ -21,6 +21,8 @@
 Ext.define('NX.coreui.view.support.Metrics', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-support-metrics',
+  ui: 'inset',
+
   requires: [
     'Ext.chart.Chart',
     'Ext.data.ArrayStore'
@@ -28,8 +30,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
 
   autoScroll: true,
   layout: {
-    type: 'table',
-    columns: 2
+    type: 'vbox'
   },
 
   tbar: [
@@ -50,111 +51,125 @@ Ext.define('NX.coreui.view.support.Metrics', {
     }
   ],
 
-  bodyPadding: 20,
   defaults: {
     style: {
-      margin: '0px 20px 20px 0px'
+      margin: '20px 0px 0px 0px'
     }
   },
 
   items: [
     {
       xtype: 'panel',
-      title: 'Memory Usage',
-      frame: true,
-      height: 240,
-      width: 300,
-      layout: 'fit',
-
+      layout: {
+        type: 'hbox'
+      },
+      defaults: {
+        style: {
+          margin: '0px 20px 0px 0px'
+        }
+      },
       items: [
         {
-          xtype: 'chart',
-          itemId: 'memoryUsage',
+          xtype: 'panel',
+          title: 'Memory Usage',
+          frame: true,
+          ui: 'subsection',
+          height: 240,
+          width: 300,
+          layout: 'fit',
 
-          animate: false,
-          insetPadding: 40,
-
-          store: Ext.create('Ext.data.ArrayStore', {
-            fields: ['value']
-          }),
-
-          axes: [
+          items: [
             {
-              type: 'gauge',
-              position: 'gauge',
-              minimum: 0,
-              maximum: 100,
-              steps: 10
-            }
-          ],
+              xtype: 'chart',
+              itemId: 'memoryUsage',
 
-          series: [
-            {
-              type: 'gauge',
-              field: 'value',
-              donut: 30,
-              colorSet: ['#F49D10', '#ddd'],
+              animate: false,
+              insetPadding: 40,
 
-              tips: {
-                trackMouse: true,
-                renderer: function (storeItem, item) {
-                  this.setTitle('Memory used: ' + storeItem.get('value') + '%');
+              store: Ext.create('Ext.data.ArrayStore', {
+                fields: ['value']
+              }),
+
+              axes: [
+                {
+                  type: 'gauge',
+                  position: 'gauge',
+                  minimum: 0,
+                  maximum: 100,
+                  steps: 10
                 }
+              ],
+
+              series: [
+                {
+                  type: 'gauge',
+                  field: 'value',
+                  donut: 30,
+                  colorSet: ['#F49D10', '#ddd'],
+
+                  tips: {
+                    trackMouse: true,
+                    renderer: function (storeItem, item) {
+                      this.setTitle('Memory used: ' + storeItem.get('value') + '%');
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          xtype: 'panel',
+          title: 'Memory Distribution',
+          frame: true,
+          ui: 'subsection',
+          height: 240,
+          width: 300,
+          layout: 'fit',
+
+          items: [
+            {
+              xtype: 'chart',
+              itemId: 'memoryDist',
+              animate: false,
+              insetPadding: 20,
+              theme: 'Green',
+
+              store: Ext.create('Ext.data.ArrayStore', {
+                fields: ['name', 'data']
+              }),
+
+              series: [
+                {
+                  type: 'pie',
+                  angleField: 'data',
+                  showInLegend: true,
+
+                  tips: {
+                    trackMouse: true,
+                    renderer: function (storeItem, item) {
+                      this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
+                    }
+                  }
+                }
+              ],
+
+              legend: {
+                position: 'right',
+                boxStrokeWidth: 0
               }
             }
           ]
         }
       ]
     },
-
-    {
-      xtype: 'panel',
-      title: 'Memory Distribution',
-      frame: true,
-      height: 240,
-      width: 300,
-      layout: 'fit',
-
-      items: [
-        {
-          xtype: 'chart',
-          itemId: 'memoryDist',
-          animate: false,
-          insetPadding: 20,
-          theme: 'Green',
-
-          store: Ext.create('Ext.data.ArrayStore', {
-            fields: ['name', 'data']
-          }),
-
-          series: [
-            {
-              type: 'pie',
-              angleField: 'data',
-              showInLegend: true,
-
-              tips: {
-                trackMouse: true,
-                renderer: function (storeItem, item) {
-                  this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data') + ' bytes');
-                }
-              }
-            }
-          ],
-
-          legend: {
-            position: 'right'
-          }
-        }
-      ]
-    },
-
     {
       xtype: 'panel',
       title: 'Thread States',
       frame: true,
-      height: 340,
-      width: 420,
+      ui: 'subsection',
+      height: 240,
+      width: 300,
 
       layout: 'fit',
       colspan: 2,
@@ -188,7 +203,8 @@ Ext.define('NX.coreui.view.support.Metrics', {
           ],
 
           legend: {
-            position: 'right'
+            position: 'right',
+            boxStrokeWidth: 0
           }
         }
       ]

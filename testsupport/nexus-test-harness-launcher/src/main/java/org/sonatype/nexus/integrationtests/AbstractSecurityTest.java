@@ -29,8 +29,6 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
@@ -162,17 +160,8 @@ public abstract class AbstractSecurityTest
 
       for (Iterator roleIter = role.getPrivileges().iterator(); roleIter.hasNext(); ) {
         String privId = (String) roleIter.next();
-        // PrivilegeBaseStatusResource priv = this.privUtil.getPrivilegeResource( privId );
-        // privs.add( priv.getName() );
-        CPrivilege priv = getSecurityConfigUtil().getCPrivilege(privId);
-        if (priv != null) {
-          privs.add(priv.getName());
-        }
-        else {
-          PrivilegeStatusResource basePriv = this.privUtil.getPrivilegeResource(privId);
-          privs.add(basePriv.getName());
-        }
-
+        PrivilegeStatusResource basePriv = this.privUtil.getPrivilegeResource(privId);
+        privs.add(basePriv.getName());
       }
     }
     return privs;

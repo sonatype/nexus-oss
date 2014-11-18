@@ -3,6 +3,89 @@
  */
 
 /**
+ * ui: 'drilldown'
+ */
+
+@include extjs-button-toolbar-large-ui(
+  $ui: 'drilldown',
+
+  $padding: 3px 3px 3px 4px,
+  $text-padding: 0,
+
+  $color: $color-navy-blue,
+  $color-over: $color-dark-cerulean,
+  $color-focus: $color-dark-cerulean,
+  $color-pressed: $color-cornflower,
+  $color-disabled: $color-night-rider,
+
+  $font-size: $font-size-h2,
+
+  $background-gradient: transparent,
+  $background-gradient-over: transparent,
+  $background-gradient-focus: transparent,
+  $background-gradient-pressed: transparent,
+  $background-gradient-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: transparent,
+  $background-color-focus: transparent,
+  $background-color-pressed: transparent,
+  $background-color-disabled: transparent,
+
+  $border-width: 0,
+
+  $border-color: transparent,
+  $border-color-over: transparent,
+  $border-color-focus: transparent,
+  $border-color-pressed: transparent,
+  $border-color-disabled: transparent,
+
+  $opacity-disabled: 1,
+  $inner-opacity-disabled: 1
+);
+
+@include extjs-button-toolbar-medium-ui(
+  $ui: 'drilldown',
+
+  $text-padding: 0,
+
+  $color: $color-navy-blue,
+  $color-over: $color-dark-cerulean,
+  $color-focus: $color-dark-cerulean,
+  $color-pressed: $color-cornflower,
+  $color-disabled: $color-night-rider,
+
+  $font-size: $font-size-h4,
+
+  $background-gradient: transparent,
+  $background-gradient-over: transparent,
+  $background-gradient-focus: transparent,
+  $background-gradient-pressed: transparent,
+  $background-gradient-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: transparent,
+  $background-color-focus: transparent,
+  $background-color-pressed: transparent,
+  $background-color-disabled: transparent,
+
+  $border-width: 0,
+
+  $border-color: transparent,
+  $border-color-over: transparent,
+  $border-color-focus: transparent,
+  $border-color-pressed: transparent,
+  $border-color-disabled: transparent,
+
+  $opacity-disabled: 1,
+  $inner-opacity-disabled: 1
+);
+
+.feature-content .x-panel-header .x-btn-drilldown-toolbar-medium {
+  top: 7px !important;
+}
+
+/**
  * ui: 'default'
  */
 

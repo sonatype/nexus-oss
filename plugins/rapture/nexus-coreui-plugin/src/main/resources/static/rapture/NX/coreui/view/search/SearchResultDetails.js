@@ -37,11 +37,6 @@ Ext.define('NX.coreui.view.search.SearchResultDetails', {
 
     me.items = [
       {
-        xtype: 'component',
-        margin: '10 0 0 10',
-        html: NX.Icons.img('search-component-detail', 'x32')
-      },
-      {
         xtype: 'nx-info',
         itemId: 'mainInfo',
         flex: 1
