@@ -35,6 +35,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
@@ -77,7 +78,7 @@ public class ProtectedRepositoryRegistryIT
 
         binder.bind(SecurityConfigurationSource.class)
             .annotatedWith(Names.named("default"))
-            .toInstance(new TestSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
+            .toInstance(new PreconfiguredSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
       }
     });
   }

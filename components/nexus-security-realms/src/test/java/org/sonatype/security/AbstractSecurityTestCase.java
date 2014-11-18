@@ -16,9 +16,11 @@ import java.io.File;
 import java.util.Properties;
 
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
 
@@ -48,10 +50,10 @@ public abstract class AbstractSecurityTestCase
     binder.install(new SecurityModule());
     binder.bind(SecurityConfigurationSource.class)
         .annotatedWith(Names.named("default"))
-        .toInstance(new TestSecurityConfigurationSource(getSecurityConfig()));
+        .toInstance(new PreconfiguredSecurityConfigurationSource(getSecurityConfig()));
     binder.bind(SecurityModelConfigurationSource.class)
         .annotatedWith(Names.named("default"))
-        .toInstance(new TestSecurityModelConfigurationSource(getSecurityModelConfig()));
+        .toInstance(new PreconfiguredSecurityModelConfigurationSource(getSecurityModelConfig()));
   }
 
   protected SecurityConfiguration getSecurityConfig() {

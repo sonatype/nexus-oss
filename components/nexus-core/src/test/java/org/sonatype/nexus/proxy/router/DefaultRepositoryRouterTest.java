@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.NexusAppTestSupportSecurity;
-import org.sonatype.nexus.TestSecurityConfigurationSource;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -46,7 +45,7 @@ import org.sonatype.nexus.proxy.targets.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 import com.google.common.collect.Maps;
@@ -97,7 +96,7 @@ public class DefaultRepositoryRouterTest
 
         binder.bind(SecurityConfigurationSource.class)
             .annotatedWith(Names.named("default"))
-            .toInstance(new TestSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
+            .toInstance(new PreconfiguredSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
       }
     });
   }

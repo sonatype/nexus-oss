@@ -12,6 +12,7 @@
  */
 package org.sonatype.security;
 
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 
@@ -28,7 +29,7 @@ public abstract class SecurityTestSupport
     binder.install(new SecurityModule());
     binder.bind(SecurityConfigurationSource.class)
         .annotatedWith(Names.named("default"))
-        .toInstance(new TestSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
+        .toInstance(new PreconfiguredSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
   }
 
 }

@@ -27,13 +27,12 @@ import javax.inject.Singleton
 @Named('static')
 @Singleton
 class StaticSecurityModelConfigurationSource
+extends PreconfiguredSecurityModelConfigurationSource
 implements SecurityModelConfigurationSource
 {
 
-  Configuration config
-
   StaticSecurityModelConfigurationSource() {
-    this.config = new Configuration(
+    super(new Configuration(
         users: [
             new CUser(
                 id: 'admin',
@@ -77,26 +76,11 @@ implements SecurityModelConfigurationSource
                 roles: ['anonymous', 'repository-any-read']
             )
         ],
-    )
+    ))
   }
 
   @Override
   void storeConfiguration() {
-    throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
-  Configuration getConfiguration() {
-    return config
-  }
-
-  @Override
-  Configuration loadConfiguration() {
-    return getConfiguration()
-  }
-
-  @Override
-  void backupConfiguration() {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
   }
 

@@ -25,33 +25,22 @@ import javax.inject.Singleton
 @Named('static')
 @Singleton
 class StaticSecurityConfigurationSource
+extends PreconfiguredSecurityConfigurationSource
 implements SecurityConfigurationSource
 {
 
-  SecurityConfiguration config
-
   StaticSecurityConfigurationSource() {
-    config = new SecurityConfiguration(
+    super(new SecurityConfiguration(
         anonymousAccessEnabled: true,
         anonymousUsername: 'anonymous',
         anonymousPassword: 'anonymous',
         realms: ['XmlAuthenticatingRealm', 'XmlAuthorizingRealm']
-    )
+    ))
   }
 
   @Override
   void storeConfiguration() {
     throw new UnsupportedOperationException("The ${this.class.simpleName} is static source!")
-  }
-
-  @Override
-  SecurityConfiguration getConfiguration() {
-    return config
-  }
-
-  @Override
-  SecurityConfiguration loadConfiguration() {
-    return getConfiguration()
   }
 
 }

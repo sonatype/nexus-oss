@@ -16,8 +16,10 @@ import java.util.List;
 
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 
 import com.google.inject.AbstractModule;
@@ -39,7 +41,7 @@ public abstract class SecurityTestSupport
         protected void configure() {
           bind(SecurityConfigurationSource.class)
               .annotatedWith(Names.named("default"))
-              .toInstance(new TestSecurityConfigurationSource(securityConfig));
+              .toInstance(new PreconfiguredSecurityConfigurationSource(securityConfig));
         }
       });
     }
@@ -51,7 +53,7 @@ public abstract class SecurityTestSupport
         protected void configure() {
           bind(SecurityModelConfigurationSource.class)
               .annotatedWith(Names.named("default"))
-              .toInstance(new TestSecurityModelConfigurationSource(securityModelConfig));
+              .toInstance(new PreconfiguredSecurityModelConfigurationSource(securityModelConfig));
         }
       });
     }

@@ -21,11 +21,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.NexusAppTestSupportSecurity;
-import org.sonatype.nexus.TestSecurityConfigurationSource;
-import org.sonatype.nexus.TestSecurityModelConfigurationSource;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -78,10 +78,10 @@ public class UserPrincipalsHelperTest
         bind(UserManager.class).annotatedWith(Names.named("TestPrincipalsUserManager")).to(TestUserManager.class);
         bind(SecurityConfigurationSource.class)
             .annotatedWith(Names.named("default"))
-            .toInstance(new TestSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
+            .toInstance(new PreconfiguredSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
         bind(SecurityModelConfigurationSource.class)
             .annotatedWith(Names.named("default"))
-            .toInstance(new TestSecurityModelConfigurationSource(NexusAppTestSupportSecurity.securityModel()));
+            .toInstance(new PreconfiguredSecurityModelConfigurationSource(NexusAppTestSupportSecurity.securityModel()));
       }
     });
   }

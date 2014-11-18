@@ -10,22 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.ldap
+package org.sonatype.security.model.source
 
 import org.sonatype.security.model.Configuration
-import org.sonatype.security.model.source.SecurityModelConfigurationSource
 
 /**
+ * Pre-configured security model configuration source.
+ *
  * @since 3.0
  */
-class TestSecurityModelConfigurationSource
+class PreconfiguredSecurityModelConfigurationSource
 implements SecurityModelConfigurationSource
 {
 
-  Configuration config
+  Configuration configuration
 
-  TestSecurityModelConfigurationSource(final Configuration config) {
-    this.config = config;
+  PreconfiguredSecurityModelConfigurationSource(final Configuration configuration) {
+    this.configuration = configuration
   }
 
   @Override
@@ -34,18 +35,8 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  Configuration getConfiguration() {
-    return config
-  }
-
-  @Override
   Configuration loadConfiguration() {
     return getConfiguration()
-  }
-
-  @Override
-  void backupConfiguration() {
-    throw new UnsupportedOperationException()
   }
 
 }
