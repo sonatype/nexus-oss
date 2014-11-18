@@ -20,7 +20,6 @@ import java.util.concurrent.Future;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.scheduling.schedule.Manual;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import com.google.common.base.Throwables;
@@ -30,6 +29,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -89,14 +89,7 @@ public class NexusTaskInfo<T>
   @Override
   public Schedule getSchedule() {
     try {
-      final List<? extends Trigger> triggers = quartzSupport.getScheduler().getTriggersOfJob(jobKey);
-      if (!triggers.isEmpty()) {
-        return nexusScheduleConverter.toSchedule(triggers.get(0));
-      }
-      else {
-        // WAT? maybe this becomes "manual"? durableJob+noTrigger?
-        return new Manual();
-      }
+      return nexusScheduleConverter.toSchedule(getTrigger());
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -123,13 +116,11 @@ public class NexusTaskInfo<T>
       NexusTaskFuture<T> future = null;
       final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
       checkState(jobDetail != null, "Job with key %s not exists!", jobKey);
-      final List<? extends Trigger> triggers = quartzSupport.getScheduler().getTriggersOfJob(jobKey);
       final List<JobExecutionContext> currentlyExecuting = quartzSupport.getScheduler().getCurrentlyExecutingJobs();
       for (JobExecutionContext ctx : currentlyExecuting) {
         if (jobKey.equals(ctx.getJobDetail().getKey())) {
-          // this is it
           state = State.RUNNING;
-          nextRun = triggers.isEmpty() ? null : triggers.get(0).getNextFireTime();
+          nextRun = getTrigger().getNextFireTime();
           runStarted = ctx.getFireTime();
           runState = RunState.RUNNING; // TODO: ? blocked? canceled?
           future = (NexusTaskFuture<T>) ctx.get(NexusTaskFuture.FUTURE_KEY);
@@ -138,7 +129,7 @@ public class NexusTaskInfo<T>
       }
       if (state == null) {
         state = State.WAITING;
-        nextRun = triggers.isEmpty() ? null : triggers.get(0).getNextFireTime();
+        nextRun = getTrigger().getNextFireTime();
         runStarted = null;
         runState = null;
       }
@@ -167,6 +158,19 @@ public class NexusTaskInfo<T>
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  // ==
+
+  /**
+   * Gets and ensures trigger for this NX job exists.
+   */
+  private Trigger getTrigger() throws SchedulerException {
+    // jobs a triggers are kept on same combinatorial keys
+    final Trigger trigger = quartzSupport.getScheduler().getTrigger(
+        TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
+    checkState(trigger != null, "Bug: no trigger for NX job %s", jobKey);
+    return trigger;
   }
 
   // ==
