@@ -175,21 +175,13 @@ public class DefaultNexusTaskScheduler
   // ==
 
   @Override
-  @Deprecated
-  public void killAll() {
-    // TODO: nop, used in UTs only
+  public int getRunningTaskCount() {
+    return getScheduler().getRunnintTaskCount();
   }
 
   @Override
   @Deprecated
-  public int getRunningTaskCount() {
-    int running = 0;
-    final List<TaskInfo<?>> tasks = getScheduler().listsTasks();
-    for (TaskInfo<?> task : tasks) {
-      if (State.RUNNING == task.getCurrentState().getState()) {
-        running++;
-      }
-    }
-    return running;
+  public void killAll() {
+    // TODO: nop, used in UTs only
   }
 }

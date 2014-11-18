@@ -25,17 +25,14 @@ public interface NexusTaskScheduler
 {
   /**
    * A factory for task configurations (by actual type). It will honor descriptor if exists for given type, otherwise
-   * will use sane default values.
+   * will use sane default values. See {@link #createTaskConfigurationInstance(String)}.
    */
   TaskConfiguration createTaskConfigurationInstance(Class<? extends Task> taskType)
       throws IllegalArgumentException;
 
   /**
-   * A factory for task configurations (by FQCN as string). It will honor descriptor if exists for given type, otherwise
-   * will use sane default values. It also uses "uber" classloader to load the class, and will check is the class
-   * actually a {@link Task}. Use of this method is discouraged, only in cases when "type" of task is geting over
-   * wire like in case of UI.
-   * // TODO: really? why not enapsulate uberCL here, and only here? Is uberCL "okay" to use or is going away?
+   * A factory for task configurations (by FQCN as string). It will honor descriptor if exists for given type,
+   * otherwise will use sane default values. It will check is the class actually a {@link Task}.
    */
   TaskConfiguration createTaskConfigurationInstance(String taskType)
       throws IllegalArgumentException;
@@ -76,9 +73,12 @@ public interface NexusTaskScheduler
 
   // -- tests
 
+  /**
+   * Returns the count of currently running tasks.
+   */
+  int getRunningTaskCount();
+
   // TODO: remove, used in UTs only
   @Deprecated
   void killAll();
-
-  int getRunningTaskCount();
 }

@@ -50,7 +50,7 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
  */
 @Singleton
 @Named
-public class DefaultNexusSchedulerSPI
+public class QuartzNexusSchedulerSPI
     extends ComponentSupport
     implements NexusTaskExecutorSPI
 {
@@ -64,8 +64,8 @@ public class DefaultNexusSchedulerSPI
   private final NexusScheduleConverter nexusScheduleConverter;
 
   @Inject
-  public DefaultNexusSchedulerSPI(final QuartzSupport quartzSupport,
-                                  final NexusScheduleConverter nexusScheduleConverter)
+  public QuartzNexusSchedulerSPI(final QuartzSupport quartzSupport,
+                                 final NexusScheduleConverter nexusScheduleConverter)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
@@ -147,6 +147,16 @@ public class DefaultNexusSchedulerSPI
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       return quartzSupport.getScheduler().deleteJob(jobKey);
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public int getRunnintTaskCount() {
+    try {
+      return quartzSupport.getScheduler().getCurrentlyExecutingJobs().size();
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);

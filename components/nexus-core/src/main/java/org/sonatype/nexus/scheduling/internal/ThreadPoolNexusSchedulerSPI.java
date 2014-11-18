@@ -32,15 +32,22 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.eclipse.sisu.Priority;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Simple SPI using ThreadPool for tests. It supports only the submit method aka "run now bg task" used in UTs.
+ * Simple SPI using ThreadPoolExecutor that supports only simple execution of background tasks, but not scheduling.
+ *
+ * @since 3.0
  */
 @Singleton
 @Named
-public class TestNexusSchedulerSPI
+// TODO: I want this implementation to be last, see DefaultNexusTaskScheduler#getScheduler method
+@Priority(-1000) // be last, sorta fallback? (and used in tests)
+public class ThreadPoolNexusSchedulerSPI
     extends ComponentSupport
     implements NexusTaskExecutorSPI
 {
@@ -49,7 +56,7 @@ public class TestNexusSchedulerSPI
   private final ThreadPoolExecutor executorService;
 
   @Inject
-  public TestNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
+  public ThreadPoolNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
@@ -60,11 +67,17 @@ public class TestNexusSchedulerSPI
   {
     private final TaskConfiguration taskConfiguration;
 
+    private final Schedule schedule;
+
     private final Future<T> future;
 
-    public TestTaskInfo(final TaskConfiguration taskConfiguration, final Future<T> future) {
+    private final Date runStarted;
+
+    public TestTaskInfo(final TaskConfiguration taskConfiguration, final Schedule schedule, final Future<T> future) {
       this.taskConfiguration = taskConfiguration;
+      this.schedule = schedule;
       this.future = future;
+      this.runStarted = new Date();
     }
 
     @Override
@@ -84,12 +97,12 @@ public class TestNexusSchedulerSPI
 
     @Override
     public Schedule getSchedule() {
-      return null;
+      return schedule;
     }
 
     @Override
     public String getMessage() {
-      return null;
+      return getConfiguration().getMessage();
     }
 
     @Override
@@ -99,6 +112,7 @@ public class TestNexusSchedulerSPI
 
     @Override
     public CurrentState getCurrentState() {
+      checkState(!future.isDone());
       return new CurrentState()
       {
         @Override
@@ -115,7 +129,7 @@ public class TestNexusSchedulerSPI
         @Nullable
         @Override
         public Date getRunStarted() {
-          return new Date();
+          return runStarted;
         }
 
         @Nullable
@@ -135,6 +149,7 @@ public class TestNexusSchedulerSPI
     @Nullable
     @Override
     public LastRunState getLastRunState() {
+      checkState(!future.isDone());
       return null;
     }
   }
@@ -146,14 +161,16 @@ public class TestNexusSchedulerSPI
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
+    executorService.getActiveCount();
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
+    checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now);
     final Task<T> task = nexusTaskFactory.createTaskInstance(taskConfiguration);
-    return new TestTaskInfo<>(taskConfiguration, executorService.submit(task));
+    return new TestTaskInfo<>(taskConfiguration, schedule, executorService.submit(task));
   }
 
   @Override
@@ -161,11 +178,8 @@ public class TestNexusSchedulerSPI
     throw new UnsupportedOperationException("not implemented");
   }
 
-  public int getRunningTaskCount() {
+  @Override
+  public int getRunnintTaskCount() {
     return executorService.getActiveCount();
-  }
-
-  public void killAll() {
-    executorService.shutdownNow();
   }
 }

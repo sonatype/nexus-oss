@@ -47,4 +47,11 @@ public interface NexusTaskExecutorSPI
    * Removes a NX task by it's ID.
    */
   boolean removeTask(String id);
+
+  /**
+   * Returns the count of currently running tasks.
+   *
+   * TODO: this is used in tests only, figure out do we really need it
+   */
+  int getRunnintTaskCount();
 }
