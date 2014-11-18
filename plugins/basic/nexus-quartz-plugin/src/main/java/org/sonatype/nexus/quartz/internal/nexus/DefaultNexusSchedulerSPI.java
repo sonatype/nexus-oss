@@ -40,6 +40,7 @@ import org.quartz.Trigger;
 import org.quartz.impl.matchers.KeyMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 /**
@@ -111,20 +112,30 @@ public class DefaultNexusSchedulerSPI
   {
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
-      // TODO: the update case, when jobKey exists, needs different call: scheduler.addJob
+      if (quartzSupport.getScheduler().checkExists(jobKey)) {
+        // this is update
+        checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running");
+        quartzSupport.getScheduler().deleteJob(jobKey);
+      }
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
 
       // get trigger, but use identity of jobKey
       // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
-      final Trigger convertedTrigger = nexusScheduleConverter.toTrigger(schedule).getTriggerBuilder()
+      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule).getTriggerBuilder()
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
+      // register job specific listener
       quartzSupport.getScheduler().getListenerManager()
           .addJobListener(new NexusTaskJobListener<>(quartzSupport, nexusScheduleConverter, jobKey),
               KeyMatcher.keyEquals(jobKey));
-      quartzSupport.getScheduler().scheduleJob(jobDetail, convertedTrigger);
+      // schedule the job
+      quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);
+      // enabled
+      if (!taskConfiguration.isEnabled()) {
+        quartzSupport.getScheduler().pauseJob(jobKey);
+      }
       return new NexusTaskInfo<>(quartzSupport, jobKey, nexusScheduleConverter);
     }
     catch (SchedulerException e) {
