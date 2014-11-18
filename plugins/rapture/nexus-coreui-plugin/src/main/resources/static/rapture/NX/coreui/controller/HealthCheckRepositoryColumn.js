@@ -174,14 +174,36 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
             + '" style="margin-left:10px">&nbsp;' + statusModel.get('licenseIssueCount') + '</div>';
       }
       else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
-        return '<div><img src="' + me.imageUrl('analyze.png') + '"></div>';
+        var classes = "x-btn x-unselectable x-btn-primary-small x-btn-primary-toolbar-small-disabled";
+        var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
+        var button = '<a class="' + classes + '" hidefocus="on" unselectable="on">' + text + '</a>';
+        return button;
       }
     }
     else if (me.getHealthCheckRepositoryStatusStore().loaded) {
-      return '<div><img src="' + me.imageUrl('analyze_disabled.png') + '"></div>';
+      var classes = "x-btn x-unselectable x-btn-plain-small x-btn-default-toolbar-small-disabled";
+      var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
+      var button = '<a class="' + classes + '" disabled="true" hidefocus="on" unselectable="on">' + text + '</a>';
+      return button;
     }
     return 'Loading...';
   },
+
+  /**
+   * @private
+   * Render Health Check button based on corresponding {NX.coreui.model.HealthCheckRepositoryStatus}.
+   * @param el Where the button is rendered
+   * @param val (not used)
+   * @param record (not used)
+   */
+  /*renderHealthCheckButton: function(el, val, record) {
+    var button = Ext.create('Ext.button.Button', {
+      ui: 'plain',
+      disable: val,
+      text: 'Analyze',
+      renderTo: el
+    });
+  },*/
 
   /**
    * @private
