@@ -19,7 +19,9 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.quartz.Scheduler;
 
 /**
- * Component able to customize scheduler during it's creation and destroy.
+ * Component able to customize scheduler during it's creation and destroy. Usable to perform listener additions, that
+ * are in contrast to Tasks and Triggers not persisted, and must be re-added. But, this customizer in limited to that
+ * kind of configuration only.
  *
  * @since 3.0
  */
