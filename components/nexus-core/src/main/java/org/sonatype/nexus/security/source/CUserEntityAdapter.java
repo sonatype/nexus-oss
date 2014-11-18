@@ -68,8 +68,8 @@ public class CUserEntityAdapter
       type = schema.createClass(DB_CLASS);
 
       type.createProperty(P_ID, OType.STRING).setNotNull(true);
-      type.createProperty(P_FIRST_NAME, OType.STRING).setNotNull(true);
-      type.createProperty(P_LAST_NAME, OType.STRING).setNotNull(true);
+      type.createProperty(P_FIRST_NAME, OType.STRING);
+      type.createProperty(P_LAST_NAME, OType.STRING);
       type.createProperty(P_PASSWORD, OType.STRING).setNotNull(true);
       type.createProperty(P_STATUS, OType.STRING).setNotNull(true);
       type.createProperty(P_EMAIL, OType.STRING).setNotNull(true);
