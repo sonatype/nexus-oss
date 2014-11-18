@@ -80,6 +80,9 @@ Ext.define('NX.controller.Content', {
     // remove the current contents
     content.removeAll();
 
+    // Hide the breadcrumb
+    content.showRoot();
+
     // update title and icon
     content.setTitle(text);
     content.setIconCls(NX.Icons.cls(iconName, 'x32'));

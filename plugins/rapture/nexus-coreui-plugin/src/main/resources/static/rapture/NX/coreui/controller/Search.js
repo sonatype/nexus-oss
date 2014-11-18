@@ -22,7 +22,10 @@ Ext.define('NX.coreui.controller.Search', {
   requires: [
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.view.drilldown.Drilldown',
+    'NX.view.drilldown.DrilldownItem',
+    'NX.view.drilldown.DrilldownLink'
   ],
 
   stores: [
@@ -146,10 +149,10 @@ Ext.define('NX.coreui.controller.Search', {
           criteriaremoved: me.removeCriteria
         },
         'nx-coreui-search-result-list': {
-          selectionchange: me.onSearchResultSelectionChange
+          cellclick: me.onSearchResultCellClick
         },
         'nx-coreui-search-result-version-list': {
-          selectionchange: me.onSearchResultVersionSelectionChange
+          cellclick: me.onSearchResultVersionCellClick
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -378,7 +381,7 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
-      me.onSearchResultSelectionChange(me.getSearchResult().getSelectionModel(), []);
+      me.onSearchResultCellClick(me.getSearchResult().getSelectionModel(), null, null, null);
       me.bookmarkFilters();
     }
   },
@@ -387,20 +390,21 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show details and load version of selected search result.
    * @param selectionModel search result grid selection model
-   * @param selected selected search result
+   * @param record selected search result
    */
-  onSearchResultSelectionChange: function(selectionModel, selected) {
+  onSearchResultCellClick: function(selectionModel, td, cellIndex, record) {
     var me = this,
-        searchResultModel = selected[0],
+        searchResultModel = record,
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
         searchResultVersionStore = me.getSearchResultVersionStore();
 
-    me.onSearchResultVersionSelectionChange(me.getSearchResultVersion().getSelectionModel(), []);
+    me.onSearchResultVersionCellClick(me.getSearchResultVersion().getSelectionModel(), null, null, null);
+
     if (searchResultModel) {
       searchResultDetails.items.get(0).hide();
       searchResultDetails.items.get(1).show();
-      searchResultDetails.items.get(1).items.get(1).showInfo({
+      searchResultDetails.items.get(1).items.get(0).showInfo({
         'Group': searchResultModel.get('groupId'),
         'Name': searchResultModel.get('artifactId'),
         'Format': searchResultModel.get('format')
@@ -418,6 +422,10 @@ Ext.define('NX.coreui.controller.Search', {
           value: searchResultModel.get('artifactId')
         }
       ]);
+
+      // Show the component version panel
+      searchResultDetails.up('#nx-drilldown').setItemName(1, record.internalId);
+      searchResultDetails.up('#nx-drilldown').showChild(1, true);
     }
     else {
       searchResultDetails.items.get(0).show();
@@ -430,11 +438,11 @@ Ext.define('NX.coreui.controller.Search', {
    * @private
    * Show storage file of selected version of search result.
    * @param selectionModel search result grid selection model
-   * @param selected selected search result
+   * @param record selected search result
    */
-  onSearchResultVersionSelectionChange: function(selectionModel, selected) {
+  onSearchResultVersionCellClick: function(selectionModel, td, cellIndex, record) {
     var me = this,
-        searchResultVersionModel = selected[0],
+        searchResultVersionModel = record,
         storageFileContainer = me.getStorageFileContainer();
 
     if (searchResultVersionModel) {
@@ -444,6 +452,11 @@ Ext.define('NX.coreui.controller.Search', {
           searchResultVersionModel.get('type')
       );
       storageFileContainer.expand();
+
+      // Show the version detail panel
+      storageFileContainer.up('#nx-drilldown').setItemClass(2, 'nx-icon-repository-item-type-' + searchResultVersionModel.get('type') + '-x16');
+      storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
+      storageFileContainer.up('#nx-drilldown').showChild(2, true);
     }
     else {
       storageFileContainer.showStorageFile();
