@@ -101,7 +101,7 @@ public class DefaultSecurityConfigurationSource
         saveConfiguration(securityDefaults.loadConfiguration());
         doc = get(db);
       }
-      setConfiguration(entityAdapter.read(doc));
+      configuration = entityAdapter.read(doc);
       return getConfiguration();
     }
   }

@@ -34,7 +34,6 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -131,7 +130,7 @@ public class DefaultSecurityModelConfigurationSource
       config.setRoles(roles);
       config.setPrivileges(privileges);
       config.setUserRoleMappings(userRoleMappings);
-      setConfiguration(config);
+      configuration = config;
       return getConfiguration();
     }
   }
