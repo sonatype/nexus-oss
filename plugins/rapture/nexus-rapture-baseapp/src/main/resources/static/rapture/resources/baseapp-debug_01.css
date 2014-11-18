@@ -10516,7 +10516,7 @@ a.x-tab .x-tab-inner-right {
   border-color: silver;
   border-width: 1px;
   background-image: none;
-  background-color: white;
+  background-color: transparent;
 }
 /* line 51, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/toolbar/Toolbar.scss */
 .x-toolbar-default .x-box-scroller {
@@ -10529,7 +10529,7 @@ a.x-tab .x-tab-inner-right {
 /* line 65, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/toolbar/Toolbar.scss */
 .x-toolbar-default .x-tool-img {
   background-image: url(images/tools/tool-sprites-dark.png);
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 166, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/toolbar/Toolbar.scss */
@@ -21595,7 +21595,7 @@ a.x-color-picker-item:hover {
 .x-btn-plain-toolbar-small-disabled .x-btn-icon-el,
 .x-btn-plain-toolbar-medium-disabled .x-btn-icon-el,
 .x-btn-plain-toolbar-large-disabled .x-btn-icon-el {
-  background-color: white;
+  background-color: transparent;
 }
 /* line 139, ../../../baseapp/ext/packages/ext-theme-neptune/sass/src/button/Button.scss */
 .x-strict .x-ie8 .x-btn-plain-toolbar-small-disabled .x-btn-icon-el, .x-strict .x-ie8
@@ -21637,7 +21637,7 @@ a.x-color-picker-item:hover {
 }
 /* line 33, ../../../baseapp/ext/packages/ext-theme-neptune/sass/src/toolbar/Toolbar.scss */
 .x-toolbar-default .x-box-scroller {
-  background-color: white;
+  background-color: transparent;
 }
 
 /* line 41, ../../../baseapp/ext/packages/ext-theme-neptune/sass/src/toolbar/Toolbar.scss */
