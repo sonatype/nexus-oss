@@ -27,6 +27,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.sisu.BeanEntry;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -40,17 +41,21 @@ import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 public class DefaultNexusTaskSchedulerTest
     extends TestSupport
 {
-  @Test
-  public void createTaskConfigurationInstance() {
+  private DefaultNexusTaskScheduler nexusTaskScheduler;
+
+  @Before
+  public void prepare() {
     final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
     final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
         ImmutableList.of(be1, be2));
-    final DefaultNexusTaskScheduler nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
+    nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
         ImmutableList.<TaskDescriptor>of(new TaskWithDescriptorDescriptor()),
         Collections.<NexusTaskExecutorSPI>emptyList());
+  }
 
-
+  @Test
+  public void createTaskConfigurationInstance() {
     final TaskConfiguration c1 = nexusTaskScheduler.createTaskConfigurationInstance(TaskWithDescriptor.class);
     assertThat(c1.getId(), notNullValue());
     assertThat(c1.getName(), equalTo(TaskWithDescriptor.class.getSimpleName()));

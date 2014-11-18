@@ -22,6 +22,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.sisu.BeanEntry;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -34,14 +35,17 @@ import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 public class DefaultNexusTaskFactoryTest
     extends TestSupport
 {
-  @Test
-  public void isTask() {
+  private DefaultNexusTaskFactory nexusTaskFactory;
+
+  @Before
+  public void prepare() {
     final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
     final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
+    nexusTaskFactory = new DefaultNexusTaskFactory(ImmutableList.of(be1, be2));
+  }
 
-    final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
-        ImmutableList.of(be1, be2));
-
+  @Test
+  public void isTask() {
     assertThat(nexusTaskFactory.isTask(TaskWithDescriptor.class.getName()), is(true));
     assertThat(nexusTaskFactory.isTask(TaskWithoutDescriptor.class.getName()), is(true));
     assertThat(nexusTaskFactory.isTask(String.class.getName()), is(false));
@@ -50,12 +54,6 @@ public class DefaultNexusTaskFactoryTest
 
   @Test
   public void createTaskInstance() {
-    final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
-    final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
-
-    final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
-        ImmutableList.of(be1, be2));
-
     final TaskConfiguration c1 = new TaskConfiguration();
     c1.setId("id");
     c1.setType(TaskWithDescriptor.class.getName());
