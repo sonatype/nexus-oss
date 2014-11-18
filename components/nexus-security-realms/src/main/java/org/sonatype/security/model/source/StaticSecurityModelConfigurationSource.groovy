@@ -34,7 +34,6 @@ implements SecurityModelConfigurationSource
 
   StaticSecurityModelConfigurationSource() {
     this.config = new Configuration(
-        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
                 id: 'admin',

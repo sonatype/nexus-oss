@@ -27,12 +27,6 @@ public class Configuration
   //--------------------------/
 
   /**
-   * The version of the security
-   * persisted model.
-   */
-  private String version;
-
-  /**
    * Field users.
    */
   private java.util.List<CUser> users;
@@ -51,12 +45,6 @@ public class Configuration
    * Field userRoleMappings.
    */
   private java.util.List<CUserRoleMapping> userRoleMappings;
-
-  /**
-   * Field modelEncoding.
-   */
-  private String modelEncoding = "UTF-8";
-
 
   //-----------/
   //- Methods -/
@@ -136,15 +124,6 @@ public class Configuration
   } //-- Configuration clone()
 
   /**
-   * Get the modelEncoding field.
-   *
-   * @return String
-   */
-  public String getModelEncoding() {
-    return this.modelEncoding;
-  } //-- String getModelEncoding()
-
-  /**
    * Method getPrivileges.
    *
    * @return List
@@ -197,15 +176,6 @@ public class Configuration
   } //-- java.util.List<CUser> getUsers()
 
   /**
-   * Get the version of the security persisted model.
-   *
-   * @return String
-   */
-  public String getVersion() {
-    return this.version;
-  } //-- String getVersion()
-
-  /**
    * Method removePrivilege.
    */
   public void removePrivilege(CPrivilege cPrivilege) {
@@ -232,13 +202,6 @@ public class Configuration
   public void removeUserRoleMapping(CUserRoleMapping cUserRoleMapping) {
     getUserRoleMappings().remove(cUserRoleMapping);
   } //-- void removeUserRoleMapping( CUserRoleMapping )
-
-  /**
-   * Set the modelEncoding field.
-   */
-  public void setModelEncoding(String modelEncoding) {
-    this.modelEncoding = modelEncoding;
-  } //-- void setModelEncoding( String )
 
   /**
    * Set list of privileges that can be put in a role.
@@ -269,15 +232,5 @@ public class Configuration
   public void setUsers(java.util.List<CUser> users) {
     this.users = users;
   } //-- void setUsers( java.util.List )
-
-  /**
-   * Set the version of the security persisted model.
-   */
-  public void setVersion(String version) {
-    this.version = version;
-  } //-- void setVersion( String )
-
-
-  public static final String MODEL_VERSION = "2.0.5";
 
 }

@@ -25,7 +25,6 @@ class ResourceMergingConfigurationManagerTestSecurity
 
   static Configuration securityModel() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: '1-test',
