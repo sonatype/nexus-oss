@@ -13910,9 +13910,9 @@
 .log-viewer-field textarea {
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
-  white-space: pre;
+  /*white-space: pre;
   word-wrap: normal;
-  overflow-x: scroll;
+  overflow-x: scroll;*/
 }
 
 /**
