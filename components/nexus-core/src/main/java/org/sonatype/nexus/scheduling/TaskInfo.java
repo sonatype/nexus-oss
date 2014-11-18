@@ -142,12 +142,16 @@ public interface TaskInfo<T>
 
   /**
    * Returns the task current state, never {@code null}.
+   *
+   * @throws IllegalStateException if task with this ID has been removed from scheduler.
    */
-  CurrentState getCurrentState();
+  CurrentState getCurrentState() throws IllegalStateException;
 
   /**
    * Returns the task last run state, if there was any, otherwise {@code null}.
+   *
+   * @throws IllegalStateException if task with this ID has been removed from scheduler.
    */
   @Nullable
-  LastRunState getLastRunState();
+  LastRunState getLastRunState() throws IllegalStateException;
 }
