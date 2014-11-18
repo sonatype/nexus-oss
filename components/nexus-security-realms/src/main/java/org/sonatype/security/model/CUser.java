@@ -185,9 +185,4 @@ public class CUser
 
   public static final String STATUS_ACTIVE = "active";
 
-  //Not currently supported
-  //public static final String STATUS_LOCKED = "locked";
-
-  //public static final String STATUS_EXPIRED = "expired";
-
 }
