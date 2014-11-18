@@ -27,10 +27,6 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
   ui: 'light',
   title: 'fun',
 
-  tools: [
-    { type: 'maximize', tooltip: 'Maximize' }
-  ],
-
   /**
    * Repository of currently shown file.
    */

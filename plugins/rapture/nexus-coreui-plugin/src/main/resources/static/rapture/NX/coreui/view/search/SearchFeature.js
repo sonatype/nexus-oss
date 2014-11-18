@@ -20,62 +20,66 @@
 Ext.define('NX.coreui.view.search.SearchFeature', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-searchfeature',
+  itemId: 'searchfeature',
 
-  layout: 'border',
+  layout: 'fit',
 
   initComponent: function() {
     var me = this;
 
     me.items = [
       {
-        xtype: 'panel',
-        itemId: 'criteria',
-
-        region: 'north',
-        header: false,
-
-        style: {
-          'border-bottom': '1px solid #000000'
-        },
-
-        layout: {
-          type: 'hbox',
-          align: 'bottom'
-        },
-        bodyPadding: 10
-
-        // disable saving for now
-        //tbar: [
-        //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome' /* fa-save */, action: 'save' },
-        //],
-      },
-      {
-        xtype: 'panel',
-        region: 'center',
-        layout: 'border',
+        xtype: 'container',
         items: [
           {
-            xtype: 'nx-coreui-search-result-list',
-            region: 'west',
-            flex: 0.3,
-            header: false,
-            split: true,
-            collapsible: true,
-            collapseMode: 'mini'
-          },
-          {
-            xtype: 'panel',
-            itemId: 'rightPanel',
-            region: 'center',
-            layout: 'border',
-            flex: 0.7,
-            header: false,
+            xtype: 'nx-drilldown',
+
             items: [
               {
-                xtype: 'panel',
-                region: 'center',
+                xtype: 'nx-drilldown-item',
+
+                itemName: 'Search',
+                itemClass: 'nx-icon-search-default-x32',
+
+                layout: 'border',
+
+                items: [
+                  {
+                    xtype: 'panel',
+                    itemId: 'criteria',
+
+                    region: 'north',
+                    header: false,
+
+                    style: {
+                      'border-bottom': '1px solid #000000'
+                    },
+
+                    layout: {
+                      type: 'hbox',
+                      align: 'bottom'
+                    },
+                    bodyPadding: 10
+
+                    // disable saving for now
+                    //tbar: [
+                    //  { xtype: 'button', text: 'Save', glyph: 'xf0c7@FontAwesome', action: 'save' },
+                    //],
+                  },
+                  {
+                    xtype: 'nx-coreui-search-result-list',
+                    region: 'center',
+                    header: false
+                  }
+                ]
+              },
+              {
+                xtype: 'nx-drilldown-item',
+
+                itemClass: 'nx-icon-search-component-detail-x16',
+
                 layout: 'fit',
-                flex: 0.5,
+
                 items: [
                   {
                     type: 'panel',
@@ -114,14 +118,26 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
                 ]
               },
               {
-                xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-                region: 'south',
-                split: true,
-                flex: 0.5,
-                collapsible: true,
-                collapsed: false,
-                collapseMode: 'mini',
-                hidden: true
+                xtype: 'nx-drilldown-item',
+
+                layout: 'fit',
+
+                style: {
+                  'background-color': 'white'
+                },
+
+                items: [
+                  {
+                    xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+                    header: false,
+                    plain: true,
+
+                    style: {
+                      'background-color': 'white',
+                      'padding-top': '10px'
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -131,5 +147,4 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
     me.callParent(arguments);
   }
-
 });

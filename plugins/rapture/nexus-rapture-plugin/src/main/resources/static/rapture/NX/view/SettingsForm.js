@@ -65,7 +65,6 @@ Ext.define('NX.view.SettingsForm', {
    */
   editableMarker: undefined,
 
-  bodyPadding: "0 10px 0px 10px",
   autoScroll: true,
   waitMsgTarget: true,
 

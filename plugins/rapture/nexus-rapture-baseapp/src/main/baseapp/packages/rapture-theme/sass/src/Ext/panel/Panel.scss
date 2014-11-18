@@ -12,18 +12,30 @@
   $ui-header-background-color: $color-white,
   $ui-header-icon-height: 32,
   $ui-header-icon-width: 32,
+  $ui-wrap-border-width: 0,
   $ui-header-text-transform: $panel-light-header-text-transform,
-
-  $ui-wrap-border-width: 0 0 0 2px,
-  $ui-wrap-border-color: $color-light-gray,
-
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
-.feature-content {
+.x-panel-feature-content {
+  background-color: $color-white;
   .x-toolbar {
-    background: $color-white;
-    padding-left: 10px;
+    background-color: $color-white;
+  }
+}
+
+/**
+ * ui: 'settings-panel'
+ */
+@include extjs-panel-ui(
+  $ui: 'inset',
+
+  $ui-padding: 0 0 0 20px
+);
+
+.x-panel-inset {
+  .x-toolbar {
+    padding: 6px 0 6px 0;
   }
 }
 
@@ -37,15 +49,21 @@
   $ui-body-background-color: $color-light-smoke
 );
 
-.x-panel-body-feature-menu {
-  .x-grid-cell {
-    background-color: $color-light-smoke;
-  }
-  .x-grid-row-over .x-grid-td {
-    background-color: $color-gainsboro;
-  }
-  .x-grid-row-selected .x-grid-td {
-    background-color: $color-light-gray;
+.x-panel-feature-menu {
+  border-width: 0 2px 0 0;
+  border-color: $color-light-gray;
+  border-style: solid;
+
+  .x-panel-body-feature-menu {
+    .x-grid-cell {
+      background-color: $color-light-smoke;
+    }
+    .x-grid-row-over .x-grid-td {
+      background-color: $color-gainsboro;
+    }
+    .x-grid-row-selected .x-grid-td {
+      background-color: $color-light-gray;
+    }
   }
 }
 
