@@ -561,7 +561,6 @@ public class DefaultConfigurationManager
     }
 
     if (modified) {
-      configurationSource.backupConfiguration();
       configurationSource.storeConfiguration();
     }
 

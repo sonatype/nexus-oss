@@ -45,6 +45,4 @@ public interface SecurityModelConfigurationSource
    */
   Configuration loadConfiguration();
 
-  void backupConfiguration();
-
 }
