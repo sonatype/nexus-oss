@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Support class for {@link TaskDescriptor}s.
  *
  * @since 3.0
+ * TODO: would fit very nicely as a groovy class ;)
  */
 public abstract class TaskDescriptorSupport<T extends Task>
     implements TaskDescriptor<T>

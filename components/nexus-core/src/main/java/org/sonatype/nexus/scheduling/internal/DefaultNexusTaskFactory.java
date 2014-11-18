@@ -22,10 +22,8 @@ import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Strings;
 import org.eclipse.sisu.BeanEntry;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -62,8 +60,7 @@ public class DefaultNexusTaskFactory
       throws IllegalArgumentException
   {
     checkNotNull(taskConfiguration);
-    checkArgument(!Strings.isNullOrEmpty(taskConfiguration.getId()), "Invalid task configuration: id");
-    checkArgument(!Strings.isNullOrEmpty(taskConfiguration.getType()), "Invalid task configuration: type");
+    taskConfiguration.validate();
     log.debug("Creating task by hint: {}", taskConfiguration);
     final BeanEntry<Named, Task> taskEntry = locateTask(taskConfiguration.getType());
     if (taskEntry != null) {

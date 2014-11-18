@@ -33,8 +33,6 @@ import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Strings;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -77,7 +75,6 @@ public class DefaultNexusTaskScheduler
 
   @Override
   public <T> TaskInfo<T> submit(final TaskConfiguration taskConfiguration) {
-    checkNotNull(taskConfiguration);
     return scheduleTask(taskConfiguration, new Now());
   }
 
@@ -95,8 +92,8 @@ public class DefaultNexusTaskScheduler
   @Override
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
+    taskConfiguration.validate();
     checkNotNull(schedule);
-    checkArgument(!Strings.isNullOrEmpty(taskConfiguration.getId()), "Invalid task configuration");
     final Date now = new Date();
     if (taskConfiguration.getCreated() != null) {
       taskConfiguration.setCreated(now);

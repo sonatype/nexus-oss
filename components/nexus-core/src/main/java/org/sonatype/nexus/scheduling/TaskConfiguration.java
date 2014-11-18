@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * The task configuration backed by plain map. The configuration is persisted by actual underlying scheduler, so it
@@ -105,6 +106,17 @@ public final class TaskConfiguration
   private final Map<String, String> configuration = Maps.newHashMap();
 
   /**
+   * Performs a "self" validation of the configuration for completeness and correctness.
+   * TODO: hook this into validator somehow? Currently, this method is only a "shortcut" to not have it
+   * spread across task factory and scheduler.
+   */
+  public final void validate() throws IllegalStateException {
+    // Minimum requirements
+    checkState(!Strings.isNullOrEmpty(getId()), "Incomplete task configuration: id");
+    checkState(!Strings.isNullOrEmpty(getType()), "Incomplete task configuration: type");
+  }
+
+  /**
    * Exposes the "live" backing map.
    */
   public Map<String, String> getMap() {
@@ -159,7 +171,9 @@ public final class TaskConfiguration
   /**
    * Is task enabled?
    */
-  public boolean isEnabled() { return getBoolean(ENABLED_KEY, true); }
+  public boolean isEnabled() {
+    return getBoolean(ENABLED_KEY, true);
+  }
 
   /**
    * Sets is task enabled.
@@ -171,7 +185,9 @@ public final class TaskConfiguration
   /**
    * Is task while running visible?
    */
-  public boolean isVisible() { return getBoolean(VISIBLE_KEY, true); }
+  public boolean isVisible() {
+    return getBoolean(VISIBLE_KEY, true);
+  }
 
   /**
    * Sets is running task visible.
@@ -277,7 +293,9 @@ public final class TaskConfiguration
   /**
    * Returns the path under which task should operate, if applicable. Never returns {@code null}.
    */
-  public String getPath() { return getString(PATH_KEY, "/"); }
+  public String getPath() {
+    return getString(PATH_KEY, "/");
+  }
 
   /**
    * Sets or clears the path.
