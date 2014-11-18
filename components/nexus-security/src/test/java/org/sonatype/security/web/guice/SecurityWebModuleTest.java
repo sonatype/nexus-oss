@@ -15,8 +15,6 @@ package org.sonatype.security.web.guice;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.ServletContext;
 
 import org.sonatype.security.SecuritySystem;
@@ -104,10 +102,6 @@ public class SecurityWebModuleTest
     NamedFilterList filterList = filterChainResolver.getFilterChainManager().getChain("/service/**");
     assertThat(filterList.get(0), instanceOf(SimpleAccessControlFilter.class));
     assertThat(filterList.get(1), instanceOf(HttpMethodPermissionFilter.class));
-
-    // test that injection of filters works
-    assertThat(((SimpleAccessControlFilter) filterList.get(0)).getSecurityXMLFilePath(),
-        equalTo("target/foo/security.xml"));
   }
 
   @After
@@ -147,7 +141,6 @@ public class SecurityWebModuleTest
       @Override
       protected void configure() {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security-xml-file", "target/foo/security.xml");
         properties.put("application-conf", "target/plexus-home/etc");
         binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
       }
@@ -157,12 +150,6 @@ public class SecurityWebModuleTest
   static class SimpleAccessControlFilter
       extends BasicHttpAuthenticationFilter
   {
-    @Inject
-    @Named("${security-xml-file}")
-    private String securityXMLFilePath;
-
-    public String getSecurityXMLFilePath() {
-      return securityXMLFilePath;
-    }
   }
+
 }

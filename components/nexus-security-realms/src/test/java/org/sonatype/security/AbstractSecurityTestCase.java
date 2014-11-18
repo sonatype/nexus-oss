@@ -40,7 +40,6 @@ public abstract class AbstractSecurityTestCase
   @Override
   public void configure(Properties properties) {
     properties.put("application-conf", CONFIG_DIR.getAbsolutePath());
-    properties.put("security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml");
     super.configure(properties);
   }
 

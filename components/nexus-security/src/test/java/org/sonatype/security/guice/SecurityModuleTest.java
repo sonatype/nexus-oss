@@ -120,7 +120,6 @@ public class SecurityModuleTest
       @Override
       protected void configure() {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security-xml-file", util.resolvePath("target/foo/security.xml"));
         properties.put("application-conf", util.resolvePath("target/plexus-home/etc"));
         binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
       }
