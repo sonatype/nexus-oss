@@ -90,28 +90,6 @@ public class EnhancedConfiguration
 
   // ==
 
-  public void removePrivilege(final CPrivilege cPrivilege) {
-    id2privileges.remove(cPrivilege.getId());
-    delegate.removePrivilege(cPrivilege);
-  }
-
-  public void removeRole(final CRole cRole) {
-    id2roles.remove(cRole.getId());
-    delegate.removeRole(cRole);
-  }
-
-  public void removeUser(final CUser cUser) {
-    id2users.remove(cUser.getId());
-    delegate.removeUser(cUser);
-  }
-
-  public void removeUserRoleMapping(final CUserRoleMapping cUserRoleMapping) {
-    id2roleMappings.remove(getUserRoleMappingKey(cUserRoleMapping.getUserId(), cUserRoleMapping.getSource()));
-    delegate.removeUserRoleMapping(cUserRoleMapping);
-  }
-
-  // ==
-
   public void setPrivileges(final List<CPrivilege> privileges) {
     delegate.setPrivileges(privileges);
     rebuildId2PrivilegesLookupMap();
