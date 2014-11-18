@@ -113,7 +113,7 @@ public class DefaultSecurityModelConfigurationSource
       List<CRole> roles = Lists.newArrayList(roleEntityAdapter.get(db));
       List<CPrivilege> privileges = Lists.newArrayList(privilegeEntityAdapter.get(db));
       List<CUserRoleMapping> userRoleMappings = Lists.newArrayList(userRoleMappingEntityAdapter.get(db));
-      if (users.isEmpty()) {
+      if (users.isEmpty() && roles.isEmpty() && privileges.isEmpty() && userRoleMappings.isEmpty()) {
         saveConfiguration(securityDefaults.loadConfiguration());
         users = Lists.newArrayList(userEntityAdapter.getAll(db));
         roles = Lists.newArrayList(roleEntityAdapter.get(db));
