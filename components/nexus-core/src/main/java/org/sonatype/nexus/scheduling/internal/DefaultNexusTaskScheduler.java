@@ -56,7 +56,6 @@ public class DefaultNexusTaskScheduler
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
                                    final List<TaskDescriptor> taskDescriptors,
-                                   final List<Task> tasks,
                                    final List<NexusTaskExecutorSPI> schedulers)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
