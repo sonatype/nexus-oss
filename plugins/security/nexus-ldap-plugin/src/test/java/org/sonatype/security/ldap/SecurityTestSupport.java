@@ -50,7 +50,7 @@ public abstract class SecurityTestSupport
         @Override
         protected void configure() {
           bind(SecurityModelConfigurationSource.class)
-              .annotatedWith(Names.named("static"))
+              .annotatedWith(Names.named("default"))
               .toInstance(new TestSecurityModelConfigurationSource(securityModelConfig));
         }
       });

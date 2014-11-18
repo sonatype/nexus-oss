@@ -51,7 +51,7 @@ public abstract class AbstractSecurityTestCase
         .annotatedWith(Names.named("default"))
         .toInstance(new TestSecurityConfigurationSource(getSecurityConfig()));
     binder.bind(SecurityModelConfigurationSource.class)
-        .annotatedWith(Names.named("static"))
+        .annotatedWith(Names.named("default"))
         .toInstance(new TestSecurityModelConfigurationSource(getSecurityModelConfig()));
   }
 
@@ -100,7 +100,7 @@ public abstract class AbstractSecurityTestCase
   }
 
   protected Configuration getSecurityConfiguration() {
-    return lookup(SecurityModelConfigurationSource.class, "file").getConfiguration();
+    return lookup(SecurityModelConfigurationSource.class, "default").getConfiguration();
   }
 
 }

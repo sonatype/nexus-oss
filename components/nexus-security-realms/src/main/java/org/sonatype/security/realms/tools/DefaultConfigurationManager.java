@@ -70,7 +70,7 @@ public class DefaultConfigurationManager
                                      List<SecurityConfigurationModifier> configurationModifiers,
                                      SecurityConfigurationCleaner configCleaner,
                                      SecurityConfigurationValidator validator,
-                                     @Named("file") SecurityModelConfigurationSource configurationSource,
+                                     SecurityModelConfigurationSource configurationSource,
                                      List<PrivilegeDescriptor> privilegeDescriptors,
                                      PasswordService passwordService)
   {
