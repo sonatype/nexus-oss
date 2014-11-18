@@ -26,25 +26,30 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   initComponent: function() {
     var me = this;
 
-    me.columns = [
-      {
-        xtype: 'nx-iconcolumn',
-        width: 36,
-        iconVariant: 'x16',
-        iconName: function() {
-          return 'repository-default';
-        }
-      },
-      { header: 'Name', dataIndex: 'name', flex: 2 },
-      { header: 'Type', dataIndex: 'type',
-        renderer: function(value) {
-          return Ext.String.capitalize(value);
-        }
-      },
-      { header: 'Format', dataIndex: 'formatName' },
-      { header: 'Status', renderer: me.renderStatus, flex: 1 },
-      { header: 'URL', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
-    ];
+    me.columns = {
+      items: [
+        {
+          xtype: 'nx-iconcolumn',
+          width: 36,
+          iconVariant: 'x16',
+          iconName: function() {
+            return 'repository-default';
+          }
+        },
+        { header: 'Name', dataIndex: 'name', flex: 2 },
+        { header: 'Type', dataIndex: 'type',
+          renderer: function(value) {
+            return Ext.String.capitalize(value);
+          }
+        },
+        { header: 'Format', dataIndex: 'formatName' },
+        { header: 'Status', renderer: me.renderStatus, flex: 1 },
+        { header: 'URL', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
+      ],
+      defaults: {
+        tdCls: 'nx-middle-align'
+      }
+    };
 
     me.callParent(arguments);
   },

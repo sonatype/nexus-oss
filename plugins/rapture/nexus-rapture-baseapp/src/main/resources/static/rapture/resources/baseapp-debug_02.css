@@ -13896,14 +13896,17 @@
   top: 0 !important;
 }
 
-/* line 1, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
+/**
+ * @class Ext.form.Label
+ */
+/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
 .user-token-field {
   padding: 2px;
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
 }
 
-/* line 7, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
+/* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
 .log-viewer-field textarea {
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
@@ -14658,6 +14661,14 @@
 .breadcrumb-icon {
   top: 13px !important;
   margin-left: 11px;
+}
+
+/**
+ * @class Ext.grid.column.Column
+ */
+/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/grid/column/Column.scss */
+.nx-middle-align {
+  vertical-align: middle;
 }
 
 /**
