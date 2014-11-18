@@ -12,7 +12,6 @@
  */
 package org.sonatype.security
 
-import org.sonatype.configuration.ConfigurationException
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.model.source.SecurityModelConfigurationSource
 
@@ -30,7 +29,7 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  void storeConfiguration() throws IOException {
+  void storeConfiguration() {
     // do nothing
   }
 
@@ -45,12 +44,12 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  Configuration loadConfiguration() throws ConfigurationException, IOException {
+  Configuration loadConfiguration() {
     return getConfiguration()
   }
 
   @Override
-  void backupConfiguration() throws IOException {
+  void backupConfiguration() {
     throw new UnsupportedOperationException()
   }
 

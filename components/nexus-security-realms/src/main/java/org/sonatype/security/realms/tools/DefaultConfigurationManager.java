@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -550,41 +548,24 @@ public class DefaultConfigurationManager
   }
 
   public void save() {
-    try {
-      this.configurationSource.storeConfiguration();
-    }
-    catch (IOException e) {
-      log.error("IOException while storing configuration file", e);
-    }
+    this.configurationSource.storeConfiguration();
   }
 
   @Override
   protected synchronized Configuration doGetConfiguration() {
-    try {
-      this.configurationSource.loadConfiguration();
+    this.configurationSource.loadConfiguration();
 
-      boolean modified = false;
-      for (SecurityConfigurationModifier modifier : configurationModifiers) {
-        modified |= modifier.apply(configurationSource.getConfiguration());
-      }
-
-      if (modified) {
-        configurationSource.backupConfiguration();
-        configurationSource.storeConfiguration();
-      }
-
-      return this.configurationSource.getConfiguration();
+    boolean modified = false;
+    for (SecurityConfigurationModifier modifier : configurationModifiers) {
+      modified |= modifier.apply(configurationSource.getConfiguration());
     }
-    catch (IOException e) {
-      log.error("IOException while retrieving configuration file", e);
 
-      throw new IllegalStateException("Cannot load configuration!", e);
+    if (modified) {
+      configurationSource.backupConfiguration();
+      configurationSource.storeConfiguration();
     }
-    catch (ConfigurationException e) {
-      log.error("Invalid Configuration", e);
 
-      throw new IllegalStateException("Invalid configuration!", e);
-    }
+    return this.configurationSource.getConfiguration();
   }
 
   public SecurityValidationContext initializeContext() {
