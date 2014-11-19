@@ -168,8 +168,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
       me.values = {
         xtype: 'grid',
         hideHeaders: true,
-        padding: '5 0 0 0',
-        //autoScroll: true,
+        ui: 'borderless',
         columns: [
           { text: 'Value', dataIndex: 'value', flex: 1 },
           {
