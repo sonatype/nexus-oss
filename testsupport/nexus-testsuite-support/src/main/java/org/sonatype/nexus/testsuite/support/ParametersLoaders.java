@@ -220,6 +220,27 @@ public abstract class ParametersLoaders
   }
 
   /**
+   * Use system property as test parameter.
+   *
+   * @param propertyName name of system property
+   * @return test parameters loader. Never null.
+   */
+  public static Loader systemProperty(final String propertyName) {
+    return new Loader()
+    {
+      @Override
+      public Collection<Object[]> load() {
+        String property = System.getProperty(propertyName);
+        if (property != null) {
+          return Arrays.<Object[]>asList(new Object[]{property});
+        }
+        return null;
+      }
+
+    };
+  }
+
+  /**
    * Iterates provided loaders and return the first non empty list of parameters.
    *
    * @param loaders to be iterated
