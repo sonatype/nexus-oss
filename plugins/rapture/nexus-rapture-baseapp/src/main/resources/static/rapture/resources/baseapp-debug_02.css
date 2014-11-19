@@ -13901,17 +13901,18 @@
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
 .nx-optionalfieldset {
-  margin: 10px 0 0 0;
+  margin: 10px 25px 0 0;
 }
 /* line 8, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
 .nx-optionalfieldset .x-fieldset-body {
   background-color: #f4f4f4;
   border: 1px solid #cbcbcb;
-  padding: 5px 0 10px 20px;
+  padding: 5px 20px 10px 20px;
   position: relative;
-  left: 25px;
+  margin-left: 25px;
+  width: auto !important;
 }
-/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+/* line 18, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
 .nx-optionalfieldset .nx-optionalfieldset .x-fieldset-body {
   background-color: rgba(0, 0, 0, 0.05);
 }
