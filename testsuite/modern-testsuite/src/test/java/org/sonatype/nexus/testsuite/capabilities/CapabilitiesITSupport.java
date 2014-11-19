@@ -21,29 +21,13 @@ import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
-import org.junit.runners.Parameterized;
-
 import static org.sonatype.nexus.capabilities.client.Filter.capabilitiesThat;
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 @NexusStartAndStopStrategy(EACH_TEST)
 public abstract class CapabilitiesITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   public CapabilitiesITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

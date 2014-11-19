@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.kenai;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -29,15 +28,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Support for Kenai integration tests.
@@ -51,16 +45,6 @@ public class KenaiITSupport
 
   @Inject
   private FileTaskBuilder fileTaskBuilder;
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

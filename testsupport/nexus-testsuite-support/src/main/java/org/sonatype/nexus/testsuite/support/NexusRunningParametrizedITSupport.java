@@ -18,9 +18,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.junit.runners.Parameterized.Parameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.defaultTestParameters;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemProperty;
 import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
+import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
+import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Base class for parametrized Nexus integration tests that starts Nexus before each test and stops it afterwards.
@@ -36,7 +38,10 @@ public abstract class NexusRunningParametrizedITSupport
   public static Collection<Object[]> data() {
     return firstAvailableTestParameters(
         systemTestParameters(),
-        defaultTestParameters()
+        systemProperty("it.nexus.bundle"),
+        testParameters(
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+        )
     ).load();
   }
 

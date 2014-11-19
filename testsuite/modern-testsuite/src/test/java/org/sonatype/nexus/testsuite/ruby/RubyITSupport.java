@@ -14,7 +14,6 @@
 package org.sonatype.nexus.testsuite.ruby;
 
 import java.io.File;
-import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -38,31 +37,17 @@ import org.hamcrest.Matcher;
 import org.jruby.embed.ScriptingContainer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runners.Parameterized;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 @NexusStartAndStopStrategy(Strategy.EACH_TEST)
 public abstract class RubyITSupport
     extends NexusRunningParametrizedITSupport
 {
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   @Inject
   protected FileTaskBuilder overlays;
@@ -135,7 +120,8 @@ public abstract class RubyITSupport
   }
 
   protected ScriptingContainer createScriptingContainer() {
-    return new ITestJRubyScriptingContainer(getBundleTargetDirectory(), new File(getBundleTargetDirectory(), "rubygems"));
+    return new ITestJRubyScriptingContainer(getBundleTargetDirectory(),
+        new File(getBundleTargetDirectory(), "rubygems"));
   }
 
   protected GemRunner gemRunner() {
@@ -172,7 +158,7 @@ public abstract class RubyITSupport
     // from version 2.4.0-03 onwards count empty files as non-existing
     assertThat(name, download.exists() && download.length() > 0, matcher);
     download.deleteOnExit();
-   return download;
+    return download;
   }
 
   protected void assertFileRemoval(String repoId, String name, Matcher<Boolean> matcher) {
@@ -214,7 +200,8 @@ public abstract class RubyITSupport
 
     if (withBundler) {
       // install nexus + bundler gem
-      File bundlerGem = artifactResolver().resolveFromDependencyManagement("rubygems", "bundler", "gem", null, null, null);
+      File bundlerGem = artifactResolver()
+          .resolveFromDependencyManagement("rubygems", "bundler", "gem", null, null, null);
       gemRunner().install(nexusGem, bundlerGem);
     }
     else {
