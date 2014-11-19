@@ -147,4 +147,11 @@ public class CUserRoleMappingEntityAdapter
     db.command(command).execute();
   }
 
+  public void delete(final ODatabaseDocumentTx db, final String userId, final String source) {
+    OCommandSQL command = new OCommandSQL(
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
+    );
+    db.command(command).execute(userId, source);
+  }
+
 }

@@ -160,4 +160,11 @@ public class CRoleEntityAdapter
     db.command(command).execute();
   }
 
+  public void delete(final ODatabaseDocumentTx db, final String id) {
+    OCommandSQL command = new OCommandSQL(
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+    );
+    db.command(command).execute(id);
+  }
+
 }

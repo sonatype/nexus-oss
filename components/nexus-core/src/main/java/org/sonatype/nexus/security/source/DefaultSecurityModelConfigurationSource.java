@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.security.source;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -126,14 +127,14 @@ public class DefaultSecurityModelConfigurationSource
       config.setRoles(roles);
       config.setPrivileges(privileges);
       config.setUserRoleMappings(userRoleMappings);
-      configuration = config;
+      configuration = new OrientSecurityModelConfiguration(config);
       return getConfiguration();
     }
   }
 
   @Override
   public void storeConfiguration() {
-    saveConfiguration(getConfiguration());
+    //saveConfiguration(getConfiguration());
   }
 
   private void saveConfiguration(final SecurityModelConfiguration configuration) {
@@ -218,6 +219,142 @@ public class DefaultSecurityModelConfigurationSource
   @Subscribe
   public void on(final NexusStoppingEvent event) throws Exception {
     stop();
+  }
+
+  private class OrientSecurityModelConfiguration
+      implements SecurityModelConfiguration
+  {
+
+    private final SecurityModelConfiguration delegate;
+
+    public OrientSecurityModelConfiguration(final SecurityModelConfiguration delegate) {
+      this.delegate = checkNotNull(delegate);
+    }
+
+    @Override
+    public List<CUser> getUsers() {
+      return delegate.getUsers();
+    }
+
+    @Override
+    public CUser getUser(final String id) {
+      return delegate.getUser(id);
+    }
+
+    @Override
+    public void addUser(final CUser user) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        userEntityAdapter.create(db, user);
+        delegate.addUser(user);
+      }
+    }
+
+    @Override
+    public void setUsers(final Collection<CUser> users) {
+      delegate.setUsers(users);
+    }
+
+    @Override
+    public boolean removeUser(final String id) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        userEntityAdapter.delete(db, id);
+        return delegate.removeUser(id);
+      }
+    }
+
+    @Override
+    public List<CUserRoleMapping> getUserRoleMappings() {
+      return delegate.getUserRoleMappings();
+    }
+
+    @Override
+    public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
+      return delegate.getUserRoleMapping(userId, source);
+    }
+
+    @Override
+    public void addUserRoleMapping(final CUserRoleMapping mapping) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        userRoleMappingEntityAdapter.create(db, mapping);
+        delegate.addUserRoleMapping(mapping);
+      }
+    }
+
+    @Override
+    public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
+      delegate.setUserRoleMappings(mappings);
+    }
+
+    @Override
+    public boolean removeUserRoleMapping(final String userId, final String source) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        userRoleMappingEntityAdapter.delete(db, userId, source);
+        return delegate.removeUserRoleMapping(userId, source);
+      }
+    }
+
+    @Override
+    public List<CPrivilege> getPrivileges() {
+      return delegate.getPrivileges();
+    }
+
+    @Override
+    public CPrivilege getPrivilege(final String id) {
+      return delegate.getPrivilege(id);
+    }
+
+    @Override
+    public void addPrivilege(final CPrivilege privilege) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        privilegeEntityAdapter.create(db, privilege);
+        delegate.addPrivilege(privilege);
+      }
+    }
+
+    @Override
+    public void setPrivileges(final Collection<CPrivilege> privileges) {
+      delegate.setPrivileges(privileges);
+    }
+
+    @Override
+    public boolean removePrivilege(final String id) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        privilegeEntityAdapter.delete(db, id);
+        return delegate.removePrivilege(id);
+      }
+    }
+
+    @Override
+    public List<CRole> getRoles() {
+      return delegate.getRoles();
+    }
+
+    @Override
+    public CRole getRole(final String id) {
+      return delegate.getRole(id);
+    }
+
+    @Override
+    public void addRole(final CRole role) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        roleEntityAdapter.create(db, role);
+        delegate.addRole(role);
+      }
+    }
+
+    @Override
+    public void setRoles(final Collection<CRole> roles) {
+      delegate.setRoles(roles);
+    }
+
+    @Override
+    public boolean removeRole(final String id) {
+      try (ODatabaseDocumentTx db = openDb()) {
+        roleEntityAdapter.delete(db, id);
+        return delegate.removeRole(id);
+      }
+    }
+
   }
 
 }
