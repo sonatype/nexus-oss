@@ -119,7 +119,7 @@ public class QuartzSupportImpl
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
     try {
-      final String sqlScript = Resources.toString(Resources.getResource("/org/sonatype/nexus/quartz/internal/tables_h2.sql"), Charsets.UTF_8);
+      final String sqlScript = Resources.toString(Resources.getResource("tables_h2.sql"), Charsets.UTF_8);
       connection.createStatement().execute(sqlScript);
       connection.commit();
       connection.close();

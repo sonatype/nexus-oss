@@ -61,8 +61,7 @@ public class NexusQuartzCustomizer
       // Install job supporting listeners for each NX task being scheduled
       final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
       for (JobKey jobKey : jobKeys) {
-        final NexusTaskJobListener<?> listener = new NexusTaskJobListener<>(quartzSupport, nexusScheduleConverter,
-            jobKey);
+        final NexusTaskJobListener<?> listener = new NexusTaskJobListener<>(quartzSupport, jobKey);
         scheduler.getListenerManager().addJobListener(listener, KeyMatcher.keyEquals(jobKey));
       }
 

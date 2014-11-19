@@ -46,7 +46,7 @@ import static com.google.common.base.Preconditions.checkState;
 @Singleton
 @Named
 // TODO: I want this implementation to be last, see DefaultNexusTaskScheduler#getScheduler method
-@Priority(-1000) // be last, sorta fallback? (and used in tests)
+@Priority(1000) // be last, sorta fallback? (and used in tests)
 public class ThreadPoolNexusSchedulerSPI
     extends ComponentSupport
     implements NexusTaskExecutorSPI

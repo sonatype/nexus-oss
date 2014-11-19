@@ -30,6 +30,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.eclipse.sisu.Priority;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -50,6 +51,7 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
  */
 @Singleton
 @Named
+@Priority(2000)
 public class QuartzNexusSchedulerSPI
     extends ComponentSupport
     implements NexusTaskExecutorSPI
@@ -127,7 +129,7 @@ public class QuartzNexusSchedulerSPI
 
       // register job specific listener
       quartzSupport.getScheduler().getListenerManager()
-          .addJobListener(new NexusTaskJobListener<>(quartzSupport, nexusScheduleConverter, jobKey),
+          .addJobListener(new NexusTaskJobListener<>(quartzSupport, jobKey),
               KeyMatcher.keyEquals(jobKey));
       // schedule the job
       quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);

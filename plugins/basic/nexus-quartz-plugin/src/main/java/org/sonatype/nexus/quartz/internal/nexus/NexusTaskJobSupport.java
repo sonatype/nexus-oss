@@ -58,6 +58,8 @@ public class NexusTaskJobSupport<T>
   public void execute() throws Exception {
     final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
     nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
+    // TODD: this should happen here?
+    // nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
     final T result = nexusTask.call();
     context.setResult(result);
     // put back any state task modified to have it persisted

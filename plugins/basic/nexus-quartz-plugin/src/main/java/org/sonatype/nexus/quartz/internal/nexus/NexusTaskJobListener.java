@@ -35,8 +35,6 @@ public class NexusTaskJobListener<T>
 {
   private final QuartzSupport quartzSupport;
 
-  private final NexusScheduleConverter nexusScheduleConverter;
-
   private final JobKey jobKey;
 
   private volatile long startedAt;
@@ -44,11 +42,9 @@ public class NexusTaskJobListener<T>
   private volatile NexusTaskFuture<T> future;
 
   public NexusTaskJobListener(final QuartzSupport quartzSupport,
-                              final NexusScheduleConverter nexusScheduleConverter,
                               final JobKey jobKey)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
-    this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
     this.jobKey = checkNotNull(jobKey);
   }
 
@@ -58,13 +54,16 @@ public class NexusTaskJobListener<T>
   public void jobToBeExecuted(final JobExecutionContext context) {
     future = new NexusTaskFuture<>(quartzSupport, jobKey);
     context.put(NexusTaskFuture.FUTURE_KEY, future);
-    startedAt = System.currentTimeMillis();
+    startedAt = context.getFireTime().getTime();
   }
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
     try {
       quartzSupport.getScheduler().getListenerManager().removeJobListener(getName());
+      if (context.getTrigger().getNextFireTime() == null) {
+        context.getScheduler().deleteJob(jobKey);
+      }
     }
     catch (SchedulerException e) {
       // mute
