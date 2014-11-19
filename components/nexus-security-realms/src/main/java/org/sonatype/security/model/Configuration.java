@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @SuppressWarnings("all")
 public class Configuration
-    implements org.sonatype.configuration.Configuration, java.io.Serializable, java.lang.Cloneable
+    implements SecurityModelConfiguration
 {
 
   private final ConcurrentMap<String, CUser> users;
@@ -47,15 +47,18 @@ public class Configuration
     userRoleMappings = Maps.newConcurrentMap();
   }
 
+  @Override
   public List<CUser> getUsers() {
     return ImmutableList.copyOf(users.values());
   }
 
+  @Override
   public CUser getUser(final String id) {
     checkNotNull(id, "user id");
     return users.get(id);
   }
 
+  @Override
   public void addUser(final CUser user) {
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
@@ -65,6 +68,7 @@ public class Configuration
     );
   }
 
+  @Override
   public void setUsers(final Collection<CUser> users) {
     this.users.clear();
     if (users != null) {
@@ -74,21 +78,25 @@ public class Configuration
     }
   }
 
+  @Override
   public boolean removeUser(final String id) {
     checkNotNull(id, "user id");
     return users.remove(id) != null;
   }
 
+  @Override
   public List<CUserRoleMapping> getUserRoleMappings() {
     return ImmutableList.copyOf(userRoleMappings.values());
   }
 
+  @Override
   public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
     checkNotNull(userId, "user id");
     checkNotNull(source, "source");
     return userRoleMappings.get(userRoleMappingKey(userId, source));
   }
 
+  @Override
   public void addUserRoleMapping(final CUserRoleMapping mapping) {
     checkNotNull(mapping, "mapping");
     checkNotNull(mapping.getUserId(), "user id");
@@ -99,6 +107,7 @@ public class Configuration
     );
   }
 
+  @Override
   public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
     this.userRoleMappings.clear();
     if (mappings != null) {
@@ -108,27 +117,32 @@ public class Configuration
     }
   }
 
+  @Override
   public boolean removeUserRoleMapping(final String userId, final String source) {
     checkNotNull(userId, "user id");
     checkNotNull(source, "source");
     return userRoleMappings.remove(userRoleMappingKey(userId, source)) != null;
   }
 
+  @Override
   public List<CPrivilege> getPrivileges() {
     return ImmutableList.copyOf(privileges.values());
   }
 
+  @Override
   public CPrivilege getPrivilege(final String id) {
     checkNotNull(id, "privilege id");
     return privileges.get(id);
   }
 
+  @Override
   public void addPrivilege(final CPrivilege privilege) {
     checkNotNull(privilege, "privilege");
     checkNotNull(privilege.getId(), "privilege id");
     checkState(privileges.putIfAbsent(privilege.getId(), privilege) == null, privilege.getId() + " already exists");
   }
 
+  @Override
   public void setPrivileges(final Collection<CPrivilege> privileges) {
     this.privileges.clear();
     if (privileges != null) {
@@ -138,26 +152,31 @@ public class Configuration
     }
   }
 
+  @Override
   public boolean removePrivilege(final String id) {
     checkNotNull(id, "privilege id");
     return privileges.remove(id) != null;
   }
 
+  @Override
   public List<CRole> getRoles() {
     return ImmutableList.copyOf(roles.values());
   }
 
+  @Override
   public CRole getRole(final String id) {
     checkNotNull(id, "role id");
     return roles.get(id);
   }
 
+  @Override
   public void addRole(final CRole role) {
     checkNotNull(role, "role");
     checkNotNull(role.getId(), "role id");
     checkState(roles.putIfAbsent(role.getId(), role) == null, role.getId() + " already exists");
   }
 
+  @Override
   public void setRoles(final Collection<CRole> roles) {
     this.roles.clear();
     if (roles != null) {
@@ -167,12 +186,13 @@ public class Configuration
     }
   }
 
+  @Override
   public boolean removeRole(final String id) {
     checkNotNull(id, "role id");
     return roles.remove(id) != null;
   }
 
-
+  @Override
   public Configuration clone() {
     try {
       Configuration copy = (Configuration) super.clone();
@@ -184,8 +204,8 @@ public class Configuration
 
       return copy;
     }
-    catch (java.lang.Exception ex) {
-      throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
+    catch (Exception ex) {
+      throw (RuntimeException) new UnsupportedOperationException(getClass().getName()
           + " does not support clone()").initCause(ex);
     }
   }

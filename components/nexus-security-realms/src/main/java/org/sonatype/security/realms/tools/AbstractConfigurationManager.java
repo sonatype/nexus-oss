@@ -13,7 +13,7 @@
 package org.sonatype.security.realms.tools;
 
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -23,7 +23,7 @@ public abstract class AbstractConfigurationManager
 {
   private final EventBus eventBus;
 
-  private volatile Configuration configuration = null;
+  private volatile SecurityModelConfiguration configuration = null;
 
   protected AbstractConfigurationManager(EventBus eventBus) {
     this.eventBus = eventBus;
@@ -33,9 +33,9 @@ public abstract class AbstractConfigurationManager
     configuration = null;
   }
 
-  protected Configuration getConfiguration() {
+  protected SecurityModelConfiguration getConfiguration() {
     // Assign configuration to local variable first, as calls to clearCache can null it out at any time
-    Configuration configuration = this.configuration;
+    SecurityModelConfiguration configuration = this.configuration;
     if (configuration == null || shouldRebuildConfiguration()) {
       boolean rebuiltConfiguration = false;
 
@@ -68,5 +68,5 @@ public abstract class AbstractConfigurationManager
    * Builds and returns fresh new Configuration instance. Implementation is expected to reset
    * {@link #shouldRebuildConfiguration()} flag back to <code>false</code>.
    */
-  protected abstract Configuration doGetConfiguration();
+  protected abstract SecurityModelConfiguration doGetConfiguration();
 }

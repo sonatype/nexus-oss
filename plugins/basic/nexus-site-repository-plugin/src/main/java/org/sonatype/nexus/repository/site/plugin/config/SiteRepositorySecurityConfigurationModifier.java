@@ -23,7 +23,7 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.SecurityConfigurationModifier;
 
 import com.google.common.collect.Lists;
@@ -60,7 +60,7 @@ public class SiteRepositorySecurityConfigurationModifier
   }
 
   @Override
-  public boolean apply(final Configuration configuration) {
+  public boolean apply(final SecurityModelConfiguration configuration) {
     boolean modified = false;
     final List<CRole> roles = configuration.getRoles();
     if (roles != null && roles.size() > 0) {

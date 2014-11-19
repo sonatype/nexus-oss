@@ -18,6 +18,7 @@ import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -41,7 +42,7 @@ public class EmptyRoleManagementTest
     UserManager userManager = this.getUserManager();
     userManager.deleteUser(userId);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
 
     for (CUser tmpUser : securityModel.getUsers()) {
       if (userId.equals(tmpUser.getId())) {
@@ -77,7 +78,7 @@ public class EmptyRoleManagementTest
 
     userManager.updateUser(user);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
     for (CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings()) {
       if (userId.equals(userRoleMapping.getUserId()) && "default".equals(userRoleMapping.getSource())) {
         List<String> configuredRoles = userRoleMapping.getRoles();
@@ -102,7 +103,7 @@ public class EmptyRoleManagementTest
 
     userManager.updateUser(user);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
 
     boolean found = false;
     for (CUser tmpUser : securityModel.getUsers()) {
@@ -147,7 +148,7 @@ public class EmptyRoleManagementTest
 
     userManager.updateUser(user);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
     for (CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings()) {
       if (userId.equals(userRoleMapping.getUserId()) && "default".equals(userRoleMapping.getSource())) {
         List<String> configuredRoles = userRoleMapping.getRoles();

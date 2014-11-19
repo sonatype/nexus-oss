@@ -22,6 +22,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -226,7 +227,7 @@ public class UserManagerTest
     // now delete the user
     userManager.deleteUser(userId);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
 
     for (CUser tmpUser : securityModel.getUsers()) {
       if (userId.equals(tmpUser.getId())) {
@@ -252,7 +253,7 @@ public class UserManagerTest
 
     securitySystem.setUsersRoles("admin", "default", roleIdentifiers);
 
-    Configuration securityModel = this.getSecurityConfiguration();
+    SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
 
     boolean found = false;
     for (CUserRoleMapping roleMapping : securityModel.getUserRoleMappings()) {

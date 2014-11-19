@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 /**
  * Will handle cleaning existing configuration when an item is removed
@@ -22,10 +22,10 @@ public interface SecurityConfigurationCleaner
   /**
    * Called when a role is removed so additional cleanup logic can be done.
    */
-  void roleRemoved(Configuration configuration, String roleId);
+  void roleRemoved(SecurityModelConfiguration configuration, String roleId);
 
   /**
-   * Called when a privilege isremoved so additional cleanup logic can be done.
+   * Called when a privilege is removed so additional cleanup logic can be done.
    */
-  void privilegeRemoved(Configuration configuration, String privilegeId);
+  void privilegeRemoved(SecurityModelConfiguration configuration, String privilegeId);
 }

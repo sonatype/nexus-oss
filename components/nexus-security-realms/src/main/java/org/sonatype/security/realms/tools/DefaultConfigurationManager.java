@@ -33,7 +33,7 @@ import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
@@ -552,7 +552,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  protected synchronized Configuration doGetConfiguration() {
+  protected synchronized SecurityModelConfiguration doGetConfiguration() {
     this.configurationSource.loadConfiguration();
 
     boolean modified = false;
@@ -564,7 +564,7 @@ public class DefaultConfigurationManager
       configurationSource.storeConfiguration();
     }
 
-    return this.configurationSource.getConfiguration();
+    return configurationSource.getConfiguration();
   }
 
   public SecurityValidationContext initializeContext() {

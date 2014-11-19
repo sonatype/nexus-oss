@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.model.source;
 
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 /**
  * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
@@ -34,13 +34,13 @@ public interface SecurityModelConfigurationSource
    *
    * @return the configuration, null if not loaded
    */
-  Configuration getConfiguration();
+  SecurityModelConfiguration getConfiguration();
 
   /**
    * Forces reloading the user configuration.
    *
    * @return the configuration
    */
-  Configuration loadConfiguration();
+  SecurityModelConfiguration loadConfiguration();
 
 }

@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
@@ -37,7 +37,7 @@ public class DefaultSecurityConfigurationCleaner
     extends ComponentSupport
     implements SecurityConfigurationCleaner
 {
-  public void privilegeRemoved(Configuration configuration, String privilegeId) {
+  public void privilegeRemoved(SecurityModelConfiguration configuration, String privilegeId) {
     log.debug("Cleaning privilege id {} from roles.", privilegeId);
     List<CRole> roles = configuration.getRoles();
 
@@ -51,7 +51,7 @@ public class DefaultSecurityConfigurationCleaner
     }
   }
 
-  public void roleRemoved(Configuration configuration, String roleId) {
+  public void roleRemoved(SecurityModelConfiguration configuration, String roleId) {
     log.debug("Cleaning role id {} from users and roles.", roleId);
     List<CRole> roles = configuration.getRoles();
 

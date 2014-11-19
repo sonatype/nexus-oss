@@ -20,6 +20,7 @@ import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigura
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
@@ -100,7 +101,7 @@ public abstract class AbstractSecurityTestCase
     return this.lookup(UserManager.class);
   }
 
-  protected Configuration getSecurityConfiguration() {
+  protected SecurityModelConfiguration getSecurityConfiguration() {
     return lookup(SecurityModelConfigurationSource.class, "default").getConfiguration();
   }
 

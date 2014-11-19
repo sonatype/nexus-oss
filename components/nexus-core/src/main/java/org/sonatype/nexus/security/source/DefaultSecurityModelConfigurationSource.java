@@ -28,6 +28,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -72,7 +73,7 @@ public class DefaultSecurityModelConfigurationSource
   /**
    * The configuration.
    */
-  private Configuration configuration;
+  private SecurityModelConfiguration configuration;
 
   @Inject
   public DefaultSecurityModelConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
@@ -102,12 +103,12 @@ public class DefaultSecurityModelConfigurationSource
   }
 
   @Override
-  public Configuration getConfiguration() {
+  public SecurityModelConfiguration getConfiguration() {
     return configuration;
   }
 
   @Override
-  public Configuration loadConfiguration() {
+  public SecurityModelConfiguration loadConfiguration() {
     try (ODatabaseDocumentTx db = openDb()) {
       List<CUser> users = Lists.newArrayList(userEntityAdapter.getAll(db));
       List<CRole> roles = Lists.newArrayList(roleEntityAdapter.get(db));
@@ -135,7 +136,7 @@ public class DefaultSecurityModelConfigurationSource
     saveConfiguration(getConfiguration());
   }
 
-  private void saveConfiguration(final Configuration configuration) {
+  private void saveConfiguration(final SecurityModelConfiguration configuration) {
     checkNotNull(configuration, "Missing configuration");
     try (ODatabaseDocumentTx db = openDb()) {
       saveUsers(db, configuration.getUsers());
