@@ -13,6 +13,7 @@
 package org.sonatype.nexus.scheduling.internal;
 
 import java.lang.annotation.Annotation;
+import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Named;
 
@@ -93,5 +94,26 @@ public class Tasks
     });
     when(beanEntry.getImplementationClass()).thenReturn((Class<Task>) clz);
     return beanEntry;
+  }
+
+  // ==
+
+  public static class SleeperTask
+      extends TaskSupport<String>
+  {
+    static final String RESULT_KEY = "result";
+
+    static CountDownLatch meWait;
+
+    @Override
+    protected String execute() throws Exception {
+      meWait.await();
+      return getConfiguration().getString(RESULT_KEY);
+    }
+
+    @Override
+    protected String getMessage() {
+      return getClass().getSimpleName();
+    }
   }
 }

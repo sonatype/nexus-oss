@@ -94,7 +94,7 @@ public class DefaultNexusTaskScheduler
     taskConfiguration.validate();
     checkNotNull(schedule);
     final Date now = new Date();
-    if (taskConfiguration.getCreated() != null) {
+    if (taskConfiguration.getCreated() == null) {
       taskConfiguration.setCreated(now);
     }
     taskConfiguration.setUpdated(now);

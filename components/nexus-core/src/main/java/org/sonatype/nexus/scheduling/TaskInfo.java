@@ -145,7 +145,7 @@ public interface TaskInfo<T>
    *
    * @throws IllegalStateException if task with this ID has been removed from scheduler.
    */
-  CurrentState getCurrentState() throws IllegalStateException;
+  CurrentState<T> getCurrentState() throws IllegalStateException;
 
   /**
    * Returns the task last run state, if there was any, otherwise {@code null}.

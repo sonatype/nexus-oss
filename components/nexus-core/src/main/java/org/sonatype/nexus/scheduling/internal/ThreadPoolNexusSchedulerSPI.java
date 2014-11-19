@@ -111,9 +111,9 @@ public class ThreadPoolNexusSchedulerSPI
     }
 
     @Override
-    public CurrentState getCurrentState() {
+    public CurrentState<T> getCurrentState() {
       checkState(!future.isDone());
-      return new CurrentState()
+      return new CurrentState<T>()
       {
         @Override
         public State getState() {

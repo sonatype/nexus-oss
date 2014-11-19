@@ -106,7 +106,7 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public CurrentState getCurrentState() {
+  public CurrentState<T> getCurrentState() {
     try {
       State state = null;
       Date nextRun = null;
