@@ -547,10 +547,6 @@ public class DefaultConfigurationManager
     return getPrivilegeProperty(readPrivilege(id), key);
   }
 
-  public void save() {
-    this.configurationSource.storeConfiguration();
-  }
-
   @Override
   protected synchronized SecurityModelConfiguration doGetConfiguration() {
     this.configurationSource.loadConfiguration();
