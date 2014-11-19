@@ -55,19 +55,15 @@ public class UpgradeTest
               + directory.getAbsolutePath());
         }
 
-        runUpgradeTest(testKey, ldapXml, ldapResultXml);
+        runUpgradeTest(ldapXml, ldapResultXml);
       }
     }
   }
 
-  private void runUpgradeTest(String testKey, File ldapXml, File ldapResultXml) throws Exception {
+  private void runUpgradeTest(File ldapXml, File ldapResultXml) throws Exception {
     //copy ldap.xml to conf dir
     File inplaceLdapXml = new File(getConfHomeDir(), "ldap.xml");
     FileUtils.copyFile(ldapXml, inplaceLdapXml);
-
-    File testSecConfigFile = new File(ldapXml.getParentFile(), "security-configuration.xml");
-    File inplaceSecConfigFile = new File(getSecurityConfiguration());
-    FileUtils.copyFile(testSecConfigFile, inplaceSecConfigFile);
 
     LdapConfigurationSource source = this.lookup(LdapConfigurationSource.class);
     final CLdapConfiguration configuration = source.load();

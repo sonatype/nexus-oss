@@ -12,26 +12,29 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 
 public class UserRoleMappingTest
     extends AbstractSecurityTestCase
 {
 
+  @Override
+  protected Configuration getSecurityModelConfig() {
+    return UserRoleMappingTestSecurity.securityModel();
+  }
+
   public ConfigurationManager getConfigManager()
       throws Exception
   {
-    return (ConfigurationManager) this.lookup(DefaultConfigurationManager.class);
+    return this.lookup(DefaultConfigurationManager.class);
   }
 
   public void testGetUser()
@@ -108,25 +111,6 @@ public class UserRoleMappingTest
 
     // make sure we have exactly 4 user role mappings
     Assert.assertEquals(5, config.listUserRoleMappings().size());
-  }
-
-  @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    // copy the file to a different location because we are going to change it
-    FileUtils.copyFile(new File("target/test-classes/org/sonatype/security/locators/security.xml"),
-        new File("target/test-classes/org/sonatype/security/locators/security-test.xml"));
-  }
-
-  @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-
-    //Overriding default value set in parent
-    properties.put("security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml");
   }
 
 }

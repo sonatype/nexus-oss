@@ -79,8 +79,6 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
 
-    new SecurityConfigUtil().verifyUser(user);
-
     return user;
   }
 
@@ -121,8 +119,6 @@ public class UserMessageUtil
     Assert.assertEquals(responseResource.getStatus(), user.getStatus());
     Assert.assertEquals(responseResource.getEmail(), user.getEmail());
     Assert.assertEquals(user.getRoles(), responseResource.getRoles());
-
-    new SecurityConfigUtil().verifyUser(user);
 
     return responseResource;
   }
@@ -307,7 +303,7 @@ public class UserMessageUtil
 
   public static final String ADMIN_ROLE = "nx-admin";
 
-  private <T> T invokeAsAdministrator(final Callable<T> callable) throws Exception {
+  public <T> T invokeAsAdministrator(final Callable<T> callable) throws Exception {
     final TestContext ctx = TestContainer.getInstance().getTestContext();
     final String username = ctx.getUsername();
     final String password = ctx.getPassword();

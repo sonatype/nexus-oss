@@ -198,8 +198,6 @@ public class Nexus233PrivilegesValidationIT
     }
 
     this.messageUtil.validateResponseErrorXml(responseText);
-
-    Assert.assertNull(getSecurityConfigUtil().getCPrivilegeByName("createWithInvalidAndValidMethodsTest - (read)"));
   }
 
   @Test

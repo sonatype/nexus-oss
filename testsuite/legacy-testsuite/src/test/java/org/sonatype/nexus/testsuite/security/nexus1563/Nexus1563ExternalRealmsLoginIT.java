@@ -13,20 +13,32 @@
 package org.sonatype.nexus.testsuite.security.nexus1563;
 
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.security.rest.model.RoleResource;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.StatusMatchers.isSuccess;
 
 public class Nexus1563ExternalRealmsLoginIT
-    extends AbstractPrivilegeTest
+    extends AbstractSecurityTest
 {
+
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+    settings.setSecurityRealms(asList("Simple", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
+    SettingsMessageUtil.save(settings);
+  }
 
   @BeforeClass
   public static void security() {

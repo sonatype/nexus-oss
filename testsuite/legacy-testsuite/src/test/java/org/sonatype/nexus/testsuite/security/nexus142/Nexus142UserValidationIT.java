@@ -254,8 +254,6 @@ public class Nexus142UserValidationIT
     Assert.assertEquals(responseResource.getEmail(), resource.getEmail());
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
 
-    getSecurityConfigUtil().verifyUser(resource);
-
     // update the user
 
     resource.setFirstName("updateValidation");

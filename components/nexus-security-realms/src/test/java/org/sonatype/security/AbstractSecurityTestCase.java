@@ -13,28 +13,19 @@
 package org.sonatype.security;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.Properties;
-
-import javax.inject.Inject;
 
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.security.usermanagement.UserManager;
 
 import com.google.inject.Binder;
+import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
-import org.apache.shiro.realm.Realm;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.sisu.launch.InjectedTestCase;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -42,14 +33,9 @@ public abstract class AbstractSecurityTestCase
     extends InjectedTestCase
 {
 
-  public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
-
   protected File PLEXUS_HOME = new File("./target/plexus_home");
 
   protected File CONFIG_DIR = new File(PLEXUS_HOME, "etc");
-
-  @Inject
-  private Map<String, Realm> realmMap;
 
   @Override
   public void configure(Properties properties) {
@@ -60,9 +46,21 @@ public abstract class AbstractSecurityTestCase
 
   @Override
   public void configure(final Binder binder) {
-    // install the module, to not rely on deprecated Plexus components anymore
-    // (as they are REMOVED)
     binder.install(new SecurityModule());
+    binder.bind(SecurityConfigurationSource.class)
+        .annotatedWith(Names.named("static"))
+        .toInstance(new TestSecurityConfigurationSource(getSecurityConfig()));
+    binder.bind(SecurityModelConfigurationSource.class)
+        .annotatedWith(Names.named("static"))
+        .toInstance(new TestSecurityModelConfigurationSource(getSecurityModelConfig()));
+  }
+
+  protected SecurityConfiguration getSecurityConfig() {
+    return AbstractSecurityTestCaseSecurity.security();
+  }
+
+  protected Configuration getSecurityModelConfig() {
+    return AbstractSecurityTestCaseSecurity.securityModel();
   }
 
   @Override
@@ -75,17 +73,8 @@ public abstract class AbstractSecurityTestCase
       throws Exception
   {
     FileUtils.deleteDirectory(PLEXUS_HOME);
-
     super.setUp();
-
     CONFIG_DIR.mkdirs();
-
-    SecurityConfigurationSource source = this.lookup(SecurityConfigurationSource.class, "file");
-    SecurityConfiguration config = source.loadConfiguration();
-
-    config.setRealms(new ArrayList<String>(realmMap.keySet()));
-    source.storeConfiguration();
-
     lookup(SecuritySystem.class).start();
   }
 
@@ -102,23 +91,16 @@ public abstract class AbstractSecurityTestCase
     }
   }
 
-  protected Configuration getConfigurationFromStream(InputStream is)
-      throws Exception
-  {
-    SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-    Reader fr = new InputStreamReader(is);
-
-    return reader.read(fr);
+  protected SecuritySystem getSecuritySystem() {
+    return lookup(SecuritySystem.class);
   }
 
-  protected Configuration getSecurityConfiguration()
-      throws IOException, XmlPullParserException
-  {
-    // now lets check the XML file for the user and the role mapping
-    SecurityConfigurationXpp3Reader secReader = new SecurityConfigurationXpp3Reader();
-    try (FileReader fileReader = new FileReader(new File(CONFIG_DIR, "security.xml"))) {
-      return secReader.read(fileReader);
-    }
+  public UserManager getUserManager() {
+    return this.lookup(UserManager.class);
   }
+
+  protected Configuration getSecurityConfiguration() {
+    return lookup(SecurityModelConfigurationSource.class, "file").getConfiguration();
+  }
+
 }

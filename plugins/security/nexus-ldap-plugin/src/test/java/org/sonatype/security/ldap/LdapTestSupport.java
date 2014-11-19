@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.guice.SecurityModule;
 
 import com.google.inject.Module;
@@ -36,7 +35,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
 public abstract class LdapTestSupport
-    extends NexusTestSupport
+    extends SecurityTestSupport
 {
   private LdapServer ldapServer;
 

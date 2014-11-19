@@ -12,17 +12,12 @@
  */
 package org.sonatype.security.realms.validator;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
-import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
 import org.eclipse.sisu.launch.InjectedTestCase;
 
@@ -35,27 +30,15 @@ public class DefaultConfigurationValidatorTest
       throws Exception
   {
     super.setUp();
-
-    this.configurationValidator = (SecurityConfigurationValidator) lookup(SecurityConfigurationValidator.class);
-  }
-
-  protected Configuration getConfigurationFromStream(InputStream is)
-      throws Exception
-  {
-    SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
-
-    Reader fr = new InputStreamReader(is);
-
-    return reader.read(fr);
+    this.configurationValidator = lookup(SecurityConfigurationValidator.class);
   }
 
   public void testBad1()
       throws Exception
   {
-    ValidationResponse response =
-        configurationValidator.validateModel(new ValidationRequest<Configuration>(
-            getConfigurationFromStream(
-                getClass().getResourceAsStream("/org/sonatype/security/configuration/validator/security-bad1.xml"))));
+    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+        DefaultConfigurationValidatorTestSecurity.securityModel1()
+    ));
 
     assertFalse(response.isValid());
 
@@ -70,10 +53,9 @@ public class DefaultConfigurationValidatorTest
   public void testBad2()
       throws Exception
   {
-    ValidationResponse response =
-        configurationValidator.validateModel(new ValidationRequest<Configuration>(
-            getConfigurationFromStream(
-                getClass().getResourceAsStream("/org/sonatype/security/configuration/validator/security-bad2.xml"))));
+    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+        DefaultConfigurationValidatorTestSecurity.securityModel2()
+    ));
 
     assertFalse(response.isValid());
 
@@ -87,10 +69,9 @@ public class DefaultConfigurationValidatorTest
   public void testBad3()
       throws Exception
   {
-    ValidationResponse response =
-        configurationValidator.validateModel(new ValidationRequest<Configuration>(
-            getConfigurationFromStream(
-                getClass().getResourceAsStream("/org/sonatype/security/configuration/validator/security-bad3.xml"))));
+    ValidationResponse response = configurationValidator.validateModel(new ValidationRequest<>(
+        DefaultConfigurationValidatorTestSecurity.securityModel3()
+    ));
 
     assertFalse(response.isValid());
 

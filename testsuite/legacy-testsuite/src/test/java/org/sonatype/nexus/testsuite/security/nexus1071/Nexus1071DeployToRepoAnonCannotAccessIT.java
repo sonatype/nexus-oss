@@ -14,10 +14,11 @@ package org.sonatype.nexus.testsuite.security.nexus1071;
 
 import java.io.File;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import org.sonatype.nexus.integrationtests.MavenVerifierHelper;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.security.rest.model.UserResource;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -26,13 +27,35 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import static java.util.Arrays.asList;
+
 /**
  * @author Juven Xu
  */
 public class Nexus1071DeployToRepoAnonCannotAccessIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
   private static final MavenVerifierHelper mavenVerifierHelper = new MavenVerifierHelper();
+
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    String p1 = createPrivileges("Public Repos", "1", null, "public", asList("read")).get(0).getId();
+    String p2 = createPrivileges("Public Snapshot Repos", "1", null, "public-snapshots", asList("read")).get(0).getId();
+    String p3 = createPrivileges("MetaData", "4", asList("update")).get(0).getId();
+
+    createRole("r1", asList(p1, p2));
+    createRole("r2", asList(p3));
+    createRole("r3", asList("T5", "T7", "T1", p3));
+
+    UserResource deployment = userUtil.getUser("deployment");
+    deployment.setRoles(asList("nx-deployment", "r3"));
+    userUtil.updateUser(deployment);
+
+    UserResource anonymous = userUtil.getUser("anonymous");
+    anonymous.setRoles(asList("anonymous", "r1"));
+    userUtil.updateUser(anonymous);
+  }
 
   @BeforeClass
   public static void setSecureTest() {

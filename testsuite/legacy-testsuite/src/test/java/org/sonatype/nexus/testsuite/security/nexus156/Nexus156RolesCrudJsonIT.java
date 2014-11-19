@@ -28,6 +28,12 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 /**
  * CRUD tests for JSON request/response.
  */
@@ -95,12 +101,17 @@ public class Nexus156RolesCrudJsonIT
     // create a role
     this.messageUtil.createRole(resource);
 
-    // now that we have at least one element stored (more from other tests, most likely)
-
-    // NEED to work around a GET problem with the REST client
     List<RoleResource> roles = this.messageUtil.getList();
-    getSecurityConfigUtil().verifyRolesComplete(roles);
-
+    RoleResource foundRole = null;
+    for (RoleResource role : roles) {
+      if (resource.getName().equals(role.getName())) {
+        foundRole = role;
+        break;
+      }
+    }
+    assertThat(foundRole, is(notNullValue()));
+    assertThat(resource.getDescription(), equalTo(foundRole.getDescription()));
+    assertThat(resource.getPrivileges(), containsInAnyOrder("1"));
   }
 
   public void readTest()
@@ -165,8 +176,6 @@ public class Nexus156RolesCrudJsonIT
     Assert.assertEquals(resource.getSessionTimeout(), responseResource.getSessionTimeout());
     Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
-
-    getSecurityConfigUtil().verifyRole(resource);
   }
 
   @Test
@@ -192,7 +201,7 @@ public class Nexus156RolesCrudJsonIT
     }
 
     // TODO: check if deleted
-    Assert.assertNull(getSecurityConfigUtil().getCRole(responseResource.getId()));
+    Assert.assertNull(messageUtil.findRole(responseResource.getId()));
   }
 
 }

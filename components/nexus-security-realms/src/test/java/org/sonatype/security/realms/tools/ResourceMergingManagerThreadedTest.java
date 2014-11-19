@@ -13,11 +13,11 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.List;
-import java.util.Properties;
 
 import javax.inject.Inject;
 
 import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.model.Configuration;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
@@ -39,26 +39,22 @@ public class ResourceMergingManagerThreadedTest
   private List<DynamicSecurityResource> injectedDynamicResources;
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-
-    //Overriding default value set in parent
-    properties.put("security-xml-file",
-        "target/test-classes/org/sonatype/jsecurity/configuration/static-merging/security.xml");
+  protected Configuration getSecurityModelConfig() {
+    return ResourceMergingConfigurationManagerTestSecurity.securityModel();
   }
 
   @Override
   public void configure(Binder binder) {
     super.configure(binder);
 
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default")).to(UnitTestSecurityResource.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default")).to(StaticSecurityResource2.class);
     binder.bind(DynamicSecurityResource.class).annotatedWith(Names.named("default"))
         .to(UnitTestDynamicSecurityResource.class);
 
     int staticResourceCount = 100;
     for (int ii = 0; ii < staticResourceCount - 1; ii++) {
       binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("test-" + ii))
-          .to(UnitTestSecurityResource.class);
+          .to(StaticSecurityResource2.class);
     }
 
     int dynamicResourceCount = 100;
@@ -82,8 +78,8 @@ public class ResourceMergingManagerThreadedTest
 
     this.expectedPrivilegeCount = this.manager.listPrivileges().size();
 
-    // 100 static items with 3 privs each + 100 dynamic items
-    Assert.assertEquals((100 * 3) + 100, expectedPrivilegeCount);
+    // 100 static items with 3 privs each + 100 dynamic items + 2 from default config
+    Assert.assertEquals((100 * 3) + 100 + 2, expectedPrivilegeCount);
 
     for (DynamicSecurityResource dynamicSecurityResource : injectedDynamicResources) {
       Assert.assertFalse(dynamicSecurityResource.isDirty());

@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -28,6 +28,7 @@ import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.sonatype.security.rest.model.UserResource;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -36,9 +37,19 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
+import static java.util.Arrays.asList;
+
 public class Nexus1170ReducePermissionCheckingIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractSecurityTest
 {
+
+  @Override
+  protected void prepareSecurity() throws Exception {
+    super.prepareSecurity();
+    UserResource test = userUtil.getUser(TEST_USER_NAME);
+    test.setRoles(asList("anonymous", "nx-deployment", "ui-basic"));
+    userUtil.updateUser(test);
+  }
 
   @BeforeClass
   public static void setSecureTest() {

@@ -221,7 +221,7 @@ public class NexusContextListener
       for (Feature feature : featuresService.listFeatures()) {
         String name = feature.getName();
         // heuristic: select anything related to nexus, except boot/edition specific features
-        if (name.contains("nexus-") && !name.contains("-boot") && !name.endsWith("-edition")) {
+        if (name.contains("nexus") && !name.contains("-boot") && !name.endsWith("-edition")) {
           log.info("Found {}", name);
           features.add(feature);
         }
