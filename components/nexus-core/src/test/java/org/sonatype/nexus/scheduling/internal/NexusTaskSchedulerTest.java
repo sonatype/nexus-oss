@@ -70,6 +70,8 @@ public class NexusTaskSchedulerTest
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
     assertThat(taskInfo.getName(), equalTo(taskConfiguration.getName()));
     assertThat(taskInfo.getConfiguration().getType(), equalTo(taskConfiguration.getType()));
+    assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
+    assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
 
     final CurrentState<String> currentState = taskInfo.getCurrentState();
@@ -99,9 +101,5 @@ public class NexusTaskSchedulerTest
     catch (IllegalStateException e) {
       // good
     }
-
-    // taskInfo.config is processed and timestamped by scheduler
-    assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
-    assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
   }
 }
