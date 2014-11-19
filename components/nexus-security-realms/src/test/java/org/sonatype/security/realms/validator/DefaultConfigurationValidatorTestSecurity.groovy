@@ -27,7 +27,6 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel1() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
             ),
@@ -100,7 +99,6 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel2() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: '1',
@@ -181,7 +179,6 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel3() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: '',

@@ -12,10 +12,6 @@
  */
 package org.sonatype.security.model.source;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.model.Configuration;
 
 /**
@@ -26,13 +22,25 @@ import org.sonatype.security.model.Configuration;
  * @author cstamas
  */
 public interface SecurityModelConfigurationSource
-    extends ConfigurationSource<Configuration>
 {
 
-  InputStream getConfigurationAsStream()
-      throws IOException;
+  /**
+   * Persists the current configuration.
+   */
+  void storeConfiguration();
 
-  void backupConfiguration()
-      throws IOException;
+  /**
+   * Gets the current configuration.
+   *
+   * @return the configuration, null if not loaded
+   */
+  Configuration getConfiguration();
+
+  /**
+   * Forces reloading the user configuration.
+   *
+   * @return the configuration
+   */
+  Configuration loadConfiguration();
 
 }

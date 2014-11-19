@@ -20,8 +20,13 @@ import java.util.Set;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.NexusAppTestSupport;
+import org.sonatype.nexus.NexusAppTestSupportSecurity;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -71,6 +76,12 @@ public class UserPrincipalsHelperTest
       protected void configure() {
         bind(Realm.class).annotatedWith(Names.named("TestPrincipalsRealm")).to(TestRealm.class);
         bind(UserManager.class).annotatedWith(Names.named("TestPrincipalsUserManager")).to(TestUserManager.class);
+        bind(SecurityConfigurationSource.class)
+            .annotatedWith(Names.named("default"))
+            .toInstance(new PreconfiguredSecurityConfigurationSource(NexusAppTestSupportSecurity.security()));
+        bind(SecurityModelConfigurationSource.class)
+            .annotatedWith(Names.named("default"))
+            .toInstance(new PreconfiguredSecurityModelConfigurationSource(NexusAppTestSupportSecurity.securityModel()));
       }
     });
   }

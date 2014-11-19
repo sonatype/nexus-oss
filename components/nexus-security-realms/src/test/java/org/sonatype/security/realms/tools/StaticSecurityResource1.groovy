@@ -29,7 +29,6 @@ implements StaticSecurityResource
   @Override
   Configuration getConfiguration() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: 'priv1',

@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.configuration.source;
 
-import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
@@ -23,6 +22,25 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * @author cstamas
  */
 public interface SecurityConfigurationSource
-    extends ConfigurationSource<SecurityConfiguration>
 {
+
+  /**
+   * Persists the current configuration.
+   */
+  void storeConfiguration();
+
+  /**
+   * Gets the current configuration.
+   *
+   * @return the configuration, null if not loaded
+   */
+  SecurityConfiguration getConfiguration();
+
+  /**
+   * Forces reloading the user configuration.
+   *
+   * @return the configuration
+   */
+  SecurityConfiguration loadConfiguration();
+
 }

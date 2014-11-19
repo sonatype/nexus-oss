@@ -1,0 +1,236 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2007-2014 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.security.model;
+
+/**
+ * The root element of Security configuration.
+ *
+ * @version $Revision$ $Date$
+ */
+@SuppressWarnings("all")
+public class Configuration
+    implements org.sonatype.configuration.Configuration, java.io.Serializable, java.lang.Cloneable
+{
+
+  //--------------------------/
+  //- Class/Member Variables -/
+  //--------------------------/
+
+  /**
+   * Field users.
+   */
+  private java.util.List<CUser> users;
+
+  /**
+   * Field roles.
+   */
+  private java.util.List<CRole> roles;
+
+  /**
+   * Field privileges.
+   */
+  private java.util.List<CPrivilege> privileges;
+
+  /**
+   * Field userRoleMappings.
+   */
+  private java.util.List<CUserRoleMapping> userRoleMappings;
+
+  //-----------/
+  //- Methods -/
+  //-----------/
+
+  /**
+   * Method addPrivilege.
+   */
+  public void addPrivilege(CPrivilege cPrivilege) {
+    getPrivileges().add(cPrivilege);
+  } //-- void addPrivilege( CPrivilege )
+
+  /**
+   * Method addRole.
+   */
+  public void addRole(CRole cRole) {
+    getRoles().add(cRole);
+  } //-- void addRole( CRole )
+
+  /**
+   * Method addUser.
+   */
+  public void addUser(CUser cUser) {
+    getUsers().add(cUser);
+  } //-- void addUser( CUser )
+
+  /**
+   * Method addUserRoleMapping.
+   */
+  public void addUserRoleMapping(CUserRoleMapping cUserRoleMapping) {
+    getUserRoleMappings().add(cUserRoleMapping);
+  } //-- void addUserRoleMapping( CUserRoleMapping )
+
+  /**
+   * Method clone.
+   *
+   * @return Configuration
+   */
+  public Configuration clone() {
+    try {
+      Configuration copy = (Configuration) super.clone();
+
+      if (this.users != null) {
+        copy.users = new java.util.ArrayList<CUser>();
+        for (CUser item : this.users) {
+          copy.users.add(((CUser) item).clone());
+        }
+      }
+
+      if (this.roles != null) {
+        copy.roles = new java.util.ArrayList<CRole>();
+        for (CRole item : this.roles) {
+          copy.roles.add(((CRole) item).clone());
+        }
+      }
+
+      if (this.privileges != null) {
+        copy.privileges = new java.util.ArrayList<CPrivilege>();
+        for (CPrivilege item : this.privileges) {
+          copy.privileges.add(((CPrivilege) item).clone());
+        }
+      }
+
+      if (this.userRoleMappings != null) {
+        copy.userRoleMappings = new java.util.ArrayList<CUserRoleMapping>();
+        for (CUserRoleMapping item : this.userRoleMappings) {
+          copy.userRoleMappings.add(((CUserRoleMapping) item).clone());
+        }
+      }
+
+      return copy;
+    }
+    catch (java.lang.Exception ex) {
+      throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
+          + " does not support clone()").initCause(ex);
+    }
+  } //-- Configuration clone()
+
+  /**
+   * Method getPrivileges.
+   *
+   * @return List
+   */
+  public java.util.List<CPrivilege> getPrivileges() {
+    if (this.privileges == null) {
+      this.privileges = new java.util.ArrayList<CPrivilege>();
+    }
+
+    return this.privileges;
+  } //-- java.util.List<CPrivilege> getPrivileges()
+
+  /**
+   * Method getRoles.
+   *
+   * @return List
+   */
+  public java.util.List<CRole> getRoles() {
+    if (this.roles == null) {
+      this.roles = new java.util.ArrayList<CRole>();
+    }
+
+    return this.roles;
+  } //-- java.util.List<CRole> getRoles()
+
+  /**
+   * Method getUserRoleMappings.
+   *
+   * @return List
+   */
+  public java.util.List<CUserRoleMapping> getUserRoleMappings() {
+    if (this.userRoleMappings == null) {
+      this.userRoleMappings = new java.util.ArrayList<CUserRoleMapping>();
+    }
+
+    return this.userRoleMappings;
+  } //-- java.util.List<CUserRoleMapping> getUserRoleMappings()
+
+  /**
+   * Method getUsers.
+   *
+   * @return List
+   */
+  public java.util.List<CUser> getUsers() {
+    if (this.users == null) {
+      this.users = new java.util.ArrayList<CUser>();
+    }
+
+    return this.users;
+  } //-- java.util.List<CUser> getUsers()
+
+  /**
+   * Method removePrivilege.
+   */
+  public void removePrivilege(CPrivilege cPrivilege) {
+    getPrivileges().remove(cPrivilege);
+  } //-- void removePrivilege( CPrivilege )
+
+  /**
+   * Method removeRole.
+   */
+  public void removeRole(CRole cRole) {
+    getRoles().remove(cRole);
+  } //-- void removeRole( CRole )
+
+  /**
+   * Method removeUser.
+   */
+  public void removeUser(CUser cUser) {
+    getUsers().remove(cUser);
+  } //-- void removeUser( CUser )
+
+  /**
+   * Method removeUserRoleMapping.
+   */
+  public void removeUserRoleMapping(CUserRoleMapping cUserRoleMapping) {
+    getUserRoleMappings().remove(cUserRoleMapping);
+  } //-- void removeUserRoleMapping( CUserRoleMapping )
+
+  /**
+   * Set list of privileges that can be put in a role.
+   */
+  public void setPrivileges(java.util.List<CPrivilege> privileges) {
+    this.privileges = privileges;
+  } //-- void setPrivileges( java.util.List )
+
+  /**
+   * Set list of roles that Users can be associated to.  A roles
+   * is simply a container that hold privileges, and other roles.
+   */
+  public void setRoles(java.util.List<CRole> roles) {
+    this.roles = roles;
+  } //-- void setRoles( java.util.List )
+
+  /**
+   * Set list of User.
+   */
+  public void setUserRoleMappings(java.util.List<CUserRoleMapping> userRoleMappings) {
+    this.userRoleMappings = userRoleMappings;
+  } //-- void setUserRoleMappings( java.util.List )
+
+  /**
+   * Set list of users that are defined to have access to the
+   * system.
+   */
+  public void setUsers(java.util.List<CUser> users) {
+    this.users = users;
+  } //-- void setUsers( java.util.List )
+
+}
