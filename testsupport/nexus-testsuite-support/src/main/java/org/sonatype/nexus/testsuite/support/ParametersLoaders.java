@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.sonatype.sisu.goodies.marshal.internal.jackson2.JacksonMarshaller;
 
@@ -232,7 +233,7 @@ public abstract class ParametersLoaders
       public Collection<Object[]> load() {
         String property = System.getProperty(propertyName);
         if (property != null) {
-          return Arrays.<Object[]>asList(new Object[]{property});
+          return Collections.singleton(new Object[]{property});
         }
         return null;
       }
