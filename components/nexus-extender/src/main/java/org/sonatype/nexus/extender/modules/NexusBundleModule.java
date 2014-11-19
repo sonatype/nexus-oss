@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import org.apache.shiro.guice.aop.ShiroAopModule;
+import org.eclipse.sisu.bean.LifecycleModule;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.BundleModule;
 import org.eclipse.sisu.plexus.PlexusSpaceModule;
@@ -54,6 +55,8 @@ public class NexusBundleModule
 
   private final List<AbstractInterceptorModule> interceptorModules;
 
+  private final LifecycleModule lifecycleModule = new LifecycleModule();
+
   private final String imports;
 
   private final boolean hasPlexus;
@@ -76,6 +79,7 @@ public class NexusBundleModule
     maybeAddValidation(modules);
     maybeAddWebResources(modules);
     maybeAddInterceptors(modules);
+    maybeAddLifecycle(modules);
     modules.addAll(super.modules());
     modules.add(rankingModule);
 
@@ -130,6 +134,12 @@ public class NexusBundleModule
       if (aim.appliesTo(space)) {
         modules.add(aim);
       }
+    }
+  }
+
+  private void maybeAddLifecycle(List<Module> modules) {
+    if (imports.contains("javax.annotation")) {
+      modules.add(lifecycleModule);
     }
   }
 }
