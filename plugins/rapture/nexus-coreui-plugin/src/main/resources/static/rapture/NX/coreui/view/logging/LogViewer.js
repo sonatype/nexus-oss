@@ -28,7 +28,8 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     cls: 'log-viewer-field',
     readOnly: true,
     hideLabel: true,
-    emptyText: 'Refresh to display log'
+    emptyText: 'Refresh to display log',
+    inputAttrTpl: 'wrap="off"'
   },
 
   tbar: [

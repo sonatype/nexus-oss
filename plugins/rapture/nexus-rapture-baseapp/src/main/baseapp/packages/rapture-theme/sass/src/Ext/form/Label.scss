@@ -1,3 +1,7 @@
+/**
+ * @class Ext.form.Label
+ */
+
 .user-token-field {
   padding: 2px;
   font-family: $font-monospace;
@@ -7,7 +11,4 @@
 .log-viewer-field textarea {
   font-family: $font-monospace;
   font-size: $font-size-code;
-  white-space: pre;
-  word-wrap: normal;
-  overflow-x: scroll;
 }

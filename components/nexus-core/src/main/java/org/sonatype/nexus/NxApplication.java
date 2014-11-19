@@ -42,6 +42,7 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import org.eclipse.sisu.bean.BeanManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -71,6 +72,8 @@ public class NxApplication
 
   private final OrientBootstrap orientBootstrap;
 
+  private final BeanManager beanManager;
+
   @Inject
   public NxApplication(final EventBus eventBus,
                        final NexusConfiguration nexusConfiguration,
@@ -79,7 +82,8 @@ public class NxApplication
                        final NexusTaskScheduler nexusTaskExecutor,
                        final RepositoryRegistry repositoryRegistry,
                        final EventSubscriberHost eventSubscriberHost,
-                       final OrientBootstrap orientBootstrap)
+                       final OrientBootstrap orientBootstrap,
+                       final BeanManager beanManager)
   {
     this.eventBus = checkNotNull(eventBus);
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
@@ -89,6 +93,7 @@ public class NxApplication
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
+    this.beanManager = checkNotNull(beanManager);
 
     logInitialized();
   }
@@ -202,6 +207,9 @@ public class NxApplication
 
     // HACK: Must stop database services manually
     orientBootstrap.stop();
+
+    // dispose of JSR-250
+    beanManager.unmanage();
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
     log.info("Stopped {}", getNexusNameForLogs());

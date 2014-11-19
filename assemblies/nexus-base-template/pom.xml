@@ -67,7 +67,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.assemblies</groupId>
-      <artifactId>nexus-base-feature</artifactId>
+      <artifactId>nexus-base-edition</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
