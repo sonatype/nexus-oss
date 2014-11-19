@@ -13897,6 +13897,26 @@
 }
 
 /**
+ * @class Ext.form.Fieldset
+ */
+/* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+.nx-optionalfieldset {
+  margin: 10px 0 0 0;
+}
+/* line 8, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+.nx-optionalfieldset .x-fieldset-body {
+  background-color: #f4f4f4;
+  border: 1px solid #cbcbcb;
+  padding: 5px 0 10px 20px;
+  position: relative;
+  left: 25px;
+}
+/* line 17, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
+.nx-optionalfieldset .nx-optionalfieldset .x-fieldset-body {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/**
  * @class Ext.form.Label
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Label.scss */
@@ -13910,9 +13930,6 @@
 .log-viewer-field textarea {
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
-  /*white-space: pre;
-  word-wrap: normal;
-  overflow-x: scroll;*/
 }
 
 /**
