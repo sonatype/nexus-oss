@@ -31,6 +31,7 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -166,5 +167,17 @@ public class CRoleEntityAdapter
     );
     db.command(command).execute(id);
   }
+
+  public ODocument get(final ODatabaseDocumentTx db, final String id) {
+    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
+        "SELECT FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+    );
+    List<ODocument> results = db.command(query).execute(id);
+    if (results.isEmpty()) {
+      return null;
+    }
+    return results.get(0);
+  }
+
 
 }

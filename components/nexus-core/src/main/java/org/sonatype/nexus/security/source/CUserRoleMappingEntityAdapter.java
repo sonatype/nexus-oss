@@ -31,6 +31,7 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -152,6 +153,17 @@ public class CUserRoleMappingEntityAdapter
         "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
     db.command(command).execute(userId, source);
+  }
+
+  public ODocument get(final ODatabaseDocumentTx db, final String userId, final String source) {
+    OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
+        "SELECT FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
+    );
+    List<ODocument> results = db.command(query).execute(userId, source);
+    if (results.isEmpty()) {
+      return null;
+    }
+    return results.get(0);
   }
 
 }

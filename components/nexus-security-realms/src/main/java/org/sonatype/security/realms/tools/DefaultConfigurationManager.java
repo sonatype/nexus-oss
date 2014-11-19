@@ -191,7 +191,7 @@ public class DefaultConfigurationManager
 
     if (vr.isValid()) {
       getConfiguration().addUser(user);
-      createOrUpdateUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
+      getConfiguration().addUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
       logValidationWarnings(vr);
     }
     else {
@@ -199,28 +199,12 @@ public class DefaultConfigurationManager
     }
   }
 
-  private void createOrUpdateUserRoleMapping(CUserRoleMapping roleMapping) {
-    // delete first, ask questions later
-    // we are always updating, its possible that this object could have already existed, because we cannot fully
-    // sync with external realms.
-    try {
-      deleteUserRoleMapping(roleMapping.getUserId(), roleMapping.getSource());
-    }
-    catch (NoSuchRoleMappingException e) {
-      // it didn't exist, thats ok.
-    }
-
-    // now add it
-    getConfiguration().addUserRoleMapping(roleMapping);
-
-  }
-
   private CUserRoleMapping buildUserRoleMapping(String userId, Set<String> roles) {
     CUserRoleMapping roleMapping = new CUserRoleMapping();
 
     roleMapping.setUserId(userId);
     roleMapping.setSource(SecurityXmlUserManager.SOURCE);
-    roleMapping.setRoles(new ArrayList<String>(roles));
+    roleMapping.setRoles(new ArrayList<>(roles));
 
     return roleMapping;
 
@@ -340,8 +324,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validatePrivilege(context, privilege, true);
 
     if (vr.isValid()) {
-      deletePrivilege(privilege.getId(), false);
-      getConfiguration().addPrivilege(privilege);
+      getConfiguration().updatePrivilege(privilege);
       logValidationWarnings(vr);
     }
     else {
@@ -365,8 +348,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateRole(context, role, true);
 
     if (vr.isValid()) {
-      deleteRole(role.getId(), false);
-      getConfiguration().addRole(role);
+      getConfiguration().updateRole(role);
       logValidationWarnings(vr);
     }
     else {
@@ -385,7 +367,7 @@ public class DefaultConfigurationManager
     catch (NoSuchRoleMappingException e) {
       this.log.debug("User: {} has no roles", user.getId());
     }
-    this.updateUser(user, new HashSet<String>(roles));
+    this.updateUser(user, new HashSet<>(roles));
   }
 
   public void updateUser(CUser user, Set<String> roles)
@@ -404,9 +386,8 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, true);
 
     if (vr.isValid()) {
-      deleteUser(user.getId());
-      getConfiguration().addUser(user);
-      this.createOrUpdateUserRoleMapping(this.buildUserRoleMapping(user.getId(), roles));
+      getConfiguration().updateUser(user);
+      getConfiguration().updateUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
       logValidationWarnings(vr);
     }
     else {

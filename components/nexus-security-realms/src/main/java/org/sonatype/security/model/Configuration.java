@@ -79,6 +79,13 @@ public class Configuration
   }
 
   @Override
+  public void updateUser(final CUser user) {
+    checkNotNull(user, "user");
+    checkNotNull(user.getId(), "user id");
+    checkState(users.replace(user.getId(), user) != null, user.getId() + " not found");
+  }
+
+  @Override
   public boolean removeUser(final String id) {
     checkNotNull(id, "user id");
     return users.remove(id) != null;
@@ -118,6 +125,17 @@ public class Configuration
   }
 
   @Override
+  public void updateUserRoleMapping(final CUserRoleMapping mapping) {
+    checkNotNull(mapping, "mapping");
+    checkNotNull(mapping.getUserId(), "user id");
+    checkNotNull(mapping.getSource(), "source");
+    checkState(userRoleMappings.replace(
+        userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) != null,
+        mapping.getUserId() + " / " + mapping.getSource() + " not found"
+    );
+  }
+
+  @Override
   public boolean removeUserRoleMapping(final String userId, final String source) {
     checkNotNull(userId, "user id");
     checkNotNull(source, "source");
@@ -153,6 +171,13 @@ public class Configuration
   }
 
   @Override
+  public void updatePrivilege(final CPrivilege privilege) {
+    checkNotNull(privilege, "privilege");
+    checkNotNull(privilege.getId(), "privilege id");
+    checkState(privileges.replace(privilege.getId(), privilege) != null, privilege.getId() + " not found");
+  }
+
+  @Override
   public boolean removePrivilege(final String id) {
     checkNotNull(id, "privilege id");
     return privileges.remove(id) != null;
@@ -184,6 +209,13 @@ public class Configuration
         addRole(role);
       }
     }
+  }
+
+  @Override
+  public void updateRole(final CRole role) {
+    checkNotNull(role, "role");
+    checkNotNull(role.getId(), "role id");
+    checkState(roles.replace(role.getId(), role) != null, role.getId() + " not found");
   }
 
   @Override

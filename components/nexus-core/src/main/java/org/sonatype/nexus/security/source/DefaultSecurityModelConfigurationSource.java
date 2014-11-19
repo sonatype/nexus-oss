@@ -36,8 +36,10 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Default {@link SecurityModelConfigurationSource} implementation using Orient db as store.
@@ -255,6 +257,18 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
+    public void updateUser(final CUser user) {
+      checkNotNull(user, "user");
+      checkNotNull(user.getId(), "user id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        ODocument document = userEntityAdapter.get(db, user.getId());
+        checkState(document != null, user.getId() + " not found");
+        userEntityAdapter.write(document, user);
+        delegate.updateUser(user);
+      }
+    }
+
+    @Override
     public boolean removeUser(final String id) {
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.delete(db, id);
@@ -283,6 +297,19 @@ public class DefaultSecurityModelConfigurationSource
     @Override
     public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
       delegate.setUserRoleMappings(mappings);
+    }
+
+    @Override
+    public void updateUserRoleMapping(final CUserRoleMapping mapping) {
+      checkNotNull(mapping, "mapping");
+      checkNotNull(mapping.getUserId(), "user id");
+      checkNotNull(mapping.getSource(), "source");
+      try (ODatabaseDocumentTx db = openDb()) {
+        ODocument document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
+        checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
+        userRoleMappingEntityAdapter.write(document, mapping);
+        delegate.updateUserRoleMapping(mapping);
+      }
     }
 
     @Override
@@ -317,6 +344,18 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
+    public void updatePrivilege(final CPrivilege privilege) {
+      checkNotNull(privilege, "privilege");
+      checkNotNull(privilege.getId(), "privilege id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        ODocument document = privilegeEntityAdapter.get(db, privilege.getId());
+        checkState(document != null, privilege.getId() + " not found");
+        privilegeEntityAdapter.write(document, privilege);
+        delegate.updatePrivilege(privilege);
+      }
+    }
+
+    @Override
     public boolean removePrivilege(final String id) {
       try (ODatabaseDocumentTx db = openDb()) {
         privilegeEntityAdapter.delete(db, id);
@@ -339,6 +378,18 @@ public class DefaultSecurityModelConfigurationSource
       try (ODatabaseDocumentTx db = openDb()) {
         roleEntityAdapter.create(db, role);
         delegate.addRole(role);
+      }
+    }
+
+    @Override
+    public void updateRole(final CRole role) {
+      checkNotNull(role, "role");
+      checkNotNull(role.getId(), "role id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        ODocument document = roleEntityAdapter.get(db, role.getId());
+        checkState(document != null, role.getId() + " not found");
+        roleEntityAdapter.write(document, role);
+        delegate.updateRole(role);
       }
     }
 

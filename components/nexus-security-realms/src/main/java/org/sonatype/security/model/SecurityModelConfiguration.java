@@ -29,6 +29,8 @@ public interface SecurityModelConfiguration
 
   void setUsers(Collection<CUser> users);
 
+  void updateUser(CUser user);
+
   boolean removeUser(String id);
 
   List<CUserRoleMapping> getUserRoleMappings();
@@ -38,6 +40,8 @@ public interface SecurityModelConfiguration
   void addUserRoleMapping(CUserRoleMapping mapping);
 
   void setUserRoleMappings(Collection<CUserRoleMapping> mappings);
+
+  void updateUserRoleMapping(CUserRoleMapping mapping);
 
   boolean removeUserRoleMapping(String userId, String source);
 
@@ -49,6 +53,8 @@ public interface SecurityModelConfiguration
 
   void setPrivileges(Collection<CPrivilege> privileges);
 
+  void updatePrivilege(CPrivilege privilege);
+
   boolean removePrivilege(String id);
 
   List<CRole> getRoles();
@@ -56,6 +62,8 @@ public interface SecurityModelConfiguration
   CRole getRole(String id);
 
   void addRole(CRole role);
+
+  void updateRole(CRole role);
 
   void setRoles(Collection<CRole> roles);
 
