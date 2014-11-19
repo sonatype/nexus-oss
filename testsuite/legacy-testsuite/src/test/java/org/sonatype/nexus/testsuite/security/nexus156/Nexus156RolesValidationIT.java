@@ -229,8 +229,6 @@ public class Nexus156RolesValidationIT
     Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
 
-    getSecurityConfigUtil().verifyRole(resource);
-
         /*
          * NO Name
          */

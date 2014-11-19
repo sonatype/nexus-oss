@@ -56,12 +56,8 @@ public class Nexus4635FirstStartIT
     // FileUtils.forceDelete fits nice, since it will throw IOEx if unable to delete (will not be dumb like
     // File.delete() is)
     final File nexusXml = new File(new File(WORK_CONF_DIR), "nexus.xml");
-    final File securityXml = new File(new File(WORK_CONF_DIR), "security.xml");
-    final File securityConfigurationXml = new File(new File(WORK_CONF_DIR), "security-configuration.xml");
 
     FileUtils.forceDelete(nexusXml);
-    FileUtils.forceDelete(securityXml);
-    FileUtils.forceDelete(securityConfigurationXml);
   }
 
   @Test

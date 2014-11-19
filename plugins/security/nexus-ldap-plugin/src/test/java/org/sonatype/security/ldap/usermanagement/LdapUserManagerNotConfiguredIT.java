@@ -12,15 +12,11 @@
  */
 package org.sonatype.security.ldap.usermanagement;
 
-import java.io.FileOutputStream;
-
 import org.sonatype.security.ldap.LdapTestSupport;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 
 import junit.framework.Assert;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class LdapUserManagerNotConfiguredIT
@@ -31,18 +27,7 @@ public class LdapUserManagerNotConfiguredIT
       throws Exception
   {
     super.setUp();
-
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-configuration-no-ldap.xml"),
-        new FileOutputStream(getNexusSecurityConfiguration()));
-
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-configuration.xml"),
-        new FileOutputStream(getSecurityConfiguration()));
-
     getLdapRealmConfig().delete();
-
-    // IOUtil.copy(
-    // getClass().getResourceAsStream( "/test-conf/etc/ldap.xml" ),
-    // new FileOutputStream( new File( CONF_HOME, "ldap.xml" ) ) );
   }
 
   @Test
@@ -56,8 +41,8 @@ public class LdapUserManagerNotConfiguredIT
       Assert.fail("Expected UserNotFoundTransientException");
     }
     catch (UserNotFoundException e) {
-    // OSS LDAP did throw transient when not configured, but Pro does not, it thrown only on error
-    // catch (UserNotFoundTransientException e) {
+      // OSS LDAP did throw transient when not configured, but Pro does not, it thrown only on error
+      // catch (UserNotFoundTransientException e) {
       // expect transient error due to misconfiguration
     }
   }

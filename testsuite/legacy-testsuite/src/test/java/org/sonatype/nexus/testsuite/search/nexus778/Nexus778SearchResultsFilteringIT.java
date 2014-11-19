@@ -76,9 +76,9 @@ public class Nexus778SearchResultsFilteringIT
     List<String> combined = new ArrayList<String>();
     combined.add(priv1.getId());
     combined.add(priv2.getId());
-    RoleResource role1 = createRole("filterRole1", Collections.singletonList(priv1.getId()));
-    RoleResource role2 = createRole("filterRole2", Collections.singletonList(priv2.getId()));
-    RoleResource role3 = createRole("filterRole3", combined);
+    RoleResource role1 = _createRole("filterRole1", Collections.singletonList(priv1.getId()));
+    RoleResource role2 = _createRole("filterRole2", Collections.singletonList(priv2.getId()));
+    RoleResource role3 = _createRole("filterRole3", combined);
 
     // Now update the test user
     updateUserRole(TEST_USER_NAME, Collections.singletonList(role3.getId()));
@@ -173,7 +173,7 @@ public class Nexus778SearchResultsFilteringIT
     return privUtil.createPrivileges(resource).iterator().next();
   }
 
-  private RoleResource createRole(String name, List<String> privilegeIds)
+  private RoleResource _createRole(String name, List<String> privilegeIds)
       throws Exception
   {
     RoleResource role = new RoleResource();

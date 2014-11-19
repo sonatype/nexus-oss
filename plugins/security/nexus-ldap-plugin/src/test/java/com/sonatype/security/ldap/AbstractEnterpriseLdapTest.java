@@ -16,8 +16,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.ldap.SecurityTestSupport;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ObjectArrays;
@@ -31,7 +31,7 @@ import org.codehaus.plexus.PlexusConstants;
 import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
 
 public abstract class AbstractEnterpriseLdapTest
-    extends NexusTestSupport
+    extends SecurityTestSupport
 {
   private CacheManager cacheManager;
 

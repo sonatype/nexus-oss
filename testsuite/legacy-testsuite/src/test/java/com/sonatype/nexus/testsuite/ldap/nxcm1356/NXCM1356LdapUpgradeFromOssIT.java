@@ -14,8 +14,6 @@ package com.sonatype.nexus.testsuite.ldap.nxcm1356;
 
 import java.util.List;
 
-import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
-
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
@@ -23,7 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class NXCM1356LdapUpgradeFromOssIT
-    extends AbstractLdapIT
+    extends NXCM1356ITSupport
 {
 
   public NXCM1356LdapUpgradeFromOssIT() {

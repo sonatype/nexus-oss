@@ -14,16 +14,15 @@ package com.sonatype.security.ldap;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.io.IOUtils;
@@ -60,9 +59,6 @@ public abstract class AbstractLdapTestCase
 
     getConfHomeDir().mkdirs();
 
-    copyResource(this.getSecurityConfigXmlFilePath(), getSecurityConfiguration());
-    copyResource(this.getSecurityXmlFilePath(), getNexusSecurityConfiguration());
-
     try (InterpolationFilterReader reader =
              new InterpolationFilterReader(new InputStreamReader(
                  getClass().getResourceAsStream(this.getLdapConfigXmlFilePath())), interpolationMap)) {
@@ -70,25 +66,13 @@ public abstract class AbstractLdapTestCase
     }
   }
 
-  private void copy(InputStream is, OutputStream os)
-      throws IOException
-  {
-    try (InputStream in = is;
-         OutputStream out = os) {
-      IOUtils.copy(in, out);
-    }
-  }
-
-  protected String getSecurityConfigXmlFilePath() {
-    return this.getFilePath("security-configuration.xml");
+  @Override
+  protected SecurityConfiguration getSecurityConfig() {
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   protected String getLdapConfigXmlFilePath() {
     return this.getFilePath("ldap.xml");
-  }
-
-  protected String getSecurityXmlFilePath() {
-    return this.getFilePath("security.xml");
   }
 
   private Object getTestLdifPath() {

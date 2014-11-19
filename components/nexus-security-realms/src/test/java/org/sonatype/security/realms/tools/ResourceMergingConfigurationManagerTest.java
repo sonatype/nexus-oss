@@ -14,12 +14,11 @@ package org.sonatype.security.realms.tools;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.locators.MockStaticSecurityResource;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.Configuration;
 
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
@@ -30,20 +29,15 @@ public class ResourceMergingConfigurationManagerTest
   private ConfigurationManager manager;
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-
-    //Overriding value set in parent
-    properties.put("security-xml-file",
-        "target/test-classes/org/sonatype/security/configuration/static-merging/security.xml");
+  protected Configuration getSecurityModelConfig() {
+    return ResourceMergingConfigurationManagerTestSecurity.securityModel();
   }
 
   @Override
   public void configure(Binder binder) {
     super.configure(binder);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("UnitTestSecurityResource"))
-        .to(UnitTestSecurityResource.class);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("mock")).to(MockStaticSecurityResource.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("s2")).to(StaticSecurityResource2.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("s1")).to(StaticSecurityResource1.class);
   }
 
   @Override
@@ -71,7 +65,6 @@ public class ResourceMergingConfigurationManagerTest
 
     assertEquals("Test Anon Role", anon.getName());
     assertEquals("Test Anon Role Description", anon.getDescription());
-    assertEquals(60, anon.getSessionTimeout());
 
     CRole other = manager.readRole("other");
     assertTrue(other.getRoles().contains("role2"));
@@ -83,7 +76,6 @@ public class ResourceMergingConfigurationManagerTest
 
     assertEquals("Other Role", other.getName());
     assertEquals("Other Role Description", other.getDescription());
-    assertEquals(60, other.getSessionTimeout());
 
     // all roles
     assertEquals(8, roles.size());

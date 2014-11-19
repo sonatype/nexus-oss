@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
-import java.io.File;
 import java.util.List;
 
 import org.sonatype.security.AbstractSecurityTestCase;
@@ -24,27 +23,14 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 
 public class EmptyRoleManagementTest
     extends AbstractSecurityTestCase
 {
+
   @Override
-  protected void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    // copy the securityConf into place
-    String securityXml = this.getClass().getName().replaceAll("\\.", "\\/") + "-security.xml";
-    FileUtils.copyURLToFile(Thread.currentThread().getContextClassLoader().getResource(securityXml),
-        new File(CONFIG_DIR, "security.xml"));
-  }
-
-  public UserManager getUserManager()
-      throws Exception
-  {
-    return this.lookup(UserManager.class);
+  protected Configuration getSecurityModelConfig() {
+    return EmptyRoleManagementTestSecurity.securityModel();
   }
 
   public void testDeleteUserWithEmptyRole()

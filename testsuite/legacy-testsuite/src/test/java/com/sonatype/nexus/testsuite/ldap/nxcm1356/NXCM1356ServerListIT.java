@@ -14,7 +14,6 @@ package com.sonatype.nexus.testsuite.ldap.nxcm1356;
 
 import java.io.IOException;
 
-import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
 import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerListEntryDTO;
@@ -33,7 +32,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 
 public class NXCM1356ServerListIT
-    extends AbstractLdapIT
+    extends NXCM1356ITSupport
 {
 
   protected boolean isStartServer() {

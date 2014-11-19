@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.SecurityTestSupportSecurity;
+import org.sonatype.security.TestSecurityConfigurationSource;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -23,6 +26,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -91,7 +95,19 @@ public class SecurityModuleTest
   }
 
   private Module getWireModule() {
-    return new WireModule(new SecurityModule(), getSpaceModule(), getPropertiesModule());
+    return new WireModule(new SecurityModule(), getTestModule(), getSpaceModule(), getPropertiesModule());
+  }
+
+  private Module getTestModule() {
+    return new AbstractModule()
+    {
+      @Override
+      protected void configure() {
+        bind(SecurityConfigurationSource.class)
+            .annotatedWith(Names.named("static"))
+            .toInstance(new TestSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
+      }
+    };
   }
 
   private Module getSpaceModule() {

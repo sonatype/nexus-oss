@@ -80,8 +80,6 @@ public class RoleMessageUtil
     Assert.assertEquals(role.getPrivileges(), responseResource.getPrivileges());
     Assert.assertEquals(role.getRoles(), responseResource.getRoles());
 
-    new SecurityConfigUtil().verifyRole(responseResource);
-
     return responseResource;
   }
 

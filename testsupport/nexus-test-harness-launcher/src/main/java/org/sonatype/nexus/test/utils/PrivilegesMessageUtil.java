@@ -65,9 +65,6 @@ public class PrivilegesMessageUtil
     finally {
       RequestFacade.releaseResponse(response);
     }
-
-    new SecurityConfigUtil().verifyPrivileges(statusResources);
-
     return statusResources;
   }
 
@@ -77,6 +74,16 @@ public class PrivilegesMessageUtil
     Response response = this.sendMessage(Method.GET, null, id);
     if (!response.getStatus().isSuccess()) {
       Assert.fail("Could not get Privilege: " + response.getStatus() + "\n" + response.getEntity().getText());
+    }
+    return this.getResourceFromResponse(response);
+  }
+
+  public PrivilegeStatusResource findPrivilege(String id)
+      throws IOException
+  {
+    Response response = this.sendMessage(Method.GET, null, id);
+    if (!response.getStatus().isSuccess()) {
+      return null;
     }
     return this.getResourceFromResponse(response);
   }

@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +35,7 @@ import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import com.google.common.collect.Maps;
@@ -46,7 +44,6 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
@@ -77,6 +74,10 @@ public class ProtectedRepositoryRegistryIT
 
         final PlexusConfiguredRealm realm = new PlexusConfiguredRealm(privileges);
         binder.bind(Key.get(Realm.class, Names.named("default"))).toInstance(realm);
+
+        binder.bind(SecurityConfigurationSource.class)
+            .annotatedWith(Names.named("static"))
+            .toInstance(new TestSecurityConfigurationSource(ProtectedRepositoryRegistryITSecurity.security()));
       }
     });
   }
@@ -91,18 +92,6 @@ public class ProtectedRepositoryRegistryIT
       throws Exception
   {
     super.setUp();
-
-    // copy the security-configuration
-    String resource = this.getClass().getName().replaceAll("\\.", "\\/") + "-security-configuration.xml";
-    URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
-    try {
-      File securityConfigFile = new File(getConfHomeDir(), "security-configuration.xml");
-      securityConfigFile.getParentFile().mkdirs();
-      FileUtils.copyURLToFile(url, securityConfigFile);
-    }
-    catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
 
     // this will trigger config load!
     startNx();
@@ -127,14 +116,6 @@ public class ProtectedRepositoryRegistryIT
 
     // setup security
     this.securitySystem = this.lookup(SecuritySystem.class);
-    // this.securitySystem.setSecurityEnabled( true );
-
-    // copy the security-configuration
-    // String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
-    // URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-    // FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
-
-    // this.securitySystem.start();
 
     waitForTasksToStop();
   }

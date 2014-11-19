@@ -27,6 +27,9 @@ import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfigur
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 import com.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Writer;
 
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
+
 import com.thoughtworks.xstream.XStream;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -43,9 +46,11 @@ public abstract class AbstractLdapConfigurationTest
   {
     super.setUp();
     this.passwordHelper = this.lookup(PasswordHelper.class);
+  }
 
-    copyResource("/defaults/security-configuration.xml", getSecurityConfiguration());
-    copyResource("/defaults/security.xml", getNexusSecurityConfiguration());
+  @Override
+  protected SecurityConfiguration getSecurityConfig() {
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   protected CUserAndGroupAuthConfiguration buildUserAndGroupAuthConfiguration() {
