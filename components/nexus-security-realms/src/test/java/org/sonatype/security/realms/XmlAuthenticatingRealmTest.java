@@ -204,7 +204,6 @@ public class XmlAuthenticatingRealmTest
     roles.add("role");
 
     configurationManager.createUser(testUser, roles);
-    configurationManager.save();
   }
 
   private void buildLegacyTestAuthenticationConfig(String password)

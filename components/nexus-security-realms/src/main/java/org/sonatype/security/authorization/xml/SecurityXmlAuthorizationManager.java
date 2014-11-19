@@ -180,7 +180,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.createRole(secRole);
-          configuration.save();
         }
       });
     }
@@ -206,7 +205,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.updateRole(secRole);
-          configuration.save();
         }
       });
     }
@@ -230,7 +228,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.deleteRole(roleId);
-          configuration.save();
         }
       });
     }
@@ -277,7 +274,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.createPrivilege(secPriv);
-          configuration.save();
         }
       });
     }
@@ -303,7 +299,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.updatePrivilege(secPriv);
-          configuration.save();
         }
       });
     }
@@ -327,7 +322,6 @@ public class SecurityXmlAuthorizationManager
         @Override
         public void run() throws Exception {
           configuration.deletePrivilege(privilegeId);
-          configuration.save();
         }
       });
     }

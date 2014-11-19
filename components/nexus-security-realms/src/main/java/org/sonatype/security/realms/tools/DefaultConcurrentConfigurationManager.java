@@ -149,12 +149,6 @@ public class DefaultConcurrentConfigurationManager
   }
 
   @Override
-  public void save() {
-    checkWriteLock();
-    configurationManager.save();
-  }
-
-  @Override
   public void cleanRemovedRole(String roleId) {
     checkWriteLock();
     configurationManager.cleanRemovedRole(roleId);

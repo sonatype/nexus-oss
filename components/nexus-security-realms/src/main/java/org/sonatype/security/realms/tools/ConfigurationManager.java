@@ -241,11 +241,6 @@ public interface ConfigurationManager
   void clearCache();
 
   /**
-   * Save to disk what is currently cached in memory
-   */
-  void save();
-
-  /**
    * Initialize the context used for validation
    */
   SecurityValidationContext initializeContext();

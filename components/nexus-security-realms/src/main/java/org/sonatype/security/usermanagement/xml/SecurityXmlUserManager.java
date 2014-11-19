@@ -183,7 +183,6 @@ public class SecurityXmlUserManager
       {
         public void run() throws Exception {
           configuration.createUser(secUser, getRoleIdsFromUser(user));
-          saveConfiguration();
         }
       });
     }
@@ -206,7 +205,6 @@ public class SecurityXmlUserManager
           final CUser secUser = configuration.readUser(userId);
           secUser.setPassword(hashPassword(newPassword));
           configuration.updateUser(secUser);
-          saveConfiguration();
         }
       });
     }
@@ -229,7 +227,6 @@ public class SecurityXmlUserManager
           newSecUser.setPassword(oldSecUser.getPassword());
 
           configuration.updateUser(newSecUser, getRoleIdsFromUser(user));
-          saveConfiguration();
         }
       });
       return user;
@@ -248,7 +245,6 @@ public class SecurityXmlUserManager
       {
         public void run() throws Exception {
           configuration.deleteUser(userId);
-          saveConfiguration();
         }
       });
     }
@@ -294,7 +290,6 @@ public class SecurityXmlUserManager
   }
 
   private void saveConfiguration() {
-    this.configuration.save();
   }
 
   public Set<User> searchUsers(final UserSearchCriteria criteria) {
@@ -393,9 +388,6 @@ public class SecurityXmlUserManager
               configuration.createUserRoleMapping(roleMapping);
             }
           }
-
-          // save the config
-          saveConfiguration();
         }
       });
     }

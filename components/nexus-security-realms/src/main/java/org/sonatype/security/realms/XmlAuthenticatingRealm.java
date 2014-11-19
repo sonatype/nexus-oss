@@ -134,7 +134,6 @@ public class XmlAuthenticatingRealm
           try {
             user.setPassword(passwordService.encryptPassword(password));
             configuration.updateUser(user);
-            configuration.save();
           }
           catch (Exception e) {
             //Update failed, rollback to previous values

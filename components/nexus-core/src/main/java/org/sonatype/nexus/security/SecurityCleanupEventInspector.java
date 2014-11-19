@@ -132,7 +132,6 @@ public class SecurityCleanupEventInspector
           for (String privilegeId : removedIds) {
             configManager.cleanRemovedPrivilege(privilegeId);
           }
-          configManager.save();
         }
 
       });

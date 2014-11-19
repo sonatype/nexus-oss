@@ -167,8 +167,6 @@ public class XmlAuthorizingRealmTest
     roles.add(role.getId());
 
     configurationManager.createUser(user, roles);
-
-    configurationManager.save();
   }
 
 }

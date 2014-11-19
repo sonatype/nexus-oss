@@ -79,7 +79,6 @@ public class UserRoleMappingTest
 
     // try to update empty role
     config.updateUserRoleMapping(mapping);
-    config.save();
     config.clearCache();
 
     // make sure we still have the role mappings

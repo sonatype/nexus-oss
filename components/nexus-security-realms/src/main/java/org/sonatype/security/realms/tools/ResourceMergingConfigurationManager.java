@@ -470,13 +470,6 @@ public class ResourceMergingConfigurationManager
 
   // ==
 
-  public void save() {
-    // The static config can't be updated, so delegate to xml file
-    manager.save();
-  }
-
-  // ==
-
   @Override
   protected boolean shouldRebuildConfiguration() {
     for (DynamicSecurityResource resource : dynamicResources) {
