@@ -31,7 +31,7 @@
   <modules>
     <module>karaf-nexus-branding</module>
     <module>nexus-boot-feature</module>
-    <module>nexus-base-feature</module>
+    <module>nexus-base-edition</module>
     <module>nexus-base-template</module>
   </modules>
 

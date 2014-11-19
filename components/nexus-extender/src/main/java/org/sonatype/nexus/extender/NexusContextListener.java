@@ -15,8 +15,8 @@ package org.sonatype.nexus.extender;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +31,7 @@ import org.sonatype.nexus.web.NexusGuiceFilter;
 import org.sonatype.nexus.web.NexusServletModule;
 
 import com.codahale.metrics.SharedMetricRegistries;
+import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -122,7 +123,7 @@ public class NexusContextListener
       // assign higher start level to hold back plugin activation
       fsl.setInitialBundleStartLevel(NEXUS_PLUGIN_START_LEVEL);
 
-      installNexusFeatures();
+      installFeatures(getFeatures((String) variables.get("nexus-features")));
 
       // raise framework start level to activate plugins
       fsl.setStartLevel(NEXUS_PLUGIN_START_LEVEL, this);
@@ -198,19 +199,39 @@ public class NexusContextListener
     return injector.getInstance(BeanLocator.class).locate(Key.get(clazz)).iterator().next().getValue();
   }
 
-  private void installNexusFeatures() throws Exception {
-    Set<Feature> features = new HashSet<>();
+  private Set<Feature> getFeatures(final String featureNames) throws Exception {
+    Set<Feature> features = new LinkedHashSet<>();
+    if (featureNames != null) {
+      log.info("Selecting features by name...");
 
-    // for now scan the system for candidate features
-    for (Feature feature : featuresService.listFeatures()) {
-      String name = feature.getName();
-      if (name.startsWith("nexus") && name.endsWith("plugin")) {
-        log.info("Adding {}", name);
-        features.add(feature);
+      for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(featureNames)) {
+        Feature feature = featuresService.getFeature(name);
+        if (feature != null) {
+          log.info("Adding {}", name);
+          features.add(feature);
+        }
+        else {
+          log.warn("Missing {}", name);
+        }
       }
     }
+    else {
+      log.info("Discovering nexus features...");
 
-    log.info("Installing chosen features...");
+      for (Feature feature : featuresService.listFeatures()) {
+        String name = feature.getName();
+        // heuristic: select anything related to nexus, except boot/edition specific features
+        if (name.contains("nexus-") && !name.contains("-boot") && !name.endsWith("-edition")) {
+          log.info("Found {}", name);
+          features.add(feature);
+        }
+      }
+    }
+    return features;
+  }
+
+  private void installFeatures(final Set<Feature> features) throws Exception {
+    log.info("Installing selected features...");
 
     // install features using batch mode; skip features already in the cache
     features.removeAll(Arrays.asList(featuresService.listInstalledFeatures()));

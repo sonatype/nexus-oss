@@ -22,7 +22,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-base-feature</artifactId>
+  <artifactId>nexus-base-edition</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>feature</packaging>
 
