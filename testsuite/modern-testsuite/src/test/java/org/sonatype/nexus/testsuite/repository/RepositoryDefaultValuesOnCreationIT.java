@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.repository;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -32,14 +31,9 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Verify that default values are applied when a new repository is created with only the mandatory parameters.
@@ -48,16 +42,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public class RepositoryDefaultValuesOnCreationIT
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   public RepositoryDefaultValuesOnCreationIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

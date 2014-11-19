@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.yum;
 
 import java.lang.ProcessBuilder.Redirect;
-import java.util.Collection;
 import java.util.List;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -39,13 +38,8 @@ import org.sonatype.nexus.yum.client.capabilities.ProxyMetadataCapability;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runners.Parameterized;
 
 import static org.junit.Assume.assumeTrue;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Support class for Yum ITs.
@@ -56,16 +50,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public class YumITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   public YumITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

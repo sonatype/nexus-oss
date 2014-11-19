@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.apachehttpclient;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collection;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
@@ -30,13 +29,8 @@ import org.sonatype.tests.http.server.fluent.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * ITs related accessing a remote server that requires mutual trust client trusts server / server trusts client).
@@ -49,14 +43,6 @@ public class SSLMutualTrustIT
 {
 
   private Server httpsRemoteServer;
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle"))
-    ).load();
-  }
 
   public SSLMutualTrustIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

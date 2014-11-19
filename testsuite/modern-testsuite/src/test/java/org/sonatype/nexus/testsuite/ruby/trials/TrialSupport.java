@@ -13,20 +13,12 @@
 
 package org.sonatype.nexus.testsuite.ruby.trials;
 
-import java.util.Collection;
-
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Support class for Rubygems "scenarios" executed as "modern ITs", a "trial". This way, the scenario utilizes
@@ -41,15 +33,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public abstract class TrialSupport
     extends NexusRunningParametrizedITSupport
 {
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
-        )
-    ).load();
-  }
 
   protected TrialSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
