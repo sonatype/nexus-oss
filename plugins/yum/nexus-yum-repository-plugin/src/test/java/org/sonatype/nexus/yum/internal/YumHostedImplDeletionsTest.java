@@ -71,6 +71,7 @@ public class YumHostedImplDeletionsTest
     when(nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class)).thenReturn(
         new TaskConfiguration()
     );
+    when(nexusScheduler.createTaskInstance(Mockito.any(TaskConfiguration.class))).thenReturn(mock(GenerateMetadataTask.class));
 
     yum = new YumHostedImpl(
         nexusScheduler,
