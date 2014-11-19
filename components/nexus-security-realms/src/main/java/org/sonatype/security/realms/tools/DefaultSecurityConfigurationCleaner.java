@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
@@ -36,7 +37,7 @@ public class DefaultSecurityConfigurationCleaner
     extends ComponentSupport
     implements SecurityConfigurationCleaner
 {
-  public void privilegeRemoved(EnhancedConfiguration configuration, String privilegeId) {
+  public void privilegeRemoved(Configuration configuration, String privilegeId) {
     log.debug("Cleaning privilege id {} from roles.", privilegeId);
     List<CRole> roles = configuration.getRoles();
 
@@ -44,13 +45,13 @@ public class DefaultSecurityConfigurationCleaner
       if (role.getPrivileges().contains(privilegeId)) {
         log.debug("removing privilege {} from role {}", privilegeId, role.getId());
         role.getPrivileges().remove(privilegeId);
-        configuration.removeRoleById(role.getId());
+        configuration.removeRole(role.getId());
         configuration.addRole(role);
       }
     }
   }
 
-  public void roleRemoved(EnhancedConfiguration configuration, String roleId) {
+  public void roleRemoved(Configuration configuration, String roleId) {
     log.debug("Cleaning role id {} from users and roles.", roleId);
     List<CRole> roles = configuration.getRoles();
 
@@ -58,7 +59,7 @@ public class DefaultSecurityConfigurationCleaner
       if (role.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from role {}", roleId, role.getId());
         role.getRoles().remove(roleId);
-        configuration.removeRoleById(role.getId());
+        configuration.removeRole(role.getId());
         configuration.addRole(role);
       }
     }
@@ -69,7 +70,7 @@ public class DefaultSecurityConfigurationCleaner
       if (mapping.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from user {}", mapping.getUserId());
         mapping.removeRole(roleId);
-        configuration.removeUserRoleMappingByUserId(mapping.getUserId(), mapping.getSource());
+        configuration.removeUserRoleMapping(mapping.getUserId(), mapping.getSource());
         configuration.addUserRoleMapping(mapping);
       }
     }

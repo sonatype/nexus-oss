@@ -63,7 +63,7 @@ public class DefaultConfigurationValidatorTest
 
     assertEquals(3, response.getValidationWarnings().size());
 
-    assertEquals(12, response.getValidationErrors().size());
+    assertEquals(10, response.getValidationErrors().size());
   }
 
   public void testBad3()
@@ -77,7 +77,7 @@ public class DefaultConfigurationValidatorTest
 
     assertTrue(response.isModified());
 
-    assertEquals(2, response.getValidationWarnings().size());
+    assertEquals(1, response.getValidationWarnings().size());
 
     assertEquals(2, response.getValidationErrors().size());
   }

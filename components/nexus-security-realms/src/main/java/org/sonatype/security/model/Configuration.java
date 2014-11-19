@@ -12,6 +12,16 @@
  */
 package org.sonatype.security.model;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * The root element of Security configuration.
  *
@@ -22,98 +32,155 @@ public class Configuration
     implements org.sonatype.configuration.Configuration, java.io.Serializable, java.lang.Cloneable
 {
 
-  //--------------------------/
-  //- Class/Member Variables -/
-  //--------------------------/
+  private final ConcurrentMap<String, CUser> users;
 
-  /**
-   * Field users.
-   */
-  private java.util.List<CUser> users;
+  private final ConcurrentMap<String, CRole> roles;
 
-  /**
-   * Field roles.
-   */
-  private java.util.List<CRole> roles;
+  private final ConcurrentMap<String, CPrivilege> privileges;
 
-  /**
-   * Field privileges.
-   */
-  private java.util.List<CPrivilege> privileges;
+  private final ConcurrentMap<String, CUserRoleMapping> userRoleMappings;
 
-  /**
-   * Field userRoleMappings.
-   */
-  private java.util.List<CUserRoleMapping> userRoleMappings;
+  public Configuration() {
+    users = Maps.newConcurrentMap();
+    roles = Maps.newConcurrentMap();
+    privileges = Maps.newConcurrentMap();
+    userRoleMappings = Maps.newConcurrentMap();
+  }
 
-  //-----------/
-  //- Methods -/
-  //-----------/
+  public List<CUser> getUsers() {
+    return ImmutableList.copyOf(users.values());
+  }
 
-  /**
-   * Method addPrivilege.
-   */
-  public void addPrivilege(CPrivilege cPrivilege) {
-    getPrivileges().add(cPrivilege);
-  } //-- void addPrivilege( CPrivilege )
+  public CUser getUser(final String id) {
+    checkNotNull(id, "user id");
+    return users.get(id);
+  }
 
-  /**
-   * Method addRole.
-   */
-  public void addRole(CRole cRole) {
-    getRoles().add(cRole);
-  } //-- void addRole( CRole )
+  public void addUser(final CUser user) {
+    checkNotNull(user, "user");
+    checkNotNull(user.getId(), "user id");
+    checkState(
+        users.putIfAbsent(user.getId(), user) == null,
+        user.getId() + " already exists"
+    );
+  }
 
-  /**
-   * Method addUser.
-   */
-  public void addUser(CUser cUser) {
-    getUsers().add(cUser);
-  } //-- void addUser( CUser )
+  public void setUsers(final Collection<CUser> users) {
+    this.users.clear();
+    if (users != null) {
+      for (CUser user : users) {
+        addUser(user);
+      }
+    }
+  }
 
-  /**
-   * Method addUserRoleMapping.
-   */
-  public void addUserRoleMapping(CUserRoleMapping cUserRoleMapping) {
-    getUserRoleMappings().add(cUserRoleMapping);
-  } //-- void addUserRoleMapping( CUserRoleMapping )
+  public boolean removeUser(final String id) {
+    checkNotNull(id, "user id");
+    return users.remove(id) != null;
+  }
 
-  /**
-   * Method clone.
-   *
-   * @return Configuration
-   */
+  public List<CUserRoleMapping> getUserRoleMappings() {
+    return ImmutableList.copyOf(userRoleMappings.values());
+  }
+
+  public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
+    checkNotNull(userId, "user id");
+    checkNotNull(source, "source");
+    return userRoleMappings.get(userRoleMappingKey(userId, source));
+  }
+
+  public void addUserRoleMapping(final CUserRoleMapping mapping) {
+    checkNotNull(mapping, "mapping");
+    checkNotNull(mapping.getUserId(), "user id");
+    checkNotNull(mapping.getSource(), "source");
+    checkState(
+        userRoleMappings.putIfAbsent(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) == null,
+        mapping.getUserId() + " / " + mapping.getSource() + " already exists"
+    );
+  }
+
+  public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
+    this.userRoleMappings.clear();
+    if (mappings != null) {
+      for (CUserRoleMapping mapping : mappings) {
+        addUserRoleMapping(mapping);
+      }
+    }
+  }
+
+  public boolean removeUserRoleMapping(final String userId, final String source) {
+    checkNotNull(userId, "user id");
+    checkNotNull(source, "source");
+    return userRoleMappings.remove(userRoleMappingKey(userId, source)) != null;
+  }
+
+  public List<CPrivilege> getPrivileges() {
+    return ImmutableList.copyOf(privileges.values());
+  }
+
+  public CPrivilege getPrivilege(final String id) {
+    checkNotNull(id, "privilege id");
+    return privileges.get(id);
+  }
+
+  public void addPrivilege(final CPrivilege privilege) {
+    checkNotNull(privilege, "privilege");
+    checkNotNull(privilege.getId(), "privilege id");
+    checkState(privileges.putIfAbsent(privilege.getId(), privilege) == null, privilege.getId() + " already exists");
+  }
+
+  public void setPrivileges(final Collection<CPrivilege> privileges) {
+    this.privileges.clear();
+    if (privileges != null) {
+      for (CPrivilege privilege : privileges) {
+        addPrivilege(privilege);
+      }
+    }
+  }
+
+  public boolean removePrivilege(final String id) {
+    checkNotNull(id, "privilege id");
+    return privileges.remove(id) != null;
+  }
+
+  public List<CRole> getRoles() {
+    return ImmutableList.copyOf(roles.values());
+  }
+
+  public CRole getRole(final String id) {
+    checkNotNull(id, "role id");
+    return roles.get(id);
+  }
+
+  public void addRole(final CRole role) {
+    checkNotNull(role, "role");
+    checkNotNull(role.getId(), "role id");
+    checkState(roles.putIfAbsent(role.getId(), role) == null, role.getId() + " already exists");
+  }
+
+  public void setRoles(final Collection<CRole> roles) {
+    this.roles.clear();
+    if (roles != null) {
+      for (CRole role : roles) {
+        addRole(role);
+      }
+    }
+  }
+
+  public boolean removeRole(final String id) {
+    checkNotNull(id, "role id");
+    return roles.remove(id) != null;
+  }
+
+
   public Configuration clone() {
     try {
       Configuration copy = (Configuration) super.clone();
 
-      if (this.users != null) {
-        copy.users = new java.util.ArrayList<CUser>();
-        for (CUser item : this.users) {
-          copy.users.add(((CUser) item).clone());
-        }
-      }
-
-      if (this.roles != null) {
-        copy.roles = new java.util.ArrayList<CRole>();
-        for (CRole item : this.roles) {
-          copy.roles.add(((CRole) item).clone());
-        }
-      }
-
-      if (this.privileges != null) {
-        copy.privileges = new java.util.ArrayList<CPrivilege>();
-        for (CPrivilege item : this.privileges) {
-          copy.privileges.add(((CPrivilege) item).clone());
-        }
-      }
-
-      if (this.userRoleMappings != null) {
-        copy.userRoleMappings = new java.util.ArrayList<CUserRoleMapping>();
-        for (CUserRoleMapping item : this.userRoleMappings) {
-          copy.userRoleMappings.add(((CUserRoleMapping) item).clone());
-        }
-      }
+      copy.users.putAll(this.users);
+      copy.roles.putAll(this.roles);
+      copy.privileges.putAll(this.privileges);
+      copy.userRoleMappings.putAll(this.userRoleMappings);
 
       return copy;
     }
@@ -121,116 +188,10 @@ public class Configuration
       throw (java.lang.RuntimeException) new java.lang.UnsupportedOperationException(getClass().getName()
           + " does not support clone()").initCause(ex);
     }
-  } //-- Configuration clone()
+  }
 
-  /**
-   * Method getPrivileges.
-   *
-   * @return List
-   */
-  public java.util.List<CPrivilege> getPrivileges() {
-    if (this.privileges == null) {
-      this.privileges = new java.util.ArrayList<CPrivilege>();
-    }
-
-    return this.privileges;
-  } //-- java.util.List<CPrivilege> getPrivileges()
-
-  /**
-   * Method getRoles.
-   *
-   * @return List
-   */
-  public java.util.List<CRole> getRoles() {
-    if (this.roles == null) {
-      this.roles = new java.util.ArrayList<CRole>();
-    }
-
-    return this.roles;
-  } //-- java.util.List<CRole> getRoles()
-
-  /**
-   * Method getUserRoleMappings.
-   *
-   * @return List
-   */
-  public java.util.List<CUserRoleMapping> getUserRoleMappings() {
-    if (this.userRoleMappings == null) {
-      this.userRoleMappings = new java.util.ArrayList<CUserRoleMapping>();
-    }
-
-    return this.userRoleMappings;
-  } //-- java.util.List<CUserRoleMapping> getUserRoleMappings()
-
-  /**
-   * Method getUsers.
-   *
-   * @return List
-   */
-  public java.util.List<CUser> getUsers() {
-    if (this.users == null) {
-      this.users = new java.util.ArrayList<CUser>();
-    }
-
-    return this.users;
-  } //-- java.util.List<CUser> getUsers()
-
-  /**
-   * Method removePrivilege.
-   */
-  public void removePrivilege(CPrivilege cPrivilege) {
-    getPrivileges().remove(cPrivilege);
-  } //-- void removePrivilege( CPrivilege )
-
-  /**
-   * Method removeRole.
-   */
-  public void removeRole(CRole cRole) {
-    getRoles().remove(cRole);
-  } //-- void removeRole( CRole )
-
-  /**
-   * Method removeUser.
-   */
-  public void removeUser(CUser cUser) {
-    getUsers().remove(cUser);
-  } //-- void removeUser( CUser )
-
-  /**
-   * Method removeUserRoleMapping.
-   */
-  public void removeUserRoleMapping(CUserRoleMapping cUserRoleMapping) {
-    getUserRoleMappings().remove(cUserRoleMapping);
-  } //-- void removeUserRoleMapping( CUserRoleMapping )
-
-  /**
-   * Set list of privileges that can be put in a role.
-   */
-  public void setPrivileges(java.util.List<CPrivilege> privileges) {
-    this.privileges = privileges;
-  } //-- void setPrivileges( java.util.List )
-
-  /**
-   * Set list of roles that Users can be associated to.  A roles
-   * is simply a container that hold privileges, and other roles.
-   */
-  public void setRoles(java.util.List<CRole> roles) {
-    this.roles = roles;
-  } //-- void setRoles( java.util.List )
-
-  /**
-   * Set list of User.
-   */
-  public void setUserRoleMappings(java.util.List<CUserRoleMapping> userRoleMappings) {
-    this.userRoleMappings = userRoleMappings;
-  } //-- void setUserRoleMappings( java.util.List )
-
-  /**
-   * Set list of users that are defined to have access to the
-   * system.
-   */
-  public void setUsers(java.util.List<CUser> users) {
-    this.users = users;
-  } //-- void setUsers( java.util.List )
+  protected String userRoleMappingKey(final String userId, final String source) {
+    return userId.toLowerCase() + "|" + source;
+  }
 
 }

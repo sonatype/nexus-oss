@@ -23,30 +23,29 @@ public abstract class AbstractConfigurationManager
 {
   private final EventBus eventBus;
 
-  private volatile EnhancedConfiguration configurationCache = null;
+  private volatile Configuration configuration = null;
 
   protected AbstractConfigurationManager(EventBus eventBus) {
     this.eventBus = eventBus;
   }
 
   public void clearCache() {
-    configurationCache = null;
+    configuration = null;
   }
 
-  protected EnhancedConfiguration getConfiguration() {
+  protected Configuration getConfiguration() {
     // Assign configuration to local variable first, as calls to clearCache can null it out at any time
-    EnhancedConfiguration configuration = this.configurationCache;
+    Configuration configuration = this.configuration;
     if (configuration == null || shouldRebuildConfiguration()) {
       boolean rebuiltConfiguration = false;
 
       synchronized (this) {
         // double-checked locking of volatile is apparently OK with java5+
         // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
-        configuration = this.configurationCache;
+        configuration = this.configuration;
         if (configuration == null || shouldRebuildConfiguration()) {
           rebuiltConfiguration = (configuration != null);
-          configuration = new EnhancedConfiguration(doGetConfiguration());
-          this.configurationCache = configuration;
+          this.configuration = configuration = doGetConfiguration();
         }
       }
 

@@ -235,7 +235,7 @@ public class DefaultConfigurationManager
   public void deletePrivilege(String id, boolean clean)
       throws NoSuchPrivilegeException
   {
-    boolean found = getConfiguration().removePrivilegeById(id);
+    boolean found = getConfiguration().removePrivilege(id);
 
     if (!found) {
       throw new NoSuchPrivilegeException(id);
@@ -255,7 +255,7 @@ public class DefaultConfigurationManager
   protected void deleteRole(String id, boolean clean)
       throws NoSuchRoleException
   {
-    boolean found = getConfiguration().removeRoleById(id);
+    boolean found = getConfiguration().removeRole(id);
 
     if (!found) {
       throw new NoSuchRoleException(id);
@@ -269,7 +269,7 @@ public class DefaultConfigurationManager
   public void deleteUser(String id)
       throws UserNotFoundException
   {
-    boolean found = getConfiguration().removeUserById(id);
+    boolean found = getConfiguration().removeUser(id);
 
     if (!found) {
       throw new UserNotFoundException(id);
@@ -288,7 +288,7 @@ public class DefaultConfigurationManager
   public CPrivilege readPrivilege(String id)
       throws NoSuchPrivilegeException
   {
-    CPrivilege privilege = getConfiguration().getPrivilegeById(id);
+    CPrivilege privilege = getConfiguration().getPrivilege(id);
 
     if (privilege != null) {
       return privilege;
@@ -301,7 +301,7 @@ public class DefaultConfigurationManager
   public CRole readRole(String id)
       throws NoSuchRoleException
   {
-    CRole role = getConfiguration().getRoleById(id);
+    CRole role = getConfiguration().getRole(id);
 
     if (role != null) {
       return role;
@@ -314,7 +314,7 @@ public class DefaultConfigurationManager
   public CUser readUser(String id)
       throws UserNotFoundException
   {
-    CUser user = getConfiguration().getUserById(id);
+    CUser user = getConfiguration().getUser(id);
 
     if (user != null) {
       return user;
@@ -480,7 +480,7 @@ public class DefaultConfigurationManager
   private CUserRoleMapping readCUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
-    CUserRoleMapping mapping = getConfiguration().getUserRoleMappingByUserId(userId, source);
+    CUserRoleMapping mapping = getConfiguration().getUserRoleMapping(userId, source);
 
     if (mapping != null) {
       return mapping;
@@ -534,7 +534,7 @@ public class DefaultConfigurationManager
   public void deleteUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
-    boolean found = getConfiguration().removeUserRoleMappingByUserId(userId, source);
+    boolean found = getConfiguration().removeUserRoleMapping(userId, source);
 
     if (!found) {
       throw new NoSuchRoleMappingException("No User Role Mapping for user: " + userId);

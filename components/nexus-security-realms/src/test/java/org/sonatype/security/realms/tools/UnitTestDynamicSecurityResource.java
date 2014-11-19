@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.realms.tools;
 
-import javax.inject.Singleton;
-
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.Configuration;
@@ -21,7 +19,6 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeD
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 
-@Singleton
 public class UnitTestDynamicSecurityResource
     extends AbstractDynamicSecurityResource
 {

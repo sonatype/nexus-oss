@@ -308,7 +308,7 @@ public class ResourceMergingConfigurationManager
   public CPrivilege readPrivilege(String id)
       throws NoSuchPrivilegeException
   {
-    final CPrivilege privilege = getConfiguration().getPrivilegeById(id);
+    final CPrivilege privilege = getConfiguration().getPrivilege(id);
 
     if (privilege != null) {
       privilege.setReadOnly(true);
@@ -323,7 +323,7 @@ public class ResourceMergingConfigurationManager
   public CRole readRole(String id)
       throws NoSuchRoleException
   {
-    final CRole role = getConfiguration().getRoleById(id);
+    final CRole role = getConfiguration().getRole(id);
 
     if (role != null) {
       role.setReadOnly(true);
@@ -527,7 +527,7 @@ public class ResourceMergingConfigurationManager
       CRole eachRole = roles.get(role.getId());
       if (eachRole != null) {
         role = this.mergeRolesContents(role, eachRole);
-        configuration.removeRole(eachRole);
+        configuration.removeRole(role.getId());
       }
 
       configuration.addRole(role);

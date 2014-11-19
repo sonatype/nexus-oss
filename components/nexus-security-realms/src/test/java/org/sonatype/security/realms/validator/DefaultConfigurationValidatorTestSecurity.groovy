@@ -29,20 +29,13 @@ class DefaultConfigurationValidatorTestSecurity
     return new Configuration(
         users: [
             new CUser(
+                id: ''
             ),
             new CUser(
                 id: 'ausernostatus',
                 password: 'fjsf8j4r3',
                 firstName: 'Alex',
                 lastName: 'User',
-                email: 'auser@auser.com'
-            ),
-            new CUser(
-                id: 'auser',
-                password: 'fjsf8j4r3',
-                firstName: 'Alex',
-                lastName: 'User',
-                status: 'active',
                 email: 'auser@auser.com'
             ),
             new CUser(
@@ -64,9 +57,12 @@ class DefaultConfigurationValidatorTestSecurity
         ],
         userRoleMappings: [
             new CUserRoleMapping(
+                userId: '',
+                source: '',
                 roles: ['id1']
             ),
             new CUserRoleMapping(
+                userId: '',
                 source: 'default',
                 roles: ['id1']
             ),
@@ -116,11 +112,7 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'name',
             ),
             new CRole(
-                privileges: ['1']
-            ),
-            new CRole(
-                id: 'arole',
-                name: 'name',
+                id: '',
                 privileges: ['1']
             ),
             new CRole(
@@ -205,16 +197,6 @@ class DefaultConfigurationValidatorTestSecurity
                 description: '',
                 properties: [
                     new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
-                ]
-            ),
-            new CPrivilege(
-                id: '5',
-                type: 'method',
-                name: 'priv',
-                description: '',
-                properties: [
-                    new CProperty(key: 'method', value: 'create'),
                     new CProperty(key: 'permission', value: '/some/path/')
                 ]
             )
