@@ -16986,10 +16986,10 @@
 }
 
 /* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
-.x-form-fieldcontainer.nx-invalid .nx-multiselect .x-panel-body {
+.x-form-fieldcontainer.nx-invalid .nx-multiselect:nth-child(3) .x-panel-body {
   border: 1px #CF4C35 solid !important;
 }
 /* line 33, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
-.x-form-fieldcontainer.nx-invalid .nx-multiselect .x-form-trigger-wrap {
+.x-form-fieldcontainer.nx-invalid .nx-multiselect:nth-child(3) .x-form-trigger-wrap {
   border: 1px #CF4C35 solid;
 }
