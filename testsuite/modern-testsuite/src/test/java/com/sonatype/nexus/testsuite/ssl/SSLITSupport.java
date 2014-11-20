@@ -13,7 +13,6 @@
 package com.sonatype.nexus.testsuite.ssl;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 
 import com.sonatype.nexus.ssl.client.Certificates;
@@ -29,13 +28,8 @@ import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-import org.junit.runners.Parameterized;
 
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * Support for ssl integration tests.
@@ -46,16 +40,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public class SSLITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

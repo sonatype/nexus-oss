@@ -12,19 +12,10 @@
  */
 package org.sonatype.nexus.testsuite.content;
 
-import java.util.Collection;
-
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-
-import org.junit.runners.Parameterized;
-
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * ITs related to content resource.
@@ -36,24 +27,13 @@ public class ContentITSupport
     extends NexusRunningParametrizedITSupport
 {
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
-
   public ContentITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
 
   @Override
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
-    return configuration
-.setLogLevel("org.sonatype.nexus.web", "TRACE").setLogLevel("org.sonatype.nexus", "DEBUG");
+    return configuration.setLogLevel("org.sonatype.nexus.web", "TRACE").setLogLevel("org.sonatype.nexus", "DEBUG");
   }
 
   protected Content content() {
