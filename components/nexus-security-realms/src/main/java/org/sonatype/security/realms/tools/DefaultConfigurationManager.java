@@ -482,8 +482,7 @@ public class DefaultConfigurationManager
       throw new InvalidConfigurationException(vr);
     }
 
-    deleteUserRoleMapping(userRoleMapping.getUserId(), userRoleMapping.getSource());
-    getConfiguration().addUserRoleMapping(userRoleMapping);
+    getConfiguration().updateUserRoleMapping(userRoleMapping);
   }
 
   public List<CUserRoleMapping> listUserRoleMappings() {
