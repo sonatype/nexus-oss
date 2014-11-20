@@ -52,7 +52,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   /**
    * @cfg {String} [blankText="This field is required"] Default text displayed when the control contains no values.
    */
-  blankText: 'This field is required',
+  blankText: 'You must add at least one key server',
 
   /**
    * @cfg {String} [minValuesText="Minimum {0} value(s) required"]
@@ -127,7 +127,6 @@ Ext.define('NX.ext.form.field.ValueSet', {
       valueFieldId: valueFieldId,
       submitValue: false,
       isFormField: false,
-      preventMark: true,
       flex: 1,
       inputFor: me.name
     });
@@ -157,7 +156,29 @@ Ext.define('NX.ext.form.field.ValueSet', {
           {
             xtype: 'button',
             listeners: {
-              click: me.addValue,
+              click: function() {
+                // Add an item to the list of values
+                me.addValue();
+
+                // Unsticky the input field’s error message
+                me.items.items[0].items.items[0].resumeEvents();
+
+                if (me.items.items[0].items.items[0].isValid()) {
+                  me.validate();
+                }
+              },
+              mouseover: function() {
+                // Sticky the input field’s error message
+                me.items.items[0].items.items[0].suspendEvents(false)
+              },
+              mouseout: function() {
+                // Unsticky the input field’s error message
+                me.items.items[0].items.items[0].resumeEvents();
+
+                if (me.items.items[0].items.items[0].isValid()) {
+                  me.validate();
+                }
+              },
               scope: me
             },
             ui: 'plain',
@@ -168,8 +189,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
       me.values = {
         xtype: 'grid',
         hideHeaders: true,
-        padding: '5 0 0 0',
-        //autoScroll: true,
+        ui: 'borderless',
         columns: [
           { text: 'Value', dataIndex: 'value', flex: 1 },
           {
@@ -200,12 +220,14 @@ Ext.define('NX.ext.form.field.ValueSet', {
     me.on('afterrender', function () {
       me.valueField = me.down('component[valueFieldId=' + valueFieldId + ']');
       me.mon(me.valueField, 'blur', function (input) {
-        input.preventMark = false;
-        input.clearInvalid();
+        if (input.isValid()) {
+          me.validate();
+        }
       });
-      me.mon(me.valueField, 'focus', function (input) {
-        input.preventMark = false;
-        input.validate();
+      me.mon(me.valueField, 'change', function (input, newValue) {
+        if (!newValue || newValue == '') {
+          me.validate();
+        }
       });
       Ext.create('Ext.util.KeyNav', me.valueField.el, {
         enter: me.addValue,
@@ -284,27 +306,19 @@ Ext.define('NX.ext.form.field.ValueSet', {
         errors = me.getErrors(),
         isValid = Ext.isEmpty(errors);
 
-    if (!me.preventMark) {
-      if (isValid) {
-        me.clearInvalid();
-      }
-      else {
-        me.markInvalid(errors);
-      }
+    if (isValid) {
+      me.clearInvalid();
+    }
+    else {
+      me.markInvalid(errors);
     }
 
     return isValid;
   },
 
   markInvalid: function (errors) {
-    var me = this,
-        oldMsg = me.getActiveError();
-
-    me.setActiveErrors(Ext.Array.from(errors));
-
-    if (oldMsg !== me.getActiveError()) {
-      me.updateLayout();
-    }
+    var me = this;
+    me.items.items[0].items.items[0].markInvalid(errors);
   },
 
   getErrors: function () {
@@ -330,12 +344,8 @@ Ext.define('NX.ext.form.field.ValueSet', {
    */
   clearInvalid: function () {
     // Clear the message and fire the 'valid' event
-    var me = this,
-        hadError = me.hasActiveError();
-    me.unsetActiveError();
-    if (hadError) {
-      me.updateLayout();
-    }
+    var me = this;
+    me.items.items[0].items.items[0].clearInvalid();
   },
 
   /**
