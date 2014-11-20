@@ -25,6 +25,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -117,18 +118,12 @@ public class CRoleEntityAdapter
   public CRole read(final ODocument document) {
     checkNotNull(document);
 
-    String id = document.field(P_ID, OType.STRING);
-    String name = document.field(P_NAME, OType.STRING);
-    String description = document.field(P_DESCRIPTION, OType.STRING);
-    Set<String> privileges = document.field(P_PRIVILEGES, OType.EMBEDDEDSET);
-    Set<String> roles = document.field(P_ROLES, OType.EMBEDDEDSET);
-
     CRole entity = new CRole();
-    entity.setId(id);
-    entity.setName(name);
-    entity.setDescription(description);
-    entity.setPrivileges(privileges);
-    entity.setRoles(roles);
+    entity.setId(document.<String>field(P_ID, OType.STRING));
+    entity.setName(document.<String>field(P_NAME, OType.STRING));
+    entity.setDescription(document.<String>field(P_DESCRIPTION, OType.STRING));
+    entity.setPrivileges(Sets.newHashSet(document.<Set<String>>field(P_PRIVILEGES, OType.EMBEDDEDSET)));
+    entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
     entity.setReadOnly(false);
 
     return entity;

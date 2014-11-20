@@ -127,19 +127,15 @@ public class CPrivilegeEntityAdapter
   public CPrivilege read(final ODocument document) {
     checkNotNull(document);
 
-    String id = document.field(P_ID, OType.STRING);
-    String name = document.field(P_NAME, OType.STRING);
-    String description = document.field(P_DESCRIPTION, OType.STRING);
-    String type = document.field(P_TYPE, OType.STRING);
-    Map<String, String> properties = document.field(P_PROPERTIES, OType.EMBEDDEDMAP);
-
     CPrivilege entity = new CPrivilege();
-    entity.setId(id);
-    entity.setName(name);
-    entity.setDescription(description);
-    entity.setType(type);
+    entity.setId(document.<String>field(P_ID, OType.STRING));
+    entity.setName(document.<String>field(P_NAME, OType.STRING));
+    entity.setDescription(document.<String>field(P_DESCRIPTION, OType.STRING));
+    entity.setType(document.<String>field(P_TYPE, OType.STRING));
     entity.setReadOnly(false);
-    for (Entry<String, String> entry : properties.entrySet()) {
+    Map<String, String> properties = document.field(P_PROPERTIES, OType.EMBEDDEDMAP);
+    for (Entry<String, String> entry : properties
+        .entrySet()) {
       CProperty property = new CProperty();
       property.setKey(entry.getKey());
       property.setValue(entry.getValue());

@@ -120,20 +120,13 @@ public class CUserEntityAdapter
   public CUser read(final ODocument document) {
     checkNotNull(document);
 
-    String id = document.field(P_ID, OType.STRING);
-    String firstName = document.field(P_FIRST_NAME, OType.STRING);
-    String lastName = document.field(P_LAST_NAME, OType.STRING);
-    String password = document.field(P_PASSWORD, OType.STRING);
-    String status = document.field(P_STATUS, OType.STRING);
-    String email = document.field(P_EMAIL, OType.STRING);
-
     CUser entity = new CUser();
-    entity.setId(id);
-    entity.setFirstName(firstName);
-    entity.setLastName(lastName);
-    entity.setStatus(status);
-    entity.setEmail(email);
-    entity.setPassword(password);
+    entity.setId(document.<String>field(P_ID, OType.STRING));
+    entity.setFirstName(document.<String>field(P_FIRST_NAME, OType.STRING));
+    entity.setLastName(document.<String>field(P_LAST_NAME, OType.STRING));
+    entity.setPassword(document.<String>field(P_PASSWORD, OType.STRING));
+    entity.setStatus(document.<String>field(P_STATUS, OType.STRING));
+    entity.setEmail(document.<String>field(P_EMAIL, OType.STRING));
 
     return entity;
   }

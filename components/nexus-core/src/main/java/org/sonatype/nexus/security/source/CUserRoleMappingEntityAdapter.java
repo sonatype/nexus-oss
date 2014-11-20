@@ -25,6 +25,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -109,14 +110,10 @@ public class CUserRoleMappingEntityAdapter
   public CUserRoleMapping read(final ODocument document) {
     checkNotNull(document);
 
-    String userId = document.field(P_USER_ID, OType.STRING);
-    String source = document.field(P_SOURCE, OType.STRING);
-    Set<String> roles = document.field(P_ROLES, OType.EMBEDDEDSET);
-
     CUserRoleMapping entity = new CUserRoleMapping();
-    entity.setUserId(userId);
-    entity.setSource(source);
-    entity.setRoles(roles);
+    entity.setUserId(document.<String>field(P_USER_ID, OType.STRING));
+    entity.setSource(document.<String>field(P_SOURCE, OType.STRING));
+    entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
 
     return entity;
   }
