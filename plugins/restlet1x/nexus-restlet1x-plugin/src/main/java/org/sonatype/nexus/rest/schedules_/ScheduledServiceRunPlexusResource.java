@@ -25,7 +25,11 @@ import javax.ws.rs.Produces;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;
@@ -87,37 +91,47 @@ public class ScheduledServiceRunPlexusResource
           + scheduledServiceId);
     }
 
-    task.runNow();
+    try {
+      task.runNow();
+      final TaskConfiguration taskConfiguration = task.getConfiguration();
+      final Schedule schedule = task.getSchedule();
+      final CurrentState currentState = task.getCurrentState();
+      final LastRunState lastRunState = task.getLastRunState();
 
-    ScheduledServiceBaseResource resource = getServiceRestModel(task);
+      ScheduledServiceBaseResource resource = getServiceRestModel(taskConfiguration, schedule);
 
-    if (resource != null) {
-      ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
-      resourceStatus.setResource(resource);
-      resourceStatus.setResourceURI(createChildReference(request, this, task.getId()).toString());
-      resourceStatus.setStatus(task.getCurrentState().getState().name());
-      resourceStatus.setReadableStatus(getReadableState(task));
-      resourceStatus.setCreated(task.getConfiguration().getCreated().toString());
-      resourceStatus.setLastRunResult(getLastRunResult(task));
-      resourceStatus.setLastRunTime(task.getLastRunState() == null ? "n/a" : task.getLastRunState().getRunStarted().toString());
-      final Date nextRunTime = getNextRunTime(task);
-      resourceStatus.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
-      resourceStatus.setCreatedInMillis(task.getConfiguration().getCreated().getTime());
-      if (task.getLastRunState() != null) {
-        resourceStatus.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
+      if (resource != null) {
+        ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
+        resourceStatus.setResource(resource);
+        resourceStatus.setResourceURI(createChildReference(request, this, taskConfiguration.getId()).toString());
+        resourceStatus.setStatus(currentState.getState().name());
+        resourceStatus.setReadableStatus(getReadableState(task));
+        resourceStatus.setCreated(taskConfiguration.getCreated().toString());
+        resourceStatus.setLastRunResult(getLastRunResult(task));
+        resourceStatus.setLastRunTime(lastRunState == null ? "n/a" : lastRunState.getRunStarted().toString());
+        final Date nextRunTime = getNextRunTime(task);
+        resourceStatus.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
+        resourceStatus.setCreatedInMillis(taskConfiguration.getCreated().getTime());
+        if (lastRunState != null) {
+          resourceStatus.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
+        }
+        if (currentState.getNextRun() != null) {
+          resourceStatus.setNextRunTimeInMillis(task.getCurrentState().getNextRun().getTime());
+        }
+
+        result = new ScheduledServiceResourceStatusResponse();
+        result.setData(resourceStatus);
       }
-      if (task.getCurrentState().getNextRun() != null) {
-        resourceStatus.setNextRunTimeInMillis(task.getCurrentState().getNextRun().getTime());
+      else {
+        throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id ("
+            + scheduledServiceId + "), can't load task.");
       }
+      return result;
 
-      result = new ScheduledServiceResourceStatusResponse();
-      result.setData(resourceStatus);
+    } catch (IllegalStateException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + scheduledServiceId);
     }
-    else {
-      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id ("
-          + scheduledServiceId + "), can't load task.");
-    }
-    return result;
   }
 
   /**

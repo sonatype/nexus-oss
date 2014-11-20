@@ -100,17 +100,22 @@ public class ScheduledServicePlexusResource
           + getScheduledServiceId(request));
     }
 
-    ScheduledServiceBaseResource resource = getServiceRestModel(task);
+    try {
+      ScheduledServiceBaseResource resource = getServiceRestModel(task.getConfiguration(), task.getSchedule());
+      if (resource != null) {
+        result.setData(resource);
+      }
+      else {
+        throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id ("
+            + getScheduledServiceId(request) + "), can't load task.");
+      }
 
-    if (resource != null) {
-      result.setData(resource);
+      return result;
     }
-    else {
-      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id ("
-          + getScheduledServiceId(request) + "), can't load task.");
+    catch (IllegalStateException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + getScheduledServiceId(request));
     }
-
-    return result;
   }
 
   /**
