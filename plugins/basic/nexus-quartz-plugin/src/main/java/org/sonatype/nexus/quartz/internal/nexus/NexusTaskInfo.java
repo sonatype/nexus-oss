@@ -75,6 +75,8 @@ public class NexusTaskInfo<T>
 
   @Override
   public TaskConfiguration getConfiguration() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
       checkState(jobDetail != null, "Job with key %s not exists!", jobKey);
@@ -82,6 +84,9 @@ public class NexusTaskInfo<T>
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
     }
   }
 
@@ -107,6 +112,8 @@ public class NexusTaskInfo<T>
 
   @Override
   public CurrentState<T> getCurrentState() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       State state = null;
       Date nextRun = null;
@@ -138,10 +145,15 @@ public class NexusTaskInfo<T>
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
   }
 
   @Override
   public LastRunState getLastRunState() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
       checkState(jobDetail != null, "Job with key %s not exists!", jobKey);
@@ -156,6 +168,9 @@ public class NexusTaskInfo<T>
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
     }
   }
 
