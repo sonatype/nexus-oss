@@ -27,6 +27,8 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   width: 600,
   height: 253,
 
+  invalidCls: 'nx-invalid',
+
   /**
    * Override super *private* impl so we can control the button configuration.
    *
