@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.model;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +19,7 @@ import java.util.Set;
  * @since 3.0
  */
 public interface SecurityModelConfiguration
-    extends org.sonatype.configuration.Configuration, java.io.Serializable, Cloneable
+    extends org.sonatype.configuration.Configuration
 {
   List<CUser> getUsers();
 
