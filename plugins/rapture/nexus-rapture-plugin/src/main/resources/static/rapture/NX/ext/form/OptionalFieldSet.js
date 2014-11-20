@@ -20,6 +20,7 @@
 Ext.define('NX.ext.form.OptionalFieldSet', {
   extend: 'Ext.form.FieldSet',
   alias: 'widget.nx-optionalfieldset',
+  cls: 'nx-optionalfieldset',
 
   /**
    * @override

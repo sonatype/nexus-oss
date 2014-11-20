@@ -12,21 +12,14 @@
  */
 package org.sonatype.nexus.testsuite.repository.nexus5944;
 
-import java.util.Collection;
-
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenHostedRepository;
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.testsuite.TwinNexusITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * IT related to issue NEXUS-5944: Remote is Nexus, but browsing of proxied repo
@@ -39,14 +32,6 @@ public class Nexus5944BrowsingNotAllowedIT
   public static final String REMOTE_REPOSITORY_ID = "releases";
 
   public static final String LOCAL_REPOSITORY_ID = "remote-releases";
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip"))
-    ).load();
-  }
 
   public Nexus5944BrowsingNotAllowedIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.repository;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -36,14 +35,9 @@ import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * ITs related to which proxy is used depending on url scheme (http / https).
@@ -69,14 +63,6 @@ public class HttpAndHttpsProxyIT
   private Server httpRemoteServer;
 
   private Server httpsRemoteServer;
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters($("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip"))
-    ).load();
-  }
 
   public HttpAndHttpsProxyIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
