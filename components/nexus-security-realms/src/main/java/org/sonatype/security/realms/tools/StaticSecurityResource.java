@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 /**
  * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
@@ -25,6 +25,6 @@ public interface StaticSecurityResource
   /**
    * Gets the security configuration.
    */
-  Configuration getConfiguration();
+  SecurityModelConfiguration getConfiguration();
 
 }

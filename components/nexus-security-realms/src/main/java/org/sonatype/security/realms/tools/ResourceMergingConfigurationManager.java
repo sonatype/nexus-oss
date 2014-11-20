@@ -33,6 +33,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -465,7 +466,7 @@ public class ResourceMergingConfigurationManager
     final Configuration configuration = new Configuration();
 
     for (StaticSecurityResource resource : staticResources) {
-      Configuration resConfig = resource.getConfiguration();
+      SecurityModelConfiguration resConfig = resource.getConfiguration();
 
       if (resConfig != null) {
         checkState(
@@ -481,7 +482,7 @@ public class ResourceMergingConfigurationManager
     }
 
     for (DynamicSecurityResource resource : dynamicResources) {
-      Configuration resConfig = resource.getConfiguration();
+      SecurityModelConfiguration resConfig = resource.getConfiguration();
 
       if (resConfig != null) {
         checkState(
@@ -499,32 +500,34 @@ public class ResourceMergingConfigurationManager
     return configuration;
   }
 
-  private Configuration appendConfig(final Configuration configuration, final Configuration config) {
-    for (CPrivilege privilege : (List<CPrivilege>) config.getPrivileges()) {
-      configuration.addPrivilege(privilege);
+  private SecurityModelConfiguration appendConfig(final SecurityModelConfiguration to,
+                                                  final SecurityModelConfiguration from)
+  {
+    for (CPrivilege privilege : from.getPrivileges()) {
+      to.addPrivilege(privilege);
     }
 
     // number of roles can be significant (>15K), so need to speedup lookup roles by roleId
     final Map<String, CRole> roles = new HashMap<String, CRole>();
-    for (CRole role : configuration.getRoles()) {
+    for (CRole role : to.getRoles()) {
       roles.put(role.getId(), role);
     }
 
-    for (Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); ) {
+    for (Iterator<CRole> iterator = from.getRoles().iterator(); iterator.hasNext(); ) {
       CRole role = iterator.next();
 
       // need to check if we need to merge the static config
       CRole eachRole = roles.get(role.getId());
       if (eachRole != null) {
         role = this.mergeRolesContents(role, eachRole);
-        configuration.removeRole(role.getId());
+        to.removeRole(role.getId());
       }
 
-      configuration.addRole(role);
+      to.addRole(role);
       roles.put(role.getId(), role); // deduplicate config roles
     }
 
-    return configuration;
+    return to;
   }
 
 }
