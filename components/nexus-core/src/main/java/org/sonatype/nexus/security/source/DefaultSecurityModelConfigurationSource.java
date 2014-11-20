@@ -286,6 +286,7 @@ public class DefaultSecurityModelConfigurationSource
     public boolean removeUser(final String id) {
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.delete(db, id);
+        userRoleMappingEntityAdapter.delete(db, id, SecurityXmlUserManager.SOURCE);
         return delegate.removeUser(id);
       }
     }

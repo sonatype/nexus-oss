@@ -108,7 +108,11 @@ public class Configuration
   @Override
   public boolean removeUser(final String id) {
     checkNotNull(id, "user id");
-    return users.remove(id) != null;
+    if (users.remove(id) != null) {
+      removeUserRoleMapping(id, SecurityXmlUserManager.SOURCE);
+      return true;
+    }
+    return false;
   }
 
   @Override
