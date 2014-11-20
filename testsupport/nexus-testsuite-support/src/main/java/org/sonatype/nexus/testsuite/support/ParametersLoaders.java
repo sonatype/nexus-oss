@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.sonatype.sisu.goodies.marshal.internal.jackson2.JacksonMarshaller;
 
@@ -214,6 +215,27 @@ public abstract class ParametersLoaders
       @Override
       public Collection<Object[]> load() {
         return Arrays.<Object[]>asList(parameters);
+      }
+
+    };
+  }
+
+  /**
+   * Use system property as test parameter.
+   *
+   * @param propertyName name of system property
+   * @return test parameters loader. Never null.
+   */
+  public static Loader systemProperty(final String propertyName) {
+    return new Loader()
+    {
+      @Override
+      public Collection<Object[]> load() {
+        String property = System.getProperty(propertyName);
+        if (property != null) {
+          return Collections.singleton(new Object[]{property});
+        }
+        return null;
       }
 
     };

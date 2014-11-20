@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.client;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
@@ -27,28 +26,12 @@ import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
-import org.junit.runners.Parameterized;
-
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 @NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public abstract class ClientITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
 
   public ClientITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
