@@ -127,7 +127,6 @@ Ext.define('NX.ext.form.field.ValueSet', {
       valueFieldId: valueFieldId,
       submitValue: false,
       isFormField: false,
-      //preventMark: true,
       flex: 1,
       inputFor: me.name
     });

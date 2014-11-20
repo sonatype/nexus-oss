@@ -16963,3 +16963,12 @@
 .nx-multiselect .x-panel-body {
   border: 1px #dddddd solid !important;
 }
+
+/* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+.x-form-fieldcontainer.nx-invalid .nx-multiselect .x-panel-body {
+  border: 1px #CF4C35 solid !important;
+}
+/* line 33, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
+.x-form-fieldcontainer.nx-invalid .nx-multiselect .x-form-trigger-wrap {
+  border: 1px #CF4C35 solid;
+}
