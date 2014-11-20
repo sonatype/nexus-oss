@@ -44,9 +44,8 @@ public class DefaultSecurityConfigurationCleaner
     for (CRole role : roles) {
       if (role.getPrivileges().contains(privilegeId)) {
         log.debug("removing privilege {} from role {}", privilegeId, role.getId());
-        role.getPrivileges().remove(privilegeId);
-        configuration.removeRole(role.getId());
-        configuration.addRole(role);
+        role.removePrivilege(privilegeId);
+        configuration.updateRole(role);
       }
     }
   }
@@ -58,9 +57,8 @@ public class DefaultSecurityConfigurationCleaner
     for (CRole role : roles) {
       if (role.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from role {}", roleId, role.getId());
-        role.getRoles().remove(roleId);
-        configuration.removeRole(role.getId());
-        configuration.addRole(role);
+        role.removeRole(roleId);
+        configuration.updateRole(role);
       }
     }
 
@@ -70,8 +68,7 @@ public class DefaultSecurityConfigurationCleaner
       if (mapping.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from user {}", mapping.getUserId());
         mapping.removeRole(roleId);
-        configuration.removeUserRoleMapping(mapping.getUserId(), mapping.getSource());
-        configuration.addUserRoleMapping(mapping);
+        configuration.updateUserRoleMapping(mapping);
       }
     }
   }
