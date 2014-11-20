@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
 
@@ -34,15 +33,10 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * @since 2.5.1
@@ -53,16 +47,6 @@ public abstract class UnpackITSupport
 {
 
   protected static final String PASSWORD = "secret";
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
 
   public UnpackITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

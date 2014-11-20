@@ -198,6 +198,10 @@ public abstract class NexusITSupport
               resolver = nexusBundleResolver;
             }
             else {
+              File bundle = new File(filteredNexusBundleCoordinates);
+              if (bundle.exists()) {
+                return bundle;
+              }
               resolver = new MavenBridgedBundleResolver(filteredNexusBundleCoordinates, artifactResolver);
             }
             return resolver.resolve();

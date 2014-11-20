@@ -119,6 +119,9 @@ a:not([class*="x-"]):active {
 /**
  * @class Ext.form.field.Base
  */
+/**
+ * @class Ext.form.Fieldset
+ */
 /* including package ext-theme-neptune */
 /** @class Global_CSS */
 /** @class Ext.LoadMask */
@@ -15553,8 +15556,8 @@ textarea.x-form-empty-field {
 
 /* line 1, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-fieldset {
-  border: 1px solid #b5b8c8;
-  padding: 0 10px;
+  border: 0 solid #b5b8c8;
+  padding: 10px 0 25px 0px;
   margin: 0 0 10px;
   overflow: hidden;
 }
@@ -15567,7 +15570,7 @@ textarea.x-form-empty-field {
 /* line 18, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-ie8m .x-fieldset .x-fieldset-body,
 .x-quirks .x-ie .x-fieldset .x-fieldset-body {
-  padding-top: 0;
+  padding-top: 10px;
 }
 
 /* line 25, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
@@ -15578,7 +15581,7 @@ textarea.x-form-empty-field {
 
 /* line 30, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-fieldset-header {
-  padding: 0 3px 1px;
+  padding: 0 8px 0 0;
 }
 /* line 33, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-fieldset-header .x-tool {
@@ -15588,7 +15591,7 @@ textarea.x-form-empty-field {
 
 /* line 45, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-fieldset-header-text {
-  font: normal 12px/16px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: bold 13px/16px "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: black;
   padding: 1px 0;
 }
@@ -15606,13 +15609,13 @@ textarea.x-form-empty-field {
 
 /* line 73, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-webkit .x-fieldset-header {
-  -webkit-padding-start: 3px;
-  -webkit-padding-end: 3px;
+  -webkit-padding-start: 0;
+  -webkit-padding-end: 8px;
 }
 
 /* line 84, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-opera .x-fieldset-with-legend {
-  margin-top: -1px;
+  margin-top: -0;
 }
 /* line 87, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-opera.x-mac .x-fieldset-header-text {
@@ -15621,21 +15624,21 @@ textarea.x-form-empty-field {
 
 /* line 95, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-strict .x-ie8 .x-fieldset-header {
-  margin-bottom: -1px;
+  margin-bottom: -0;
 }
 /* line 99, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-strict .x-ie8 .x-fieldset-header .x-tool,
 .x-strict .x-ie8 .x-fieldset-header .x-fieldset-header-text,
 .x-strict .x-ie8 .x-fieldset-header .x-fieldset-header-checkbox {
   position: relative;
-  top: -1px;
+  top: -0;
 }
 
 /* line 109, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
 .x-quirks .x-ie .x-fieldset-header,
 .x-ie8m .x-fieldset-header {
-  padding-left: 1px;
-  padding-right: 1px;
+  padding-left: -2;
+  padding-right: 6px;
 }
 
 /* line 116, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/form/FieldSet.scss */
