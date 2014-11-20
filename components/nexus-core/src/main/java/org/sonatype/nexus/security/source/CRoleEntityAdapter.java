@@ -60,7 +60,7 @@ public class CRoleEntityAdapter
   /**
    * Register schema.
    */
-  public OClass register(final ODatabaseDocumentTx db) {
+  public OClass register(final ODatabaseDocumentTx db, final Runnable initializer) {
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
@@ -77,6 +77,8 @@ public class CRoleEntityAdapter
       type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
+
+      initializer.run();
     }
     return type;
   }
@@ -161,11 +163,12 @@ public class CRoleEntityAdapter
     db.command(command).execute();
   }
 
-  public void delete(final ODatabaseDocumentTx db, final String id) {
+  public boolean delete(final ODatabaseDocumentTx db, final String id) {
     OCommandSQL command = new OCommandSQL(
         "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
     );
-    db.command(command).execute(id);
+    int records = db.command(command).execute(id);
+    return records == 1;
   }
 
   public ODocument get(final ODatabaseDocumentTx db, final String id) {

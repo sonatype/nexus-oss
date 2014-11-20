@@ -56,7 +56,7 @@ public class CUserRoleMappingEntityAdapter
   /**
    * Register schema.
    */
-  public OClass register(final ODatabaseDocumentTx db) {
+  public OClass register(final ODatabaseDocumentTx db, final Runnable initializer) {
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
@@ -71,6 +71,8 @@ public class CUserRoleMappingEntityAdapter
       type.createIndex(DB_CLASS + "_" + P_USER_ID + "_" + P_SOURCE + "idx", INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
+
+      initializer.run();
     }
     return type;
   }
@@ -148,11 +150,12 @@ public class CUserRoleMappingEntityAdapter
     db.command(command).execute();
   }
 
-  public void delete(final ODatabaseDocumentTx db, final String userId, final String source) {
+  public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
     OCommandSQL command = new OCommandSQL(
         "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
-    db.command(command).execute(userId, source);
+    int records = db.command(command).execute(userId, source);
+    return records == 1;
   }
 
   public ODocument get(final ODatabaseDocumentTx db, final String userId, final String source) {

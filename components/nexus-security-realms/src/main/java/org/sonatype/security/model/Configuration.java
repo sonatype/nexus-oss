@@ -82,7 +82,6 @@ public class Configuration
     addUserRoleMapping(mapping);
   }
 
-  @Override
   public void setUsers(final Collection<CUser> users) {
     this.users.clear();
     if (users != null) {
@@ -138,7 +137,6 @@ public class Configuration
     );
   }
 
-  @Override
   public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
     this.userRoleMappings.clear();
     if (mappings != null) {
@@ -184,7 +182,6 @@ public class Configuration
     checkState(privileges.putIfAbsent(privilege.getId(), privilege) == null, privilege.getId() + " already exists");
   }
 
-  @Override
   public void setPrivileges(final Collection<CPrivilege> privileges) {
     this.privileges.clear();
     if (privileges != null) {
@@ -225,7 +222,6 @@ public class Configuration
     checkState(roles.putIfAbsent(role.getId(), role) == null, role.getId() + " already exists");
   }
 
-  @Override
   public void setRoles(final Collection<CRole> roles) {
     this.roles.clear();
     if (roles != null) {

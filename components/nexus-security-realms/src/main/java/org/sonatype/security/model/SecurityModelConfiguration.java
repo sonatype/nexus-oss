@@ -28,8 +28,6 @@ public interface SecurityModelConfiguration
 
   void addUser(CUser user, Set<String> roles);
 
-  void setUsers(Collection<CUser> users);
-
   void updateUser(CUser user, Set<String> roles);
 
   boolean removeUser(String id);
@@ -40,8 +38,6 @@ public interface SecurityModelConfiguration
 
   void addUserRoleMapping(CUserRoleMapping mapping);
 
-  void setUserRoleMappings(Collection<CUserRoleMapping> mappings);
-
   void updateUserRoleMapping(CUserRoleMapping mapping);
 
   boolean removeUserRoleMapping(String userId, String source);
@@ -51,8 +47,6 @@ public interface SecurityModelConfiguration
   CPrivilege getPrivilege(String id);
 
   void addPrivilege(CPrivilege privilege);
-
-  void setPrivileges(Collection<CPrivilege> privileges);
 
   void updatePrivilege(CPrivilege privilege);
 
@@ -65,8 +59,6 @@ public interface SecurityModelConfiguration
   void addRole(CRole role);
 
   void updateRole(CRole role);
-
-  void setRoles(Collection<CRole> roles);
 
   boolean removeRole(String id);
 }

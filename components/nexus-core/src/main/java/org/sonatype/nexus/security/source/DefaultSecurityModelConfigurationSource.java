@@ -13,7 +13,6 @@
 package org.sonatype.nexus.security.source;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +29,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -101,10 +99,58 @@ public class DefaultSecurityModelConfigurationSource
   protected void doStart() {
     try (ODatabaseDocumentTx db = databaseInstance.get().connect()) {
       // register schema
-      userEntityAdapter.register(db);
-      roleEntityAdapter.register(db);
-      privilegeEntityAdapter.register(db);
-      userRoleMappingEntityAdapter.register(db);
+      userEntityAdapter.register(db, new Runnable()
+      {
+        @Override
+        public void run() {
+          List<CUser> users = securityDefaults.getConfiguration().getUsers();
+          if (users != null && !users.isEmpty()) {
+            log.info("Initializing default users");
+            for (CUser user : users) {
+              userEntityAdapter.create(db, user);
+            }
+          }
+        }
+      });
+      roleEntityAdapter.register(db, new Runnable()
+      {
+        @Override
+        public void run() {
+          List<CRole> roles = securityDefaults.getConfiguration().getRoles();
+          if (roles != null && !roles.isEmpty()) {
+            log.info("Initializing default roles");
+            for (CRole role : roles) {
+              roleEntityAdapter.create(db, role);
+            }
+          }
+        }
+      });
+      privilegeEntityAdapter.register(db, new Runnable()
+      {
+        @Override
+        public void run() {
+          List<CPrivilege> privileges = securityDefaults.getConfiguration().getPrivileges();
+          if (privileges != null && !privileges.isEmpty()) {
+            log.info("Initializing default privileges");
+            for (CPrivilege privilege : privileges) {
+              privilegeEntityAdapter.create(db, privilege);
+            }
+          }
+        }
+      });
+      userRoleMappingEntityAdapter.register(db, new Runnable()
+      {
+        @Override
+        public void run() {
+          List<CUserRoleMapping> mappings = securityDefaults.getConfiguration().getUserRoleMappings();
+          if (mappings != null && !mappings.isEmpty()) {
+            log.info("Initializing default user/role mappings");
+            for (CUserRoleMapping mapping : mappings) {
+              userRoleMappingEntityAdapter.create(db, mapping);
+            }
+          }
+        }
+      });
     }
   }
 
@@ -115,84 +161,8 @@ public class DefaultSecurityModelConfigurationSource
 
   @Override
   public SecurityModelConfiguration loadConfiguration() {
-    try (ODatabaseDocumentTx db = openDb()) {
-      List<CUser> users = Lists.newArrayList(userEntityAdapter.getAll(db));
-      List<CRole> roles = Lists.newArrayList(roleEntityAdapter.get(db));
-      List<CPrivilege> privileges = Lists.newArrayList(privilegeEntityAdapter.get(db));
-      List<CUserRoleMapping> userRoleMappings = Lists.newArrayList(userRoleMappingEntityAdapter.get(db));
-      if (users.isEmpty() && roles.isEmpty() && privileges.isEmpty() && userRoleMappings.isEmpty()) {
-        saveConfiguration(securityDefaults.loadConfiguration());
-        users = Lists.newArrayList(userEntityAdapter.getAll(db));
-        roles = Lists.newArrayList(roleEntityAdapter.get(db));
-        privileges = Lists.newArrayList(privilegeEntityAdapter.get(db));
-        userRoleMappings = Lists.newArrayList(userRoleMappingEntityAdapter.get(db));
-      }
-      Configuration config = new Configuration();
-      config.setUsers(users);
-      config.setRoles(roles);
-      config.setPrivileges(privileges);
-      config.setUserRoleMappings(userRoleMappings);
-      configuration = new OrientSecurityModelConfiguration(config);
-      return getConfiguration();
-    }
-  }
-
-  private void saveConfiguration(final SecurityModelConfiguration configuration) {
-    checkNotNull(configuration, "Missing configuration");
-    try (ODatabaseDocumentTx db = openDb()) {
-      saveUsers(db, configuration.getUsers());
-      saveRoles(db, configuration.getRoles());
-      savePrivileges(db, configuration.getPrivileges());
-      saveUserRoleMappings(db, configuration.getUserRoleMappings());
-    }
-  }
-
-  /**
-   * Replace users.
-   */
-  private void saveUsers(final ODatabaseDocumentTx db, final List<CUser> users) {
-    userEntityAdapter.deleteAll(db);
-    if (users != null) {
-      for (CUser user : users) {
-        userEntityAdapter.create(db, user);
-      }
-    }
-  }
-
-  /**
-   * Replace roles.
-   */
-  private void saveRoles(final ODatabaseDocumentTx db, final List<CRole> roles) {
-    roleEntityAdapter.deleteAll(db);
-    if (roles != null) {
-      for (CRole role : roles) {
-        roleEntityAdapter.create(db, role);
-      }
-    }
-  }
-
-  /**
-   * Replace privileges.
-   */
-  private void savePrivileges(final ODatabaseDocumentTx db, final List<CPrivilege> privileges) {
-    privilegeEntityAdapter.deleteAll(db);
-    if (privileges != null) {
-      for (CPrivilege privilege : privileges) {
-        privilegeEntityAdapter.create(db, privilege);
-      }
-    }
-  }
-
-  /**
-   * Replace user role mappings.
-   */
-  private void saveUserRoleMappings(final ODatabaseDocumentTx db, final List<CUserRoleMapping> userRoleMappings) {
-    userRoleMappingEntityAdapter.deleteAll(db);
-    if (userRoleMappings != null) {
-      for (CUserRoleMapping userRoleMapping : userRoleMappings) {
-        userRoleMappingEntityAdapter.create(db, userRoleMapping);
-      }
-    }
+    configuration = new OrientSecurityModelConfiguration();
+    return getConfiguration();
   }
 
   /**
@@ -225,24 +195,25 @@ public class DefaultSecurityModelConfigurationSource
       implements SecurityModelConfiguration
   {
 
-    private final SecurityModelConfiguration delegate;
-
-    public OrientSecurityModelConfiguration(final SecurityModelConfiguration delegate) {
-      this.delegate = checkNotNull(delegate);
-    }
-
     @Override
     public List<CUser> getUsers() {
-      return delegate.getUsers();
+      try (ODatabaseDocumentTx db = openDb()) {
+        return Lists.newArrayList(userEntityAdapter.get(db));
+      }
     }
 
     @Override
     public CUser getUser(final String id) {
-      return delegate.getUser(id);
+      checkNotNull(id, "user id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        return userEntityAdapter.read(userEntityAdapter.get(db, id));
+      }
     }
 
     @Override
     public void addUser(final CUser user, final Set<String> roles) {
+      checkNotNull(user, "user");
+      checkNotNull(user.getId(), "user id");
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.create(db, user);
 
@@ -251,14 +222,7 @@ public class DefaultSecurityModelConfigurationSource
         mapping.setSource(SecurityXmlUserManager.SOURCE);
         mapping.setRoles(new ArrayList<>(roles));
         userRoleMappingEntityAdapter.create(db, mapping);
-
-        delegate.addUser(user, roles);
       }
-    }
-
-    @Override
-    public void setUsers(final Collection<CUser> users) {
-      delegate.setUsers(users);
     }
 
     @Override
@@ -277,41 +241,45 @@ public class DefaultSecurityModelConfigurationSource
         document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
         checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
         userRoleMappingEntityAdapter.write(document, mapping);
-
-        delegate.updateUser(user, roles);
       }
     }
 
     @Override
     public boolean removeUser(final String id) {
+      checkNotNull(id, "user id");
       try (ODatabaseDocumentTx db = openDb()) {
-        userEntityAdapter.delete(db, id);
-        userRoleMappingEntityAdapter.delete(db, id, SecurityXmlUserManager.SOURCE);
-        return delegate.removeUser(id);
+        if (userEntityAdapter.delete(db, id)) {
+          userRoleMappingEntityAdapter.delete(db, id, SecurityXmlUserManager.SOURCE);
+          return true;
+        }
+        return false;
       }
     }
 
     @Override
     public List<CUserRoleMapping> getUserRoleMappings() {
-      return delegate.getUserRoleMappings();
-    }
-
-    @Override
-    public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
-      return delegate.getUserRoleMapping(userId, source);
-    }
-
-    @Override
-    public void addUserRoleMapping(final CUserRoleMapping mapping) {
       try (ODatabaseDocumentTx db = openDb()) {
-        userRoleMappingEntityAdapter.create(db, mapping);
-        delegate.addUserRoleMapping(mapping);
+        return Lists.newArrayList(userRoleMappingEntityAdapter.get(db));
       }
     }
 
     @Override
-    public void setUserRoleMappings(final Collection<CUserRoleMapping> mappings) {
-      delegate.setUserRoleMappings(mappings);
+    public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
+      checkNotNull(userId, "user id");
+      checkNotNull(source, "source");
+      try (ODatabaseDocumentTx db = openDb()) {
+        return userRoleMappingEntityAdapter.read(userRoleMappingEntityAdapter.get(db, userId, source));
+      }
+    }
+
+    @Override
+    public void addUserRoleMapping(final CUserRoleMapping mapping) {
+      checkNotNull(mapping, "mapping");
+      checkNotNull(mapping.getUserId(), "user id");
+      checkNotNull(mapping.getSource(), "source");
+      try (ODatabaseDocumentTx db = openDb()) {
+        userRoleMappingEntityAdapter.create(db, mapping);
+      }
     }
 
     @Override
@@ -323,39 +291,40 @@ public class DefaultSecurityModelConfigurationSource
         ODocument document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
         checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
         userRoleMappingEntityAdapter.write(document, mapping);
-        delegate.updateUserRoleMapping(mapping);
       }
     }
 
     @Override
     public boolean removeUserRoleMapping(final String userId, final String source) {
+      checkNotNull(userId, "user id");
+      checkNotNull(source, "source");
       try (ODatabaseDocumentTx db = openDb()) {
-        userRoleMappingEntityAdapter.delete(db, userId, source);
-        return delegate.removeUserRoleMapping(userId, source);
+        return userRoleMappingEntityAdapter.delete(db, userId, source);
       }
     }
 
     @Override
     public List<CPrivilege> getPrivileges() {
-      return delegate.getPrivileges();
-    }
-
-    @Override
-    public CPrivilege getPrivilege(final String id) {
-      return delegate.getPrivilege(id);
-    }
-
-    @Override
-    public void addPrivilege(final CPrivilege privilege) {
       try (ODatabaseDocumentTx db = openDb()) {
-        privilegeEntityAdapter.create(db, privilege);
-        delegate.addPrivilege(privilege);
+        return Lists.newArrayList(privilegeEntityAdapter.get(db));
       }
     }
 
     @Override
-    public void setPrivileges(final Collection<CPrivilege> privileges) {
-      delegate.setPrivileges(privileges);
+    public CPrivilege getPrivilege(final String id) {
+      checkNotNull(id, "privilege id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        return privilegeEntityAdapter.read(privilegeEntityAdapter.get(db, id));
+      }
+    }
+
+    @Override
+    public void addPrivilege(final CPrivilege privilege) {
+      checkNotNull(privilege, "privilege");
+      checkNotNull(privilege.getId(), "privilege id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        privilegeEntityAdapter.create(db, privilege);
+      }
     }
 
     @Override
@@ -366,33 +335,38 @@ public class DefaultSecurityModelConfigurationSource
         ODocument document = privilegeEntityAdapter.get(db, privilege.getId());
         checkState(document != null, privilege.getId() + " not found");
         privilegeEntityAdapter.write(document, privilege);
-        delegate.updatePrivilege(privilege);
       }
     }
 
     @Override
     public boolean removePrivilege(final String id) {
+      checkNotNull(id, "privilege id");
       try (ODatabaseDocumentTx db = openDb()) {
-        privilegeEntityAdapter.delete(db, id);
-        return delegate.removePrivilege(id);
+        return privilegeEntityAdapter.delete(db, id);
       }
     }
 
     @Override
     public List<CRole> getRoles() {
-      return delegate.getRoles();
+      try (ODatabaseDocumentTx db = openDb()) {
+        return Lists.newArrayList(roleEntityAdapter.get(db));
+      }
     }
 
     @Override
     public CRole getRole(final String id) {
-      return delegate.getRole(id);
+      checkNotNull(id, "role id");
+      try (ODatabaseDocumentTx db = openDb()) {
+        return roleEntityAdapter.read(roleEntityAdapter.get(db, id));
+      }
     }
 
     @Override
     public void addRole(final CRole role) {
+      checkNotNull(role, "role");
+      checkNotNull(role.getId(), "role id");
       try (ODatabaseDocumentTx db = openDb()) {
         roleEntityAdapter.create(db, role);
-        delegate.addRole(role);
       }
     }
 
@@ -404,20 +378,14 @@ public class DefaultSecurityModelConfigurationSource
         ODocument document = roleEntityAdapter.get(db, role.getId());
         checkState(document != null, role.getId() + " not found");
         roleEntityAdapter.write(document, role);
-        delegate.updateRole(role);
       }
     }
 
     @Override
-    public void setRoles(final Collection<CRole> roles) {
-      delegate.setRoles(roles);
-    }
-
-    @Override
     public boolean removeRole(final String id) {
+      checkNotNull(id, "role id");
       try (ODatabaseDocumentTx db = openDb()) {
-        roleEntityAdapter.delete(db, id);
-        return delegate.removeRole(id);
+        return roleEntityAdapter.delete(db, id);
       }
     }
 
