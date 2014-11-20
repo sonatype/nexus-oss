@@ -46,8 +46,6 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
  * default ConfigurationManager.
- *
- * @author Brian Demers
  */
 @Singleton
 @Typed(ConfigurationManager.class)
@@ -55,7 +53,7 @@ import static com.google.common.base.Preconditions.checkState;
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
-  // This will handle all normal security.xml file loading/storing
+
   private final ConfigurationManager manager;
 
   private final List<StaticSecurityResource> staticResources;
