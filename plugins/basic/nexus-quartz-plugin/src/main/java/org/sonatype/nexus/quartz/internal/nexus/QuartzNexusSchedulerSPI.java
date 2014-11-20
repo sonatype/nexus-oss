@@ -124,7 +124,7 @@ public class QuartzNexusSchedulerSPI
 
       // get trigger, but use identity of jobKey
       // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
-      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule).getTriggerBuilder()
+      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
       // register job specific listener
