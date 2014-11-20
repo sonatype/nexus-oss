@@ -40,7 +40,7 @@ public abstract class NexusParametrizedITSupport
         systemTestParameters(),
         systemProperty("it.nexus.bundle"),
         testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip:bundle")
+            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
         )
     ).load();
   }
