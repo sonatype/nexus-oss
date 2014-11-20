@@ -71,7 +71,7 @@ public class ResourceMergingManagerThreadedTest
   {
     super.setUp();
 
-    this.manager = (ConfigurationManager) lookup(ConfigurationManager.class, "resourceMerging");
+    this.manager = lookup(ResourceMergingConfigurationManager.class);
 
     // test the lookup, make sure we have 100
     Assert.assertEquals(100, injectedStaticResources.size());

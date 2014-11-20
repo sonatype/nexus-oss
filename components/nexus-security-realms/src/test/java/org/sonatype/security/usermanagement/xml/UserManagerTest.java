@@ -24,6 +24,7 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.ResourceMergingConfigurationManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -58,7 +59,7 @@ public class UserManagerTest
   public ConfigurationManager getConfigurationManager()
       throws Exception
   {
-    return lookup(ConfigurationManager.class, "resourceMerging");
+    return lookup(ResourceMergingConfigurationManager.class);
   }
 
   public void testGetUser()

@@ -46,7 +46,7 @@ public class ResourceMergingConfigurationManagerTest
   {
     super.setUp();
 
-    manager = lookup(ConfigurationManager.class, "resourceMerging");
+    manager = lookup(ResourceMergingConfigurationManager.class);
   }
 
   public void testRoleMerging()
