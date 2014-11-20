@@ -41,6 +41,8 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s and {@link DynamicSecurityResource}s with
  * default ConfigurationManager.
@@ -487,6 +489,14 @@ public class ResourceMergingConfigurationManager
       Configuration resConfig = resource.getConfiguration();
 
       if (resConfig != null) {
+        checkState(
+            resConfig.getUsers() == null || resConfig.getUsers().isEmpty(),
+            "Static resources cannot have users"
+        );
+        checkState(
+            resConfig.getUserRoleMappings() == null || resConfig.getUserRoleMappings().isEmpty(),
+            "Static resources cannot have user/role mappings"
+        );
         appendConfig(configuration, resConfig);
       }
     }
@@ -495,6 +505,14 @@ public class ResourceMergingConfigurationManager
       Configuration resConfig = resource.getConfiguration();
 
       if (resConfig != null) {
+        checkState(
+            resConfig.getUsers() == null || resConfig.getUsers().isEmpty(),
+            "Dynamic resources cannot have users"
+        );
+        checkState(
+            resConfig.getUserRoleMappings() == null || resConfig.getUserRoleMappings().isEmpty(),
+            "Dynamic resources cannot have user/role mappings"
+        );
         appendConfig(configuration, resConfig);
       }
     }
