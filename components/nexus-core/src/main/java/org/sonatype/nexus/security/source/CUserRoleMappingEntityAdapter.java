@@ -142,14 +142,12 @@ public class CUserRoleMappingEntityAdapter
     });
   }
 
-  public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
-    OCommandSQL command = new OCommandSQL(
-        "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
-    );
-    int records = db.command(command).execute(userId, source);
-    return records == 1;
-  }
-
+  /**
+   * Retrieves a mapping document.
+   *
+   * @return found document, null otherwise
+   */
+  @Nullable
   public ODocument get(final ODatabaseDocumentTx db, final String userId, final String source) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
         "SELECT FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
@@ -159,6 +157,19 @@ public class CUserRoleMappingEntityAdapter
       return null;
     }
     return results.get(0);
+  }
+
+  /**
+   * Deletes a mapping.
+   *
+   * @return true if mapping was deleted
+   */
+  public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
+    OCommandSQL command = new OCommandSQL(
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
+    );
+    int records = db.command(command).execute(userId, source);
+    return records == 1;
   }
 
 }

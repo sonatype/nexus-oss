@@ -171,14 +171,12 @@ public class CPrivilegeEntityAdapter
     });
   }
 
-  public boolean delete(final ODatabaseDocumentTx db, final String id) {
-    OCommandSQL command = new OCommandSQL(
-        "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
-    );
-    int records = db.command(command).execute(id);
-    return records == 1;
-  }
-
+  /**
+   * Retrieves a privilege document.
+   *
+   * @return found document, null otherwise
+   */
+  @Nullable
   public ODocument get(final ODatabaseDocumentTx db, final String id) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
         "SELECT FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
@@ -190,5 +188,17 @@ public class CPrivilegeEntityAdapter
     return results.get(0);
   }
 
+  /**
+   * Deletes a privilege.
+   *
+   * @return true if privilege was deleted
+   */
+  public boolean delete(final ODatabaseDocumentTx db, final String id) {
+    OCommandSQL command = new OCommandSQL(
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+    );
+    int records = db.command(command).execute(id);
+    return records == 1;
+  }
 
 }
