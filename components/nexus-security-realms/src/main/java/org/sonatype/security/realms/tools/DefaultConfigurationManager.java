@@ -198,17 +198,6 @@ public class DefaultConfigurationManager
     }
   }
 
-  private CUserRoleMapping buildUserRoleMapping(String userId, Set<String> roles) {
-    CUserRoleMapping roleMapping = new CUserRoleMapping();
-
-    roleMapping.setUserId(userId);
-    roleMapping.setSource(SecurityXmlUserManager.SOURCE);
-    roleMapping.setRoles(new ArrayList<>(roles));
-
-    return roleMapping;
-
-  }
-
   public void deletePrivilege(String id)
       throws NoSuchPrivilegeException
   {
