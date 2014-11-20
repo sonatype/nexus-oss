@@ -27,6 +27,7 @@ import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Once;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Sets;
 import org.quartz.CronScheduleBuilder;
@@ -48,13 +49,14 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Singleton
 @Named
 public class NexusScheduleConverter
+    extends ComponentSupport
 {
   private static final Date FAR_FUTURE = new Date(Long.MAX_VALUE);
 
   /**
    * Creates Quartz trigger from schedule.
    */
-  public Trigger toTrigger(final Schedule schedule) {
+  public TriggerBuilder toTrigger(final Schedule schedule) {
     final TriggerBuilder triggerBuilder;
     if (schedule instanceof Cron) {
       final Cron s = (Cron) schedule;
@@ -99,14 +101,12 @@ public class NexusScheduleConverter
     // make type as description
     triggerBuilder.withDescription(schedule.getType());
 
-    final Trigger trigger = triggerBuilder.build();
-
     // store all the schedule properties for opposite conversion
     for (Map.Entry<String, String> entry : schedule.asMap().entrySet()) {
-      trigger.getJobDataMap().put(entry.getKey(), entry.getValue());
+      triggerBuilder.usingJobData(entry.getKey(), entry.getValue());
     }
 
-    return triggerBuilder.build();
+    return triggerBuilder;
   }
 
   /**
@@ -140,7 +140,7 @@ public class NexusScheduleConverter
       return new Manual();
     }
     else {
-      throw new IllegalArgumentException("Trigger unknown:" + trigger.getKey());
+      throw new IllegalArgumentException("Trigger unknown key: '" + trigger.getKey() + "', type: '" + type + "'");
     }
   }
 }
