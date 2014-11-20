@@ -193,7 +193,7 @@ public class NexusTaskInfo<T>
     // jobs a triggers are kept on same combinatorial keys
     final Trigger trigger = quartzSupport.getScheduler().getTrigger(
         TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
-    checkState(trigger != null, "Bug: no trigger for NX job %s", jobKey);
+    checkState(trigger != null, "No trigger with key %s", jobKey);
     return trigger;
   }
 
