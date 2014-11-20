@@ -17,8 +17,8 @@
     <!--
     Wrappers that require use of fragments
     -->
-    <bundle>wrap:${mvn:quartz}$Bundle-SymbolicName=quartz&amp;Fragment-Host=org.sonatype.nexus.plugins.nexus-quartz-plugin</bundle>
-    <bundle>wrap:${mvn:c3p0}$Bundle-SymbolicName=c3p0&amp;Fragment-Host=org.sonatype.nexus.plugins.nexus-quartz-plugin</bundle>
+    <bundle>wrap:${mvn:quartz}$overwrite=merge&amp;Bundle-SymbolicName=quartz&amp;Fragment-Host=org.sonatype.nexus.plugins.nexus-quartz-plugin</bundle>
+    <bundle>wrap:${mvn:c3p0}$overwrite=merge&amp;Bundle-SymbolicName=c3p0&amp;Fragment-Host=org.sonatype.nexus.plugins.nexus-quartz-plugin</bundle>
   </feature>
 </features>
 
