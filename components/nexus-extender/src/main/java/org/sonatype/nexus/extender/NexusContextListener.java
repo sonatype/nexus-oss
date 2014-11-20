@@ -125,6 +125,10 @@ public class NexusContextListener
 
       installFeatures(getFeatures((String) variables.get("nexus-features")));
 
+      if (variables.containsKey("nexus-test-features")) {
+        installFeatures(getFeatures((String) variables.get("nexus-test-features")));
+      }
+
       // raise framework start level to activate plugins
       fsl.setStartLevel(NEXUS_PLUGIN_START_LEVEL, this);
     }
@@ -212,18 +216,6 @@ public class NexusContextListener
         }
         else {
           log.warn("Missing {}", name);
-        }
-      }
-    }
-    else {
-      log.info("Discovering nexus features...");
-
-      for (Feature feature : featuresService.listFeatures()) {
-        String name = feature.getName();
-        // heuristic: select anything related to nexus, except boot/edition specific features
-        if (name.contains("nexus") && !name.contains("-boot") && !name.endsWith("-edition")) {
-          log.info("Found {}", name);
-          features.add(feature);
         }
       }
     }

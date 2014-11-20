@@ -41,6 +41,15 @@
     Location of unpacked Nexus distribution.
     -->
     <nexus.dir>${project.build.directory}/nexus/${it.nexus.bundle.artifactId}-${it.nexus.bundle.version}</nexus.dir>
+
+    <!--
+    Additional features used in legacy tests.
+    -->
+    <nexus-test-features>
+      nexus-it-helper-plugin,\
+      nexus-p2-bridge-plugin,\
+      nexus-p2-repository-plugin
+    </nexus-test-features>
   </properties>
 
   <dependencies>
