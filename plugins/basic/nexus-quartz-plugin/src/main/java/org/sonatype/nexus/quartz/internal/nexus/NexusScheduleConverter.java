@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -48,6 +49,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Named
 public class NexusScheduleConverter
 {
+  private static final Date FAR_FUTURE = new Date(Long.MAX_VALUE);
+
   /**
    * Creates Quartz trigger from schedule.
    */
@@ -85,7 +88,10 @@ public class NexusScheduleConverter
     }
     else if (schedule instanceof Manual) {
       final Manual s = (Manual) schedule;
-      triggerBuilder = newTrigger().startAt(null); // TODO: a far future?
+      // TODO: this looks awkward, but is needed to maintain job:trigger 1:1 ratio
+      // TODO: Investigate other solutions? (ie. durable job w/o trigger?)
+      // that would introduce lot of exceptional branches handling trigger==null in code
+      triggerBuilder = newTrigger().startAt(FAR_FUTURE);
     }
     else {
       throw new IllegalArgumentException("Schedule unknown:" + schedule.getType());
