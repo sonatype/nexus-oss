@@ -206,7 +206,11 @@ public class DefaultSecurityModelConfigurationSource
     public CUser getUser(final String id) {
       checkNotNull(id, "user id");
       try (ODatabaseDocumentTx db = openDb()) {
-        return userEntityAdapter.read(userEntityAdapter.get(db, id));
+        ODocument document = userEntityAdapter.get(db, id);
+        if (document != null) {
+          return userEntityAdapter.read(document);
+        }
+        return null;
       }
     }
 
@@ -268,7 +272,11 @@ public class DefaultSecurityModelConfigurationSource
       checkNotNull(userId, "user id");
       checkNotNull(source, "source");
       try (ODatabaseDocumentTx db = openDb()) {
-        return userRoleMappingEntityAdapter.read(userRoleMappingEntityAdapter.get(db, userId, source));
+        ODocument document = userRoleMappingEntityAdapter.get(db, userId, source);
+        if (document != null) {
+          return userRoleMappingEntityAdapter.read(document);
+        }
+        return null;
       }
     }
 
@@ -314,7 +322,11 @@ public class DefaultSecurityModelConfigurationSource
     public CPrivilege getPrivilege(final String id) {
       checkNotNull(id, "privilege id");
       try (ODatabaseDocumentTx db = openDb()) {
-        return privilegeEntityAdapter.read(privilegeEntityAdapter.get(db, id));
+        ODocument document = privilegeEntityAdapter.get(db, id);
+        if (document != null) {
+          return privilegeEntityAdapter.read(document);
+        }
+        return null;
       }
     }
 
@@ -357,7 +369,11 @@ public class DefaultSecurityModelConfigurationSource
     public CRole getRole(final String id) {
       checkNotNull(id, "role id");
       try (ODatabaseDocumentTx db = openDb()) {
-        return roleEntityAdapter.read(roleEntityAdapter.get(db, id));
+        ODocument document = roleEntityAdapter.get(db, id);
+        if (document != null) {
+          return roleEntityAdapter.read(document);
+        }
+        return null;
       }
     }
 
