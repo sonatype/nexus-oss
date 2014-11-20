@@ -15,6 +15,8 @@ package org.sonatype.security.model;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 /**
  * @since 3.0
  */
@@ -23,6 +25,7 @@ public interface SecurityModelConfiguration
 {
   List<CUser> getUsers();
 
+  @Nullable
   CUser getUser(String id);
 
   void addUser(CUser user, Set<String> roles);
@@ -33,6 +36,7 @@ public interface SecurityModelConfiguration
 
   List<CUserRoleMapping> getUserRoleMappings();
 
+  @Nullable
   CUserRoleMapping getUserRoleMapping(String userId, String source);
 
   void addUserRoleMapping(CUserRoleMapping mapping);
@@ -43,6 +47,7 @@ public interface SecurityModelConfiguration
 
   List<CPrivilege> getPrivileges();
 
+  @Nullable
   CPrivilege getPrivilege(String id);
 
   void addPrivilege(CPrivilege privilege);
@@ -53,6 +58,7 @@ public interface SecurityModelConfiguration
 
   List<CRole> getRoles();
 
+  @Nullable
   CRole getRole(String id);
 
   void addRole(CRole role);
