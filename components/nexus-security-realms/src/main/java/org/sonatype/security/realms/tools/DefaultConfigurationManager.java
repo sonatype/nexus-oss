@@ -191,7 +191,6 @@ public class DefaultConfigurationManager
 
     if (vr.isValid()) {
       getConfiguration().addUser(user, roles);
-      getConfiguration().addUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
       logValidationWarnings(vr);
     }
     else {
