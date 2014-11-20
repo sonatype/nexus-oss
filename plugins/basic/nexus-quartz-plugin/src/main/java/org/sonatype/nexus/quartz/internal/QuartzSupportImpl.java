@@ -14,6 +14,7 @@ package org.sonatype.nexus.quartz.internal;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,10 +38,12 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.UnableToInterruptJobException;
+import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.impl.jdbcjobstore.JobStoreTX;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.spi.JobFactory;
+import org.quartz.spi.ThreadExecutor;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.utils.DBConnectionManager;
 
@@ -57,6 +60,8 @@ public class QuartzSupportImpl
     extends LifecycleSupport
     implements QuartzSupport, JobFactory
 {
+  private final String SCHEDULER_NAME = "NX-Quartz-Scheduler";
+
   private final H2ConnectionProvider h2ConnectionProvider;
 
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
@@ -84,6 +89,18 @@ public class QuartzSupportImpl
 
   @Override
   protected void doStart() throws Exception {
+    // hack: Quartz and c3p0 are fragments hosted in this plugin's bundle
+    // Still, as it spawns threads, we need this
+    // this thread executor executes two important thread: quartz misfire handler and quartz's default thread
+    final ThreadExecutor threadExecutor = new DefaultThreadExecutor()
+    {
+      @Override
+      public void execute(final Thread thread) {
+        thread.setContextClassLoader(QuartzSupport.class.getClassLoader());
+        super.execute(thread);
+      }
+    };
+
     // create JDBC JobStore
     final JobStoreTX jobStoreTX = new JobStoreTX();
     jobStoreTX.setDriverDelegateClass(StdJDBCDelegate.class.getName());
@@ -91,6 +108,7 @@ public class QuartzSupportImpl
     jobStoreTX.setDataSource(QuartzPlugin.STORE_NAME);
     jobStoreTX.setTablePrefix("QRTZ_");
     jobStoreTX.setIsClustered(false);
+    jobStoreTX.setThreadExecutor(threadExecutor);
 
     // start the pool
     h2ConnectionProvider.initialize();
@@ -102,9 +120,23 @@ public class QuartzSupportImpl
     DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, h2ConnectionProvider);
 
     // create Scheduler
-    DirectSchedulerFactory.getInstance()
-        .createScheduler(new QuartzThreadPool(threadPoolSize), jobStoreTX);
-    scheduler = DirectSchedulerFactory.getInstance().getScheduler();
+    DirectSchedulerFactory.getInstance().createScheduler(
+        SCHEDULER_NAME,
+        UUID.randomUUID().toString(),
+        new QuartzThreadPool(threadPoolSize),
+        threadExecutor,
+        jobStoreTX,
+        null,
+        null,
+        0,
+        -1,
+        -1,
+        false,
+        null,
+        1,
+        0L
+    );
+    scheduler = DirectSchedulerFactory.getInstance().getScheduler(SCHEDULER_NAME);
     scheduler.setJobFactory(this);
 
     // invoke customisers
