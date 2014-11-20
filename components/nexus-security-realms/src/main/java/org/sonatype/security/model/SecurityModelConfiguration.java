@@ -14,6 +14,7 @@ package org.sonatype.security.model;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @since 3.0
@@ -25,11 +26,11 @@ public interface SecurityModelConfiguration
 
   CUser getUser(String id);
 
-  void addUser(CUser user);
+  void addUser(CUser user, Set<String> roles);
 
   void setUsers(Collection<CUser> users);
 
-  void updateUser(CUser user);
+  void updateUser(CUser user, Set<String> roles);
 
   boolean removeUser(String id);
 

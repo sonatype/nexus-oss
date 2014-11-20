@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.security.source;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,7 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
@@ -239,10 +242,17 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void addUser(final CUser user) {
+    public void addUser(final CUser user, final Set<String> roles) {
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.create(db, user);
-        delegate.addUser(user);
+
+        CUserRoleMapping mapping = new CUserRoleMapping();
+        mapping.setUserId(user.getId());
+        mapping.setSource(SecurityXmlUserManager.SOURCE);
+        mapping.setRoles(new ArrayList<>(roles));
+        userRoleMappingEntityAdapter.create(db, mapping);
+
+        delegate.addUser(user, roles);
       }
     }
 
@@ -252,14 +262,23 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void updateUser(final CUser user) {
+    public void updateUser(final CUser user, final Set<String> roles) {
       checkNotNull(user, "user");
       checkNotNull(user.getId(), "user id");
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userEntityAdapter.get(db, user.getId());
         checkState(document != null, user.getId() + " not found");
         userEntityAdapter.write(document, user);
-        delegate.updateUser(user);
+
+        CUserRoleMapping mapping = new CUserRoleMapping();
+        mapping.setUserId(user.getId());
+        mapping.setSource(SecurityXmlUserManager.SOURCE);
+        mapping.setRoles(new ArrayList<>(roles));
+        document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
+        checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
+        userRoleMappingEntityAdapter.write(document, mapping);
+
+        delegate.updateUser(user, roles);
       }
     }
 

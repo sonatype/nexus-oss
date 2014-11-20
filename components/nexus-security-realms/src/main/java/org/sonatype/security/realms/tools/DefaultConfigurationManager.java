@@ -190,7 +190,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, false);
 
     if (vr.isValid()) {
-      getConfiguration().addUser(user);
+      getConfiguration().addUser(user, roles);
       getConfiguration().addUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
       logValidationWarnings(vr);
     }
@@ -386,8 +386,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, true);
 
     if (vr.isValid()) {
-      getConfiguration().updateUser(user);
-      getConfiguration().updateUserRoleMapping(buildUserRoleMapping(user.getId(), roles));
+      getConfiguration().updateUser(user,roles);
       logValidationWarnings(vr);
     }
     else {

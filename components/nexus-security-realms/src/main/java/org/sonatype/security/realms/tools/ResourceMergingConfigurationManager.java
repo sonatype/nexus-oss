@@ -527,10 +527,7 @@ public class ResourceMergingConfigurationManager
       roles.put(role.getId(), role); // deduplicate config roles
     }
 
-    for (CUser user : (List<CUser>) config.getUsers()) {
-      configuration.addUser(user);
-    }
-
     return configuration;
   }
+
 }

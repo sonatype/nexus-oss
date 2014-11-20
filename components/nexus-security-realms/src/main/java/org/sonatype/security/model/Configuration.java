@@ -12,9 +12,13 @@
  */
 package org.sonatype.security.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
+import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -58,14 +62,24 @@ public class Configuration
     return users.get(id);
   }
 
-  @Override
-  public void addUser(final CUser user) {
+  private void addUser(final CUser user) {
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
     checkState(
         users.putIfAbsent(user.getId(), user) == null,
         user.getId() + " already exists"
     );
+  }
+
+  @Override
+  public void addUser(final CUser user, final Set<String> roles) {
+    addUser(user);
+
+    CUserRoleMapping mapping = new CUserRoleMapping();
+    mapping.setUserId(user.getId());
+    mapping.setSource(SecurityXmlUserManager.SOURCE);
+    mapping.setRoles(new ArrayList<>(roles));
+    addUserRoleMapping(mapping);
   }
 
   @Override
@@ -79,10 +93,16 @@ public class Configuration
   }
 
   @Override
-  public void updateUser(final CUser user) {
+  public void updateUser(final CUser user, final Set<String> roles) {
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
     checkState(users.replace(user.getId(), user) != null, user.getId() + " not found");
+
+    CUserRoleMapping mapping = new CUserRoleMapping();
+    mapping.setUserId(user.getId());
+    mapping.setSource(SecurityXmlUserManager.SOURCE);
+    mapping.setRoles(new ArrayList<>(roles));
+    updateUserRoleMapping(mapping);
   }
 
   @Override
