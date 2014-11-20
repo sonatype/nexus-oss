@@ -155,14 +155,6 @@ public class CRoleEntityAdapter
     });
   }
 
-  /**
-   * Delete all roles.
-   */
-  public void deleteAll(final ODatabaseDocumentTx db) {
-    OCommandSQL command = new OCommandSQL("DELETE FROM " + DB_CLASS);
-    db.command(command).execute();
-  }
-
   public boolean delete(final ODatabaseDocumentTx db, final String id) {
     OCommandSQL command = new OCommandSQL(
         "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"

@@ -142,14 +142,6 @@ public class CUserRoleMappingEntityAdapter
     });
   }
 
-  /**
-   * Delete all user role mappings.
-   */
-  public void deleteAll(final ODatabaseDocumentTx db) {
-    OCommandSQL command = new OCommandSQL("DELETE FROM " + DB_CLASS);
-    db.command(command).execute();
-  }
-
   public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
     OCommandSQL command = new OCommandSQL(
         "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
