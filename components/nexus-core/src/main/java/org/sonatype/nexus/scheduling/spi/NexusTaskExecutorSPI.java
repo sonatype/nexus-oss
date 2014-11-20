@@ -15,6 +15,8 @@ package org.sonatype.nexus.scheduling.spi;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -29,6 +31,7 @@ public interface NexusTaskExecutorSPI
   /**
    * Returns the info of a NX task by it's ID, if present. If no task present with ID then {@code null}.
    */
+  @Nullable
   <T> TaskInfo<T> getTaskById(String id);
 
   /**

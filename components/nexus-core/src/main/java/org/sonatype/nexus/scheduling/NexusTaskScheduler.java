@@ -16,6 +16,8 @@ package org.sonatype.nexus.scheduling;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 /**
@@ -54,6 +56,7 @@ public interface NexusTaskScheduler
   /**
    * Returns the {@link TaskInfo<T>} of a task by it's ID, if present, otherwise {@code null}.
    */
+  @Nullable
   <T> TaskInfo<T> getTaskById(String id);
 
   /**
