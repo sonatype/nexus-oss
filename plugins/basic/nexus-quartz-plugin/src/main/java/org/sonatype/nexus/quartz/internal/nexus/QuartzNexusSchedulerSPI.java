@@ -75,6 +75,8 @@ public class QuartzNexusSchedulerSPI
 
   @Override
   public <T> TaskInfo<T> getTaskById(final String id) {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       return (TaskInfo<T>) allTasks().get(jobKey);
@@ -82,15 +84,23 @@ public class QuartzNexusSchedulerSPI
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
   }
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       return Lists.<TaskInfo<?>>newArrayList(allTasks().values());
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
     }
   }
 
@@ -111,6 +121,8 @@ public class QuartzNexusSchedulerSPI
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration,
                                       final Schedule schedule)
   {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
@@ -142,10 +154,15 @@ public class QuartzNexusSchedulerSPI
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
   }
 
   @Override
   public boolean removeTask(final String id) {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       return quartzSupport.getScheduler().deleteJob(jobKey);
@@ -153,15 +170,23 @@ public class QuartzNexusSchedulerSPI
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
   }
 
   @Override
   public int getRunnintTaskCount() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       return quartzSupport.getScheduler().getCurrentlyExecutingJobs().size();
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
     }
   }
 }

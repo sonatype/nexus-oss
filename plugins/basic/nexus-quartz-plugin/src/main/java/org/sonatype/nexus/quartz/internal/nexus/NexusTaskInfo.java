@@ -92,21 +92,31 @@ public class NexusTaskInfo<T>
 
   @Override
   public Schedule getSchedule() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       return nexusScheduleConverter.toSchedule(getTrigger());
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
   }
 
   @Override
   public void runNow() {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       quartzSupport.getScheduler().triggerJob(jobKey);
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
     }
   }
 
