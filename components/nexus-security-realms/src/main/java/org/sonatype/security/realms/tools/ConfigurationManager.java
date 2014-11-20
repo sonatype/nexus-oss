@@ -22,7 +22,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -56,11 +55,6 @@ public interface ConfigurationManager
    * Retrieve all privileges
    */
   List<CPrivilege> listPrivileges();
-
-  /**
-   * Retrieve all descriptors of available privileges
-   */
-  List<PrivilegeDescriptor> listPrivilegeDescriptors();
 
   /**
    * Create a new user.

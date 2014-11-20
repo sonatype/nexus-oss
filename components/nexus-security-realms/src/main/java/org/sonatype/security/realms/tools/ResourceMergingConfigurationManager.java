@@ -33,7 +33,6 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -440,10 +439,6 @@ public class ResourceMergingConfigurationManager
 
     // The static config can't be updated, so delegate to xml file
     manager.updateUser(user, roles, context);
-  }
-
-  public List<PrivilegeDescriptor> listPrivilegeDescriptors() {
-    return manager.listPrivilegeDescriptors();
   }
 
   public void cleanRemovedPrivilege(String privilegeId) {

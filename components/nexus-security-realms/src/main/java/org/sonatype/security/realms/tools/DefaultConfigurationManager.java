@@ -35,7 +35,6 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -55,8 +54,6 @@ public class DefaultConfigurationManager
 
   private final SecurityConfigurationValidator validator;
 
-  private final List<PrivilegeDescriptor> privilegeDescriptors;
-
   private final SecurityConfigurationCleaner configCleaner;
 
   private final List<SecurityConfigurationModifier> configurationModifiers;
@@ -69,7 +66,6 @@ public class DefaultConfigurationManager
                                      SecurityConfigurationCleaner configCleaner,
                                      SecurityConfigurationValidator validator,
                                      SecurityModelConfigurationSource configurationSource,
-                                     List<PrivilegeDescriptor> privilegeDescriptors,
                                      PasswordService passwordService)
   {
     super(eventBus);
@@ -77,7 +73,6 @@ public class DefaultConfigurationManager
     this.configCleaner = configCleaner;
     this.validator = validator;
     this.configurationSource = configurationSource;
-    this.privilegeDescriptors = privilegeDescriptors;
     this.passwordService = passwordService;
   }
 
@@ -349,7 +344,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, true);
 
     if (vr.isValid()) {
-      getConfiguration().updateUser(user,roles);
+      getConfiguration().updateUser(user, roles);
       logValidationWarnings(vr);
     }
     else {
@@ -533,10 +528,6 @@ public class DefaultConfigurationManager
     }
 
     return context;
-  }
-
-  public List<PrivilegeDescriptor> listPrivilegeDescriptors() {
-    return Collections.unmodifiableList(privilegeDescriptors);
   }
 
   public void cleanRemovedPrivilege(String privilegeId) {
