@@ -216,7 +216,7 @@ public class SecurityXmlUserManager
     try {
       CUserRoleMapping roleMapping = configuration.readUserRoleMapping(userId, source);
       if (roleMapping != null) {
-        for (String roleId : (List<String>) roleMapping.getRoles()) {
+        for (String roleId : roleMapping.getRoles()) {
           RoleIdentifier role = toRole(roleId);
           if (role != null) {
             roles.add(role);

@@ -115,8 +115,7 @@ public class XmlRolePermissionResolver
           // process the roles this role has recursively
           rolesToProcess.addAll(role.getRoles());
           // add the permissions this role has
-          final List<String> privilegeIds = role.getPrivileges();
-          for (String privilegeId : privilegeIds) {
+          for (String privilegeId : role.getPrivileges()) {
             Set<Permission> set = getPermissions(privilegeId);
             permissions.addAll(set);
           }

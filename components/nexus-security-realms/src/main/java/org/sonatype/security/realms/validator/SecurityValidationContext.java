@@ -16,8 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sonatype.configuration.validation.ValidationContext;
+
+import com.google.common.collect.Maps;
 
 public class SecurityValidationContext
     implements ValidationContext
@@ -34,7 +37,7 @@ public class SecurityValidationContext
 
   private Map<String, String> existingRoleNameMap;
 
-  private Map<String, List<String>> existingUserRoleMap;
+  private Map<String, Set<String>> existingUserRoleMap;
 
   public void addExistingPrivilegeIds() {
     if (this.existingPrivilegeIds == null) {
@@ -56,7 +59,7 @@ public class SecurityValidationContext
     }
 
     if (this.existingUserRoleMap == null) {
-      this.existingUserRoleMap = new HashMap<String, List<String>>();
+      this.existingUserRoleMap = Maps.newHashMap();
     }
   }
 
@@ -94,7 +97,7 @@ public class SecurityValidationContext
     return existingRoleNameMap;
   }
 
-  public Map<String, List<String>> getExistingUserRoleMap() {
+  public Map<String, Set<String>> getExistingUserRoleMap() {
     return existingUserRoleMap;
   }
 

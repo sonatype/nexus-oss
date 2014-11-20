@@ -36,6 +36,7 @@ import junit.framework.Assert;
 import org.apache.shiro.authc.credential.PasswordService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 public class UserManagerTest
@@ -261,8 +262,7 @@ public class UserManagerTest
       if (roleMapping.getUserId().equals("admin")) {
         found = true;
 
-        Assert.assertEquals(1, roleMapping.getRoles().size());
-        Assert.assertEquals("role2", roleMapping.getRoles().get(0));
+        assertThat(roleMapping.getRoles(), contains("role2"));
       }
     }
 
@@ -287,8 +287,7 @@ public class UserManagerTest
       if (roleMapping.getUserId().equals(securitySystem.getAnonymousUsername())) {
         found = true;
 
-        Assert.assertEquals(1, roleMapping.getRoles().size());
-        Assert.assertEquals("role3", roleMapping.getRoles().get(0));
+        assertThat(roleMapping.getRoles(), contains("role3"));
       }
     }
 

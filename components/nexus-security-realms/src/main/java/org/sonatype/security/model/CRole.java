@@ -12,6 +12,10 @@
  */
 package org.sonatype.security.model;
 
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
 /**
  * A Role is a bucket for privileges, can also contain other roles.
  *
@@ -50,12 +54,12 @@ public class CRole
   /**
    * Field privileges.
    */
-  private java.util.List<String> privileges;
+  private Set<String> privileges;
 
   /**
    * Field roles.
    */
-  private java.util.List<String> roles;
+  private Set<String> roles;
 
   /**
    * Marks if this role is editable.
@@ -91,13 +95,11 @@ public class CRole
       CRole copy = (CRole) super.clone();
 
       if (this.privileges != null) {
-        copy.privileges = new java.util.ArrayList<String>();
-        copy.privileges.addAll(this.privileges);
+        copy.privileges = Sets.newHashSet(this.privileges);
       }
 
       if (this.roles != null) {
-        copy.roles = new java.util.ArrayList<String>();
-        copy.roles.addAll(this.roles);
+        copy.roles = Sets.newHashSet(this.roles);
       }
 
       return copy;
@@ -135,31 +137,21 @@ public class CRole
     return this.name;
   } //-- String getName()
 
-  /**
-   * Method getPrivileges.
-   *
-   * @return List
-   */
-  public java.util.List<String> getPrivileges() {
+  public Set<String> getPrivileges() {
     if (this.privileges == null) {
-      this.privileges = new java.util.ArrayList<String>();
+      this.privileges = Sets.newHashSet();
     }
 
     return this.privileges;
   } //-- java.util.List<String> getPrivileges()
 
-  /**
-   * Method getRoles.
-   *
-   * @return List
-   */
-  public java.util.List<String> getRoles() {
+  public Set<String> getRoles() {
     if (this.roles == null) {
-      this.roles = new java.util.ArrayList<String>();
+      this.roles = Sets.newHashSet();
     }
 
     return this.roles;
-  } //-- java.util.List<String> getRoles()
+  }
 
   /**
    * Get the number of minutes to wait before the session
@@ -215,12 +207,9 @@ public class CRole
     this.name = name;
   } //-- void setName( String )
 
-  /**
-   * Set list of privilege ids that will define this role.
-   */
-  public void setPrivileges(java.util.List<String> privileges) {
+  public void setPrivileges(final Set<String> privileges) {
     this.privileges = privileges;
-  } //-- void setPrivileges( java.util.List )
+  }
 
   /**
    * Set marks if this role is editable.
@@ -229,13 +218,9 @@ public class CRole
     this.readOnly = readOnly;
   } //-- void setReadOnly( boolean )
 
-  /**
-   * Set list of role ids, whose contents, will also define this
-   * role.
-   */
-  public void setRoles(java.util.List<String> roles) {
+  public void setRoles(Set<String> roles) {
     this.roles = roles;
-  } //-- void setRoles( java.util.List )
+  }
 
   /**
    * Set the number of minutes to wait before the session

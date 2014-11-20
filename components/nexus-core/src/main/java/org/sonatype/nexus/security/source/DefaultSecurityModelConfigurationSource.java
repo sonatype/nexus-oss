@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.security.source;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -224,7 +223,7 @@ public class DefaultSecurityModelConfigurationSource
         CUserRoleMapping mapping = new CUserRoleMapping();
         mapping.setUserId(user.getId());
         mapping.setSource(SecurityXmlUserManager.SOURCE);
-        mapping.setRoles(new ArrayList<>(roles));
+        mapping.setRoles(roles);
         userRoleMappingEntityAdapter.create(db, mapping);
       }
     }
@@ -241,7 +240,7 @@ public class DefaultSecurityModelConfigurationSource
         CUserRoleMapping mapping = new CUserRoleMapping();
         mapping.setUserId(user.getId());
         mapping.setSource(SecurityXmlUserManager.SOURCE);
-        mapping.setRoles(new ArrayList<>(roles));
+        mapping.setRoles(roles);
         document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
         checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
         userRoleMappingEntityAdapter.write(document, mapping);

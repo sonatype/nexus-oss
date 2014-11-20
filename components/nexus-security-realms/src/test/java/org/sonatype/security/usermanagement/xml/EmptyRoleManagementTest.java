@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.usermanagement.xml;
 
-import java.util.List;
+import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
@@ -81,7 +81,7 @@ public class EmptyRoleManagementTest
     SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
     for (CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings()) {
       if (userId.equals(userRoleMapping.getUserId()) && "default".equals(userRoleMapping.getSource())) {
-        List<String> configuredRoles = userRoleMapping.getRoles();
+        Set<String> configuredRoles = userRoleMapping.getRoles();
         assertEquals(2, configuredRoles.size());
         assertFalse(configuredRoles.contains(roleId));
       }
@@ -151,7 +151,7 @@ public class EmptyRoleManagementTest
     SecurityModelConfiguration securityModel = this.getSecurityConfiguration();
     for (CUserRoleMapping userRoleMapping : securityModel.getUserRoleMappings()) {
       if (userId.equals(userRoleMapping.getUserId()) && "default".equals(userRoleMapping.getSource())) {
-        List<String> configuredRoles = userRoleMapping.getRoles();
+        Set<String> configuredRoles = userRoleMapping.getRoles();
         assertEquals(2, configuredRoles.size());
         assertFalse(configuredRoles.contains(roleId));
       }

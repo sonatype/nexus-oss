@@ -13,6 +13,7 @@
 package org.sonatype.nexus.security.source;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
@@ -66,7 +67,7 @@ public class CUserRoleMappingEntityAdapter
 
       type.createProperty(P_USER_ID, OType.STRING).setNotNull(true);
       type.createProperty(P_SOURCE, OType.STRING).setNotNull(true);
-      type.createProperty(P_ROLES, OType.EMBEDDEDLIST);
+      type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
       type.createIndex(DB_CLASS + "_" + P_USER_ID + "_" + P_SOURCE + "idx", INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
 
@@ -110,7 +111,7 @@ public class CUserRoleMappingEntityAdapter
 
     String userId = document.field(P_USER_ID, OType.STRING);
     String source = document.field(P_SOURCE, OType.STRING);
-    List<String> roles = document.field(P_ROLES, OType.EMBEDDEDLIST);
+    Set<String> roles = document.field(P_ROLES, OType.EMBEDDEDSET);
 
     CUserRoleMapping entity = new CUserRoleMapping();
     entity.setUserId(userId);

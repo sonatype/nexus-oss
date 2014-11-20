@@ -13,6 +13,7 @@
 package org.sonatype.nexus.security.source;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
@@ -71,8 +72,8 @@ public class CRoleEntityAdapter
       type.createProperty(P_ID, OType.STRING).setNotNull(true);
       type.createProperty(P_NAME, OType.STRING).setNotNull(true);
       type.createProperty(P_DESCRIPTION, OType.STRING);
-      type.createProperty(P_PRIVILEGES, OType.EMBEDDEDLIST);
-      type.createProperty(P_ROLES, OType.EMBEDDEDLIST);
+      type.createProperty(P_PRIVILEGES, OType.EMBEDDEDSET);
+      type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
       type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
 
@@ -119,8 +120,8 @@ public class CRoleEntityAdapter
     String id = document.field(P_ID, OType.STRING);
     String name = document.field(P_NAME, OType.STRING);
     String description = document.field(P_DESCRIPTION, OType.STRING);
-    List<String> privileges = document.field(P_PRIVILEGES, OType.EMBEDDEDLIST);
-    List<String> roles = document.field(P_ROLES, OType.EMBEDDEDLIST);
+    Set<String> privileges = document.field(P_PRIVILEGES, OType.EMBEDDEDSET);
+    Set<String> roles = document.field(P_ROLES, OType.EMBEDDEDSET);
 
     CRole entity = new CRole();
     entity.setId(id);

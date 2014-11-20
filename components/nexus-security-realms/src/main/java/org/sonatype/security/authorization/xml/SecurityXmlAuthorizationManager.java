@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.authorization.xml;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -35,6 +34,8 @@ import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.common.collect.Sets;
 
 /**
  * AuthorizationManager that wraps roles from security-xml-realm.
@@ -75,8 +76,8 @@ public class SecurityXmlAuthorizationManager
     role.setSource(SOURCE);
     role.setDescription(secRole.getDescription());
     role.setReadOnly(secRole.isReadOnly());
-    role.setPrivileges(new HashSet<String>(secRole.getPrivileges()));
-    role.setRoles(new HashSet<String>(secRole.getRoles()));
+    role.setPrivileges(Sets.newHashSet(secRole.getPrivileges()));
+    role.setRoles(Sets.newHashSet(secRole.getRoles()));
 
     return role;
   }
@@ -90,18 +91,18 @@ public class SecurityXmlAuthorizationManager
     secRole.setReadOnly(role.isReadOnly());
     // null check
     if (role.getPrivileges() != null) {
-      secRole.setPrivileges(new ArrayList<String>(role.getPrivileges()));
+      secRole.setPrivileges(Sets.newHashSet(role.getPrivileges()));
     }
     else {
-      secRole.setPrivileges(new ArrayList<String>());
+      secRole.setPrivileges(Sets.<String>newHashSet());
     }
 
     // null check
     if (role.getRoles() != null) {
-      secRole.setRoles(new ArrayList<String>(role.getRoles()));
+      secRole.setRoles(Sets.newHashSet(role.getRoles()));
     }
     else {
-      secRole.setRoles(new ArrayList<String>());
+      secRole.setRoles(Sets.<String>newHashSet());
     }
 
     return secRole;

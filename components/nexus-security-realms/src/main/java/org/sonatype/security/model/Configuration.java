@@ -13,7 +13,6 @@
 package org.sonatype.security.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +75,7 @@ public class Configuration
     CUserRoleMapping mapping = new CUserRoleMapping();
     mapping.setUserId(user.getId());
     mapping.setSource(SecurityXmlUserManager.SOURCE);
-    mapping.setRoles(new ArrayList<>(roles));
+    mapping.setRoles(roles);
     addUserRoleMapping(mapping);
   }
 
@@ -98,7 +97,7 @@ public class Configuration
     CUserRoleMapping mapping = new CUserRoleMapping();
     mapping.setUserId(user.getId());
     mapping.setSource(SecurityXmlUserManager.SOURCE);
-    mapping.setRoles(new ArrayList<>(roles));
+    mapping.setRoles(roles);
     updateUserRoleMapping(mapping);
   }
 

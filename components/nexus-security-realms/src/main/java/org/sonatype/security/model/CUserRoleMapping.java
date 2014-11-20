@@ -12,6 +12,10 @@
  */
 package org.sonatype.security.model;
 
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
 /**
  * Defines the mapping between users and roles, if LDAP groups are
  * not used.
@@ -41,7 +45,7 @@ public class CUserRoleMapping
   /**
    * Field roles.
    */
-  private java.util.List<String> roles;
+  private Set<String> roles;
 
 
   //-----------/
@@ -65,8 +69,7 @@ public class CUserRoleMapping
       CUserRoleMapping copy = (CUserRoleMapping) super.clone();
 
       if (this.roles != null) {
-        copy.roles = new java.util.ArrayList<String>();
-        copy.roles.addAll(this.roles);
+        copy.roles = Sets.newHashSet(this.roles);
       }
 
       return copy;
@@ -77,18 +80,12 @@ public class CUserRoleMapping
     }
   } //-- CUserRoleMapping clone()
 
-  /**
-   * Method getRoles.
-   *
-   * @return List
-   */
-  public java.util.List<String> getRoles() {
+  public Set<String> getRoles() {
     if (this.roles == null) {
-      this.roles = new java.util.ArrayList<String>();
+      this.roles = Sets.newHashSet();
     }
-
     return this.roles;
-  } //-- java.util.List<String> getRoles()
+  }
 
   /**
    * Get the source or realm id, of the user.  For example an
@@ -116,12 +113,9 @@ public class CUserRoleMapping
     getRoles().remove(string);
   } //-- void removeRole( String )
 
-  /**
-   * Set list of the users roles.
-   */
-  public void setRoles(java.util.List<String> roles) {
+  public void setRoles(Set<String> roles) {
     this.roles = roles;
-  } //-- void setRoles( java.util.List )
+  }
 
   /**
    * Set the source or realm id, of the user.  For example an

@@ -39,6 +39,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.Sets;
 import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -256,8 +257,8 @@ public class ResourceMergingConfigurationManager
 
     CRole newRole = new CRole();
     newRole.setId(roleA.getId());
-    newRole.setRoles(new ArrayList<String>(roles));
-    newRole.setPrivileges(new ArrayList<String>(privs));
+    newRole.setRoles(Sets.newHashSet(roles));
+    newRole.setPrivileges(Sets.newHashSet(privs));
 
     // now for the name and description
     if (StringUtils.isNotEmpty(roleA.getName())) {
