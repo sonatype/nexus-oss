@@ -55,6 +55,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.nexus.util.NexusUberClassloader;
 
+import com.google.common.base.Strings;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -276,7 +277,10 @@ public abstract class AbstractScheduledServicePlexusResource
       }
 
       task.setAlertEmail(model.getAlertEmail());
-      task.setId(model.getId());
+      // new tasks will have this empty
+      if (!Strings.isNullOrEmpty(model.getId())) {
+        task.setId(model.getId());
+      }
       task.setName(model.getName());
       task.setEnabled(model.isEnabled());
 
