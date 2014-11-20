@@ -160,6 +160,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
       }
       settingsPanel.loadRecord(model);
+      settingsPanel.up('#nx-drilldown').showChild(1, true);
       Ext.resumeLayouts(true);
     }
   },

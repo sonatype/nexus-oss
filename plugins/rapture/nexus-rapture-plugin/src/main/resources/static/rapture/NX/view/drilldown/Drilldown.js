@@ -105,7 +105,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         root.hide();
         breadcrumb.show();
       }
-    },
+    };
 
     me.syncSizeToOwner = function () {
       var me = this;
@@ -113,7 +113,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         me.setSize(me.ownerCt.el.getWidth() * me.items.items.length, me.ownerCt.el.getHeight());
         me.showChild(me.currentIndex, false);
       }
-    },
+    };
 
     me.showChild = function (index, animate) {
       var me = this;
@@ -132,17 +132,17 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
         me.refreshBreadcrumb();
       }
-    },
+    };
 
     me.setItemName = function (index, text) {
       var me = this;
       me.items.items[index].setItemName(text);
-    },
+    };
 
     me.setItemClass = function (index, cls) {
       var me = this;
       me.items.items[index].setItemClass(cls);
-    },
+    };
 
     me.callParent(arguments);
   },
