@@ -532,15 +532,9 @@ public class DefaultConfigurationManager
   protected synchronized SecurityModelConfiguration doGetConfiguration() {
     this.configurationSource.loadConfiguration();
 
-    boolean modified = false;
     for (SecurityConfigurationModifier modifier : configurationModifiers) {
-      modified |= modifier.apply(configurationSource.getConfiguration());
+      modifier.apply(configurationSource.getConfiguration());
     }
-
-    if (modified) {
-      configurationSource.storeConfiguration();
-    }
-
     return configurationSource.getConfiguration();
   }
 

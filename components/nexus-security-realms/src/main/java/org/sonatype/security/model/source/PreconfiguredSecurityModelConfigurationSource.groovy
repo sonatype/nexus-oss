@@ -30,11 +30,6 @@ implements SecurityModelConfigurationSource
   }
 
   @Override
-  void storeConfiguration() {
-    // do nothing
-  }
-
-  @Override
   Configuration loadConfiguration() {
     return getConfiguration()
   }

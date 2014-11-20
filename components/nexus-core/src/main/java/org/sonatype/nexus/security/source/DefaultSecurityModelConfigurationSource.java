@@ -134,11 +134,6 @@ public class DefaultSecurityModelConfigurationSource
     }
   }
 
-  @Override
-  public void storeConfiguration() {
-    //saveConfiguration(getConfiguration());
-  }
-
   private void saveConfiguration(final SecurityModelConfiguration configuration) {
     checkNotNull(configuration, "Missing configuration");
     try (ODatabaseDocumentTx db = openDb()) {

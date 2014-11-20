@@ -25,11 +25,6 @@ public interface SecurityModelConfigurationSource
 {
 
   /**
-   * Persists the current configuration.
-   */
-  void storeConfiguration();
-
-  /**
    * Gets the current configuration.
    *
    * @return the configuration, null if not loaded
