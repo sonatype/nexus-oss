@@ -149,13 +149,18 @@ public class TasksWaitForPlexusResource
   }
 
   private static boolean isTaskCompleted(TaskInfo<?> task) {
-    if (task.getSchedule() instanceof Now) {
-      // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
-      // means they are not YET complete
-      return false;
-    }
-    else {
-      return State.WAITING == task.getCurrentState().getState() && task.getLastRunState() != null;
+    try {
+      if (task.getSchedule() instanceof Now) {
+        // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
+        // means they are not YET complete
+        return false;
+      }
+      else {
+        return State.WAITING == task.getCurrentState().getState() && task.getLastRunState() != null;
+      }
+    } catch (IllegalStateException e) {
+      // this means task is stale, job is removed, so is "dome"
+      return true;
     }
   }
 
