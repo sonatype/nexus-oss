@@ -51,7 +51,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Singleton
 @Typed(ConfigurationManager.class)
-@Named("resourceMerging")
+@Named("default")
 public class ResourceMergingConfigurationManager
     extends AbstractConfigurationManager
 {
@@ -72,22 +72,6 @@ public class ResourceMergingConfigurationManager
     this.dynamicResources = dynamicResources;
     this.manager = manager;
     this.staticResources = staticResources;
-  }
-
-  public void runRead(ConfigurationManagerAction action)
-      throws Exception
-  {
-    //No support for this
-    throw new UnsupportedOperationException(
-        "Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
-  }
-
-  public void runWrite(ConfigurationManagerAction action)
-      throws Exception
-  {
-    //No support for this
-    throw new UnsupportedOperationException(
-        "Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
   }
 
   public void clearCache() {

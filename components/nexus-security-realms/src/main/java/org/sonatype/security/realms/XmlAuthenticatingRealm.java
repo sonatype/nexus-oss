@@ -19,10 +19,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import com.google.common.base.Throwables;
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -65,7 +63,7 @@ public class XmlAuthenticatingRealm
   private final int MAX_LEGACY_PASSWORD_LENGTH = 40;
 
   @Inject
-  public XmlAuthenticatingRealm(@Named("default") ConfigurationManager configuration,
+  public XmlAuthenticatingRealm(ConfigurationManager configuration,
                                 PasswordService passwordService)
   {
     this.configuration = configuration;
@@ -125,26 +123,13 @@ public class XmlAuthenticatingRealm
     final String currentPasswordHash = user.getPassword();
 
     try {
-      configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run()
-            throws Exception
-        {
-          try {
-            user.setPassword(passwordService.encryptPassword(password));
-            configuration.updateUser(user);
-          }
-          catch (Exception e) {
-            //Update failed, rollback to previous values
-            user.setPassword(currentPasswordHash);
-            logger.error("Unable to update hash for user {}", user.getId(), e);
-          }
-        }
-      });
+      user.setPassword(passwordService.encryptPassword(password));
+      configuration.updateUser(user);
     }
     catch (Exception e) {
-      throw Throwables.propagate(e);
+      //Update failed, rollback to previous values
+      user.setPassword(currentPasswordHash);
+      logger.error("Unable to update hash for user {}", user.getId(), e);
     }
   }
 

@@ -81,22 +81,6 @@ public class DefaultConfigurationManager
     this.passwordService = passwordService;
   }
 
-  public void runRead(ConfigurationManagerAction action)
-      throws Exception
-  {
-    //No support for this
-    throw new UnsupportedOperationException(
-        "Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
-  }
-
-  public void runWrite(ConfigurationManagerAction action)
-      throws Exception
-  {
-    //No support for this
-    throw new UnsupportedOperationException(
-        "Concurrent access not supported. ConcurrentConfigurationManager should be used instead");
-  }
-
   public List<CPrivilege> listPrivileges() {
     return Collections.unmodifiableList(getConfiguration().getPrivileges());
   }

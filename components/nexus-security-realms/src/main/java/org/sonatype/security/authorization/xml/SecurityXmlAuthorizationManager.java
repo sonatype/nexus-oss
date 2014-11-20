@@ -34,10 +34,7 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-
-import com.google.common.base.Throwables;
 
 /**
  * AuthorizationManager that wraps roles from security-xml-realm.
@@ -57,7 +54,7 @@ public class SecurityXmlAuthorizationManager
   private final EventBus eventBus;
 
   @Inject
-  public SecurityXmlAuthorizationManager(@Named("default") ConfigurationManager configuration,
+  public SecurityXmlAuthorizationManager(ConfigurationManager configuration,
                                          PrivilegeInheritanceManager privInheritance,
                                          EventBus eventBus)
   {
@@ -174,19 +171,7 @@ public class SecurityXmlAuthorizationManager
     // the roleId of the secRole might change, so we need to keep the reference
     final CRole secRole = this.toRole(role);
 
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.createRole(secRole);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.createRole(secRole);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
@@ -199,19 +184,7 @@ public class SecurityXmlAuthorizationManager
   {
     final CRole secRole = this.toRole(role);
 
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.updateRole(secRole);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, NoSuchRoleException.class, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.updateRole(secRole);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
@@ -222,19 +195,7 @@ public class SecurityXmlAuthorizationManager
   public void deleteRole(final String roleId)
       throws NoSuchRoleException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.deleteRole(roleId);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, NoSuchRoleException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.deleteRole(roleId);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
@@ -268,19 +229,7 @@ public class SecurityXmlAuthorizationManager
     // create implies read, so we need to add logic for that
     addInheritedPrivileges(secPriv);
 
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.createPrivilege(secPriv);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.createPrivilege(secPriv);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
@@ -293,19 +242,7 @@ public class SecurityXmlAuthorizationManager
   {
     final CPrivilege secPriv = this.toPrivilege(privilege);
 
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.updatePrivilege(secPriv);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, NoSuchPrivilegeException.class, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.updatePrivilege(secPriv);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();
@@ -316,19 +253,7 @@ public class SecurityXmlAuthorizationManager
   public void deletePrivilege(final String privilegeId)
       throws NoSuchPrivilegeException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run() throws Exception {
-          configuration.deletePrivilege(privilegeId);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, NoSuchPrivilegeException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.deletePrivilege(privilegeId);
 
     // notify any listeners that the config changed
     this.fireAuthorizationChangedEvent();

@@ -28,7 +28,6 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -41,7 +40,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-import com.google.common.base.Throwables;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.eclipse.sisu.Description;
 
@@ -69,7 +67,7 @@ public class SecurityXmlUserManager
   private final PasswordService passwordService;
 
   @Inject
-  public SecurityXmlUserManager(@Named("default") ConfigurationManager configuration,
+  public SecurityXmlUserManager(ConfigurationManager configuration,
                                 SecuritySystem securitySystem,
                                 PasswordService passwordService)
   {
@@ -178,18 +176,7 @@ public class SecurityXmlUserManager
     final CUser secUser = this.toUser(user);
     secUser.setPassword(this.hashPassword(password));
 
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          configuration.createUser(secUser, getRoleIdsFromUser(user));
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.createUser(secUser, getRoleIdsFromUser(user));
 
     // TODO: i am starting to feel we shouldn't return a user.
     return user;
@@ -198,60 +185,27 @@ public class SecurityXmlUserManager
   public void changePassword(final String userId, final String newPassword)
       throws UserNotFoundException, InvalidConfigurationException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          final CUser secUser = configuration.readUser(userId);
-          secUser.setPassword(hashPassword(newPassword));
-          configuration.updateUser(secUser);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, UserNotFoundException.class, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    final CUser secUser = configuration.readUser(userId);
+    secUser.setPassword(hashPassword(newPassword));
+    configuration.updateUser(secUser);
   }
 
   public User updateUser(final User user)
       throws UserNotFoundException, InvalidConfigurationException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          // we need to pull the users password off off the old user object
-          CUser oldSecUser = configuration.readUser(user.getUserId());
-          CUser newSecUser = toUser(user);
-          newSecUser.setPassword(oldSecUser.getPassword());
+    // we need to pull the users password off off the old user object
+    CUser oldSecUser = configuration.readUser(user.getUserId());
+    CUser newSecUser = toUser(user);
+    newSecUser.setPassword(oldSecUser.getPassword());
 
-          configuration.updateUser(newSecUser, getRoleIdsFromUser(user));
-        }
-      });
-      return user;
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, UserNotFoundException.class, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.updateUser(newSecUser, getRoleIdsFromUser(user));
+    return user;
   }
 
   public void deleteUser(final String userId)
       throws UserNotFoundException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          configuration.deleteUser(userId);
-        }
-      });
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, UserNotFoundException.class);
-      throw Throwables.propagate(e);
-    }
+    configuration.deleteUser(userId);
   }
 
   public Set<RoleIdentifier> getUsersRoles(final String userId, final String source)
@@ -260,30 +214,18 @@ public class SecurityXmlUserManager
     final Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
 
     try {
-      this.configuration.runRead(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          CUserRoleMapping roleMapping;
-          try {
-            roleMapping = configuration.readUserRoleMapping(userId, source);
-            if (roleMapping != null) {
-              for (String roleId : (List<String>) roleMapping.getRoles()) {
-                RoleIdentifier role = toRole(roleId);
-                if (role != null) {
-                  roles.add(role);
-                }
-              }
-            }
-          }
-          catch (NoSuchRoleMappingException e) {
-            log.debug("No user role mapping found for user: " + userId);
+      CUserRoleMapping roleMapping = configuration.readUserRoleMapping(userId, source);
+      if (roleMapping != null) {
+        for (String roleId : (List<String>) roleMapping.getRoles()) {
+          RoleIdentifier role = toRole(roleId);
+          if (role != null) {
+            roles.add(role);
           }
         }
-      });
+      }
     }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, UserNotFoundException.class);
-      throw Throwables.propagate(e);
+    catch (NoSuchRoleMappingException e) {
+      log.debug("No user role mapping found for user: " + userId);
     }
 
     return roles;
@@ -295,40 +237,30 @@ public class SecurityXmlUserManager
   public Set<User> searchUsers(final UserSearchCriteria criteria) {
     final Set<User> users = new HashSet<User>();
 
-    try {
-      this.configuration.runRead(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          users.addAll(filterListInMemeory(listUsers(), criteria));
+    users.addAll(filterListInMemeory(listUsers(), criteria));
 
-          // we also need to search through the user role mappings.
+    // we also need to search through the user role mappings.
 
-          List<CUserRoleMapping> roleMappings = configuration.listUserRoleMappings();
-          for (CUserRoleMapping roleMapping : roleMappings) {
-            if (!SOURCE.equals(roleMapping.getSource())) {
-              if (matchesCriteria(roleMapping.getUserId(), roleMapping.getSource(), roleMapping.getRoles(),
-                  criteria)) {
-                try {
-                  User user = getSecuritySystem().getUser(roleMapping.getUserId(), roleMapping.getSource());
-                  users.add(user);
-                }
-                catch (UserNotFoundException e) {
-                  log.debug("User: '" + roleMapping.getUserId() + "' of source: '"
-                      + roleMapping.getSource() + "' could not be found.", e);
-                }
-                catch (NoSuchUserManagerException e) {
-                  log.warn("User: '" + roleMapping.getUserId() + "' of source: '"
-                      + roleMapping.getSource() + "' could not be found.", e);
-                }
-
-              }
-            }
+    List<CUserRoleMapping> roleMappings = configuration.listUserRoleMappings();
+    for (CUserRoleMapping roleMapping : roleMappings) {
+      if (!SOURCE.equals(roleMapping.getSource())) {
+        if (matchesCriteria(roleMapping.getUserId(), roleMapping.getSource(), roleMapping.getRoles(),
+            criteria)) {
+          try {
+            User user = getSecuritySystem().getUser(roleMapping.getUserId(), roleMapping.getSource());
+            users.add(user);
           }
+          catch (UserNotFoundException e) {
+            log.debug("User: '" + roleMapping.getUserId() + "' of source: '"
+                + roleMapping.getSource() + "' could not be found.", e);
+          }
+          catch (NoSuchUserManagerException e) {
+            log.warn("User: '" + roleMapping.getUserId() + "' of source: '"
+                + roleMapping.getSource() + "' could not be found.", e);
+          }
+
         }
-      });
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
+      }
     }
 
     return users;
@@ -350,50 +282,39 @@ public class SecurityXmlUserManager
   public void setUsersRoles(final String userId, final String userSource, final Set<RoleIdentifier> roleIdentifiers)
       throws UserNotFoundException, InvalidConfigurationException
   {
-    try {
-      this.configuration.runWrite(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          // delete if no roleIdentifiers
-          if (roleIdentifiers == null || roleIdentifiers.isEmpty()) {
-            try {
-              configuration.deleteUserRoleMapping(userId, userSource);
-            }
-            catch (NoSuchRoleMappingException e) {
-              log.debug("User role mapping for user: " + userId + " source: " + userSource
-                  + " could not be deleted because it does not exist.");
-            }
-          }
-          else {
-            CUserRoleMapping roleMapping = new CUserRoleMapping();
-            roleMapping.setUserId(userId);
-            roleMapping.setSource(userSource);
-
-            for (RoleIdentifier roleIdentifier : roleIdentifiers) {
-              // make sure we only save roles that we manage
-              // TODO: although we shouldn't need to worry about this.
-              if (getSource().equals(roleIdentifier.getSource())) {
-                roleMapping.addRole(roleIdentifier.getRoleId());
-              }
-            }
-
-            // try to update first
-            try {
-              configuration.updateUserRoleMapping(roleMapping);
-            }
-            catch (NoSuchRoleMappingException e) {
-              // update failed try create
-              log.debug("Update of user role mapping for user: " + userId + " source: " + userSource
-                  + " did not exist, creating new one.");
-              configuration.createUserRoleMapping(roleMapping);
-            }
-          }
-        }
-      });
+    // delete if no roleIdentifiers
+    if (roleIdentifiers == null || roleIdentifiers.isEmpty()) {
+      try {
+        configuration.deleteUserRoleMapping(userId, userSource);
+      }
+      catch (NoSuchRoleMappingException e) {
+        log.debug("User role mapping for user: " + userId + " source: " + userSource
+            + " could not be deleted because it does not exist.");
+      }
     }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, UserNotFoundException.class, InvalidConfigurationException.class);
-      throw Throwables.propagate(e);
+    else {
+      CUserRoleMapping roleMapping = new CUserRoleMapping();
+      roleMapping.setUserId(userId);
+      roleMapping.setSource(userSource);
+
+      for (RoleIdentifier roleIdentifier : roleIdentifiers) {
+        // make sure we only save roles that we manage
+        // TODO: although we shouldn't need to worry about this.
+        if (getSource().equals(roleIdentifier.getSource())) {
+          roleMapping.addRole(roleIdentifier.getRoleId());
+        }
+      }
+
+      // try to update first
+      try {
+        configuration.updateUserRoleMapping(roleMapping);
+      }
+      catch (NoSuchRoleMappingException e) {
+        // update failed try create
+        log.debug("Update of user role mapping for user: " + userId + " source: " + userSource
+            + " did not exist, creating new one.");
+        configuration.createUserRoleMapping(roleMapping);
+      }
     }
   }
 

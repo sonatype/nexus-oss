@@ -34,17 +34,14 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.RolePermissionResolver;
-
-import com.google.common.base.Throwables;
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
 
 /**
  * The default implementation of the RolePermissionResolver which reads roles from {@link StaticSecurityResource}s to
@@ -68,7 +65,7 @@ public class XmlRolePermissionResolver
   private final Map<String, Collection<Permission>> permissionsCache;
 
   @Inject
-  public XmlRolePermissionResolver(@Named("default") ConfigurationManager configuration,
+  public XmlRolePermissionResolver(ConfigurationManager configuration,
                                    List<PrivilegeDescriptor> privilegeDescriptors,
                                    @Named("caching") PermissionFactory permissionFactory,
                                    EventBus eventBus)
@@ -93,19 +90,9 @@ public class XmlRolePermissionResolver
   }
 
   public Collection<Permission> resolvePermissionsInRole(final String roleString) {
-    try {
-      final Set<Permission> permissions = new LinkedHashSet<Permission>();
-      configuration.runRead(new ConfigurationManagerAction()
-      {
-        public void run() throws Exception {
-          resolvePermissionsInRole(roleString, permissions);
-        }
-      });
-      return permissions;
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    final Set<Permission> permissions = new LinkedHashSet<Permission>();
+    resolvePermissionsInRole(roleString, permissions);
+    return permissions;
   }
 
   protected void resolvePermissionsInRole(final String roleString, final Collection<Permission> permissions) {

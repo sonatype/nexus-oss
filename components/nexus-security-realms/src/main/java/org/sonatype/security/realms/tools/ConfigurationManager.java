@@ -40,21 +40,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  */
 public interface ConfigurationManager
 {
-  /*
-   * Runs the provided action in a thread-safe way. Any read-based operations requiring multiple
-   * ConfigurationManager calls should be executed in an action via a call to this method.
-   *
-   * @since 3.1
-   */
-  void runRead(ConfigurationManagerAction action) throws Exception;
 
-  /*
-   * Runs the provided action in a thread-safe way. Any write-based ConfigurationManager calls must be executed
-   * in an action via a call to this method.
-   *
-   * @since 3.1
-   */
-  void runWrite(ConfigurationManagerAction action) throws Exception;
 
   /**
    * Retrieve all users

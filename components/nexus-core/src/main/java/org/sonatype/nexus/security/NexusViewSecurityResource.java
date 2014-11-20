@@ -35,11 +35,9 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,7 +58,8 @@ public class NexusViewSecurityResource
 
   @Inject
   public NexusViewSecurityResource(final EventBus eventBus, final RepositoryRegistry repoRegistry,
-      final RepositoryTypeRegistry repoTypeRegistry, final @Named("default") ConfigurationManager configManager)
+                                   final RepositoryTypeRegistry repoTypeRegistry,
+                                   final ConfigurationManager configManager)
   {
     this.repoRegistry = checkNotNull(repoRegistry);
     this.repoTypeRegistry = checkNotNull(repoTypeRegistry);
@@ -158,21 +157,7 @@ public class NexusViewSecurityResource
   @Subscribe
   public void onEvent(final RepositoryRegistryEventRemove event) {
     setDirty(true);
-
-    try {
-      configManager.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run()
-            throws Exception
-        {
-          configManager.cleanRemovedPrivilege(createPrivilegeId(event.getRepository().getId()));
-        }
-
-      });
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    configManager.cleanRemovedPrivilege(createPrivilegeId(event.getRepository().getId()));
   }
+
 }

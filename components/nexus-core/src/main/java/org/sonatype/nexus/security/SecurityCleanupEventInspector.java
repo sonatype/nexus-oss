@@ -33,10 +33,8 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -122,22 +120,9 @@ public class SecurityCleanupEventInspector
       }
     }
 
-    try {
-      configManager.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run()
-            throws Exception
-        {
-          for (String privilegeId : removedIds) {
-            configManager.cleanRemovedPrivilege(privilegeId);
-          }
-        }
+    for (String privilegeId : removedIds) {
+      configManager.cleanRemovedPrivilege(privilegeId);
+    }
 
-      });
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
   }
 }
