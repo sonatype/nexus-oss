@@ -18,6 +18,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
+ * Security configuration.
+ *
  * @since 3.0
  */
 public interface SecurityModelConfiguration
