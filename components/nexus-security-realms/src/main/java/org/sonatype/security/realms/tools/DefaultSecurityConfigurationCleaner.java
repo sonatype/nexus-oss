@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.util.List;
-
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,9 +37,7 @@ public class DefaultSecurityConfigurationCleaner
 {
   public void privilegeRemoved(SecurityModelConfiguration configuration, String privilegeId) {
     log.debug("Cleaning privilege id {} from roles.", privilegeId);
-    List<CRole> roles = configuration.getRoles();
-
-    for (CRole role : roles) {
+    for (CRole role : configuration.getRoles()) {
       if (role.getPrivileges().contains(privilegeId)) {
         log.debug("removing privilege {} from role {}", privilegeId, role.getId());
         role.removePrivilege(privilegeId);
@@ -52,19 +48,14 @@ public class DefaultSecurityConfigurationCleaner
 
   public void roleRemoved(SecurityModelConfiguration configuration, String roleId) {
     log.debug("Cleaning role id {} from users and roles.", roleId);
-    List<CRole> roles = configuration.getRoles();
-
-    for (CRole role : roles) {
+    for (CRole role : configuration.getRoles()) {
       if (role.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from role {}", roleId, role.getId());
         role.removeRole(roleId);
         configuration.updateRole(role);
       }
     }
-
-    List<CUserRoleMapping> mappings = configuration.getUserRoleMappings();
-
-    for (CUserRoleMapping mapping : mappings) {
+    for (CUserRoleMapping mapping : configuration.getUserRoleMappings()) {
       if (mapping.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from user {}", mapping.getUserId());
         mapping.removeRole(roleId);
