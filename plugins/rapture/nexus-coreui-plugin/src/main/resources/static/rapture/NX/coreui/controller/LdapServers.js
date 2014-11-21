@@ -168,6 +168,11 @@ Ext.define('NX.coreui.controller.LdapServers', {
       me.getConnection().loadRecord(model);
       me.getBackup().loadRecord(model);
       me.getUserAndGroup().loadRecord(model);
+
+      var panel = me.getConnection();
+      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-security-ldap-x16');
+      panel.up('#nx-drilldown').setItemName(1, model.data.name);
+      panel.up('#nx-drilldown').showChild(1, true);
     }
   },
 

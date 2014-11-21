@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-capability-feature',
 
+  rootName: 'Capabilities',
+  rootClass: 'nx-icon-feature-admin-system-capabilities-x32',
+
   list: 'nx-coreui-capability-list',
 
   iconName: 'capability-default',

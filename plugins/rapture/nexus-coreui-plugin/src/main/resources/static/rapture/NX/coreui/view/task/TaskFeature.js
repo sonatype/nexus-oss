@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-task-feature',
 
+  rootName: 'Tasks',
+  rootClass: 'nx-icon-feature-admin-system-tasks-x32',
+
   list: 'nx-coreui-task-list',
 
   iconName: 'task-default',

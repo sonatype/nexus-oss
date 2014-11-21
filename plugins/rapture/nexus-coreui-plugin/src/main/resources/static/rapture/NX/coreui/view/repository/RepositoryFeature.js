@@ -23,10 +23,12 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
 
   list: 'nx-coreui-repository-list',
 
+  rootName: 'Repositories',
+  rootClass: 'nx-icon-feature-admin-repository-repositories-x32',
+
   iconName: 'repository-default',
 
   tabs: [
     { xtype: 'nx-coreui-repository-settings', title: 'Settings', weight: 10 }
   ]
-
 });

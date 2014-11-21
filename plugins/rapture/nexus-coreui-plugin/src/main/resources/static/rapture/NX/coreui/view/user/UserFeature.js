@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.user.UserFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-user-feature',
 
+  rootName: 'Users',
+  rootClass: 'nx-icon-feature-admin-security-users-x32',
+
   list: 'nx-coreui-user-list',
 
   // FIXME: This seems strange to configure icon name here for the detail panel

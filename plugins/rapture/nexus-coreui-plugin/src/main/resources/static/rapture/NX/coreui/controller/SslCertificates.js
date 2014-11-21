@@ -125,7 +125,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     var me = this;
 
     if (Ext.isDefined(model)) {
-      me.getDetails().loadRecord(model);
+      var panel = me.getDetails();
+
+      panel.loadRecord(model);
+
+      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-security-sslcertificates-x16');
+      panel.up('#nx-drilldown').setItemName(1, model.data.name);
+      panel.up('#nx-drilldown').showChild(1, true);
     }
   },
 

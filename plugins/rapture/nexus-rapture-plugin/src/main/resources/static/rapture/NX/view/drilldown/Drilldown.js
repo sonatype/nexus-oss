@@ -32,7 +32,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
     flex: 1
   },
 
-  rootName: 'default',
+  rootName: '',
+  rootClass: '',
 
   /**
    * @override

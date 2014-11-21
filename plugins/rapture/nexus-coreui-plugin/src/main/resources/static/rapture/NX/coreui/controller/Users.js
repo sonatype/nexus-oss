@@ -214,6 +214,10 @@ Ext.define('NX.coreui.controller.Users', {
       }
       me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
+
+      settingsPanel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-security-users-x16');
+      settingsPanel.up('#nx-drilldown').setItemName(1, model.internalId);
+      settingsPanel.up('#nx-drilldown').showChild(1, true);
     }
   },
 

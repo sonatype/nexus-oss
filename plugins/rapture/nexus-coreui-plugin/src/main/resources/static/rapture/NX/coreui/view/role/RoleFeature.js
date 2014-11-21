@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-role-feature',
 
+  rootName: 'Roles',
+  rootClass: 'nx-icon-feature-admin-security-roles-x32',
+
   list: 'nx-coreui-role-list',
 
   iconName: 'role-default',

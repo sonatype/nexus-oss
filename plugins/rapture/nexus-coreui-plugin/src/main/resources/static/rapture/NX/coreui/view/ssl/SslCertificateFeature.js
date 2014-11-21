@@ -21,6 +21,9 @@ Ext.define('NX.coreui.view.ssl.SslCertificateFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-sslcertificate-feature',
 
+  rootName: 'SSL Certificates',
+  rootClass: 'nx-icon-feature-admin-security-sslcertificates-x32',
+
   list: 'nx-coreui-sslcertificate-list',
 
   iconName: 'sslcertificate-default',

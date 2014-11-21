@@ -132,7 +132,14 @@ Ext.define('NX.coreui.controller.Privileges', {
       if (model.get('repositoryName')) {
         info['Repository'] = model.get('repositoryName');
       }
-      me.getInfo().showInfo(info);
+
+      var panel = me.getInfo();
+
+      panel.showInfo(info);
+
+      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-privilege-' + model.get('type') + '-x16');
+      panel.up('#nx-drilldown').setItemName(1, model.data.name);
+      panel.up('#nx-drilldown').showChild(1, true);
     }
   },
 

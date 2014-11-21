@@ -137,9 +137,15 @@ Ext.define('NX.coreui.controller.Roles', {
     var me = this;
 
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      var panel = me.getSettings();
+
+      panel.loadRecord(model);
       me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
+
+      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-security-roles-x16');
+      panel.up('#nx-drilldown').setItemName(1, model.data.name);
+      panel.up('#nx-drilldown').showChild(1, true);
     }
   },
 

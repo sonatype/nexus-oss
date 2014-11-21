@@ -47,6 +47,9 @@ Ext.define('NX.view.masterdetail.Panel', {
               {
                 xtype: 'nx-drilldown-item',
 
+                itemName: me.rootName,
+                itemClass: me.rootClass,
+
                 layout: 'fit',
 
                 items: {
@@ -62,6 +65,9 @@ Ext.define('NX.view.masterdetail.Panel', {
                 items: {
                   xtype: 'nx-masterdetail-tabs',
                   ui: 'masterdetail-tabs',
+                  header: false,
+                  plain: true,
+
                   layout: {
                     type: 'vbox',
                     align: 'stretch',

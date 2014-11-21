@@ -160,6 +160,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
       }
       settingsPanel.loadRecord(model);
+
+      settingsPanel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-repository-repositories-x16');
+      settingsPanel.up('#nx-drilldown').setItemName(1, model.internalId);
       settingsPanel.up('#nx-drilldown').showChild(1, true);
       Ext.resumeLayouts(true);
     }
