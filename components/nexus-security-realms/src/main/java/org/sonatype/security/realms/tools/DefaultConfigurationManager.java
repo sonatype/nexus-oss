@@ -523,10 +523,6 @@ public class DefaultConfigurationManager
       context.getExistingPrivilegeIds().add(priv.getId());
     }
 
-    for (CUserRoleMapping roleMappings : listUserRoleMappings()) {
-      context.getExistingUserRoleMap().put(roleMappings.getUserId(), roleMappings.getRoles());
-    }
-
     return context;
   }
 

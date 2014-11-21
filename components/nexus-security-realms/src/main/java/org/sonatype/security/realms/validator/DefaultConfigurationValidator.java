@@ -426,7 +426,7 @@ public class DefaultConfigurationValidator
       response.addValidationError(message);
     }
 
-    if (context.getExistingRoleIds() != null && context.getExistingUserRoleMap() != null) {
+    if (context.getExistingRoleIds() != null) {
 
       if (roles != null && roles.size() > 0) {
         for (String roleId : roles) {
@@ -470,7 +470,7 @@ public class DefaultConfigurationValidator
 
     Set<String> roles = userRoleMapping.getRoles();
     // all roles must be real
-    if (context.getExistingRoleIds() != null && context.getExistingUserRoleMap() != null) {
+    if (context.getExistingRoleIds() != null) {
 
       if (roles != null && roles.size() > 0) {
         for (String roleId : roles) {
