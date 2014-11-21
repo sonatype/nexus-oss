@@ -62,7 +62,6 @@ public class AuthorizationManagerTest
     Set<Role> roles = authzManager.listRoles();
 
     Map<String, Role> roleMap = this.toRoleMap(roles);
-    System.out.println("------------ " + roleMap.keySet());
     Assert.assertTrue(roleMap.containsKey("role1"));
     Assert.assertTrue(roleMap.containsKey("role2"));
     Assert.assertTrue(roleMap.containsKey("role3"));
