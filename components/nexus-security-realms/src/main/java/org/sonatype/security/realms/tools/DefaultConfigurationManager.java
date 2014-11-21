@@ -31,7 +31,6 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -98,6 +97,7 @@ public class DefaultConfigurationManager
     this.passwordService = passwordService;
   }
 
+  @Override
   public List<CPrivilege> listPrivileges() {
     List<CPrivilege> privileges = Lists.newArrayList();
     privileges.addAll(getDefaultConfiguration().getPrivileges());
@@ -105,6 +105,7 @@ public class DefaultConfigurationManager
     return Collections.unmodifiableList(privileges);
   }
 
+  @Override
   public List<CRole> listRoles() {
     List<CRole> roles = Lists.newArrayList();
     roles.addAll(getDefaultConfiguration().getRoles());
@@ -112,21 +113,24 @@ public class DefaultConfigurationManager
     return Collections.unmodifiableList(roles);
   }
 
+  @Override
   public List<CUser> listUsers() {
     return Collections.unmodifiableList(getDefaultConfiguration().getUsers());
   }
 
+  @Override
   public List<CUserRoleMapping> listUserRoleMappings() {
     return Collections.unmodifiableList(getDefaultConfiguration().getUserRoleMappings());
   }
 
+  @Override
   public void createPrivilege(CPrivilege privilege)
       throws InvalidConfigurationException
   {
     createPrivilege(privilege, initializeContext());
   }
 
-  public void createPrivilege(CPrivilege privilege, SecurityValidationContext context)
+  private void createPrivilege(CPrivilege privilege, SecurityValidationContext context)
       throws InvalidConfigurationException
   {
     if (context == null) {
@@ -144,13 +148,14 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public void createRole(CRole role)
       throws InvalidConfigurationException
   {
     createRole(role, initializeContext());
   }
 
-  public void createRole(CRole role, SecurityValidationContext context)
+  private void createRole(CRole role, SecurityValidationContext context)
       throws InvalidConfigurationException
   {
     if (context == null) {
@@ -168,25 +173,21 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public void createUser(CUser user, Set<String> roles)
       throws InvalidConfigurationException
   {
     createUser(user, null, roles, initializeContext());
   }
 
+  @Override
   public void createUser(CUser user, String password, Set<String> roles)
       throws InvalidConfigurationException
   {
     createUser(user, password, roles, initializeContext());
   }
 
-  public void createUser(CUser user, Set<String> roles, SecurityValidationContext context)
-      throws InvalidConfigurationException
-  {
-    createUser(user, null, roles, context);
-  }
-
-  public void createUser(CUser user, String password, Set<String> roles, SecurityValidationContext context)
+  private void createUser(CUser user, String password, Set<String> roles, SecurityValidationContext context)
       throws InvalidConfigurationException
   {
     if (context == null) {
@@ -209,46 +210,29 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public void deletePrivilege(String id)
       throws NoSuchPrivilegeException
   {
-    deletePrivilege(id, true);
-  }
-
-  public void deletePrivilege(String id, boolean clean)
-      throws NoSuchPrivilegeException
-  {
     boolean found = getDefaultConfiguration().removePrivilege(id);
-
     if (!found) {
       throw new NoSuchPrivilegeException(id);
     }
-
-    if (clean) {
-      cleanRemovedPrivilege(id);
-    }
+    cleanRemovedPrivilege(id);
   }
 
+  @Override
   public void deleteRole(String id)
       throws NoSuchRoleException
   {
-    deleteRole(id, true);
-  }
-
-  protected void deleteRole(String id, boolean clean)
-      throws NoSuchRoleException
-  {
     boolean found = getDefaultConfiguration().removeRole(id);
-
     if (!found) {
       throw new NoSuchRoleException(id);
     }
-
-    if (clean) {
-      cleanRemovedRole(id);
-    }
+    cleanRemovedRole(id);
   }
 
+  @Override
   public void deleteUser(String id)
       throws UserNotFoundException
   {
@@ -259,6 +243,7 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public CPrivilege readPrivilege(String id)
       throws NoSuchPrivilegeException
   {
@@ -275,6 +260,7 @@ public class DefaultConfigurationManager
     throw new NoSuchPrivilegeException(id);
   }
 
+  @Override
   public CRole readRole(String id)
       throws NoSuchRoleException
   {
@@ -291,6 +277,7 @@ public class DefaultConfigurationManager
     throw new NoSuchRoleException(id);
   }
 
+  @Override
   public CUser readUser(String id)
       throws UserNotFoundException
   {
@@ -302,13 +289,14 @@ public class DefaultConfigurationManager
     throw new UserNotFoundException(id);
   }
 
+  @Override
   public void updatePrivilege(CPrivilege privilege)
       throws InvalidConfigurationException, NoSuchPrivilegeException
   {
     updatePrivilege(privilege, initializeContext());
   }
 
-  public void updatePrivilege(CPrivilege privilege, SecurityValidationContext context)
+  private void updatePrivilege(CPrivilege privilege, SecurityValidationContext context)
       throws InvalidConfigurationException, NoSuchPrivilegeException
   {
     if (context == null) {
@@ -326,13 +314,14 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public void updateRole(CRole role)
       throws InvalidConfigurationException, NoSuchRoleException
   {
     updateRole(role, initializeContext());
   }
 
-  public void updateRole(CRole role, SecurityValidationContext context)
+  private void updateRole(CRole role, SecurityValidationContext context)
       throws InvalidConfigurationException, NoSuchRoleException
   {
     if (context == null) {
@@ -350,6 +339,7 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public void updateUser(CUser user)
       throws InvalidConfigurationException, UserNotFoundException
   {
@@ -363,13 +353,14 @@ public class DefaultConfigurationManager
     updateUser(user, roles);
   }
 
+  @Override
   public void updateUser(CUser user, Set<String> roles)
       throws InvalidConfigurationException, UserNotFoundException
   {
     updateUser(user, roles, initializeContext());
   }
 
-  public void updateUser(CUser user, Set<String> roles, SecurityValidationContext context)
+  private void updateUser(CUser user, Set<String> roles, SecurityValidationContext context)
       throws InvalidConfigurationException, UserNotFoundException
   {
     if (context == null) {
@@ -387,25 +378,14 @@ public class DefaultConfigurationManager
     }
   }
 
-  public String getPrivilegeProperty(CPrivilege privilege, String key) {
-    if (privilege != null && privilege.getProperties() != null) {
-      for (CProperty prop : privilege.getProperties()) {
-        if (prop.getKey().equals(key)) {
-          return prop.getValue();
-        }
-      }
-    }
-
-    return null;
-  }
-
+  @Override
   public void createUserRoleMapping(CUserRoleMapping userRoleMapping)
       throws InvalidConfigurationException
   {
     createUserRoleMapping(userRoleMapping, initializeContext());
   }
 
-  public void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
+  private void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
       throws InvalidConfigurationException
   {
     if (context == null) {
@@ -463,19 +443,21 @@ public class DefaultConfigurationManager
     }
   }
 
+  @Override
   public CUserRoleMapping readUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
     return readCUserRoleMapping(userId, source);
   }
 
+  @Override
   public void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
       throws InvalidConfigurationException, NoSuchRoleMappingException
   {
     updateUserRoleMapping(userRoleMapping, initializeContext());
   }
 
-  public void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
+  private void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
       throws InvalidConfigurationException, NoSuchRoleMappingException
   {
     if (context == null) {
@@ -499,6 +481,7 @@ public class DefaultConfigurationManager
     getDefaultConfiguration().updateUserRoleMapping(userRoleMapping);
   }
 
+  @Override
   public void deleteUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
@@ -509,13 +492,7 @@ public class DefaultConfigurationManager
     }
   }
 
-  public String getPrivilegeProperty(String id, String key)
-      throws NoSuchPrivilegeException
-  {
-    return getPrivilegeProperty(readPrivilege(id), key);
-  }
-
-  public SecurityValidationContext initializeContext() {
+  private SecurityValidationContext initializeContext() {
     SecurityValidationContext context = new SecurityValidationContext();
 
     context.addExistingUserIds();
@@ -539,14 +516,17 @@ public class DefaultConfigurationManager
     return context;
   }
 
+  @Override
   public void cleanRemovedPrivilege(String privilegeId) {
     configCleaner.privilegeRemoved(getDefaultConfiguration(), privilegeId);
   }
 
+  @Override
   public void cleanRemovedRole(String roleId) {
     configCleaner.roleRemoved(getDefaultConfiguration(), roleId);
   }
 
+  @Override
   public void clearCache() {
     defaultConfiguration = null;
     mergedConfiguration = null;
@@ -600,7 +580,7 @@ public class DefaultConfigurationManager
     return configuration;
   }
 
-  protected boolean shouldRebuildMergedConfiguration() {
+  private boolean shouldRebuildMergedConfiguration() {
     for (DynamicSecurityResource resource : dynamicResources) {
       if (resource.isDirty()) {
         return true;
@@ -609,7 +589,7 @@ public class DefaultConfigurationManager
     return false;
   }
 
-  protected Configuration doGetMergedConfiguration() {
+  private Configuration doGetMergedConfiguration() {
     final Configuration configuration = new Configuration();
 
     for (StaticSecurityResource resource : staticResources) {

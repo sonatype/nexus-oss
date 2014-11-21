@@ -22,7 +22,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -39,7 +38,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  */
 public interface ConfigurationManager
 {
-
 
   /**
    * Retrieve all users
@@ -69,39 +67,15 @@ public interface ConfigurationManager
       throws InvalidConfigurationException;
 
   /**
-   * Create a new user with a context to validate in.
-   */
-  void createUser(CUser user, Set<String> roles, SecurityValidationContext context)
-      throws InvalidConfigurationException;
-
-  /**
-   * Create a new user/password with a context to validate in.
-   */
-  void createUser(CUser user, String password, Set<String> roles, SecurityValidationContext context)
-      throws InvalidConfigurationException;
-
-  /**
    * Create a new role
    */
   void createRole(CRole role)
       throws InvalidConfigurationException;
 
   /**
-   * Create a new role with a context to validate in
-   */
-  void createRole(CRole role, SecurityValidationContext context)
-      throws InvalidConfigurationException;
-
-  /**
    * Create a new privilege
    */
   void createPrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException;
-
-  /**
-   * Create a new privilege with a context to validate in
-   */
-  void createPrivilege(CPrivilege privilege, SecurityValidationContext context)
       throws InvalidConfigurationException;
 
   /**
@@ -137,33 +111,15 @@ public interface ConfigurationManager
       throws InvalidConfigurationException, UserNotFoundException;
 
   /**
-   * Update an existing user with a context to validate in
-   */
-  void updateUser(CUser user, Set<String> roles, SecurityValidationContext context)
-      throws InvalidConfigurationException, UserNotFoundException;
-
-  /**
    * Update an existing role
    */
   void updateRole(CRole role)
       throws InvalidConfigurationException, NoSuchRoleException;
 
-  /**
-   * Update an existing role with a context to validate in
-   */
-  void updateRole(CRole role, SecurityValidationContext context)
-      throws InvalidConfigurationException, NoSuchRoleException;
-
   void createUserRoleMapping(CUserRoleMapping userRoleMapping)
       throws InvalidConfigurationException;
 
-  void createUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
-      throws InvalidConfigurationException;
-
   void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
-      throws InvalidConfigurationException, NoSuchRoleMappingException;
-
-  void updateUserRoleMapping(CUserRoleMapping userRoleMapping, SecurityValidationContext context)
       throws InvalidConfigurationException, NoSuchRoleMappingException;
 
   CUserRoleMapping readUserRoleMapping(String userId, String source)
@@ -178,12 +134,6 @@ public interface ConfigurationManager
    * Update an existing privilege
    */
   void updatePrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException, NoSuchPrivilegeException;
-
-  /**
-   * Update an existing privilege with a context to validate in
-   */
-  void updatePrivilege(CPrivilege privilege, SecurityValidationContext context)
       throws InvalidConfigurationException, NoSuchPrivilegeException;
 
   /**
@@ -205,25 +155,9 @@ public interface ConfigurationManager
       throws NoSuchPrivilegeException;
 
   /**
-   * Helper method to retrieve a property from the privilege
-   */
-  String getPrivilegeProperty(CPrivilege privilege, String key);
-
-  /**
-   * Helper method to retrieve a property from the privilege
-   */
-  String getPrivilegeProperty(String id, String key)
-      throws NoSuchPrivilegeException;
-
-  /**
    * Clear the cache and reload from file
    */
   void clearCache();
-
-  /**
-   * Initialize the context used for validation
-   */
-  SecurityValidationContext initializeContext();
 
   void cleanRemovedRole(String roleId);
 
