@@ -56,8 +56,6 @@ public class XmlAuthenticatingRealmTest
 
     configurationManager = lookup(DefaultConfigurationManager.class);
 
-    configurationManager.clearCache();
-
     passwordGenerator = lookup(PasswordGenerator.class, "default");
     passwordService = lookup(PasswordService.class, "default");
   }

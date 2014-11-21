@@ -526,12 +526,6 @@ public class DefaultConfigurationManager
     configCleaner.roleRemoved(getDefaultConfiguration(), roleId);
   }
 
-  @Override
-  public void clearCache() {
-    defaultConfiguration = null;
-    mergedConfiguration = null;
-  }
-
   private SecurityModelConfiguration getDefaultConfiguration() {
     // Assign configuration to local variable first, as calls to clearCache can null it out at any time
     SecurityModelConfiguration configuration = this.defaultConfiguration;

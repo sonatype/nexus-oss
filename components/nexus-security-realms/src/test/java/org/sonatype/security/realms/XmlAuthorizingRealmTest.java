@@ -50,7 +50,6 @@ public class XmlAuthorizingRealmTest
     realm.setRolePermissionResolver(this.lookup(RolePermissionResolver.class));
 
     configurationManager = lookup(DefaultConfigurationManager.class);
-    configurationManager.clearCache();
   }
 
   public void testAuthorization()

@@ -154,11 +154,6 @@ public interface ConfigurationManager
   void deletePrivilege(String id)
       throws NoSuchPrivilegeException;
 
-  /**
-   * Clear the cache and reload from file
-   */
-  void clearCache();
-
   void cleanRemovedRole(String roleId);
 
   void cleanRemovedPrivilege(String privilegeId);
