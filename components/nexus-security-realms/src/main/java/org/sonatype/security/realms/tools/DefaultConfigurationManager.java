@@ -12,13 +12,14 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,27 +29,34 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.shiro.authc.credential.PasswordService;
+import org.codehaus.plexus.util.StringUtils;
 
+import static com.google.common.base.Preconditions.checkState;
+
+@Named
 @Singleton
-@Typed(ConfigurationManager.class)
-@Named("legacydefault")
 public class DefaultConfigurationManager
-    extends AbstractConfigurationManager
+    extends ComponentSupport
+    implements ConfigurationManager
 {
   private final SecurityModelConfigurationSource configurationSource;
 
@@ -60,32 +68,56 @@ public class DefaultConfigurationManager
 
   private final PasswordService passwordService;
 
+  private final EventBus eventBus;
+
+  private final List<StaticSecurityResource> staticResources;
+
+  private final List<DynamicSecurityResource> dynamicResources;
+
+  private volatile SecurityModelConfiguration defaultConfiguration;
+
+  private volatile SecurityModelConfiguration mergedConfiguration;
+
   @Inject
-  public DefaultConfigurationManager(EventBus eventBus,
+  public DefaultConfigurationManager(SecurityModelConfigurationSource configurationSource,
+                                     List<StaticSecurityResource> staticResources,
+                                     List<DynamicSecurityResource> dynamicResources,
                                      List<SecurityConfigurationModifier> configurationModifiers,
                                      SecurityConfigurationCleaner configCleaner,
                                      SecurityConfigurationValidator validator,
-                                     SecurityModelConfigurationSource configurationSource,
-                                     PasswordService passwordService)
+                                     PasswordService passwordService,
+                                     EventBus eventBus)
   {
-    super(eventBus);
+    this.configurationSource = configurationSource;
+    this.dynamicResources = dynamicResources;
+    this.staticResources = staticResources;
+    this.eventBus = eventBus;
     this.configurationModifiers = configurationModifiers;
     this.configCleaner = configCleaner;
     this.validator = validator;
-    this.configurationSource = configurationSource;
     this.passwordService = passwordService;
   }
 
   public List<CPrivilege> listPrivileges() {
-    return Collections.unmodifiableList(getConfiguration().getPrivileges());
+    List<CPrivilege> privileges = Lists.newArrayList();
+    privileges.addAll(getDefaultConfiguration().getPrivileges());
+    privileges.addAll(getMergedConfiguration().getPrivileges());
+    return Collections.unmodifiableList(privileges);
   }
 
   public List<CRole> listRoles() {
-    return Collections.unmodifiableList(getConfiguration().getRoles());
+    List<CRole> roles = Lists.newArrayList();
+    roles.addAll(getDefaultConfiguration().getRoles());
+    roles.addAll(getMergedConfiguration().getRoles());
+    return Collections.unmodifiableList(roles);
   }
 
   public List<CUser> listUsers() {
-    return Collections.unmodifiableList(getConfiguration().getUsers());
+    return Collections.unmodifiableList(getDefaultConfiguration().getUsers());
+  }
+
+  public List<CUserRoleMapping> listUserRoleMappings() {
+    return Collections.unmodifiableList(getDefaultConfiguration().getUserRoleMappings());
   }
 
   public void createPrivilege(CPrivilege privilege)
@@ -104,7 +136,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validatePrivilege(context, privilege, false);
 
     if (vr.isValid()) {
-      getConfiguration().addPrivilege(privilege);
+      getDefaultConfiguration().addPrivilege(privilege);
       logValidationWarnings(vr);
     }
     else {
@@ -128,7 +160,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateRole(context, role, false);
 
     if (vr.isValid()) {
-      getConfiguration().addRole(role);
+      getDefaultConfiguration().addRole(role);
       logValidationWarnings(vr);
     }
     else {
@@ -169,7 +201,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, false);
 
     if (vr.isValid()) {
-      getConfiguration().addUser(user, roles);
+      getDefaultConfiguration().addUser(user, roles);
       logValidationWarnings(vr);
     }
     else {
@@ -186,7 +218,7 @@ public class DefaultConfigurationManager
   public void deletePrivilege(String id, boolean clean)
       throws NoSuchPrivilegeException
   {
-    boolean found = getConfiguration().removePrivilege(id);
+    boolean found = getDefaultConfiguration().removePrivilege(id);
 
     if (!found) {
       throw new NoSuchPrivilegeException(id);
@@ -206,7 +238,7 @@ public class DefaultConfigurationManager
   protected void deleteRole(String id, boolean clean)
       throws NoSuchRoleException
   {
-    boolean found = getConfiguration().removeRole(id);
+    boolean found = getDefaultConfiguration().removeRole(id);
 
     if (!found) {
       throw new NoSuchRoleException(id);
@@ -220,7 +252,7 @@ public class DefaultConfigurationManager
   public void deleteUser(String id)
       throws UserNotFoundException
   {
-    boolean found = getConfiguration().removeUser(id);
+    boolean found = getDefaultConfiguration().removeUser(id);
 
     if (!found) {
       throw new UserNotFoundException(id);
@@ -230,40 +262,44 @@ public class DefaultConfigurationManager
   public CPrivilege readPrivilege(String id)
       throws NoSuchPrivilegeException
   {
-    CPrivilege privilege = getConfiguration().getPrivilege(id);
-
+    CPrivilege privilege = getMergedConfiguration().getPrivilege(id);
     if (privilege != null) {
       return privilege;
     }
-    else {
-      throw new NoSuchPrivilegeException(id);
+
+    privilege = getDefaultConfiguration().getPrivilege(id);
+    if (privilege != null) {
+      return privilege;
     }
+
+    throw new NoSuchPrivilegeException(id);
   }
 
   public CRole readRole(String id)
       throws NoSuchRoleException
   {
-    CRole role = getConfiguration().getRole(id);
-
+    CRole role = getMergedConfiguration().getRole(id);
     if (role != null) {
       return role;
     }
-    else {
-      throw new NoSuchRoleException(id);
+
+    role = getDefaultConfiguration().getRole(id);
+    if (role != null) {
+      return role;
     }
+
+    throw new NoSuchRoleException(id);
   }
 
   public CUser readUser(String id)
       throws UserNotFoundException
   {
-    CUser user = getConfiguration().getUser(id);
+    CUser user = getDefaultConfiguration().getUser(id);
 
     if (user != null) {
       return user;
     }
-    else {
-      throw new UserNotFoundException(id);
-    }
+    throw new UserNotFoundException(id);
   }
 
   public void updatePrivilege(CPrivilege privilege)
@@ -282,7 +318,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validatePrivilege(context, privilege, true);
 
     if (vr.isValid()) {
-      getConfiguration().updatePrivilege(privilege);
+      getDefaultConfiguration().updatePrivilege(privilege);
       logValidationWarnings(vr);
     }
     else {
@@ -306,7 +342,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateRole(context, role, true);
 
     if (vr.isValid()) {
-      getConfiguration().updateRole(role);
+      getDefaultConfiguration().updateRole(role);
       logValidationWarnings(vr);
     }
     else {
@@ -317,15 +353,14 @@ public class DefaultConfigurationManager
   public void updateUser(CUser user)
       throws InvalidConfigurationException, UserNotFoundException
   {
-    Set<String> roles = Sets.newHashSet();
+    Set<String> roles = Collections.emptySet();
     try {
-      CUserRoleMapping userRoleMapping = this.readUserRoleMapping(user.getId(), SecurityXmlUserManager.SOURCE);
-      roles.addAll(userRoleMapping.getRoles());
+      roles = readUserRoleMapping(user.getId(), SecurityXmlUserManager.SOURCE).getRoles();
     }
     catch (NoSuchRoleMappingException e) {
-      this.log.debug("User: {} has no roles", user.getId());
+      log.debug("User: {} has no roles", user.getId());
     }
-    this.updateUser(user, new HashSet<>(roles));
+    updateUser(user, roles);
   }
 
   public void updateUser(CUser user, Set<String> roles)
@@ -344,7 +379,7 @@ public class DefaultConfigurationManager
     ValidationResponse vr = validator.validateUser(context, user, roles, true);
 
     if (vr.isValid()) {
-      getConfiguration().updateUser(user, roles);
+      getDefaultConfiguration().updateUser(user, roles);
       logValidationWarnings(vr);
     }
     else {
@@ -397,7 +432,7 @@ public class DefaultConfigurationManager
       throw new InvalidConfigurationException(vr);
     }
 
-    getConfiguration().addUserRoleMapping(userRoleMapping);
+    getDefaultConfiguration().addUserRoleMapping(userRoleMapping);
     logValidationWarnings(vr);
   }
 
@@ -418,7 +453,7 @@ public class DefaultConfigurationManager
   private CUserRoleMapping readCUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
-    CUserRoleMapping mapping = getConfiguration().getUserRoleMapping(userId, source);
+    CUserRoleMapping mapping = getDefaultConfiguration().getUserRoleMapping(userId, source);
 
     if (mapping != null) {
       return mapping;
@@ -461,17 +496,13 @@ public class DefaultConfigurationManager
       throw new InvalidConfigurationException(vr);
     }
 
-    getConfiguration().updateUserRoleMapping(userRoleMapping);
-  }
-
-  public List<CUserRoleMapping> listUserRoleMappings() {
-    return Collections.unmodifiableList(getConfiguration().getUserRoleMappings());
+    getDefaultConfiguration().updateUserRoleMapping(userRoleMapping);
   }
 
   public void deleteUserRoleMapping(String userId, String source)
       throws NoSuchRoleMappingException
   {
-    boolean found = getConfiguration().removeUserRoleMapping(userId, source);
+    boolean found = getDefaultConfiguration().removeUserRoleMapping(userId, source);
 
     if (!found) {
       throw new NoSuchRoleMappingException("No User Role Mapping for user: " + userId);
@@ -482,16 +513,6 @@ public class DefaultConfigurationManager
       throws NoSuchPrivilegeException
   {
     return getPrivilegeProperty(readPrivilege(id), key);
-  }
-
-  @Override
-  protected synchronized SecurityModelConfiguration doGetConfiguration() {
-    this.configurationSource.loadConfiguration();
-
-    for (SecurityConfigurationModifier modifier : configurationModifiers) {
-      modifier.apply(configurationSource.getConfiguration());
-    }
-    return configurationSource.getConfiguration();
   }
 
   public SecurityValidationContext initializeContext() {
@@ -507,28 +528,207 @@ public class DefaultConfigurationManager
 
     for (CRole role : listRoles()) {
       context.getExistingRoleIds().add(role.getId());
-
-      ArrayList<String> containedRoles = new ArrayList<String>();
-
-      containedRoles.addAll(role.getRoles());
-
-      context.getRoleContainmentMap().put(role.getId(), containedRoles);
-
+      context.getRoleContainmentMap().put(role.getId(), Lists.newArrayList(role.getRoles()));
       context.getExistingRoleNameMap().put(role.getId(), role.getName());
     }
 
-    for (CPrivilege priv : listPrivileges()) {
-      context.getExistingPrivilegeIds().add(priv.getId());
+    for (CPrivilege privilege : listPrivileges()) {
+      context.getExistingPrivilegeIds().add(privilege.getId());
     }
 
     return context;
   }
 
   public void cleanRemovedPrivilege(String privilegeId) {
-    configCleaner.privilegeRemoved(getConfiguration(), privilegeId);
+    configCleaner.privilegeRemoved(getDefaultConfiguration(), privilegeId);
   }
 
   public void cleanRemovedRole(String roleId) {
-    configCleaner.roleRemoved(getConfiguration(), roleId);
+    configCleaner.roleRemoved(getDefaultConfiguration(), roleId);
   }
+
+  public void clearCache() {
+    defaultConfiguration = null;
+    mergedConfiguration = null;
+  }
+
+  private SecurityModelConfiguration getDefaultConfiguration() {
+    // Assign configuration to local variable first, as calls to clearCache can null it out at any time
+    SecurityModelConfiguration configuration = this.defaultConfiguration;
+    if (configuration == null) {
+      synchronized (this) {
+        // double-checked locking of volatile is apparently OK with java5+
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+        configuration = this.defaultConfiguration;
+        if (configuration == null) {
+          this.defaultConfiguration = configuration = doGetDefaultConfiguration();
+        }
+      }
+    }
+    return configuration;
+  }
+
+  private SecurityModelConfiguration doGetDefaultConfiguration() {
+    configurationSource.loadConfiguration();
+    for (SecurityConfigurationModifier modifier : configurationModifiers) {
+      modifier.apply(configurationSource.getConfiguration());
+    }
+    return configurationSource.getConfiguration();
+  }
+
+  private SecurityModelConfiguration getMergedConfiguration() {
+    // Assign configuration to local variable first, as calls to clearCache can null it out at any time
+    SecurityModelConfiguration configuration = this.mergedConfiguration;
+    if (configuration == null || shouldRebuildMergedConfiguration()) {
+      boolean rebuiltConfiguration = false;
+
+      synchronized (this) {
+        // double-checked locking of volatile is apparently OK with java5+
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+        configuration = this.mergedConfiguration;
+        if (configuration == null || shouldRebuildMergedConfiguration()) {
+          rebuiltConfiguration = (configuration != null);
+          this.mergedConfiguration = configuration = doGetMergedConfiguration();
+        }
+      }
+
+      if (rebuiltConfiguration) {
+        // signal rebuild (outside lock to avoid contention)
+        eventBus.post(new AuthorizationConfigurationChanged());
+      }
+    }
+    return configuration;
+  }
+
+  protected boolean shouldRebuildMergedConfiguration() {
+    for (DynamicSecurityResource resource : dynamicResources) {
+      if (resource.isDirty()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected Configuration doGetMergedConfiguration() {
+    final Configuration configuration = new Configuration();
+
+    for (StaticSecurityResource resource : staticResources) {
+      SecurityModelConfiguration resConfig = resource.getConfiguration();
+
+      if (resConfig != null) {
+        checkState(
+            resConfig.getUsers() == null || resConfig.getUsers().isEmpty(),
+            "Static resources cannot have users"
+        );
+        checkState(
+            resConfig.getUserRoleMappings() == null || resConfig.getUserRoleMappings().isEmpty(),
+            "Static resources cannot have user/role mappings"
+        );
+        appendConfig(configuration, resConfig);
+      }
+    }
+
+    for (DynamicSecurityResource resource : dynamicResources) {
+      SecurityModelConfiguration resConfig = resource.getConfiguration();
+
+      if (resConfig != null) {
+        checkState(
+            resConfig.getUsers() == null || resConfig.getUsers().isEmpty(),
+            "Dynamic resources cannot have users"
+        );
+        checkState(
+            resConfig.getUserRoleMappings() == null || resConfig.getUserRoleMappings().isEmpty(),
+            "Dynamic resources cannot have user/role mappings"
+        );
+        appendConfig(configuration, resConfig);
+      }
+    }
+
+    return configuration;
+  }
+
+  private SecurityModelConfiguration appendConfig(final SecurityModelConfiguration to,
+                                                  final SecurityModelConfiguration from)
+  {
+    for (CPrivilege privilege : from.getPrivileges()) {
+      privilege.setReadOnly(true);
+      to.addPrivilege(privilege);
+    }
+
+    // number of roles can be significant (>15K), so need to speedup lookup roles by roleId
+    final Map<String, CRole> roles = new HashMap<String, CRole>();
+    for (CRole role : to.getRoles()) {
+      roles.put(role.getId(), role);
+    }
+
+    for (Iterator<CRole> iterator = from.getRoles().iterator(); iterator.hasNext(); ) {
+      CRole role = iterator.next();
+
+      // need to check if we need to merge the static config
+      CRole eachRole = roles.get(role.getId());
+      if (eachRole != null) {
+        role = this.mergeRolesContents(role, eachRole);
+        to.removeRole(role.getId());
+      }
+
+      role.setReadOnly(true);
+      to.addRole(role);
+      roles.put(role.getId(), role); // deduplicate config roles
+    }
+
+    return to;
+  }
+
+  private CRole mergeRolesContents(CRole roleA, CRole roleB) {
+    // ROLES
+    Set<String> roles = new HashSet<String>();
+    // make sure they are not empty
+    if (roleA.getRoles() != null) {
+      roles.addAll(roleA.getRoles());
+    }
+    if (roleB.getRoles() != null) {
+      roles.addAll(roleB.getRoles());
+    }
+
+    // PRIVS
+    Set<String> privs = new HashSet<String>();
+    // make sure they are not empty
+    if (roleA.getPrivileges() != null) {
+      privs.addAll(roleA.getPrivileges());
+    }
+    if (roleB.getPrivileges() != null) {
+      privs.addAll(roleB.getPrivileges());
+    }
+
+    CRole newRole = new CRole();
+    newRole.setId(roleA.getId());
+    newRole.setRoles(Sets.newHashSet(roles));
+    newRole.setPrivileges(Sets.newHashSet(privs));
+
+    // now for the name and description
+    if (StringUtils.isNotEmpty(roleA.getName())) {
+      newRole.setName(roleA.getName());
+    }
+    else {
+      newRole.setName(roleB.getName());
+    }
+
+    if (StringUtils.isNotEmpty(roleA.getDescription())) {
+      newRole.setDescription(roleA.getDescription());
+    }
+    else {
+      newRole.setDescription(roleB.getDescription());
+    }
+
+    // and session timeout (which we don't use)
+    if (roleA.getSessionTimeout() > roleB.getSessionTimeout()) {
+      newRole.setSessionTimeout(roleA.getSessionTimeout());
+    }
+    else {
+      newRole.setSessionTimeout(roleB.getSessionTimeout());
+    }
+
+    return newRole;
+  }
+
 }

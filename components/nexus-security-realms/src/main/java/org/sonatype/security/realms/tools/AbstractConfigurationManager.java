@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -31,30 +30,6 @@ public abstract class AbstractConfigurationManager
 
   public void clearCache() {
     configuration = null;
-  }
-
-  protected SecurityModelConfiguration getConfiguration() {
-    // Assign configuration to local variable first, as calls to clearCache can null it out at any time
-    SecurityModelConfiguration configuration = this.configuration;
-    if (configuration == null || shouldRebuildConfiguration()) {
-      boolean rebuiltConfiguration = false;
-
-      synchronized (this) {
-        // double-checked locking of volatile is apparently OK with java5+
-        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
-        configuration = this.configuration;
-        if (configuration == null || shouldRebuildConfiguration()) {
-          rebuiltConfiguration = (configuration != null);
-          this.configuration = configuration = doGetConfiguration();
-        }
-      }
-
-      if (rebuiltConfiguration) {
-        // signal rebuild (outside lock to avoid contention)
-        eventBus.post(new AuthorizationConfigurationChanged());
-      }
-    }
-    return configuration;
   }
 
   /**

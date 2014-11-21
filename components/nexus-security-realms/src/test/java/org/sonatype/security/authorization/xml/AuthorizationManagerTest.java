@@ -28,7 +28,6 @@ import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ResourceMergingConfigurationManager;
 
 import junit.framework.Assert;
 
@@ -50,7 +49,7 @@ public class AuthorizationManagerTest
   public ConfigurationManager getConfigurationManager()
       throws Exception
   {
-    return lookup(ResourceMergingConfigurationManager.class);
+    return lookup(ConfigurationManager.class);
   }
 
   // ROLES
