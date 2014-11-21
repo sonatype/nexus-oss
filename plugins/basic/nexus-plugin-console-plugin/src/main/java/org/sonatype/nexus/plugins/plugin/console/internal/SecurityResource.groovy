@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugins.plugin.console.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Plugin Infos: Read',
                 description: 'Give permission to read plugins\' information.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:pluginconsoleplugininfos')
+                    'method': 'read',
+                    'permission': 'nexus:pluginconsoleplugininfos'
                 ]
             )
         ],

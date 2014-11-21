@@ -14,7 +14,6 @@ package org.sonatype.nexus.security.source;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
@@ -22,7 +21,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
@@ -109,14 +107,7 @@ public class CPrivilegeEntityAdapter
     document.field(P_NAME, entity.getName());
     document.field(P_DESCRIPTION, entity.getDescription());
     document.field(P_TYPE, entity.getType());
-
-    Map<String, String> properties = Maps.newHashMap();
-    if (entity.getProperties() != null) {
-      for (CProperty property : entity.getProperties()) {
-        properties.put(property.getKey(), property.getValue());
-      }
-    }
-    document.field(P_PROPERTIES, properties);
+    document.field(P_PROPERTIES, entity.getProperties());
 
     return document.save();
   }
@@ -133,14 +124,7 @@ public class CPrivilegeEntityAdapter
     entity.setDescription(document.<String>field(P_DESCRIPTION, OType.STRING));
     entity.setType(document.<String>field(P_TYPE, OType.STRING));
     entity.setReadOnly(false);
-    Map<String, String> properties = document.field(P_PROPERTIES, OType.EMBEDDEDMAP);
-    for (Entry<String, String> entry : properties
-        .entrySet()) {
-      CProperty property = new CProperty();
-      property.setKey(entry.getKey());
-      property.setValue(entry.getValue());
-      entity.addProperty(property);
-    }
+    entity.setProperties(Maps.newHashMap(document.<Map<String, String>>field(P_PROPERTIES, OType.EMBEDDEDMAP)));
 
     return entity;
   }

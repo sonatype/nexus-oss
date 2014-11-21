@@ -14,7 +14,6 @@ package org.sonatype.security.authorization.xml;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.enterprise.inject.Typed;
@@ -30,11 +29,12 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -115,14 +115,8 @@ public class SecurityXmlAuthorizationManager
     secPriv.setDescription(privilege.getDescription());
     secPriv.setReadOnly(privilege.isReadOnly());
     secPriv.setType(privilege.getType());
-
-    if (privilege.getProperties() != null && privilege.getProperties().entrySet() != null) {
-      for (Entry<String, String> entry : privilege.getProperties().entrySet()) {
-        CProperty prop = new CProperty();
-        prop.setKey(entry.getKey());
-        prop.setValue(entry.getValue());
-        secPriv.addProperty(prop);
-      }
+    if (privilege.getProperties() != null) {
+      secPriv.setProperties(Maps.newHashMap(privilege.getProperties()));
     }
 
     return secPriv;
@@ -135,12 +129,7 @@ public class SecurityXmlAuthorizationManager
     privilege.setDescription(secPriv.getDescription());
     privilege.setReadOnly(secPriv.isReadOnly());
     privilege.setType(secPriv.getType());
-
-    if (secPriv.getProperties() != null) {
-      for (CProperty prop : (List<CProperty>) secPriv.getProperties()) {
-        privilege.addProperty(prop.getKey(), prop.getValue());
-      }
-    }
+    privilege.setProperties(Maps.newHashMap(secPriv.getProperties()));
 
     return privilege;
   }
@@ -265,17 +254,10 @@ public class SecurityXmlAuthorizationManager
   }
 
   private void addInheritedPrivileges(CPrivilege privilege) {
-    CProperty methodProperty = null;
-
-    for (CProperty property : (List<CProperty>) privilege.getProperties()) {
-      if (property.getKey().equals("method")) {
-        methodProperty = property;
-        break;
-      }
-    }
+    String methodProperty = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
 
     if (methodProperty != null) {
-      List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty.getValue());
+      List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty);
 
       StringBuffer buf = new StringBuffer();
 
@@ -287,7 +269,7 @@ public class SecurityXmlAuthorizationManager
       if (buf.length() > 0) {
         buf.setLength(buf.length() - 1);
 
-        methodProperty.setValue(buf.toString());
+        privilege.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, buf.toString());
       }
     }
   }

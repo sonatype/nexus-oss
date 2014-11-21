@@ -18,7 +18,6 @@ import java.util.Set;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
@@ -170,16 +169,8 @@ public class XmlAuthenticatingRealmTest
     priv.setName("name");
     priv.setDescription("desc");
     priv.setType("method");
-
-    CProperty prop = new CProperty();
-    prop.setKey("method");
-    prop.setValue("read");
-    priv.addProperty(prop);
-
-    prop = new CProperty();
-    prop.setKey("permission");
-    prop.setValue("somevalue");
-    priv.addProperty(prop);
+    priv.setProperty("method", "read");
+    priv.setProperty("permission", "somevalue");
 
     configurationManager.createPrivilege(priv);
 

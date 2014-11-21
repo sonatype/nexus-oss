@@ -24,7 +24,6 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -257,9 +256,8 @@ public class AuthorizationManagerTest
     Assert.assertEquals(privilege.getType(), secPriv.getType());
     Assert.assertEquals(privilege.getProperties().size(), secPriv.getProperties().size());
 
-    Map<String, String> props = this.getPropertyMap(secPriv);
-    Assert.assertEquals("bar2", props.get("foo1"));
-    Assert.assertEquals("foo2", props.get("bar1"));
+    Assert.assertEquals("bar2", secPriv.getProperty("foo1"));
+    Assert.assertEquals("foo2", secPriv.getProperty("bar1"));
 
   }
 
@@ -280,9 +278,8 @@ public class AuthorizationManagerTest
     Assert.assertEquals(priv2.getDescription(), secPriv.getDescription());
     Assert.assertEquals(priv2.getType(), secPriv.getType());
 
-    Map<String, String> props = this.getPropertyMap(secPriv);
-    Assert.assertEquals("read", props.get("method"));
-    Assert.assertEquals("/some/path/", props.get("permission"));
+    Assert.assertEquals("read", secPriv.getProperty("method"));
+    Assert.assertEquals("/some/path/", secPriv.getProperty("permission"));
     Assert.assertEquals(2, secPriv.getProperties().size());
   }
 
@@ -326,17 +323,6 @@ public class AuthorizationManagerTest
       // expected
     }
 
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<String, String> getPropertyMap(CPrivilege secPriv) {
-    Map<String, String> props = new HashMap<String, String>();
-
-    for (CProperty prop : secPriv.getProperties()) {
-      props.put(prop.getKey(), prop.getValue());
-    }
-
-    return props;
   }
 
   private Map<String, Privilege> toPrivilegeMap(Set<Privilege> privileges) {

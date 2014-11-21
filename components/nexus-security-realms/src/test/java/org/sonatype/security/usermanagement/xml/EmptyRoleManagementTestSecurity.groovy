@@ -13,7 +13,6 @@
 package org.sonatype.security.usermanagement.xml
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
@@ -91,8 +90,8 @@ class EmptyRoleManagementTestSecurity
                 name: '1',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path1/')
+                    'method': 'read',
+                    'permission': '/some/path1/'
                 ]
             ),
             new CPrivilege(
@@ -101,8 +100,8 @@ class EmptyRoleManagementTestSecurity
                 name: '2',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path2/')
+                    'method': 'read',
+                    'permission': '/some/path2/'
                 ]
             ),
             new CPrivilege(
@@ -111,8 +110,8 @@ class EmptyRoleManagementTestSecurity
                 name: '3',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -121,8 +120,8 @@ class EmptyRoleManagementTestSecurity
                 name: '4',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],

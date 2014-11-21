@@ -18,7 +18,6 @@ import java.util.Set;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
@@ -128,21 +127,13 @@ public class XmlAuthorizingRealmTest
   private void buildTestAuthorizationConfig(String userId)
       throws InvalidConfigurationException
   {
-    CProperty permissionProp = new CProperty();
-    permissionProp.setKey(ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    permissionProp.setValue("app:config");
-
-    CProperty methodProp = new CProperty();
-    methodProp.setKey(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    methodProp.setValue("read");
-
     CPrivilege priv = new CPrivilege();
     priv.setId("priv");
     priv.setName("somepriv");
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.addProperty(permissionProp);
-    priv.addProperty(methodProp);
+    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "app:config");
+    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
 
     configurationManager.createPrivilege(priv);
 

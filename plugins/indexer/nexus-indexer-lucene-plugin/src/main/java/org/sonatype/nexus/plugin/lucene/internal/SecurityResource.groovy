@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugin.lucene.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Search Repositories',
                 description: 'Give permission to perform searches of repository content.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:index')
+                    'method': 'read',
+                    'permission': 'nexus:index'
                 ]
             ),
             new CPrivilege(
@@ -51,8 +50,8 @@ implements StaticSecurityResource
                 name: 'Reindex',
                 description: 'Give permission to Reindex repository content.  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:index')
+                    'method': 'delete,read',
+                    'permission': 'nexus:index'
                 ]
             ),
             new CPrivilege(
@@ -61,8 +60,8 @@ implements StaticSecurityResource
                 name: 'Checksum Search',
                 description: 'Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:identify')
+                    'method': 'read',
+                    'permission': 'nexus:identify'
                 ]
             )
         ],

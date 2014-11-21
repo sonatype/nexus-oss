@@ -73,7 +73,7 @@ public class RepositoryViewPrivilegeDescriptor
       return null;
     }
 
-    String repoId = getProperty(privilege, RepositoryPropertyDescriptor.ID);
+    String repoId = privilege.getProperty(RepositoryPropertyDescriptor.ID);
 
     if (StringUtils.isEmpty(repoId)) {
       repoId = "*";

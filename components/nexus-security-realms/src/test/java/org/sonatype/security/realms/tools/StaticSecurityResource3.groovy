@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.tools
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 
@@ -42,8 +41,8 @@ implements StaticSecurityResource
                 name: '4-test',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path4/')
+                    'method': 'read',
+                    'permission': '/some/path4/'
                 ])
             ,
             new CPrivilege(
@@ -52,8 +51,8 @@ implements StaticSecurityResource
                 name: '5-test',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path5/')
+                    'method': 'read',
+                    'permission': '/some/path5/'
                 ])
             ,
             new CPrivilege(
@@ -62,8 +61,8 @@ implements StaticSecurityResource
                 name: '6-test',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path6/')
+                    'method': 'read',
+                    'permission': '/some/path6/'
                 ])
         ],
         roles: [

@@ -21,7 +21,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 import org.sonatype.security.realms.XmlAuthorizingRealm;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
@@ -168,21 +167,13 @@ public class EmptyRoleTest
   private String createTestPriv()
       throws InvalidConfigurationException
   {
-    CProperty permissionProp = new CProperty();
-    permissionProp.setKey(ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    permissionProp.setValue("app:config");
-
-    CProperty methodProp = new CProperty();
-    methodProp.setKey(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    methodProp.setValue("read");
-
     CPrivilege priv = new CPrivilege();
     priv.setId("priv-" + Math.random());
     priv.setName("somepriv");
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.addProperty(permissionProp);
-    priv.addProperty(methodProp);
+    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "app:config");
+    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
 
     this.lookup(DefaultConfigurationManager.class).createPrivilege(priv);
 

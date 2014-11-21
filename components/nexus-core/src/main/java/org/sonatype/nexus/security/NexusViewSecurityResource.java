@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.registry.RootContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
@@ -133,11 +132,7 @@ public class NexusViewSecurityResource
     priv.setName(name);
     priv.setDescription(description);
     priv.setType(RepositoryViewPrivilegeDescriptor.TYPE);
-
-    CProperty prop = new CProperty();
-    prop.setKey(RepositoryPropertyDescriptor.ID);
-    prop.setValue(repoId);
-    priv.addProperty(prop);
+    priv.setProperty(RepositoryPropertyDescriptor.ID, repoId);
 
     return priv;
   }

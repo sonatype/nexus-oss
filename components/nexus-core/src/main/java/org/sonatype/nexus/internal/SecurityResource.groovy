@@ -13,7 +13,6 @@
 package org.sonatype.nexus.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Metrics Endpoints',
                 description: 'Allows access to metrics endpoints.',
                 properties: [
-                    new CProperty(key: 'method', value: '*'),
-                    new CProperty(key: 'permission', value: 'nexus:metrics-endpoints')
+                    'method': '*',
+                    'permission': 'nexus:metrics-endpoints'
                 ]
             ),
             new CPrivilege(
@@ -51,10 +50,10 @@ implements StaticSecurityResource
                 name: 'All M2 Repositories - (read)',
                 description: 'Give permission to read any content in any Maven 2 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'repositoryTargetId', value: '1'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'read',
+                    'repositoryTargetId': '1',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -63,10 +62,10 @@ implements StaticSecurityResource
                 name: 'All M1 Repositories - (read)',
                 description: 'Give permission to read any content in any Maven 1 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'repositoryTargetId', value: '2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'read',
+                    'repositoryTargetId': '2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -75,10 +74,10 @@ implements StaticSecurityResource
                 name: 'All M2 Repositories - (update)',
                 description: 'Give permission to update any content in any Maven 2 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '1'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'update,read',
+                    'repositoryTargetId': '1',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -87,10 +86,10 @@ implements StaticSecurityResource
                 name: 'All M1 Repositories - (update)',
                 description: 'Give permission to update any content in any Maven 1 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'update,read',
+                    'repositoryTargetId': '2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -99,10 +98,10 @@ implements StaticSecurityResource
                 name: 'All M2 Repositories - (create)',
                 description: 'Give permission to create any content in any Maven 2 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '1'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'create,read',
+                    'repositoryTargetId': '1',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -111,10 +110,10 @@ implements StaticSecurityResource
                 name: 'All M1 Repositories - (create)',
                 description: 'Give permission to create any content in any Maven 1 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'create,read',
+                    'repositoryTargetId': '2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -123,10 +122,10 @@ implements StaticSecurityResource
                 name: 'All M2 Repositories - (delete)',
                 description: 'Give permission to delete any content in any Maven 2 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '1'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'delete,read',
+                    'repositoryTargetId': '1',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -135,10 +134,10 @@ implements StaticSecurityResource
                 name: 'All M1 Repositories - (delete)',
                 description: 'Give permission to delete any content in any Maven 1 type repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'repositoryTargetId', value: '2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'delete,read',
+                    'repositoryTargetId': '2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -147,10 +146,10 @@ implements StaticSecurityResource
                 name: 'All Repositories - (read)',
                 description: 'Give permission to read any content in any repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'any'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'read',
+                    'repositoryTargetId': 'any',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -159,10 +158,10 @@ implements StaticSecurityResource
                 name: 'All Repositories - (update)',
                 description: 'Give permission to update any content in any repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'any'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'update,read',
+                    'repositoryTargetId': 'any',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -171,10 +170,10 @@ implements StaticSecurityResource
                 name: 'All Repositories - (create)',
                 description: 'Give permission to create any content in any repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'any'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'create,read',
+                    'repositoryTargetId': 'any',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -183,10 +182,10 @@ implements StaticSecurityResource
                 name: 'All Repositories - (delete)',
                 description: 'Give permission to delete any content in any repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'any'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'delete,read',
+                    'repositoryTargetId': 'any',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -195,8 +194,8 @@ implements StaticSecurityResource
                 name: 'Administrator privilege (ALL)',
                 description: 'Give permission to everything available in nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: '*'),
-                    new CProperty(key: 'permission', value: 'nexus:*')
+                    'method': '*',
+                    'permission': 'nexus:*'
                 ]
             ),
             new CPrivilege(
@@ -205,8 +204,8 @@ implements StaticSecurityResource
                 name: 'Status - (read)',
                 description: 'Give permission to query the nexus server for it\'s status.  This privilege is required by the anonymous user so that the UI can retrieve anonymous permissions on startup.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:status')
+                    'method': 'read',
+                    'permission': 'nexus:status'
                 ]
             ),
             new CPrivilege(
@@ -215,8 +214,8 @@ implements StaticSecurityResource
                 name: 'Login to UI',
                 description: 'Give permission to allow a user to login to nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:authentication')
+                    'method': 'read',
+                    'permission': 'nexus:authentication'
                 ]
             ),
             new CPrivilege(
@@ -225,8 +224,8 @@ implements StaticSecurityResource
                 name: 'Server Settings - (read)',
                 description: 'Give permission to read the nexus server settings.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:settings')
+                    'method': 'read',
+                    'permission': 'nexus:settings'
                 ]
             ),
             new CPrivilege(
@@ -235,8 +234,8 @@ implements StaticSecurityResource
                 name: 'Server Settings - (update,read)',
                 description: 'Give permission to update,read the nexus server settings.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:settings')
+                    'method': 'update,read',
+                    'permission': 'nexus:settings'
                 ]
             ),
             new CPrivilege(
@@ -245,8 +244,8 @@ implements StaticSecurityResource
                 name: 'Repositories - (create,read)',
                 description: 'Give permission to create,read new repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositories')
+                    'method': 'create,read',
+                    'permission': 'nexus:repositories'
                 ]
             ),
             new CPrivilege(
@@ -255,8 +254,8 @@ implements StaticSecurityResource
                 name: 'Repositories - (read)',
                 description: 'Give permission to read existing repository configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositories')
+                    'method': 'read',
+                    'permission': 'nexus:repositories'
                 ]
             ),
             new CPrivilege(
@@ -265,8 +264,8 @@ implements StaticSecurityResource
                 name: 'Repositories - (update,read)',
                 description: 'Give permission to update,read existing repository configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositories')
+                    'method': 'update,read',
+                    'permission': 'nexus:repositories'
                 ]
             ),
             new CPrivilege(
@@ -275,8 +274,8 @@ implements StaticSecurityResource
                 name: 'Repositories - (delete,read)',
                 description: 'Give permission to delete,read existing repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositories')
+                    'method': 'delete,read',
+                    'permission': 'nexus:repositories'
                 ]
             ),
             new CPrivilege(
@@ -285,8 +284,8 @@ implements StaticSecurityResource
                 name: 'Repository Templates - (create,read)',
                 description: 'Give permission to create,read new repository templates.  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repotemplates')
+                    'method': 'create,read',
+                    'permission': 'nexus:repotemplates'
                 ]
             ),
             new CPrivilege(
@@ -295,8 +294,8 @@ implements StaticSecurityResource
                 name: 'Repository Templates - (read)',
                 description: 'Give permission to read existing repository template configuration.  This privilege is required to add a new Repository in the UI, as the default values are retrieved from the template on the server.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repotemplates')
+                    'method': 'read',
+                    'permission': 'nexus:repotemplates'
                 ]
             ),
             new CPrivilege(
@@ -305,8 +304,8 @@ implements StaticSecurityResource
                 name: 'Repository Templates - (update,read)',
                 description: 'Give permission to update,read existing repository template configuration.  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repotemplates')
+                    'method': 'update,read',
+                    'permission': 'nexus:repotemplates'
                 ]
             ),
             new CPrivilege(
@@ -315,8 +314,8 @@ implements StaticSecurityResource
                 name: 'Repository Templates - (delete,read)',
                 description: 'Give permission to delete,read existing repository templates.  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repotemplates')
+                    'method': 'delete,read',
+                    'permission': 'nexus:repotemplates'
                 ]
             ),
             new CPrivilege(
@@ -325,8 +324,8 @@ implements StaticSecurityResource
                 name: 'Repository Groups - (create,read)',
                 description: 'Give permission to create,read new repository groups.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repogroups')
+                    'method': 'create,read',
+                    'permission': 'nexus:repogroups'
                 ]
             ),
             new CPrivilege(
@@ -335,8 +334,8 @@ implements StaticSecurityResource
                 name: 'Repository Groups - (read)',
                 description: 'Give permission to read existing repository group configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repogroups')
+                    'method': 'read',
+                    'permission': 'nexus:repogroups'
                 ]
             ),
             new CPrivilege(
@@ -345,8 +344,8 @@ implements StaticSecurityResource
                 name: 'Repository Groups - (update,read)',
                 description: 'Give permission to update,read existing repository group configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repogroups')
+                    'method': 'update,read',
+                    'permission': 'nexus:repogroups'
                 ]
             ),
             new CPrivilege(
@@ -355,8 +354,8 @@ implements StaticSecurityResource
                 name: 'Repository Groups - (delete,read)',
                 description: 'Give permission to delete,read existing repository groups.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repogroups')
+                    'method': 'delete,read',
+                    'permission': 'nexus:repogroups'
                 ]
             ),
             new CPrivilege(
@@ -365,8 +364,8 @@ implements StaticSecurityResource
                 name: 'Rebuild Repository Attributes',
                 description: 'Give permission to rebuild the attributes of repository content.  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:attributes')
+                    'method': 'delete,read',
+                    'permission': 'nexus:attributes'
                 ]
             ),
             new CPrivilege(
@@ -375,8 +374,8 @@ implements StaticSecurityResource
                 name: 'Clear Repository Cache',
                 description: 'Give permission to clear the content of a repositories not found cache.  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:cache')
+                    'method': 'delete,read',
+                    'permission': 'nexus:cache'
                 ]
             ),
             new CPrivilege(
@@ -385,8 +384,8 @@ implements StaticSecurityResource
                 name: 'Repository Routes - (create,read)',
                 description: 'Give permission to create,read repository routes.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:routes')
+                    'method': 'create,read',
+                    'permission': 'nexus:routes'
                 ]
             ),
             new CPrivilege(
@@ -395,8 +394,8 @@ implements StaticSecurityResource
                 name: 'Repository Routes - (read)',
                 description: 'Give permission to read existing repository route configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:routes')
+                    'method': 'read',
+                    'permission': 'nexus:routes'
                 ]
             ),
             new CPrivilege(
@@ -405,8 +404,8 @@ implements StaticSecurityResource
                 name: 'Repository Routes - (update,read)',
                 description: 'Give permission to update,read existing repository route configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:routes')
+                    'method': 'update,read',
+                    'permission': 'nexus:routes'
                 ]
             ),
             new CPrivilege(
@@ -415,8 +414,8 @@ implements StaticSecurityResource
                 name: 'Repository Routes - (delete,read)',
                 description: 'Give permission to delete,read existing repository routes.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:routes')
+                    'method': 'delete,read',
+                    'permission': 'nexus:routes'
                 ]
             ),
             new CPrivilege(
@@ -425,8 +424,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Tasks - (create,read)',
                 description: 'Give permission to create,read scheduled tasks.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:tasks')
+                    'method': 'create,read',
+                    'permission': 'nexus:tasks'
                 ]
             ),
             new CPrivilege(
@@ -435,8 +434,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Tasks - (read)',
                 description: 'Give permission to read existing scheduled task configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:tasks')
+                    'method': 'read',
+                    'permission': 'nexus:tasks'
                 ]
             ),
             new CPrivilege(
@@ -445,8 +444,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Tasks - (update,read)',
                 description: 'Give permission to update,read existing scheduled task configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:tasks')
+                    'method': 'update,read',
+                    'permission': 'nexus:tasks'
                 ]
             ),
             new CPrivilege(
@@ -455,8 +454,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Tasks - (delete,read)',
                 description: 'Give permission to delete,read existing scheduled tasks.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:tasks')
+                    'method': 'delete,read',
+                    'permission': 'nexus:tasks'
                 ]
             ),
             new CPrivilege(
@@ -465,8 +464,8 @@ implements StaticSecurityResource
                 name: 'Logs - (read)',
                 description: 'Give permission to retrieve the nexus log files.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:logs')
+                    'method': 'read',
+                    'permission': 'nexus:logs'
                 ]
             ),
             new CPrivilege(
@@ -475,8 +474,8 @@ implements StaticSecurityResource
                 name: 'Configuration File - (read)',
                 description: 'Give permission to retrieve the nexus.xml configuration file.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:configuration')
+                    'method': 'read',
+                    'permission': 'nexus:configuration'
                 ]
             ),
             new CPrivilege(
@@ -485,8 +484,8 @@ implements StaticSecurityResource
                 name: 'Repository Targets - (create,read)',
                 description: 'Give permission to create,read repository targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:targets')
+                    'method': 'create,read',
+                    'permission': 'nexus:targets'
                 ]
             ),
             new CPrivilege(
@@ -495,8 +494,8 @@ implements StaticSecurityResource
                 name: 'Repository Targets - (read)',
                 description: 'Give permission to read existing repository target configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:targets')
+                    'method': 'read',
+                    'permission': 'nexus:targets'
                 ]
             ),
             new CPrivilege(
@@ -505,8 +504,8 @@ implements StaticSecurityResource
                 name: 'Repository Targets - (update,read)',
                 description: 'Give permission to update,read existing repository target configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:targets')
+                    'method': 'update,read',
+                    'permission': 'nexus:targets'
                 ]
             ),
             new CPrivilege(
@@ -515,8 +514,8 @@ implements StaticSecurityResource
                 name: 'Repository Targets - (delete,read)',
                 description: 'Give permission to delete,read existing repository targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:targets')
+                    'method': 'delete,read',
+                    'permission': 'nexus:targets'
                 ]
             ),
             new CPrivilege(
@@ -525,8 +524,8 @@ implements StaticSecurityResource
                 name: 'Server Status - (update,read)',
                 description: 'Give permission to update,read the status of the nexus server.  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:status')
+                    'method': 'update,read',
+                    'permission': 'nexus:status'
                 ]
             ),
             new CPrivilege(
@@ -535,8 +534,8 @@ implements StaticSecurityResource
                 name: 'Wastebasket - (read)',
                 description: 'Give permission to read the contents of the nexus trash.  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:wastebasket')
+                    'method': 'read',
+                    'permission': 'nexus:wastebasket'
                 ]
             ),
             new CPrivilege(
@@ -545,8 +544,8 @@ implements StaticSecurityResource
                 name: 'Wastebasket - (delete,read)',
                 description: 'Give permission to delete,read the contents of the nexus trash.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:wastebasket')
+                    'method': 'delete,read',
+                    'permission': 'nexus:wastebasket'
                 ]
             ),
             new CPrivilege(
@@ -555,8 +554,8 @@ implements StaticSecurityResource
                 name: 'Artifact Download',
                 description: 'Give permission to download artifacts (using /artifact service, not the /content url).  The extents of this privilege are related to the allowed targets..  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:artifact')
+                    'method': 'read',
+                    'permission': 'nexus:artifact'
                 ]
             ),
             new CPrivilege(
@@ -565,8 +564,8 @@ implements StaticSecurityResource
                 name: 'Read Repository Status',
                 description: 'Give permission to retrieve the status of a repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repostatus')
+                    'method': 'read',
+                    'permission': 'nexus:repostatus'
                 ]
             ),
             new CPrivilege(
@@ -575,8 +574,8 @@ implements StaticSecurityResource
                 name: 'Update Repository Status',
                 description: 'Give permission to update the status of a repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update'),
-                    new CProperty(key: 'permission', value: 'nexus:repostatus')
+                    'method': 'update',
+                    'permission': 'nexus:repostatus'
                 ]
             ),
             new CPrivilege(
@@ -585,8 +584,8 @@ implements StaticSecurityResource
                 name: 'Artifact Upload',
                 description: 'Give permission to upload artifacts (using /artifact service, not the /content service).  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:artifact')
+                    'method': 'create,read',
+                    'permission': 'nexus:artifact'
                 ]
             ),
             new CPrivilege(
@@ -595,8 +594,8 @@ implements StaticSecurityResource
                 name: 'Nexus Remote Control',
                 description: 'Give permission to remotely control nexus server (start, stop, etc.).  Note that this privilege is not currently invoked by the Nexus UI.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:command')
+                    'method': 'update,read',
+                    'permission': 'nexus:command'
                 ]
             ),
             new CPrivilege(
@@ -605,8 +604,8 @@ implements StaticSecurityResource
                 name: 'Repository Summary Info (read)',
                 description: 'Give permission to read the repository summary information.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repometa')
+                    'method': 'read',
+                    'permission': 'nexus:repometa'
                 ]
             ),
             new CPrivilege(
@@ -615,8 +614,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Tasks - (run,stop)',
                 description: 'Give permission to run and stop existing scheduled tasks manually.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read,delete'),
-                    new CProperty(key: 'permission', value: 'nexus:tasksrun')
+                    'method': 'read,delete',
+                    'permission': 'nexus:tasksrun'
                 ]
             ),
             new CPrivilege(
@@ -625,8 +624,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Task Types - (read)',
                 description: 'Give permission to retrieve list of support task types available in nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:tasktypes')
+                    'method': 'read',
+                    'permission': 'nexus:tasktypes'
                 ]
             ),
             new CPrivilege(
@@ -635,8 +634,8 @@ implements StaticSecurityResource
                 name: 'Repository Content Classes Component - (read)',
                 description: 'Give permission to retrieve the list of repository content classes supported by nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:componentscontentclasses')
+                    'method': 'read',
+                    'permission': 'nexus:componentscontentclasses'
                 ]
             ),
             new CPrivilege(
@@ -645,8 +644,8 @@ implements StaticSecurityResource
                 name: 'Scheduled Task Types Component - (read)',
                 description: 'Give permission to retrieve list of support task types available in nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:componentscheduletypes')
+                    'method': 'read',
+                    'permission': 'nexus:componentscheduletypes'
                 ]
             ),
             new CPrivilege(
@@ -655,8 +654,8 @@ implements StaticSecurityResource
                 name: 'Realm Types Component - (read)',
                 description: 'Give permission to retrieve list of support realms available in nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:componentrealmtypes')
+                    'method': 'read',
+                    'permission': 'nexus:componentrealmtypes'
                 ]
             ),
             new CPrivilege(
@@ -665,8 +664,8 @@ implements StaticSecurityResource
                 name: 'Repository Types - (read)',
                 description: 'Give permission to retrieve the list of repository types supported by nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:componentsrepotypes')
+                    'method': 'read',
+                    'permission': 'nexus:componentsrepotypes'
                 ]
             ),
             new CPrivilege(
@@ -675,8 +674,8 @@ implements StaticSecurityResource
                 name: 'Rebuild Maven Metadata',
                 description: 'Give permission to rebuild the maven metadata of repository content.  The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:metadata')
+                    'method': 'delete,read',
+                    'permission': 'nexus:metadata'
                 ]
             ),
             new CPrivilege(
@@ -685,8 +684,8 @@ implements StaticSecurityResource
                 name: 'Log Configuration - (read,update)',
                 description: 'Give permission to read and update log configuration',
                 properties: [
-                    new CProperty(key: 'method', value: 'read,update'),
-                    new CProperty(key: 'permission', value: 'nexus:logconfig')
+                    'method': 'read,update',
+                    'permission': 'nexus:logconfig'
                 ]
             ),
             new CPrivilege(
@@ -695,8 +694,8 @@ implements StaticSecurityResource
                 name: 'Repository Mirrors - (read)',
                 description: 'Give permission to read repository mirror configuration',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositorymirrors')
+                    'method': 'read',
+                    'permission': 'nexus:repositorymirrors'
                 ]
             ),
             new CPrivilege(
@@ -705,8 +704,8 @@ implements StaticSecurityResource
                 name: 'Repository Mirrors - (create,read)',
                 description: 'Give permission to create repository mirror configuration',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositorymirrors')
+                    'method': 'create,read',
+                    'permission': 'nexus:repositorymirrors'
                 ]
             ),
             new CPrivilege(
@@ -715,8 +714,8 @@ implements StaticSecurityResource
                 name: 'Repository Mirrors, Retrieve Predefined List - (read)',
                 description: 'Give permission to retrieve predefined list of mirrors from the server',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositorypredefinedmirrors')
+                    'method': 'read',
+                    'permission': 'nexus:repositorypredefinedmirrors'
                 ]
             ),
             new CPrivilege(
@@ -725,8 +724,8 @@ implements StaticSecurityResource
                 name: 'Repository Mirrors, Retrieve Mirror Status - (read)',
                 description: 'Give permission to retrieve mirror status from the server',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:repositorymirrorsstatus')
+                    'method': 'read',
+                    'permission': 'nexus:repositorymirrorsstatus'
                 ]
             ),
             new CPrivilege(
@@ -735,8 +734,8 @@ implements StaticSecurityResource
                 name: 'API-Key Access',
                 description: 'Give permission to use an API-Key to access the server.',
                 properties: [
-                    new CProperty(key: 'method', value: '*'),
-                    new CProperty(key: 'permission', value: 'apikey:access')
+                    'method': '*',
+                    'permission': 'apikey:access'
                 ]
             )
         ],

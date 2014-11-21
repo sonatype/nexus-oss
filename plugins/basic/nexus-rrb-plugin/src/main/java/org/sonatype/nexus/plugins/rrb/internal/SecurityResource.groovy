@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugins.rrb.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Browse Remote Repository - (read)',
                 description: 'Give permission to browse remote repositories',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:browseremote')
+                    'method': 'read',
+                    'permission': 'nexus:browseremote'
                 ]
             )
         ],

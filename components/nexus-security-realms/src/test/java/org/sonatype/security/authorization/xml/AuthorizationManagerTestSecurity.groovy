@@ -13,7 +13,6 @@
 package org.sonatype.security.authorization.xml
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
@@ -79,8 +78,8 @@ class AuthorizationManagerTestSecurity
                 name: '1',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ])
             ,
             new CPrivilege(
@@ -89,8 +88,8 @@ class AuthorizationManagerTestSecurity
                 name: '2',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ])
             ,
             new CPrivilege(
@@ -99,8 +98,8 @@ class AuthorizationManagerTestSecurity
                 name: '3-name',
                 description: 'Privilege Three',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ])
             ,
             new CPrivilege(
@@ -109,8 +108,8 @@ class AuthorizationManagerTestSecurity
                 name: '4',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ])
         ],
         roles: [

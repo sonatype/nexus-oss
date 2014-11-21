@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.tools
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 
@@ -32,8 +31,8 @@ class ResourceMergingConfigurationManagerTestSecurity
                 name: '1-test',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -42,8 +41,8 @@ class ResourceMergingConfigurationManagerTestSecurity
                 name: '2-test',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],

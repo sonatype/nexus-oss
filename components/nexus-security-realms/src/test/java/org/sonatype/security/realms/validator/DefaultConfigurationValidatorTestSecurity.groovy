@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.validator
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
@@ -78,8 +77,8 @@ class DefaultConfigurationValidatorTestSecurity
                 type: 'method',
                 name: 'priv',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],
@@ -101,8 +100,8 @@ class DefaultConfigurationValidatorTestSecurity
                 type: 'method',
                 name: 'priv',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],
@@ -177,8 +176,7 @@ class DefaultConfigurationValidatorTestSecurity
                 type: '',
                 name: '',
                 description: '',
-                properties: [
-                ]
+                properties: [:]
             ),
             new CPrivilege(
                 id: '25',
@@ -186,8 +184,8 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'priv',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -196,8 +194,8 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'priv',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],

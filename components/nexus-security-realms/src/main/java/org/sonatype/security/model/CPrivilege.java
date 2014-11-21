@@ -12,6 +12,10 @@
  */
 package org.sonatype.security.model;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 /**
  * Base privilege class contains items common to all types of
  * privileges.
@@ -48,9 +52,9 @@ public class CPrivilege
   private String type;
 
   /**
-   * Field properties.
+   * Privilege properties.
    */
-  private java.util.List<CProperty> properties;
+  private Map<String, String> properties;
 
   /**
    * Marks if this privilege is editable.
@@ -62,12 +66,9 @@ public class CPrivilege
   //- Methods -/
   //-----------/
 
-  /**
-   * Method addProperty.
-   */
-  public void addProperty(CProperty cProperty) {
-    getProperties().add(cProperty);
-  } //-- void addProperty( CProperty )
+  public void setProperty(final String key, final String value) {
+    getProperties().put(key, value);
+  }
 
   /**
    * Method clone.
@@ -79,10 +80,7 @@ public class CPrivilege
       CPrivilege copy = (CPrivilege) super.clone();
 
       if (this.properties != null) {
-        copy.properties = new java.util.ArrayList<CProperty>();
-        for (CProperty item : this.properties) {
-          copy.properties.add(((CProperty) item).clone());
-        }
+        copy.properties = Maps.newHashMap(this.properties);
       }
 
       return copy;
@@ -120,18 +118,16 @@ public class CPrivilege
     return this.name;
   } //-- String getName()
 
-  /**
-   * Method getProperties.
-   *
-   * @return List
-   */
-  public java.util.List<CProperty> getProperties() {
+  public Map<String, String> getProperties() {
     if (this.properties == null) {
-      this.properties = new java.util.ArrayList<CProperty>();
+      this.properties = Maps.newHashMap();
     }
-
     return this.properties;
-  } //-- java.util.List<CProperty> getProperties()
+  }
+
+  public String getProperty(final String key) {
+    return getProperties().get(key);
+  }
 
   /**
    * Get the type of privilege.
@@ -151,12 +147,9 @@ public class CPrivilege
     return this.readOnly;
   } //-- boolean isReadOnly()
 
-  /**
-   * Method removeProperty.
-   */
-  public void removeProperty(CProperty cProperty) {
-    getProperties().remove(cProperty);
-  } //-- void removeProperty( CProperty )
+  public void removeProperty(final String key) {
+    getProperties().remove(key);
+  }
 
   /**
    * Set a description of the privilege.
@@ -183,9 +176,9 @@ public class CPrivilege
    * Set properties assigned to this privilege, used to define a
    * permission.
    */
-  public void setProperties(java.util.List<CProperty> properties) {
+  public void setProperties(Map<String, String> properties) {
     this.properties = properties;
-  } //-- void setProperties( java.util.List )
+  }
 
   /**
    * Set marks if this privilege is editable.
