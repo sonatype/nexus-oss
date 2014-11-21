@@ -1,0 +1,13 @@
+/**
+ * @class Ext.grid.Panel
+ */
+
+/**
+ * ui: 'borderless'
+ */
+@include extjs-panel-ui(
+  $ui: 'borderless',
+
+  $ui-body-border-width: 0,
+  $ui-padding: 5px 0 0 0
+);

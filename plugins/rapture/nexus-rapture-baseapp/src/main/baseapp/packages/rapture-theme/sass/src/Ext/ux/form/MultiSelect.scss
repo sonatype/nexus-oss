@@ -24,3 +24,11 @@
     border: 1px $color-gainsboro solid !important;
   }
 }
+
+.x-form-fieldcontainer.nx-invalid {
+  .nx-multiselect:nth-child(3) {
+    .x-panel-body {
+      border: 1px #CF4C35 solid !important;
+    }
+  }
+}
