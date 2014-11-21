@@ -503,8 +503,6 @@ public class DefaultConfigurationManager
 
     for (CUser user : listUsers()) {
       context.getExistingUserIds().add(user.getId());
-
-      context.getExistingEmailMap().put(user.getId(), user.getEmail());
     }
 
     for (CRole role : listRoles()) {

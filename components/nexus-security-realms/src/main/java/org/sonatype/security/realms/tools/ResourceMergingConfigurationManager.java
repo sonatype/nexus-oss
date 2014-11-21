@@ -182,8 +182,6 @@ public class ResourceMergingConfigurationManager
     List<CUser> users = new ArrayList<CUser>(listUsers());
     for (CUser user : users) {
       context.getExistingUserIds().add(user.getId());
-
-      context.getExistingEmailMap().put(user.getId(), user.getEmail());
     }
 
     List<CRole> roles = new ArrayList<CRole>(listRoles());

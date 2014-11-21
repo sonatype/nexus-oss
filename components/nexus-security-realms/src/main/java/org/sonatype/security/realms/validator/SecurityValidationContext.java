@@ -28,8 +28,6 @@ public class SecurityValidationContext
 
   private List<String> existingUserIds;
 
-  private Map<String, String> existingEmailMap;
-
   private Map<String, List<String>> roleContainmentMap;
 
   private Map<String, String> existingRoleNameMap;
@@ -58,10 +56,6 @@ public class SecurityValidationContext
     if (this.existingUserIds == null) {
       this.existingUserIds = new ArrayList<String>();
     }
-
-    if (this.existingEmailMap == null) {
-      this.existingEmailMap = new HashMap<String, String>();
-    }
   }
 
   public List<String> getExistingPrivilegeIds() {
@@ -74,10 +68,6 @@ public class SecurityValidationContext
 
   public List<String> getExistingUserIds() {
     return existingUserIds;
-  }
-
-  public Map<String, String> getExistingEmailMap() {
-    return existingEmailMap;
   }
 
   public Map<String, List<String>> getRoleContainmentMap() {
