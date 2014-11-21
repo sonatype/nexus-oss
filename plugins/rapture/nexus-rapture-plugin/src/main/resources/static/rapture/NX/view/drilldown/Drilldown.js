@@ -32,9 +32,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
     flex: 1
   },
 
-  rootName: '',
-  rootClass: '',
-
   /**
    * @override
    */
@@ -61,12 +58,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
             xtype: 'image',
             height: 32,
             width: 32,
-            cls: me.items.items[0].itemClass
+            cls: content.currentIconCls
           },
           {
             xtype: 'nx-drilldown-link',
             scale: 'large',
-            text: me.items.items[0].itemName,
+            text: content.currentTitle,
             handler: function() {
               me.showChild(0, true);
             }

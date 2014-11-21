@@ -21,9 +21,6 @@ Ext.define('NX.coreui.view.system.Plugins', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-system-plugins',
 
-  rootName: 'Plugins',
-  rootClass: 'nx-icon-feature-admin-system-plugins-x32',
-
   list: 'nx-coreui-system-pluginlist',
 
   iconName: 'plugin-default'

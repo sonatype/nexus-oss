@@ -86,6 +86,12 @@ Ext.define('NX.view.feature.Content', {
   },
 
   /**
+   * The currently set title, so subpanels can access it
+   * @param text
+   */
+  currentTitle: undefined,
+
+  /**
    * Custom handling for title since we are using custom header component.
    *
    * @override
@@ -98,6 +104,7 @@ Ext.define('NX.view.feature.Content', {
     me.callParent(arguments);
 
     label.setText(text);
+    me.currentTitle = text;
   },
 
   /**

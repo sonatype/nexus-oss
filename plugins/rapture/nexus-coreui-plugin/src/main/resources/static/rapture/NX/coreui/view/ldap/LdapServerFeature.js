@@ -21,9 +21,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-ldapserver-feature',
 
-  rootName: 'LDAP',
-  rootClass: 'nx-icon-feature-admin-security-ldap-x32',
-
   list: 'nx-coreui-ldapserver-list',
 
   iconName: 'ldapserver-default',

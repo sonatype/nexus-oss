@@ -21,9 +21,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-privilege-feature',
 
-  rootName: 'Privileges',
-  rootClass: 'nx-icon-feature-admin-security-privileges-x32',
-
   list: 'nx-coreui-privilege-list',
 
   iconName: 'privilege-default'

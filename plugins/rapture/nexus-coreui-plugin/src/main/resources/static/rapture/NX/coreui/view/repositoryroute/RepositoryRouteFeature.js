@@ -23,9 +23,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteFeature', {
 
   list: 'nx-coreui-repositoryroute-list',
 
-  rootName: 'Routing',
-  rootClass: 'nx-icon-feature-admin-repository-routing-x32',
-
   iconName: 'repositoryroute-default',
 
   tabs: { xtype: 'nx-coreui-repositoryroute-settings' }

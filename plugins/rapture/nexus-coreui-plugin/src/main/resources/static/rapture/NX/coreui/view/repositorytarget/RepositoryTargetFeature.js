@@ -21,9 +21,6 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetFeature', {
   extend: 'NX.view.masterdetail.Panel',
   alias: 'widget.nx-coreui-repositorytarget-feature',
 
-  rootName: 'Targets',
-  rootClass: 'nx-icon-feature-admin-repository-targets-x32',
-
   list: 'nx-coreui-repositorytarget-list',
 
   iconName: 'target-default',
