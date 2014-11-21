@@ -187,7 +187,6 @@ public class XmlAuthenticatingRealmTest
     role.setName("name");
     role.setId("role");
     role.setDescription("desc");
-    role.setSessionTimeout(50);
     role.addPrivilege("priv");
 
     configurationManager.createRole(role);

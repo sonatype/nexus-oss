@@ -46,12 +46,6 @@ public class CRole
   private String description;
 
   /**
-   * The number of minutes to wait before the session timeouts
-   * because of inactivity.
-   */
-  private int sessionTimeout = 0;
-
-  /**
    * Field privileges.
    */
   private Set<String> privileges;
@@ -154,16 +148,6 @@ public class CRole
   }
 
   /**
-   * Get the number of minutes to wait before the session
-   * timeouts because of inactivity.
-   *
-   * @return int
-   */
-  public int getSessionTimeout() {
-    return this.sessionTimeout;
-  } //-- int getSessionTimeout()
-
-  /**
    * Get marks if this role is editable.
    *
    * @return boolean
@@ -221,13 +205,5 @@ public class CRole
   public void setRoles(Set<String> roles) {
     this.roles = roles;
   }
-
-  /**
-   * Set the number of minutes to wait before the session
-   * timeouts because of inactivity.
-   */
-  public void setSessionTimeout(int sessionTimeout) {
-    this.sessionTimeout = sessionTimeout;
-  } //-- void setSessionTimeout( int )
 
 }

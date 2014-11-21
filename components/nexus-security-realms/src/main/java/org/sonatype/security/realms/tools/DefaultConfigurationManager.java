@@ -700,14 +700,6 @@ public class DefaultConfigurationManager
       newRole.setDescription(roleB.getDescription());
     }
 
-    // and session timeout (which we don't use)
-    if (roleA.getSessionTimeout() > roleB.getSessionTimeout()) {
-      newRole.setSessionTimeout(roleA.getSessionTimeout());
-    }
-    else {
-      newRole.setSessionTimeout(roleB.getSessionTimeout());
-    }
-
     return newRole;
   }
 

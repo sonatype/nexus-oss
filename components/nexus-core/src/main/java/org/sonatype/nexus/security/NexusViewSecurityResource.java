@@ -107,7 +107,6 @@ public class NexusViewSecurityResource
 
     method = StringUtils.capitalizeFirstLetter(method);
     view.setName("Repo: All " + contentClassName + " Repositories (" + method + ")");
-    view.setSessionTimeout(60);
 
     List<? extends Repository> repos = getRepositoriesWithContentClass(entry.getValue());
     for (Repository repo : repos) {
