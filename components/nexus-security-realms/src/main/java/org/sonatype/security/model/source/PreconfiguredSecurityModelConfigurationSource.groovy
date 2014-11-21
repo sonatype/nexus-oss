@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.model.source
 
-import org.sonatype.security.model.Configuration
+import org.sonatype.security.model.SecurityModelConfiguration
 
 /**
  * Pre-configured security model configuration source.
@@ -23,14 +23,14 @@ class PreconfiguredSecurityModelConfigurationSource
 implements SecurityModelConfigurationSource
 {
 
-  Configuration configuration
+  SecurityModelConfiguration configuration
 
-  PreconfiguredSecurityModelConfigurationSource(final Configuration configuration) {
+  PreconfiguredSecurityModelConfigurationSource(final SecurityModelConfiguration configuration) {
     this.configuration = configuration
   }
 
   @Override
-  Configuration loadConfiguration() {
+  SecurityModelConfiguration loadConfiguration() {
     return getConfiguration()
   }
 
