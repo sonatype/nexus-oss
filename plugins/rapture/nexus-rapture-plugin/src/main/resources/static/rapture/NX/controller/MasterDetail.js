@@ -38,7 +38,10 @@ Ext.define('NX.controller.MasterDetail', {
 
   permission: undefined,
 
-  onSelection: Ext.emptyFn,
+  //onSelection: Ext.emptyFn,
+  onSelection: function(list, model) {
+    list.up('#nx-drilldown').showChild(1, true);
+  },
 
   getDescription: Ext.emptyFn,
 
@@ -169,16 +172,14 @@ Ext.define('NX.controller.MasterDetail', {
   onModelChanged: function (model) {
     var me = this,
         list = me.getList(),
-        tabs = list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs');
+        masterdetail = list.up('nx-masterdetail-panel');
 
     if (model) {
-      tabs.show();
       list.getView().focusRow(model);
-      tabs.setDescription(me.getDescription(model));
+      masterdetail.setDescription(me.getDescription(model));
     }
     else {
-      tabs.hide();
-      tabs.setDescription('Empty selection');
+      masterdetail.setDescription('Empty selection');
     }
 
     me.getList().fireEvent('selection', me.getList(), model);

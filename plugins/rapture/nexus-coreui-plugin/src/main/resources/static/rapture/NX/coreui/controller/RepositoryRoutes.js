@@ -114,14 +114,10 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     var me = this;
 
     if (Ext.isDefined(model)) {
-      var panel = me.getSettings();
-
-      panel.loadRecord(model);
-
-      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-repository-routing-x16');
-      panel.up('#nx-drilldown').setItemName(1, model.data.pattern);
-      panel.up('#nx-drilldown').showChild(1, true);
+      me.getSettings().loadRecord(model);
     }
+
+    me.callParent(arguments);
   },
 
   /**

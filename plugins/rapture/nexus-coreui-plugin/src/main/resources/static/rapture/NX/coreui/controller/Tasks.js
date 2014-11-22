@@ -176,6 +176,8 @@ Ext.define('NX.coreui.controller.Tasks', {
         }
       }
     }
+
+    me.callParent(arguments);
   },
 
   /**
@@ -196,10 +198,6 @@ Ext.define('NX.coreui.controller.Tasks', {
       'Last Run': model.get('lastRun'),
       'Last Result': model.get('lastRunResult')
     });
-
-    panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-system-tasks-x16');
-    panel.up('#nx-drilldown').setItemName(1, model.data.name);
-    panel.up('#nx-drilldown').showChild(1, true);
   },
 
   /**

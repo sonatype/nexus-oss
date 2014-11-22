@@ -93,11 +93,9 @@ Ext.define('NX.coreui.controller.PluginConsole', {
       var panel = me.getInfo();
 
       panel.showInfo(info);
-
-      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-system-plugins-x16');
-      panel.up('#nx-drilldown').setItemName(1, model.data.name);
-      panel.up('#nx-drilldown').showChild(1, true);
     }
+
+    me.callParent(arguments);
   }
 
 });

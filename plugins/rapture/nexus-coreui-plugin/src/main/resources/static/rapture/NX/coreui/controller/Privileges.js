@@ -136,11 +136,9 @@ Ext.define('NX.coreui.controller.Privileges', {
       var panel = me.getInfo();
 
       panel.showInfo(info);
-
-      panel.up('#nx-drilldown').setItemClass(1, 'nx-icon-privilege-' + model.get('type') + '-x16');
-      panel.up('#nx-drilldown').setItemName(1, model.data.name);
-      panel.up('#nx-drilldown').showChild(1, true);
     }
+
+    me.callParent(arguments);
   },
 
   /**

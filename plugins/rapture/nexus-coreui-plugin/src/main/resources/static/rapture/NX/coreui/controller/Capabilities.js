@@ -179,6 +179,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.showAbout(capabilityTypeModel);
       me.showStatus(model);
     }
+
+    me.callParent(arguments);
   },
 
   /**
@@ -216,10 +218,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     summary.showInfo(info);
     summary.down('form').loadRecord(model);
-
-    summary.up('#nx-drilldown').setItemClass(1, 'nx-icon-feature-admin-system-capabilities-x16');
-    summary.up('#nx-drilldown').setItemName(1, model.data.typeName);
-    summary.up('#nx-drilldown').showChild(1, true);
   },
 
   /**
