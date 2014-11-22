@@ -77,13 +77,9 @@ public class NowScheduledTaskLifecycleIT
 
     // done
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
-    // "now" task when done are removed, call for non-existent state will throw ISEx
-    try {
-      taskInfo.getCurrentState();
-      Assert.fail("Run now tasks once done are gone");
-    }
-    catch (IllegalStateException e) {
-      // good
-    }
+    // taskInfo for DONE task is terminal
+    final TaskInfo ti = taskInfo.refresh();
+    assertThat(ti.getCurrentState().getState(), equalTo(State.DONE));
+    assertThat(System.identityHashCode(ti), equalTo(System.identityHashCode(taskInfo)));
   }
 }

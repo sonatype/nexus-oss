@@ -12,13 +12,12 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import org.sonatype.nexus.quartz.QuartzSupport;
 
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -38,9 +37,11 @@ public class NexusTaskFuture<T>
    */
   static final String FUTURE_KEY = NexusTaskFuture.class.getName();
 
-  private final QuartzSupport quartzSupport;
+  private final QuartzNexusSchedulerSPI quartzSupport;
 
   private final JobKey jobKey;
+
+  private final Date startedAt;
 
   private final CountDownLatch countDownLatch;
 
@@ -50,11 +51,13 @@ public class NexusTaskFuture<T>
 
   private T result;
 
-  public NexusTaskFuture(final QuartzSupport quartzSupport,
-                         final JobKey jobKey)
+  public NexusTaskFuture(final QuartzNexusSchedulerSPI quartzSupport,
+                         final JobKey jobKey,
+                         final Date startedAt)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
+    this.startedAt = checkNotNull(startedAt);
     this.countDownLatch = new CountDownLatch(1);
   }
 
@@ -62,6 +65,10 @@ public class NexusTaskFuture<T>
     this.result = result;
     this.jobExecutionException = jobExecutionException;
     countDownLatch.countDown();
+  }
+
+  public Date getStartedAt() {
+    return startedAt;
   }
 
   // == TaskFuture

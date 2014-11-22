@@ -125,6 +125,9 @@ public class NexusScheduleConverter
     else if ("once".equals(type)) {
       return new Once(trigger.getStartTime());
     }
+    else if ("hourly".equals(type)) {
+      return new Hourly(trigger.getStartTime());
+    }
     else if ("daily".equals(type)) {
       return new Daily(trigger.getStartTime());
     }

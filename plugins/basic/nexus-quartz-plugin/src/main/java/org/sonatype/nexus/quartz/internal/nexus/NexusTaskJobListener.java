@@ -12,55 +12,80 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
-import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
-import org.quartz.SchedulerException;
 import org.quartz.listeners.JobListenerSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
 /**
  * A {#link JobListenerSupport} that provides NX Task integration by creating future when task starts, recording
- * execution results.
+ * execution results. Each NX Task wrapping job has one listener. Since NX Job wrapping tasks cannot concurrently
+ * execute ("unique per jobKey", basically per NX Task "instance"), this listener may be stateful, and maintain
+ * the task info in simple way.
  *
  * @since 3.0
  */
 public class NexusTaskJobListener<T>
     extends JobListenerSupport
 {
-  private final QuartzSupport quartzSupport;
+  private final QuartzNexusSchedulerSPI quartzSupport;
 
   private final JobKey jobKey;
 
-  private volatile long startedAt;
+  private final NexusScheduleConverter nexusScheduleConverter;
 
-  private volatile NexusTaskFuture<T> future;
+  private final NexusTaskInfo<T> nexusTaskInfo;
 
-  public NexusTaskJobListener(final QuartzSupport quartzSupport,
-                              final JobKey jobKey)
+  public NexusTaskJobListener(final QuartzNexusSchedulerSPI quartzSupport,
+                              final JobKey jobKey,
+                              final NexusScheduleConverter nexusScheduleConverter,
+                              final StateHolder<T> initialState)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
+    this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
+    this.nexusTaskInfo = new NexusTaskInfo<>(
+        quartzSupport,
+        jobKey,
+        initialState
+    );
+  }
+
+  public NexusTaskInfo<T> getNexusTaskInfo() {
+    return nexusTaskInfo;
   }
 
   // == JobListener
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
-    future = new NexusTaskFuture<>(quartzSupport, jobKey);
+    final NexusTaskFuture<T> future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime());
+    nexusTaskInfo.setStateHolder(
+        new StateHolder<>(
+            future,
+            true,
+            toTaskConfiguration(context.getJobDetail().getJobDataMap()),
+            nexusScheduleConverter.toSchedule(context.getTrigger()),
+            context.getTrigger().getNextFireTime()
+        )
+    );
     context.put(NexusTaskFuture.FUTURE_KEY, future);
-    startedAt = context.getFireTime().getTime();
+    context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
   }
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
+    final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
+    // TODO: done jobs will be GCed
+    /*
     try {
-      quartzSupport.getScheduler().getListenerManager().removeJobListener(getName());
+      // Job is done
       if (context.getTrigger().getNextFireTime() == null) {
         context.getScheduler().deleteJob(jobKey);
       }
@@ -68,6 +93,7 @@ public class NexusTaskJobListener<T>
     catch (SchedulerException e) {
       // mute
     }
+    */
     final EndState endState;
     if (jobException != null) {
       endState = EndState.FAILED;
@@ -80,13 +106,30 @@ public class NexusTaskJobListener<T>
     }
     final JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
     jobDataMap.put("lastRunState.endState", endState.name());
-    jobDataMap.putAsString("lastRunState.runStarted", startedAt);
-    jobDataMap.putAsString("lastRunState.runDuration", System.currentTimeMillis() - startedAt);
+    jobDataMap.putAsString("lastRunState.runStarted", future.getStartedAt().getTime());
+    jobDataMap.putAsString("lastRunState.runDuration", System.currentTimeMillis() - future.getStartedAt().getTime());
+
+    nexusTaskInfo.setStateHolder(
+        new StateHolder<>(
+            future,
+            false,
+            toTaskConfiguration(jobDataMap),
+            nexusScheduleConverter.toSchedule(context.getTrigger()),
+            context.getTrigger().getNextFireTime()
+        )
+    );
+
     future.setResult((T) context.getResult(), jobException);
   }
 
   @Override
   public String getName() {
-    return jobKey.getName();
+    return listenerName(jobKey);
+  }
+
+  // ==
+
+  public static String listenerName(final JobKey jobKey) {
+    return NexusTaskJobListener.class.getName() + ":" + jobKey.toString();
   }
 }

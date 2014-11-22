@@ -111,7 +111,8 @@ public class RepeatedlyScheduledTaskLifecycleIT
       assertThat(currentState.getState(), equalTo(State.WAITING));
       assertThat(currentState.getRunState(), nullValue());
       assertThat(currentState.getRunStarted(), nullValue());
-      assertThat(currentState.getFuture(), nullValue());
+      // task future is last future
+      // assertThat(currentState.getFuture(), nullValue());
     }
 
     // same thing from "old" handle
@@ -121,7 +122,8 @@ public class RepeatedlyScheduledTaskLifecycleIT
       assertThat(currentState.getState(), equalTo(State.WAITING));
       assertThat(currentState.getRunState(), nullValue());
       assertThat(currentState.getRunStarted(), nullValue());
-      assertThat(currentState.getFuture(), nullValue());
+      // task future is last future
+      // assertThat(currentState.getFuture(), nullValue());
     }
 
     // and post-execution it will have last rune state

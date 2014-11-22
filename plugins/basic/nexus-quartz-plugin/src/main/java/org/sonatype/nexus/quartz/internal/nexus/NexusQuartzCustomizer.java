@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.quartz.QuartzSupport;
@@ -24,13 +25,18 @@ import org.sonatype.nexus.quartz.internal.QuartzCustomizer;
 import org.sonatype.nexus.scheduling.TaskLifecycleListener;
 
 import com.google.common.base.Throwables;
+import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.impl.matchers.KeyMatcher;
+import org.quartz.Trigger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.quartz.TriggerKey.triggerKey;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
+import static org.quartz.impl.matchers.KeyMatcher.keyEquals;
+import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
 /**
  * Customizer installing NX specific JobListeners on Quartz being created. This is required as while Jobs are persisted
@@ -43,14 +49,19 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 public class NexusQuartzCustomizer
     extends QuartzCustomizer
 {
+  // TODO: this is due cycle
+  private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
+
   private final NexusScheduleConverter nexusScheduleConverter;
 
   private final List<TaskLifecycleListener> taskLifecycleListeners;
 
   @Inject
-  public NexusQuartzCustomizer(final NexusScheduleConverter nexusScheduleConverter,
+  public NexusQuartzCustomizer(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider,
+                               final NexusScheduleConverter nexusScheduleConverter,
                                final List<TaskLifecycleListener> taskLifecycleListeners)
   {
+    this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
     this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
     this.taskLifecycleListeners = checkNotNull(taskLifecycleListeners);
   }
@@ -61,15 +72,31 @@ public class NexusQuartzCustomizer
       // Install job supporting listeners for each NX task being scheduled
       final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
       for (JobKey jobKey : jobKeys) {
-        final NexusTaskJobListener<?> listener = new NexusTaskJobListener<>(quartzSupport, jobKey);
-        scheduler.getListenerManager().addJobListener(listener, KeyMatcher.keyEquals(jobKey));
+        final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
+        checkState(jobDetail != null);
+        final Trigger trigger = quartzSupport.getScheduler()
+            .getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
+        checkState(trigger != null);
+        // register job specific listener with initial state
+        final NexusTaskJobListener<?> listener = new NexusTaskJobListener<>(
+            quartzNexusSchedulerSPIProvider.get(),
+            jobKey,
+            nexusScheduleConverter,
+            new StateHolder<>(
+                null,
+                false,
+                toTaskConfiguration(jobDetail.getJobDataMap()),
+                nexusScheduleConverter.toSchedule(trigger),
+                trigger.getNextFireTime()
+            )
+        );
+        scheduler.getListenerManager().addJobListener(listener, keyEquals(jobKey));
       }
 
       // Install global listeners
       for (TaskLifecycleListener taskLifecycleListener : taskLifecycleListeners) {
-        final NexusTaskLifecycleListener listener = new NexusTaskLifecycleListener(taskLifecycleListener, quartzSupport,
-            nexusScheduleConverter);
-        scheduler.getListenerManager().addJobListener(listener);
+        final NexusTaskLifecycleListener listener = new NexusTaskLifecycleListener(taskLifecycleListener);
+        scheduler.getListenerManager().addJobListener(listener, jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
       }
     }
     catch (SchedulerException e) {

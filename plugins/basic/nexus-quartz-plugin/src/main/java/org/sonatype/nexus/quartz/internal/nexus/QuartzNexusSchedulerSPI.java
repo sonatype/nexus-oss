@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -34,14 +35,17 @@ import org.eclipse.sisu.Priority;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
+import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.impl.matchers.KeyMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
+import static org.quartz.impl.matchers.KeyMatcher.keyEquals;
+import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
 /**
  * Quartz backed implementation of {@link NexusTaskExecutorSPI}. It uses distinct group for NX tasks and relies on
@@ -79,7 +83,7 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
-      return (TaskInfo<T>) allTasks().get(jobKey);
+      return taskByKey(jobKey);
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -104,18 +108,6 @@ public class QuartzNexusSchedulerSPI
     }
   }
 
-  /**
-   * Returns a jobKey to NexusTaskInfo map of all existing tasks.
-   */
-  private Map<JobKey, NexusTaskInfo<?>> allTasks() throws SchedulerException {
-    final Set<JobKey> jobKeys = quartzSupport.getScheduler().getJobKeys(jobGroupEquals(QZ_NEXUS_GROUP));
-    // put all task infos
-    final Map<JobKey, NexusTaskInfo<?>> infos = Maps.newHashMap();
-    for (JobKey jobKey : jobKeys) {
-      infos.put(jobKey, new NexusTaskInfo<>(quartzSupport, jobKey, nexusScheduleConverter));
-    }
-    return infos;
-  }
 
   @Override
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration,
@@ -128,7 +120,7 @@ public class QuartzNexusSchedulerSPI
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
         checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running");
-        quartzSupport.getScheduler().deleteJob(jobKey);
+        removeTask(jobKey);
       }
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
@@ -139,17 +131,29 @@ public class QuartzNexusSchedulerSPI
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
-      // register job specific listener
-      quartzSupport.getScheduler().getListenerManager()
-          .addJobListener(new NexusTaskJobListener<>(quartzSupport, jobKey),
-              KeyMatcher.keyEquals(jobKey));
+      // register job specific listener with initial state
+      final NexusTaskJobListener<T> nexusTaskJobListener = new NexusTaskJobListener<>(
+          this,
+          jobKey,
+          nexusScheduleConverter,
+          new StateHolder<T>(
+              null,
+              false,
+              toTaskConfiguration(jobDetail.getJobDataMap()),
+              nexusScheduleConverter.toSchedule(trigger),
+              trigger.getNextFireTime()
+          )
+      );
+      quartzSupport.getScheduler().getListenerManager().addJobListener(
+          nexusTaskJobListener,
+          keyEquals(jobKey));
       // schedule the job
       quartzSupport.getScheduler().scheduleJob(jobDetail, trigger);
       // enabled
       if (!taskConfiguration.isEnabled()) {
         quartzSupport.getScheduler().pauseJob(jobKey);
       }
-      return new NexusTaskInfo<>(quartzSupport, jobKey, nexusScheduleConverter);
+      return nexusTaskJobListener.getNexusTaskInfo();
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -165,7 +169,7 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
-      return quartzSupport.getScheduler().deleteJob(jobKey);
+      return removeTask(jobKey);
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -175,12 +179,97 @@ public class QuartzNexusSchedulerSPI
     }
   }
 
+  protected boolean removeTask(final JobKey jobKey) throws SchedulerException {
+    boolean result = quartzSupport.getScheduler().deleteJob(jobKey);
+    if (result) {
+      quartzSupport.getScheduler().getListenerManager().removeJobListener(jobKey.getName());
+    }
+    return result;
+  }
+
   @Override
   public int getRunnintTaskCount() {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       return quartzSupport.getScheduler().getCurrentlyExecutingJobs().size();
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+  }
+
+  // ==
+
+  Map<JobKey, NexusTaskInfo<?>> allTasks() throws SchedulerException {
+    final Map<JobKey, NexusTaskInfo<?>> result = Maps.newHashMap();
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      final List<JobExecutionContext> jobExecutionContexts = quartzSupport.getScheduler().getCurrentlyExecutingJobs();
+      for (JobExecutionContext context : jobExecutionContexts) {
+        result.put(context.getJobDetail().getKey(), (NexusTaskInfo<?>) context.get(NexusTaskInfo.TASK_INFO_KEY));
+      }
+
+      final Set<JobKey> jobKeys = quartzSupport.getScheduler().getJobKeys(jobGroupEquals(QZ_NEXUS_GROUP));
+      for (JobKey jobKey : jobKeys) {
+        if (!result.containsKey(jobKey)) {
+          final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
+              .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
+          checkState(nexusTaskJobListener != null, "NX task must have listener");
+          result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
+        }
+      }
+      return result;
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+  }
+
+  <T> NexusTaskInfo<T> taskByKey(final JobKey jobKey) throws SchedulerException {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      final List<JobExecutionContext> jobExecutionContexts = quartzSupport.getScheduler().getCurrentlyExecutingJobs();
+      for (JobExecutionContext context : jobExecutionContexts) {
+        if (jobKey.equals(context.getJobDetail().getKey())) {
+          return (NexusTaskInfo<T>) context.get(NexusTaskInfo.TASK_INFO_KEY);
+        }
+      }
+      final NexusTaskJobListener<T> nexusTaskJobListener = (NexusTaskJobListener<T>) quartzSupport.getScheduler()
+          .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
+      checkState(nexusTaskJobListener != null, "NX task must have listener");
+      return nexusTaskJobListener.getNexusTaskInfo();
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+  }
+
+  boolean cancelJob(final JobKey jobKey) {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      checkNotNull(jobKey);
+      return quartzSupport.cancelJob(jobKey);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+  }
+
+  void runNow(final JobKey jobKey) throws TaskRemovedException {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      quartzSupport.getScheduler().triggerJob(jobKey);
+    }
+    catch (JobPersistenceException e) {
+      throw new TaskRemovedException(jobKey.getName(), e);
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
