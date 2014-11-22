@@ -16,6 +16,9 @@ import java.util.Date;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Schedule that accepts cron expression.
+ */
 public class Cron
     extends Schedule
 {

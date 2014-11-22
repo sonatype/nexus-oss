@@ -17,6 +17,9 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Schedule that repeats on same days of a month repeatedly.
+ */
 public class Monthly
     extends Schedule
 {

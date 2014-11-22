@@ -28,6 +28,9 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Schedule support class.
+ */
 public abstract class Schedule
 {
   protected final Map<String, String> properties;

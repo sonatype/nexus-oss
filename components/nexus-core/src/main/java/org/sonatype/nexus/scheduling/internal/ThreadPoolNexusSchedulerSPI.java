@@ -14,6 +14,7 @@ package org.sonatype.nexus.scheduling.internal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,7 +37,6 @@ import org.eclipse.sisu.Priority;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Simple SPI using ThreadPoolExecutor that supports only simple execution of background tasks, but not scheduling.
@@ -62,22 +62,30 @@ public class ThreadPoolNexusSchedulerSPI
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
   }
 
-  private static class TestTaskInfo<T>
-      implements TaskInfo<T>
+  private static class ThreadPoolTaskInfo<T>
+      implements TaskInfo<T>, Callable<T>
   {
-    private final TaskConfiguration taskConfiguration;
+    private final Task<T> task;
 
     private final Schedule schedule;
 
-    private final Future<T> future;
-
     private final Date runStarted;
 
-    public TestTaskInfo(final TaskConfiguration taskConfiguration, final Schedule schedule, final Future<T> future) {
-      this.taskConfiguration = taskConfiguration;
+    private volatile EndState endState;
+
+    private long runDuration;
+
+    private Future<T> future;
+
+    public ThreadPoolTaskInfo(final Task<T> task, final Schedule schedule)
+    {
+      this.task = task;
       this.schedule = schedule;
-      this.future = future;
       this.runStarted = new Date();
+    }
+
+    public void setFuture(final Future<T> future) {
+      this.future = future;
     }
 
     @Override
@@ -92,7 +100,7 @@ public class ThreadPoolNexusSchedulerSPI
 
     @Override
     public TaskConfiguration getConfiguration() {
-      return taskConfiguration;
+      return task.getConfiguration();
     }
 
     @Override
@@ -106,18 +114,17 @@ public class ThreadPoolNexusSchedulerSPI
     }
 
     @Override
-    public void runNow() {
-      throw new UnsupportedOperationException("not implemented");
-    }
-
-    @Override
     public CurrentState<T> getCurrentState() {
-      checkState(!future.isDone());
       return new CurrentState<T>()
       {
         @Override
         public State getState() {
-          return State.RUNNING;
+          if (endState != null) {
+            return State.DONE;
+          }
+          else {
+            return State.RUNNING;
+          }
         }
 
         @Nullable
@@ -129,13 +136,23 @@ public class ThreadPoolNexusSchedulerSPI
         @Nullable
         @Override
         public Date getRunStarted() {
-          return runStarted;
+          if (endState != null) {
+            return null;
+          }
+          else {
+            return runStarted;
+          }
         }
 
         @Nullable
         @Override
         public RunState getRunState() {
-          return RunState.RUNNING;
+          if (endState != null) {
+            return null;
+          }
+          else {
+            return RunState.RUNNING;
+          }
         }
 
         @Nullable
@@ -149,8 +166,60 @@ public class ThreadPoolNexusSchedulerSPI
     @Nullable
     @Override
     public LastRunState getLastRunState() {
-      checkState(!future.isDone());
+      if (endState != null) {
+        return new LastRunState()
+        {
+          @Override
+          public EndState getEndState() {
+            return endState;
+          }
+
+          @Override
+          public Date getRunStarted() {
+            return runStarted;
+          }
+
+          @Override
+          public long getRunDuration() {
+            return runDuration;
+          }
+        };
+      }
       return null;
+    }
+
+    @Override
+    public void runNow() {
+      throw new UnsupportedOperationException("Only once executing tasks are supported");
+    }
+
+    @Override
+    public boolean remove() {
+      return future.cancel(true);
+    }
+
+    @Override
+    public TaskInfo<T> refresh() {
+      return this;
+    }
+
+    @Override
+    public T call() throws Exception {
+      final long now = System.currentTimeMillis();
+      EndState endState = null;
+      try {
+        T result = task.call();
+        endState = EndState.OK;
+        return result;
+      }
+      catch (Exception e) {
+        endState = EndState.FAILED;
+        throw e;
+      }
+      finally {
+        this.runDuration = System.currentTimeMillis() - now;
+        this.endState = endState;
+      }
     }
   }
 
@@ -161,16 +230,18 @@ public class ThreadPoolNexusSchedulerSPI
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
-    executorService.getActiveCount();
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
-    checkArgument(schedule instanceof Now);
+    checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
     final Task<T> task = nexusTaskFactory.createTaskInstance(taskConfiguration);
-    return new TestTaskInfo<>(taskConfiguration, schedule, executorService.submit(task));
+    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
+    final Future<T> future = executorService.submit(taskInfo);
+    taskInfo.setFuture(future);
+    return taskInfo;
   }
 
   @Override

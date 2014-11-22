@@ -20,7 +20,12 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 /**
- * The class holding information about tasks. This is the "handle" of a scheduled task.
+ * The class holding information about task at the moment the instance of task info was created.
+ * This is the "handle" of a scheduled task. The handle might become "stale"
+ * if the task this instance is handle of is removed from scheduler (ie. by some other thread). In that case,
+ * some of the methods will throw {@link TaskRemovedException} on invocation to signal that state. For task entering
+ * {@link State#DONE}, this class will behave a bit differently: they will never throw {@link TaskRemovedException},
+ * and upon they are done, the task info will cache task configuration, schedule, current and last run state forever.
  *
  * @since 3.0
  */
@@ -42,9 +47,11 @@ public interface TaskInfo<T>
   String getMessage();
 
   /**
-   * Returns a COPY of the task configuration map. Modifications to this configuration are possible, but does not
-   * affect currently executing task, nor is being persisted. Generally, this configuration is only for inspection,
-   * or, to be used to re-schedule existing task with change configuration.
+   * Returns a COPY of the task configuration map from the moment this instance was created. Modifications to this
+   * configuration are possible, but does not affect currently executing task, nor is being persisted. Generally, this
+   * configuration is only for inspection, or, to be used to re-schedule existing task with change configuration. If
+   * in the meanwhile, task finishes, and modifies configuration, it is NOT reflected in configuration returned by
+   * this method, you need to "reload" task info using {@link #refresh()} method.
    */
   TaskConfiguration getConfiguration();
 
@@ -53,22 +60,22 @@ public interface TaskInfo<T>
    */
   Schedule getSchedule();
 
-  /**
-   * Executes the scheduled task now, unrelated to it's actual schedule.
-   */
-  void runNow();
-
   // ==
 
   /**
-   * Task instance might be waiting (to be run, either by schedule or manually), or might be running.
+   * Task instance might be waiting (to be run, either by schedule or manually), or might be running, or might be
+   * done (will never run again, is "done"). The "done" state is ending state for task, it will according to it's
+   * {@link Schedule} not execute anymore.
    *
    * WAITING -> RUNNING
    * RUNNING -> WAITING
+   * RUNNING -> DONE
+   *
+   * @see {@link #refresh()} method.
    */
   enum State
   {
-    WAITING, RUNNING
+    WAITING, RUNNING, DONE
   }
 
   /**
@@ -109,7 +116,8 @@ public interface TaskInfo<T>
     RunState getRunState();
 
     /**
-     * If task is running, returns it's future, otherwise {@code null}.
+     * If task is in states {@link State#RUNNING} or {@link State#DONE}, returns it's future, otherwise {@code null}.
+     * In case of {@link State#DONE} the future is done too.
      */
     @Nullable
     Future<T> getFuture();
@@ -142,16 +150,36 @@ public interface TaskInfo<T>
 
   /**
    * Returns the task current state, never {@code null}.
-   *
-   * @throws IllegalStateException if task with this ID has been removed from scheduler.
    */
-  CurrentState<T> getCurrentState() throws IllegalStateException;
+  CurrentState<T> getCurrentState();
 
   /**
    * Returns the task last run state, if there was any, otherwise {@code null}.
-   *
-   * @throws IllegalStateException if task with this ID has been removed from scheduler.
    */
   @Nullable
-  LastRunState getLastRunState() throws IllegalStateException;
+  LastRunState getLastRunState();
+
+  // ==
+
+  /**
+   * Removes (with canceling it if it runs) the task. Returns {@code true} if removal succeeded (task was found and was
+   * removed), otherwise {@code false}.
+   */
+  boolean remove();
+
+  /**
+   * Executes the scheduled task now, unrelated to it's actual schedule.
+   *
+   * @throws TaskRemovedException if task with this ID has been removed from scheduler.
+   */
+  void runNow() throws TaskRemovedException;
+
+  /**
+   * Returns a fresh task info (with actualized values). If the task got removed from scheduler (by some other thread),
+   * an {@link TaskRemovedException} will be thrown. If this instance was already in ending {@link State#DONE} state,
+   * this same instance is returned.
+   *
+   * @throws TaskRemovedException if task with this ID has been removed from scheduler.
+   */
+  TaskInfo<T> refresh() throws TaskRemovedException;
 }

@@ -29,6 +29,7 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -128,6 +129,9 @@ public class ScheduledServiceRunPlexusResource
       }
       return result;
 
+    } catch (TaskRemovedException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + scheduledServiceId);
     } catch (IllegalStateException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
           + scheduledServiceId);

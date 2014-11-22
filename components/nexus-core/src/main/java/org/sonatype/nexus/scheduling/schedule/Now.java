@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.scheduling.schedule;
 
+/**
+ * Schedule that executes once at the moment task is being scheduled with.
+ */
 public class Now
     extends Schedule
 {

@@ -16,6 +16,9 @@ import java.util.Date;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Schedule that executes once at given time.
+ */
 public class Once
     extends Schedule
 {

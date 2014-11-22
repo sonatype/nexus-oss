@@ -10,25 +10,23 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.schedule;
-
-import java.util.Date;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.scheduling;
 
 /**
- * Schedule that repeats daily at same time.
+ * Checked exception thrown in cases when task is removed by some other party, but the caller is unaware of it.
+ *
+ * @since 3.0
  */
-public class Daily
-    extends Schedule
+public class TaskRemovedException
+    extends Exception
 {
-  public Daily(final Date startAt) {
-    super("daily");
-    checkNotNull(startAt);
-    properties.put("schedule.startAt", dateToString(startAt));
+  public TaskRemovedException(String taskId)
+  {
+    super(String.format("NX task '%s' does not exists", taskId));
   }
 
-  public Date getStartAt() {
-    return stringToDate("schedule.startAt");
+  public TaskRemovedException(String taskId, Throwable cause)
+  {
+    super(String.format("NX task '%s' does not exists", taskId), cause);
   }
 }

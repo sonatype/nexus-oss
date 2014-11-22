@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.scheduling.schedule;
 
+/**
+ * Schedule that never executes, is meant for manual execution (from code or via UI by user).
+ */
 public class Manual
     extends Schedule
 {

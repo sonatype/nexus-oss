@@ -14,6 +14,9 @@ package org.sonatype.nexus.scheduling.schedule;
 
 import java.util.Date;
 
+/**
+ * Schedule that repeats every hour at same minute of hour.
+ */
 public class Hourly
     extends Schedule
 {
