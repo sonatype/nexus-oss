@@ -132,6 +132,7 @@ public class QuartzNexusSchedulerSPI
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
+      // TODO: move this logic here into a method and reuse it from NxQzCustomizer
       // register job specific listener with initial state
       final NexusTaskJobListener<T> nexusTaskJobListener = new NexusTaskJobListener<>(
           this,

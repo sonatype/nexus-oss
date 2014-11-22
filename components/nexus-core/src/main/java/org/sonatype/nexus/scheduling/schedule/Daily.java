@@ -29,6 +29,6 @@ public class Daily
   }
 
   public Date getStartAt() {
-    return stringToDate("schedule.startAt");
+    return stringToDate(properties.get("schedule.startAt"));
   }
 }

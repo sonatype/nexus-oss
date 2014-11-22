@@ -14,6 +14,7 @@ package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,14 +30,14 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Sets;
 import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.sonatype.nexus.scheduling.schedule.Schedule.listToSet;
+import static org.sonatype.nexus.scheduling.schedule.Schedule.stringToDate;
 
 /**
  * Converter for NX and QZ schedules. This converter cannot convert ANY QZ trigger, just  those created by this
@@ -81,11 +82,13 @@ public class NexusScheduleConverter
     else if (schedule instanceof Weekly) {
       final Weekly s = (Weekly) schedule;
       // TODO: create cron expr would be the best
+      // TODO: Nope, better would be CalendarIntervalScheduleBuilder?
       triggerBuilder = newTrigger().startAt(s.getStartAt()).withSchedule(CronScheduleBuilder.cronSchedule(""));
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
       // TODO: create cron expr would be the best
+      // TODO: Nope, better would be CalendarIntervalScheduleBuilder?
       triggerBuilder = newTrigger().startAt(s.getStartAt()).withSchedule(CronScheduleBuilder.cronSchedule(""));
     }
     else if (schedule instanceof Manual) {
@@ -117,27 +120,34 @@ public class NexusScheduleConverter
   public Schedule toSchedule(final Trigger trigger) {
     final String type = trigger.getJobDataMap().getString("schedule.type");
     if ("cron".equals(type)) {
-      return new Cron(trigger.getStartTime(), ((CronTrigger) trigger).getCronExpression());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      final String cronExpression = trigger.getJobDataMap().getString("schedule.cronExpression");
+      return new Cron(startAt, cronExpression);
     }
     else if ("now".equals(type)) {
       return new Now();
     }
     else if ("once".equals(type)) {
-      return new Once(trigger.getStartTime());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      return new Once(startAt);
     }
     else if ("hourly".equals(type)) {
-      return new Hourly(trigger.getStartTime());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      return new Hourly(startAt);
     }
     else if ("daily".equals(type)) {
-      return new Daily(trigger.getStartTime());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      return new Daily(startAt);
     }
     else if ("weekly".equals(type)) {
-      // TODO: ?
-      return new Weekly(trigger.getStartTime(), Sets.<Integer>newHashSet());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      return new Weekly(startAt, daysToRun);
     }
     else if ("monthly".equals(type)) {
-      // TODO: ?
-      return new Monthly(trigger.getStartTime(), Sets.<Integer>newHashSet());
+      final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
+      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      return new Monthly(startAt, daysToRun);
     }
     else if ("manual".equals(type)) {
       return new Manual();

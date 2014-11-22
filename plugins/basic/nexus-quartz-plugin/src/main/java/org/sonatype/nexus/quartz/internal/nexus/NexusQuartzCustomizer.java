@@ -72,6 +72,7 @@ public class NexusQuartzCustomizer
       // Install job supporting listeners for each NX task being scheduled
       final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
       for (JobKey jobKey : jobKeys) {
+        // TODO: move this logic out of here into QuartzSPI
         final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
         checkState(jobDetail != null);
         final Trigger trigger = quartzSupport.getScheduler()
