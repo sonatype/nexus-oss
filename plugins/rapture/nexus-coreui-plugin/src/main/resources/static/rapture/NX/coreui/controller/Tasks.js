@@ -144,7 +144,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @param {NX.coreui.view.task.TaskList} list task grid
    * @param {NX.coreui.model.Task} model selected model
    */
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
     var me = this,
         settings = me.getSettings(),
         schedule = me.getSchedule(),

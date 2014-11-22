@@ -139,9 +139,11 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @override
    * Create & show settings panel for selected repository based on type/provider/format.
    */
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
+    global = list;
+
     var me = this,
-        moreButton = list.down('button[action=more]'),
+        moreButton = list.up('nx-feature-content').down('button[action=more]'),
         settingsPanel = me.getSettings(),
         settingsForm = settingsPanel.down('nx-settingsform'),
         settingsFormClass, template;

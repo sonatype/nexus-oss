@@ -38,8 +38,14 @@ Ext.define('NX.controller.MasterDetail', {
 
   permission: undefined,
 
-  //onSelection: Ext.emptyFn,
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
+    var me = this;
+
+    console.log(model);
+
+    me.onModelChanged(model);
+    me.bookmark();
+
     list.up('#nx-drilldown').showChild(1, true);
   },
 
@@ -70,8 +76,7 @@ Ext.define('NX.controller.MasterDetail', {
 
     componentListener[me.list] = {
       afterrender: me.onAfterRender,
-      selectionchange: me.onSelectionChange,
-      selection: me.onSelection
+      cellclick: me.onCellClick
     };
     componentListener[me.list + ' button[action=new]'] = {
       afterrender: me.bindNewButton
@@ -160,13 +165,6 @@ Ext.define('NX.controller.MasterDetail', {
 
     list.mon(list.getStore(), 'load', me.onStoreLoad, me);
     me.loadStore();
-  },
-
-  onSelectionChange: function (selectionModel, selected) {
-    var me = this;
-
-    me.onModelChanged(selected.length === 1 ? selected[0] : undefined);
-    me.bookmark();
   },
 
   onModelChanged: function (model) {

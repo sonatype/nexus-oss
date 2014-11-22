@@ -110,7 +110,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   /**
    * @override
    */
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {

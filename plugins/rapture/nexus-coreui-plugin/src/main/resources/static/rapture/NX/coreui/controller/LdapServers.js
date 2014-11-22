@@ -161,7 +161,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
   /**
    * @override
    */
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {

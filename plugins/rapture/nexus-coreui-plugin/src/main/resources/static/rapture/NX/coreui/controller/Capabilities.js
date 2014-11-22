@@ -164,7 +164,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.view.capability.CapabilityList} list capability grid
    * @param {NX.coreui.model.Capability} model selected model
    */
-  onSelection: function(list, model) {
+  onCellClick: function(list, td, cellIndex, model) {
     var me = this,
         capabilityTypeModel;
 
