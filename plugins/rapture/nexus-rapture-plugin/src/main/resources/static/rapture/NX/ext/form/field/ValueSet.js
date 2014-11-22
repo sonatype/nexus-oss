@@ -52,7 +52,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   /**
    * @cfg {String} [blankText="This field is required"] Default text displayed when the control contains no values.
    */
-  blankText: 'You must add at least one key server',
+  blankText: 'At least one value is required',
 
   /**
    * @cfg {String} [minValuesText="Minimum {0} value(s) required"]
