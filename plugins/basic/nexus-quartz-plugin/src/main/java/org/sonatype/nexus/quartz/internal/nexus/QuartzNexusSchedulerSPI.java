@@ -24,6 +24,7 @@ import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
+import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -266,7 +267,12 @@ public class QuartzNexusSchedulerSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      quartzSupport.getScheduler().triggerJob(jobKey);
+      // triggering with dataMap from "now" trigger as it contains metadata for back-conversion
+      // in listener
+      quartzSupport.getScheduler().triggerJob(
+          jobKey,
+          nexusScheduleConverter.toTrigger(new Now()).build().getJobDataMap()
+      );
     }
     catch (JobPersistenceException e) {
       throw new TaskRemovedException(jobKey.getName(), e);
