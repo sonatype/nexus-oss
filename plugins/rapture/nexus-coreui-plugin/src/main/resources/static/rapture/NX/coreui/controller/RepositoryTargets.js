@@ -115,7 +115,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
   /**
    * @override
    */
-  onCellClick: function(list, td, cellIndex, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {

@@ -121,7 +121,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
   /**
    * @override
    */
-  onCellClick: function (list, td, cellIndex, model) {
+  onSelection: function (list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {

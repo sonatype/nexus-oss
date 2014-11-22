@@ -181,7 +181,7 @@ Ext.define('NX.coreui.controller.Users', {
   /**
    * @override
    */
-  onCellClick: function(list, td, cellIndex, model) {
+  onSelection: function(list, model) {
     var me = this,
         settingsPanel = me.getSettings(),
         externalSettingsPanel = me.getExternalSettings();

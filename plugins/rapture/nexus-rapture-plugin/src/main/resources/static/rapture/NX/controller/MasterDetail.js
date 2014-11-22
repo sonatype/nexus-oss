@@ -38,17 +38,6 @@ Ext.define('NX.controller.MasterDetail', {
 
   permission: undefined,
 
-  onCellClick: function(list, td, cellIndex, model) {
-    var me = this;
-
-    console.log(model);
-
-    me.onModelChanged(model);
-    me.bookmark();
-
-    list.up('#nx-drilldown').showChild(1, true);
-  },
-
   getDescription: Ext.emptyFn,
 
   /**
@@ -76,7 +65,9 @@ Ext.define('NX.controller.MasterDetail', {
 
     componentListener[me.list] = {
       afterrender: me.onAfterRender,
-      cellclick: me.onCellClick
+      selection: me.onSelection,
+      selectionChanged: me.onSelectionChanged,
+      cellclick: function(list, td, cellIndex, model) { me.onSelection(list, model) }
     };
     componentListener[me.list + ' button[action=new]'] = {
       afterrender: me.bindNewButton
@@ -167,6 +158,19 @@ Ext.define('NX.controller.MasterDetail', {
     me.loadStore();
   },
 
+  onSelection: function(list, model) {
+    var me = this;
+
+    me.onModelChanged(model);
+    me.bookmark();
+
+    list.up('#nx-drilldown').showChild(1, true);
+  },
+
+  onSelectionChanged: function(list, selection) {
+    list.fireEvent('selection', list, (selection.length === 1 ? selection[0] : undefined));
+  },
+
   onModelChanged: function (model) {
     var me = this,
         list = me.getList(),
@@ -179,8 +183,6 @@ Ext.define('NX.controller.MasterDetail', {
     else {
       masterdetail.setDescription('Empty selection');
     }
-
-    me.getList().fireEvent('selection', me.getList(), model);
   },
 
   /**
@@ -240,7 +242,9 @@ Ext.define('NX.controller.MasterDetail', {
           list.getSelectionModel().deselectAll(true);
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
-          me.onModelChanged(model);
+          list.fireEvent('selection', list, model);
+          /*me.onModelChanged(model);
+          list.up('nx-drilldown').showChild(1, false);*/
         }
         if (tabBookmark) {
           list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs').setActiveTabByBookmark(tabBookmark);

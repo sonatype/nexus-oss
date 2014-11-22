@@ -133,7 +133,7 @@ Ext.define('NX.coreui.controller.Roles', {
     return model.get('name');
   },
 
-  onCellClick: function(list, td, cellIndex, model) {
+  onSelection: function(list, model) {
     var me = this;
 
     if (Ext.isDefined(model)) {

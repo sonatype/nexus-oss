@@ -111,7 +111,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     return model.get('name');
   },
 
-  onCellClick: function (list, td, cellIndex, model) {
+  onSelection: function (list, model) {
     var me = this,
         info;
 
