@@ -89,12 +89,12 @@ Ext.define('NX.view.dev.styles.Header', {
             inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
           },
           '->',
-          {
-            xtype: 'button',
-            ui: 'header',
-            glyph: 'xf0f3@FontAwesome',
-            tooltip: 'Toggle messages display'
-          },
+          //{
+          //  xtype: 'button',
+          //  ui: 'header',
+          //  glyph: 'xf0f3@FontAwesome',
+          //  tooltip: 'Toggle messages display'
+          //},
           {
             xtype: 'button',
             ui: 'header',
