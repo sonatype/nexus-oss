@@ -53,8 +53,7 @@ Ext.define('NX.view.masterdetail.Panel', {
                 layout: 'fit',
 
                 items: {
-                  xtype: me.list,
-                  allowDeselect: true
+                  xtype: me.list
                 }
               },
               {
