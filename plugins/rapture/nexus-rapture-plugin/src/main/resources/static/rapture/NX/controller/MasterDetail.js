@@ -67,7 +67,12 @@ Ext.define('NX.controller.MasterDetail', {
       afterrender: me.onAfterRender,
       selection: me.onSelection,
       selectionchange: me.onSelectionChange,
-      cellclick: function(list, td, cellIndex, model) { me.onSelection(list, model) }
+      cellclick: function(list, td, cellIndex, model) {
+        me.onSelection(list, model);
+        me.onModelChanged(model);
+        me.getList().up('#nx-drilldown').showChild(1, true);
+        me.bookmark(model);
+      }
     };
     componentListener[me.list + ' button[action=new]'] = {
       afterrender: me.bindNewButton
@@ -159,21 +164,11 @@ Ext.define('NX.controller.MasterDetail', {
   },
 
   onSelection: function(list, model) {
-    var me = this;
-
-    console.log("onSelection");
+    //var me = this;
   },
 
   onSelectionChange: function(list, selection) {
-    var me = this;
-
-    console.log("onSelectionChange");
-
-    console.log(selection);
-    me.onModelChanged(selection.length === 1 ? selection[0] : undefined);
-    me.getList().up('#nx-drilldown').showChild(1, true);
-
-    me.bookmark();
+    //var me = this;
   },
 
   onModelChanged: function (model) {
@@ -193,15 +188,15 @@ Ext.define('NX.controller.MasterDetail', {
   /**
    * Bookmark current selected model / selected tab.
    */
-  bookmark: function () {
+  bookmark: function (model) {
     var me = this,
-        selected = me.getList().getSelectionModel().getSelection(),
-        index = me.getList().up('#nx-drilldown').currentIndex,
         modelId;
 
-    if (index === 1 && selected.length === 1) {
-      modelId = selected[0].getId();
+    console.log(model);
+    if (model && model.getId) {
+      modelId = model.getId();
     }
+
     me.bookmarkAt(modelId);
   },
 
@@ -249,7 +244,8 @@ Ext.define('NX.controller.MasterDetail', {
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
           me.onSelection(list, model);
-          me.onSelectionChange(list, [model]);
+          me.onModelChanged(model);
+          me.getList().up('#nx-drilldown').showChild(1, false);
         }
         if (tabBookmark) {
           list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs').setActiveTabByBookmark(tabBookmark);
