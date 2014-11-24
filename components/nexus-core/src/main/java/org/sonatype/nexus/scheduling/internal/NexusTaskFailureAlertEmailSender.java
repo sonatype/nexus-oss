@@ -56,7 +56,7 @@ public class NexusTaskFailureAlertEmailSender
   @AllowConcurrentEvents
   public void inspect(final NexusTaskEventStoppedFailed<?> failureEvent) {
     final TaskInfo<?> failedTask = failureEvent.getNexusTaskInfo();
-    if (failedTask == null || failedTask.getConfiguration().getAlertEmail() != null) {
+    if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }
     m_postOffice

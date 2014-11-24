@@ -15,7 +15,7 @@ package org.sonatype.nexus.tasks;
 import java.io.File;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
-import org.sonatype.nexus.scheduling.Task;
+import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 
 import org.junit.Test;
 
@@ -38,12 +38,8 @@ public class DeleteRepositoryFoldersTaskTest
 
     String repoId = snapshots.getId();
 
-    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(Task.class,
-        DeleteRepositoryFoldersTask.class.getName());
-    task.getConfiguration().setRepositoryId(repoId);
-    task.setDeleteForever(false);
-
-    task.call();
+    RepositoryFolderRemover repositoryFolderRemover = lookup(RepositoryFolderRemover.class);
+    repositoryFolderRemover.deleteRepositoryFolders(snapshots, false);
 
     File workDir = nexusConfiguration().getWorkingDirectory();
     File trashDir = new File(workDir, "trash");
@@ -66,12 +62,8 @@ public class DeleteRepositoryFoldersTaskTest
 
     String repoId = snapshots.getId();
 
-    DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup(Task.class,
-        DeleteRepositoryFoldersTask.class.getName());
-    task.getConfiguration().setRepositoryId(repoId);
-    task.setDeleteForever(true);
-
-    task.call();
+    RepositoryFolderRemover repositoryFolderRemover = lookup(RepositoryFolderRemover.class);
+    repositoryFolderRemover.deleteRepositoryFolders(snapshots, true);
 
     File workDir = nexusConfiguration().getWorkingDirectory();
     File trashDir = new File(workDir, "trash");

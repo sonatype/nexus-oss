@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -19,13 +21,13 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
-import org.sonatype.nexus.scheduling.TaskConfiguration;
-import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Spawns a background task to delete repository folders upon removal.
@@ -38,28 +40,23 @@ public class DeleteRepositoryFoldersEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-  private final NexusTaskScheduler nexusTaskExecutor;
+  private final RepositoryFolderRemover repositoryFolderRemover;
 
   @Inject
-  public DeleteRepositoryFoldersEventInspector(final NexusTaskScheduler nexusTaskExecutor)
+  public DeleteRepositoryFoldersEventInspector(final RepositoryFolderRemover repositoryFolderRemover)
   {
-    this.nexusTaskExecutor = nexusTaskExecutor;
+    this.repositoryFolderRemover = checkNotNull(repositoryFolderRemover);
   }
 
   @Subscribe
   @AllowConcurrentEvents
   public void inspect(final RepositoryRegistryEventPostRemove evt) {
-    Repository repository = evt.getRepository();
-
+    final Repository repository = evt.getRepository();
     try {
-      // remove the storage folders for the repository
-      final TaskConfiguration taskConfiguration = nexusTaskExecutor
-          .createTaskConfigurationInstance(DeleteRepositoryFoldersTask.class);
-      taskConfiguration.setRepositoryId(repository.getId());
-      nexusTaskExecutor.submit(taskConfiguration);
+      repositoryFolderRemover.deleteRepositoryFolders(repository, false);
     }
-    catch (Exception e) {
-      log.warn("Could not remove repository folders for repository {}", repository, e);
+    catch (IOException e) {
+      log.warn("Unable to delete repository folders ", e);
     }
   }
 }
