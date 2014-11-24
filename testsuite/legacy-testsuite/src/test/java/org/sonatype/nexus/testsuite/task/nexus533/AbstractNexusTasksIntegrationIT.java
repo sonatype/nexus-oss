@@ -12,13 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.task.nexus533;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -56,18 +52,13 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
   }
 
   protected void assertTasks()
-      throws IOException
+      throws Exception
   {
-    Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
-
-    List<CScheduledTask> tasks = nexusConfig.getTasks();
-    Assert.assertEquals(1, tasks.size());
-
-    CScheduledTask task = tasks.get(0);
     E scheduledTask = getTaskScheduled();
 
+    ScheduledServiceListResource task = TaskScheduleUtil.getTask(scheduledTask.getName());
     Assert.assertEquals(task.getName(), scheduledTask.getName());
-    Assert.assertEquals(task.getType(), scheduledTask.getTypeId());
+    Assert.assertEquals(task.getTypeId(), scheduledTask.getTypeId());
   }
 
   public void updateTasks()
