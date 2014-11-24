@@ -24,8 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Weekly
     extends Schedule
 {
-  // TODO: this encoding, as strange at start, is done just to keep backward compat
-  // TODO: with restlet1x going away, this might change
+  // TODO: make this type safe by using enum?
   public static final Integer SUN = Integer.valueOf(1);
 
   public static final Integer MON = Integer.valueOf(2);
