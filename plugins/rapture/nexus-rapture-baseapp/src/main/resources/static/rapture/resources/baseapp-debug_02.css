@@ -4869,7 +4869,7 @@
 }
 /* line 248, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-masterdetail-tabs .x-tool-img {
-  background-color: #f4f4f4;
+  background-color: white;
 }
 
 /* line 261, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4918,13 +4918,13 @@
 /* line 463, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-masterdetail-tabs {
   background-image: none;
-  background-color: #f4f4f4;
+  background-color: white;
 }
 
 /* line 467, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-panel-header-masterdetail-tabs-vertical {
   background-image: none;
-  background-color: #f4f4f4;
+  background-color: white;
 }
 
 /* line 525, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -4993,8 +4993,8 @@
 }
 /* line 36, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/rotate-element.scss */
 .x-ie9m .x-panel-header-masterdetail-tabs-vertical .x-panel-header-text-container {
-  background-color: #f4f4f4;
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=#f4f4f4);
+  background-color: white;
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1), progid:DXImageTransform.Microsoft.Chroma(color=white);
 }
 
 /* line 582, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -5012,7 +5012,7 @@
 }
 /* line 604, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
 .x-ie8m .x-panel-header-masterdetail-tabs .x-panel-header-glyph {
-  color: #f9f9f9;
+  color: white;
 }
 
 /* line 613, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/panel/Panel.scss */
@@ -16487,7 +16487,7 @@
 
 /* line 282, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-light {
-  background-color: #f4f4f4;
+  background-color: white;
 }
 
 /* line 331, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
@@ -16495,7 +16495,7 @@
   cursor: pointer;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
   opacity: 0.5;
-  background-color: #f4f4f4;
+  background-color: white;
 }
 /* line 347, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Bar.scss */
 .x-tab-bar-light .x-box-scroller-plain .x-box-scroller {
@@ -16988,8 +16988,4 @@
 /* line 30, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
 .x-form-fieldcontainer.nx-invalid .nx-multiselect:nth-child(3) .x-panel-body {
   border: 1px #CF4C35 solid !important;
-}
-/* line 33, ../../../baseapp/packages/rapture-theme/sass/src/Ext/ux/form/MultiSelect.scss */
-.x-form-fieldcontainer.nx-invalid .nx-multiselect:nth-child(3) .x-form-trigger-wrap {
-  border: 1px #CF4C35 solid;
 }
