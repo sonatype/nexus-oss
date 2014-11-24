@@ -15,6 +15,7 @@ package org.sonatype.nexus.scheduling.internal;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,6 +34,8 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.eclipse.sisu.Priority;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -55,14 +58,17 @@ public class ThreadPoolNexusSchedulerSPI
 
   private final ThreadPoolExecutor executorService;
 
+  private final ConcurrentMap<String, TaskInfo<?>> tasks;
+
   @Inject
   public ThreadPoolNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+    this.tasks = Maps.newConcurrentMap();
   }
 
-  private static class ThreadPoolTaskInfo<T>
+  private class ThreadPoolTaskInfo<T>
       implements TaskInfo<T>, Callable<T>
   {
     private final Task<T> task;
@@ -217,6 +223,7 @@ public class ThreadPoolNexusSchedulerSPI
         throw e;
       }
       finally {
+        tasks.remove(getId());
         this.runDuration = System.currentTimeMillis() - now;
         this.endState = endState;
       }
@@ -225,12 +232,12 @@ public class ThreadPoolNexusSchedulerSPI
 
   @Override
   public <T> TaskInfo<T> getTaskById(final String id) {
-    throw new UnsupportedOperationException("not implemented");
+    return (TaskInfo<T>) tasks.get(id);
   }
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
-    throw new UnsupportedOperationException("not implemented");
+    return Lists.newArrayList(tasks.values());
   }
 
   @Override
@@ -241,12 +248,19 @@ public class ThreadPoolNexusSchedulerSPI
     final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
     taskInfo.setFuture(future);
+    tasks.put(task.getId(), taskInfo);
     return taskInfo;
   }
 
   @Override
   public boolean removeTask(final String id) {
-    throw new UnsupportedOperationException("not implemented");
+    final TaskInfo<?> taskInfo = getTaskById(id);
+    if (taskInfo == null) {
+      return false;
+    }
+    taskInfo.getCurrentState().getFuture().cancel(false);
+    tasks.remove(id);
+    return true;
   }
 
   @Override
