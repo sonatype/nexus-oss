@@ -66,6 +66,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
             text: content.currentTitle,
             handler: function() {
               me.showChild(0, true);
+
+              // Set the bookmark
+              var bookmark = me.items.items[0].itemBookmark;
+              if (bookmark) {
+                NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+              }
             }
           }
         );
@@ -94,6 +100,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
                 text: me.items.items[j].itemName,
                 handler: function() {
                   me.showChild(j, true);
+
+                  // Set the bookmark
+                  var bookmark = me.items.items[j].itemBookmark;
+                  if (bookmark) {
+                    NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+                  }
                 }
               }
             })(i)
@@ -124,6 +136,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
           setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
         }
 
+        // Show the new panel
         var left = me.items.items[index].el.getLeft() - me.el.getLeft();
         me.el.first().move('l', left, animate);
         me.currentIndex = index;
@@ -142,6 +155,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
       var me = this;
       me.items.items[index].setItemClass(cls);
     };
+
+    me.setItemBookmark = function (index, bookmark, scope) {
+      var me = this;
+      me.items.items[index].setItemBookmark(bookmark, scope);
+    },
 
     me.callParent(arguments);
   },
