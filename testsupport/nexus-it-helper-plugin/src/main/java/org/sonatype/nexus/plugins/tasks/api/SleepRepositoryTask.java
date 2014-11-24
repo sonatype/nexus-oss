@@ -18,7 +18,7 @@ import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
-@Named("SleepRepositoryTask")
+@Named
 public class SleepRepositoryTask
     extends RepositoryTaskSupport<Void>
     implements Cancelable
