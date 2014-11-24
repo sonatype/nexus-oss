@@ -75,4 +75,14 @@ public class NexusScheduleConverterTest
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
     assertThat(cronExpression, equalTo("0 0 0 1,2,3,10,11,12 * ?"));
   }
+
+  @Test
+  public void montlhy3() {
+    final Monthly monthly = new Monthly(new Date(), Sets.newSet(Monthly.LAST_DAY_OF_MONTH));
+    final TriggerBuilder triggerBuilder = converter.toTrigger(monthly);
+    final Trigger trigger = triggerBuilder.build();
+    assertThat(trigger, instanceOf(CronTrigger.class));
+    final String cronExpression = ((CronTrigger) trigger).getCronExpression();
+    assertThat(cronExpression, equalTo("0 0 0 L * ?"));
+  }
 }

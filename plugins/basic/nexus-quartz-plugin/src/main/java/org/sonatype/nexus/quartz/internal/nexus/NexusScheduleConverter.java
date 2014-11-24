@@ -113,20 +113,25 @@ public class NexusScheduleConverter
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
-      final String daysToRun = Joiner.on(",").join(Iterables.transform(s.getDaysToRun(), new Function<Integer, String>()
-      {
-        @Override
-        public String apply(final Integer integer) {
-          if (Monthly.LAST_DAY_OF_MONTH == integer) {
-            return "L";
-          }
-          else {
+      final Set<Integer> daysToRun = s.getDaysToRun();
+      final boolean lastDayOfMonth = daysToRun.remove(Monthly.LAST_DAY_OF_MONTH);
+      // TODO: quartz does not support use of "L" along with days!
+      if (!lastDayOfMonth) {
+        final String daysToRunStr = Joiner.on(",").join(Iterables.transform(daysToRun, new Function<Integer, String>()
+        {
+          @Override
+          public String apply(final Integer integer) {
             return Integer.toString(integer);
           }
-        }
-      }));
-      triggerBuilder = newTrigger().startAt(s.getStartAt())
-          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 " + daysToRun + " * ?"));
+        }));
+        triggerBuilder = newTrigger().startAt(s.getStartAt())
+            .withSchedule(
+                CronScheduleBuilder.cronSchedule("0 0 0 " + daysToRunStr + " * ?"));
+      }
+      else {
+        triggerBuilder = newTrigger().startAt(s.getStartAt())
+            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"));
+      }
     }
     else if (schedule instanceof Manual) {
       final Manual s = (Manual) schedule;
