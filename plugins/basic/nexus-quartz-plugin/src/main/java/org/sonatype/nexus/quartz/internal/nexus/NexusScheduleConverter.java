@@ -30,6 +30,9 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
@@ -81,15 +84,49 @@ public class NexusScheduleConverter
     }
     else if (schedule instanceof Weekly) {
       final Weekly s = (Weekly) schedule;
-      // TODO: create cron expr would be the best
-      // TODO: Nope, better would be CalendarIntervalScheduleBuilder?
-      triggerBuilder = newTrigger().startAt(s.getStartAt()).withSchedule(CronScheduleBuilder.cronSchedule(""));
+      final String daysToRun = Joiner.on(",").join(Iterables.transform(s.getDaysToRun(), new Function<Integer, String>()
+      {
+        @Override
+        public String apply(final Integer integer) {
+          switch (integer) {
+            case 1:
+              return "SUN";
+            case 2:
+              return "MON";
+            case 3:
+              return "TUE";
+            case 4:
+              return "WED";
+            case 5:
+              return "THU";
+            case 6:
+              return "FRI";
+            case 7:
+              return "SAT";
+            default:
+              throw new IllegalArgumentException("Unknown day of week: " + integer);
+          }
+        }
+      }));
+      triggerBuilder = newTrigger().startAt(s.getStartAt())
+          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 ? * " + daysToRun));
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
-      // TODO: create cron expr would be the best
-      // TODO: Nope, better would be CalendarIntervalScheduleBuilder?
-      triggerBuilder = newTrigger().startAt(s.getStartAt()).withSchedule(CronScheduleBuilder.cronSchedule(""));
+      final String daysToRun = Joiner.on(",").join(Iterables.transform(s.getDaysToRun(), new Function<Integer, String>()
+      {
+        @Override
+        public String apply(final Integer integer) {
+          if (Monthly.LAST_DAY_OF_MONTH == integer) {
+            return "L";
+          }
+          else {
+            return Integer.toString(integer);
+          }
+        }
+      }));
+      triggerBuilder = newTrigger().startAt(s.getStartAt())
+          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 " + daysToRun + " * ?"));
     }
     else if (schedule instanceof Manual) {
       final Manual s = (Manual) schedule;
