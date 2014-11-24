@@ -20,6 +20,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Response;
 
@@ -32,6 +33,7 @@ import static org.sonatype.nexus.test.utils.ResponseMatchers.responseText;
 /**
  * Checks to make sure the tasks don't have packages in the type field.
  */
+@Ignore("Tasks type IDs are now FQCN, so this IT will fail")
 public class Nexus810PackageNamesInRestMessagesIT
     extends AbstractNexusIntegrationTest
 {
