@@ -205,7 +205,8 @@ public abstract class NexusAppTestSupport
     }
 
     // Give task a chance to start
-    Thread.sleep(50);
+    Thread.sleep(100);
+    Thread.yield();
 
     int counter = 0;
 
