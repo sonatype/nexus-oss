@@ -75,7 +75,7 @@ public class UnusedSnapshotRemoverTaskIT
     taskProperties.put("repositoryId", repository.id());
     taskProperties.put("daysSinceLastRequested", "4");
 
-    scheduler().run("UnusedSnapshotRemoverTask", taskProperties);
+    scheduler().run("org.sonatype.nexus.maven.tasks.UnusedSnapshotRemoverTask", taskProperties);
 
     // the following have requested timestamp = today
     assertExists(repository.id(), "20130102.120000-2.pom");
