@@ -21,7 +21,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -149,19 +148,8 @@ public class TasksWaitForPlexusResource
   }
 
   private static boolean isTaskCompleted(TaskInfo<?> task) {
-    try {
-      if (task.getSchedule() instanceof Now) {
-        // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
-        // means they are not YET complete
-        return false;
-      }
-      else {
-        return State.WAITING == task.getCurrentState().getState() && task.getLastRunState() != null;
-      }
-    } catch (IllegalStateException e) {
-      // this means task is stale, job is removed, so is "dome"
-      return true;
-    }
+    System.out.println(task.getName() + " " + task.getCurrentState().getState() + " " + task.getLastRunState());
+    return State.RUNNING != task.getCurrentState().getState() && task.getLastRunState() != null;
   }
 
   private static List<TaskInfo<?>> getTasks(final NexusTaskScheduler nexusScheduler, final String taskType) {
