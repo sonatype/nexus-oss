@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.events;
 
-import java.util.List;
+import java.lang.annotation.Annotation;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.threads.NexusExecutorService;
@@ -32,6 +31,10 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Key;
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.Mediator;
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,16 +54,13 @@ public class EventSubscriberHost
 
   private final EventBus eventBus;
 
-  private final List<Provider<EventSubscriber>> eventSubscriberProviders;
-
   private final NexusExecutorService hostThreadPool;
 
   private final com.google.common.eventbus.AsyncEventBus asyncBus;
 
   @Inject
-  public EventSubscriberHost(final EventBus eventBus, final List<Provider<EventSubscriber>> eventSubscriberProviders) {
+  public EventSubscriberHost(final EventBus eventBus, final BeanLocator locator) {
     this.eventBus = checkNotNull(eventBus);
-    this.eventSubscriberProviders = checkNotNull(eventSubscriberProviders);
 
     // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
     final ThreadPoolExecutor target =
@@ -71,36 +71,13 @@ public class EventSubscriberHost
 
     eventBus.register(this);
     log.info("Initialized");
-  }
 
-  @Override
-  protected void doStart() throws Exception {
-    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
-      EventSubscriber es = null;
-      try {
-        es = eventSubscriberProvider.get();
-        register(es);
-      }
-      catch (Exception e) {
-        log.warn("Could not register: {}", es, e);
-      }
-    }
+    locator.watch(Key.get(EventSubscriber.class), new SubscriberMediator(), this);
   }
 
   @Override
   protected void doStop() throws Exception {
     eventBus.unregister(this);
-
-    for (Provider<EventSubscriber> eventSubscriberProvider : eventSubscriberProviders) {
-      EventSubscriber es = null;
-      try {
-        es = eventSubscriberProvider.get();
-        unregister(es);
-      }
-      catch (Exception e) {
-        log.warn("Could not unregister: {}", es, e);
-      }
-    }
 
     // we need clean shutdown, wait all background event inspectors to finish to have consistent state
     hostThreadPool.shutdown();
@@ -146,5 +123,22 @@ public class EventSubscriberHost
   @AllowConcurrentEvents
   public void onEvent(final Object evt) {
     asyncBus.post(evt);
+  }
+
+  /**
+   * Automatically registers/unregisters {@link EventSubscriber}s with the {@link EventSubscriberHost}.
+   * 
+   * @since 3.0
+   */
+  static final class SubscriberMediator
+      implements Mediator<Annotation, EventSubscriber, EventSubscriberHost>
+  {
+    public void add(BeanEntry entry, EventSubscriberHost host) throws Exception {
+      host.register(entry.getValue());
+    }
+
+    public void remove(BeanEntry entry, EventSubscriberHost host) throws Exception {
+      host.unregister(entry.getValue());
+    }
   }
 }
