@@ -66,7 +66,7 @@ Ext.define('NX.controller.MasterDetail', {
     componentListener[me.list] = {
       afterrender: me.onAfterRender,
       selection: me.onSelection,
-      selectionChanged: me.onSelectionChanged,
+      selectionchange: me.onSelectionChange,
       cellclick: function(list, td, cellIndex, model) { me.onSelection(list, model) }
     };
     componentListener[me.list + ' button[action=new]'] = {
@@ -161,14 +161,19 @@ Ext.define('NX.controller.MasterDetail', {
   onSelection: function(list, model) {
     var me = this;
 
-    me.onModelChanged(model);
-    me.bookmark();
-
-    list.up('#nx-drilldown').showChild(1, true);
+    console.log("onSelection");
   },
 
-  onSelectionChanged: function(list, selection) {
-    list.fireEvent('selection', list, (selection.length === 1 ? selection[0] : undefined));
+  onSelectionChange: function(list, selection) {
+    var me = this;
+
+    console.log("onSelectionChange");
+
+    console.log(selection);
+    me.onModelChanged(selection.length === 1 ? selection[0] : undefined);
+    me.getList().up('#nx-drilldown').showChild(1, true);
+
+    me.bookmark();
   },
 
   onModelChanged: function (model) {
@@ -191,9 +196,10 @@ Ext.define('NX.controller.MasterDetail', {
   bookmark: function () {
     var me = this,
         selected = me.getList().getSelectionModel().getSelection(),
+        index = me.getList().up('#nx-drilldown').currentIndex,
         modelId;
 
-    if (selected.length === 1) {
+    if (index === 1 && selected.length === 1) {
       modelId = selected[0].getId();
     }
     me.bookmarkAt(modelId);
@@ -242,9 +248,8 @@ Ext.define('NX.controller.MasterDetail', {
           list.getSelectionModel().deselectAll(true);
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
-          list.fireEvent('selection', list, model);
-          /*me.onModelChanged(model);
-          list.up('nx-drilldown').showChild(1, false);*/
+          me.onSelection(list, model);
+          me.onSelectionChange(list, [model]);
         }
         if (tabBookmark) {
           list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs').setActiveTabByBookmark(tabBookmark);
