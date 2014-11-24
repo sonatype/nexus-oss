@@ -23,6 +23,7 @@ import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 
+import com.google.common.base.Throwables;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDataMap;
@@ -56,14 +57,30 @@ public class NexusTaskJobSupport<T>
 
   @Override
   public void execute() throws Exception {
-    final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
-    nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
-    // TODD: this should happen here?
-    // nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
-    final T result = nexusTask.call();
-    context.setResult(result);
-    // put back any state task modified to have it persisted
-    context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
+    Exception ex = null;
+    try {
+      final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
+      nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
+      try {
+        // TODD: this should happen here?
+        // nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
+        final T result = nexusTask.call();
+        context.setResult(result);
+        // put back any state task modified to have it persisted
+        context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
+      }
+      catch (Exception e) {
+        log.warn("Task execution failure: {}:{}", taskConfiguration.getType(), taskConfiguration.getId(), e);
+        ex = e;
+      }
+    }
+    catch (Exception e) {
+      log.warn("Task instantiation failure: {}", context.getJobDetail().getKey(), e);
+      ex = e;
+    }
+    if (ex != null) {
+      throw Throwables.propagate(ex);
+    }
   }
 
   @Override
