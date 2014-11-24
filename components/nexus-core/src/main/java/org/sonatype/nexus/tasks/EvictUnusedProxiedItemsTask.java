@@ -41,7 +41,7 @@ public class EvictUnusedProxiedItemsTask
 
     final int olderThanDays = getConfiguration()
         .getInteger(EvictUnusedProxiedItemsTaskDescriptor.OLDER_THAN_FIELD_ID, -1);
-    checkArgument(olderThanDays > 0);
+    checkArgument(olderThanDays > -1);
 
     long olderThan = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(olderThanDays);
 
