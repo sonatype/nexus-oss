@@ -217,10 +217,7 @@ public class ScheduledServicePlexusResource
   {
     final TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
     if (task != null) {
-      final Future<?> future = task.getCurrentState().getFuture();
-      if (future != null) {
-        future.cancel(false);
-      }
+      getNexusScheduler().removeTask(task.getId());
       response.setStatus(Status.SUCCESS_NO_CONTENT);
       return;
     }

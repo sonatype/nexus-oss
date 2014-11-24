@@ -13,7 +13,6 @@
 package org.sonatype.nexus.rest.schedules_;
 
 import java.util.Date;
-import java.util.concurrent.Future;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,6 +28,7 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -129,10 +129,12 @@ public class ScheduledServiceRunPlexusResource
       }
       return result;
 
-    } catch (TaskRemovedException e) {
+    }
+    catch (TaskRemovedException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
           + scheduledServiceId);
-    } catch (IllegalStateException e) {
+    }
+    catch (IllegalStateException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
           + scheduledServiceId);
     }
@@ -150,9 +152,8 @@ public class ScheduledServiceRunPlexusResource
   {
     final TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
     if (task != null) {
-      final Future<?> future = task.getCurrentState().getFuture();
-      if (future != null) {
-        future.cancel(false);
+      if (State.RUNNING == task.getCurrentState().getState()) {
+        task.getCurrentState().getFuture().cancel(false);
       }
       response.setStatus(Status.SUCCESS_NO_CONTENT);
       return;
