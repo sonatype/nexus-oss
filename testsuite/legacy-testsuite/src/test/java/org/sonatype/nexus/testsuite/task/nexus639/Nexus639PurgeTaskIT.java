@@ -46,7 +46,7 @@ public class Nexus639PurgeTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("purgeOlderThan");
     repo.setValue("0");
-    TaskScheduleUtil.runTask("purge", "PurgeTimelineTask", repo);
+    TaskScheduleUtil.runTask("purge", "org.sonatype.nexus.timeline.tasks.PurgeTimelineTask", repo);
 
     // validate the feeds contain nothing.
 
