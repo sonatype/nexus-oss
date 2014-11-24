@@ -15,6 +15,7 @@ package org.sonatype.nexus.scheduling.schedule;
 import java.util.Date;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -23,10 +24,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Weekly
     extends Schedule
 {
+  // TODO: this encoding, as strange at start, is done just to keep backward compat
+  // TODO: with restlet1x going away, this might change
+  public static final Integer SUN = Integer.valueOf(1);
+
+  public static final Integer MON = Integer.valueOf(2);
+
+  public static final Integer TUE = Integer.valueOf(3);
+
+  public static final Integer WED = Integer.valueOf(4);
+
+  public static final Integer THU = Integer.valueOf(5);
+
+  public static final Integer FRI = Integer.valueOf(6);
+
+  public static final Integer SAT = Integer.valueOf(7);
+
   public Weekly(final Date startAt, final Set<Integer> daysToRun) {
     super("weekly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
+    for (Integer integer : daysToRun) {
+      checkArgument(integer >= SUN && integer <= SAT, "Invalid weekly argument: %s", daysToRun);
+    }
     properties.put("schedule.startAt", dateToString(startAt));
     properties.put("schedule.daysToRun", setToList(daysToRun));
   }

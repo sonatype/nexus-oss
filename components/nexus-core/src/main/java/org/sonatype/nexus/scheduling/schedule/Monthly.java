@@ -15,6 +15,7 @@ package org.sonatype.nexus.scheduling.schedule;
 import java.util.Date;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -29,6 +30,10 @@ public class Monthly
     super("monthly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
+    for (Integer integer : daysToRun) {
+      checkArgument((integer >= 1 && integer <= 12) || integer == LAST_DAY_OF_MONTH, "Invalid monthly argument: %s",
+          daysToRun);
+    }
     properties.put("schedule.startAt", dateToString(startAt));
     properties.put("schedule.daysToRun", setToList(daysToRun));
   }
