@@ -31,7 +31,7 @@ public class Monthly
     checkNotNull(startAt);
     checkNotNull(daysToRun);
     for (Integer integer : daysToRun) {
-      checkArgument((integer >= 1 && integer <= 12) || integer == LAST_DAY_OF_MONTH, "Invalid monthly argument: %s",
+      checkArgument((integer >= 1 && integer <= 31) || integer == LAST_DAY_OF_MONTH, "Invalid monthly argument: %s",
           daysToRun);
     }
     properties.put("schedule.startAt", dateToString(startAt));
