@@ -20,10 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
-import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.util.NexusUberClassloader;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
@@ -49,14 +47,10 @@ public class TasksRunPlexusResource
 
   private final NexusTaskScheduler nexusScheduler;
 
-  private final NexusUberClassloader nexusUberClassloader;
-
   @Inject
-  public TasksRunPlexusResource(final NexusTaskScheduler nexusScheduler,
-                                final NexusUberClassloader nexusUberClassloader)
+  public TasksRunPlexusResource(final NexusTaskScheduler nexusScheduler)
   {
     this.nexusScheduler = checkNotNull(nexusScheduler);
-    this.nexusUberClassloader = checkNotNull(nexusUberClassloader);
   }
 
   @Override
@@ -87,8 +81,7 @@ public class TasksRunPlexusResource
 
     if (taskType != null) {
       try {
-        final Class<? extends Task> serviceClass = (Class<? extends Task>) nexusUberClassloader.loadClass(taskType);
-        TaskConfiguration taskInstance = nexusScheduler.createTaskConfigurationInstance(serviceClass);
+        TaskConfiguration taskInstance = nexusScheduler.createTaskConfigurationInstance(taskType);
 
         final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
         if (valuesMap != null && !valuesMap.isEmpty()) {
