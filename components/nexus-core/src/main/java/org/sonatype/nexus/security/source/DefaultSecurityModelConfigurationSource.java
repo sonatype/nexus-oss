@@ -31,6 +31,7 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -230,12 +231,14 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void updateUser(final CUser user, final Set<String> roles) {
+    public void updateUser(final CUser user, final Set<String> roles) throws UserNotFoundException {
       checkNotNull(user, "user");
       checkNotNull(user.getId(), "user id");
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userEntityAdapter.get(db, user.getId());
-        checkState(document != null, user.getId() + " not found");
+        if (document == null) {
+          throw new UserNotFoundException("User " + user.getId() + " not found");
+        }
         userEntityAdapter.write(document, user);
 
         CUserRoleMapping mapping = new CUserRoleMapping();

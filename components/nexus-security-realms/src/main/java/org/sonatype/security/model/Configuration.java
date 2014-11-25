@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.collect.ImmutableList;
@@ -90,10 +91,12 @@ public class Configuration
   }
 
   @Override
-  public void updateUser(final CUser user, final Set<String> roles) {
+  public void updateUser(final CUser user, final Set<String> roles) throws UserNotFoundException {
     checkNotNull(user, "user");
     checkNotNull(user.getId(), "user id");
-    checkState(users.replace(user.getId(), user) != null, user.getId() + " not found");
+    if (users.replace(user.getId(), user) == null) {
+      throw new UserNotFoundException("User " + user.getId() + " not found");
+    }
 
     CUserRoleMapping mapping = new CUserRoleMapping();
     mapping.setUserId(user.getId());

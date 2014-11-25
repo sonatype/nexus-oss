@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * Security configuration.
@@ -34,7 +35,7 @@ public interface SecurityModelConfiguration
 
   void addUser(CUser user, Set<String> roles);
 
-  void updateUser(CUser user, Set<String> roles);
+  void updateUser(CUser user, Set<String> roles) throws UserNotFoundException;
 
   boolean removeUser(String id);
 
