@@ -259,6 +259,7 @@ Ext.define('NX.controller.MasterDetail', {
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
           me.loadView(list, model, false);
+          list.fireEvent('selectionchange', list, [model]);
         }
         if (tabBookmark) {
           list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs').setActiveTabByBookmark(tabBookmark);

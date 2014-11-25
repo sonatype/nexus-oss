@@ -39,40 +39,27 @@ Ext.define('NX.util.condition.GridHasSelection', {
     if (!me.bounded) {
       components[me.grid] = {
         afterrender: me.evaluate,
-        selection: me.evaluate,
-        selectionchange: function (selectionModel) {
-          me.evaluate(selectionModel.grid);
+        selectionchange: function (cmp, selection) {
+          me.evaluate(cmp, selection);
         },
         destroy: me.evaluate
       };
       Ext.app.EventBus.listen({ component: components }, me);
       me.callParent();
-      queryResult = Ext.ComponentQuery.query(me.grid);
-      if (queryResult && queryResult.length > 0) {
-        me.evaluate(queryResult[0]);
-      }
     }
 
     return me;
   },
 
-  evaluate: function (grid) {
+  evaluate: function (cmp, selection) {
     var me = this,
-        satisfied = false,
-        selectionModel, selection;
+        satisfied = false;
 
     if (me.bounded) {
-      if (Ext.isDefined(grid) && grid.isXType('grid')) {
-        selectionModel = grid.getSelectionModel();
-        if (!selectionModel.grid) {
-          selectionModel.grid = grid;
-        }
-        selection = selectionModel.getSelection();
-        if (selection.length) {
-          satisfied = true;
-          if (Ext.isFunction(me.fn)) {
-            satisfied = me.fn(selection.length === 1 ? selection[0] : selection) === true;
-          }
+      if (selection && selection.length) {
+        satisfied = true;
+        if (Ext.isFunction(me.fn)) {
+          satisfied = me.fn(selection.length === 1 ? selection[0] : selection) === true;
         }
       }
       me.setSatisfied(satisfied);
