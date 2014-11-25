@@ -10,20 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.security.source;
+package org.sonatype.security.model.source;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -36,28 +38,22 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link CUser} entity adapter.
+ * {@link CUserRoleMapping} entity adapter.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class CUserEntityAdapter
+public class CUserRoleMappingEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_CLASS = new OClassNameBuilder().type("SecurityUser").build();
+  public static final String DB_CLASS = new OClassNameBuilder().type("SecurityUserRoleMapping").build();
 
-  public static final String P_ID = "id";
+  public static final String P_USER_ID = "userId";
 
-  public static final String P_FIRST_NAME = "firstName";
+  public static final String P_SOURCE = "source";
 
-  public static final String P_LAST_NAME = "lastName";
-
-  public static final String P_PASSWORD = "password";
-
-  public static final String P_STATUS = "status";
-
-  public static final String P_EMAIL = "email";
+  public static final String P_ROLES = "roles";
 
   /**
    * Register schema.
@@ -70,14 +66,11 @@ public class CUserEntityAdapter
     if (type == null) {
       type = schema.createClass(DB_CLASS);
 
-      type.createProperty(P_ID, OType.STRING).setNotNull(true);
-      type.createProperty(P_FIRST_NAME, OType.STRING);
-      type.createProperty(P_LAST_NAME, OType.STRING);
-      type.createProperty(P_PASSWORD, OType.STRING).setNotNull(true);
-      type.createProperty(P_STATUS, OType.STRING).setNotNull(true);
-      type.createProperty(P_EMAIL, OType.STRING).setNotNull(true);
+      type.createProperty(P_USER_ID, OType.STRING).setNotNull(true);
+      type.createProperty(P_SOURCE, OType.STRING).setNotNull(true);
+      type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
-      type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
+      type.createIndex(DB_CLASS + "_" + P_USER_ID + "_" + P_SOURCE + "idx", INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
 
@@ -89,7 +82,7 @@ public class CUserEntityAdapter
   /**
    * Create a new document and write entity.
    */
-  public ODocument create(final ODatabaseDocumentTx db, final CUser entity) {
+  public ODocument create(final ODatabaseDocumentTx db, final CUserRoleMapping entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -100,16 +93,13 @@ public class CUserEntityAdapter
   /**
    * Write entity to document.
    */
-  public ODocument write(final ODocument document, final CUser entity) {
+  public ODocument write(final ODocument document, final CUserRoleMapping entity) {
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_ID, entity.getId());
-    document.field(P_FIRST_NAME, entity.getFirstName());
-    document.field(P_LAST_NAME, entity.getLastName());
-    document.field(P_STATUS, entity.getStatus());
-    document.field(P_EMAIL, entity.getEmail());
-    document.field(P_PASSWORD, entity.getPassword());
+    document.field(P_USER_ID, entity.getUserId());
+    document.field(P_SOURCE, entity.getSource());
+    document.field(P_ROLES, entity.getRoles());
 
     return document.save();
   }
@@ -117,16 +107,13 @@ public class CUserEntityAdapter
   /**
    * Read entity from document.
    */
-  public CUser read(final ODocument document) {
+  public CUserRoleMapping read(final ODocument document) {
     checkNotNull(document);
 
-    CUser entity = new CUser();
-    entity.setId(document.<String>field(P_ID, OType.STRING));
-    entity.setFirstName(document.<String>field(P_FIRST_NAME, OType.STRING));
-    entity.setLastName(document.<String>field(P_LAST_NAME, OType.STRING));
-    entity.setPassword(document.<String>field(P_PASSWORD, OType.STRING));
-    entity.setStatus(document.<String>field(P_STATUS, OType.STRING));
-    entity.setEmail(document.<String>field(P_EMAIL, OType.STRING));
+    CUserRoleMapping entity = new CUserRoleMapping();
+    entity.setUserId(document.<String>field(P_USER_ID, OType.STRING));
+    entity.setSource(document.<String>field(P_SOURCE, OType.STRING));
+    entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
 
     entity.setVersion(String.valueOf(document.getVersion()));
 
@@ -142,30 +129,30 @@ public class CUserEntityAdapter
   }
 
   /**
-   * Get all users.
+   * Get all user role mappings.
    */
-  public Iterable<CUser> get(final ODatabaseDocumentTx db) {
-    return Iterables.transform(browse(db), new Function<ODocument, CUser>()
+  public Iterable<CUserRoleMapping> get(final ODatabaseDocumentTx db) {
+    return Iterables.transform(browse(db), new Function<ODocument, CUserRoleMapping>()
     {
       @Nullable
       @Override
-      public CUser apply(@Nullable final ODocument input) {
+      public CUserRoleMapping apply(@Nullable final ODocument input) {
         return input == null ? null : read(input);
       }
     });
   }
 
   /**
-   * Retrieves a user document.
+   * Retrieves a mapping document.
    *
    * @return found document, null otherwise
    */
   @Nullable
-  public ODocument get(final ODatabaseDocumentTx db, final String id) {
+  public ODocument get(final ODatabaseDocumentTx db, final String userId, final String source) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
-        "SELECT FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+        "SELECT FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
-    List<ODocument> results = db.command(query).execute(id);
+    List<ODocument> results = db.command(query).execute(userId, source);
     if (results.isEmpty()) {
       return null;
     }
@@ -173,15 +160,15 @@ public class CUserEntityAdapter
   }
 
   /**
-   * Deletes a user.
+   * Deletes a mapping.
    *
-   * @return true if user was deleted
+   * @return true if mapping was deleted
    */
-  public boolean delete(final ODatabaseDocumentTx db, final String id) {
+  public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
     OCommandSQL command = new OCommandSQL(
-        "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
-    int records = db.command(command).execute(id);
+    int records = db.command(command).execute(userId, source);
     return records == 1;
   }
 
