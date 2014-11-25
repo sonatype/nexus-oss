@@ -108,15 +108,11 @@ Ext.define('NX.coreui.controller.Repositories', {
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
-        'nx-coreui-repository-list button[action=browse]': {
-          afterrender: me.bindBrowseButton,
+        'nx-coreui-repository-list ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=browse]': {
           click: me.navigateToBrowseMode
         },
         'nx-coreui-repository-list button[action=new]': {
           click: me.showSelectTemplateWindow
-        },
-        'nx-coreui-repository-list button[action=more]': {
-          afterrender: me.bindMoreButton
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
@@ -427,42 +423,6 @@ Ext.define('NX.coreui.controller.Repositories', {
         repositoryModel.commit(true);
       }
     });
-  },
-
-  /**
-   * @protected
-   * Enable 'Browse' when user has selected a repository.
-   */
-  bindBrowseButton: function(button) {
-    var me = this;
-    button.mon(
-        NX.Conditions.and(
-            NX.Conditions.gridHasSelection(me.list)
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
-  },
-
-  /**
-   * @protected
-   * Enable 'More' when user has selected a repository.
-   */
-  bindMoreButton: function(button) {
-    var me = this;
-    button.mon(
-        NX.Conditions.and(
-            NX.Conditions.gridHasSelection(me.list)
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
   },
 
   /**
