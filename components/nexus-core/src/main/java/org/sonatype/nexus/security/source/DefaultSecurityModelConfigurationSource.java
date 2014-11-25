@@ -24,6 +24,7 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
@@ -386,12 +387,14 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void updateRole(final CRole role) {
+    public void updateRole(final CRole role) throws NoSuchRoleException {
       checkNotNull(role, "role");
       checkNotNull(role.getId(), "role id");
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = roleEntityAdapter.get(db, role.getId());
-        checkState(document != null, role.getId() + " not found");
+        if (document == null) {
+          throw new NoSuchRoleException("Role " + role.getId() + " not found");
+        }
         roleEntityAdapter.write(document, role);
       }
     }

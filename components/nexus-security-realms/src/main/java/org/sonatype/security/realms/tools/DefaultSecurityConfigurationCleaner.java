@@ -16,6 +16,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
@@ -41,7 +42,13 @@ public class DefaultSecurityConfigurationCleaner
       if (role.getPrivileges().contains(privilegeId)) {
         log.debug("removing privilege {} from role {}", privilegeId, role.getId());
         role.removePrivilege(privilegeId);
-        configuration.updateRole(role);
+        try {
+          configuration.updateRole(role);
+        }
+        catch (NoSuchRoleException e) {
+          // role could had been removed in the mean time
+          log.warn("Role {} removed during update", role.getId());
+        }
       }
     }
   }
@@ -52,7 +59,13 @@ public class DefaultSecurityConfigurationCleaner
       if (role.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from role {}", roleId, role.getId());
         role.removeRole(roleId);
-        configuration.updateRole(role);
+        try {
+          configuration.updateRole(role);
+        }
+        catch (NoSuchRoleException e) {
+          // role could had been removed in the mean time
+          log.warn("Role {} removed during update", role.getId());
+        }
       }
     }
     for (CUserRoleMapping mapping : configuration.getUserRoleMappings()) {

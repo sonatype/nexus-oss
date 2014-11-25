@@ -17,6 +17,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.security.authorization.NoSuchRoleException;
+
 /**
  * Security configuration.
  *
@@ -65,7 +67,7 @@ public interface SecurityModelConfiguration
 
   void addRole(CRole role);
 
-  void updateRole(CRole role);
+  void updateRole(CRole role) throws NoSuchRoleException;
 
   boolean removeRole(String id);
 }
