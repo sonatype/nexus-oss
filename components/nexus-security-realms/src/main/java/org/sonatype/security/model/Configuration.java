@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
@@ -193,10 +194,12 @@ public class Configuration
   }
 
   @Override
-  public void updatePrivilege(final CPrivilege privilege) {
+  public void updatePrivilege(final CPrivilege privilege) throws NoSuchPrivilegeException {
     checkNotNull(privilege, "privilege");
     checkNotNull(privilege.getId(), "privilege id");
-    checkState(privileges.replace(privilege.getId(), privilege) != null, privilege.getId() + " not found");
+    if (privileges.replace(privilege.getId(), privilege) == null) {
+      throw new NoSuchPrivilegeException("Privilege " + privilege.getId() + " not found");
+    }
   }
 
   @Override

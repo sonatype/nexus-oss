@@ -24,6 +24,7 @@ import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
@@ -343,12 +344,14 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void updatePrivilege(final CPrivilege privilege) {
+    public void updatePrivilege(final CPrivilege privilege) throws NoSuchPrivilegeException {
       checkNotNull(privilege, "privilege");
       checkNotNull(privilege.getId(), "privilege id");
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = privilegeEntityAdapter.get(db, privilege.getId());
-        checkState(document != null, privilege.getId() + " not found");
+        if (document == null) {
+          throw new NoSuchPrivilegeException("Privilege " + privilege.getId() + " not found");
+        }
         privilegeEntityAdapter.write(document, privilege);
       }
     }
