@@ -72,7 +72,10 @@ Ext.define('NX.controller.MasterDetail', {
       afterrender: me.bindNewButton
     };
     componentListener[me.list + ' ^ nx-masterdetail-panel nx-masterdetail-tabs > tabpanel'] = {
-      tabchange: me.bookmark
+      tabchange: function() {
+        var selected = me.getList().getSelectionModel().getSelection();
+        me.bookmark(selected.length === 1 ? selected[0] : null);
+      }
     };
 
     // bind to a delete button if delete function defined
