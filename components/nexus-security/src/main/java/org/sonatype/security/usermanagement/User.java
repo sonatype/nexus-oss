@@ -121,4 +121,8 @@ public interface User
    */
   public void setStatus(UserStatus status);
 
+  String getVersion();
+
+  void setVersion(final String version);
+
 }

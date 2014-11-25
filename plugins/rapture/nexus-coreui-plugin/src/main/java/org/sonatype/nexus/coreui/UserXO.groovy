@@ -17,6 +17,7 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.model.Password
 import org.sonatype.nexus.validation.Create
+import org.sonatype.nexus.validation.Update
 import org.sonatype.security.usermanagement.UserStatus
 
 import javax.validation.constraints.NotNull
@@ -31,6 +32,9 @@ class UserXO
 {
   @NotEmpty
   String userId
+
+  @NotEmpty(groups = Update)
+  String version
 
   String realm
 

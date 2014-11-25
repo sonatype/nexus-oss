@@ -160,16 +160,18 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.userId).with {
-      firstName = userXO.firstName
-      lastName = userXO.lastName
-      emailAddress = validateEmail(userXO.email)
-      status = userXO.status
-      roles = userXO.roles?.collect { id ->
-        new RoleIdentifier(DEFAULT_SOURCE, id)
-      }
-      return it
-    }))
+    asUserXO(securitySystem.updateUser(new DefaultUser(
+        userId: userXO.userId,
+        version: userXO.version,
+        source: DEFAULT_SOURCE,
+        firstName: userXO.firstName,
+        lastName: userXO.lastName,
+        emailAddress: validateEmail(userXO.email),
+        status: userXO.status,
+        roles: userXO.roles?.collect { id ->
+          new RoleIdentifier(DEFAULT_SOURCE, id)
+        }
+    )))
   }
 
   /**
@@ -296,6 +298,7 @@ extends DirectComponentSupport
   private static asUserXO(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
+        version: user.version,
         realm: user.source,
         firstName: user.firstName,
         lastName: user.lastName,

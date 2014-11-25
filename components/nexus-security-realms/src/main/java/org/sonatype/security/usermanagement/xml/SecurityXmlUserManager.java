@@ -84,6 +84,7 @@ public class SecurityXmlUserManager
     CUser secUser = new CUser();
 
     secUser.setId(user.getUserId());
+    secUser.setVersion(user.getVersion());
     secUser.setFirstName(user.getFirstName());
     secUser.setLastName(user.getLastName());
     secUser.setEmail(user.getEmailAddress());
@@ -101,6 +102,7 @@ public class SecurityXmlUserManager
     DefaultUser user = new DefaultUser();
 
     user.setUserId(cUser.getId());
+    user.setVersion(cUser.getVersion());
     user.setFirstName(cUser.getFirstName());
     user.setLastName(cUser.getLastName());
     user.setEmailAddress(cUser.getEmail());

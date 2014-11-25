@@ -22,6 +22,7 @@ Ext.define('NX.coreui.model.User', {
   idProperty: 'userId',
   fields: [
     'userId',
+    'version',
     'realm',
     'firstName',
     'lastName',

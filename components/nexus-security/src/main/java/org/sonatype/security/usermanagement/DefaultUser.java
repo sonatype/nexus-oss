@@ -41,6 +41,8 @@ public class DefaultUser
 
   private boolean readOnly;
 
+  private String version;
+
   private Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
 
   public String getUserId() {
@@ -136,6 +138,14 @@ public class DefaultUser
 
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
   }
 
   @Override

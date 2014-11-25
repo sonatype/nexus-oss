@@ -52,6 +52,7 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         helpText: 'The ID assigned to this user, will be used as the username.',
         emptyText: 'enter a user id'
       },
+      { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
         fieldLabel: 'First Name',
