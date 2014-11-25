@@ -13,12 +13,10 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.scheduling.TaskConfiguration;
-import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
@@ -81,21 +79,15 @@ public class StateHolder<T>
     checkState(!running || future != null, "Running task must have future");
     State state;
     Date nextRun;
-    Date runStarted;
-    RunState runState;
     if (running) {
       state = State.RUNNING;
       nextRun = nextExecutionTime;
-      runStarted = future.getStartedAt();
-      runState = future.getRunState();
     }
     else {
       state = nextExecutionTime == null ? State.DONE : State.WAITING;
       nextRun = nextExecutionTime;
-      runStarted = null;
-      runState = null;
     }
-    return new CS<>(state, nextRun, runStarted, runState, future);
+    return new CS<>(state, nextRun, future);
   }
 
   private LastRunState extractLastRunState(final TaskConfiguration taskConfiguration) {
@@ -117,19 +109,12 @@ public class StateHolder<T>
 
     private final Date nextRun;
 
-    private final Date runStarted;
+    private final NexusTaskFuture<T> future;
 
-    private final RunState runState;
-
-    private final Future<T> future;
-
-    public CS(final State state, final Date nextRun, final Date runStarted, final RunState runState,
-              final Future<T> future)
+    public CS(final State state, final Date nextRun, final NexusTaskFuture<T> future)
     {
       this.state = state;
       this.nextRun = nextRun;
-      this.runStarted = runStarted;
-      this.runState = runState;
       this.future = future;
     }
 
@@ -145,16 +130,16 @@ public class StateHolder<T>
 
     @Override
     public Date getRunStarted() {
-      return runStarted;
+      return state == State.RUNNING ? future.getStartedAt() : null;
     }
 
     @Override
     public RunState getRunState() {
-      return runState;
+      return state == State.RUNNING ? future.getRunState() : null;
     }
 
     @Override
-    public Future<T> getFuture() {
+    public NexusTaskFuture<T> getFuture() {
       return future;
     }
   }

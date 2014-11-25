@@ -53,6 +53,22 @@ public class NexusTaskJobSupport<T>
     extends JobSupport
     implements InterruptableJob
 {
+  private static class OtherRunningTasks<T>
+      implements Predicate<TaskInfo<?>>
+  {
+    private final Task<T> me;
+
+    public OtherRunningTasks(final Task<T> me) {
+      this.me = me;
+    }
+
+    @Override
+    public boolean apply(final TaskInfo<?> taskInfo) {
+      return !me.getId().equals(taskInfo.getId())
+          && State.RUNNING == taskInfo.getCurrentState().getState();
+    }
+  }
+
   private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
 
   private final NexusTaskFactory nexusTaskFactory;
@@ -75,15 +91,15 @@ public class NexusTaskJobSupport<T>
       final NexusTaskFuture<T> future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
       nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
       try {
-        nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
         mayBlock(nexusTask, future);
         if (!future.isCancelled()) {
           future.setRunState(RunState.RUNNING);
+          nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
           final T result = nexusTask.call();
           context.setResult(result);
+          // put back any state task modified to have it persisted
+          context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
         }
-        // put back any state task modified to have it persisted
-        context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
       }
       catch (Exception e) {
         log.warn("Task execution failure: {}:{}", taskConfiguration.getType(), taskConfiguration.getId(), e);
@@ -101,20 +117,15 @@ public class NexusTaskJobSupport<T>
 
   private void mayBlock(final Task<T> nexusTask, final NexusTaskFuture<T> future) {
     // filter for running tasks, to be reused
-    final Predicate<TaskInfo<?>> runningTaskFilter = new Predicate<TaskInfo<?>>()
-    {
-      @Override
-      public boolean apply(final TaskInfo<?> taskInfo) {
-        return State.RUNNING == taskInfo.getCurrentState().getState();
-      }
-    };
+    final OtherRunningTasks<T> otherRunningTasks = new OtherRunningTasks<>(nexusTask);
     List<TaskInfo<?>> blockedBy;
     do {
       blockedBy = nexusTask.isBlockedBy(Lists.newArrayList(Iterables.filter(
-          quartzNexusSchedulerSPIProvider.get().listsTasks(), runningTaskFilter)));
+          quartzNexusSchedulerSPIProvider.get().listsTasks(), otherRunningTasks)));
       // wait for them all
       if (blockedBy != null && !blockedBy.isEmpty()) {
         try {
+          // will ISEx if canceled!
           future.setRunState(RunState.BLOCKED);
           for (TaskInfo<?> taskInfo : blockedBy) {
             try {
@@ -126,7 +137,7 @@ public class NexusTaskJobSupport<T>
           }
         }
         catch (IllegalStateException e) {
-          // task got canceled, setRunState throw ISEx
+          // task got canceled, setRunState ISEx
           break;
         }
       }
@@ -141,7 +152,6 @@ public class NexusTaskJobSupport<T>
     }
     if (nexusTask instanceof Cancelable) {
       ((Cancelable) nexusTask).cancel();
-      // TODO: flag cancellation in context
     }
     else {
       throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");

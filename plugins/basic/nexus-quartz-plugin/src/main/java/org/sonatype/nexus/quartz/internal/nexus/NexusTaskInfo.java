@@ -12,9 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
@@ -98,49 +96,16 @@ public class NexusTaskInfo<T>
   @Override
   public CurrentState<T> getCurrentState() {
     if (getSchedule() instanceof Now) {
-      return new CurrentState<T>()
-      {
-        @Override
-        public State getState() {
-          return getStateHolder().getCurrentState().getState();
-        }
-
-        @Nullable
-        @Override
-        public Date getNextRun() {
-          return getStateHolder().getCurrentState().getNextRun();
-        }
-
-        @Nullable
-        @Override
-        public Date getRunStarted() {
-          return getStateHolder().getCurrentState().getRunStarted();
-        }
-
-        @Nullable
-        @Override
-        public RunState getRunState() {
-          return getStateHolder().getCurrentState().getRunState();
-        }
-
-        @Nullable
-        @Override
-        public Future<T> getFuture() {
-          try {
-            // TODO: this makes sense for "bg jobs" only! In other cases this might cause unacceptable long blocked threads!
-            countDownLatch.await();
-          }
-          catch (InterruptedException e) {
-            throw Throwables.propagate(e);
-          }
-          return getStateHolder().getCurrentState().getFuture();
-        }
-      };
+      // TODO: this makes sense for "bg jobs" only! In other cases this might cause unacceptable long blocked threads!
+      // TODO: for bg jobs caller usually submits it and wants the result of it, kinda "thread pool" use of scheduler
+      try {
+        countDownLatch.await();
+      }
+      catch (InterruptedException e) {
+        throw Throwables.propagate(e);
+      }
     }
-    else {
-      return getStateHolder().getCurrentState();
-    }
-
+    return getStateHolder().getCurrentState();
   }
 
   @Nullable
