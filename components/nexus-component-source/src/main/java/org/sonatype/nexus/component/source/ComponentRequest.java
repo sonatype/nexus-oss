@@ -14,23 +14,24 @@ package org.sonatype.nexus.component.source;
 
 import java.util.Map;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
-
 import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A request for one or more Components from a {@link ComponentSource}.
+ * A normalized request for one or more Components from a {@link ComponentSource}.
  *
  * @since 3.0
  */
-public class ComponentRequest<C extends Component, A extends Asset>
+public class ComponentRequest
 {
   private final Map<String, String> query;
 
-  public ComponentRequest(final Map<String, String> query) {
+  /**
+   * Formats encode specific types of request and their parameters into the query map.
+   */
+  public ComponentRequest(final Map<String, String> query)
+  {
     this.query = ImmutableMap.copyOf(checkNotNull(query));
   }
 

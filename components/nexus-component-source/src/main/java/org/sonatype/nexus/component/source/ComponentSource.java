@@ -14,9 +14,6 @@ package org.sonatype.nexus.component.source;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentEnvelope;
 import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 /**
@@ -29,7 +26,7 @@ import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
  *
  * @since 3.0
  */
-public interface ComponentSource<T extends Component>
+public interface ComponentSource
 {
   /**
    * A cluster-wide unique name for this source.
@@ -37,14 +34,16 @@ public interface ComponentSource<T extends Component>
   ComponentSourceId getId();
 
   /**
-   * Query the source for matching components.
+   * Fetch component/asset content from the source.
    *
-   * Formats are responsible for encoding all of their various request types into the query, whether these are mere
-   * checks for the existence of a component, downloading just the metadata (partially or fully), or retrieving and
-   * storing some or all of the binary assets of the component.
+   * @param request information to identify
+   *                Query the source for matching components.
    *
-   * If no component(s) match the query, the returned {@link Iterable} is empty.
+   *                Formats are responsible for encoding all of their various request types into the query, whether
+   *                these are mere checks for the existence of a component, downloading just the metadata (partially or
+   *                fully), or retrieving and storing some or all of the binary assets of the component.
+   *
+   *                If no component(s) match the query, the returned {@link Iterable} is empty.
    */
-  <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents(
-      ComponentRequest<C, A> request) throws IOException;
+  ComponentResponse fetchComponents(ComponentRequest request) throws IOException;
 }

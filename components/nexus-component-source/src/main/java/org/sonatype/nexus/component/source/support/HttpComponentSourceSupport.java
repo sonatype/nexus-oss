@@ -14,7 +14,6 @@ package org.sonatype.nexus.component.source.support;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.component.model.Component;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -33,9 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public abstract class HttpComponentSourceSupport<T extends Component>
+public abstract class HttpComponentSourceSupport
     extends ComponentSupport
-    implements ComponentSource<T>
+    implements ComponentSource
 {
   private final ComponentSourceId sourceId;
 

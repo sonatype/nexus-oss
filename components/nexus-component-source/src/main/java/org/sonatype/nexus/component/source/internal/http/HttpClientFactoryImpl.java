@@ -75,7 +75,8 @@ public class HttpClientFactoryImpl
   private org.sonatype.nexus.httpclient.HttpClientFactory httpClientFactory;
 
   @Inject
-  public HttpClientFactoryImpl(final org.sonatype.nexus.httpclient.HttpClientFactory httpClientFactory) {
+  public HttpClientFactoryImpl(final org.sonatype.nexus.httpclient.HttpClientFactory httpClientFactory)
+  {
     this.httpClientFactory = checkNotNull(httpClientFactory);
   }
 
