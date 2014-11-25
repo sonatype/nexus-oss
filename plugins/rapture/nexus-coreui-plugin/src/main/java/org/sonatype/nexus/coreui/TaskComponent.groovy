@@ -137,10 +137,12 @@ class TaskComponent
       nexusTask.getMap().put(key, value)
     }
     nexusTask.setAlertEmail(taskXO.alertEmail)
+    // TODO: this should not be set by user, it's description instead
     nexusTask.setName(taskXO.name)
+    nexusTask.setDescription(taskXO.description)
     nexusTask.setEnabled(taskXO.enabled)
 
-    nexusScheduler.scheduleTask(nexusTask, schedule)
+    TaskInfo<?> task = nexusScheduler.scheduleTask(nexusTask, schedule)
 
     log.debug "Created task with type '${nexusTask.class}': ${nexusTask.name} (${nexusTask.id})"
     return asTaskXO(task)
@@ -160,6 +162,7 @@ class TaskComponent
     validateState(task)
     task.configuration.enabled = taskXO.enabled
     task.configuration.name = taskXO.name
+    task.configuration.description = taskXO.description
     task.configuration.map.putAll(taskXO.properties)
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
@@ -193,7 +196,7 @@ class TaskComponent
   @RequiresPermissions('nexus:tasks:delete')
   @Validate
   void remove(final @NotEmpty(message = '[id] may not be empty') String id) {
-    nexusScheduler.getTaskById(id)?.cancel()
+    nexusScheduler.getTaskById(id)?.remove()
   }
 
   @DirectMethod
@@ -209,7 +212,7 @@ class TaskComponent
   @RequiresPermissions('nexus:tasksrun:delete')
   @Validate
   void stop(final @NotEmpty(message = '[id] may not be empty') String id) {
-    nexusScheduler.getTaskById(id)?.cancelOnly()
+    nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(true)
   }
 
   static String getStatusDescription(final CurrentState<?> currentState) {
@@ -314,15 +317,15 @@ class TaskComponent
         enabled: task.configuration.enabled,
         name: task.name,
         typeId: task.configuration.type,
-        typeName: (descriptors.find { it.id == task.type })?.name,
-        status: task.taskState,
-        statusDescription: task.enabled ? getStatusDescription(task.taskState) : 'Disabled',
+        typeName: (descriptors.find { it.id == task.configuration.type })?.name,
+        status: task.currentState.state,
+        statusDescription: task.configuration.enabled ? getStatusDescription(task.currentState) : 'Disabled',
         schedule: getSchedule(task.schedule),
-        lastRun: task.lastRun,
+        lastRun: task.lastRunState?.runStarted,
         lastRunResult: getLastRunResult(task),
         nextRun: getNextRun(task),
-        runnable: task.taskState in [TaskState.SUBMITTED, TaskState.WAITING],
-        stoppable: task.taskState in [TaskState.RUNNING, TaskState.SLEEPING],
+        runnable: task.currentState.state in [State.WAITING],
+        stoppable: task.currentState.state in [State.RUNNING],
         alertEmail: task.configuration.alertEmail,
         properties: task.configuration.map
     )
@@ -351,7 +354,7 @@ class TaskComponent
   static Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
       try {
-        return new Cron(taskXO.cronExpression)
+        return new Cron(new Date(), taskXO.cronExpression)
       }
       catch (Exception e) {
         def response = new ValidationResponse()
@@ -399,8 +402,8 @@ class TaskComponent
   }
 
   private static void validateState(final TaskInfo<?> task) {
-    TaskInfo.State state = task.currentState.state;
-    if (TaskInfo.State.RUNNING == state) {
+    State state = task.currentState.state;
+    if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');
     }
   }
