@@ -454,7 +454,14 @@ Ext.define('NX.coreui.controller.Search', {
       storageFileContainer.expand();
 
       // Show the version detail panel
-      storageFileContainer.up('#nx-drilldown').setItemClass(2, 'nx-icon-repository-item-type-' + searchResultVersionModel.get('type') + '-x16');
+      var icon;
+      var type = searchResultVersionModel.get('type');
+      if (NX.getApplication().getIconController().findIcon('repository-item-type-' + type, 'x16')) {
+        icon = type;
+      } else {
+        icon = 'default';
+      }
+      storageFileContainer.up('#nx-drilldown').setItemClass(2, NX.Icons.cls('repository-item-type-' + icon, 'x16'));
       storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
       storageFileContainer.up('#nx-drilldown').showChild(2, true);
     }
