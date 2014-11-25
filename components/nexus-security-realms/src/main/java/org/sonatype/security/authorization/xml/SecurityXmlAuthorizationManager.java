@@ -72,6 +72,7 @@ public class SecurityXmlAuthorizationManager
     Role role = new Role();
 
     role.setRoleId(secRole.getId());
+    role.setVersion(secRole.getVersion());
     role.setName(secRole.getName());
     role.setSource(SOURCE);
     role.setDescription(secRole.getDescription());
@@ -86,6 +87,7 @@ public class SecurityXmlAuthorizationManager
     CRole secRole = new CRole();
 
     secRole.setId(role.getRoleId());
+    secRole.setVersion(role.getVersion());
     secRole.setName(role.getName());
     secRole.setDescription(role.getDescription());
     secRole.setReadOnly(role.isReadOnly());

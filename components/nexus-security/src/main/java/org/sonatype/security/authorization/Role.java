@@ -13,6 +13,7 @@
 package org.sonatype.security.authorization;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -36,6 +37,8 @@ public class Role
   private Set<String> roles = new HashSet<String>();
 
   private Set<String> privileges = new HashSet<String>();
+
+  private String version;
 
   public Role() {
 
@@ -152,6 +155,14 @@ public class Role
     this.readOnly = readOnly;
   }
 
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -163,6 +174,7 @@ public class Role
     result = prime * result + ((roleId == null) ? 0 : roleId.hashCode());
     result = prime * result + ((roles == null) ? 0 : roles.hashCode());
     result = prime * result + ((source == null) ? 0 : source.hashCode());
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
     return result;
   }
 
@@ -227,6 +239,9 @@ public class Role
       }
     }
     else if (!source.equals(other.source)) {
+      return false;
+    }
+    if (!Objects.equals(version, other.source)) {
       return false;
     }
     return true;

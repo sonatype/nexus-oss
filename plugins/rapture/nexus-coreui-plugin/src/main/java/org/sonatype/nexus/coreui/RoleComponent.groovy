@@ -133,6 +133,7 @@ extends DirectComponentSupport
     return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
+            version: roleXO.version,
             source: roleXO.source,
             name: roleXO.name,
             description: roleXO.description,
@@ -158,6 +159,7 @@ extends DirectComponentSupport
   private static RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
+        version: input.version,
         source: (input.source == DEFAULT_SOURCE || !input.source) ? 'Nexus' : input.source,
         name: input.name,
         description: input.description,
