@@ -113,6 +113,7 @@ public class SecurityXmlAuthorizationManager
   protected CPrivilege toPrivilege(Privilege privilege) {
     CPrivilege secPriv = new CPrivilege();
     secPriv.setId(privilege.getId());
+    secPriv.setVersion(privilege.getVersion());
     secPriv.setName(privilege.getName());
     secPriv.setDescription(privilege.getDescription());
     secPriv.setReadOnly(privilege.isReadOnly());
@@ -127,6 +128,7 @@ public class SecurityXmlAuthorizationManager
   protected Privilege toPrivilege(CPrivilege secPriv) {
     Privilege privilege = new Privilege();
     privilege.setId(secPriv.getId());
+    privilege.setVersion(secPriv.getVersion());
     privilege.setName(secPriv.getName());
     privilege.setDescription(secPriv.getDescription());
     privilege.setReadOnly(secPriv.isReadOnly());

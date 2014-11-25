@@ -144,6 +144,7 @@ extends DirectComponentSupport
   def PrivilegeXO asPrivilegeXO(Privilege input) {
     def privilege = new PrivilegeXO(
         id: input.id,
+        version: input.version,
         name: input.name,
         description: input.description,
         type: input.type,
