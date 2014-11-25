@@ -60,6 +60,7 @@ public class CRole
    */
   private boolean readOnly = false;
 
+  private String version;
 
   //-----------/
   //- Methods -/
@@ -204,6 +205,14 @@ public class CRole
 
   public void setRoles(Set<String> roles) {
     this.roles = roles;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
   }
 
 }

@@ -126,6 +126,8 @@ public class CPrivilegeEntityAdapter
     entity.setReadOnly(false);
     entity.setProperties(Maps.newHashMap(document.<Map<String, String>>field(P_PROPERTIES, OType.EMBEDDEDMAP)));
 
+    entity.setVersion(String.valueOf(document.getVersion()));
+
     return entity;
   }
 

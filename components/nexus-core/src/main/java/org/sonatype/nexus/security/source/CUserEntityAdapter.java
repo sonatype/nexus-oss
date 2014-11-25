@@ -128,6 +128,8 @@ public class CUserEntityAdapter
     entity.setStatus(document.<String>field(P_STATUS, OType.STRING));
     entity.setEmail(document.<String>field(P_EMAIL, OType.STRING));
 
+    entity.setVersion(String.valueOf(document.getVersion()));
+
     return entity;
   }
 

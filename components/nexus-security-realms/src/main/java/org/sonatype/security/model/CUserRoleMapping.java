@@ -47,6 +47,7 @@ public class CUserRoleMapping
    */
   private Set<String> roles;
 
+  private String version;
 
   //-----------/
   //- Methods -/
@@ -131,5 +132,13 @@ public class CUserRoleMapping
   public void setUserId(String userId) {
     this.userId = userId;
   } //-- void setUserId( String )
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
 
 }

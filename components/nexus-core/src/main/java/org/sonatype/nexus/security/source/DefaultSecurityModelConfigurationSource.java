@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.security.source;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -40,9 +42,11 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.valueOf;
 
 /**
  * Default {@link SecurityModelConfigurationSource} implementation using Orient db as store.
@@ -240,6 +244,11 @@ public class DefaultSecurityModelConfigurationSource
         if (document == null) {
           throw new UserNotFoundException("User " + user.getId() + " not found");
         }
+        if (user.getVersion() != null && !Objects.equals(user.getVersion(), valueOf(document.getVersion()))) {
+          throw new ConcurrentModificationException(
+              "User " + user.getId() + " updated in the mean time"
+          );
+        }
         userEntityAdapter.write(document, user);
 
         CUserRoleMapping mapping = new CUserRoleMapping();
@@ -254,6 +263,11 @@ public class DefaultSecurityModelConfigurationSource
           userRoleMappingEntityAdapter.create(db, mapping);
         }
       }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "User " + user.getId() + " updated in the mean time"
+        );
+      }
     }
 
     @Override
@@ -265,6 +279,11 @@ public class DefaultSecurityModelConfigurationSource
           return true;
         }
         return false;
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "User " + id + " updated in the mean time"
+        );
       }
     }
 
@@ -308,7 +327,17 @@ public class DefaultSecurityModelConfigurationSource
         if (document == null) {
           throw new NoSuchRoleMappingException("User " + mapping.getUserId() + " role mappings not found");
         }
+        if (mapping.getVersion() != null && !Objects.equals(mapping.getVersion(), valueOf(document.getVersion()))) {
+          throw new ConcurrentModificationException(
+              "User " + mapping.getUserId() + " role mappings updated in the mean time"
+          );
+        }
         userRoleMappingEntityAdapter.write(document, mapping);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "User " + mapping.getUserId() + " role mappings updated in the mean time"
+        );
       }
     }
 
@@ -318,6 +347,11 @@ public class DefaultSecurityModelConfigurationSource
       checkNotNull(source, "source");
       try (ODatabaseDocumentTx db = openDb()) {
         return userRoleMappingEntityAdapter.delete(db, userId, source);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "User " + userId + " role mappings updated in the mean time"
+        );
       }
     }
 
@@ -358,7 +392,17 @@ public class DefaultSecurityModelConfigurationSource
         if (document == null) {
           throw new NoSuchPrivilegeException("Privilege " + privilege.getId() + " not found");
         }
+        if (privilege.getVersion() != null && !Objects.equals(privilege.getVersion(), valueOf(document.getVersion()))) {
+          throw new ConcurrentModificationException(
+              "Privilege " + privilege.getId() + " updated in the mean time"
+          );
+        }
         privilegeEntityAdapter.write(document, privilege);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "Privilege " + privilege.getId() + " updated in the mean time"
+        );
       }
     }
 
@@ -367,6 +411,11 @@ public class DefaultSecurityModelConfigurationSource
       checkNotNull(id, "privilege id");
       try (ODatabaseDocumentTx db = openDb()) {
         return privilegeEntityAdapter.delete(db, id);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "Privilege " + id + " updated in the mean time"
+        );
       }
     }
 
@@ -407,7 +456,17 @@ public class DefaultSecurityModelConfigurationSource
         if (document == null) {
           throw new NoSuchRoleException("Role " + role.getId() + " not found");
         }
+        if (role.getVersion() != null && !Objects.equals(role.getVersion(), valueOf(document.getVersion()))) {
+          throw new ConcurrentModificationException(
+              "Role " + role.getId() + " updated in the mean time"
+          );
+        }
         roleEntityAdapter.write(document, role);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "Role " + role.getId() + " updated in the mean time"
+        );
       }
     }
 
@@ -416,6 +475,11 @@ public class DefaultSecurityModelConfigurationSource
       checkNotNull(id, "role id");
       try (ODatabaseDocumentTx db = openDb()) {
         return roleEntityAdapter.delete(db, id);
+      }
+      catch (OConcurrentModificationException e) {
+        throw new ConcurrentModificationException(
+            "Role " + id + " updated in the mean time"
+        );
       }
     }
 

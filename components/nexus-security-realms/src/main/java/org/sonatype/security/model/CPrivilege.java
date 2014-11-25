@@ -61,6 +61,7 @@ public class CPrivilege
    */
   private boolean readOnly = false;
 
+  private String version;
 
   //-----------/
   //- Methods -/
@@ -193,5 +194,13 @@ public class CPrivilege
   public void setType(String type) {
     this.type = type;
   } //-- void setType( String )
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
 
 }

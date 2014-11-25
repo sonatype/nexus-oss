@@ -115,6 +115,8 @@ public class CUserRoleMappingEntityAdapter
     entity.setSource(document.<String>field(P_SOURCE, OType.STRING));
     entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
 
+    entity.setVersion(String.valueOf(document.getVersion()));
+
     return entity;
   }
 

@@ -58,6 +58,7 @@ public class CUser
    */
   private String email;
 
+  private String version;
 
   //-----------/
   //- Methods -/
@@ -180,6 +181,13 @@ public class CUser
     this.status = status;
   } //-- void setStatus( String )
 
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
 
   public static final String STATUS_DISABLED = "disabled";
 

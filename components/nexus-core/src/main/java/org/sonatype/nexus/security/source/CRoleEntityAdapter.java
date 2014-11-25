@@ -126,6 +126,8 @@ public class CRoleEntityAdapter
     entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
     entity.setReadOnly(false);
 
+    entity.setVersion(String.valueOf(document.getVersion()));
+
     return entity;
   }
 
