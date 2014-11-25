@@ -65,7 +65,7 @@ extends DirectComponentSupport
     TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(RepairIndexTask.class)
     task.setRepositoryId(id)
     task.setPath(path ?: '/')
-    task.setDescription("Repair ${repository.name} index")
+    task.setName("Repair ${repository.name} index")
 
     nexusScheduler.submit(task)
   }
@@ -82,7 +82,7 @@ extends DirectComponentSupport
     TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(UpdateIndexTask)
     task.setRepositoryId(id)
     task.setPath(path ?: '/')
-    task.setDescription("Update ${repository.name} index")
+    task.setName("Update ${repository.name} index")
 
     nexusScheduler.submit(task)
   }

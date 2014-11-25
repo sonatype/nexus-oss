@@ -395,7 +395,7 @@ extends DirectComponentSupport
     TaskConfiguration taskConfiguration = nexusScheduler.createTaskConfigurationInstance(ExpireCacheTask)
     taskConfiguration.setRepositoryId(id)
     taskConfiguration.setPath(path)
-    taskConfiguration.setDescription("Clear cache ${id}:${path}")
+    taskConfiguration.setName("Clear cache ${id}:${path}")
     nexusScheduler.submit(taskConfiguration)
   }
 

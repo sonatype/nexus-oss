@@ -282,7 +282,7 @@ public abstract class AbstractScheduledServicePlexusResource
       if (!Strings.isNullOrEmpty(model.getId())) {
         task.setId(model.getId());
       }
-      task.setDescription(model.getName());
+      task.setName(model.getName());
       task.setEnabled(model.isEnabled());
 
       return task;
@@ -458,7 +458,7 @@ public abstract class AbstractScheduledServicePlexusResource
     if (resource != null) {
       resource.setId(taskConfiguration.getId());
       resource.setEnabled(taskConfiguration.isEnabled());
-      resource.setName(taskConfiguration.getDescription());
+      resource.setName(taskConfiguration.getName());
       resource.setSchedule(getScheduleShortName(schedule));
       resource.setTypeId(taskConfiguration.getType());
       resource.setProperties(formatServiceProperties(taskConfiguration.getMap()));

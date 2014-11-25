@@ -79,7 +79,7 @@ public class RepositoryConfigurationUpdatedEventInspector
 
       final TaskConfiguration taskConfiguration = nexusTaskExecutor.createTaskConfigurationInstance(ExpireCacheTask.class);
       taskConfiguration.setRepositoryId(event.getRepository().getId());
-      taskConfiguration.setDescription(taskName);
+      taskConfiguration.setName(taskName);
       nexusTaskExecutor.submit(taskConfiguration);
       log.info(logMessage);
     }
