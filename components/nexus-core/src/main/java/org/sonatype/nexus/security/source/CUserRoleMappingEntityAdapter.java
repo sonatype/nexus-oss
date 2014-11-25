@@ -10,22 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.model.source;
+package org.sonatype.nexus.security.source;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -38,26 +38,22 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link CPrivilege} entity adapter.
+ * {@link CUserRoleMapping} entity adapter.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class CPrivilegeEntityAdapter
+public class CUserRoleMappingEntityAdapter
     extends ComponentSupport
 {
-  public static final String DB_CLASS = new OClassNameBuilder().type("SecurityPrivilege").build();
+  public static final String DB_CLASS = new OClassNameBuilder().type("SecurityUserRoleMapping").build();
 
-  public static final String P_ID = "id";
+  public static final String P_USER_ID = "userId";
 
-  public static final String P_NAME = "name";
+  public static final String P_SOURCE = "source";
 
-  public static final String P_DESCRIPTION = "description";
-
-  public static final String P_TYPE = "type";
-
-  public static final String P_PROPERTIES = "properties";
+  public static final String P_ROLES = "roles";
 
   /**
    * Register schema.
@@ -70,13 +66,11 @@ public class CPrivilegeEntityAdapter
     if (type == null) {
       type = schema.createClass(DB_CLASS);
 
-      type.createProperty(P_ID, OType.STRING).setNotNull(true);
-      type.createProperty(P_NAME, OType.STRING).setNotNull(true);
-      type.createProperty(P_DESCRIPTION, OType.STRING);
-      type.createProperty(P_TYPE, OType.STRING).setNotNull(true);
-      type.createProperty(P_PROPERTIES, OType.EMBEDDEDMAP).setNotNull(true);
+      type.createProperty(P_USER_ID, OType.STRING).setNotNull(true);
+      type.createProperty(P_SOURCE, OType.STRING).setNotNull(true);
+      type.createProperty(P_ROLES, OType.EMBEDDEDSET);
 
-      type.createIndex(DB_CLASS + "_" + P_ID + "idx", INDEX_TYPE.UNIQUE, P_ID);
+      type.createIndex(DB_CLASS + "_" + P_USER_ID + "_" + P_SOURCE + "idx", INDEX_TYPE.UNIQUE, P_USER_ID, P_SOURCE);
 
       log.info("Created schema: {}, properties: {}", type, type.properties());
 
@@ -88,7 +82,7 @@ public class CPrivilegeEntityAdapter
   /**
    * Create a new document and write entity.
    */
-  public ODocument create(final ODatabaseDocumentTx db, final CPrivilege entity) {
+  public ODocument create(final ODatabaseDocumentTx db, final CUserRoleMapping entity) {
     checkNotNull(db);
     checkNotNull(entity);
 
@@ -99,15 +93,13 @@ public class CPrivilegeEntityAdapter
   /**
    * Write entity to document.
    */
-  public ODocument write(final ODocument document, final CPrivilege entity) {
+  public ODocument write(final ODocument document, final CUserRoleMapping entity) {
     checkNotNull(document);
     checkNotNull(entity);
 
-    document.field(P_ID, entity.getId());
-    document.field(P_NAME, entity.getName());
-    document.field(P_DESCRIPTION, entity.getDescription());
-    document.field(P_TYPE, entity.getType());
-    document.field(P_PROPERTIES, entity.getProperties());
+    document.field(P_USER_ID, entity.getUserId());
+    document.field(P_SOURCE, entity.getSource());
+    document.field(P_ROLES, entity.getRoles());
 
     return document.save();
   }
@@ -115,16 +107,13 @@ public class CPrivilegeEntityAdapter
   /**
    * Read entity from document.
    */
-  public CPrivilege read(final ODocument document) {
+  public CUserRoleMapping read(final ODocument document) {
     checkNotNull(document);
 
-    CPrivilege entity = new CPrivilege();
-    entity.setId(document.<String>field(P_ID, OType.STRING));
-    entity.setName(document.<String>field(P_NAME, OType.STRING));
-    entity.setDescription(document.<String>field(P_DESCRIPTION, OType.STRING));
-    entity.setType(document.<String>field(P_TYPE, OType.STRING));
-    entity.setReadOnly(false);
-    entity.setProperties(Maps.newHashMap(document.<Map<String, String>>field(P_PROPERTIES, OType.EMBEDDEDMAP)));
+    CUserRoleMapping entity = new CUserRoleMapping();
+    entity.setUserId(document.<String>field(P_USER_ID, OType.STRING));
+    entity.setSource(document.<String>field(P_SOURCE, OType.STRING));
+    entity.setRoles(Sets.newHashSet(document.<Set<String>>field(P_ROLES, OType.EMBEDDEDSET)));
 
     entity.setVersion(String.valueOf(document.getVersion()));
 
@@ -140,30 +129,30 @@ public class CPrivilegeEntityAdapter
   }
 
   /**
-   * Get all privileges.
+   * Get all user role mappings.
    */
-  public Iterable<CPrivilege> get(final ODatabaseDocumentTx db) {
-    return Iterables.transform(browse(db), new Function<ODocument, CPrivilege>()
+  public Iterable<CUserRoleMapping> get(final ODatabaseDocumentTx db) {
+    return Iterables.transform(browse(db), new Function<ODocument, CUserRoleMapping>()
     {
       @Nullable
       @Override
-      public CPrivilege apply(@Nullable final ODocument input) {
+      public CUserRoleMapping apply(@Nullable final ODocument input) {
         return input == null ? null : read(input);
       }
     });
   }
 
   /**
-   * Retrieves a privilege document.
+   * Retrieves a mapping document.
    *
    * @return found document, null otherwise
    */
   @Nullable
-  public ODocument get(final ODatabaseDocumentTx db, final String id) {
+  public ODocument get(final ODatabaseDocumentTx db, final String userId, final String source) {
     OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
-        "SELECT FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+        "SELECT FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
-    List<ODocument> results = db.command(query).execute(id);
+    List<ODocument> results = db.command(query).execute(userId, source);
     if (results.isEmpty()) {
       return null;
     }
@@ -171,15 +160,15 @@ public class CPrivilegeEntityAdapter
   }
 
   /**
-   * Deletes a privilege.
+   * Deletes a mapping.
    *
-   * @return true if privilege was deleted
+   * @return true if mapping was deleted
    */
-  public boolean delete(final ODatabaseDocumentTx db, final String id) {
+  public boolean delete(final ODatabaseDocumentTx db, final String userId, final String source) {
     OCommandSQL command = new OCommandSQL(
-        "DELETE FROM " + DB_CLASS + " WHERE " + P_ID + " = ?"
+        "DELETE FROM " + DB_CLASS + " WHERE " + P_USER_ID + " = ?" + " AND " + P_SOURCE + " = ?"
     );
-    int records = db.command(command).execute(id);
+    int records = db.command(command).execute(userId, source);
     return records == 1;
   }
 

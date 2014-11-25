@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.model.source;
+package org.sonatype.nexus.security.source;
 
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -22,7 +22,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
@@ -30,12 +33,14 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -46,13 +51,15 @@ import static java.lang.String.valueOf;
 /**
  * Default {@link SecurityModelConfigurationSource} implementation using Orient db as store.
  *
+ * TODO remove EventSubscriber and replace with component lifecycle (NEXUS-7303)
+ *
  * @since 3.0
  */
 @Named
 @Singleton
-public class OrientSecurityModelConfigurationSource
+public class DefaultSecurityModelConfigurationSource
     extends LifecycleSupport
-    implements SecurityModelConfigurationSource
+    implements SecurityModelConfigurationSource, EventSubscriber
 {
 
   /**
@@ -79,12 +86,12 @@ public class OrientSecurityModelConfigurationSource
   private SecurityModelConfiguration configuration;
 
   @Inject
-  public OrientSecurityModelConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
-                                                final @Named("static") SecurityModelConfigurationSource defaults,
-                                                final CUserEntityAdapter userEntityAdapter,
-                                                final CRoleEntityAdapter roleEntityAdapter,
-                                                final CPrivilegeEntityAdapter privilegeEntityAdapter,
-                                                final CUserRoleMappingEntityAdapter userRoleMappingEntityAdapter)
+  public DefaultSecurityModelConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
+                                                 final @Named("static") SecurityModelConfigurationSource defaults,
+                                                 final CUserEntityAdapter userEntityAdapter,
+                                                 final CRoleEntityAdapter roleEntityAdapter,
+                                                 final CPrivilegeEntityAdapter privilegeEntityAdapter,
+                                                 final CUserRoleMappingEntityAdapter userRoleMappingEntityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
     this.securityDefaults = checkNotNull(defaults);
@@ -170,6 +177,24 @@ public class OrientSecurityModelConfigurationSource
   private ODatabaseDocumentTx openDb() {
     ensureStarted();
     return databaseInstance.get().acquire();
+  }
+
+  /**
+   * Start itself on nexus start.
+   * TODO remove this and replace with component lifecycle (NEXUS-7303)
+   */
+  @Subscribe
+  public void on(final NexusInitializedEvent event) throws Exception {
+    start();
+  }
+
+  /**
+   * Stop itself on nexus shutdown.
+   * TODO remove this and replace with component lifecycle (NEXUS-7303)
+   */
+  @Subscribe
+  public void on(final NexusStoppingEvent event) throws Exception {
+    stop();
   }
 
   private class OrientSecurityModelConfiguration
