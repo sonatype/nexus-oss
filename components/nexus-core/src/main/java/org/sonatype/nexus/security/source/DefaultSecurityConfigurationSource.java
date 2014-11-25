@@ -10,17 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.configuration.source;
+package org.sonatype.nexus.security.source;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -29,13 +34,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Default {@link SecurityConfigurationSource} implementation using Orient db as store.
  *
+ * TODO remove EventSubscriber and replace with component lifecycle (NEXUS-7303)
+ *
  * @since 3.0
  */
 @Named
 @Singleton
-public class OrientSecurityConfigurationSource
+public class DefaultSecurityConfigurationSource
     extends LifecycleSupport
-    implements SecurityConfigurationSource
+    implements SecurityConfigurationSource, EventSubscriber
 {
 
   /**
@@ -59,9 +66,9 @@ public class OrientSecurityConfigurationSource
   private SecurityConfiguration configuration;
 
   @Inject
-  public OrientSecurityConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
-                                           final @Named("static") SecurityConfigurationSource securityDefaults,
-                                           final SecurityConfigurationEntityAdapter entityAdapter)
+  public DefaultSecurityConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
+                                            final @Named("static") SecurityConfigurationSource securityDefaults,
+                                            final SecurityConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
     this.securityDefaults = checkNotNull(securityDefaults);
@@ -129,6 +136,24 @@ public class OrientSecurityConfigurationSource
   private ODatabaseDocumentTx openDb() {
     ensureStarted();
     return databaseInstance.get().acquire();
+  }
+
+  /**
+   * Start itself on nexus start.
+   * TODO remove this and replace with component lifecycle (NEXUS-7303)
+   */
+  @Subscribe
+  public void on(final NexusInitializedEvent event) throws Exception {
+    start();
+  }
+
+  /**
+   * Stop itself on nexus shutdown.
+   * TODO remove this and replace with component lifecycle (NEXUS-7303)
+   */
+  @Subscribe
+  public void on(final NexusStoppingEvent event) throws Exception {
+    stop();
   }
 
 }
