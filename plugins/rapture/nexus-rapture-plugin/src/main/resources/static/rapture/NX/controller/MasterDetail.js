@@ -323,8 +323,7 @@ Ext.define('NX.controller.MasterDetail', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list)
+            NX.Conditions.isPermitted(me.permission, 'delete')
         ),
         {
           satisfied: button.enable,
