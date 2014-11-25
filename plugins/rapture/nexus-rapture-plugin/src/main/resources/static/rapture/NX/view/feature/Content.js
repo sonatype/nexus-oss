@@ -21,30 +21,43 @@ Ext.define('NX.view.feature.Content', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-feature-content',
 
+  itemId: 'feature-content',
   ui: 'feature-content',
   cls: 'feature-content',
   layout: 'fit',
 
   header: {
-    xtype: 'toolbar',
-    height: 50,
+    xtype: 'panel',
     items: [
-      ' ',
       {
-        xtype: 'image',
-        itemId: 'icon',
-        height: 32,
-        width: 32
+        xtype: 'toolbar',
+        itemId: 'breadcrumb',
+        height: 50,
+        hidden: true
       },
       {
-        xtype: 'tbtext',
-        cls: 'feature-name',
-        itemId: 'title'
-      },
-      {
-        xtype: 'tbtext',
-        cls: 'feature-description',
-        itemId: 'description'
+        xtype: 'toolbar',
+        itemId: 'feature-root',
+        height: 50,
+        items: [
+          '',
+          {
+            xtype: 'image',
+            itemId: 'icon',
+            height: 32,
+            width: 32
+          },
+          {
+            xtype: 'tbtext',
+            cls: 'feature-name',
+            itemId: 'title'
+          },
+          {
+            xtype: 'tbtext',
+            cls: 'feature-description',
+            itemId: 'description'
+          }
+        ]
       }
     ]
   },
@@ -58,6 +71,18 @@ Ext.define('NX.view.feature.Content', {
       me.setTitle(title.text);
       me.setDescription(description.text);
     }
+  },
+
+  /**
+   * Show the feature root (hide the breadcrumb)
+   */
+  showRoot: function() {
+    var me = this;
+    var root = me.down('#feature-root');
+    var breadcrumb = me.down('#breadcrumb');
+
+    root.show();
+    breadcrumb.hide();
   },
 
   /**

@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.ldap.usermanagement;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,35 +21,36 @@ import com.sonatype.nexus.ldap.LdapPlugin;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.ldap.LdapTestSupport;
+import org.sonatype.security.ldap.SecurityTestSupportSecurity;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-import com.google.inject.Module;
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class LdapUserManagerIT
     extends LdapTestSupport
 {
+
   @Override
-  protected Module[] getTestCustomModules() {
-    return new Module[]{new SecurityModule()};
+  protected SecurityConfiguration getSecurityConfig() {
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   @Override
-  public void setUp()
-      throws Exception
-  {
-    super.setUp();
-    copyResourceToFile("/test-conf/etc/security-users-in-both-realms.xml", getNexusSecurityConfiguration());
-    copyResourceToFile("/test-conf/etc/security-configuration.xml", getSecurityConfiguration());
+  protected Configuration getSecurityModelConfig() {
+    return LdapUserManagerITSecurity.securityModel();
   }
 
   private SecuritySystem getSecuritySystem()
@@ -79,11 +79,7 @@ public class LdapUserManagerIT
     Assert.assertEquals("Tamas Cservenak", user.getName());
 
     Set<String> roleIds = this.getUserRoleIds(user);
-    assertTrue(roleIds.contains("repoconsumer")); // from LDAP
-    assertTrue(roleIds.contains("developer")); // FROM LDAP and XML
-    assertTrue(roleIds.contains("anonymous")); // FROM XML
-    assertTrue(roleIds.contains("nx-developer"));
-    Assert.assertEquals("Expected 4 roles; found " + roleIds.size() + ": " + roleIds, 4, roleIds.size());
+    assertThat(roleIds, containsInAnyOrder("repoconsumer", "anonymous", "developer"));
   }
 
   @Test
@@ -194,9 +190,6 @@ public class LdapUserManagerIT
   public void testOrderOfUserSearch()
       throws Exception
   {
-    IOUtils.copy(getClass().getResourceAsStream("/test-conf/etc/security-users-in-both-realms.xml"),
-        new FileOutputStream(getNexusSecurityConfiguration()));
-
     SecuritySystem securitySystem = this.getSecuritySystem();
     securitySystem.start();
 

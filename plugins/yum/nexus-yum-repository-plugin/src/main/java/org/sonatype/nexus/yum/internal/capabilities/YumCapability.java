@@ -20,16 +20,16 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionConstraint;
-import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.capability.Condition;
 import org.sonatype.nexus.capability.Evaluable;
 import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
 
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
+import org.eclipse.aether.version.VersionScheme;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;

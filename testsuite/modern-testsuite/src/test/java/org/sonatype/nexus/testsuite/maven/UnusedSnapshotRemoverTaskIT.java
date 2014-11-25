@@ -13,7 +13,6 @@
 package org.sonatype.nexus.testsuite.maven;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -28,15 +27,10 @@ import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.collect.Maps;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.client.core.subsystem.content.Location.repositoryLocation;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 /**
  * ITs related to unused snapshots remover task.
@@ -47,16 +41,6 @@ import static org.sonatype.sisu.goodies.common.Varargs.$;
 public class UnusedSnapshotRemoverTaskIT
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
 
   public UnusedSnapshotRemoverTaskIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

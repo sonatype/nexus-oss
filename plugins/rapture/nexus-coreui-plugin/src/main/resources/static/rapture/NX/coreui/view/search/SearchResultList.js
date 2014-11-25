@@ -37,8 +37,31 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
         return 'search-component';
       }
     },
-    { header: 'Component', dataIndex: 'id', flex: 1 },
-    { header: 'Format', dataIndex: 'format', width: 70, hidden: true }
+    {
+      header: 'Component',
+      dataIndex: 'id',
+      menuDisabled: true,
+      resizable: false,
+      flex: 1
+    },
+    { header: 'Format', dataIndex: 'format', width: 70, hidden: true },
+    {
+      width: 24,
+      hideable: false,
+      sortable: false,
+      menuDisabled: true,
+      resizable: false,
+
+      defaultRenderer: function() {
+        return Ext.DomHelper.markup(
+          {
+            tag: 'span',
+            html: '&#xf105;', // Right angle
+            style: 'font-family: FontAwesome;'
+          }
+        )
+      }
+    }
   ],
 
   dockedItems: [

@@ -20,6 +20,7 @@
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-settingsform',
+  //ui: 'inset',
 
   /**
    * @cfg {boolean} [settingsForm=true] Marker that we have a settings form
@@ -65,7 +66,6 @@ Ext.define('NX.view.SettingsForm', {
    */
   editableMarker: undefined,
 
-  bodyPadding: "0 10px 0px 10px",
   autoScroll: true,
   waitMsgTarget: true,
 

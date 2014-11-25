@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.site;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Properties;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
@@ -28,27 +27,12 @@ import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import com.sun.jersey.api.client.ClientResponse;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.runners.Parameterized;
 
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.firstAvailableTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.systemTestParameters;
-import static org.sonatype.nexus.testsuite.support.ParametersLoaders.testParameters;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.goodies.common.Varargs.$;
 
 public abstract class SiteRepositoryITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Parameterized.Parameters
-  public static Collection<Object[]> data() {
-    return firstAvailableTestParameters(
-        systemTestParameters(),
-        testParameters(
-            $("${it.nexus.bundle.groupId}:${it.nexus.bundle.artifactId}:zip")
-        )
-    ).load();
-  }
 
   public SiteRepositoryITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);

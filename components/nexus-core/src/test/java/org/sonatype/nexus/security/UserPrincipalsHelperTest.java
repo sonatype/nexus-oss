@@ -31,11 +31,9 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import junit.framework.Assert;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -67,7 +65,7 @@ public class UserPrincipalsHelperTest
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add( new AbstractModule()
+    modules.add(new AbstractModule()
     {
       @Override
       protected void configure() {
@@ -85,9 +83,6 @@ public class UserPrincipalsHelperTest
     TestUserManager.userDeleted = false;
 
     super.setUp();
-
-    copyResource("UserPrincipalsHelperTest-security.xml", getNexusSecurityConfiguration());
-    copyResource("UserPrincipalsHelperTest-security-configuration.xml", getSecurityConfiguration());
 
     securitySystem = lookup(SecuritySystem.class);
     securitySystem.start();
@@ -111,7 +106,7 @@ public class UserPrincipalsHelperTest
     try {
       helper().findUserManager(null);
 
-      Assert.fail("Expected NoSuchUserManagerException");
+      assertThat("Expected NoSuchUserManagerException", false);
     }
     catch (final NoSuchUserManagerException e) {
       // expected...
@@ -123,7 +118,7 @@ public class UserPrincipalsHelperTest
     try {
       helper().findUserManager(new SimplePrincipalCollection("badUser", "badRealm"));
 
-      Assert.fail("Expected NoSuchUserManagerException");
+      assertThat("Expected NoSuchUserManagerException", false);
     }
     catch (final NoSuchUserManagerException e) {
       // expected...
@@ -134,7 +129,7 @@ public class UserPrincipalsHelperTest
   public void testFindUserManager()
       throws NoSuchUserManagerException, AuthenticationException
   {
-    final Subject subject = login("test-user", "deployment123");
+    final Subject subject = login("deployment", "deployment123");
     try {
       final PrincipalCollection principals = subject.getPrincipals();
       final UserManager userManager = helper().findUserManager(principals);
@@ -173,7 +168,7 @@ public class UserPrincipalsHelperTest
     try {
       helper().getUserStatus(null);
 
-      Assert.fail("Expected UserNotFoundException");
+      assertThat("Expected UserNotFoundException", false);
     }
     catch (final UserNotFoundException e) {
       // expected...
@@ -185,7 +180,7 @@ public class UserPrincipalsHelperTest
     try {
       helper().getUserStatus(new SimplePrincipalCollection("badUser", "badRealm"));
 
-      Assert.fail("Expected UserNotFoundException");
+      assertThat("Expected UserNotFoundException", false);
     }
     catch (final UserNotFoundException e) {
       // expected...
@@ -196,7 +191,7 @@ public class UserPrincipalsHelperTest
   public void testGetUserStatus()
       throws UserNotFoundException, AuthenticationException
   {
-    final Subject subject = login("test-user", "deployment123");
+    final Subject subject = login("deployment", "deployment123");
     try {
       final PrincipalCollection principals = subject.getPrincipals();
 
@@ -233,7 +228,7 @@ public class UserPrincipalsHelperTest
       try {
         helper().getUserStatus(principals);
 
-        Assert.fail("Expected UserNotFoundException");
+        assertThat("Expected UserNotFoundException", false);
       }
       catch (final UserNotFoundException e) {
         // expected...

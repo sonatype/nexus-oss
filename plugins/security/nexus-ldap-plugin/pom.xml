@@ -72,12 +72,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-groovy-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rapture-plugin</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -117,6 +111,11 @@
           <artifactId>shared-bouncycastle-reduced</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
     </dependency>
   </dependencies>
 

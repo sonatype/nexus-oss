@@ -37,9 +37,7 @@ public class DefaultSecurityConfigurationCleanerTest
   public void testRemovePrivilege()
       throws Exception
   {
-    Configuration configuration =
-        getConfigurationFromStream(getClass().getResourceAsStream(
-            "/org/sonatype/security/realms/tools/cleaner-security.xml"));
+    Configuration configuration = DefaultSecurityConfigurationCleanerTestSecurity.securityModel();
 
     CPrivilege priv = (CPrivilege) configuration.getPrivileges().get(0);
 
@@ -55,9 +53,7 @@ public class DefaultSecurityConfigurationCleanerTest
   public void testRemoveRole()
       throws Exception
   {
-    Configuration configuration =
-        getConfigurationFromStream(getClass().getResourceAsStream(
-            "/org/sonatype/security/realms/tools/cleaner-security.xml"));
+    Configuration configuration = DefaultSecurityConfigurationCleanerTestSecurity.securityModel();
 
     CRole role = (CRole) configuration.getRoles().get(0);
 

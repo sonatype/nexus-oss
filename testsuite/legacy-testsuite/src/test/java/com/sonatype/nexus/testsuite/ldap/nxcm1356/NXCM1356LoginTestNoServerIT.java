@@ -12,7 +12,6 @@
  */
 package com.sonatype.nexus.testsuite.ldap.nxcm1356;
 
-import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
 import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
 import com.sonatype.security.ldap.api.dto.LdapServerLoginTestDTO;
@@ -30,7 +29,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 
 public class NXCM1356LoginTestNoServerIT
-    extends AbstractLdapIT
+    extends NXCM1356ITSupport
 {
 
   @Test

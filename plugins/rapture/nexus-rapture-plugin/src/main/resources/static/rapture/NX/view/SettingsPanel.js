@@ -20,6 +20,7 @@
 Ext.define('NX.view.SettingsPanel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-settingsPanel',
+  ui: 'inset',
 
   layout: {
     type: 'vbox',

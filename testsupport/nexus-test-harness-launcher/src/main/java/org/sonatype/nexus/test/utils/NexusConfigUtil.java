@@ -89,17 +89,6 @@ public class NexusConfigUtil
     }
   }
 
-  public void saveNexusConfig(final Configuration config)
-      throws IOException
-  {
-    // save it
-    final NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-    try (FileWriter fos = new FileWriter(getSecurityConfigurationFile())) {
-      writer.write(fos, config);
-      Flushables.flushQuietly(fos);
-    }
-  }
-
   @Deprecated
   public static File getNexusFile() {
     return getNexusConfigurationFile();
@@ -107,10 +96,6 @@ public class NexusConfigUtil
 
   public static File getNexusConfigurationFile() {
     return new File(AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml");
-  }
-
-  public static File getSecurityConfigurationFile() {
-    return new File(AbstractNexusIntegrationTest.WORK_CONF_DIR, "security-configuration.xml");
   }
 
   public CPathMappingItem getRoute(String id)

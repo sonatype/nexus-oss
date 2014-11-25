@@ -49,16 +49,16 @@ Ext.define('NX.view.Main', {
       border: true
     },
 
-    {
-      xtype: 'nx-message-panel',
-      region: 'east',
-      border: true,
-      resizable: true,
-      resizeHandles: 'w',
-
-      // default to hidden, header button toggles
-      hidden: true
-    },
+    //{
+    //  xtype: 'nx-message-panel',
+    //  region: 'east',
+    //  border: true,
+    //  resizable: true,
+    //  resizeHandles: 'w',
+    //
+    //  // default to hidden, header button toggles
+    //  hidden: true
+    //},
 
     {
       xtype: 'nx-footer',
@@ -96,7 +96,7 @@ Ext.define('NX.view.Main', {
       ' ',
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
-      { xtype: 'nx-header-messages', ui: 'header' },
+      //{ xtype: 'nx-header-messages', ui: 'header' },
       { xtype: 'nx-header-refresh', ui: 'header' },
       { xtype: 'nx-header-signin', ui: 'header' },
       { xtype: 'nx-header-user-mode', ui: 'header', hidden: true },

@@ -20,16 +20,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.mavenbridge.NexusAether;
 import org.sonatype.nexus.plugins.mavenbridge.workspace.NexusWorkspace;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.LocalRepository;
 
 @Named
 @Singleton
@@ -73,12 +73,12 @@ public class DefaultNexusAether
   }
 
   public DefaultRepositorySystemSession getDefaultRepositorySystemSession() {
-    MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+    DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
     // can't aether work _without_ local repo?
     LocalRepository localRepo =
         new LocalRepository(applicationConfiguration.getWorkingDirectory(LOCAL_REPO_DIR));
-    session.setLocalRepositoryManager(getRepositorySystem().newLocalRepositoryManager(localRepo));
+    session.setLocalRepositoryManager(getRepositorySystem().newLocalRepositoryManager(session, localRepo));
 
     // session.setIgnoreMissingArtifactDescriptor( false );
 

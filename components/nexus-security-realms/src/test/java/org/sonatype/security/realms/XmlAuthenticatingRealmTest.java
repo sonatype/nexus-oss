@@ -12,12 +12,11 @@
  */
 package org.sonatype.security.realms;
 
-import java.io.File;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -30,19 +29,13 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.realm.Realm;
-import org.eclipse.sisu.launch.InjectedTestCase;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class XmlAuthenticatingRealmTest
-    extends InjectedTestCase
+    extends AbstractSecurityTestCase
 {
-  private final String SECURITY_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
-
-  private final String SECURITY_CONFIGURATION_FILE_PATH = getBasedir() + "/target/jsecurity/security-configuration.xml";
-
-  private File configFile = new File(SECURITY_FILE_PATH);
 
   private XmlAuthenticatingRealm realm;
 
@@ -53,13 +46,6 @@ public class XmlAuthenticatingRealmTest
   private PasswordService passwordService;
 
   private CUser testUser;
-
-  @Override
-  public void configure(Properties properties) {
-    properties.put("security-xml-file", SECURITY_FILE_PATH);
-    properties.put("application-conf", SECURITY_CONFIGURATION_FILE_PATH);
-    super.configure(properties);
-  }
 
   @Override
   protected void setUp()
@@ -75,8 +61,6 @@ public class XmlAuthenticatingRealmTest
 
     passwordGenerator = lookup(PasswordGenerator.class, "default");
     passwordService = lookup(PasswordService.class, "default");
-
-    configFile.delete();
   }
 
   public void testSuccessfulAuthentication()

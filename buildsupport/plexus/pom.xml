@@ -72,7 +72,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.0.10</version>
+        <version>3.0.20</version>
       </dependency>
 
       <dependency>
@@ -94,7 +94,7 @@
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-ldap-testsuite</artifactId>
-        <version>1.5.1-SNAPSHOT</version>
+        <version>1.5.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>

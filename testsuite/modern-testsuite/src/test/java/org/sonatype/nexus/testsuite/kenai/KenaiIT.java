@@ -59,6 +59,7 @@ public class KenaiIT
   public void kenaiLogsInWithGoodCredentials()
       throws Exception
   {
+    configureKenaiRealm();
     createKenaiBaseRoleIfNeeded();
     // see KenaiAuthcBehaviour: "authenticated" users are those having password = username + "123"
     final NexusClient kenaiAuthenticatedClient = createNexusClient(nexus(), "kenaiuser", "kenaiuser123");
@@ -73,6 +74,7 @@ public class KenaiIT
   public void kenaiNotLogsInWithBadCredentials()
       throws Exception
   {
+    configureKenaiRealm();
     createKenaiBaseRoleIfNeeded();
     // see KenaiAuthcBehaviour: "authenticated" users are those having password = username + "123"
     // this user below will have BAD credentials

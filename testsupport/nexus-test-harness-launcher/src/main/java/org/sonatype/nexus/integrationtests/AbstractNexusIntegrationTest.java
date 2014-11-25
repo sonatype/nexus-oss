@@ -16,21 +16,25 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.rest.model.RoleResource;
+import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.sisu.goodies.prefs.memory.MemoryPreferencesFactory;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -51,11 +55,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import static java.util.Arrays.asList;
+
 /**
  * Support for legacy (embedded-server) integration tests.
  */
 public abstract class AbstractNexusIntegrationTest
-  extends TestSupport
+    extends TestSupport
 {
   /**
    * Default start timeout value in seconds.
@@ -79,6 +85,10 @@ public abstract class AbstractNexusIntegrationTest
   public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
   public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
+
+  public static final String TEST_USER_NAME = "test-user";
+
+  public static final String TEST_USER_PASSWORD = "admin123";
 
   @ClassRule
   public static final ProfilerHelper profilerHelper = new ProfilerHelper();
@@ -137,6 +147,10 @@ public abstract class AbstractNexusIntegrationTest
   protected final Logger log = util.getLog();
 
   private String testRepositoryId;
+
+  protected static UserMessageUtil userUtil;
+
+  protected static RoleMessageUtil roleUtil;
 
   protected AbstractNexusIntegrationTest() {
     this("nexus-test-harness-repo");
@@ -253,12 +267,26 @@ public abstract class AbstractNexusIntegrationTest
         // start nexus
         startNexus();
 
+        XStream xStream = getXMLXStream();
+        userUtil = new UserMessageUtil(xStream, MediaType.APPLICATION_XML);
+        roleUtil = new RoleMessageUtil(xStream, MediaType.APPLICATION_XML);
+
         // set security enabled/disabled as expected by current IT
         final boolean testRequiresSecurityEnabled =
             TestContainer.getInstance().getTestContext().isSecureTest()
                 || Boolean.valueOf(System.getProperty("secure.test"));
-        new UserMessageUtil(getXMLXStream(), MediaType.APPLICATION_XML)
-            .makeAnonymousAdministrator(!testRequiresSecurityEnabled);
+        userUtil.makeAnonymousAdministrator(!testRequiresSecurityEnabled);
+        userUtil.invokeAsAdministrator(new Callable<Object>()
+        {
+          @Override
+          public Object call() throws Exception {
+            createUser(TEST_USER_NAME, TEST_USER_PASSWORD, asList("anonymous"));
+            createRole("role1", asList("1", "2"));
+            createRole("role2", asList("3", "4"));
+            prepareSecurity();
+            return null;
+          }
+        });
 
         // deploy artifacts
         deployArtifacts();
@@ -271,6 +299,10 @@ public abstract class AbstractNexusIntegrationTest
 
       getEventInspectorsUtil().waitForCalmPeriod();
     }
+  }
+
+
+  protected void prepareSecurity() throws Exception {
   }
 
   /**
@@ -371,12 +403,6 @@ public abstract class AbstractNexusIntegrationTest
 
   protected NexusConfigUtil getNexusConfigUtil() {
     return nexusConfigUtil;
-  }
-
-  private final SecurityConfigUtil securityConfigUtil = new SecurityConfigUtil();
-
-  protected SecurityConfigUtil getSecurityConfigUtil() {
-    return securityConfigUtil;
   }
 
   private final DeployUtils deployUtils = new DeployUtils();
@@ -536,8 +562,11 @@ public abstract class AbstractNexusIntegrationTest
   }
 
   @Deprecated
-  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type, String classifier, String targetDirectory) throws IOException {
-    return new DownloadHelper().downloadArtifact(baseUrl, groupId, artifact, version, type, classifier, targetDirectory);
+  protected File downloadArtifact(String baseUrl, String groupId, String artifact, String version, String type,
+                                  String classifier, String targetDirectory) throws IOException
+  {
+    return new DownloadHelper()
+        .downloadArtifact(baseUrl, groupId, artifact, version, type, classifier, targetDirectory);
   }
 
   @Deprecated
@@ -611,4 +640,34 @@ public abstract class AbstractNexusIntegrationTest
 
     return deleted;
   }
+
+  protected void createUser(final String userId, final String password, final String firstName,
+                            final String lastName, final String email, final String status,
+                            final List<String> roles)
+      throws Exception
+  {
+    UserResource user = new UserResource();
+    user.setUserId(userId);
+    user.setPassword(password);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+    user.setEmail(email);
+    user.setStatus(status);
+    user.setRoles(roles);
+    userUtil.createUser(user);
+  }
+
+  protected void createUser(final String userId, final String password, final List<String> roles) throws Exception {
+    createUser(userId, password, userId, userId, userId + "@foo.bar", "active", roles);
+  }
+
+  protected RoleResource createRole(final String id, List<String> privileges) throws Exception {
+    RoleResource role = new RoleResource();
+    role.setId(id);
+    role.setName(id);
+    role.setDescription(id);
+    role.setPrivileges(privileges);
+    return roleUtil.createRole(role);
+  }
+
 }

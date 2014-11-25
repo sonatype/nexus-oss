@@ -13,17 +13,14 @@
 package org.sonatype.nexus.testsuite.security.nexus142;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
-import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
 
 import org.apache.shiro.authc.credential.PasswordService;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +29,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * CRUD tests for JSON request/response.
@@ -73,28 +73,6 @@ public class Nexus142UserCrudJsonIT
   }
 
   @Test
-  public void createTestWithPassword()
-      throws IOException, ComponentLookupException
-  {
-
-    UserResource resource = new UserResource();
-    String password = "defaultPassword";
-    resource.setFirstName("Create User");
-    resource.setUserId("createTestWithPassword");
-    resource.setStatus("active");
-    resource.setEmail("nexus@user.com");
-    resource.addRole("role1");
-    resource.setPassword(password);
-
-    // this also validates
-    this.messageUtil.createUser(resource);
-
-    // validate password is correct
-    CUser cUser = getSecurityConfigUtil().getCUser("createTestWithPassword");
-    assertThat("Expected passwords to match", passwordService.passwordsMatch(password, cUser.getPassword()), is(true));
-  }
-
-  @Test
   public void listTest()
       throws IOException
   {
@@ -109,12 +87,20 @@ public class Nexus142UserCrudJsonIT
     // this also validates
     this.messageUtil.createUser(resource);
 
-    // now that we have at least one element stored (more from other tests, most likely)
-
-    // NEED to work around a GET problem with the REST client
     List<UserResource> users = this.messageUtil.getList();
-    getSecurityConfigUtil().verifyUsers(users);
-
+    UserResource foundUser = null;
+    for (UserResource user : users) {
+      if (resource.getUserId().equals(user.getUserId())) {
+        foundUser = user;
+        break;
+      }
+    }
+    assertThat(foundUser, is(notNullValue()));
+    assertThat(resource.getFirstName(), equalTo(foundUser.getFirstName()));
+    assertThat(resource.getLastName(), equalTo(foundUser.getLastName()));
+    assertThat(resource.getEmail(), equalTo(foundUser.getEmail()));
+    assertThat(resource.getStatus(), equalTo(foundUser.getStatus()));
+    assertThat(resource.getRoles(), containsInAnyOrder("role1"));
   }
 
   public void readTest()
@@ -198,8 +184,6 @@ public class Nexus142UserCrudJsonIT
     if (!response.getStatus().isSuccess()) {
       Assert.fail("Could not delete User: " + response.getStatus());
     }
-
-    getSecurityConfigUtil().verifyUsers(new ArrayList<UserResource>());
   }
 
 }

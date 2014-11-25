@@ -39,6 +39,7 @@ public abstract class NexusTestSupport
 
   public static final String CONF_DIR_KEY = "application-conf";
 
+  // TODO remove once moved to orient security
   public static final String SECURITY_XML_FILE = "security-xml-file";
 
   public static final String NEXUS_BASE_CONFIGURATION_KEY = "nexus-base";
@@ -76,6 +77,7 @@ public abstract class NexusTestSupport
     ctx.put(WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath());
     ctx.put(APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath());
     ctx.put(CONF_DIR_KEY, confHomeDir.getAbsolutePath());
+    // TODO remove once moved to orient security
     ctx.put(SECURITY_XML_FILE, getNexusSecurityConfiguration());
     ctx.put(NEXUS_BASE_CONFIGURATION_KEY, baseHomeDir.getAbsolutePath());
     ctx.put(NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath());
@@ -140,10 +142,7 @@ public abstract class NexusTestSupport
     return new File(confHomeDir, "nexus.xml").getAbsolutePath();
   }
 
-  protected String getSecurityConfiguration() {
-    return new File(confHomeDir, "security-configuration.xml").getAbsolutePath();
-  }
-
+  // TODO remove once moved to orient security
   protected String getNexusSecurityConfiguration() {
     return new File(confHomeDir, "security.xml").getAbsolutePath();
   }
@@ -152,12 +151,6 @@ public abstract class NexusTestSupport
       throws IOException
   {
     this.copyResource("/META-INF/nexus/default-oss-nexus.xml", getNexusConfiguration());
-  }
-
-  protected void copyDefaultSecurityConfigToPlace()
-      throws IOException
-  {
-    this.copyResource("/META-INF/security/security.xml", getNexusSecurityConfiguration());
   }
 
   protected void copyResource(String resource, String dest)

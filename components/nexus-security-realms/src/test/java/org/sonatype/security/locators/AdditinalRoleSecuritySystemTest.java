@@ -15,41 +15,26 @@ package org.sonatype.security.locators;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+import org.sonatype.security.model.Configuration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
 import junit.framework.Assert;
 
 public class AdditinalRoleSecuritySystemTest
     extends AbstractSecurityTestCase
 {
-  public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
-
-  private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/test-classes/"
-      + AdditinalRoleSecuritySystemTest.class.getPackage().getName().replaceAll("\\.", "\\/")
-      + "/additinalRoleTest-security.xml";
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-    properties.put(PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH);
-  }
-
-  @Override
-  public void configure(Binder binder) {
-    super.configure(binder);
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("mock")).to(MockStaticSecurityResource.class);
+  protected Configuration getSecurityModelConfig() {
+    return AdditinalRoleSecuritySystemTestSecurity.securityModel();
   }
 
   private Set<String> getXMLRoles()
@@ -63,12 +48,6 @@ public class AdditinalRoleSecuritySystemTest
     }
 
     return roles;
-  }
-
-  private SecuritySystem getSecuritySystem()
-      throws Exception
-  {
-    return this.lookup(SecuritySystem.class);
   }
 
   public void testListUsers()
