@@ -24,9 +24,7 @@ import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import com.google.common.io.Resources;
 import org.eclipse.sisu.BeanEntry;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -64,6 +62,8 @@ public class QuartzSupportImpl
 
   private final H2ConnectionProvider h2ConnectionProvider;
 
+  private final QuartzDatabaseMigrator migrator;
+
   private final Iterable<BeanEntry<Named, Job>> jobEntries;
 
   private final List<QuartzCustomizer> quartzCustomizers;
@@ -76,11 +76,13 @@ public class QuartzSupportImpl
 
   @Inject
   public QuartzSupportImpl(final H2ConnectionProvider h2ConnectionProvider,
+                           final QuartzDatabaseMigrator migrator,
                            final Iterable<BeanEntry<Named, Job>> jobEntries,
                            final List<QuartzCustomizer> quartzCustomizers)
       throws Exception
   {
     this.h2ConnectionProvider = checkNotNull(h2ConnectionProvider);
+    this.migrator = checkNotNull(migrator);
     this.jobEntries = checkNotNull(jobEntries);
     this.quartzCustomizers = checkNotNull(quartzCustomizers);
     this.active = true;
@@ -151,10 +153,7 @@ public class QuartzSupportImpl
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
     try {
-      final String sqlScript = Resources.toString(Resources.getResource("tables_h2.sql"), Charsets.UTF_8);
-      connection.createStatement().execute(sqlScript);
-      connection.commit();
-      connection.close();
+      migrator.migrateAll(connection, QuartzDatabaseMigrations.MIGRATIONS);
     }
     finally {
       Thread.currentThread().setContextClassLoader(cl);
