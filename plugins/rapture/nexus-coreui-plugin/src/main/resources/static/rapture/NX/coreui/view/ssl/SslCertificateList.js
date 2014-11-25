@@ -75,13 +75,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
             iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
           }
         ]
-      },
-      {
-        xtype: 'button',
-        text: 'Delete',
-        glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
-        action: 'delete',
-        disabled: true
       }
     ];
 

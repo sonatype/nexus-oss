@@ -54,28 +54,6 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       action: 'new',
       disabled: true,
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */
-    },
-    {
-      xtype: 'button',
-      text: 'Delete',
-      action: 'delete',
-      disabled: true,
-      glyph: 'xf056@FontAwesome' /* fa-minus-circle */
-    },
-    '-',
-    {
-      xtype: 'button',
-      text: 'Enable',
-      action: 'enable',
-      disabled: true,
-      glyph: 'xf04b@FontAwesome' /* fa-play */
-    },
-    {
-      xtype: 'button',
-      text: 'Disable',
-      action: 'disable',
-      disabled: true,
-      glyph: 'xf04d@FontAwesome' /* fa-stop */
     }
   ],
 

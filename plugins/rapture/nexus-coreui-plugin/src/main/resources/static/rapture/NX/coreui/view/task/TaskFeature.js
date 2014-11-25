@@ -27,6 +27,11 @@ Ext.define('NX.coreui.view.task.TaskFeature', {
 
   tabs: [
     { xtype: 'nx-info-panel', weight: 10 }
-  ]
+  ],
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
+    { xtype: 'button', text: 'Run', glyph: 'xf04b@FontAwesome' /* fa-play */, action: 'run', disabled: true },
+    { xtype: 'button', text: 'Stop', glyph: 'xf04d@FontAwesome' /* fa-stop */, action: 'stop', disabled: true }
+  ]
 });

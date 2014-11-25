@@ -44,7 +44,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
     { xtype: 'button', text: 'Change Order', glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */, action: 'changeorder', disabled: true },
     { xtype: 'button', text: 'Clear Cache', glyph: 'xf014@FontAwesome' /* fa-trash-o */, action: 'clearcache', disabled: true }
   ],

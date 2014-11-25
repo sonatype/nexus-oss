@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
 
   actions: [
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more',
+    { xtype: 'button', text: 'More&hellip;', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more',
       menu: []
     },
     '-',

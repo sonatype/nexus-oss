@@ -141,13 +141,13 @@ Ext.define('NX.coreui.controller.Users', {
         'nx-coreui-user-list menuitem[action=filter]': {
           click: me.onSourceChanged
         },
-        'nx-coreui-user-list button[action=more]': {
+        'nx-coreui-user-list ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=more]': {
           afterrender: me.bindMoreButton
         },
-        'nx-coreui-user-list menuitem[action=resetpassword]': {
+        'nx-coreui-user-list ^ nx-masterdetail-panel nx-masterdetail-tabs menuitem[action=resetpassword]': {
           click: me.resetPassword
         },
-        'nx-coreui-user-list menuitem[action=setpassword]': {
+        'nx-coreui-user-list ^ nx-masterdetail-panel nx-masterdetail-tabs menuitem[action=setpassword]': {
           click: me.showChangePasswordWindowForSelection
         },
         'nx-coreui-user-list nx-coreui-user-searchbox': {
