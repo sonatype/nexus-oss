@@ -77,7 +77,7 @@ Ext.define('NX.controller.MasterDetail', {
 
     // bind to a delete button if delete function defined
     if (me.deleteModel) {
-      componentListener[me.list + ' button[action=delete]'] = {
+      componentListener[me.list + ' ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=delete]'] = {
         afterrender: me.bindDeleteButton,
         click: me.onDelete
       };
@@ -188,10 +188,14 @@ Ext.define('NX.controller.MasterDetail', {
   loadView: function (list, model, animate) {
     var me = this;
 
-    me.onSelection(list, model);
-    me.onModelChanged(model);
-    me.getList().up('#nx-drilldown').setItemBookmark(0, NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)), me);
-    me.getList().up('#nx-drilldown').showChild(1, animate);
+    if (model) {
+      me.onSelection(list, model);
+      me.onModelChanged(model);
+      me.getList().up('#nx-drilldown').setItemBookmark(0, NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)), me);
+      me.getList().up('#nx-drilldown').showChild(1, animate);
+    } else {
+      me.getList().up('#nx-drilldown').showChild(0, animate);
+    }
   },
 
   /**
@@ -259,6 +263,7 @@ Ext.define('NX.controller.MasterDetail', {
       }
       else {
         list.getSelectionModel().deselectAll();
+        me.loadView(list, null, false);
       }
     }
   },
@@ -272,6 +277,7 @@ Ext.define('NX.controller.MasterDetail', {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
         me.deleteModel(selection[0]);
+        me.bookmark(null);
       }, {scope: me});
     }
   },

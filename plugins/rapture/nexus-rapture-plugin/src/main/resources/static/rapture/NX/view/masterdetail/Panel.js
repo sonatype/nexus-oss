@@ -72,7 +72,8 @@ Ext.define('NX.view.masterdetail.Panel', {
                     align: 'stretch',
                     pack: 'start'
                   },
-                  tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs)
+                  tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
+                  tbar: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : Ext.apply({}, me.actions)
                 }
               }
             ]
