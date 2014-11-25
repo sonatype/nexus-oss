@@ -39,7 +39,7 @@ public class Tasks
     }
 
     @Override
-    protected String getMessage() {
+    public String getMessage() {
       return getClass().getSimpleName();
     }
   }
@@ -61,7 +61,7 @@ public class Tasks
     }
 
     @Override
-    protected String getMessage() {
+    public String getMessage() {
       return getClass().getSimpleName();
     }
   }
@@ -112,7 +112,7 @@ public class Tasks
     }
 
     @Override
-    protected String getMessage() {
+    public String getMessage() {
       return getClass().getSimpleName();
     }
   }

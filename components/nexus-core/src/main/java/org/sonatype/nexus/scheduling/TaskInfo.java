@@ -13,11 +13,14 @@
 package org.sonatype.nexus.scheduling;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.scheduling.schedule.Schedule;
+
+import com.google.common.collect.Sets;
 
 /**
  * The class holding information about task at the moment the instance of task info was created.
@@ -82,12 +85,12 @@ public interface TaskInfo<T>
    * Running task instance might be running okay, being blocked (by other tasks), or might be canceled but the
    * cancellation is not yet detected, or some cleanup is happening.
    *
-   * BLOCKED->RUNNING
-   * RUNNING->CANCELED
+   * Possible transitions: currentState.ordinal <= newState.ordinal
+   * Ending states are RUNNING and CANCELED.
    */
   enum RunState
   {
-    BLOCKED, RUNNING, CANCELED
+    STARTING, BLOCKED, RUNNING, CANCELED
   }
 
   interface CurrentState<T>

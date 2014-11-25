@@ -172,7 +172,7 @@ public class MergeMetadataTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return format("Merging Yum metadata in repository '%s'", getConfiguration().getRepositoryId());
   }
 

@@ -173,7 +173,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     }
 
     rt.setRepositoryId(repository.getId());
-    rt.setName(taskName);
+    rt.setDescription(taskName);
 
     nexusScheduler.submit(rt);
   }

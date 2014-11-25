@@ -41,7 +41,7 @@ public class UpdateSiteMirrorTask
     final TaskConfiguration task = scheduler.createTaskConfigurationInstance(UpdateSiteMirrorTask.class);
     task.setRepositoryId(updateSite.getId());
     task.setBoolean(UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID, force);
-    task.setName("Eclipse Update Site Mirror (" + updateSite.getId() + ")");
+    task.setDescription("Eclipse Update Site Mirror (" + updateSite.getId() + ")");
     return scheduler.submit(task);
   }
 
@@ -95,7 +95,7 @@ public class UpdateSiteMirrorTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() == null) {
       return "Mirroring content of All Eclipse Update Sites.";
     }

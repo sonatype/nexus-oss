@@ -15,9 +15,11 @@ package org.sonatype.nexus.scheduling;
 import java.util.List;
 
 import org.sonatype.nexus.scheduling.CancelableSupport.CancelableFlagHolder;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.MDC;
 
@@ -60,20 +62,25 @@ public abstract class TaskSupport<T>
     return getConfiguration().getName();
   }
 
+  @Override
+  public String getDescription() {
+    return getConfiguration().getDescription();
+  }
+
   /**
-   * Returns {@code true} if task having same type as this task already runs.
+   * Returns running tasks having same type as this task.
    */
   @Override
-  public boolean isBlocked(final List<TaskInfo<?>> runningTasks) {
-    final List<String> runningTaskTypes = Lists.transform(runningTasks, new Function<TaskInfo<?>, String>()
+  public List<TaskInfo<?>> isBlockedBy(final List<TaskInfo<?>> runningTasks) {
+    return Lists.newArrayList(Iterables.filter(runningTasks, new Predicate<TaskInfo<?>>()
     {
       @Override
-      public String apply(final TaskInfo<?> input) {
-        return input.getConfiguration().getType();
+      public boolean apply(final TaskInfo<?> taskInfo) {
+        // blockedBy: running tasks of same type as me
+        return State.RUNNING == taskInfo.getCurrentState().getState()
+            && getConfiguration().getType().equals(taskInfo.getConfiguration().getType());
       }
-    });
-    // same type tasks are blocked
-    return runningTaskTypes.contains(getConfiguration().getType());
+    }));
   }
 
   @Override
@@ -81,7 +88,6 @@ public abstract class TaskSupport<T>
     MDC.put(TaskSupport.class.getSimpleName(), getClass().getSimpleName());
     CancelableSupport.setCurrent(cancelableFlagHolder);
     try {
-      getConfiguration().setMessage(getMessage());
       return execute();
     }
     finally {
@@ -106,13 +112,6 @@ public abstract class TaskSupport<T>
    * Where the job is done.
    */
   protected abstract T execute() throws Exception;
-
-  /**
-   * Returns short message of current task's instance work. This message is based on task configuration and same
-   * typed tasks might emit different messages depending on configuration. Example: "Emptying trash of
-   * repository Foo".
-   */
-  protected abstract String getMessage();
 
   // ==
 

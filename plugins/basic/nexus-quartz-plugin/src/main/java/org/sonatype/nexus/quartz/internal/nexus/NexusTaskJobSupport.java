@@ -12,18 +12,26 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.quartz.JobSupport;
 import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.RunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.InterruptableJob;
 import org.quartz.JobDataMap;
@@ -45,13 +53,17 @@ public class NexusTaskJobSupport<T>
     extends JobSupport
     implements InterruptableJob
 {
+  private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
+
   private final NexusTaskFactory nexusTaskFactory;
 
   private Task<T> nexusTask;
 
   @Inject
-  public NexusTaskJobSupport(final NexusTaskFactory nexusTaskFactory)
+  public NexusTaskJobSupport(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider,
+                             final NexusTaskFactory nexusTaskFactory)
   {
+    this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
   }
 
@@ -60,12 +72,16 @@ public class NexusTaskJobSupport<T>
     Exception ex = null;
     try {
       final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
+      final NexusTaskFuture<T> future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
       nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
       try {
-        // TODD: this should happen here?
-        // nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
-        final T result = nexusTask.call();
-        context.setResult(result);
+        nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
+        mayBlock(nexusTask, future);
+        if (!future.isCancelled()) {
+          future.setRunState(RunState.RUNNING);
+          final T result = nexusTask.call();
+          context.setResult(result);
+        }
         // put back any state task modified to have it persisted
         context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
       }
@@ -81,6 +97,41 @@ public class NexusTaskJobSupport<T>
     if (ex != null) {
       throw Throwables.propagate(ex);
     }
+  }
+
+  private void mayBlock(final Task<T> nexusTask, final NexusTaskFuture<T> future) {
+    // filter for running tasks, to be reused
+    final Predicate<TaskInfo<?>> runningTaskFilter = new Predicate<TaskInfo<?>>()
+    {
+      @Override
+      public boolean apply(final TaskInfo<?> taskInfo) {
+        return State.RUNNING == taskInfo.getCurrentState().getState();
+      }
+    };
+    List<TaskInfo<?>> blockedBy;
+    do {
+      blockedBy = nexusTask.isBlockedBy(Lists.newArrayList(Iterables.filter(
+          quartzNexusSchedulerSPIProvider.get().listsTasks(), runningTaskFilter)));
+      // wait for them all
+      if (blockedBy != null && !blockedBy.isEmpty()) {
+        try {
+          future.setRunState(RunState.BLOCKED);
+          for (TaskInfo<?> taskInfo : blockedBy) {
+            try {
+              taskInfo.getCurrentState().getFuture().get();
+            }
+            catch (Exception e) {
+              // we don't care if other task failed or not, it will report itself
+            }
+          }
+        }
+        catch (IllegalStateException e) {
+          // task got canceled, setRunState throw ISEx
+          break;
+        }
+      }
+    }
+    while (!blockedBy.isEmpty());
   }
 
   @Override

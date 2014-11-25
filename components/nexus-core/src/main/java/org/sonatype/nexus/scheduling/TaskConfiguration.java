@@ -94,6 +94,11 @@ public final class TaskConfiguration
   static final String MESSAGE_KEY = PRIVATE_PROP_PREFIX + "message";
 
   /**
+   * Key of description.
+   */
+  public static final String DESCRIPTION_KEY = "description";
+
+  /**
    * Key of repository.
    */
   public static final String REPOSITORY_ID_KEY = "repositoryId";
@@ -261,6 +266,29 @@ public final class TaskConfiguration
     }
     else {
       getMap().put(MESSAGE_KEY, message);
+    }
+  }
+
+  /**
+   * Returns the description of the task.
+   */
+  public String getDescription() {
+    final String description = getString(DESCRIPTION_KEY);
+    if (Strings.isNullOrEmpty(description)) {
+      return getName();
+    }
+    return description;
+  }
+
+  /**
+   * Sets or resets the description of the task.
+   */
+  public void setDescription(final String description) {
+    if (Strings.isNullOrEmpty(description)) {
+      getMap().remove(DESCRIPTION_KEY);
+    }
+    else {
+      getMap().put(DESCRIPTION_KEY, description);
     }
   }
 

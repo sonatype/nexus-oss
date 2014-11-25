@@ -43,7 +43,7 @@ public class MergeMetadataTaskIT
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
     task.getConfiguration().setRepositoryId(GROUP_ID_1);
-    assertThat(task.isBlocked(createRunningTaskForGroups(GROUP_ID_1)), is(true));
+    assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_1)).isEmpty(), is(false));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class MergeMetadataTaskIT
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
     task.getConfiguration().setRepositoryId(GROUP_ID_1);
-    assertThat(task.isBlocked(createRunningTaskForGroups(GROUP_ID_2)), is(false));
+    assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_2)).isEmpty(), is(true));
   }
 
   private List<TaskInfo<?>> createRunningTaskForGroups(final String... groupIds) {

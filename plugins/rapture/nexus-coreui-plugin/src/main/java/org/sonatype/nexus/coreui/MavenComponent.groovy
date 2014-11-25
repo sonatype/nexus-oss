@@ -110,7 +110,7 @@ extends DirectComponentSupport
     TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(RebuildMavenMetadataTask)
     task.setRepositoryId(id)
     task.setPath(path)
-    task.setName("Rebuild metadata ${id}:${path}")
+    task.setDescription("Rebuild metadata ${id}:${path}")
     nexusScheduler.submit(task)
   }
 

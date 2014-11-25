@@ -13,16 +13,20 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.quartz.JobExecutionException;
+import org.sonatype.nexus.scheduling.TaskInfo.RunState;
+
+import com.google.common.base.Throwables;
 import org.quartz.JobKey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Nexus task {@link Future}. Is created by {@link NexusTaskJobListener} and is stick into job context.
@@ -45,9 +49,9 @@ public class NexusTaskFuture<T>
 
   private final CountDownLatch countDownLatch;
 
-  private volatile boolean canceled;
+  private volatile RunState runState;
 
-  private JobExecutionException jobExecutionException;
+  private Exception exception;
 
   private T result;
 
@@ -59,11 +63,12 @@ public class NexusTaskFuture<T>
     this.jobKey = checkNotNull(jobKey);
     this.startedAt = checkNotNull(startedAt);
     this.countDownLatch = new CountDownLatch(1);
+    this.runState = RunState.STARTING;
   }
 
-  public void setResult(final T result, final JobExecutionException jobExecutionException) {
+  public void setResult(final T result, final Exception exception) {
     this.result = result;
-    this.jobExecutionException = jobExecutionException;
+    this.exception = exception;
     countDownLatch.countDown();
   }
 
@@ -71,17 +76,31 @@ public class NexusTaskFuture<T>
     return startedAt;
   }
 
+  public RunState getRunState() {
+    return runState;
+  }
+
+  public void setRunState(final RunState runState) {
+    checkState(this.runState.ordinal() <= runState.ordinal(),
+        "Illegal run state transition: %s -> %s", this.runState, runState);
+    this.runState = runState;
+  }
+
   // == TaskFuture
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
-    canceled = true;
+    if (isCancelled()) {
+      return true;
+    }
+    setRunState(RunState.CANCELED);
+    setResult(null, new CancellationException("Task canceled"));
     return quartzSupport.cancelJob(jobKey);
   }
 
   @Override
   public boolean isCancelled() {
-    return canceled;
+    return runState == RunState.CANCELED;
   }
 
   @Override
@@ -92,8 +111,9 @@ public class NexusTaskFuture<T>
   @Override
   public T get() throws InterruptedException, ExecutionException {
     countDownLatch.await();
-    if (jobExecutionException != null) {
-      throw new ExecutionException("Job failure: ", jobExecutionException);
+    if (exception != null) {
+      Throwables.propagateIfPossible(exception);
+      throw new ExecutionException("Job failure: ", exception);
     }
     return result;
   }
@@ -103,8 +123,9 @@ public class NexusTaskFuture<T>
       throws InterruptedException, ExecutionException, TimeoutException
   {
     countDownLatch.await(timeout, unit);
-    if (jobExecutionException != null) {
-      throw new ExecutionException("Job failure: ", jobExecutionException);
+    if (exception != null) {
+      Throwables.propagateIfPossible(exception);
+      throw new ExecutionException("Job failure: ", exception);
     }
     return result;
   }

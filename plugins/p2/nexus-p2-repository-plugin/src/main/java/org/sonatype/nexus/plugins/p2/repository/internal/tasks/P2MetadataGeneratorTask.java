@@ -31,7 +31,7 @@ public class P2MetadataGeneratorTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return String.format("Rebuild repository [%s] p2 metadata from path [%s] and bellow",
           getConfiguration().getRepositoryId(),

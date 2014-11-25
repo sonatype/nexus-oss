@@ -79,7 +79,7 @@ public class EmptyTrashTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Emptying Trash.";
   }
 }

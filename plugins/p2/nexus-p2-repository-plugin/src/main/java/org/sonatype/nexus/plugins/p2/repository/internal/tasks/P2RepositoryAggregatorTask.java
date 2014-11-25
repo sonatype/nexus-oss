@@ -33,7 +33,7 @@ public class P2RepositoryAggregatorTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return String.format("Rebuild p2 repository on repository [%s] from root path and bellow",
           getConfiguration().getRepositoryId());

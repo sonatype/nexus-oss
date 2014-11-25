@@ -43,7 +43,10 @@ import org.sonatype.nexus.yum.internal.RpmListWriter;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,19 +110,26 @@ public class GenerateMetadataTask
     getConfiguration().getMap().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
   }
 
+  /**
+   * Returns running tasks having same type as this task, that are running on set of repositories that would
+   * overlap with this tasks' processed repositories, and have same version (including null!).
+   */
   @Override
-  public boolean isBlocked(List<TaskInfo<?>> taskInfos) {
-    if (super.isBlocked(taskInfos)) {
-      for (TaskInfo<?> taskInfo : taskInfos) {
-        if (Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION),
-            getConfiguration().getString(
-                GenerateMetadataTask.PARAM_VERSION))) {
-          // type + repoId + version equal, it does block us
-          return true;
-        }
-      }
+  public List<TaskInfo<?>> isBlockedBy(List<TaskInfo<?>> runningTasks) {
+    final List<TaskInfo<?>> blockedBy = super.isBlockedBy(runningTasks);
+    if (blockedBy.isEmpty()) {
+      return blockedBy;
     }
-    return false;
+    else {
+      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
+      {
+        @Override
+        public boolean apply(final TaskInfo<?> taskInfo) {
+          return Objects.equals(getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION),
+              taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION));
+        }
+      }));
+    }
   }
 
   @Override
@@ -207,7 +217,7 @@ public class GenerateMetadataTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return format("Generate Yum metadata of repository '%s'", getRepositoryId());
   }
 

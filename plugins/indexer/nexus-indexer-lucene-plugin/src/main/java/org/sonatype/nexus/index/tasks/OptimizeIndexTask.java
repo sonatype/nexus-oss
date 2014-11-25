@@ -50,7 +50,7 @@ public class OptimizeIndexTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Optimizing repository " + getConfiguration().getRepositoryId() + " index.";
     }

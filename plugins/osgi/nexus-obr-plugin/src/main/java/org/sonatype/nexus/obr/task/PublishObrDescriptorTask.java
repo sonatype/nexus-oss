@@ -86,7 +86,7 @@ public class PublishObrDescriptorTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Publishing obr.xml for repository " + getConfiguration().getRepositoryId();
   }
 }

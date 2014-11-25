@@ -58,7 +58,7 @@ public class PublishIndexesTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Publishing indexes for repository " + getConfiguration().getRepositoryId();
     }

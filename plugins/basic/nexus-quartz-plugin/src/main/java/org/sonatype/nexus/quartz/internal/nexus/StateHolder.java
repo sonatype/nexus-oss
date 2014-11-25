@@ -87,7 +87,7 @@ public class StateHolder<T>
       state = State.RUNNING;
       nextRun = nextExecutionTime;
       runStarted = future.getStartedAt();
-      runState = future.isCancelled() ? RunState.CANCELED : RunState.RUNNING; // TODO: blocked?
+      runState = future.getRunState();
     }
     else {
       state = nextExecutionTime == null ? State.DONE : State.WAITING;

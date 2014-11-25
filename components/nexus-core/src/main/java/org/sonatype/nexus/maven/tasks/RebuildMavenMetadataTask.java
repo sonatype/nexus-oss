@@ -63,7 +63,7 @@ public class RebuildMavenMetadataTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Rebuilding maven metadata of repository " + getConfiguration().getRepositoryId() + " from path "
           + getConfiguration().getPath() + " and below.";

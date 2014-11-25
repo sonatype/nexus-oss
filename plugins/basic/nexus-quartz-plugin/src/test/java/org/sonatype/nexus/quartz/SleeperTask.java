@@ -44,7 +44,7 @@ public class SleeperTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Message is:" + getConfiguration().getString(RESULT_KEY);
   }
 }

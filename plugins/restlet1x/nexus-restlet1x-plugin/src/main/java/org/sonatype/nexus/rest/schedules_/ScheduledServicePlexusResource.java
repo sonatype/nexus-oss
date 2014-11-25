@@ -151,7 +151,7 @@ public class ScheduledServicePlexusResource
 
         task.getConfiguration().setEnabled(resource.isEnabled());
 
-        task.getConfiguration().setName(getModelName(resource));
+        task.getConfiguration().setDescription(getModelName(resource));
 
         Schedule schedule = getModelSchedule(resource);
 
@@ -162,7 +162,7 @@ public class ScheduledServicePlexusResource
 
         task.getConfiguration().setAlertEmail(resource.getAlertEmail());
         if (resource.getName() != null) {
-          task.getConfiguration().setName(resource.getName());
+          task.getConfiguration().setDescription(resource.getName());
         }
 
         // Store the changes

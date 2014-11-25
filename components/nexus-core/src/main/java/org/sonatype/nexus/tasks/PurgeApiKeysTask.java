@@ -38,7 +38,7 @@ public class PurgeApiKeysTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Purging Orphaned API Keys.";
   }
 

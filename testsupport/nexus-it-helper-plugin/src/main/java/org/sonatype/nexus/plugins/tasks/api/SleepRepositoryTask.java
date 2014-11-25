@@ -56,7 +56,7 @@ public class SleepRepositoryTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Sleeping for " + getTime() + " seconds (cancellable: " + cancellable + ")!";
   }
 }

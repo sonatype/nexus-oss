@@ -58,7 +58,7 @@ public class UnusedSnapshotRemoverTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Removing unused snapshots from repository " + getConfiguration().getRepositoryId();
     }

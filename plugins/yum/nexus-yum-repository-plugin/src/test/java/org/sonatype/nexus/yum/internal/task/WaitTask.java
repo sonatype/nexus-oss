@@ -30,7 +30,7 @@ public class WaitTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Wait";
   }
 }

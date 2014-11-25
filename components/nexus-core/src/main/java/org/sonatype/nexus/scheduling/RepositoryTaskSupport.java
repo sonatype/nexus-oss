@@ -16,14 +16,10 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 
 /**
  * Support for {@link Task} implementations that operate on repositories.
@@ -45,51 +41,33 @@ public abstract class RepositoryTaskSupport<T>
   }
 
   /**
-   * Returns {@code true} if task having same type as this task already runs, and the running task operates on
-   * same set of repositories that this task would.
+   * Returns running tasks having same type as this task, that are running on set of repositories that would
+   * overlap with this tasks' processed repositories.
    */
   @Override
-  public boolean isBlocked(final List<TaskInfo<?>> runningTasks) {
+  public List<TaskInfo<?>> isBlockedBy(final List<TaskInfo<?>> runningTasks) {
     // we need to do stuff if super says is blocked (task with same type already running)
-    if (super.isBlocked(runningTasks)) {
-      // refine filtering: among these typed tasks, is any of them operating on same set of repositories as me?
-      // me: all-repository => blocked
-      // me: X repository => blocked if other task runs on same or all-repositories
-      if (getConfiguration().getRepositoryId() == null) {
-        // am gonna work on all reposes
-        return true;
-      }
-      // filter running ones to my type
-      final List<TaskInfo<?>> runningTasksThisType = newArrayList(
-          filter(runningTasks, new Predicate<TaskInfo>()
-          {
-            @Override
-            public boolean apply(final TaskInfo input) {
-              return getConfiguration().getType().equals(input.getConfiguration().getType());
-            }
-          }));
-      // collect repoIds of filtered tasks
-      final List<String> runningTasksThisTypeRepositories = transform(
-          runningTasksThisType, new Function<TaskInfo<?>, String>()
-          {
-            @Override
-            public String apply(final TaskInfo<?> input) {
-              final String repoId = input.getConfiguration().getRepositoryId();
-              if (Strings.isNullOrEmpty(repoId)) {
-                return "*";
-              }
-              else {
-                return repoId;
-              }
-            }
-          });
-      // some other works on ALL or my repoId
-      return runningTasksThisTypeRepositories.contains("*") ||
-          runningTasksThisTypeRepositories.contains(getConfiguration().getRepositoryId());
+    // blocked if:
+    // me: all-repository => blockedBy all of same type
+    // me: X repository => blockedBy other task if runs on same repository or all repositories
+    final List<TaskInfo<?>> blockedBy = super.isBlockedBy(runningTasks);
+    if (blockedBy.isEmpty()) {
+      return blockedBy;
+    }
+    else if (getConfiguration().getRepositoryId() == null) {
+      // am gonna work on all reposes, so am conflicting will all already running ones
+      return blockedBy;
     }
     else {
-      // no task with this type running, go ahead
-      return false;
+      // am gonna work on X, am blocked if any other running task works on X or all repositories
+      return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
+      {
+        @Override
+        public boolean apply(final TaskInfo<?> taskInfo) {
+          return taskInfo.getConfiguration().getRepositoryId() == null
+              || getConfiguration().getRepositoryId().equals(taskInfo.getConfiguration().getRepositoryId());
+        }
+      }));
     }
   }
 }

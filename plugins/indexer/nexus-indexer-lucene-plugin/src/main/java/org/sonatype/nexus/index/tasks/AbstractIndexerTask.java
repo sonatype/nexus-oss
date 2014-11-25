@@ -73,7 +73,7 @@ public abstract class AbstractIndexerTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return action + " repository index " + getConfiguration().getRepositoryId() + " from path " +
           getConfiguration().getPath() + " and below.";

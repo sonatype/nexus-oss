@@ -46,7 +46,7 @@ public class ExpireCacheTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Expiring caches for repository " + getConfiguration().getRepositoryId() + " from path " +
           getConfiguration().getPath()

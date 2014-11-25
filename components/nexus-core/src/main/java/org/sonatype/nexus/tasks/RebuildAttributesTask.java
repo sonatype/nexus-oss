@@ -46,7 +46,7 @@ public class RebuildAttributesTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Rebuilding attributes of repository '" + getConfiguration().getRepositoryId() + "' from path "
           + getConfiguration().getPath() + " and below.";

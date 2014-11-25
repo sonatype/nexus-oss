@@ -50,7 +50,7 @@ public class DownloadIndexesTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Downloading indexes for repository " + getConfiguration().getRepositoryId();
     }

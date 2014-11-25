@@ -43,11 +43,25 @@ public interface Task<T>
   String getName();
 
   /**
-   * Method should return {@code true} if this task instance should not be run along the other, already running tasks.
+   * Returns the description of task instance. Initially same as {@link #getName()} but is actually meant for users
+   * to set custom task description over UI or REST.
+   */
+  String getDescription();
+
+  /**
+   * Returns short generated message of current task's instance work. This message is based on task configuration and
+   * same typed tasks might emit different messages depending on configuration. Example: "Emptying trash of
+   * repository Foo".
+   */
+  String getMessage();
+
+
+  /**
+   * Method should return list of tasks that block this task instance from running.
    * This method might be invoked multiple times during task instance lifetime but only before it's main execute
-   * method. Once the method returns {@code false} (is not blocked), the task execution will continue and this method
-   * will not be invoked anymore.
+   * method. Once the method returns empty list (is not blocked by any tasks), the task execution will continue and
+   * this method will not be invoked anymore.
    * // TODO: this should be not exposed via Task iface, this is internal to taskSupport?
    */
-  boolean isBlocked(List<TaskInfo<?>> runningTasks);
+  List<TaskInfo<?>> isBlockedBy(List<TaskInfo<?>> runningTasks);
 }

@@ -67,7 +67,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, NO_VERSION);
-    assertTrue(task.isBlocked(asList(scheduledTask(REPO, NO_VERSION))));
+    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, NO_VERSION))).isEmpty());
   }
 
   @Test
@@ -75,7 +75,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, VERSION);
-    assertTrue(task.isBlocked(asList(scheduledTask(REPO, NO_VERSION))));
+    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, NO_VERSION))).isEmpty());
   }
 
   @Test
@@ -83,7 +83,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, VERSION);
-    assertFalse(task.isBlocked(asList(scheduledTask(REPO, ANOTHER_VERSION))));
+    assertTrue(task.isBlockedBy(asList(scheduledTask(REPO, ANOTHER_VERSION))).isEmpty());
   }
 
   @Test
@@ -91,7 +91,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, NO_VERSION);
-    assertFalse(task.isBlocked(asList(scheduledTask(ANOTHER_REPO, NO_VERSION))));
+    assertTrue(task.isBlockedBy(asList(scheduledTask(ANOTHER_REPO, NO_VERSION))).isEmpty());
   }
 
   @Test

@@ -62,7 +62,7 @@ public class SnapshotRemovalTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Removing snapshots from repository " + getConfiguration().getRepositoryId();
     }

@@ -47,7 +47,7 @@ public class ReleaseRemovalTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Removing old releases from repository " + getConfiguration().getRepositoryId();
   }
 }

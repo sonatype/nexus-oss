@@ -35,7 +35,7 @@ public class SynchronizeShadowsTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Synchronizing virtual repository '" + getConfiguration().getRepositoryId() +
         "' with it's master repository.";
   }

@@ -61,7 +61,7 @@ public class EvictUnusedProxiedItemsTask
   }
 
   @Override
-  protected String getMessage() {
+  public String getMessage() {
     if (getConfiguration().getRepositoryId() != null) {
       return "Evicting unused proxied items for repository " + getConfiguration().getRepositoryId() + ".";
     }

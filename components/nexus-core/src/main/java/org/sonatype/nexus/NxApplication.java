@@ -222,7 +222,7 @@ public class NxApplication
         final TaskConfiguration taskConfiguration = nexusTaskExecutor
             .createTaskConfigurationInstance(SynchronizeShadowsTask.class);
         taskConfiguration.setRepositoryId(shadow.getId());
-        taskConfiguration.setName("Shadow Sync (" + shadow.getId() + ")");
+        taskConfiguration.setDescription("Shadow Sync (" + shadow.getId() + ")");
         nexusTaskExecutor.submit(taskConfiguration);
       }
     }
