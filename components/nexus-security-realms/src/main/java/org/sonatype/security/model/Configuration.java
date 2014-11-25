@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
@@ -103,7 +104,12 @@ public class Configuration
     mapping.setUserId(user.getId());
     mapping.setSource(SecurityXmlUserManager.SOURCE);
     mapping.setRoles(roles);
-    updateUserRoleMapping(mapping);
+    try {
+      updateUserRoleMapping(mapping);
+    }
+    catch (NoSuchRoleMappingException e) {
+      addUserRoleMapping(mapping);
+    }
   }
 
   @Override
@@ -149,14 +155,13 @@ public class Configuration
   }
 
   @Override
-  public void updateUserRoleMapping(final CUserRoleMapping mapping) {
+  public void updateUserRoleMapping(final CUserRoleMapping mapping) throws NoSuchRoleMappingException {
     checkNotNull(mapping, "mapping");
     checkNotNull(mapping.getUserId(), "user id");
     checkNotNull(mapping.getSource(), "source");
-    checkState(userRoleMappings.replace(
-        userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) != null,
-        mapping.getUserId() + " / " + mapping.getSource() + " not found"
-    );
+    if (userRoleMappings.replace(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping) == null) {
+      throw new NoSuchRoleMappingException("User " + mapping.getUserId() + " role mappings not found");
+    }
   }
 
   @Override

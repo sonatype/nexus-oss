@@ -72,7 +72,13 @@ public class DefaultSecurityConfigurationCleaner
       if (mapping.getRoles().contains(roleId)) {
         log.debug("removing ref to role {} from user {}", mapping.getUserId());
         mapping.removeRole(roleId);
-        configuration.updateUserRoleMapping(mapping);
+        try {
+          configuration.updateUserRoleMapping(mapping);
+        }
+        catch (NoSuchRoleMappingException e) {
+          // mapping could had been removed in the mean time
+          log.warn("User {} role mappings removed during update", mapping.getUserId());
+        }
       }
     }
   }

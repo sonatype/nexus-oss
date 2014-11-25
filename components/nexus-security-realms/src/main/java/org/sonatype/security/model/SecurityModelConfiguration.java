@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -47,7 +48,7 @@ public interface SecurityModelConfiguration
 
   void addUserRoleMapping(CUserRoleMapping mapping);
 
-  void updateUserRoleMapping(CUserRoleMapping mapping);
+  void updateUserRoleMapping(CUserRoleMapping mapping) throws NoSuchRoleMappingException;
 
   boolean removeUserRoleMapping(String userId, String source);
 

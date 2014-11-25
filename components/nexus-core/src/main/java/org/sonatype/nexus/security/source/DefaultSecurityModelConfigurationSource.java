@@ -32,6 +32,7 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
@@ -42,7 +43,6 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Default {@link SecurityModelConfigurationSource} implementation using Orient db as store.
@@ -247,8 +247,12 @@ public class DefaultSecurityModelConfigurationSource
         mapping.setSource(SecurityXmlUserManager.SOURCE);
         mapping.setRoles(roles);
         document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
-        checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
-        userRoleMappingEntityAdapter.write(document, mapping);
+        if (document != null) {
+          userRoleMappingEntityAdapter.write(document, mapping);
+        }
+        else {
+          userRoleMappingEntityAdapter.create(db, mapping);
+        }
       }
     }
 
@@ -295,13 +299,15 @@ public class DefaultSecurityModelConfigurationSource
     }
 
     @Override
-    public void updateUserRoleMapping(final CUserRoleMapping mapping) {
+    public void updateUserRoleMapping(final CUserRoleMapping mapping) throws NoSuchRoleMappingException {
       checkNotNull(mapping, "mapping");
       checkNotNull(mapping.getUserId(), "user id");
       checkNotNull(mapping.getSource(), "source");
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
-        checkState(document != null, mapping.getUserId() + " / " + mapping.getSource() + " not found");
+        if (document == null) {
+          throw new NoSuchRoleMappingException("User " + mapping.getUserId() + " role mappings not found");
+        }
         userRoleMappingEntityAdapter.write(document, mapping);
       }
     }
