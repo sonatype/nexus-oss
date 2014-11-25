@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.realms.tools;
 
+import java.util.ConcurrentModificationException;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,47 +41,71 @@ public class DefaultSecurityConfigurationCleaner
   public void privilegeRemoved(SecurityModelConfiguration configuration, String privilegeId) {
     log.debug("Cleaning privilege id {} from roles.", privilegeId);
     for (CRole role : configuration.getRoles()) {
-      if (role.getPrivileges().contains(privilegeId)) {
-        log.debug("removing privilege {} from role {}", privilegeId, role.getId());
-        role.removePrivilege(privilegeId);
-        try {
-          configuration.updateRole(role);
-        }
-        catch (NoSuchRoleException e) {
-          // role could had been removed in the mean time
-          log.warn("Role {} removed during update", role.getId());
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CRole currentRole = configuration.getRole(role.getId());
+        if (currentRole != null && currentRole.getPrivileges().contains(privilegeId)) {
+          log.debug("removing privilege {} from role {}", privilegeId, currentRole.getId());
+          currentRole.removePrivilege(privilegeId);
+          try {
+            configuration.updateRole(currentRole);
+          }
+          catch (NoSuchRoleException e) {
+            // role was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
         }
       }
+      while (concurrentlyUpdated);
     }
   }
 
   public void roleRemoved(SecurityModelConfiguration configuration, String roleId) {
     log.debug("Cleaning role id {} from users and roles.", roleId);
     for (CRole role : configuration.getRoles()) {
-      if (role.getRoles().contains(roleId)) {
-        log.debug("removing ref to role {} from role {}", roleId, role.getId());
-        role.removeRole(roleId);
-        try {
-          configuration.updateRole(role);
-        }
-        catch (NoSuchRoleException e) {
-          // role could had been removed in the mean time
-          log.warn("Role {} removed during update", role.getId());
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CRole currentRole = configuration.getRole(role.getId());
+        if (currentRole != null && currentRole.getRoles().contains(roleId)) {
+          log.debug("removing ref to role {} from role {}", roleId, currentRole.getId());
+          currentRole.removeRole(roleId);
+          try {
+            configuration.updateRole(currentRole);
+          }
+          catch (NoSuchRoleException e) {
+            // role was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
         }
       }
+      while (concurrentlyUpdated);
     }
     for (CUserRoleMapping mapping : configuration.getUserRoleMappings()) {
-      if (mapping.getRoles().contains(roleId)) {
-        log.debug("removing ref to role {} from user {}", mapping.getUserId());
-        mapping.removeRole(roleId);
-        try {
-          configuration.updateUserRoleMapping(mapping);
-        }
-        catch (NoSuchRoleMappingException e) {
-          // mapping could had been removed in the mean time
-          log.warn("User {} role mappings removed during update", mapping.getUserId());
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CUserRoleMapping currentMapping = configuration.getUserRoleMapping(mapping.getUserId(), mapping.getSource());
+        if (currentMapping != null && currentMapping.getRoles().contains(roleId)) {
+          log.debug("removing ref to role {} from user {}", currentMapping.getUserId());
+          currentMapping.removeRole(roleId);
+          try {
+            configuration.updateUserRoleMapping(currentMapping);
+          }
+          catch (NoSuchRoleMappingException e) {
+            // mapping was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
         }
       }
+      while (concurrentlyUpdated);
     }
   }
 }
