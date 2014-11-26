@@ -23,6 +23,11 @@ import java.io.IOException;
 public interface EventWriter
   extends Closeable
 {
+  /**
+   * Open event stream and write header.
+   *
+   * This must be done prior to any {@link #write} operations.
+   */
   void open(EventHeader header) throws IOException;
 
   void write(EventData data) throws IOException;
