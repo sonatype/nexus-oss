@@ -215,8 +215,6 @@ Ext.define('NX.coreui.controller.Users', {
       me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
     }
-
-    me.callParent(arguments);
   },
 
   /**

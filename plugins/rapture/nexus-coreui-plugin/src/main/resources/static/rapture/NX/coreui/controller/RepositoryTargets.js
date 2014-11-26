@@ -121,8 +121,6 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
     }
-
-    me.callParent(arguments);
   },
 
   /**

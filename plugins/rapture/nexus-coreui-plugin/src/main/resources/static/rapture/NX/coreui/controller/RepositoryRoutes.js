@@ -116,8 +116,6 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     if (Ext.isDefined(model)) {
       me.getSettings().loadRecord(model);
     }
-
-    me.callParent(arguments);
   },
 
   /**

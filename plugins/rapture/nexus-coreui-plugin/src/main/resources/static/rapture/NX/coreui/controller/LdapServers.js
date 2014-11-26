@@ -169,8 +169,6 @@ Ext.define('NX.coreui.controller.LdapServers', {
       me.getBackup().loadRecord(model);
       me.getUserAndGroup().loadRecord(model);
     }
-
-    me.callParent(arguments);
   },
 
   /**

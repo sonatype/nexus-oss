@@ -127,8 +127,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     if (Ext.isDefined(model)) {
       me.getDetails().loadRecord(model);
     }
-
-    me.callParent(arguments);
   },
 
   /**

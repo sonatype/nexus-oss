@@ -179,8 +179,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.showAbout(capabilityTypeModel);
       me.showStatus(model);
     }
-
-    me.callParent(arguments);
   },
 
   /**

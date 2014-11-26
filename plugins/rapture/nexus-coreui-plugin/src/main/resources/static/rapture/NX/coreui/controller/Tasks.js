@@ -176,8 +176,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         }
       }
     }
-
-    me.callParent(arguments);
   },
 
   /**

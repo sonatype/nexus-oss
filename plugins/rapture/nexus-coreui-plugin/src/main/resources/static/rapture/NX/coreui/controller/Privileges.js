@@ -137,8 +137,6 @@ Ext.define('NX.coreui.controller.Privileges', {
 
       panel.showInfo(info);
     }
-
-    me.callParent(arguments);
   },
 
   /**

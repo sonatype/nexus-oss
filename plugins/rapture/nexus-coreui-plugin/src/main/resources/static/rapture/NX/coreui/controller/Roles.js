@@ -141,8 +141,6 @@ Ext.define('NX.coreui.controller.Roles', {
       me.getPrivilegeTrace().loadRecord(model.data);
       me.getRoleTree().loadRecord(model.data);
     }
-
-    me.callParent(arguments);
   },
 
   /**

@@ -160,10 +160,6 @@ Ext.define('NX.controller.MasterDetail', {
     me.loadStore();
   },
 
-  onSelection: function(list, model) {
-    // Nothing to do here!
-  },
-
   onCellClick: function(list, td, cellIndex, model) {
     var me = this;
 

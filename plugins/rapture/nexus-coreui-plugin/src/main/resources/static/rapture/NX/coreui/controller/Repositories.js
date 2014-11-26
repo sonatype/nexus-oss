@@ -159,8 +159,6 @@ Ext.define('NX.coreui.controller.Repositories', {
 
       Ext.resumeLayouts(true);
     }
-
-    me.callParent(arguments);
   },
 
   /**
