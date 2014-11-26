@@ -13,6 +13,9 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.schedule.Now;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -69,7 +72,7 @@ public class NexusTaskJobListener<T>
     nexusTaskInfo.setStateHolder(
         new StateHolder<>(
             future,
-            true,
+            State.RUNNING,
             toTaskConfiguration(context.getJobDetail().getJobDataMap()),
             nexusScheduleConverter.toSchedule(context.getTrigger()),
             context.getTrigger().getNextFireTime()
@@ -109,12 +112,14 @@ public class NexusTaskJobListener<T>
     jobDataMap.putAsString("lastRunState.runStarted", future.getStartedAt().getTime());
     jobDataMap.putAsString("lastRunState.runDuration", System.currentTimeMillis() - future.getStartedAt().getTime());
 
+    final Schedule schedule = nexusScheduleConverter.toSchedule(context.getTrigger());
+    // TODO: better "done" detection: ie. "now" scheduled task vs non-now but manually run task?
     nexusTaskInfo.setStateHolder(
         new StateHolder<>(
             future,
-            false,
+            schedule instanceof Now ? State.DONE : State.WAITING,
             toTaskConfiguration(jobDataMap),
-            nexusScheduleConverter.toSchedule(context.getTrigger()),
+            schedule,
             context.getTrigger().getNextFireTime()
         )
     );

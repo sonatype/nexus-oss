@@ -43,14 +43,14 @@ public class StateHolder<T>
   private final LastRunState lastRunState;
 
   public StateHolder(final @Nullable NexusTaskFuture<T> nexusTaskFuture,
-                     final boolean running,
+                     final State state,
                      final TaskConfiguration taskConfiguration,
                      final Schedule schedule,
                      final @Nullable Date nextExecutionTime)
   {
     this.taskConfiguration = checkNotNull(taskConfiguration);
     this.schedule = checkNotNull(schedule);
-    this.currentState = extractCurrentState(running, nexusTaskFuture, nextExecutionTime);
+    this.currentState = extractCurrentState(state, nexusTaskFuture, nextExecutionTime);
     this.lastRunState = extractLastRunState(taskConfiguration);
   }
 
@@ -73,21 +73,11 @@ public class StateHolder<T>
 
   // ==
 
-  private CurrentState<T> extractCurrentState(final boolean running, final NexusTaskFuture<T> future,
+  private CurrentState<T> extractCurrentState(final State state, final NexusTaskFuture<T> future,
                                               final Date nextExecutionTime)
   {
-    checkState(!running || future != null, "Running task must have future");
-    State state;
-    Date nextRun;
-    if (running) {
-      state = State.RUNNING;
-      nextRun = nextExecutionTime;
-    }
-    else {
-      state = nextExecutionTime == null ? State.DONE : State.WAITING;
-      nextRun = nextExecutionTime;
-    }
-    return new CS<>(state, nextRun, future);
+    checkState(State.RUNNING != state || future != null, "Running task must have future");
+    return new CS<>(state, nextExecutionTime, future);
   }
 
   private LastRunState extractLastRunState(final TaskConfiguration taskConfiguration) {

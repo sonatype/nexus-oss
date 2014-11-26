@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -210,7 +211,7 @@ public class QuartzNexusSchedulerSPI
         nexusScheduleConverter,
         new StateHolder<T>(
             null,
-            false,
+            State.WAITING,
             toTaskConfiguration(jobDetail.getJobDataMap()),
             nexusScheduleConverter.toSchedule(trigger),
             trigger.getNextFireTime()
