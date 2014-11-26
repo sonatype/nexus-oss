@@ -21,6 +21,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
@@ -75,7 +77,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, VERSION);
-    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, NO_VERSION))).isEmpty());
+    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, VERSION))).isEmpty());
   }
 
   @Test
@@ -203,7 +205,10 @@ public class GenerateMetadataTaskSettingsIT
     configuration.setString(GenerateMetadataTask.PARAM_VERSION, version);
     TaskInfo task = mock(TaskInfo.class);
     when(task.getConfiguration()).thenReturn(configuration);
-    when(task.getId()).thenReturn(task.getConfiguration().getId());
+    when(task.getId()).thenReturn(configuration.getId());
+    CurrentState currentState = mock(CurrentState.class);
+    when(currentState.getState()).thenReturn(State.RUNNING);
+    when(task.getCurrentState()).thenReturn(currentState);
     return task;
   }
 
@@ -225,6 +230,7 @@ public class GenerateMetadataTaskSettingsIT
         return null;
       }
     };
+    task.getConfiguration().setType(GenerateMetadataTask.class.getName());
     task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
     task.setRepoDir(rpmsDir());
