@@ -56,7 +56,7 @@ extends TestSupport
 
   private MemoryDatabaseManager databaseManager
 
-  private DefaultSecurityModelConfigurationSource source
+  private OrientSecurityModelConfigurationSource source
 
   private SecurityModelConfiguration configuration
 
@@ -68,7 +68,7 @@ extends TestSupport
     databaseServer.start()
     databaseManager = new MemoryDatabaseManager()
     databaseManager.start()
-    source = new DefaultSecurityModelConfigurationSource(
+    source = new OrientSecurityModelConfigurationSource(
         Providers.of(databaseManager.instance("security")),
         new StaticSecurityModelConfigurationSource(),
         new CUserEntityAdapter(),

@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-public class DefaultSecurityConfigurationSource
+public class OrientSecurityConfigurationSource
     extends LifecycleSupport
     implements SecurityConfigurationSource, EventSubscriber
 {
@@ -66,9 +66,9 @@ public class DefaultSecurityConfigurationSource
   private SecurityConfiguration configuration;
 
   @Inject
-  public DefaultSecurityConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
-                                            final @Named("static") SecurityConfigurationSource securityDefaults,
-                                            final SecurityConfigurationEntityAdapter entityAdapter)
+  public OrientSecurityConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
+                                           final @Named("static") SecurityConfigurationSource securityDefaults,
+                                           final SecurityConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
     this.securityDefaults = checkNotNull(securityDefaults);

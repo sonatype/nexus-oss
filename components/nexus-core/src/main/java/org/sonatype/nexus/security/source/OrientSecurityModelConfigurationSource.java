@@ -57,7 +57,7 @@ import static java.lang.String.valueOf;
  */
 @Named
 @Singleton
-public class DefaultSecurityModelConfigurationSource
+public class OrientSecurityModelConfigurationSource
     extends LifecycleSupport
     implements SecurityModelConfigurationSource, EventSubscriber
 {
@@ -86,12 +86,12 @@ public class DefaultSecurityModelConfigurationSource
   private SecurityModelConfiguration configuration;
 
   @Inject
-  public DefaultSecurityModelConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
-                                                 final @Named("static") SecurityModelConfigurationSource defaults,
-                                                 final CUserEntityAdapter userEntityAdapter,
-                                                 final CRoleEntityAdapter roleEntityAdapter,
-                                                 final CPrivilegeEntityAdapter privilegeEntityAdapter,
-                                                 final CUserRoleMappingEntityAdapter userRoleMappingEntityAdapter)
+  public OrientSecurityModelConfigurationSource(final @Named("security") Provider<DatabaseInstance> databaseInstance,
+                                                final @Named("static") SecurityModelConfigurationSource defaults,
+                                                final CUserEntityAdapter userEntityAdapter,
+                                                final CRoleEntityAdapter roleEntityAdapter,
+                                                final CPrivilegeEntityAdapter privilegeEntityAdapter,
+                                                final CUserRoleMappingEntityAdapter userRoleMappingEntityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
     this.securityDefaults = checkNotNull(defaults);
