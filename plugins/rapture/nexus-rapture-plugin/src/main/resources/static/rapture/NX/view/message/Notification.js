@@ -25,17 +25,8 @@ Ext.define('NX.view.message.Notification', {
   maxWidth: 400,
   autoShow: true,
 
-  manager: 'default',
+  paddingY: 5,
+  paddingX: 5,
 
-  // top-right, but do not obscure the header toolbar
-  position: 'tr',
-  paddingX: 10,
-  paddingY: 55,
-
-  stickWhileHover: false,
-  slideInDuration: 800,
-  slideBackDuration: 1500,
-  autoCloseDelay: 4000,
-  slideInAnimation: 'elasticIn',
-  slideBackAnimation: 'elasticIn'
+  manager: 'default'
 });

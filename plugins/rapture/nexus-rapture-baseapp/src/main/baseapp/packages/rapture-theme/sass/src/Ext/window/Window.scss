@@ -6,6 +6,10 @@
   $ui: 'message-default',
 
   $ui-padding: 10px,
+  $ui-border-radius: 4px,
+  $ui-border-width: 1px,
+  $ui-header-line-height: 20px,
+  $ui-header-padding: 4px 10px 5px 10px,
   $ui-header-font-size: $font-size-h5,
   $ui-header-font-weight: $font-weight-h5
 );
@@ -14,6 +18,10 @@
   $ui: 'message-primary',
 
   $ui-padding: 10px,
+  $ui-border-radius: 4px,
+  $ui-border-width: 1px,
+  $ui-header-line-height: 20px,
+  $ui-header-padding: 4px 10px 5px 10px,
   $ui-header-font-size: $font-size-h5,
   $ui-header-font-weight: $font-weight-h5,
   $ui-tool-background-image: 'tools/tool-sprites',
@@ -25,6 +33,10 @@
   $ui: 'message-danger',
 
   $ui-padding: 10px,
+  $ui-border-radius: 4px,
+  $ui-border-width: 1px,
+  $ui-header-line-height: 20px,
+  $ui-header-padding: 4px 10px 5px 10px,
   $ui-header-font-size: $font-size-h5,
   $ui-header-font-weight: $font-weight-h5,
   $ui-tool-background-image: 'tools/tool-sprites',
@@ -36,6 +48,10 @@
   $ui: 'message-warning',
 
   $ui-padding: 10px,
+  $ui-border-radius: 4px,
+  $ui-border-width: 1px,
+  $ui-header-line-height: 20px,
+  $ui-header-padding: 4px 10px 5px 10px,
   $ui-header-font-size: $font-size-h5,
   $ui-header-font-weight: $font-weight-h5,
   $ui-tool-background-image: 'tools/tool-sprites',
@@ -47,13 +63,16 @@
   $ui: 'message-success',
 
   $ui-padding: 10px,
+  $ui-border-radius: 4px,
+  $ui-border-width: 1px,
+  $ui-header-line-height: 20px,
+  $ui-header-padding: 4px 10px 5px 10px,
   $ui-header-font-size: $font-size-h5,
   $ui-header-font-weight: $font-weight-h5,
   $ui-tool-background-image: 'tools/tool-sprites',
   $ui-header-color: $color-white,
   $ui-header-background-color: $color-pigment-green
 );
-
 
 /* Fixed modals for the visual style guide */
 .fixed-modal {
