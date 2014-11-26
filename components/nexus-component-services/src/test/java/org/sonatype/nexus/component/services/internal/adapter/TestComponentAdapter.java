@@ -12,23 +12,19 @@
  */
 package org.sonatype.nexus.component.services.internal.adapter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.sonatype.nexus.component.services.adapter.ComponentAdapter;
-import org.sonatype.nexus.component.services.model.TestComponent;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
- * Entity adapter for {@link TestComponent}.
+ * Entity adapter for test components.
  */
 public class TestComponentAdapter
-    extends ComponentAdapter<TestComponent>
+    extends ComponentAdapter
 {
+  public static final String CLASS_NAME = "testcomponent";
+
   public static final String P_BINARY = "binaryProp";
   public static final String P_BOOLEAN = "booleanProp";
   public static final String P_BYTE = "byteProp";
@@ -44,13 +40,12 @@ public class TestComponentAdapter
   public static final String P_STRING = "stringProp"; // required and indexed (unique)...all others are optional
   public static final String P_UNREGISTERED = "unregisteredProp"; // not a formal part of the schema...all others are
 
-  @Override
-  public Class<TestComponent> getEntityClass() {
-    return TestComponent.class;
+  public TestComponentAdapter() {
+    super(CLASS_NAME);
   }
 
   @Override
-  public void initStorageClass(final OClass oClass) {
+  public void initClass(final OClass oClass) {
     createOptionalProperty(oClass, P_BINARY, OType.BINARY);
     createOptionalProperty(oClass, P_BOOLEAN, OType.BOOLEAN);
     createOptionalProperty(oClass, P_BYTE, OType.BYTE);
@@ -66,42 +61,5 @@ public class TestComponentAdapter
     createRequiredAutoIndexedProperty(oClass, P_STRING, OType.STRING, false);
     // NOTE: P_UNREGISTERED is not a formal part of the schema, but may
     // still be used because this oClass doesn't specify strict mode
-  }
-
-  @Override
-  public void populateDocument(final TestComponent entity, final ODocument document) {
-    setValueOrNull(document, P_BINARY, entity.getBinaryProp());
-    setValueOrNull(document, P_BOOLEAN, entity.getBooleanProp());
-    setValueOrNull(document, P_BYTE, entity.getByteProp());
-    setValueOrNull(document, P_DATETIME, entity.getDatetimeProp());
-    setValueOrNull(document, P_DOUBLE, entity.getDoubleProp());
-    setValueOrNull(document, P_EMBEDDEDLIST, entity.getEmbeddedListProp());
-    setValueOrNull(document, P_EMBEDDEDMAP, entity.getEmbeddedMapProp());
-    setValueOrNull(document, P_EMBEDDEDSET, entity.getEmbeddedSetProp());
-    setValueOrNull(document, P_FLOAT, entity.getFloatProp());
-    setValueOrNull(document, P_INTEGER, entity.getIntegerProp());
-    setValueOrNull(document, P_LONG, entity.getLongProp());
-    setValueOrNull(document, P_SHORT, entity.getShortProp());
-    setValueOrNull(document, P_STRING, entity.getStringProp());
-    setValueOrNull(document, P_UNREGISTERED, entity.getUnregisteredProp());
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public void populateEntity(final ODocument document, final TestComponent entity) {
-    entity.setBinaryProp((byte[]) document.field(P_BINARY));
-    entity.setBooleanProp((Boolean) document.field(P_BOOLEAN));
-    entity.setByteProp((Byte) document.field(P_BYTE));
-    entity.setDatetimeProp(getDateTimeOrNull(document, P_DATETIME));
-    entity.setDoubleProp((Double) document.field(P_DOUBLE));
-    entity.setEmbeddedListProp((List<String>) document.field(P_EMBEDDEDLIST));
-    entity.setEmbeddedMapProp((Map<String, String>) document.field(P_EMBEDDEDMAP));
-    entity.setEmbeddedSetProp((Set<String>) document.field(P_EMBEDDEDSET));
-    entity.setFloatProp((Float) document.field(P_FLOAT));
-    entity.setIntegerProp((Integer) document.field(P_INTEGER));
-    entity.setLongProp((Long) document.field(P_LONG));
-    entity.setShortProp((Short) document.field(P_SHORT));
-    entity.setStringProp((String) document.field(P_STRING));
-    entity.setUnregisteredProp(document.field(P_UNREGISTERED));
   }
 }

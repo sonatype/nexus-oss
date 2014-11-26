@@ -10,40 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.views.rawbinaries.internal.storage.orientblobstore;
+package org.sonatype.nexus.views.rawbinaries.internal.storage.adapter;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.component.services.adapter.AssetAdapter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 
 /**
- * Obtains and provides an OrientDB {@link DatabaseInstance} by the name of {@link #NAME} from the {@link
- * DatabaseManager}; this is used for storing component metadata.
+ * Entity adapter for raw binary assets.
  *
  * @since 3.0
  */
-@Named(OrientDBProvider.NAME)
+@Named
 @Singleton
-public class OrientDBProvider
-    implements Provider<DatabaseInstance>
+public class RawBinaryAssetAdapter
+    extends AssetAdapter
 {
-  public static final String NAME = "rawBinaryMetadata";
+  public static final String CLASS_NAME = "rawbinaryasset";
 
-  private final DatabaseManager databaseManager;
-
-  @Inject
-  public OrientDBProvider(final DatabaseManager databaseManager) {
-    this.databaseManager = checkNotNull(databaseManager);
+  public RawBinaryAssetAdapter() {
+    super(CLASS_NAME);
   }
 
   @Override
-  public DatabaseInstance get() {
-    return databaseManager.instance(NAME);
+  protected void initClass(final OClass storageClass) {
+    // no custom properties, but add a unique index on the inherited path property
+    String indexName = String.format("%s.%s", storageClass.getName(), P_PATH);
+    storageClass.createIndex(indexName, INDEX_TYPE.UNIQUE, P_PATH);
   }
 }

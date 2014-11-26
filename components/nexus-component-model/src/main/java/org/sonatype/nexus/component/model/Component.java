@@ -12,24 +12,22 @@
  */
 package org.sonatype.nexus.component.model;
 
-import java.util.Set;
-
-import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
- * An {@link Entity} that may contain any number of {@link Asset}s.
+ * A component.
+ *
+ * @since 3.0
  */
-public interface Component
-    extends Entity
+public class Component
+    extends BaseEntity
+    implements Entity
 {
-  /**
-   * Gets the ids of the {@link Asset}s that belong to this component, or {@code null} if it hasn't been stored yet.
-   */
-  @Nullable
-  Set<EntityId> getAssetIds();
+  public Component(String className) {
+    super(className);
+  }
 
-  /**
-   * @see #getAssetIds()
-   */
-  void setAssetIds(Set<EntityId> assetIds);
+  public Component(String className, Map<String, Object> props) {
+    super(className, props);
+  }
 }

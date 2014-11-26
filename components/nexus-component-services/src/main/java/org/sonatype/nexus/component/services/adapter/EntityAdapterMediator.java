@@ -10,11 +10,31 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.component.services.adapter;
+
+import javax.inject.Named;
+
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.Mediator;
+
 /**
- * This class provides a temporary and raw binary-specific implementation of the component storage service.
- *
- * TODO: Migrate this to use the actual Component Storage Service, c.f. NX-448.
+ * Manages {@link EntityAdapter} registrations via Sisu component mediation.
  *
  * @since 3.0
  */
-package org.sonatype.nexus.views.rawbinaries.internal.storage.orientblobstore;
+@Named
+public class EntityAdapterMediator
+    implements Mediator<Named, EntityAdapter, EntityAdapterRegistry>
+{
+  @Override
+  public void add(final BeanEntry<Named, EntityAdapter> entry,
+                  final EntityAdapterRegistry registry) {
+    registry.registerAdapter(entry.getValue());
+  }
+
+  @Override
+  public void remove(final BeanEntry<Named, EntityAdapter> entry,
+                     final EntityAdapterRegistry registry) {
+    registry.unregisterAdapter(entry.getValue().getClassName());
+  }
+}
