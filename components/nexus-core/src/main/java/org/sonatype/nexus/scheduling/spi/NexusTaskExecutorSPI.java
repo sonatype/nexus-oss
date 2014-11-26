@@ -40,11 +40,15 @@ public interface NexusTaskExecutorSPI
   List<TaskInfo<?>> listsTasks();
 
   /**
-   * (re)Schedules a NX task with given schedule. If given task configuration existed, it will be updated, if not,
-   * added.
+   * Schedules a NX task with given schedule. If given task configuration existed, it will be updated, if not,
+   * added. Task must not be running.
    */
-  <T> TaskInfo<T> scheduleTask(TaskConfiguration taskConfiguration,
-                               Schedule schedule);
+  <T> TaskInfo<T> scheduleTask(TaskConfiguration taskConfiguration, Schedule schedule);
+
+  /**
+   * Reschedules a NX task with given schedule. Task might be running. If no task found, {@code null} is returned.
+   */
+  <T> TaskInfo<T> rescheduleTask(String id, Schedule schedule);
 
   /**
    * Removes a NX task by it's ID.

@@ -128,7 +128,8 @@ public class QuartzNexusSchedulerSPI
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
         // TODO: what about updating running jobs? HealthCheck does it, but Quartz recommends against it (config persist?)
-        checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running, cannot update", taskConfiguration.getId());
+        checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running, cannot update",
+            taskConfiguration.getId());
         removeTask(jobKey);
       }
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
@@ -158,6 +159,28 @@ public class QuartzNexusSchedulerSPI
     }
   }
 
+  @Override
+  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
+      final TaskInfo<T> task = (TaskInfo<T>) allTasks().get(jobKey);
+      if (task == null) {
+        return null;
+      }
+      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
+          .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
+      quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
+      return taskByKey(jobKey);
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+  }
 
   @Override
   public boolean removeTask(final String id) {

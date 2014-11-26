@@ -253,6 +253,11 @@ public class ThreadPoolNexusSchedulerSPI
   }
 
   @Override
+  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+    throw new UnsupportedOperationException("Only once executing tasks are supported");
+  }
+
+  @Override
   public boolean removeTask(final String id) {
     final TaskInfo<?> taskInfo = getTaskById(id);
     if (taskInfo == null) {

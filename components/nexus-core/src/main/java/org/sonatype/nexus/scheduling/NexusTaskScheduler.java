@@ -65,9 +65,17 @@ public interface NexusTaskScheduler
   List<TaskInfo<?>> listsTasks();
 
   /**
-   * Schedules a tasks. If existing task with ID exists, it will be re-scheduled (replaced).
+   * Schedules a tasks. If existing task with ID exists, it will be replaced. As this changes task configuration, task
+   * must not be running.
    */
   <T> TaskInfo<T> scheduleTask(TaskConfiguration configuration, Schedule schedule);
+
+  /**
+   * Re-schedules a tasks. Only change the task schedule. Task might even be running. Returns {@code null} if task not
+   * found, or the updated task info (with new schedule).
+   */
+  @Nullable
+  <T> TaskInfo<T> rescheduleTask(String id, Schedule schedule);
 
   /**
    * Removes task by ID.

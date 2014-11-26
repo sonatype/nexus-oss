@@ -101,6 +101,13 @@ public class DefaultNexusTaskScheduler
   }
 
   @Override
+  public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
+    checkNotNull(id);
+    checkNotNull(schedule);
+    return getScheduler().rescheduleTask(id, schedule);
+  }
+
+  @Override
   public boolean removeTask(final String id) {
     checkNotNull(id);
     return getScheduler().removeTask(id);
