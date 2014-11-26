@@ -127,7 +127,8 @@ public class QuartzNexusSchedulerSPI
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
-        checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running");
+        // TODO: what about updating running jobs? HealthCheck does it, but Quartz recommends against it (config persist?)
+        checkState(!quartzSupport.isRunning(jobKey), "Task %s is currently running, cannot update", taskConfiguration.getId());
         removeTask(jobKey);
       }
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
