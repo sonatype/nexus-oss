@@ -37,7 +37,6 @@ import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.DefaultUser
 import org.sonatype.security.usermanagement.RoleIdentifier
 import org.sonatype.security.usermanagement.User
 import org.sonatype.security.usermanagement.UserManager
@@ -137,7 +136,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Create.class, Default.class])
   UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.addUser(new DefaultUser(
+    asUserXO(securitySystem.addUser(new User(
         userId: userXO.userId,
         source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
@@ -160,7 +159,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(new DefaultUser(
+    asUserXO(securitySystem.updateUser(new User(
         userId: userXO.userId,
         version: userXO.version,
         source: DEFAULT_SOURCE,

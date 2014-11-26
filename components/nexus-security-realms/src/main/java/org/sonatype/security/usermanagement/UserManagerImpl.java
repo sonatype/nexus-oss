@@ -87,7 +87,7 @@ public class UserManagerImpl
       return null;
     }
 
-    DefaultUser user = new DefaultUser();
+    User user = new User();
 
     user.setUserId(cUser.getId());
     user.setVersion(cUser.getVersion());

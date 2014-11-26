@@ -20,9 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -46,7 +45,7 @@ public class MockUserManager
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
-    User jcohen = new DefaultUser();
+    User jcohen = new User();
     jcohen.setEmailAddress("JamesDCohen@example.com");
     jcohen.setFirstName("James");
     jcohen.setLastName("Cohen");

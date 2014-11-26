@@ -82,7 +82,7 @@ public class UserManagerTest
   {
     UserManager userManager = this.getUserManager();
 
-    User user = new DefaultUser();
+    User user = new User();
     user.setUserId("testCreateUser");
     user.setName(user.getUserId() + "-name");
     user.setSource(user.getUserId() + "default");
@@ -208,7 +208,7 @@ public class UserManagerTest
 
     UserManager userManager = this.getUserManager();
 
-    User user = new DefaultUser();
+    User user = new User();
     user.setUserId(userId);
     user.setName(user.getUserId() + "-name");
     user.setSource(user.getUserId() + "default");

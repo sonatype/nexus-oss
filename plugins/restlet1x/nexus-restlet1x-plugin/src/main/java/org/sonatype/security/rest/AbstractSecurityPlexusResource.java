@@ -46,9 +46,8 @@ import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.rest.model.UserResource;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import com.google.common.base.Function;
@@ -140,7 +139,7 @@ public abstract class AbstractSecurityPlexusResource
       throws InvalidConfigurationException
   {
     if (user == null) {
-      user = new DefaultUser();
+      user = new User();
     }
 
     // validate users Status, converting to an ENUM throws an exception, so we need to explicitly check it

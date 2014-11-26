@@ -27,9 +27,8 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeD
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -57,7 +56,7 @@ public class EmptyRoleTest
     authManager.addRole(emptyRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
@@ -111,7 +110,7 @@ public class EmptyRoleTest
     authManager.addRole(normalRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.addRole(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId()));
     user.addRole(new RoleIdentifier(normalRole.getSource(), normalRole.getRoleId()));
 
@@ -137,7 +136,7 @@ public class EmptyRoleTest
     authManager.addRole(emptyRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
@@ -152,8 +151,8 @@ public class EmptyRoleTest
 
   }
 
-  private DefaultUser buildTestUser() {
-    DefaultUser user = new DefaultUser();
+  private User buildTestUser() {
+    User user = new User();
     user.setUserId("test-user-" + Math.random());
     user.setEmailAddress("test@foo.com");
     user.setFirstName("test");
