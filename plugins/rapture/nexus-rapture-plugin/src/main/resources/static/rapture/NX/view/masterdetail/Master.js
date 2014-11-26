@@ -20,11 +20,6 @@
 Ext.define('NX.view.masterdetail.Master', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-masterdetail-master',
-  /*requires: [
-    'NX.Icons',
-    'NX.Bookmarks',
-    'NX.ext.tab.SortedPanel'
-  ],*/
 
   listeners: {
     columnschanged: 'refreshDrilldown',
@@ -67,57 +62,4 @@ Ext.define('NX.view.masterdetail.Master', {
 
     this.resumeEvents();
   }
-
-  /**
-   * @override
-   */
-  /*initComponent: function() {
-    var me = this;
-
-    me.callParent(arguments);
-
-    //me.on('afterrender', me.calculateBookmarks, me);
-  }*/
-
-  /**
-   * @public
-   * @returns {String} bookmark token of selected tab
-   */
-  /*getBookmarkOfSelectedTab: function() {
-    var me = this,
-        tabPanel = me.down('>#tab');
-
-    return tabPanel.getActiveTab().bookmark;
-  },*/
-
-  /**
-   * @public
-   * Finds a tab by bookmark & sets it active (if found).
-   * @param {String} bookmark of tab to be activated
-   */
-  /*setActiveTabByBookmark: function(bookmark) {
-    var me = this,
-        tabPanel = me.down('>#tab'),
-        tab = me.down('> tabpanel > panel[bookmark=' + bookmark + ']');
-
-    if (tabPanel && tab) {
-      tabPanel.setActiveTab(tab);
-    }
-  },*/
-
-  /**
-   * @private
-   * Calculates bookmarks of all tabs based on tab title.
-   */
-  /*calculateBookmarks: function() {
-    var me = this,
-        tabPanel = me.down('>#tab');
-
-    tabPanel.items.each(function(tab) {
-      if (tab.title) {
-        tab.bookmark = NX.Bookmarks.encode(tab.title).toLowerCase();
-      }
-    });
-  }*/
-
 });
