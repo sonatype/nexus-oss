@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
 
@@ -42,6 +44,7 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
+    task.getConfiguration().setType(MergeMetadataTask.class.getName());
     task.getConfiguration().setRepositoryId(GROUP_ID_1);
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_1)).isEmpty(), is(false));
   }
@@ -53,6 +56,7 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
+    task.getConfiguration().setType(MergeMetadataTask.class.getName());
     task.getConfiguration().setRepositoryId(GROUP_ID_1);
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_2)).isEmpty(), is(true));
   }
@@ -71,6 +75,9 @@ public class MergeMetadataTaskIT
     taskConfiguration.setRepositoryId(repoId);
     taskConfiguration.setType(MergeMetadataTask.class.getName());
     when(task.getConfiguration()).thenReturn(taskConfiguration);
+    CurrentState currentState = mock(CurrentState.class);
+    when(currentState.getState()).thenReturn(State.RUNNING);
+    when(task.getCurrentState()).thenReturn(currentState);
     return task;
   }
 
