@@ -68,8 +68,6 @@ public abstract class AbstractScheduledServicePlexusResource
 {
   private NexusTaskScheduler nexusScheduler;
 
-  private NexusUberClassloader nexusUberClassloader;
-
   public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
   private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
@@ -77,11 +75,6 @@ public abstract class AbstractScheduledServicePlexusResource
   @Inject
   public void setNexusScheduler(final NexusTaskScheduler nexusScheduler) {
     this.nexusScheduler = nexusScheduler;
-  }
-
-  @Inject
-  public void setNexusUberClassloader(final NexusUberClassloader nexusUberClassloader) {
-    this.nexusUberClassloader = nexusUberClassloader;
   }
 
   protected NexusTaskScheduler getNexusScheduler() {
@@ -270,9 +263,7 @@ public abstract class AbstractScheduledServicePlexusResource
       throws IllegalArgumentException, ResourceException
   {
     try {
-      final Class<? extends Task> serviceClass = (Class<? extends Task>) nexusUberClassloader.loadClass(model.getTypeId());
-
-      TaskConfiguration task = getNexusScheduler().createTaskConfigurationInstance(serviceClass);
+      TaskConfiguration task = getNexusScheduler().createTaskConfigurationInstance(model.getTypeId());
 
       for (Iterator iter = model.getProperties().iterator(); iter.hasNext(); ) {
         ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
@@ -289,10 +280,7 @@ public abstract class AbstractScheduledServicePlexusResource
 
       return task;
     }
-    catch (ClassCastException e) {
-      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
-    }
-    catch (ClassNotFoundException e) {
+    catch (IllegalArgumentException e) {
       throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
     }
   }
@@ -535,28 +523,41 @@ public abstract class AbstractScheduledServicePlexusResource
     return lastRunResult;
   }
 
-  protected String getReadableState(TaskInfo info) {
-    try {
-      switch (info.getCurrentState().getState()) {
-        case WAITING:
-          return "Waiting";
-        case DONE:
-          return "Done";
-        case RUNNING: {
-          switch (info.getCurrentState().getRunState()) {
-            case RUNNING:
-              return "Running";
-            case BLOCKED:
-              return "Blocked";
-            case CANCELED:
-              return "Cancelling";
-          }
-        }
+  protected String getState(final TaskInfo info) {
+    if (State.RUNNING != info.getCurrentState().getState()) {
+      return info.getCurrentState().getState().name();
+    }
+    else {
+      // is running
+      switch (info.getCurrentState().getRunState()) {
+        case BLOCKED:
+          return "SLEEPING";
+        case CANCELED:
+          return "CANCELLING";
         default:
-          throw new IllegalStateException();
+          return "RUNNING";
       }
-    } catch (IllegalStateException e) {
-      return "unknown";
+    }
+  }
+
+  protected String getReadableState(final TaskInfo info) {
+    switch (info.getCurrentState().getState()) {
+      case WAITING:
+        return "Waiting";
+      case DONE:
+        return "Done";
+      case RUNNING: {
+        switch (info.getCurrentState().getRunState()) {
+          case BLOCKED:
+            return "Blocked";
+          case CANCELED:
+            return "Cancelling";
+          default:
+            return "Running";
+        }
+      }
+      default:
+        return String.valueOf(info.getCurrentState().getState());
     }
   }
 

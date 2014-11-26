@@ -118,19 +118,8 @@ public class ScheduledServiceListPlexusResource
         item.setLastRunResult(getLastRunResult(task));
         item.setId(task.getId());
         item.setName(task.getName());
-        if (State.WAITING == task.getCurrentState().getState() || State.DONE == task.getCurrentState().getState()) {
-          item.setStatus(task.getCurrentState().getState().toString());
-        }
-        else {
-          // is running
-          switch (task.getCurrentState().getRunState()) {
-            case BLOCKED:
-              item.setStatus("SLEEPING");
-              break;
-            default:
-              item.setStatus("RUNNING");
-          }
-        }
+
+        item.setStatus(getState(task));
         item.setReadableStatus(getReadableState(task));
         item.setTypeId(task.getConfiguration().getType());
         item.setTypeName(task.getConfiguration().getName());
