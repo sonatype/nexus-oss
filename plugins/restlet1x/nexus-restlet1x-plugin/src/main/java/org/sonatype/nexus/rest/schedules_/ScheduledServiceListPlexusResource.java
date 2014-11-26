@@ -34,6 +34,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.RunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -116,21 +118,36 @@ public class ScheduledServiceListPlexusResource
         item.setLastRunResult(getLastRunResult(task));
         item.setId(task.getId());
         item.setName(task.getName());
-        item.setStatus(task.getCurrentState().getState().toString());
+        if (State.WAITING == task.getCurrentState().getState() || State.DONE == task.getCurrentState().getState()) {
+          item.setStatus(task.getCurrentState().getState().toString());
+        }
+        else {
+          // is running
+          switch (task.getCurrentState().getRunState()) {
+            case BLOCKED:
+              item.setStatus("SLEEPING");
+              break;
+            default:
+              item.setStatus("RUNNING");
+          }
+        }
         item.setReadableStatus(getReadableState(task));
         item.setTypeId(task.getConfiguration().getType());
         item.setTypeName(task.getConfiguration().getName());
         item.setCreated(task.getConfiguration().getCreated().toString());
-        item.setLastRunTime(task.getLastRunState() == null ? "n/a" : task.getLastRunState().getRunStarted().toString());
-        final Date nextRunTime = getNextRunTime(task);
-        item.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
         item.setCreatedInMillis(task.getConfiguration().getUpdated().getTime());
-        if (task.getLastRunState() != null) {
-          item.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
+
+        final Date lastRunTime = getLastRunTime(task);
+        final Date nextRunTime = getNextRunTime(task);
+        item.setLastRunTime(lastRunTime == null ? "n/a" : lastRunTime.toString());
+        if (lastRunTime != null) {
+          item.setLastRunTimeInMillis(lastRunTime.getTime());
         }
+        item.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
         if (nextRunTime != null) {
           item.setNextRunTimeInMillis(nextRunTime.getTime());
         }
+
         item.setSchedule(getScheduleShortName(task.getSchedule()));
         item.setEnabled(task.getConfiguration().isEnabled());
 

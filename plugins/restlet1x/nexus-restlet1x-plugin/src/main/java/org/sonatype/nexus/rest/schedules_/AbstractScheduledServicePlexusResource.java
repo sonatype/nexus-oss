@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -45,6 +46,7 @@ import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Cron;
 import org.sonatype.nexus.scheduling.schedule.Daily;
 import org.sonatype.nexus.scheduling.schedule.Hourly;
@@ -468,13 +470,26 @@ public abstract class AbstractScheduledServicePlexusResource
     return resource;
   }
 
-  protected <T> Date getNextRunTime(TaskInfo<T> task) {
-    try {
-      return task.getCurrentState().getNextRun();
+  /**
+   * Returns last run time (when task started). Restlet1x API has slight difference of how this value is interpreted
+   * from current Tasks API, as it includes the current run if task in question is running.
+   */
+  protected <T> Date getLastRunTime(final TaskInfo<T> task) {
+    if (State.RUNNING == task.getCurrentState().getState()) {
+      return task.getCurrentState().getRunStarted();
     }
-    catch (IllegalStateException e) {
-      return null;
+    else if (task.getLastRunState() != null) {
+      return task.getLastRunState().getRunStarted();
     }
+    return null;
+  }
+
+  /**
+   * Returns next run time of the task.
+   */
+  @Nullable
+  protected <T> Date getNextRunTime(final TaskInfo<T> task) {
+    return task.getCurrentState().getNextRun();
   }
 
   protected String getLastRunResult(TaskInfo<?> task) {
@@ -525,6 +540,8 @@ public abstract class AbstractScheduledServicePlexusResource
       switch (info.getCurrentState().getState()) {
         case WAITING:
           return "Waiting";
+        case DONE:
+          return "Done";
         case RUNNING: {
           switch (info.getCurrentState().getRunState()) {
             case RUNNING:
