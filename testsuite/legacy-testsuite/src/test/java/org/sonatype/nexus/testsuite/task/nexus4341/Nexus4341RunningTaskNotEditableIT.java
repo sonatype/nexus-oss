@@ -37,6 +37,7 @@ public class Nexus4341RunningTaskNotEditableIT
   {
     final String taskName = "SleepRepositoryTask_" + getTestRepositoryId() + "_" + System.nanoTime();
     TaskScheduleUtil.runTask(taskName, SleepRepositoryTask.class.getName(), 0,
+        TaskScheduleUtil.newProperty(".visible", Boolean.TRUE.toString()),
         TaskScheduleUtil.newProperty("repositoryId", getTestRepositoryId()),
         TaskScheduleUtil.newProperty("time", String.valueOf(10)));
 
