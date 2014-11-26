@@ -28,10 +28,10 @@ import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescripto
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.AuthorizationManagerImpl;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -114,7 +114,7 @@ public class SecurityCleanupEventInspector
       if (!privilege.isReadOnly() && privilege.getType().equals(TargetPrivilegeDescriptor.TYPE)
           && (propertyValue.equals(privilege.getPrivilegeProperty(propertyId)))) {
         log.debug("Removing Privilege {} because repository was removed", privilege.getName());
-        security.getAuthorizationManager(SecurityXmlAuthorizationManager.SOURCE).deletePrivilege(
+        security.getAuthorizationManager(AuthorizationManagerImpl.SOURCE).deletePrivilege(
             privilege.getId());
         removedIds.add(privilege.getId());
       }

@@ -25,13 +25,13 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import junit.framework.Assert;
 
-public class SecurityXmlUserLocatorTest
+public class UserManagerTest
     extends AbstractSecurityTestCase
 {
 
   @Override
   protected Configuration getSecurityModelConfig() {
-    return SecurityXmlUserLocatorTestSecurity.securityModel();
+    return UserManagerTestSecurity.securityModel();
   }
 
   public void testListUserIds()

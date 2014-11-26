@@ -34,7 +34,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.MapMaker;
@@ -44,16 +43,12 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 
 /**
- * The default implementation of the RolePermissionResolver which reads roles from {@link StaticSecurityResource}s to
- * resolve a role into a collection of permissions. This class allows Realm implementations to no know what/how there
- * roles are used.
- *
- * @author Brian Demers
+ * Default {@link RolePermissionResolver}.
  */
 @Singleton
 @Typed(RolePermissionResolver.class)
 @Named("default")
-public class XmlRolePermissionResolver
+public class RolePermissionResolverImpl
     implements RolePermissionResolver
 {
   private final ConfigurationManager configuration;
@@ -65,10 +60,10 @@ public class XmlRolePermissionResolver
   private final Map<String, Collection<Permission>> permissionsCache;
 
   @Inject
-  public XmlRolePermissionResolver(ConfigurationManager configuration,
-                                   List<PrivilegeDescriptor> privilegeDescriptors,
-                                   @Named("caching") PermissionFactory permissionFactory,
-                                   EventBus eventBus)
+  public RolePermissionResolverImpl(ConfigurationManager configuration,
+                                    List<PrivilegeDescriptor> privilegeDescriptors,
+                                    @Named("caching") PermissionFactory permissionFactory,
+                                    EventBus eventBus)
   {
     this.configuration = configuration;
     this.privilegeDescriptors = privilegeDescriptors;

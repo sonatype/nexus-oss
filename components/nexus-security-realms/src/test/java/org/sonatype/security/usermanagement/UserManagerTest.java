@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.usermanagement.xml;
+package org.sonatype.security.usermanagement;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,12 +24,6 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
 import org.apache.shiro.authc.credential.PasswordService;

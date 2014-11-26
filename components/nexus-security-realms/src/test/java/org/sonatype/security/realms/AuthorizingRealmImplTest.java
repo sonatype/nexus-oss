@@ -32,11 +32,11 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 
-public class XmlAuthorizingRealmTest
+public class AuthorizingRealmImplTest
     extends AbstractSecurityTestCase
 {
 
-  private XmlAuthorizingRealm realm;
+  private AuthorizingRealmImpl realm;
 
   private DefaultConfigurationManager configurationManager;
 
@@ -46,7 +46,7 @@ public class XmlAuthorizingRealmTest
   {
     super.setUp();
 
-    realm = (XmlAuthorizingRealm) lookup(Realm.class, "XmlAuthorizingRealm");
+    realm = (AuthorizingRealmImpl) lookup(Realm.class, "XmlAuthorizingRealm");
     realm.setRolePermissionResolver(this.lookup(RolePermissionResolver.class));
 
     configurationManager = lookup(DefaultConfigurationManager.class);

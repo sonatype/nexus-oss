@@ -41,8 +41,8 @@ import org.sonatype.security.usermanagement.DefaultUser
 import org.sonatype.security.usermanagement.RoleIdentifier
 import org.sonatype.security.usermanagement.User
 import org.sonatype.security.usermanagement.UserManager
+import org.sonatype.security.usermanagement.UserManagerImpl
 import org.sonatype.security.usermanagement.UserSearchCriteria
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -64,7 +64,7 @@ class UserComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
 
   @Inject
   SecuritySystem securitySystem

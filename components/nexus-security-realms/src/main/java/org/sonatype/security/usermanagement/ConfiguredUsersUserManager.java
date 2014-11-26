@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.usermanagement.xml;
+package org.sonatype.security.usermanagement;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,23 +25,15 @@ import javax.inject.Singleton;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Description;
 
 /**
- * A user manger that returns all users that have roles defined in the security.xml file. This allows you to easily
- * search for users that have added roles. For example if your users generally come from an external Realm (LDAP) you
- * could see which users have had roles added to them.
- *
- * @author Brian Demers
+ * This allows you to easily search for users that have added roles.
+ * For example if your users generally come from an external Realm (LDAP) you could see which users have had roles
+ * added to them.
  */
 @Singleton
 @Typed(UserManager.class)

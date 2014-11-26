@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.usermanagement.xml;
+package org.sonatype.security.usermanagement;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,30 +29,18 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
-import org.sonatype.security.usermanagement.AbstractUserManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.RoleMappingUserManager;
-import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.UserSearchCriteria;
-import org.sonatype.security.usermanagement.UserStatus;
 
 import org.apache.shiro.authc.credential.PasswordService;
 import org.eclipse.sisu.Description;
 
 /**
- * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.
- *
- * @author Brian Demers
+ * Default {@link UserManager}.
  */
 @Singleton
 @Typed(UserManager.class)
 @Named("default")
 @Description("Default")
-public class SecurityXmlUserManager
+public class UserManagerImpl
     extends AbstractUserManager
     implements RoleMappingUserManager
 {
@@ -67,9 +55,9 @@ public class SecurityXmlUserManager
   private final PasswordService passwordService;
 
   @Inject
-  public SecurityXmlUserManager(ConfigurationManager configuration,
-                                SecuritySystem securitySystem,
-                                PasswordService passwordService)
+  public UserManagerImpl(ConfigurationManager configuration,
+                         SecuritySystem securitySystem,
+                         PasswordService passwordService)
   {
     this.configuration = configuration;
     this.securitySystem = securitySystem;

@@ -38,21 +38,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An Authentication Realm backed by an XML file see the security-model-xml module. This model defines users, roles,
- * and
- * privileges. This realm ONLY handles authentication.
- *
- * @author Brian Demers
+ * Default {@link AuthenticatingRealm}.
+ * This realm ONLY handles authentication.
  */
 @Singleton
 @Typed(Realm.class)
-@Named(XmlAuthenticatingRealm.ROLE)
-@Description("Xml Authenticating Realm")
-public class XmlAuthenticatingRealm
+@Named(AuthenticatingRealmImpl.ROLE)
+@Description("Nexus Authenticating Realm")
+public class AuthenticatingRealmImpl
     extends AuthenticatingRealm
     implements Realm
 {
-  private static final Logger logger = LoggerFactory.getLogger(XmlAuthenticatingRealm.class);
+  private static final Logger logger = LoggerFactory.getLogger(AuthenticatingRealmImpl.class);
 
   public static final String ROLE = "XmlAuthenticatingRealm";
 
@@ -63,8 +60,8 @@ public class XmlAuthenticatingRealm
   private final int MAX_LEGACY_PASSWORD_LENGTH = 40;
 
   @Inject
-  public XmlAuthenticatingRealm(ConfigurationManager configuration,
-                                PasswordService passwordService)
+  public AuthenticatingRealmImpl(ConfigurationManager configuration,
+                                 PasswordService passwordService)
   {
     this.configuration = configuration;
     this.passwordService = passwordService;

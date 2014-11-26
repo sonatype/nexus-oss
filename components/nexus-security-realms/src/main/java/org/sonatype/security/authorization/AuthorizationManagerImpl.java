@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.authorization.xml;
+package org.sonatype.security.authorization;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,11 +22,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
@@ -38,12 +33,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
- * AuthorizationManager that wraps roles from security-xml-realm.
+ * Default {@link AuthorizationManager}.
  */
 @Singleton
 @Typed(AuthorizationManager.class)
 @Named("default")
-public class SecurityXmlAuthorizationManager
+public class AuthorizationManagerImpl
     implements AuthorizationManager
 {
   public static final String SOURCE = "default";
@@ -55,9 +50,9 @@ public class SecurityXmlAuthorizationManager
   private final EventBus eventBus;
 
   @Inject
-  public SecurityXmlAuthorizationManager(ConfigurationManager configuration,
-                                         PrivilegeInheritanceManager privInheritance,
-                                         EventBus eventBus)
+  public AuthorizationManagerImpl(ConfigurationManager configuration,
+                                  PrivilegeInheritanceManager privInheritance,
+                                  EventBus eventBus)
   {
     this.configuration = configuration;
     this.privInheritance = privInheritance;

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.authorization.xml;
+package org.sonatype.security.authorization;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,11 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;

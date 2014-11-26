@@ -37,7 +37,7 @@ public class AdditinalRoleSecuritySystemTest
     return AdditinalRoleSecuritySystemTestSecurity.securityModel();
   }
 
-  private Set<String> getXMLRoles()
+  private Set<String> getRoles()
       throws Exception
   {
     AuthorizationManager authzManager = this.lookup(AuthorizationManager.class);
@@ -99,7 +99,7 @@ public class AdditinalRoleSecuritySystemTest
       throws Exception
   {
     UserSearchCriteria criteria = new UserSearchCriteria();
-    criteria.setOneOfRoleIds(this.getXMLRoles());
+    criteria.setOneOfRoleIds(this.getRoles());
 
     criteria.setUserId("pperalez");
     User user = searchForSingleUser(criteria, "pperalez", null);

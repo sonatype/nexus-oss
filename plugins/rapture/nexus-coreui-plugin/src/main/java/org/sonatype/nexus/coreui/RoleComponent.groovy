@@ -26,7 +26,7 @@ import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Role
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
+import org.sonatype.security.usermanagement.UserManagerImpl
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -47,7 +47,7 @@ class RoleComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
 
   @Inject
   SecuritySystem securitySystem

@@ -31,7 +31,7 @@ import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.ExternalRoleMappingListResourceResponse;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 
 import org.apache.commons.lang.StringUtils;
 import org.restlet.Context;
@@ -84,7 +84,8 @@ public class ExternalRoleMappingListPlexusResource
    */
   @Override
   @GET
-  public ExternalRoleMappingListResourceResponse get(Context context, Request request, Response response, Variant variant)
+  public ExternalRoleMappingListResourceResponse get(Context context, Request request, Response response,
+                                                     Variant variant)
       throws ResourceException
   {
     String source = this.getSourceId(request);
@@ -98,7 +99,7 @@ public class ExternalRoleMappingListPlexusResource
             + "' could not be found.");
       }
 
-      Set<Role> defaultRoles = this.getSecuritySystem().listRoles(SecurityXmlUserManager.SOURCE);
+      Set<Role> defaultRoles = this.getSecuritySystem().listRoles(UserManagerImpl.SOURCE);
 
       Map<Role, Set<Role>> roleMap = new HashMap<Role, Set<Role>>();
 

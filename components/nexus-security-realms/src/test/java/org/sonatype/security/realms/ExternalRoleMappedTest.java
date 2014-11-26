@@ -58,11 +58,11 @@ public class ExternalRoleMappedTest
     // add MockRealm to config
     List<String> realms = new ArrayList<String>();
     realms.add("Mock");
-    realms.add(XmlAuthorizingRealm.ROLE);
+    realms.add(AuthorizingRealmImpl.ROLE);
     securitySystem.setRealms(realms);
 
-    // jcohen has the role mockrole1, there is also xml role with the same ID, which means jcohen automaticly has
-    // this xml role
+    // jcohen has the role mockrole1, there is also test role with the same ID, which means jcohen automaticly has
+    // this test role
 
     PrincipalCollection jcohen = new SimplePrincipalCollection("jcohen", MockRealm.NAME);
 

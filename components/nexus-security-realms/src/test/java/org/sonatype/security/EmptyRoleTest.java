@@ -21,8 +21,8 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.realms.XmlAuthenticatingRealm;
-import org.sonatype.security.realms.XmlAuthorizingRealm;
+import org.sonatype.security.realms.AuthenticatingRealmImpl;
+import org.sonatype.security.realms.AuthorizingRealmImpl;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
@@ -95,7 +95,7 @@ public class EmptyRoleTest
       throws Exception
   {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
-    securitySystem.setRealms(Arrays.asList(XmlAuthenticatingRealm.ROLE, XmlAuthorizingRealm.ROLE));
+    securitySystem.setRealms(Arrays.asList(AuthenticatingRealmImpl.ROLE, AuthorizingRealmImpl.ROLE));
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");
 
     // create an empty role

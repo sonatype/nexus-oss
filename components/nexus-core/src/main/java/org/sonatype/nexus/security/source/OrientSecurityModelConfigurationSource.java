@@ -35,8 +35,8 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
@@ -229,7 +229,7 @@ public class OrientSecurityModelConfigurationSource
 
         CUserRoleMapping mapping = new CUserRoleMapping();
         mapping.setUserId(user.getId());
-        mapping.setSource(SecurityXmlUserManager.SOURCE);
+        mapping.setSource(UserManagerImpl.SOURCE);
         mapping.setRoles(roles);
         userRoleMappingEntityAdapter.create(db, mapping);
       }
@@ -253,7 +253,7 @@ public class OrientSecurityModelConfigurationSource
 
         CUserRoleMapping mapping = new CUserRoleMapping();
         mapping.setUserId(user.getId());
-        mapping.setSource(SecurityXmlUserManager.SOURCE);
+        mapping.setSource(UserManagerImpl.SOURCE);
         mapping.setRoles(roles);
         document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
         if (document != null) {
@@ -275,7 +275,7 @@ public class OrientSecurityModelConfigurationSource
       checkNotNull(id, "user id");
       try (ODatabaseDocumentTx db = openDb()) {
         if (userEntityAdapter.delete(db, id)) {
-          userRoleMappingEntityAdapter.delete(db, id, SecurityXmlUserManager.SOURCE);
+          userRoleMappingEntityAdapter.delete(db, id, UserManagerImpl.SOURCE);
           return true;
         }
         return false;

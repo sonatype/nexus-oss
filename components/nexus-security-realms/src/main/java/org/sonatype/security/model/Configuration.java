@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -78,7 +78,7 @@ public class Configuration
 
     CUserRoleMapping mapping = new CUserRoleMapping();
     mapping.setUserId(user.getId());
-    mapping.setSource(SecurityXmlUserManager.SOURCE);
+    mapping.setSource(UserManagerImpl.SOURCE);
     mapping.setRoles(roles);
     addUserRoleMapping(mapping);
   }
@@ -102,7 +102,7 @@ public class Configuration
 
     CUserRoleMapping mapping = new CUserRoleMapping();
     mapping.setUserId(user.getId());
-    mapping.setSource(SecurityXmlUserManager.SOURCE);
+    mapping.setSource(UserManagerImpl.SOURCE);
     mapping.setRoles(roles);
     try {
       updateUserRoleMapping(mapping);
@@ -116,7 +116,7 @@ public class Configuration
   public boolean removeUser(final String id) {
     checkNotNull(id, "user id");
     if (users.remove(id) != null) {
-      removeUserRoleMapping(id, SecurityXmlUserManager.SOURCE);
+      removeUserRoleMapping(id, UserManagerImpl.SOURCE);
       return true;
     }
     return false;

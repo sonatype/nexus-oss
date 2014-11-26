@@ -39,8 +39,8 @@ import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 import org.sonatype.security.usermanagement.UserNotFoundException;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -345,7 +345,7 @@ public class DefaultConfigurationManager
   {
     Set<String> roles = Collections.emptySet();
     try {
-      roles = readUserRoleMapping(user.getId(), SecurityXmlUserManager.SOURCE).getRoles();
+      roles = readUserRoleMapping(user.getId(), UserManagerImpl.SOURCE).getRoles();
     }
     catch (NoSuchRoleMappingException e) {
       log.debug("User: {} has no roles", user.getId());

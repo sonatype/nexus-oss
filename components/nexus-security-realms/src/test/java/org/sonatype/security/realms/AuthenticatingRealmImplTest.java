@@ -32,11 +32,11 @@ import org.apache.shiro.realm.Realm;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class XmlAuthenticatingRealmTest
+public class AuthenticatingRealmImplTest
     extends AbstractSecurityTestCase
 {
 
-  private XmlAuthenticatingRealm realm;
+  private AuthenticatingRealmImpl realm;
 
   private DefaultConfigurationManager configurationManager;
 
@@ -52,7 +52,7 @@ public class XmlAuthenticatingRealmTest
   {
     super.setUp();
 
-    realm = (XmlAuthenticatingRealm) lookup(Realm.class, "XmlAuthenticatingRealm");
+    realm = (AuthenticatingRealmImpl) lookup(Realm.class, "XmlAuthenticatingRealm");
 
     configurationManager = lookup(DefaultConfigurationManager.class);
 

@@ -43,20 +43,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An Authorizing Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
- * privileges. This realm ONLY handles authorization.
- *
- * @author Brian Demers
+ * Default {@link AuthorizingRealm}.
+ * This realm ONLY handles authorization.
  */
 @Singleton
 @Typed(Realm.class)
-@Named(XmlAuthorizingRealm.ROLE)
-@Description("Xml Authorizing Realm")
-public class XmlAuthorizingRealm
+@Named(AuthorizingRealmImpl.ROLE)
+@Description("Nexus Authorizing Realm")
+public class AuthorizingRealmImpl
     extends AuthorizingRealm
     implements Realm
 {
-  private static final Logger logger = LoggerFactory.getLogger(XmlAuthorizingRealm.class);
+  private static final Logger logger = LoggerFactory.getLogger(AuthorizingRealmImpl.class);
 
   public static final String ROLE = "XmlAuthorizingRealm";
 
@@ -67,8 +65,8 @@ public class XmlAuthorizingRealm
   private final SecuritySystem securitySystem;
 
   @Inject
-  public XmlAuthorizingRealm(UserManager userManager, SecuritySystem securitySystem,
-                             Map<String, UserManager> userManagerMap)
+  public AuthorizingRealmImpl(UserManager userManager, SecuritySystem securitySystem,
+                              Map<String, UserManager> userManagerMap)
   {
     this.userManager = userManager;
     this.securitySystem = securitySystem;
