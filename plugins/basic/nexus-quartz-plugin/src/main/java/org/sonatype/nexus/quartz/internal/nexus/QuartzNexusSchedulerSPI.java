@@ -183,7 +183,7 @@ public class QuartzNexusSchedulerSPI
   }
 
   @Override
-  public int getRunnintTaskCount() {
+  public int getRunningTaskCount() {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {

@@ -26,7 +26,6 @@ import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
@@ -176,7 +175,7 @@ public class DefaultNexusTaskScheduler
 
   @Override
   public int getRunningTaskCount() {
-    return getScheduler().getRunnintTaskCount();
+    return getScheduler().getRunningTaskCount();
   }
 
   @Override

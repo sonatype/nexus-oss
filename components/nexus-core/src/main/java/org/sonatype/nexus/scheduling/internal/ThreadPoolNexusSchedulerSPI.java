@@ -264,7 +264,7 @@ public class ThreadPoolNexusSchedulerSPI
   }
 
   @Override
-  public int getRunnintTaskCount() {
+  public int getRunningTaskCount() {
     return executorService.getActiveCount();
   }
 }

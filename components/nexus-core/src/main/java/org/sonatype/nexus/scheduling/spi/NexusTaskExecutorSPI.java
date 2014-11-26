@@ -56,5 +56,5 @@ public interface NexusTaskExecutorSPI
    *
    * TODO: this is used in tests only, figure out do we really need it
    */
-  int getRunnintTaskCount();
+  int getRunningTaskCount();
 }
