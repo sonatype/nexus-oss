@@ -18,11 +18,13 @@ import java.util.Date;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+@Ignore("Tasks are no more in nexus.xml, nor we trick with that 20ms this IT checks for")
 public class Nexus2797Validate140TaskUpgradeIT
     extends AbstractNexusIntegrationTest
 {

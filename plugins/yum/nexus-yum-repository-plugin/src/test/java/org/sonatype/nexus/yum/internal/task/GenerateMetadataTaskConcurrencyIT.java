@@ -45,6 +45,7 @@ import com.google.code.tempusfugit.temporal.Condition;
 import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -96,6 +97,7 @@ public class GenerateMetadataTaskConcurrencyIT
   }
 
   @Test
+  @Ignore("One cannot override Task execute as done in createYumRepositoryTask anymore, as Quartz is re-instantiating the task instance")
   public void shouldExecuteSeveralThreadInParallel()
       throws Exception
   {
@@ -172,6 +174,9 @@ public class GenerateMetadataTaskConcurrencyIT
     }
   }
 
+  /**
+   * This method is broken: you cannot override task like this anymore.
+   */
   private GenerateMetadataTask createYumRepositoryTask(final int repositoryId)
       throws Exception
   {
