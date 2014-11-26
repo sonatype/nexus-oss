@@ -12,21 +12,20 @@
  */
 package org.sonatype.nexus.component.model;
 
-import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
- * A stored {@link Component} or {@link Asset}.
+ * A stored component or asset.
+ *
+ * @since 3.0
  */
 public interface Entity
 {
-  /**
-   * Gets the canonical id, or {@code null} if it hasn't been stored yet.
-   */
-  @Nullable
-  EntityId getId();
+  String getClassName();
 
-  /**
-   * @see #getId()
-   */
-  void setId(EntityId id);
+  Entity put(String name, Object value);
+
+  <T> T get(String name, Class<T> clazz);
+
+  Map<String, Object> toMap(boolean includeClass);
 }

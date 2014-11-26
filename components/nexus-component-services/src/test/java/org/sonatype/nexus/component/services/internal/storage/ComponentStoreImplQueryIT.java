@@ -17,8 +17,12 @@ import java.util.List;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.services.model.TestAsset;
-import org.sonatype.nexus.component.services.model.TestComponent;
+import org.sonatype.nexus.component.model.EntityId;
+import org.sonatype.nexus.component.services.adapter.AssetAdapter;
+import org.sonatype.nexus.component.services.adapter.ComponentAdapter;
+import org.sonatype.nexus.component.services.adapter.EntityAdapter;
+import org.sonatype.nexus.component.services.internal.adapter.TestAssetAdapter;
+import org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapter;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
 
@@ -44,46 +48,36 @@ public class ComponentStoreImplQueryIT
     extends ComponentStoreImplITSupport
 {
   @Test
-  public void initialState() {
-    assertThat(adapterRegistry.assetClasses().size(), is(0));
-    assertThat(adapterRegistry.componentClasses().size(), is(0));
+  public void countsBeforeAddingTestEntities() {
+    adapterRegistry.registerAdapter(new EntityAdapter());
+    adapterRegistry.registerAdapter(new ComponentAdapter());
+    adapterRegistry.registerAdapter(new AssetAdapter());
+    adapterRegistry.registerAdapter(testComponentAdapter);
+    adapterRegistry.registerAdapter(testAssetAdapter);
+    componentStore.prepareStorage(TestComponentAdapter.CLASS_NAME, TestAssetAdapter.CLASS_NAME);
 
-    assertThat(componentStore.assetClasses().size(), is(0));
-    assertThat(componentStore.componentClasses().size(), is(0));
+    assertThat(componentStore.count(ComponentAdapter.CLASS_NAME, null), is(0L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, null), is(0L));
+
+    assertThat(componentStore.count(AssetAdapter.CLASS_NAME, null), is(0L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, null), is(0L));
+
+    assertThat(componentStore.findComponents(ComponentAdapter.CLASS_NAME, null).size(), is(0));
+    assertThat(componentStore.findAssets(AssetAdapter.CLASS_NAME, null).size(), is(0));
   }
 
   @Test
-  public void registerAdapters() {
-    adapterRegistry.registerComponentAdapter(testComponentAdapter);
-    adapterRegistry.registerAssetAdapter(testAssetAdapter);
-
-    assertThat(adapterRegistry.assetClasses().size(), is(1));
-    assertThat(adapterRegistry.componentClasses().size(), is(1));
-
-    assertThat(componentStore.assetClasses().size(), is(1));
-    assertThat(componentStore.componentClasses().size(), is(1));
-
-    assertThat(componentStore.countComponents(TestComponent.class, null), is(0L));
-    assertThat(componentStore.countAssets(TestAsset.class, null), is(0L));
-
-    assertThat(componentStore.findComponents(TestComponent.class, null).size(), is(0));
-    assertThat(componentStore.findAssets(TestAsset.class, null).size(), is(0));
-  }
-
-  @Test
-  public void totalAssetCount() {
+  public void countsAfterAddingTestEntities() {
     addTwoTestComponentsWithTwoAssetsEach();
 
-    assertThat(componentStore.countAssets(Asset.class, null), is(4L));
-    assertThat(componentStore.countAssets(TestAsset.class, null), is(4L));
-  }
+    assertThat(componentStore.count(null, null), is(6L));
+    assertThat(componentStore.count(EntityAdapter.CLASS_NAME, null), is(6L));
 
-  @Test
-  public void totalComponentCount() {
-    addTwoTestComponentsWithTwoAssetsEach();
+    assertThat(componentStore.count(AssetAdapter.CLASS_NAME, null), is(4L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, null), is(4L));
 
-    assertThat(componentStore.countComponents(Component.class, null), is(2L));
-    assertThat(componentStore.countComponents(TestComponent.class, null), is(2L));
+    assertThat(componentStore.count(ComponentAdapter.CLASS_NAME, null), is(2L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, null), is(2L));
   }
 
   @Test
@@ -93,10 +87,10 @@ public class ComponentStoreImplQueryIT
     // SELECT FROM testcomponent
 
     // count should be 2
-    assertThat(componentStore.countComponents(TestComponent.class, null), is(2L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, null), is(2L));
 
     MetadataQuery query = new MetadataQuery().orderBy(P_ID, true);
-    List<TestComponent> results = componentStore.findComponents(TestComponent.class, query);
+    List<Component> results = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
 
     // query should return component1 then component2
     assertThat(results.size(), is(2));
@@ -112,10 +106,10 @@ public class ComponentStoreImplQueryIT
     MetadataQueryRestriction restriction = componentPropertyEquals(P_ID, TEST_COMPONENT_ID_1);
 
     // count should be 1
-    assertThat(componentStore.countComponents(TestComponent.class, restriction), is(1L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestComponent> results = componentStore.findComponents(TestComponent.class, query);
+    List<Component> results = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
 
     // query should return component1 only
     assertThat(results.size(), is(1));
@@ -132,10 +126,10 @@ public class ComponentStoreImplQueryIT
         componentPropertyEquals(P_ID, TEST_COMPONENT_ID_2));
 
     // count should be 2
-    assertThat(componentStore.countComponents(TestComponent.class, restriction), is(2L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, restriction), is(2L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(P_ID, true);
-    List<TestComponent> results = componentStore.findComponents(TestComponent.class, query);
+    List<Component> results = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
 
     // query should return component1 then component2
     assertThat(results.size(), is(2));
@@ -151,10 +145,10 @@ public class ComponentStoreImplQueryIT
     MetadataQueryRestriction restriction = assetPropertyEquals(P_DOWNLOAD_COUNT, 1);
 
     // count should be 1
-    assertThat(componentStore.countComponents(TestComponent.class, restriction), is(1L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestComponent> results = componentStore.findComponents(TestComponent.class, query);
+    List<Component> results = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
 
     // query should return component1 only
     assertThat(results.size(), is(1));
@@ -171,10 +165,10 @@ public class ComponentStoreImplQueryIT
         assetPropertyEquals(P_CONTENT_TYPE, "text/plain"));
 
     // count should be 2
-    assertThat(componentStore.countComponents(TestComponent.class, restriction), is(2L));
+    assertThat(componentStore.count(TestComponentAdapter.CLASS_NAME, restriction), is(2L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(P_ID, false);
-    List<TestComponent> results = componentStore.findComponents(TestComponent.class, query);
+    List<Component> results = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
 
     // query should return component2 then component1 (since we ordered results DESCending this time)
     assertThat(results.size(), is(2));
@@ -189,19 +183,19 @@ public class ComponentStoreImplQueryIT
     // SELECT FROM testasset
 
     // count should be 4
-    assertThat(componentStore.countAssets(TestAsset.class, null), is(4L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, null), is(4L));
 
     MetadataQuery query = new MetadataQuery()
         .orderBy(P_COMPONENT, true)
         .orderBy(P_DOWNLOAD_COUNT, false);
-    List<TestAsset> results = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> results = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
 
     // query should return all four assets in order of component ascending, then downloadCount descending
     assertThat(results.size(), is(4));
-    checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 2);
-    checkAsset(results.get(1), TEST_COMPONENT_1.getId(), 1);
-    checkAsset(results.get(2), TEST_COMPONENT_2.getId(), 4);
-    checkAsset(results.get(3), TEST_COMPONENT_2.getId(), 3);
+    checkAsset(results.get(0), TEST_COMPONENT_1.get(P_ID, EntityId.class), 2);
+    checkAsset(results.get(1), TEST_COMPONENT_1.get(P_ID, EntityId.class), 1);
+    checkAsset(results.get(2), TEST_COMPONENT_2.get(P_ID, EntityId.class), 4);
+    checkAsset(results.get(3), TEST_COMPONENT_2.get(P_ID, EntityId.class), 3);
   }
 
   @Test
@@ -212,14 +206,14 @@ public class ComponentStoreImplQueryIT
     MetadataQueryRestriction restriction = assetPropertyEquals(P_DOWNLOAD_COUNT, 1);
 
     // count should be 1
-    assertThat(componentStore.countAssets(TestAsset.class, restriction), is(1L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestAsset> results = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> results = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
 
     // query should return component1's first asset only
     assertThat(results.size(), is(1));
-    checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 1);
+    checkAsset(results.get(0), TEST_COMPONENT_1.get(P_ID, EntityId.class), 1);
   }
 
   @Test
@@ -232,17 +226,17 @@ public class ComponentStoreImplQueryIT
         assetPropertyEquals(P_CONTENT_TYPE, "text/plain"));
 
     // count should be 2
-    assertThat(componentStore.countAssets(TestAsset.class, restriction), is(4L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, restriction), is(4L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(P_ID, true);
-    List<TestAsset> results = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> results = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
 
     // query should return all four assets in ascending order of assetId
     assertThat(results.size(), is(4));
-    checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 1);
-    checkAsset(results.get(1), TEST_COMPONENT_1.getId(), 2);
-    checkAsset(results.get(2), TEST_COMPONENT_2.getId(), 3);
-    checkAsset(results.get(3), TEST_COMPONENT_2.getId(), 4);
+    checkAsset(results.get(0), TEST_COMPONENT_1.get(P_ID, EntityId.class), 1);
+    checkAsset(results.get(1), TEST_COMPONENT_1.get(P_ID, EntityId.class), 2);
+    checkAsset(results.get(2), TEST_COMPONENT_2.get(P_ID, EntityId.class), 3);
+    checkAsset(results.get(3), TEST_COMPONENT_2.get(P_ID, EntityId.class), 4);
   }
 
   @Test
@@ -253,15 +247,15 @@ public class ComponentStoreImplQueryIT
     MetadataQueryRestriction restriction = componentPropertyEquals(P_ID, TEST_COMPONENT_ID_1);
 
     // count should be 2
-    assertThat(componentStore.countAssets(TestAsset.class, restriction), is(2L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, restriction), is(2L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction).orderBy(P_DOWNLOAD_COUNT, true);
-    List<TestAsset> results = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> results = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
 
     // query should return component1's assets in ascending order of path
     assertThat(results.size(), is(2));
-    checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 1);
-    checkAsset(results.get(1), TEST_COMPONENT_1.getId(), 2);
+    checkAsset(results.get(0), TEST_COMPONENT_1.get(P_ID, EntityId.class), 1);
+    checkAsset(results.get(1), TEST_COMPONENT_1.get(P_ID, EntityId.class), 2);
   }
 
   @Test
@@ -275,14 +269,14 @@ public class ComponentStoreImplQueryIT
         assetPropertyEquals(P_PATH, "1"));
 
     // count should be 1
-    assertThat(componentStore.countAssets(TestAsset.class, restriction), is(1L));
+    assertThat(componentStore.count(TestAssetAdapter.CLASS_NAME, restriction), is(1L));
 
     MetadataQuery query = new MetadataQuery().restriction(restriction);
-    List<TestAsset> results = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> results = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
 
     // query should return component1's first asset only
     assertThat(results.size(), is(1));
-    checkAsset(results.get(0), TEST_COMPONENT_1.getId(), 1);
+    checkAsset(results.get(0), TEST_COMPONENT_1.get(P_ID, EntityId.class), 1);
   }
 
   @Test
@@ -291,13 +285,13 @@ public class ComponentStoreImplQueryIT
 
     MetadataQuery query = new MetadataQuery().limit(2);
 
-    List<TestAsset> page1 = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> page1 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
     assertThat(page1.size(), is(2));
 
-    List<TestAsset> page2 = componentStore.findAssets(TestAsset.class, query.skip(2));
+    List<Asset> page2 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query.skip(2));
     assertThat(page2.size(), is(2));
 
-    List<TestAsset> page3 = componentStore.findAssets(TestAsset.class, query.skip(4));
+    List<Asset> page3 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query.skip(4));
     assertThat(page3.size(), is(0));
   }
 
@@ -307,15 +301,15 @@ public class ComponentStoreImplQueryIT
 
     MetadataQuery query = new MetadataQuery().limit(2);
 
-    List<TestAsset> page1 = componentStore.findAssets(TestAsset.class, query);
+    List<Asset> page1 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
     assertThat(page1.size(), is(2));
 
-    query.skipEntityId(page1.get(1).getId());
-    List<TestAsset> page2 = componentStore.findAssets(TestAsset.class, query);
+    query.skipEntityId(page1.get(1).get(P_ID, EntityId.class));
+    List<Asset> page2 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
     assertThat(page2.size(), is(2));
 
-    query.skipEntityId(page2.get(1).getId());
-    List<TestAsset> page3 = componentStore.findAssets(TestAsset.class, query);
+    query.skipEntityId(page2.get(1).get(P_ID, EntityId.class));
+    List<Asset> page3 = componentStore.findAssets(TestAssetAdapter.CLASS_NAME, query);
     assertThat(page3.size(), is(0));
   }
 
@@ -325,13 +319,13 @@ public class ComponentStoreImplQueryIT
 
     MetadataQuery query = new MetadataQuery().limit(1);
 
-    List<TestComponent> page1 = componentStore.findComponents(TestComponent.class, query);
+    List<Component> page1 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
     assertThat(page1.size(), is(1));
 
-    List<TestComponent> page2 = componentStore.findComponents(TestComponent.class, query.skip(1));
+    List<Component> page2 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query.skip(1));
     assertThat(page2.size(), is(1));
 
-    List<TestComponent> page3 = componentStore.findComponents(TestComponent.class, query.skip(2));
+    List<Component> page3 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query.skip(2));
     assertThat(page3.size(), is(0));
   }
 
@@ -341,15 +335,15 @@ public class ComponentStoreImplQueryIT
 
     MetadataQuery query = new MetadataQuery().limit(1);
 
-    List<TestComponent> page1 = componentStore.findComponents(TestComponent.class, query);
+    List<Component> page1 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
     assertThat(page1.size(), is(1));
 
-    query.skipEntityId(page1.get(0).getId());
-    List<TestComponent> page2 = componentStore.findComponents(TestComponent.class, query);
+    query.skipEntityId(page1.get(0).get(P_ID, EntityId.class));
+    List<Component> page2 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
     assertThat(page2.size(), is(1));
 
-    query.skipEntityId(page2.get(0).getId());
-    List<TestComponent> page3 = componentStore.findComponents(TestComponent.class, query);
+    query.skipEntityId(page2.get(0).get(P_ID, EntityId.class));
+    List<Component> page3 = componentStore.findComponents(TestComponentAdapter.CLASS_NAME, query);
     assertThat(page3.size(), is(0));
   }
 }

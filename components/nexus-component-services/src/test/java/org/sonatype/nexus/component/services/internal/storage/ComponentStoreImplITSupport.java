@@ -29,15 +29,19 @@ import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Asset;
+import org.sonatype.nexus.component.model.Component;
+import org.sonatype.nexus.component.model.Entity;
 import org.sonatype.nexus.component.model.EntityId;
+import org.sonatype.nexus.component.model.Envelope;
+import org.sonatype.nexus.component.services.adapter.AssetAdapter;
+import org.sonatype.nexus.component.services.adapter.ComponentAdapter;
+import org.sonatype.nexus.component.services.adapter.EntityAdapter;
 import org.sonatype.nexus.component.services.adapter.EntityAdapterRegistry;
 import org.sonatype.nexus.component.services.internal.adapter.EntityAdapterRegistryImpl;
 import org.sonatype.nexus.component.services.internal.adapter.TestAssetAdapter;
 import org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapter;
 import org.sonatype.nexus.component.services.internal.id.DefaultEntityIdFactory;
-import org.sonatype.nexus.component.services.model.TestAsset;
-import org.sonatype.nexus.component.services.model.TestComponent;
 import org.sonatype.nexus.component.services.storage.ComponentStore;
 import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
 import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
@@ -67,15 +71,18 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_BLOB_REFS;
 import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_COMPONENT;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_LENGTH;
 import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_TYPE;
 import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_FIRST_CREATED;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_LAST_MODIFIED;
 import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_PATH;
 import static org.sonatype.nexus.component.services.adapter.ComponentAdapter.P_ASSETS;
 import static org.sonatype.nexus.component.services.adapter.EntityAdapter.P_ID;
 import static org.sonatype.nexus.component.services.internal.adapter.TestAssetAdapter.P_DOWNLOAD_COUNT;
+import static org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapter.*;
 
 /**
- * Supporting base class for {@link ComponentStoreImpl} integrationt tests.
+ * Supporting base class for {@link ComponentStoreImpl} integration tests.
  */
 public abstract class ComponentStoreImplITSupport
     extends TestSupport
@@ -97,8 +104,8 @@ public abstract class ComponentStoreImplITSupport
   protected static final String TEST_STRING_1 = "String One";
   protected static final String TEST_STRING_2 = "String Two";
   protected static final Object TEST_UNREGISTERED = "Unregistered";
-  protected static final TestComponent TEST_COMPONENT_1 = createTestComponent(TEST_COMPONENT_ID_1, TEST_STRING_1, true);
-  protected static final TestComponent TEST_COMPONENT_2 = createTestComponent(TEST_COMPONENT_ID_2, TEST_STRING_2, false);
+  protected static final Entity TEST_COMPONENT_1 = createTestComponent(TEST_COMPONENT_ID_1, TEST_STRING_1, true);
+  protected static final Entity TEST_COMPONENT_2 = createTestComponent(TEST_COMPONENT_ID_2, TEST_STRING_2, false);
 
   protected final TestAssetAdapter testAssetAdapter = new TestAssetAdapter();
 
@@ -189,8 +196,12 @@ public abstract class ComponentStoreImplITSupport
   }
 
   protected void registerTestAdapters() {
-    adapterRegistry.registerComponentAdapter(testComponentAdapter);
-    adapterRegistry.registerAssetAdapter(testAssetAdapter);
+    adapterRegistry.registerAdapter(new EntityAdapter());
+    adapterRegistry.registerAdapter(new ComponentAdapter());
+    adapterRegistry.registerAdapter(new AssetAdapter());
+    adapterRegistry.registerAdapter(testComponentAdapter);
+    adapterRegistry.registerAdapter(testAssetAdapter);
+    componentStore.prepareStorage(TestComponentAdapter.CLASS_NAME, TestAssetAdapter.CLASS_NAME);
   }
 
   protected void addTwoTestComponentsWithTwoAssetsEach() {
@@ -210,37 +221,39 @@ public abstract class ComponentStoreImplITSupport
     }
   }
 
-  protected ComponentEnvelope<TestComponent, TestAsset> testEnvelope(int numAssets) {
-    TestComponent sourceComponent = testComponent();
-    Set<TestAsset> sourceAssets = Sets.newHashSet();
+  protected Envelope testEnvelope(int numAssets) {
+    Component sourceComponent = testComponent();
+    Set<Asset> sourceAssets = Sets.newHashSet();
     for (int i = 0; i < numAssets; i++) {
       sourceAssets.add(testAsset(i + 1));
     }
-    return new ComponentEnvelope<>(sourceComponent, sourceAssets);
+    return new Envelope(sourceComponent, sourceAssets);
   }
 
-  protected TestAsset testAsset(int n) {
-    TestAsset asset = new TestAsset();
-    asset.setDownloadCount(n);
-    asset.setContentType("text/plain");
+  protected Asset testAsset(int n) {
+    Asset asset = new Asset(TestAssetAdapter.CLASS_NAME);
+    asset.put(P_DOWNLOAD_COUNT, n);
+    asset.put(P_CONTENT_TYPE, "text/plain");
     asset.setStreamSupplier(streamSupplier(testContent(n)));
     return asset;
   }
 
-  protected void checkAsset(TestAsset actual, EntityId expectedComponentId, int n, boolean sameDates) {
+  protected void checkAsset(Asset actual, EntityId expectedComponentId, int n, boolean sameDates) {
     try {
-      assertThat(actual.getComponentId().asUniqueString(), is(expectedComponentId.asUniqueString()));
-      assertThat(actual.getDownloadCount(), is((long) n));
-      assertThat(actual.getContentLength(), is((long) testContent(n).length()));
-      assertThat(actual.getContentType(), is("text/plain"));
-      assertThat(actual.getFirstCreated(), notNullValue());
-      assertThat(actual.getLastModified(), notNullValue());
+      assertThat(actual.get(P_COMPONENT, EntityId.class).asUniqueString(),
+          is(expectedComponentId.asUniqueString()));
+      assertThat(actual.get(P_DOWNLOAD_COUNT, Long.class), is((long) n));
+      assertThat(actual.get(P_CONTENT_LENGTH, Long.class), is((long) testContent(n).length()));
+      assertThat(actual.get(P_CONTENT_TYPE, String.class), is("text/plain"));
+      assertThat(actual.get(P_FIRST_CREATED, DateTime.class), notNullValue());
+      assertThat(actual.get(P_LAST_MODIFIED, DateTime.class), notNullValue());
       if (sameDates) {
-        assertThat(actual.getFirstCreated(), is(actual.getLastModified()));
+        assertThat(actual.get(P_FIRST_CREATED, DateTime.class), is(actual.get(P_LAST_MODIFIED, DateTime.class)));
       }
       else {
-        assertThat(actual.getFirstCreated(), not(actual.getLastModified()));
+        assertThat(actual.get(P_FIRST_CREATED, DateTime.class), not(actual.get(P_LAST_MODIFIED, DateTime.class)));
       }
+      assertThat(actual.get(P_BLOB_REFS, Map.class).size(), is(1));
       assertThat(IOUtils.toString(actual.openStream()), is(testContent(n)));
     }
     catch (Throwable t) {
@@ -249,37 +262,59 @@ public abstract class ComponentStoreImplITSupport
   }
 
 
-  protected void checkAsset(TestAsset actual, EntityId expectedComponentId, int n) {
+  protected void checkAsset(Asset actual, EntityId expectedComponentId, int n) {
     checkAsset(actual, expectedComponentId, n, true);
   }
 
-  protected void assertTestComponentsEqual(TestComponent actual, TestComponent expected) {
-    assertThat(actual.getId().asUniqueString(), is(expected.getId().asUniqueString()));
+  protected void assertTestComponentsEqual(Entity actual, Entity expected) {
+    assertThat(actual.get(P_ID, EntityId.class).asUniqueString(), is(expected.get(P_ID, EntityId.class).asUniqueString()));
     checkComponent(actual, expected);
   }
 
-  protected void checkComponent(TestComponent actual, TestComponent expected) {
-    assertThat(actual.getBinaryProp(), is(expected.getBinaryProp()));
-    assertThat(actual.getBooleanProp(), is(expected.getBooleanProp()));
-    assertThat(actual.getByteProp(), is(expected.getByteProp()));
-    assertThat(actual.getDatetimeProp(), is(expected.getDatetimeProp()));
-    assertThat(actual.getDoubleProp(), is(expected.getDoubleProp()));
-    assertThat(actual.getEmbeddedListProp(), is(expected.getEmbeddedListProp()));
-    assertThat(actual.getEmbeddedMapProp(), is(expected.getEmbeddedMapProp()));
-    assertThat(actual.getEmbeddedSetProp(), is(expected.getEmbeddedSetProp()));
-    assertThat(actual.getFloatProp(), is(expected.getFloatProp()));
-    assertThat(actual.getIntegerProp(), is(expected.getIntegerProp()));
-    assertThat(actual.getLongProp(), is(expected.getLongProp()));
-    assertThat(actual.getShortProp(), is(expected.getShortProp()));
-    assertThat(actual.getStringProp(), is(expected.getStringProp()));
-    assertThat(actual.getUnregisteredProp(), is(expected.getUnregisteredProp()));
+  protected void checkComponent(Entity actual, Entity expected) {
+    assertThat(actual.get(P_BINARY, Byte[].class), is(expected.get(P_BINARY, Byte[].class)));
+    assertThat(actual.get(P_BOOLEAN, Boolean.class), is(expected.get(P_BOOLEAN, Boolean.class)));
+    assertThat(actual.get(P_BYTE, Byte.class), is(expected.get(P_BYTE, Byte.class)));
+    assertThat(actual.get(P_DATETIME, DateTime.class), is(expected.get(P_DATETIME, DateTime.class)));
+    assertThat(actual.get(P_DOUBLE, Double.class), is(expected.get(P_DOUBLE, Double.class)));
+    assertThat(actual.get(P_EMBEDDEDLIST, List.class), is(expected.get(P_EMBEDDEDLIST, List.class)));
+    assertThat(actual.get(P_EMBEDDEDMAP, Map.class), is(expected.get(P_EMBEDDEDMAP, Map.class)));
+    assertThat(actual.get(P_EMBEDDEDSET, Set.class), is(expected.get(P_EMBEDDEDSET, Set.class)));
+    assertThat(actual.get(P_FLOAT, Float.class), is(expected.get(P_FLOAT, Float.class)));
+    assertThat(actual.get(P_INTEGER, Integer.class), is(expected.get(P_INTEGER, Integer.class)));
+    assertThat(actual.get(P_LONG, Long.class), is(expected.get(P_LONG, Long.class)));
+    assertThat(actual.get(P_SHORT, Short.class), is(expected.get(P_SHORT, Short.class)));
+    assertThat(actual.get(P_STRING, String.class), is(expected.get(P_STRING, String.class)));
+    assertThat(actual.get(P_UNREGISTERED, Object.class), is(expected.get(P_UNREGISTERED, Object.class)));
   }
 
-  protected void addTestComponentWithTwoAssets(ODatabaseDocumentTx db, TestComponent component) {
+  protected Object toStorageType(Object o) {
+    if (o instanceof DateTime) {
+      return ((DateTime) o).toDate();
+    }
+    else if (o instanceof EntityId) {
+      return ((EntityId) o).asUniqueString();
+    }
+    return o;
+  }
+
+  protected void addTestComponentWithTwoAssets(ODatabaseDocumentTx db, Entity component) {
     // save the component initially with no assets
     ODocument componentDocument = db.newInstance("testcomponent");
-    testComponentAdapter.populateDocument(component, componentDocument);
-    componentDocument.field(P_ID, component.getId().asUniqueString());
+
+    Set<String> ignoreProps = ImmutableSet.of(P_ID, P_ASSETS);
+    Map<String, Object> map = component.toMap(false);
+    for (String name: map.keySet()) {
+      if (!ignoreProps.contains(name)) {
+        Object o = map.get(name);
+        if (o instanceof DateTime) {
+          o = ((DateTime) o).toDate();
+        }
+        componentDocument.field(name, o);
+      }
+    }
+
+    componentDocument.field(P_ID, component.get(P_ID, EntityId.class).asUniqueString());
     Set<ORID> assets = Sets.newHashSet();
     componentDocument.field(P_ASSETS, assets);
     componentDocument.save();
@@ -292,8 +327,8 @@ public abstract class ComponentStoreImplITSupport
     else {
       n = 3;
     }
-    assets.add(addTestAsset(db, componentDocument.getIdentity(), component.getId(), n));
-    assets.add(addTestAsset(db, componentDocument.getIdentity(), component.getId(), n + 1));
+    assets.add(addTestAsset(db, componentDocument.getIdentity(), component.get(P_ID, EntityId.class), n));
+    assets.add(addTestAsset(db, componentDocument.getIdentity(), component.get(P_ID, EntityId.class), n + 1));
     componentDocument.field(P_ASSETS, assets);
     componentDocument.save();
   }
@@ -327,38 +362,36 @@ public abstract class ComponentStoreImplITSupport
     return "Test Content " + n;
   }
 
-  protected static TestComponent createTestComponent(final String id, String stringValue, boolean populateOptionalProperties) {
-    TestComponent component = testComponent(stringValue, populateOptionalProperties);
-    component.setId(new EntityId(id));
+  protected static Component createTestComponent(final String id, String stringValue, boolean populateOptionalProperties) {
+    Component component = testComponent(stringValue, populateOptionalProperties);
+    component.put(P_ID, new EntityId(id));
     return component;
   }
 
-  protected static TestComponent testComponent() {
+  protected static Component testComponent() {
     return testComponent(TEST_STRING_1, false);
   }
 
-  protected static TestComponent testComponent(String stringValue, boolean populateOptionalProperties) {
-    TestComponent component = new TestComponent();
+  protected static Component testComponent(String stringValue, boolean populateOptionalProperties) {
+    Component component = new Component(TestComponentAdapter.CLASS_NAME);
     if (populateOptionalProperties) {
-      component.setBinaryProp(TEST_BINARY);
-      component.setBooleanProp(TEST_BOOLEAN);
-      component.setByteProp(TEST_BYTE);
-      component.setDatetimeProp(TEST_DATETIME);
-      component.setDoubleProp(TEST_DOUBLE);
-      component.setEmbeddedListProp(TEST_EMBEDDEDLIST);
-      component.setEmbeddedMapProp(TEST_EMBEDDEDMAP);
-      component.setEmbeddedSetProp(TEST_EMBEDDEDSET);
-      component.setFloatProp(TEST_FLOAT);
-      component.setIntegerProp(TEST_INTEGER);
-      component.setLongProp(TEST_LONG);
-      component.setShortProp(TEST_SHORT);
-      component.setUnregisteredProp(TEST_UNREGISTERED);
+      component.put(P_BINARY, TEST_BINARY);
+      component.put(P_BOOLEAN, TEST_BOOLEAN);
+      component.put(P_BYTE, TEST_BYTE);
+      component.put(P_DATETIME, TEST_DATETIME);
+      component.put(P_DOUBLE, TEST_DOUBLE);
+      component.put(P_EMBEDDEDLIST, TEST_EMBEDDEDLIST);
+      component.put(P_EMBEDDEDMAP, TEST_EMBEDDEDMAP);
+      component.put(P_EMBEDDEDSET, TEST_EMBEDDEDSET);
+      component.put(P_FLOAT, TEST_FLOAT);
+      component.put(P_INTEGER, TEST_INTEGER);
+      component.put(P_LONG, TEST_LONG);
+      component.put(P_SHORT, TEST_SHORT);
+      component.put(P_UNREGISTERED, TEST_UNREGISTERED);
     }
-    component.setStringProp(stringValue);
+    component.put(P_STRING, stringValue);
     return component;
   }
-
-
 
   protected InputStream toStream(String string) {
     try {

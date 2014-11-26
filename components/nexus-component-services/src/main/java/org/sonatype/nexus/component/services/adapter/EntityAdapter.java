@@ -12,38 +12,97 @@
  */
 package org.sonatype.nexus.component.services.adapter;
 
-import org.sonatype.nexus.component.model.Entity;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.component.model.EntityId;
+
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 
 /**
- * Adapter for converting between {@link Entity} objects and OrientDB {@code ODocument}s.
+ * Adapter for the abstract "entity" storage class.
+ * <p>
+ * This is the root storage class of all component and asset entities.
  *
  * @since 3.0
  */
-public interface EntityAdapter<T extends Entity>
+@Named
+@Singleton
+public class EntityAdapter
+    extends EntityAdapterSupport
 {
-  /** OrientDB property name for an entity's globally unique id. */
-  static final String P_ID = "id";
+  /** Storage class name. */
+  public static final String CLASS_NAME = "entity";
 
   /**
-   * Gets the entity class this adapter works with.
+   * Property name for an entity's globally unique id.
+   * This is a system-controlled property whose value is an {@link EntityId}.
    */
-  Class<T> getEntityClass();
+  public static final String P_ID = "id";
+
+  private final String className;
+
+  private volatile boolean initialized;
+
+  public EntityAdapter() {
+    this(CLASS_NAME);
+  }
+
+  protected EntityAdapter(String className) {
+    this.className = className;
+  }
 
   /**
-   * Creates the OrientDB class and associated indexes, if needed.
+   * Gets the name of the storage class this adapter works with.
    */
-  void createStorageClass(OSchema schema);
+  public String getClassName() {
+    return className;
+  }
 
   /**
-   * Sets the given document's type-specific properties based on those of the given entity.
+   * Returns whether initialization has occurred on this adapter yet.
+   *
+   * @return {@code true} if {@link #getClass(OSchema)} has been called on this instance.
    */
-  void populateDocument(T entity, ODocument document);
+  public boolean isInitialized() {
+    return initialized;
+  }
 
   /**
-   * Sets the given entity's type-specific properties based on those of the given document.
+   * Gets the OrientDB class, initializing it first if it doesn't exist yet.
    */
-  void populateEntity(ODocument document, T entity);
+  public OClass getClass(OSchema schema) {
+    OClass oClass = schema.getClass(CLASS_NAME);
+    if (oClass == null) {
+      oClass = schema.createAbstractClass(CLASS_NAME);
+      createRequiredAutoIndexedProperty(oClass, P_ID, OType.STRING, true);
+      logCreatedClassInfo(oClass);
+    }
+    initialized = true;
+    return oClass;
+  }
+
+  /**
+   * Creates the storage subclass and calls {@link #initClass(OClass)} on it if this adapter is a subclass of
+   * {@code superClass} and the storage subclass doesn't yet exist in the schema.
+   */
+  protected void maybeCreateSubClass(OSchema schema, OClass oSuperClass, Class adapterSuperClass) {
+    if (this.getClass() != adapterSuperClass) {
+      OClass oSubClass = schema.getClass(getClassName());
+      if (oSubClass == null) {
+        oSubClass = schema.createClass(getClassName(), oSuperClass);
+        initClass(oSubClass);
+        logCreatedClassInfo(oSubClass);
+      }
+    }
+  }
+
+  /**
+   * Initialize the given concrete storage subclass to hold entities of this type.
+   */
+  protected void initClass(OClass oClass) {
+    // no-op; subclasses may override
+  }
 }

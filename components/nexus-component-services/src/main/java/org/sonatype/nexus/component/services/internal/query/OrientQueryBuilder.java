@@ -14,23 +14,19 @@ package org.sonatype.nexus.component.services.internal.query;
 
 import java.util.Map;
 
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.Entity;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.BooleanMetadataQueryRestriction.EntityType;
 import org.sonatype.nexus.component.services.query.CompoundMetadataQueryRestriction;
 import org.sonatype.nexus.component.services.query.MetadataQuery;
 import org.sonatype.nexus.component.services.query.MetadataQueryRestriction;
-import org.sonatype.nexus.orient.OClassNameBuilder;
 
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.id.ORID;
 
-import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_COMPONENT;
-import static org.sonatype.nexus.component.services.adapter.ComponentAdapter.P_ASSETS;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_COMPONENT;
+import static org.sonatype.nexus.component.services.adapter.ComponentAdapter.P_ASSETS;
 
 /**
  * Translates a {@link MetadataQuery} into OrientDB syntax.
@@ -74,15 +70,10 @@ public class OrientQueryBuilder
     return parameters;
   }
 
-  public <T extends Entity> String buildQuery(final Class<T> entityClass, final boolean isCountQuery) {
-    checkNotNull(entityClass);
+  public String buildQuery(String className, boolean isCountQuery, boolean isComponentQuery) {
+    checkNotNull(className);
 
     parameters.clear();
-    final boolean isComponentQuery = Component.class.isAssignableFrom(entityClass);
-    return buildQuery(new OClassNameBuilder().type(entityClass).build(), isCountQuery, isComponentQuery);
-  }
-
-  private String buildQuery(String className, boolean isCountQuery, boolean isComponentQuery) {
 
     // "SELECT [COUNT(*)] FROM componentClassName"
 

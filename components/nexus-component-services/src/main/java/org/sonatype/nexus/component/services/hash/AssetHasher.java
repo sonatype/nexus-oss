@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.sonatype.nexus.component.model.Asset;
 
 /**
- * Service that hashes {@link Asset} content.
+ * Service that hashes asset content.
  * 
  * @since 3.0
  */

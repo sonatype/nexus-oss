@@ -12,72 +12,120 @@
  */
 package org.sonatype.nexus.component.services.adapter;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.orient.OClassNameBuilder;
+import java.util.Set;
 
-import com.google.common.base.Predicate;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.component.model.EntityId;
+
+import com.google.common.collect.ImmutableSet;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import org.joda.time.DateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Adapter for converting between {@link Asset} objects and OrientDB {@code ODocument}s.
+ * Adapter for the abstract "asset" storage class, which extends from "entity".
+ * <p>
+ * This is the base storage class of all assets. An asset represents a file that
+ * logically belongs to a component, and may have format-specific properties in addition
+ * to those defined below.
+ * <p>
+ * Subclasses are generally expected to be {@code @Named} {@code @Singleton}s, define a
+ * {@code CLASS_NAME} constant, and implement a no-arg constructor that calls {@code super(CLASS_NAME)}.
+ * They should also override {@link EntityAdapter#initClass(OClass)} if they need to define additional
+ * properties and/or indexes as part of the storage schema.
  *
  * @since 3.0
  */
-public abstract class AssetAdapter<T extends Asset>
-    extends EntityAdapterSupport
-    implements EntityAdapter<T>
+@Named
+@Singleton
+public class AssetAdapter
+    extends EntityAdapter
 {
-  /** OrientDB base class name for assets. */
-  public static final String BASE_CLASS_NAME = new OClassNameBuilder().type(Asset.class).build();
+  /** Storage class name. */
+  public static final String CLASS_NAME = "asset";
 
-  /** OrientDB property name for the component in which an asset belongs. */
+  /**
+   * Property name for the component in which an asset belongs.
+   * This is a system-controlled property whose value is an {@link EntityId}.
+   */
   public static final String P_COMPONENT = "component";
 
-  /** OrientDB property name for the date an asset was first created. */
+  /**
+   * Property name for the date an asset was first created.
+   * This is a system-controlled property whose value is a {@link DateTime}.
+   */
   public static final String P_FIRST_CREATED = "firstCreated";
 
-  /** OrientDB property name for an asset's mime type. */
+  /**
+   * Property name for an asset's mime type.
+   * This is an optional property whose value is a {@code String}.
+   */
   public static final String P_CONTENT_TYPE = "contentType";
 
-  /** OrientDB property name for an asset's path. */
+  /**
+   * Property name for an asset's path.
+   * This is an optional property whose value is a {@code String}.
+   */
   public static final String P_PATH = "path";
 
-  /** OrientDB property name for the known locations of an asset's content; a map of blob ids keyed by blobstore id. */
+  /**
+   * Property name for the date an asset's content was last modified.
+   * This is a system-controlled property whose value is a {@link DateTime}.
+   */
+  public static final String P_LAST_MODIFIED = "lastModified";
+
+  /**
+   * Property name for the length of the content in bytes.
+   * This is a system-controlled property whose value is a {@link Long}.
+   */
+  public static final String P_CONTENT_LENGTH = "contentLength";
+
+  /**
+   * Property name for the known locations of an asset's content; a map of blob ids keyed by blobstore id.
+   * This is a system-controlled property whose value is a {@code Map} with {@code String} keys and values.
+   */
   public static final String P_BLOB_REFS = "blobRefs";
 
-  @Override
-  public void createStorageClass(OSchema schema) {
-    createAndInitStorageClassWithBaseClass(
-        checkNotNull(schema),
-        BASE_CLASS_NAME,
-        new Predicate<OClass>() {
-          @Override
-          public boolean apply(final OClass baseClass) {
-            createRequiredAutoIndexedProperty(baseClass, P_ID, OType.STRING, true);
-            createRequiredAutoIndexedProperty(baseClass, P_COMPONENT, OType.LINK, false);
-            createRequiredProperty(baseClass, P_FIRST_CREATED, OType.DATETIME);
-            createOptionalProperty(baseClass, P_CONTENT_TYPE, OType.STRING);
-            createOptionalProperty(baseClass, P_PATH, OType.STRING);
-            createRequiredProperty(baseClass, P_BLOB_REFS, OType.EMBEDDEDMAP);
-            return true;
-          }
-        },
-        new OClassNameBuilder().type(getEntityClass()).build(),
-        new Predicate<OClass>() {
-          @Override
-          public boolean apply(final OClass storageClass) {
-            initStorageClass(storageClass);
-            return true;
-          }
-        });
+  /**
+   * Asset properties whose values are system-controlled.
+   */
+  public static final Set<String> SYSTEM_PROPS =
+      ImmutableSet.of(P_ID, P_COMPONENT, P_FIRST_CREATED, P_LAST_MODIFIED, P_CONTENT_LENGTH, P_BLOB_REFS);
+
+  /**
+   * No-arg constructor for direct instances.
+   */
+  public AssetAdapter() {
+    this(CLASS_NAME);
+    checkState(this.getClass() == AssetAdapter.class, "Subclass must use super(className) constructor");
   }
 
   /**
-   * Initializes the given OrientDB class with properties and associated indexes to store entities of this type.
+   * Constructor for subclasses.
    */
-  protected abstract void initStorageClass(OClass storageClass);
+  protected AssetAdapter(String className) {
+    super(className);
+  }
+
+  @Override
+  public OClass getClass(OSchema schema) {
+    OClass superClass = super.getClass(schema);
+    OClass oClass = schema.getClass(CLASS_NAME);
+    if (oClass == null) {
+      oClass = schema.createAbstractClass(CLASS_NAME, superClass);
+      createRequiredAutoIndexedLinkProperty(oClass, P_COMPONENT, OType.LINK, superClass, false);
+      createRequiredProperty(oClass, P_FIRST_CREATED, OType.DATETIME);
+      createOptionalProperty(oClass, P_CONTENT_TYPE, OType.STRING);
+      createOptionalProperty(oClass, P_PATH, OType.STRING);
+      createRequiredProperty(oClass, P_BLOB_REFS, OType.EMBEDDEDMAP);
+      logCreatedClassInfo(oClass);
+    }
+    maybeCreateSubClass(schema, oClass, AssetAdapter.class);
+    return oClass;
+  }
 }

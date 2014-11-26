@@ -21,12 +21,12 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Envelope;
 import org.sonatype.nexus.component.source.ComponentRequest;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceId;
-import org.sonatype.nexus.views.rawbinaries.internal.RawAsset;
-import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.adapter.RawBinaryAssetAdapter;
+import org.sonatype.nexus.views.rawbinaries.internal.storage.adapter.RawBinaryComponentAdapter;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
@@ -39,9 +39,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_LENGTH;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_CONTENT_TYPE;
 
 /**
- * A source for remote {@link RawComponent}s which provides HTTP resources under a given URL prefix as assets.
+ * A source for remote raw binary components which provides HTTP resources under a given URL prefix as assets.
  *
  * @since 3.0
  */
@@ -65,12 +67,7 @@ public class RawBinaryComponentSource
 
   @Nullable
   @Override
-  @SuppressWarnings("unchecked")
-  // TODO: The method is parameterized, but we're assuming specific types in the implementation.
-  //       Consider either changing the *class* (interface) to be parameterized instead of the method,
-  //       or making the construction of Component and Asset subclasses in the impl less presumptious.
-  public <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents(
-      final ComponentRequest<C, A> request) throws IOException
+  public Iterable<Envelope> fetchComponents(final ComponentRequest request) throws IOException
   {
     final String uri = urlPrefix + request.getQuery().get("path");
 
@@ -78,13 +75,14 @@ public class RawBinaryComponentSource
 
     final CloseableHttpResponse response = httpClient.execute(httpGet);
 
-    A asset = (A) new RawAsset();
     final HttpEntity httpEntity = response.getEntity();
     final Header contentType = httpEntity.getContentType();
+
+    Asset asset = new Asset(RawBinaryAssetAdapter.CLASS_NAME);
     if (contentType != null) {
-      asset.setContentType(contentType.getValue());
+      asset.put(P_CONTENT_TYPE, contentType.getValue());
     }
-    asset.setContentLength(0);
+    asset.put(P_CONTENT_LENGTH, 0L);
     asset.setStreamSupplier(new Supplier<InputStream>()
     {
       @Override
@@ -98,7 +96,9 @@ public class RawBinaryComponentSource
       }
     });
 
-    return asList(ComponentEnvelope.simpleEnvelope((C) new RawComponent(), asset));
+    Component component = new Component(RawBinaryComponentAdapter.CLASS_NAME);
+
+    return asList(new Envelope(component, asset));
   }
 
   /**

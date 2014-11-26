@@ -12,96 +12,47 @@
  */
 package org.sonatype.nexus.component.model;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.annotation.Nullable;
+import java.util.Map;
 
 import com.google.common.base.Supplier;
-import org.joda.time.DateTime;
 
 /**
- * A file within a {@link Component}.
- * 
+ * An asset.
+ *
  * @since 3.0
  */
-public interface Asset
-    extends Entity
+public class Asset
+    extends BaseEntity
+    implements Entity
 {
-  /**
-   * Gets the id of the {@link Component} to which this asset belongs, or {@code null} if it hasn't been stored yet.
-   */
-  @Nullable
-  EntityId getComponentId();
+  private Supplier<InputStream> streamSupplier;
 
-  /**
-   * @see #getComponentId()
-   */
-  void setComponentId(EntityId entityId);
+  public Asset(String className) {
+    super(className);
+  }
 
-  /**
-   * @return length of this asset in bytes, {@code -1} if unknown
-   */
-  long getContentLength();
+  public Asset(String className, Map<String, Object> props) {
+    super(className, props);
+  }
 
-  /**
-   * @see #getContentLength()
-   */
-  void setContentLength(long contentLength);
+  public void setStream(final InputStream inputStream) {
+    this.streamSupplier = new Supplier<InputStream>() {
+      @Override
+      public InputStream get() {
+        return inputStream;
+      }
+    };
+  }
 
-  /**
-   * @return content type of this asset, {@code null} if unknown
-   */
-  @Nullable
-  String getContentType();
+  public void setStreamSupplier(Supplier<InputStream> streamSupplier) {
+    this.streamSupplier = streamSupplier;
+  }
 
-  /**
-   * @see #getContentType()
-   */
-  void setContentType(String contentType);
-
-  /**
-   * Gets the path of this asset within its component. This is an optional property and is used to
-   * disambiguate the asset from others within the same component, for view purposes.
-   */
-  @Nullable
-  String getPath();
-
-  /**
-   * @see #getPath()
-   */
-  void setPath(String path);
-
-  /**
-   * @return when this asset was first created, {@code null} if unknown
-   */
-  @Nullable
-  DateTime getFirstCreated();
-
-  /**
-   * @see #getFirstCreated()
-   */
-  void setFirstCreated(DateTime firstCreated);
-
-  /**
-   * @return when this asset's content was last modified, {@code null} if unknown
-   */
-  @Nullable
-  DateTime getLastModified();
-
-  /**
-   * @see #getLastModified()
-   */
-  void setLastModified(DateTime lastModified);
-
-  /**
-   * @return input stream for reading the content of this asset, {@code null} if there is no stream supplier.
-   */
-  @Nullable
-  InputStream openStream() throws IOException;
-
-  /**
-   * @see #openStream()
-   */
-  void setStreamSupplier(Supplier<InputStream> streamSupplier);
+  public InputStream openStream() {
+    if (streamSupplier == null) {
+      return null;
+    }
+    return streamSupplier.get();
+  }
 }

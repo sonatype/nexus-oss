@@ -14,9 +14,7 @@ package org.sonatype.nexus.component.source;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Envelope;
 import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 /**
@@ -45,5 +43,5 @@ public interface ComponentSource
    *
    * If no component(s) match the query, the returned {@link Iterable} is empty.
    */
-  <C extends Component, A extends Asset> Iterable<ComponentEnvelope<C, A>> fetchComponents(ComponentRequest<C, A> request) throws IOException;
+  Iterable<Envelope> fetchComponents(ComponentRequest request) throws IOException;
 }
