@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.security.nexus1563;
 
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.AbstractSecurityTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
@@ -36,7 +35,7 @@ public class Nexus1563ExternalRealmsLoginIT
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-    settings.setSecurityRealms(asList("Simple", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
+    settings.setSecurityRealms(asList("Simple", "NexusAuthenticatingRealm", "NexusAuthorizingRealm"));
     SettingsMessageUtil.save(settings);
   }
 

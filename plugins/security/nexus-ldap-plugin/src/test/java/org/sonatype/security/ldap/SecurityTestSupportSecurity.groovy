@@ -25,8 +25,8 @@ class SecurityTestSupportSecurity
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [
-            'XmlAuthenticatingRealm',
-            'XmlAuthorizingRealm'
+            'NexusAuthenticatingRealm',
+            'NexusAuthorizingRealm'
         ]
     )
   }

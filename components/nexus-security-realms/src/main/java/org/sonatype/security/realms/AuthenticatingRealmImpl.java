@@ -51,7 +51,7 @@ public class AuthenticatingRealmImpl
 {
   private static final Logger logger = LoggerFactory.getLogger(AuthenticatingRealmImpl.class);
 
-  public static final String ROLE = "XmlAuthenticatingRealm";
+  public static final String ROLE = "NexusAuthenticatingRealm";
 
   private ConfigurationManager configuration;
 

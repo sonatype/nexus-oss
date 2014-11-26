@@ -27,7 +27,7 @@ public class NXCM1356ITSupport
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-    settings.setSecurityRealms(asList("LdapAuthenticatingRealm", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
+    settings.setSecurityRealms(asList("LdapAuthenticatingRealm", "NexusAuthenticatingRealm", "NexusAuthorizingRealm"));
     SettingsMessageUtil.save(settings);
   }
 

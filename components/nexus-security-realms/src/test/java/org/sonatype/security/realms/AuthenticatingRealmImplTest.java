@@ -52,7 +52,7 @@ public class AuthenticatingRealmImplTest
   {
     super.setUp();
 
-    realm = (AuthenticatingRealmImpl) lookup(Realm.class, "XmlAuthenticatingRealm");
+    realm = (AuthenticatingRealmImpl) lookup(Realm.class, "NexusAuthenticatingRealm");
 
     configurationManager = lookup(DefaultConfigurationManager.class);
 

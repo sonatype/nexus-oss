@@ -46,7 +46,7 @@ public class AuthorizingRealmImplTest
   {
     super.setUp();
 
-    realm = (AuthorizingRealmImpl) lookup(Realm.class, "XmlAuthorizingRealm");
+    realm = (AuthorizingRealmImpl) lookup(Realm.class, "NexusAuthorizingRealm");
     realm.setRolePermissionResolver(this.lookup(RolePermissionResolver.class));
 
     configurationManager = lookup(DefaultConfigurationManager.class);
@@ -57,7 +57,7 @@ public class AuthorizingRealmImplTest
   {
     buildTestAuthorizationConfig();
 
-    // Fails because the configuration requirement in SecurityXmlRealm isn't initialized
+    // Fails because the configuration requirement in nexus authorizing realm isn't initialized
     // thus NPE
     SimplePrincipalCollection principal = new SimplePrincipalCollection("username", realm.getName());
 

@@ -56,7 +56,7 @@ public class AuthorizingRealmImpl
 {
   private static final Logger logger = LoggerFactory.getLogger(AuthorizingRealmImpl.class);
 
-  public static final String ROLE = "XmlAuthorizingRealm";
+  public static final String ROLE = "NexusAuthorizingRealm";
 
   private final UserManager userManager;
 
@@ -118,7 +118,7 @@ public class AuthorizingRealmImpl
       }
     }
 
-    // clean up the realm names for processing (replace the Xml*Realm with default)
+    // clean up the realm names for processing (replace the Nexus*Realm with default)
     cleanUpRealmList(realmNames);
 
     if (RoleMappingUserManager.class.isInstance(userManager)) {
@@ -153,7 +153,7 @@ public class AuthorizingRealmImpl
     // user not managed by this Realm
     {
       throw new AuthorizationException("User for principals: " + principals.getPrimaryPrincipal()
-          + " not manged by XML realm.");
+          + " not manged by Nexus realm.");
     }
 
     SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);

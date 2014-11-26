@@ -47,7 +47,7 @@ public class SimpleRealm
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    // Unless your realm is very specific the XmlAuthorizingRealm will take
+    // Unless your realm is very specific the NexusAuthorizingRealm will take
     // care of this. (provided you implement the PlexusUserLocator interface).
     String username = principals.getPrimaryPrincipal().toString();
     final SimpleUser user = this.userStore.getUser(username);

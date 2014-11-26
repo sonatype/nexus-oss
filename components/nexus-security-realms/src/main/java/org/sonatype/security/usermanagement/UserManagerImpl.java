@@ -309,7 +309,7 @@ public class UserManagerImpl
   }
 
   public String getAuthenticationRealmName() {
-    return "XmlAuthenticatingRealm";
+    return "NexusAuthenticatingRealm";
   }
 
   private Set<String> getRoleIdsFromUser(User user) {

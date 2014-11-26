@@ -28,8 +28,8 @@ class AbstractSecurityTestCaseSecurity
         anonymousAccessEnabled: false,
         anonymousUsername: 'anonymous',
         realms: [
-            'XmlAuthenticatingRealm',
-            'XmlAuthorizingRealm'
+            'NexusAuthenticatingRealm',
+            'NexusAuthorizingRealm'
         ]
     )
   }

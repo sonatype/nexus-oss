@@ -34,7 +34,7 @@ implements SecurityConfigurationSource
         anonymousAccessEnabled: true,
         anonymousUsername: 'anonymous',
         anonymousPassword: 'anonymous',
-        realms: ['XmlAuthenticatingRealm', 'XmlAuthorizingRealm']
+        realms: ['NexusAuthenticatingRealm', 'NexusAuthorizingRealm']
     ))
   }
 
