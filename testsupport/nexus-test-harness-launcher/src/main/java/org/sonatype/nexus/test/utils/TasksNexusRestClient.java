@@ -78,6 +78,7 @@ public class TasksNexusRestClient
   {
     List<ScheduledServiceListResource> list = getTasks();
     for (ScheduledServiceListResource task : list) {
+      LOG.debug("getTask: {} : {} : {}", task.getId(), task.getName(), task.getStatus());
       if (name.equals(task.getName())) {
         return task;
       }
