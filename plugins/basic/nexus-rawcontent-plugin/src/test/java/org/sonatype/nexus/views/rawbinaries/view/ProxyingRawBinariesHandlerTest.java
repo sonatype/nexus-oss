@@ -14,7 +14,7 @@ package org.sonatype.nexus.views.rawbinaries.view;
 
 import java.util.Collections;
 
-import org.sonatype.nexus.component.model.ComponentEnvelope;
+import org.sonatype.nexus.component.model.Asset;
 import org.sonatype.nexus.component.source.AssetResponse;
 import org.sonatype.nexus.component.source.ComponentRequest;
 import org.sonatype.nexus.component.source.ComponentResponse;
@@ -24,9 +24,6 @@ import org.sonatype.nexus.componentviews.HandlerContext;
 import org.sonatype.nexus.componentviews.ViewRequest;
 import org.sonatype.nexus.componentviews.ViewRequest.HttpMethod;
 import org.sonatype.nexus.componentviews.ViewResponse;
-import org.sonatype.nexus.views.rawbinaries.internal.RawAsset;
-import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
-import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinary;
 import org.sonatype.nexus.views.rawbinaries.internal.storage.RawBinaryStore;
 
 import com.google.common.collect.ImmutableMap;
@@ -41,6 +38,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.component.services.adapter.AssetAdapter.P_PATH;
 
 public class ProxyingRawBinariesHandlerTest
 {
@@ -71,8 +69,8 @@ public class ProxyingRawBinariesHandlerTest
     HandlerContext context = mock(HandlerContext.class);
     when(context.getRequest()).thenReturn(request);
 
-    final RawBinary localBinary = mock(RawBinary.class);
-    when(localBinary.getPath()).thenReturn(PATH);
+    final Asset localBinary = new Asset("");
+    localBinary.put(P_PATH, PATH);
 
     when(store.getForPath(PATH)).thenReturn(asList(localBinary));
 
@@ -90,7 +88,7 @@ public class ProxyingRawBinariesHandlerTest
     when(context.getRequest()).thenReturn(request);
 
     // There's no matching local raw binary
-    when(store.getForPath(PATH)).thenReturn(Collections.<RawBinary>emptyList());
+    when(store.getForPath(PATH)).thenReturn(Collections.<Asset>emptyList());
 
     final ComponentResponse mockComponentResponse = mock(ComponentResponse.class);
     when(mockComponentResponse.getAssets()).thenReturn(asList(mock(AssetResponse.class)));
@@ -114,7 +112,7 @@ public class ProxyingRawBinariesHandlerTest
   private static class TestableRawProxyHandler
       extends ProxyingRawBinariesHandler
   {
-    private RawBinary streamed;
+    private Asset streamed;
 
     private TestableRawProxyHandler(final RawBinaryStore binaryStore, final String sourceName,
                                     final ComponentSourceRegistry sourceRegistry)
@@ -123,12 +121,12 @@ public class ProxyingRawBinariesHandlerTest
     }
 
     @Override
-    ViewResponse createStreamResponse(final RawBinary binary) {
+    ViewResponse createStreamResponse(final Asset binary) {
       this.streamed = binary;
       return null;
     }
 
-    public RawBinary getStreamed() {
+    public Asset getStreamed() {
       return streamed;
     }
   }

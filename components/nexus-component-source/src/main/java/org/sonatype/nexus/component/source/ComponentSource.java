@@ -14,6 +14,8 @@ package org.sonatype.nexus.component.source;
 
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
 
 /**
@@ -42,8 +44,8 @@ public interface ComponentSource
    *                Formats are responsible for encoding all of their various request types into the query, whether
    *                these are mere checks for the existence of a component, downloading just the metadata (partially or
    *                fully), or retrieving and storing some or all of the binary assets of the component.
-   *
-   *                If no component(s) match the query, the returned {@link Iterable} is empty.
+   * @return {@null} if no components match the request.
    */
+  @Nullable
   ComponentResponse fetchComponents(ComponentRequest request) throws IOException;
 }

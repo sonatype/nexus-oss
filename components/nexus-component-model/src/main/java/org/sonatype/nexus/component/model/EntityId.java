@@ -15,7 +15,7 @@ package org.sonatype.nexus.component.model;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Identifies a stored {@link Component} or {@link Asset}.
+ * Identifies a stored component or asset.
  * 
  * @since 3.0
  */

@@ -12,58 +12,74 @@
  */
 package org.sonatype.nexus.component.services.adapter;
 
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.orient.OClassNameBuilder;
+import java.util.Set;
 
-import com.google.common.base.Predicate;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import com.google.common.collect.ImmutableSet;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Adapter for converting between {@link Component} objects and OrientDB {@code ODocument}s.
+ * Adapter for the abstract "component" storage class, which extends from "entity".
+ * <p>
+ * This is the base storage class of all components. A component represents a reusable software
+ * package and may logically contain any number of assets, representing files that comprise the
+ * package. In addition, a component may have any number of format-specific properties.
+ * <p>
+ * Subclasses are generally expected to be {@code @Named} {@code @Singleton}s, define a
+ * {@code CLASS_NAME} constant, and implement a no-arg constructor that calls {@code super(CLASS_NAME)}.
+ * They should also override {@link EntityAdapter#initClass(OClass)} if they need to define additional
+ * properties and/or indexes as part of the storage schema.
  *
  * @since 3.0
  */
-public abstract class ComponentAdapter<T extends Component>
-    extends EntityAdapterSupport
-    implements EntityAdapter<T>
+@Named
+@Singleton
+public class ComponentAdapter
+    extends EntityAdapter
 {
-  /** OrientDB base class name for assets. */
-  public static final String BASE_CLASS_NAME = new OClassNameBuilder().type(Component.class).build();
+  /** Storage class name. */
+  public static final String CLASS_NAME = "component";
 
-  /** OrientDB property name for the set of assets that belong to a component. */
+  /**
+   * Property name for the set of assets that belong to a component.
+   * This is a system-controlled property whose value is a {@code Set} of {@code EntityId}s.
+   */
   public static final String P_ASSETS = "assets";
 
-  @Override
-  public void createStorageClass(OSchema schema) {
-    createAndInitStorageClassWithBaseClass(
-        checkNotNull(schema),
-        BASE_CLASS_NAME,
-        new Predicate<OClass>()
-        {
-          @Override
-          public boolean apply(final OClass baseClass) {
-            createRequiredAutoIndexedProperty(baseClass, P_ID, OType.STRING, true);
-            createRequiredProperty(baseClass, P_ASSETS, OType.LINKSET);
-            return true;
-          }
-        },
-        new OClassNameBuilder().type(getEntityClass()).build(),
-        new Predicate<OClass>()
-        {
-          @Override
-          public boolean apply(final OClass storageClass) {
-            initStorageClass(storageClass);
-            return true;
-          }
-        });
+  /** Component properties whose values are system-controlled. */
+  public static final Set<String> SYSTEM_PROPS = ImmutableSet.of(P_ID, P_ASSETS);
+
+  /**
+   * No-arg constructor for direct instances.
+   */
+  public ComponentAdapter() {
+    this(CLASS_NAME);
+    checkState(this.getClass() == ComponentAdapter.class, "Subclass must use super(className) constructor");
   }
 
   /**
-   * Initializes the given OrientDB class with properties and associated indexes to store entities of this type.
+   * Constructor for subclasses.
    */
-  protected abstract void initStorageClass(OClass storageClass);
+  protected ComponentAdapter(String className) {
+    super(className);
+  }
+
+  @Override
+  public OClass getClass(OSchema schema) {
+    OClass superClass = super.getClass(schema);
+    OClass oClass = schema.getClass(CLASS_NAME);
+    if (oClass == null) {
+      oClass = schema.createAbstractClass(CLASS_NAME, superClass);
+      createRequiredProperty(oClass, P_ASSETS, OType.LINKSET);
+      logCreatedClassInfo(oClass);
+    }
+    maybeCreateSubClass(schema, oClass, ComponentAdapter.class);
+    return oClass;
+  }
 }

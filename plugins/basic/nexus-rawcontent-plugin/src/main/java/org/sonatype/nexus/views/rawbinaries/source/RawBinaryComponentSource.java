@@ -20,7 +20,6 @@ import org.sonatype.nexus.component.source.ComponentResponse;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceId;
 import org.sonatype.nexus.component.source.support.HttpComponentResponseBuilder;
-import org.sonatype.nexus.views.rawbinaries.internal.RawComponent;
 
 import com.google.common.collect.Maps;
 import org.apache.http.HttpEntity;
@@ -31,7 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A source for remote {@link RawComponent}s which provides HTTP resources under a given URL prefix as assets.
+ * A source for remote raw binary components which provides HTTP resources under a given URL prefix as assets.
  *
  * @since 3.0
  */
@@ -58,6 +57,7 @@ public class RawBinaryComponentSource
 
   @Override
   public ComponentResponse fetchComponents(final ComponentRequest request) throws IOException {
+
     final String uri = urlPrefix + request.getQuery().get("path");
 
     final HttpGet httpGet = new HttpGet(uri);

@@ -10,25 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.model;
+package org.sonatype.nexus.views.rawbinaries.internal.storage.adapter;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.BaseAsset;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.component.services.adapter.ComponentAdapter;
 
 /**
- * Asset subclass for testing.
+ * Entity adapter for raw binary components.
+ *
+ * @since 3.0
  */
-public class TestAsset
-  extends BaseAsset
-  implements Asset
+@Named
+@Singleton
+public class RawBinaryComponentAdapter
+    extends ComponentAdapter
 {
-  private long downloadCount;
+  public static final String CLASS_NAME = "rawbinarycomponent";
 
-  public long getDownloadCount() {
-    return downloadCount;
-  }
-
-  public void setDownloadCount(long downloadCount) {
-    this.downloadCount = downloadCount;
+  public RawBinaryComponentAdapter() {
+    super(CLASS_NAME);
   }
 }
