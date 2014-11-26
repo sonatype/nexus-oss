@@ -21,7 +21,10 @@ Ext.define('NX.view.message.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-message-panel',
 
-  border: false,
+  frame: true,
+  floating: true,
+  draggable: true,
+  resizable: true,
   ui: 'messages',
   width: 200,
   stateful: true,
@@ -64,5 +67,15 @@ Ext.define('NX.view.message.Panel', {
         deferEmptyText: false
       }
     }
-  ]
+  ],
+
+  listeners: {
+    afterrender: function () {
+      var me = this,
+          main = me.up('nx-main');
+
+      me.setXY([main.getWidth() - me.getWidth() - 5, 50], true);
+    }
+  }
+
 });
