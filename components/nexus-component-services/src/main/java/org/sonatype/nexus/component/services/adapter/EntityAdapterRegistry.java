@@ -12,64 +12,31 @@
  */
 package org.sonatype.nexus.component.services.adapter;
 
-import java.util.Set;
-
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Component;
-import org.sonatype.nexus.component.model.Entity;
-
 /**
- * A registry of {@link EntityAdapter}s, keyed by {@link Entity} domain class.
+ * A registry of {@link EntityAdapter}s, keyed by storage class name.
  *
  * @since 3.0
  */
 public interface EntityAdapterRegistry
 {
   /**
-   * Registers an asset adapter and creates the OrientDB class in the database if it doesn't already exist.
+   * Registers an adapter. The underlying storage class will be created the first time the adapter is
+   * requested via {@link #getAdapter(String)} if it doesn't exist yet.
    *
    * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
    */
-  <T extends Asset> void registerAssetAdapter(AssetAdapter<T> adapter);
+  void registerAdapter(EntityAdapter adapter);
 
   /**
-   * Registers a component adapter and creates the OrientDB class in the database if it doesn't already exist.
-   *
-   * @throws IllegalStateException if an adapter already exists in the registry with the same entity class.
+   * Unregisters the adapter for the given storage class. If no such adapter is registered, this is a no-op.
    */
-  <T extends Component> void registerComponentAdapter(ComponentAdapter<T> adapter);
+  void unregisterAdapter(String className);
 
   /**
-   * Unregisters the adapter for the given asset class. If no such adapter is registered, this is a no-op.
-   */
-  <T extends Asset> void unregisterAssetAdapter(Class<T> entityClass);
-
-  /**
-   * Unregisters the adapter for the given component class. If no such adapter is registered, this is a no-op.
-   */
-  <T extends Component> void unregisterComponentAdapter(Class<T> entityClass);
-
-  /**
-   * Gets the registered adapter for the given asset class, or {@code null} if it doesn't exist.
+   * Gets the adapter for the given storage class, or {@code null} if it doesn't exist.
    */
   @Nullable
-  <T extends Asset> AssetAdapter<T> getAssetAdapter(Class<T> entityClass);
-
-  /**
-   * Gets the registered adapter for the given component class, or {@code null} if it doesn't exist.
-   */
-  @Nullable
-  <T extends Component> ComponentAdapter<T> getComponentAdapter(Class<T> entityClass);
-
-  /**
-   * Gets all asset classes for which a registered adapter exists.
-   */
-  Set<Class<? extends Asset>> assetClasses();
-
-  /**
-   * Gets all component classes for which a registered adapter exists.
-   */
-  Set<Class<? extends Component>> componentClasses();
+  EntityAdapter getAdapter(String className);
 }
