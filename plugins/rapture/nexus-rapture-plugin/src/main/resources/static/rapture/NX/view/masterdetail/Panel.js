@@ -90,11 +90,11 @@ Ext.define('NX.view.masterdetail.Panel', {
   },
 
   setDescription: function (description) {
-    this.items.items[0].items.items[0].items.items[1].setItemName(description);
+    this.down('nx-masterdetail-tabs').up('nx-drilldown-item').setItemName(description);
   },
 
   setDescriptionIconName: function (iconName) {
-    this.items.items[0].items.items[0].items.items[1].setItemClass(NX.Icons.cls(iconName, 'x16'));
+    this.down('nx-masterdetail-tabs').up('nx-drilldown-item').setItemClass(NX.Icons.cls(iconName, 'x16'));
   },
 
   showInfo: function (message) {
