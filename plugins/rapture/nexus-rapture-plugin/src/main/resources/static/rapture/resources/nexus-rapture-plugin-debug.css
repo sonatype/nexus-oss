@@ -37,10 +37,6 @@
  * @namespace NX.view.info
  */
 
-.nx-info {
-  margin: 10px;
-}
-
 .nx-info-entry td {
   padding-bottom: 4px;
 }
