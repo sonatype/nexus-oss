@@ -72,6 +72,9 @@ public class RoutingWithProxyRepositoryIT
   public void proxyLoosesWLIfDisabled()
       throws Exception
   {
+    // wait for central
+    routingTest().waitForAllRoutingUpdateJobToStop();
+
     assertThat(exists(PREFIX_FILE_LOCATION), is(true));
     assertThat(noscrape(PREFIX_FILE_LOCATION), is(false));
     {
@@ -98,6 +101,9 @@ public class RoutingWithProxyRepositoryIT
   public void proxyWLDeletableAndRecreateManually()
       throws Exception
   {
+    // wait for central
+    routingTest().waitForAllRoutingUpdateJobToStop();
+
     // we did no any waiting, e just booted nexus, so it must be present
     assertThat(exists(PREFIX_FILE_LOCATION), is(true));
     assertThat(noscrape(PREFIX_FILE_LOCATION), is(false));
