@@ -105,6 +105,8 @@ public abstract class AbstractNexusIntegrationTest
 
   public static final String RELATIVE_CONF_DIR = "../sonatype-work/nexus/etc";
 
+  public static final String BASE_CONF_DIR;
+
   public static final String WORK_CONF_DIR;
 
   public static final Integer nexusControlPort;
@@ -137,6 +139,7 @@ public abstract class AbstractNexusIntegrationTest
     nexusApplicationPort = TestProperties.getInteger("nexus.application.port");
     nexusControlPort = TestProperties.getInteger("nexus.control.port");
     nexusBaseDir = TestProperties.getString("nexus.base.dir");
+    BASE_CONF_DIR = nexusBaseDir + "/etc";
     nexusWorkDir = TestProperties.getString("nexus.work.dir");
     WORK_CONF_DIR = nexusWorkDir + "/etc";
     nexusLogDir = TestProperties.getString("nexus.log.dir");
@@ -477,6 +480,9 @@ public abstract class AbstractNexusIntegrationTest
     log.info("Copying config files");
 
     Map<String, String> testProperties = getTestProperties();
+
+    // this has to be in the base directory to be picked up by the launcher
+    copyConfigFile("nexus-test.properties", testProperties, BASE_CONF_DIR);
 
     copyConfigFile("nexus.xml", testProperties, WORK_CONF_DIR);
     copyConfigFile("security.xml", testProperties, WORK_CONF_DIR);

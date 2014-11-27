@@ -269,6 +269,11 @@ public class DefaultNexusBundleConfiguration
               .inFile(path("nexus/etc/org.apache.karaf.features.cfg"))
               .replace("featuresRepositories = ", "featuresRepositories = " + repositoriesBuilder)
       );
+
+      overlays.add(
+          fileTaskBuilder.properties(path("nexus/etc/nexus-test.properties"))
+              .property("nexus-test-features", Joiner.on(',').join(getFeatures()))
+      );
     }
 
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
