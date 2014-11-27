@@ -61,6 +61,8 @@ public class NexusHttpAuthenticationFilter
 
   private final Logger logger = Loggers.getLogger(getClass());
 
+  private final String USERNAME_HEADER = "X-NEXUS-USER";
+
   private boolean fakeAuthScheme;
 
   // FIXME: Evil field injection should be replaced!
@@ -406,6 +408,13 @@ public class NexusHttpAuthenticationFilter
     return new String[]{parts[0], decoded.substring(parts[0].length() + 1)};
   }
 
+  @Override
+  public boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
+    boolean rt = super.onPreHandle(request, response, mappedValue);
+    addUserInHeader(response);
+    return rt;
+  }
+
   // ==
 
   protected Object getAttribute(String key) {
@@ -420,5 +429,26 @@ public class NexusHttpAuthenticationFilter
     }
 
     return null;
+  }
+
+  private void addUserInHeader(ServletResponse response) {
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
+    if (httpResponse.containsHeader(USERNAME_HEADER)) {
+      return;
+    }
+
+    String username = null;
+    Subject currentUser = SecurityUtils.getSubject();
+    Object principal = currentUser.getPrincipal();
+    if (principal != null) {
+      username = principal.toString();
+    }
+
+    if (username == null || username.isEmpty()) {
+      username = "-";
+    } else {
+      httpResponse.setHeader(USERNAME_HEADER, username);
+    }
+    getLogger().debug(username);
   }
 }
