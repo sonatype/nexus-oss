@@ -1,3 +1,4 @@
+// NOTE: Electing MIT license
 /*global Ext*/
 
 /*
@@ -37,26 +38,17 @@ Ext.define('Ext.ux.window.Notification', {
 	spacing: 6,
 
 	// Pixels from the managers borders to start the first notification
-	paddingX: 0,
-	paddingY: 0,
+	paddingX: 30,
+	paddingY: 10,
 
-  // Show a notification
-  slideInAnimation: 'easeOut',
-  slideInDuration: 500,
-  startYoffset: -60,
-
-  // Hide the notification
-  hideDuration: 3000,
-  autoCloseDelay: 7000,
-
-  // Animate remaining notifications
-  slideBackAnimation: 'easeIn',
-  slideBackDuration: 300,
-
+	slideInAnimation: 'easeIn',
+	slideBackAnimation: 'bounceOut',
+	slideInDuration: 1500,
+	slideBackDuration: 1000,
+	hideDuration: 500,
+	autoCloseDelay: 7000,
 	stickOnClick: true,
 	stickWhileHover: true,
-  startingOpacity: 0,
-  endingOpacity: 1,
 
 	// Private. Do not override!
 	isHiding: false,
@@ -372,13 +364,12 @@ Ext.define('Ext.ux.window.Notification', {
 		me.el.animate({
 			from: {
 				x: me.el.getX(),
-				y: me.el.getY() + me.startYoffset,
-        opacity: me.startingOpacity
+				y: me.el.getY()
 			},
 			to: {
 				x: me.xPos,
 				y: me.yPos,
-				opacity: me.endingOpacity
+				opacity: 1
 			},
 			easing: me.slideInAnimation,
 			duration: me.slideInDuration,
@@ -407,10 +398,6 @@ Ext.define('Ext.ux.window.Notification', {
 			me.stopAnimation();
 
 			me.el.animate({
-        from: {
-          x: me.el.getX(),
-          y: me.el.getY()
-        },
 				to: {
 					x: me.xPos,
 					y: me.yPos
