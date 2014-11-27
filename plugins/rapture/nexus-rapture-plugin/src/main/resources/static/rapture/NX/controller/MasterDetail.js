@@ -188,7 +188,7 @@ Ext.define('NX.controller.MasterDetail', {
     var me = this;
 
     if (model) {
-      me.onSelection(list, model);
+      me.getList().fireEvent("selection", list, model);
       me.onModelChanged(model);
       me.getList().up('#nx-drilldown').setItemBookmark(0, NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)), me);
       me.getList().up('#nx-drilldown').showChild(1, animate);
