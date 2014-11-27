@@ -108,7 +108,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
-        'nx-coreui-repository-list ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=browse]': {
+        'nx-coreui-repository-feature button[action=browse]': {
           click: me.navigateToBrowseMode
         },
         'nx-coreui-repository-list button[action=new]': {

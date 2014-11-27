@@ -108,11 +108,11 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-schedule-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-task-list ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=run]': {
+        'nx-coreui-task-feature button[action=run]': {
           click: me.runTask,
           afterrender: me.bindRunButton
         },
-        'nx-coreui-task-list ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=stop]': {
+        'nx-coreui-task-feature button[action=stop]': {
           click: me.stopTask,
           afterrender: me.bindStopButton
         },
