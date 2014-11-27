@@ -99,18 +99,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-ldap-testsuite</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ldap-testsupport</artifactId>
       <scope>test</scope>
-      <!--
-      FIXME: Sort out this exclusion, if it makes sense move up to DM
-      -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.directory.shared</groupId>
-          <artifactId>shared-bouncycastle-reduced</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

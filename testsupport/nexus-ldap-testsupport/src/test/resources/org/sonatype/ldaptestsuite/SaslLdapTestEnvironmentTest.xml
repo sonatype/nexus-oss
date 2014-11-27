@@ -1,0 +1,54 @@
+<!--
+
+    Copyright (c) 2007-2014 Sonatype, Inc. All rights reserved.
+
+    This program is licensed to you under the Apache License Version 2.0,
+    and you may not use this file except in compliance with the Apache License Version 2.0.
+    You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the Apache License Version 2.0 is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+
+-->
+<plexus>
+  <components>
+    <component>
+      <role>org.sonatype.ldaptestsuite.LdapServer</role>
+      <implementation>
+        org.sonatype.ldaptestsuite.LdapServer
+      </implementation>
+      <configuration>
+        <workingDirectory>
+          ${basedir}/target/apache-ds/
+        </workingDirectory>
+        <doDelete>true</doDelete>
+        <port>12345</port>
+        <saslHost>localhost</saslHost>
+        <saslPrincipal>ldap/localhost@EXAMPLE.COM</saslPrincipal>
+        <searchBaseDn>ou=people,o=sonatype</searchBaseDn>
+        <saslRealms>
+          <saslRealm>localhost</saslRealm>
+        </saslRealms>
+        <partitions>
+          <partition>
+            <name>sonatype</name>
+            <suffix>o=sonatype</suffix>
+            <indexedAttributes>
+              <indexedAttribute>
+                objectClass
+              </indexedAttribute>
+              <indexedAttribute>o</indexedAttribute>
+            </indexedAttributes>
+            <rootEntryClasses>
+              <rootEntryClass>top</rootEntryClass>
+              <rootEntryClass>organization</rootEntryClass>
+            </rootEntryClasses>
+            <ldifFile>${basedir}/src/test/resources/sonatype.ldif</ldifFile>
+          </partition>
+        </partitions>
+      </configuration>
+    </component>
+  </components>
+</plexus>

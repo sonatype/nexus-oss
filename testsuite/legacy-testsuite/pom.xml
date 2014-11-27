@@ -120,8 +120,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-ldap-testsuite</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ldap-testsupport</artifactId>
       <scope>test</scope>
     </dependency>
 
