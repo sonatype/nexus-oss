@@ -74,4 +74,8 @@ public class Responses
   public static StringResponse xml(String xml) {
     return new StringResponse(xml, "text/xml");
   }
+
+  public static StringResponse text(String xml) {
+    return new StringResponse(xml, "text/plain");
+  }
 }

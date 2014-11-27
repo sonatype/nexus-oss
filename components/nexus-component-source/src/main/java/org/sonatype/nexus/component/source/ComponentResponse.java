@@ -10,28 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.componentviews.requestmatchers;
+package org.sonatype.nexus.component.source;
 
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
- * A token representing an unchanging portion of a path.
+ * A container for asset content, as returned by {@link ComponentSource#fetchComponents(ComponentRequest)}.
  *
  * @since 3.0
  */
-public class LiteralToken
-    extends Token
+public interface ComponentResponse
 {
-  public LiteralToken(final String value) {
-    super(value);
-  }
+  /**
+   * @return the component-level metadata available from the response
+   */
+  Map<String, Object> getMetadata();
 
-  @Override
-  public String toRegexp() {
-    return Pattern.quote(value);
-  }
-
-  public String toString() {
-    return String.format("lit(%s))", value);
-  }
+  /**
+   * @return any assets returned as part of the response
+   */
+  Iterable<AssetResponse> getAssets();
 }

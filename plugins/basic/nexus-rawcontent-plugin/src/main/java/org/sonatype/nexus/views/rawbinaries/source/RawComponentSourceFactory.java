@@ -17,10 +17,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.ComponentSource;
-import org.sonatype.nexus.component.source.api.http.HttpClientConfigMarshaller;
-import org.sonatype.nexus.component.source.api.http.HttpClientFactory;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.config.ComponentSourceFactory;
+import org.sonatype.nexus.component.source.http.HttpClientConfigMarshaller;
+import org.sonatype.nexus.component.source.http.HttpClientFactory;
+import org.sonatype.nexus.component.source.support.HttpComponentResponseBuilder;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -44,12 +45,17 @@ public class RawComponentSourceFactory
 
   private final HttpClientConfigMarshaller httpClientConfigMarshaller;
 
+  private final HttpComponentResponseBuilder responseBuilder;
+
+
   @Inject
   public RawComponentSourceFactory(final HttpClientFactory httpClientFactory,
-                                   final HttpClientConfigMarshaller httpClientConfigMarshaller)
+                                   final HttpClientConfigMarshaller httpClientConfigMarshaller,
+                                   final HttpComponentResponseBuilder responseBuilder)
   {
     this.httpClientFactory = checkNotNull(httpClientFactory);
     this.httpClientConfigMarshaller = checkNotNull(httpClientConfigMarshaller);
+    this.responseBuilder = checkNotNull(responseBuilder);
   }
 
   @Override
@@ -58,7 +64,7 @@ public class RawComponentSourceFactory
     return new RawBinaryComponentSource(
         config.getSourceId(),
         (CloseableHttpClient) httpClientFactory.create(httpClientConfigMarshaller.fromMap(config.getConfiguration())),
-        (String) config.getConfiguration().get(REMOTE_URL_PARAM)
-    );
+        (String) config.getConfiguration().get(REMOTE_URL_PARAM),
+        responseBuilder);
   }
 }

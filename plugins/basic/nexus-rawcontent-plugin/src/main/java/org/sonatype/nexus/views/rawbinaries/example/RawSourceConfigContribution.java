@@ -20,16 +20,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.source.ComponentSourceId;
-import org.sonatype.nexus.component.source.api.http.ConnectionConfig;
-import org.sonatype.nexus.component.source.api.http.HttpClientConfig;
-import org.sonatype.nexus.component.source.api.http.HttpClientConfigMarshaller;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfig;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigContributor;
 import org.sonatype.nexus.component.source.config.ComponentSourceConfigStore;
+import org.sonatype.nexus.component.source.http.ConnectionConfig;
+import org.sonatype.nexus.component.source.http.HttpClientConfig;
+import org.sonatype.nexus.component.source.http.HttpClientConfigMarshaller;
 import org.sonatype.nexus.views.rawbinaries.source.RawComponentSourceFactory;
 
 import com.google.common.collect.Maps;
-
 
 /**
  * Contributes an example binary source for search.maven.org.
@@ -48,7 +47,8 @@ public class RawSourceConfigContribution
   private final HttpClientConfigMarshaller httpClientConfigMarshaller;
 
   @Inject
-  public RawSourceConfigContribution(final HttpClientConfigMarshaller httpClientConfigMarshaller) {
+  public RawSourceConfigContribution(final HttpClientConfigMarshaller httpClientConfigMarshaller)
+  {
     this.httpClientConfigMarshaller = httpClientConfigMarshaller;
   }
 
@@ -59,11 +59,12 @@ public class RawSourceConfigContribution
       config.put(RawComponentSourceFactory.REMOTE_URL_PARAM, "http://search.maven.org/");
       config.putAll(httpClientConfigMarshaller.toMap(
           new HttpClientConfig().withConnectionConfig(new ConnectionConfig()
-              .withTimeout(500)
-              .withRetries(5)
-              .withUserAgentCustomisation("NX3")
+                  .withTimeout(500)
+                  .withRetries(5)
+                  .withUserAgentCustomisation("NX3")
           )
       ));
+
 
       store.add(new ComponentSourceConfig(
           new ComponentSourceId(SOURCE_NAME, INTERNAL_ID),
