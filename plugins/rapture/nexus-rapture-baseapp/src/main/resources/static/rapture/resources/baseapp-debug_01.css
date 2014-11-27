@@ -97,6 +97,15 @@ a:not([class*="x-"]):active {
   color: #96caee;
 }
 
+/**
+ * Paragraphs
+ */
+/* line 145, ../../../baseapp/packages/rapture-theme/sass/etc/all.scss */
+p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
 /* including package rapture-theme */
 /**
  * @class Ext.Component
@@ -24438,9 +24447,4 @@ a.x-color-picker-item:hover {
 .x-btn-drilldown-toolbar-medium-icon .x-btn-inner {
   width: 24px;
   padding: 0;
-}
-/* line 381, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-toolbar-medium-icon .x-btn-icon-el {
-  width: 24px;
-  height: 24px;
 }
