@@ -10,28 +10,46 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.componentviews.requestmatchers;
-
-import java.util.regex.Pattern;
+package org.sonatype.nexus.component.source.http;
 
 /**
- * A token representing an unchanging portion of a path.
+ * HTTP client HTTP proxy configuration.
  *
  * @since 3.0
  */
-public class LiteralToken
-    extends Token
+public class HttpProxyConfig
 {
-  public LiteralToken(final String value) {
-    super(value);
+
+  private String hostname;
+
+  private Integer port;
+
+  private AuthenticationConfig authenticationConfig;
+
+  public String getHostname() {
+    return hostname;
   }
 
-  @Override
-  public String toRegexp() {
-    return Pattern.quote(value);
+  public Integer getPort() {
+    return port;
   }
 
-  public String toString() {
-    return String.format("lit(%s))", value);
+  public AuthenticationConfig getAuthenticationConfig() {
+    return authenticationConfig;
+  }
+
+  public HttpProxyConfig withHostname(final String hostname) {
+    this.hostname = hostname;
+    return this;
+  }
+
+  public HttpProxyConfig withPort(final Integer port) {
+    this.port = port;
+    return this;
+  }
+
+  public HttpProxyConfig withAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
+    this.authenticationConfig = authenticationConfig;
+    return this;
   }
 }

@@ -79,4 +79,10 @@ public interface ViewConfigStore
    */
   @Nullable
   ViewConfig get(String viewName) throws IOException;
+
+  /**
+   * Retrieves the config ID based on the view name.
+   */
+  @Nullable
+  ViewConfigId getId(String viewName) throws IOException;
 }

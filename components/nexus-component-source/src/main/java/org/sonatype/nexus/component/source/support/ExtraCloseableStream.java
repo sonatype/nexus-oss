@@ -10,28 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.componentviews.requestmatchers;
+package org.sonatype.nexus.component.source.support;
 
-import java.util.regex.Pattern;
+import java.io.Closeable;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * A token representing an unchanging portion of a path.
- *
- * @since 3.0
+ * A decorator that gives an InputStream the ability to close an additional {@link Closeable} resource when the
+ * InputStream is closed.
  */
-public class LiteralToken
-    extends Token
+public class ExtraCloseableStream
+    extends FilterInputStream
 {
-  public LiteralToken(final String value) {
-    super(value);
+  final Closeable needsClosing;
+
+  public ExtraCloseableStream(final InputStream in, final Closeable needsClosing) {
+    super(in);
+    this.needsClosing = needsClosing;
   }
 
   @Override
-  public String toRegexp() {
-    return Pattern.quote(value);
-  }
-
-  public String toString() {
-    return String.format("lit(%s))", value);
+  public void close() throws IOException {
+    try {
+      super.close();
+    }
+    finally {
+      needsClosing.close();
+    }
   }
 }

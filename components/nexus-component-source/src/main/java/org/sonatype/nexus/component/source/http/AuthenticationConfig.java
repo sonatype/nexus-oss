@@ -10,28 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.componentviews.requestmatchers;
+package org.sonatype.nexus.component.source.http;
 
-import java.util.regex.Pattern;
+import java.util.List;
+
+import org.apache.http.auth.Credentials;
 
 /**
- * A token representing an unchanging portion of a path.
+ * HTTP client authentication configuration.
  *
  * @since 3.0
  */
-public class LiteralToken
-    extends Token
+public interface AuthenticationConfig
 {
-  public LiteralToken(final String value) {
-    super(value);
-  }
 
-  @Override
-  public String toRegexp() {
-    return Pattern.quote(value);
-  }
+  String getType();
 
-  public String toString() {
-    return String.format("lit(%s))", value);
-  }
+  Credentials getCredentials();
+
+  List<String> getPreferredAuthSchemes();
+
 }

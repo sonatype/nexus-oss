@@ -191,7 +191,8 @@ public class MapdbBlobMetadataStore
      * Deserialization constructor.
      */
     @SuppressWarnings("unused")
-    public MetadataRecord() {
+    public MetadataRecord()
+    {
     }
 
     @Override

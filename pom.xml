@@ -203,7 +203,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-component-source-api</artifactId>
+        <artifactId>nexus-component-source</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 

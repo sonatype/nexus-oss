@@ -124,7 +124,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-component-source-api</artifactId>
+      <artifactId>nexus-component-source</artifactId>
     </dependency>
 
     <dependency>
