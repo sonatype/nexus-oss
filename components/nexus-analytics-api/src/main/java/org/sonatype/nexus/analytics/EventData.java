@@ -116,6 +116,9 @@ public class EventData
     return attributes;
   }
 
+  /**
+   * Returns a deeply cloned copy.
+   */
   public EventData copy() {
     try {
       EventData copy = (EventData) clone();

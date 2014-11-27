@@ -89,6 +89,9 @@ public class EventHeader
     return attributes;
   }
 
+  /**
+   * Returns a deeply cloned copy.
+   */
   public EventHeader copy() {
     try {
       EventHeader copy = (EventHeader) clone();
