@@ -14,16 +14,20 @@ package org.sonatype.nexus.quartz.internal.nexus;
 
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
+import com.google.common.base.Throwables;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.listeners.JobListenerSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.quartz.TriggerKey.triggerKey;
 import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
 /**
@@ -48,7 +52,7 @@ public class NexusTaskJobListener<T>
   public NexusTaskJobListener(final QuartzNexusSchedulerSPI quartzSupport,
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
-                              final StateHolder<T> initialState)
+                              final NexusTaskState initialState)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
@@ -66,17 +70,35 @@ public class NexusTaskJobListener<T>
 
   // == JobListener
 
+  /**
+   * Returns the trigger associated with NX Task wrapping job. The trigger executing this Job does NOT have to be
+   * THAT trigger, think about "runNow"! So, this method returns the associated trigger, while the trigger in
+   * context might be something completely different.
+   */
+  private Trigger getJobTrigger(final JobExecutionContext context) {
+    try {
+      final Trigger trigger = context.getScheduler().getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
+      checkState(trigger != null, "NX Task job %s not having a trigger", jobKey);
+      return trigger;
+    }
+    catch (SchedulerException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
-    final NexusTaskFuture<T> future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime());
-    nexusTaskInfo.setStateHolder(
-        new StateHolder<>(
-            future,
+    final Trigger jobTrigger = getJobTrigger(context);
+    final NexusTaskFuture<T> future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
+        nexusScheduleConverter.toSchedule(context.getTrigger()));
+    nexusTaskInfo.setNexusTaskState(
+        new NexusTaskState(
             State.RUNNING,
             toTaskConfiguration(context.getJobDetail().getJobDataMap()),
-            nexusScheduleConverter.toSchedule(context.getTrigger()),
-            context.getTrigger().getNextFireTime()
-        )
+            nexusScheduleConverter.toSchedule(jobTrigger),
+            jobTrigger.getNextFireTime()
+        ),
+        future
     );
     context.put(NexusTaskFuture.FUTURE_KEY, future);
     context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
@@ -85,18 +107,6 @@ public class NexusTaskJobListener<T>
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
-    // TODO: done jobs will be GCed
-    /*
-    try {
-      // Job is done
-      if (context.getTrigger().getNextFireTime() == null) {
-        context.getScheduler().deleteJob(jobKey);
-      }
-    }
-    catch (SchedulerException e) {
-      // mute
-    }
-    */
     final EndState endState;
     if (jobException != null) {
       endState = EndState.FAILED;
@@ -112,17 +122,28 @@ public class NexusTaskJobListener<T>
     jobDataMap.putAsString("lastRunState.runStarted", future.getStartedAt().getTime());
     jobDataMap.putAsString("lastRunState.runDuration", System.currentTimeMillis() - future.getStartedAt().getTime());
 
-    final Schedule schedule = nexusScheduleConverter.toSchedule(context.getTrigger());
-    // TODO: better "done" detection: ie. "now" scheduled task vs non-now but manually run task?
-    nexusTaskInfo.setStateHolder(
-        new StateHolder<>(
-            future,
-            schedule instanceof Now ? State.DONE : State.WAITING,
+    final Trigger jobTrigger = getJobTrigger(context);
+    final Schedule jobSchedule = nexusScheduleConverter.toSchedule(jobTrigger);
+    final State state = jobTrigger.getNextFireTime() == null ? State.DONE : State.WAITING;
+    // update task state, w/ respect to state: if DONE keep future, if WAITING drop it
+    nexusTaskInfo.setNexusTaskState(
+        new NexusTaskState(
+            state,
             toTaskConfiguration(jobDataMap),
-            schedule,
-            context.getTrigger().getNextFireTime()
-        )
+            jobSchedule,
+            jobTrigger.getNextFireTime()
+        ),
+        State.DONE == state ? future : null
     );
+
+    if (State.DONE == state) {
+      try {
+        quartzSupport.removeTask(jobKey);
+      }
+      catch (SchedulerException e) {
+        // mute
+      }
+    }
 
     future.setResult((T) context.getResult(), jobException);
   }

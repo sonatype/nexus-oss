@@ -20,7 +20,6 @@ import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -78,8 +77,6 @@ public class NowScheduledTaskLifecycleIT
     // done
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
     // taskInfo for DONE task is terminal
-    final TaskInfo ti = taskInfo.refresh();
-    assertThat(ti.getCurrentState().getState(), equalTo(State.DONE));
-    assertThat(System.identityHashCode(ti), equalTo(System.identityHashCode(taskInfo)));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
   }
 }

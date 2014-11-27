@@ -17,41 +17,37 @@ import java.util.Date;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.scheduling.TaskConfiguration;
-import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
-import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Holder for state of a task. Pushed by {@link NexusTaskJobListener}.
  *
  * @since 3.0
  */
-public class StateHolder<T>
+public class NexusTaskState
 {
   private final TaskConfiguration taskConfiguration;
 
   private final Schedule schedule;
 
-  private final CurrentState<T> currentState;
+  private final State state;
 
-  private final LastRunState lastRunState;
+  private final Date nextExecutionTime;
 
-  public StateHolder(final @Nullable NexusTaskFuture<T> nexusTaskFuture,
-                     final State state,
-                     final TaskConfiguration taskConfiguration,
-                     final Schedule schedule,
-                     final @Nullable Date nextExecutionTime)
+  public NexusTaskState(final State state,
+                        final TaskConfiguration taskConfiguration,
+                        final Schedule schedule,
+                        final @Nullable Date nextExecutionTime)
   {
     this.taskConfiguration = checkNotNull(taskConfiguration);
     this.schedule = checkNotNull(schedule);
-    this.currentState = extractCurrentState(state, nexusTaskFuture, nextExecutionTime);
-    this.lastRunState = extractLastRunState(taskConfiguration);
+    this.state = checkNotNull(state);
+    this.nextExecutionTime = nextExecutionTime;
   }
 
   public TaskConfiguration getConfiguration() {
@@ -62,25 +58,16 @@ public class StateHolder<T>
     return schedule;
   }
 
-  public CurrentState<T> getCurrentState() {
-    return currentState;
+  public State getState() {
+    return state;
+  }
+
+  public Date getNextExecutionTime() {
+    return nextExecutionTime;
   }
 
   @Nullable
   public LastRunState getLastRunState() {
-    return lastRunState;
-  }
-
-  // ==
-
-  private CurrentState<T> extractCurrentState(final State state, final NexusTaskFuture<T> future,
-                                              final Date nextExecutionTime)
-  {
-    checkState(State.RUNNING != state || future != null, "Running task must have future");
-    return new CS<>(state, nextExecutionTime, future);
-  }
-
-  private LastRunState extractLastRunState(final TaskConfiguration taskConfiguration) {
     if (taskConfiguration.getMap().containsKey("lastRunState.endState")) {
       final String endStateString = taskConfiguration.getString("lastRunState.endState");
       final long runStarted = taskConfiguration.getLong("lastRunState.runStarted", -1);
@@ -88,50 +75,6 @@ public class StateHolder<T>
       return new LS(EndState.valueOf(endStateString), new Date(runStarted), runDuration);
     }
     return null;
-  }
-
-  // ==
-
-  static class CS<T>
-      implements CurrentState<T>
-  {
-    private final State state;
-
-    private final Date nextRun;
-
-    private final NexusTaskFuture<T> future;
-
-    public CS(final State state, final Date nextRun, final NexusTaskFuture<T> future)
-    {
-      this.state = state;
-      this.nextRun = nextRun;
-      this.future = future;
-    }
-
-    @Override
-    public State getState() {
-      return state;
-    }
-
-    @Override
-    public Date getNextRun() {
-      return nextRun;
-    }
-
-    @Override
-    public Date getRunStarted() {
-      return state == State.RUNNING ? future.getStartedAt() : null;
-    }
-
-    @Override
-    public RunState getRunState() {
-      return state == State.RUNNING ? future.getRunState() : null;
-    }
-
-    @Override
-    public NexusTaskFuture<T> getFuture() {
-      return future;
-    }
   }
 
   static class LS

@@ -198,7 +198,7 @@ public class QuartzNexusSchedulerSPI
     }
   }
 
-  protected boolean removeTask(final JobKey jobKey) throws SchedulerException {
+  boolean removeTask(final JobKey jobKey) throws SchedulerException {
     boolean result = quartzSupport.getScheduler().deleteJob(jobKey);
     if (result) {
       quartzSupport.getScheduler().getListenerManager().removeJobListener(jobKey.getName());
@@ -233,8 +233,7 @@ public class QuartzNexusSchedulerSPI
         this,
         jobDetail.getKey(),
         nexusScheduleConverter,
-        new StateHolder<T>(
-            null,
+        new NexusTaskState(
             State.WAITING,
             toTaskConfiguration(jobDetail.getJobDataMap()),
             nexusScheduleConverter.toSchedule(trigger),

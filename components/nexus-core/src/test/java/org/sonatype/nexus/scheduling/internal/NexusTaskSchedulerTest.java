@@ -94,8 +94,6 @@ public class NexusTaskSchedulerTest
     // done
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
     // taskInfo for DONE task is terminal
-    final TaskInfo ti = taskInfo.refresh();
-    assertThat(ti.getCurrentState().getState(), equalTo(State.DONE));
-    assertThat(System.identityHashCode(ti), equalTo(System.identityHashCode(taskInfo)));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
   }
 }

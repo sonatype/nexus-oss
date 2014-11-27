@@ -13,14 +13,12 @@
 package org.sonatype.nexus.scheduling;
 
 import java.util.Date;
-import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-
-import com.google.common.collect.Sets;
 
 /**
  * The class holding information about task at the moment the instance of task info was created.
@@ -50,16 +48,15 @@ public interface TaskInfo<T>
   String getMessage();
 
   /**
-   * Returns a COPY of the task configuration map from the moment this instance was created. Modifications to this
-   * configuration are possible, but does not affect currently executing task, nor is being persisted. Generally, this
-   * configuration is only for inspection, or, to be used to re-schedule existing task with change configuration. If
-   * in the meanwhile, task finishes, and modifies configuration, it is NOT reflected in configuration returned by
-   * this method, you need to "reload" task info using {@link #refresh()} method.
+   * Returns a COPY of the task configuration map from the moment this instance was created or any state change on task
+   * happened. Modifications to this configuration are possible, but does not affect currently executing task, nor is
+   * being persisted. Generally, this configuration is only for inspection, or, to be used to re-schedule existing task
+   * with changed configuration.
    */
   TaskConfiguration getConfiguration();
 
   /**
-   * Returns the task's schedule.
+   * Returns the task's schedule from the moment this instance was created or any state change on task happened.
    */
   Schedule getSchedule();
 
@@ -73,8 +70,6 @@ public interface TaskInfo<T>
    * WAITING -> RUNNING
    * RUNNING -> WAITING
    * RUNNING -> DONE
-   *
-   * @see {@link #refresh()} method.
    */
   enum State
   {
@@ -83,9 +78,9 @@ public interface TaskInfo<T>
 
   /**
    * Running task instance might be running okay, being blocked (by other tasks), or might be canceled but the
-   * cancellation is not yet detected, or some cleanup is happening.
+   * cancellation was not yet detected or some cleanup is being done.
    *
-   * Possible transitions: currentState.ordinal <= newState.ordinal
+   * Possible transitions: currentRunState.ordinal <= newRunState.ordinal
    * Ending states are RUNNING and CANCELED.
    */
   enum RunState
@@ -152,7 +147,9 @@ public interface TaskInfo<T>
   // ==
 
   /**
-   * Returns the task current state, never {@code null}.
+   * Returns the task current state, never {@code null}. For tasks scheduled with {@link Now} schedule, or having
+   * manually started with {@link #runNow()} method, the invocation of this method will block until underlying
+   * scheduler actually starts the task, hence, caller might get the task result.
    */
   CurrentState<T> getCurrentState();
 
@@ -165,7 +162,7 @@ public interface TaskInfo<T>
   // ==
 
   /**
-   * Removes (with canceling it if it runs) the task. Returns {@code true} if removal succeeded (task was found and was
+   * Removes (with canceling if runs) the task. Returns {@code true} if removal succeeded (task was found and was
    * removed), otherwise {@code false}.
    */
   boolean remove();
@@ -173,16 +170,8 @@ public interface TaskInfo<T>
   /**
    * Executes the scheduled task now, unrelated to it's actual schedule.
    *
-   * @throws TaskRemovedException if task with this ID has been removed from scheduler.
+   * @throws TaskRemovedException  if task with this ID has been removed from scheduler.
+   * @throws IllegalStateException if task is already running.
    */
-  void runNow() throws TaskRemovedException;
-
-  /**
-   * Returns a fresh task info (with actualized values). If the task got removed from scheduler (by some other thread),
-   * an {@link TaskRemovedException} will be thrown. If this instance was already in ending {@link State#DONE} state,
-   * this same instance is returned.
-   *
-   * @throws TaskRemovedException if task with this ID has been removed from scheduler.
-   */
-  TaskInfo<T> refresh() throws TaskRemovedException;
+  TaskInfo<T> runNow() throws TaskRemovedException;
 }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nullable;
@@ -24,9 +25,9 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import com.google.common.base.Throwables;
 import org.quartz.JobKey;
-import org.quartz.SchedulerException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link TaskInfo} support class backed by Quartz.
@@ -45,27 +46,30 @@ public class NexusTaskInfo<T>
 
   private final JobKey jobKey;
 
-  private final CountDownLatch countDownLatch;
+  private volatile CountDownLatch countDownLatch;
 
-  private volatile StateHolder<T> stateHolder;
+  private volatile NexusTaskState nexusTaskState;
+
+  private volatile NexusTaskFuture<T> nexusTaskFuture;
 
   public NexusTaskInfo(final QuartzNexusSchedulerSPI quartzSupport,
                        final JobKey jobKey,
-                       final StateHolder<T> stateHolder)
+                       final NexusTaskState nexusTaskState)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
-    this.countDownLatch = new CountDownLatch(1);
-    this.stateHolder = checkNotNull(stateHolder);
+    this.countDownLatch = nexusTaskState.getSchedule() instanceof Now ? new CountDownLatch(1) : new CountDownLatch(0);
+    this.nexusTaskState = checkNotNull(nexusTaskState);
+    this.nexusTaskFuture = null;
   }
 
-  public StateHolder<T> getStateHolder() {
-    return stateHolder;
-  }
-
-  public void setStateHolder(final StateHolder<T> stateHolder) {
-    this.stateHolder = checkNotNull(stateHolder);
-    countDownLatch.countDown();
+  public synchronized void setNexusTaskState(final NexusTaskState nexusTaskState,
+                                             final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+  {
+    checkState(State.RUNNING != nexusTaskState.getState() || nexusTaskFuture != null, "Running task must have future");
+    this.nexusTaskState = checkNotNull(nexusTaskState);
+    this.nexusTaskFuture = nexusTaskFuture;
+    this.countDownLatch.countDown();
   }
 
   @Override
@@ -85,33 +89,32 @@ public class NexusTaskInfo<T>
 
   @Override
   public TaskConfiguration getConfiguration() {
-    return getStateHolder().getConfiguration();
+    return nexusTaskState.getConfiguration();
   }
 
   @Override
   public Schedule getSchedule() {
-    return getStateHolder().getSchedule();
+    return nexusTaskState.getSchedule();
   }
 
   @Override
   public CurrentState<T> getCurrentState() {
-    if (getSchedule() instanceof Now) {
-      // TODO: this makes sense for "bg jobs" only! In other cases this might cause unacceptable long blocked threads!
-      // TODO: for bg jobs caller usually submits it and wants the result of it, kinda "thread pool" use of scheduler
-      try {
-        countDownLatch.await();
-      }
-      catch (InterruptedException e) {
-        throw Throwables.propagate(e);
-      }
+    try {
+      countDownLatch.await();
     }
-    return getStateHolder().getCurrentState();
+    catch (InterruptedException e) {
+      throw Throwables.propagate(e);
+    }
+    // get all 2 in consistent manner but w/o deadlock on latch.await
+    synchronized (this) {
+      return new CS<>(nexusTaskState, nexusTaskFuture);
+    }
   }
 
   @Nullable
   @Override
   public LastRunState getLastRunState() {
-    return getStateHolder().getLastRunState();
+    return nexusTaskState.getLastRunState();
   }
 
   @Override
@@ -120,23 +123,54 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public void runNow() throws TaskRemovedException {
+  public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
+    checkState(State.RUNNING != nexusTaskState.getState(), "Task already running");
+    countDownLatch = new CountDownLatch(1);
     quartzSupport.runNow(jobKey);
+    return this;
   }
 
-  @Override
-  public TaskInfo<T> refresh() throws TaskRemovedException {
-    if (State.DONE != getCurrentState().getState()) {
-      try {
-        setStateHolder((StateHolder<T>) quartzSupport.taskByKey(jobKey).getStateHolder());
-      }
-      catch (SchedulerException e) {
-        throw Throwables.propagate(e);
-      }
-      catch (IllegalStateException e) {
-        throw new TaskRemovedException(jobKey.getName(), e);
-      }
+  // ==
+
+  static class CS<T>
+      implements CurrentState<T>
+  {
+    private final State state;
+
+    private final Date nextRun;
+
+    private final NexusTaskFuture<T> future;
+
+    public CS(final NexusTaskState nexusTaskState, final NexusTaskFuture<T> nexusTaskFuture)
+    {
+      this.state = nexusTaskState.getState();
+      this.nextRun = nexusTaskState.getNextExecutionTime();
+      this.future = nexusTaskFuture;
     }
-    return this;
+
+    @Override
+    public State getState() {
+      return state;
+    }
+
+    @Override
+    public Date getNextRun() {
+      return nextRun;
+    }
+
+    @Override
+    public Date getRunStarted() {
+      return state == State.RUNNING ? future.getStartedAt() : null;
+    }
+
+    @Override
+    public RunState getRunState() {
+      return state == State.RUNNING ? future.getRunState() : null;
+    }
+
+    @Override
+    public NexusTaskFuture<T> getFuture() {
+      return future;
+    }
   }
 }

@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import com.google.common.base.Throwables;
 import org.quartz.JobKey;
@@ -47,6 +48,8 @@ public class NexusTaskFuture<T>
 
   private final Date startedAt;
 
+  private final Schedule startedBy;
+
   private final CountDownLatch countDownLatch;
 
   private volatile RunState runState;
@@ -57,11 +60,13 @@ public class NexusTaskFuture<T>
 
   public NexusTaskFuture(final QuartzNexusSchedulerSPI quartzSupport,
                          final JobKey jobKey,
-                         final Date startedAt)
+                         final Date startedAt,
+                         final Schedule startedBy)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
     this.startedAt = checkNotNull(startedAt);
+    this.startedBy = checkNotNull(startedBy);
     this.countDownLatch = new CountDownLatch(1);
     this.runState = RunState.STARTING;
   }
@@ -74,6 +79,10 @@ public class NexusTaskFuture<T>
 
   public Date getStartedAt() {
     return startedAt;
+  }
+
+  public Schedule getStartedBy() {
+    return startedBy;
   }
 
   public RunState getRunState() {

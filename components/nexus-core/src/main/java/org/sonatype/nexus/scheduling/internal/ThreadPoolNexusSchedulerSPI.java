@@ -64,7 +64,7 @@ public class ThreadPoolNexusSchedulerSPI
   public ThreadPoolNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
-    this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+    this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);
     this.tasks = Maps.newConcurrentMap();
   }
 
@@ -195,7 +195,7 @@ public class ThreadPoolNexusSchedulerSPI
     }
 
     @Override
-    public void runNow() {
+    public TaskInfo<T> runNow() {
       throw new UnsupportedOperationException("Only once executing tasks are supported");
     }
 
@@ -205,21 +205,19 @@ public class ThreadPoolNexusSchedulerSPI
     }
 
     @Override
-    public TaskInfo<T> refresh() {
-      return this;
-    }
-
-    @Override
     public T call() throws Exception {
       final long now = System.currentTimeMillis();
       EndState endState = null;
+      log.info("Task started: {} : {}", getConfiguration().getType(), getName());
       try {
         T result = task.call();
         endState = EndState.OK;
+        log.info("Task ended: {} : {}", getConfiguration().getType(), getName());
         return result;
       }
       catch (Exception e) {
         endState = EndState.FAILED;
+        log.info("Task failed: {} : {}", getConfiguration().getType(), getName(), e);
         throw e;
       }
       finally {
