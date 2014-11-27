@@ -77,46 +77,6 @@ public class AuthorizingRealmImplTest
     Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:delete")));
   }
 
-  public void testCaseSensitiveAuthorization()
-      throws Exception
-  {
-    buildTestAuthorizationConfig("ABcd");
-
-    SimplePrincipalCollection principal = new SimplePrincipalCollection("ABcd", realm.getName());
-
-    Assert.assertTrue(realm.hasRole(principal, "role"));
-
-    // Verify the permission
-    Assert.assertTrue(realm.isPermitted(principal, new WildcardPermission("app:config:read")));
-    // Verify other method not allowed
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:create")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:update")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:delete")));
-
-    // Verify other permission not allowed
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:read")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:create")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:update")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:delete")));
-
-    principal = new SimplePrincipalCollection("abcd", realm.getName());
-
-    Assert.assertTrue(realm.hasRole(principal, "role"));
-
-    // Verify the permission
-    Assert.assertTrue(realm.isPermitted(principal, new WildcardPermission("app:config:read")));
-    // Verify other method not allowed
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:create")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:update")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:config:delete")));
-
-    // Verify other permission not allowed
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:read")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:create")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:update")));
-    Assert.assertFalse(realm.isPermitted(principal, new WildcardPermission("app:ui:delete")));
-  }
-
   private void buildTestAuthorizationConfig()
       throws InvalidConfigurationException
   {

@@ -269,7 +269,7 @@ public class Configuration
   }
 
   protected String userRoleMappingKey(final String userId, final String source) {
-    return userId.toLowerCase() + "|" + source;
+    return userId + "|" + source;
   }
 
 }
