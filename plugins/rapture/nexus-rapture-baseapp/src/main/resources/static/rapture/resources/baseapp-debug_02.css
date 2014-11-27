@@ -6366,7 +6366,7 @@
 .x-window-header-text-container-message-default {
   color: #333333;
   font-weight: bold;
-  line-height: 22px;
+  line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
   font-size: 13px;
   padding: 1px 0 0;
@@ -7910,7 +7910,7 @@
 .x-window-header-text-container-message-primary {
   color: white;
   font-weight: bold;
-  line-height: 22px;
+  line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
   font-size: 13px;
   padding: 1px 0 0;
@@ -9454,7 +9454,7 @@
 .x-window-header-text-container-message-danger {
   color: white;
   font-weight: bold;
-  line-height: 22px;
+  line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
   font-size: 13px;
   padding: 1px 0 0;
@@ -10998,7 +10998,7 @@
 .x-window-header-text-container-message-warning {
   color: white;
   font-weight: bold;
-  line-height: 22px;
+  line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
   font-size: 13px;
   padding: 1px 0 0;
@@ -12542,7 +12542,7 @@
 .x-window-header-text-container-message-success {
   color: white;
   font-weight: bold;
-  line-height: 22px;
+  line-height: 15px;
   font-family: arial, helvetica, verdana, sans-serif;
   font-size: 13px;
   padding: 1px 0 0;
@@ -13891,7 +13891,7 @@
 }
 
 /* Fixed modals for the visual style guide */
-/* line 59, ../../../baseapp/packages/rapture-theme/sass/src/Ext/window/Window.scss */
+/* line 64, ../../../baseapp/packages/rapture-theme/sass/src/Ext/window/Window.scss */
 .fixed-modal {
   top: 0 !important;
 }
