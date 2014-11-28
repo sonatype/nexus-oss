@@ -51,7 +51,7 @@ public abstract class Schedule
 
   @Override
   public String toString() {
-    return "Schedule{" +
+    return getClass().getSimpleName() + "{" +
         "properties=" + properties +
         '}';
   }

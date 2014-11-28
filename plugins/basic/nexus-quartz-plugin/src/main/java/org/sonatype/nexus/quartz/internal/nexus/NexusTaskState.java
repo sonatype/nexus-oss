@@ -79,7 +79,7 @@ public class NexusTaskState
 
   @Override
   public String toString() {
-    return "NXTaskState{" +
+    return getClass().getSimpleName() + "{" +
         "taskConfiguration=" + taskConfiguration +
         ", schedule=" + schedule +
         ", state=" + state +

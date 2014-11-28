@@ -94,7 +94,7 @@ public class NexusTaskFuture<T>
   public void setRunState(final RunState runState) {
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
-    log.info("NX Task runState transition {} -> {}", this.runState, runState);
+    log.debug("NX Task runState transition {} -> {}", this.runState, runState);
     this.runState = runState;
   }
 

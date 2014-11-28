@@ -68,8 +68,9 @@ public class NexusTaskInfo<T>
   public synchronized void setNexusTaskState(final NexusTaskState nexusTaskState,
                                              final @Nullable NexusTaskFuture<T> nexusTaskFuture)
   {
+    checkNotNull(nexusTaskState);
     checkState(State.RUNNING != nexusTaskState.getState() || nexusTaskFuture != null, "Running task must have future");
-    log.info("NX Task transition {} -> {}", this.nexusTaskState, nexusTaskState);
+    log.debug("NX Task transition {} -> {}", this.nexusTaskState.getState(), nexusTaskState.getState());
     this.nexusTaskState = checkNotNull(nexusTaskState);
     this.nexusTaskFuture = nexusTaskFuture;
     this.countDownLatch.countDown();
