@@ -75,7 +75,7 @@ public class GlobalComponentLookupHelper
       }
     }
     catch (Exception e) {
-      log.trace("Unable to load class: {}; ignoring", e);
+      log.trace("Unable to lookup component: {}; ignoring", className, e);
     }
     return null;
   }
