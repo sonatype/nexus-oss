@@ -1,0 +1,19 @@
+dn: o=sonatype
+objectClass: top
+objectClass: organization
+o: sonatype
+
+dn: ou=people,o=sonatype
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+description: Contains entries which describe persons
+
+dn: uid=tstevens,ou=people,o=sonatype
+objectclass: inetOrgPerson
+cn: tstevens
+sn: Toby Stevens
+uid: tstevens
+mail: tstevens@sonatype.com
+userPassword: tstevens123
+description: This is Toby
