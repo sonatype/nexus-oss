@@ -216,9 +216,6 @@ public class ObrGroupRepository
       uidLock.lock(Action.create);
       try {
         obrItem = ObrUtils.getCachedItem(obrUid);
-        for (StorageFileItem item : memberObrItems) {
-          modified = Math.max(modified, item.getModified());
-        }
         if (null == obrItem || lastModified < modified) {
           ObrResourceReader reader = null;
           ObrResourceWriter writer = null;
