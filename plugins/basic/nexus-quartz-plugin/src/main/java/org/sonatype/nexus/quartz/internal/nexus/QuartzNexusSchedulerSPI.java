@@ -302,7 +302,7 @@ public class QuartzNexusSchedulerSPI
     }
   }
 
-  void runNow(final JobKey jobKey) throws TaskRemovedException {
+  void runNow(final JobKey jobKey) throws TaskRemovedException, SchedulerException {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
@@ -315,9 +315,6 @@ public class QuartzNexusSchedulerSPI
     }
     catch (JobPersistenceException e) {
       throw new TaskRemovedException(jobKey.getName(), e);
-    }
-    catch (SchedulerException e) {
-      throw Throwables.propagate(e);
     }
     finally {
       Thread.currentThread().setContextClassLoader(classLoader);
