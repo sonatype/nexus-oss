@@ -203,10 +203,6 @@ public class ObrGroupRepository
         final StorageFileItem item = ObrUtils.retrieveObrItem(r);
         modified = Math.max(modified, item.getModified());
         memberObrItems.add(item);
-
-        if (item.isExpired()) {
-          lastModified = Long.MIN_VALUE;
-        }
       }
       catch (final StorageException e) {
         // ignore this particular OBR and continue
