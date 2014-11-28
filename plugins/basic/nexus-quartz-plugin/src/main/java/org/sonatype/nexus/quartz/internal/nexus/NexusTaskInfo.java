@@ -122,7 +122,14 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public boolean remove() {
+  public synchronized boolean remove() {
+    if (nexusTaskFuture != null) {
+      nexusTaskFuture.cancel(true);
+    }
+    nexusTaskState.getConfiguration().getMap().put("lastRunState.endState", EndState.CANCELED.name());
+    nexusTaskState.getConfiguration().getMap().put("lastRunState.runStarted", Long.toString(new Date().getTime()));
+    nexusTaskState.getConfiguration().getMap().put("lastRunState.runDuration", Long.toString(0L));
+    log.info("NX Task remove: {}", nexusTaskState);
     return quartzSupport.removeTask(jobKey.getName());
   }
 
@@ -131,7 +138,14 @@ public class NexusTaskInfo<T>
     checkState(State.RUNNING != nexusTaskState.getState(), "Task already running");
     log.info("NX Task runNow: {}", nexusTaskState);
     countDownLatch = new CountDownLatch(1);
-    quartzSupport.runNow(jobKey);
+    try {
+      quartzSupport.runNow(jobKey);
+    }
+    catch (Exception e) {
+      countDownLatch.countDown();
+      Throwables.propagateIfInstanceOf(e, TaskRemovedException.class);
+      throw Throwables.propagate(e);
+    }
     return this;
   }
 
