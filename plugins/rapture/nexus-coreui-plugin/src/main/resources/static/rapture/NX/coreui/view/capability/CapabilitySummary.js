@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.CapabilitySummary', {
-  extend: 'Ext.panel.Panel',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-summary',
   requires: [
     'NX.Conditions'
