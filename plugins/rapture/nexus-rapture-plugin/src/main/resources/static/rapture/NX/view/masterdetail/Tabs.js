@@ -56,16 +56,9 @@ Ext.define('NX.view.masterdetail.Tabs', {
       }
     ];
 
-    me.description = me.title;
-
     me.callParent(arguments);
 
     me.on('afterrender', me.calculateBookmarks, me);
-  },
-
-  setDescription: function(description) {
-    this.description = description;
-    this.setTitle(description);
   },
 
   showInfo: function(message) {

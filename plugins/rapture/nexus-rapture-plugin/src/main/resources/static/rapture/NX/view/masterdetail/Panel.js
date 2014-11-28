@@ -24,7 +24,7 @@ Ext.define('NX.view.masterdetail.Panel', {
     'NX.Icons'
   ],
 
-  layout: 'border',
+  layout: 'fit',
 
   tabs: {
     xtype: 'nx-info-panel'
@@ -38,25 +38,47 @@ Ext.define('NX.view.masterdetail.Panel', {
 
     me.items = [
       {
-        xtype: me.list,
-        region: 'center',
-        flex: 0.5,
-        allowDeselect: true
-      },
-      {
-        xtype: 'nx-masterdetail-tabs',
-        ui: 'masterdetail-tabs',
-        region: 'south',
-        split: true,
-        collapsible: true,
-        flex: 0.5,
-        hidden: true,
-        layout: {
-          type: 'vbox',
-          align: 'stretch',
-          pack: 'start'
-        },
-        tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs)
+        xtype: 'container',
+        items: [
+          {
+            xtype: 'nx-drilldown',
+
+            items: [
+              {
+                xtype: 'nx-drilldown-item',
+
+                itemName: me.rootName,
+                itemClass: me.rootClass,
+
+                layout: 'fit',
+
+                items: {
+                  xtype: me.list
+                }
+              },
+              {
+                xtype: 'nx-drilldown-item',
+
+                layout: 'fit',
+
+                items: {
+                  xtype: 'nx-masterdetail-tabs',
+                  ui: 'masterdetail-tabs',
+                  header: false,
+                  plain: true,
+
+                  layout: {
+                    type: 'vbox',
+                    align: 'stretch',
+                    pack: 'start'
+                  },
+                  tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
+                  tbar: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : Ext.apply({}, me.actions)
+                }
+              }
+            ]
+          }
+        ]
       }
     ];
 
@@ -68,11 +90,11 @@ Ext.define('NX.view.masterdetail.Panel', {
   },
 
   setDescription: function (description) {
-    this.down('nx-masterdetail-tabs').setDescription(description);
+    this.down('nx-masterdetail-tabs').up('nx-drilldown-item').setItemName(description);
   },
 
   setDescriptionIconName: function (iconName) {
-    this.down('nx-masterdetail-tabs').setIconCls(NX.Icons.cls(iconName, 'x16'));
+    this.down('nx-masterdetail-tabs').up('nx-drilldown-item').setItemClass(NX.Icons.cls(iconName, 'x16'));
   },
 
   showInfo: function (message) {

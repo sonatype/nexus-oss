@@ -108,11 +108,11 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-schedule-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-task-list button[action=run]': {
+        'nx-coreui-task-feature button[action=run]': {
           click: me.runTask,
           afterrender: me.bindRunButton
         },
-        'nx-coreui-task-list button[action=stop]': {
+        'nx-coreui-task-feature button[action=stop]': {
           click: me.stopTask,
           afterrender: me.bindStopButton
         },
@@ -185,6 +185,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   showSummary: function(model) {
     var me = this;
+
     me.getInfo().showInfo({
       'Id': model.getId(),
       'Name': model.get('name'),

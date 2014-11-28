@@ -25,6 +25,9 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetFeature', {
 
   iconName: 'target-default',
 
-  tabs: { xtype: 'nx-coreui-repositorytarget-settings' }
+  tabs: { xtype: 'nx-coreui-repositorytarget-settings' },
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+  ]
 });

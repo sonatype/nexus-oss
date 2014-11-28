@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-privilege-list',
   requires: [
     'NX.Icons'
@@ -63,8 +63,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
           { text: 'Repository Target Privilege', action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target',
               'x16') }
         ]
-      },
-      { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+      }
     ];
 
     me.callParent();
