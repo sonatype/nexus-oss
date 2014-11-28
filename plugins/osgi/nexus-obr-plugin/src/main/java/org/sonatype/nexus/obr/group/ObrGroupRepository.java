@@ -221,7 +221,7 @@ public class ObrGroupRepository
           ObrResourceWriter writer = null;
 
           try {
-            writer = obrMetadataSource.getWriter(createUid(request.getRequestPath()));
+            writer = obrMetadataSource.getWriter(obrUid);
             for (final StorageFileItem f : memberObrItems) {
               try {
                 reader = obrMetadataSource.getReader(new ManagedObrSite(f));
