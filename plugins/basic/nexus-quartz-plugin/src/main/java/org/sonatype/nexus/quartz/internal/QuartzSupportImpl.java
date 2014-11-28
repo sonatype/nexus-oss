@@ -24,6 +24,7 @@ import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import org.eclipse.sisu.BeanEntry;
 import org.quartz.Job;
@@ -38,6 +39,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.DirectSchedulerFactory;
+import org.quartz.impl.SchedulerRepository;
 import org.quartz.impl.jdbcjobstore.JobStoreTX;
 import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.spi.JobFactory;
@@ -89,6 +91,15 @@ public class QuartzSupportImpl
     this.threadPoolSize = 20;
   }
 
+  /**
+   * Making method public to be able to hack some tests in Pro.
+   */
+  @VisibleForTesting
+  @Override
+  public boolean isStarted() {
+    return super.isStarted();
+  }
+
   @Override
   protected void doStart() throws Exception {
     // hack: Quartz and c3p0 are fragments hosted in this plugin's bundle
@@ -121,7 +132,7 @@ public class QuartzSupportImpl
     // register ConnectionProvider
     DBConnectionManager.getInstance().addConnectionProvider(QuartzPlugin.STORE_NAME, h2ConnectionProvider);
 
-    // create Scheduler
+    // create Scheduler (implicitly registers it with repository)
     DirectSchedulerFactory.getInstance().createScheduler(
         SCHEDULER_NAME,
         UUID.randomUUID().toString(),
@@ -168,6 +179,8 @@ public class QuartzSupportImpl
     }
     scheduler.shutdown();
     scheduler = null;
+    // unregister it from repository
+    SchedulerRepository.getInstance().remove(SCHEDULER_NAME);
     h2ConnectionProvider.shutdown();
     log.info("Quartz Scheduler stopped.");
   }
