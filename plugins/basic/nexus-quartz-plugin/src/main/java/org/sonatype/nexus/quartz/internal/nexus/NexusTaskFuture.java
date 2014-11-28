@@ -22,6 +22,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
 import org.quartz.JobKey;
@@ -35,6 +36,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class NexusTaskFuture<T>
+    extends ComponentSupport
     implements Future<T>
 {
   /**
@@ -92,6 +94,7 @@ public class NexusTaskFuture<T>
   public void setRunState(final RunState runState) {
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
+    log.info("NX Task runState transition {} -> {}", this.runState, runState);
     this.runState = runState;
   }
 

@@ -22,6 +22,7 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Throwables;
 import org.quartz.JobKey;
@@ -35,6 +36,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class NexusTaskInfo<T>
+    extends ComponentSupport
     implements TaskInfo<T>
 {
   /**
@@ -67,6 +69,7 @@ public class NexusTaskInfo<T>
                                              final @Nullable NexusTaskFuture<T> nexusTaskFuture)
   {
     checkState(State.RUNNING != nexusTaskState.getState() || nexusTaskFuture != null, "Running task must have future");
+    log.info("NX Task transition {} -> {}", this.nexusTaskState, nexusTaskState);
     this.nexusTaskState = checkNotNull(nexusTaskState);
     this.nexusTaskFuture = nexusTaskFuture;
     this.countDownLatch.countDown();
@@ -125,6 +128,7 @@ public class NexusTaskInfo<T>
   @Override
   public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
     checkState(State.RUNNING != nexusTaskState.getState(), "Task already running");
+    log.info("NX Task runNow: {}", nexusTaskState);
     countDownLatch = new CountDownLatch(1);
     quartzSupport.runNow(jobKey);
     return this;

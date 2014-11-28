@@ -49,6 +49,13 @@ public abstract class Schedule
     return Collections.unmodifiableMap(properties);
   }
 
+  @Override
+  public String toString() {
+    return "Schedule{" +
+        "properties=" + properties +
+        '}';
+  }
+
   // ==
 
   public static String dateToString(final Date date) {

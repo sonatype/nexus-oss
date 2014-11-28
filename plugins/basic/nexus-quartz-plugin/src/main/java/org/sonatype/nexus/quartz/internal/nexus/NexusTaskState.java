@@ -77,6 +77,16 @@ public class NexusTaskState
     return null;
   }
 
+  @Override
+  public String toString() {
+    return "NXTaskState{" +
+        "taskConfiguration=" + taskConfiguration +
+        ", schedule=" + schedule +
+        ", state=" + state +
+        ", nextExecutionTime=" + nextExecutionTime +
+        '}';
+  }
+
   static class LS
       implements LastRunState
   {
