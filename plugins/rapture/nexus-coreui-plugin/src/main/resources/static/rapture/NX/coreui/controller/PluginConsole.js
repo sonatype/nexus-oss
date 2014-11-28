@@ -90,9 +90,7 @@ Ext.define('NX.coreui.controller.PluginConsole', {
           }
         });
       }
-      var panel = me.getInfo();
-
-      panel.showInfo(info);
+      me.getInfo().showInfo(info);
     }
   }
 

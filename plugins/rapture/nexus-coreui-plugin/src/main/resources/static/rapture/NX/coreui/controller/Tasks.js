@@ -185,9 +185,8 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   showSummary: function(model) {
     var me = this;
-    var panel = me.getInfo();
 
-    panel.showInfo({
+    me.getInfo().showInfo({
       'Id': model.getId(),
       'Name': model.get('name'),
       'Type': model.get('typeName'),
