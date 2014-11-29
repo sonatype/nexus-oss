@@ -26,6 +26,7 @@ import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.util.Providers;
 import org.eclipse.sisu.BeanEntry;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class DefaultNexusTaskSchedulerTest
         ImmutableList.of(be1, be2));
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
         ImmutableList.<TaskDescriptor>of(new TaskWithDescriptorDescriptor()),
-        Collections.<NexusTaskExecutorSPI>emptyList());
+        Providers.<NexusTaskExecutorSPI>of(null));
   }
 
   @Test

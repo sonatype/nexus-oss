@@ -30,6 +30,7 @@ import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.util.Providers;
 import org.eclipse.sisu.BeanEntry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class NexusTaskSchedulerTest
         ImmutableList.of(task));
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
         Collections.<TaskDescriptor>emptyList(),
-        ImmutableList.<NexusTaskExecutorSPI>of(new ThreadPoolNexusSchedulerSPI(nexusTaskFactory)));
+        Providers.<NexusTaskExecutorSPI>of(new ThreadPoolNexusSchedulerSPI(nexusTaskFactory)));
   }
 
   @Test
