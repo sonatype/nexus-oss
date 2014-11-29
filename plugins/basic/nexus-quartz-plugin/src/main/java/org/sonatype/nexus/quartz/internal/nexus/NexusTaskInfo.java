@@ -13,7 +13,6 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
-import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Nullable;
 
@@ -33,6 +32,10 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * {@link TaskInfo} support class backed by Quartz.
  *
+ * Note about {@link NexusTaskFuture}: when this class has future (is not null), the task is meant to be started
+ * (either by schedule or by "runNow"). When this class has no future, that means that task is in WAITING or DONE
+ * states.
+ *
  * @since 3.0
  */
 public class NexusTaskInfo<T>
@@ -48,7 +51,7 @@ public class NexusTaskInfo<T>
 
   private final JobKey jobKey;
 
-  private volatile CountDownLatch countDownLatch;
+  private volatile State state;
 
   private volatile NexusTaskState nexusTaskState;
 
@@ -56,24 +59,30 @@ public class NexusTaskInfo<T>
 
   public NexusTaskInfo(final QuartzNexusSchedulerSPI quartzSupport,
                        final JobKey jobKey,
-                       final NexusTaskState nexusTaskState)
+                       final NexusTaskState nexusTaskState,
+                       final @Nullable NexusTaskFuture<T> nexusTaskFuture)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
-    this.countDownLatch = nexusTaskState.getSchedule() instanceof Now ? new CountDownLatch(1) : new CountDownLatch(0);
-    this.nexusTaskState = checkNotNull(nexusTaskState);
-    this.nexusTaskFuture = null;
+    setNexusTaskState(nexusTaskFuture != null ? State.RUNNING : State.WAITING, nexusTaskState, nexusTaskFuture);
   }
 
-  public synchronized void setNexusTaskState(final NexusTaskState nexusTaskState,
+  public synchronized void setNexusTaskState(final State state,
+                                             final NexusTaskState nexusTaskState,
                                              final @Nullable NexusTaskFuture<T> nexusTaskFuture)
   {
+    checkNotNull(state);
     checkNotNull(nexusTaskState);
-    checkState(State.RUNNING != nexusTaskState.getState() || nexusTaskFuture != null, "Running task must have future");
-    log.debug("NX Task transition {} -> {}", this.nexusTaskState.getState(), nexusTaskState.getState());
-    this.nexusTaskState = checkNotNull(nexusTaskState);
+    checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
+    log.debug("NX Task transition {} -> {}", this.state, state);
+    this.state = state;
+    this.nexusTaskState = nexusTaskState;
     this.nexusTaskFuture = nexusTaskFuture;
-    this.countDownLatch.countDown();
+  }
+
+  @Nullable
+  public NexusTaskFuture<T> getNexusTaskFuture() {
+    return nexusTaskFuture;
   }
 
   @Override
@@ -102,17 +111,8 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public CurrentState<T> getCurrentState() {
-    try {
-      countDownLatch.await();
-    }
-    catch (InterruptedException e) {
-      throw Throwables.propagate(e);
-    }
-    // get all 2 in consistent manner but w/o deadlock on latch.await
-    synchronized (this) {
-      return new CS<>(nexusTaskState, nexusTaskFuture);
-    }
+  public synchronized CurrentState<T> getCurrentState() {
+    return new CS<>(state, nexusTaskState, nexusTaskFuture);
   }
 
   @Nullable
@@ -126,21 +126,33 @@ public class NexusTaskInfo<T>
     if (nexusTaskFuture != null) {
       nexusTaskFuture.cancel(true);
     }
-    NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
+    if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration().getMap())) {
+      // if no last state (removed even before 1st run), add one noting it got removed/canceled
+      // if was running and is cancelable, the task will itself set a proper ending state
+      NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
+    }
     log.info("NX Task remove: {}", nexusTaskState);
     return quartzSupport.removeTask(jobKey.getName());
   }
 
   @Override
   public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
-    checkState(State.RUNNING != nexusTaskState.getState(), "Task already running");
+    checkState(State.RUNNING != state, "Task already running");
     log.info("NX Task runNow: {}", nexusTaskState);
-    countDownLatch = new CountDownLatch(1);
+    setNexusTaskState(
+        State.RUNNING,
+        nexusTaskState,
+        new NexusTaskFuture<T>(
+            quartzSupport,
+            jobKey,
+            new Date(),
+            new Now()
+        )
+    );
     try {
       quartzSupport.runNow(jobKey);
     }
     catch (Exception e) {
-      countDownLatch.countDown();
       Throwables.propagateIfInstanceOf(e, TaskRemovedException.class);
       throw Throwables.propagate(e);
     }
@@ -158,9 +170,9 @@ public class NexusTaskInfo<T>
 
     private final NexusTaskFuture<T> future;
 
-    public CS(final NexusTaskState nexusTaskState, final NexusTaskFuture<T> nexusTaskFuture)
+    public CS(final State state, final NexusTaskState nexusTaskState, final NexusTaskFuture<T> nexusTaskFuture)
     {
-      this.state = nexusTaskState.getState();
+      this.state = state;
       this.nextRun = nexusTaskState.getNextExecutionTime();
       this.future = nexusTaskFuture;
     }

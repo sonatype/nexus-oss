@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
@@ -59,7 +61,8 @@ public class NexusTaskJobListener<T>
                               final QuartzNexusSchedulerSPI quartzSupport,
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
-                              final NexusTaskState initialState)
+                              final NexusTaskState initialState,
+                              final @Nullable NexusTaskFuture nexusTaskFuture)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
@@ -68,7 +71,8 @@ public class NexusTaskJobListener<T>
     this.nexusTaskInfo = new NexusTaskInfo<>(
         quartzSupport,
         jobKey,
-        initialState
+        initialState,
+        nexusTaskFuture
     );
   }
 
@@ -96,18 +100,26 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
+    // might be null: job Removed
     final Trigger jobTrigger = getJobTrigger(context);
-    final NexusTaskFuture<T> future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
-        nexusScheduleConverter.toSchedule(context.getTrigger()));
-    nexusTaskInfo.setNexusTaskState(
-        new NexusTaskState(
-            State.RUNNING,
-            toTaskConfiguration(context.getJobDetail().getJobDataMap()),
-            nexusScheduleConverter.toSchedule(jobTrigger),
-            jobTrigger.getNextFireTime()
-        ),
-        future
-    );
+    // must never be null, so use this or that
+    final Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
+
+    NexusTaskFuture<T> future = nexusTaskInfo.getNexusTaskFuture();
+    if (future == null) {
+      future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
+          nexusScheduleConverter.toSchedule(context.getTrigger()));
+      // set the future on taskinfo
+      nexusTaskInfo.setNexusTaskState(
+          State.RUNNING,
+          new NexusTaskState(
+              toTaskConfiguration(context.getJobDetail().getJobDataMap()),
+              nexusScheduleConverter.toSchedule(currentTrigger),
+              currentTrigger.getNextFireTime()
+          ),
+          future
+      );
+    }
     context.put(NexusTaskFuture.FUTURE_KEY, future);
     context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
     eventBus.post(new NexusTaskEventStarted<>(nexusTaskInfo));
@@ -144,8 +156,8 @@ public class NexusTaskJobListener<T>
     final State state = jobTrigger != null && jobTrigger.getNextFireTime() != null ? State.WAITING : State.DONE;
     // update task state, w/ respect to future: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
+        state,
         new NexusTaskState(
-            state,
             toTaskConfiguration(jobDataMap),
             jobSchedule,
             jobTrigger.getNextFireTime()
@@ -153,7 +165,7 @@ public class NexusTaskJobListener<T>
         State.DONE == state ? future : null
     );
 
-    // DONE tasks (or those already removed) should be cleaned up, as they might reschedule themselve
+    // DONE tasks (or those already removed) should be cleaned up, as they might reschedule themselves
     if (State.DONE == state) {
       try {
         quartzSupport.removeTask(jobKey);

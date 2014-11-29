@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -235,17 +234,34 @@ public class QuartzNexusSchedulerSPI
    * NexusTaskInfo}.
    */
   <T> TaskInfo<T> initializeTaskState(final JobDetail jobDetail, final Trigger trigger) throws SchedulerException {
+    final Date now = new Date();
+    final TaskConfiguration taskConfiguration = toTaskConfiguration(jobDetail.getJobDataMap());
+    final Schedule schedule = nexusScheduleConverter.toSchedule(trigger);
+    final NexusTaskState nexusTaskState = new NexusTaskState(
+        taskConfiguration,
+        schedule,
+        trigger.getFireTimeAfter(now)
+    );
+
+    NexusTaskFuture<T> future = null;
+    if (schedule instanceof Now) {
+      future = new NexusTaskFuture<>(
+          this,
+          jobDetail.getKey(),
+          now,
+          schedule
+      );
+    }
+
     final NexusTaskJobListener<T> nexusTaskJobListener = new NexusTaskJobListener<>(
         eventBus,
         this,
         jobDetail.getKey(),
         nexusScheduleConverter,
-        new NexusTaskState(
-            State.WAITING,
-            toTaskConfiguration(jobDetail.getJobDataMap()),
-            nexusScheduleConverter.toSchedule(trigger),
-            trigger.getFireTimeAfter(new Date())
-        ));
+        nexusTaskState,
+        future
+    );
+
     quartzSupport.getScheduler().getListenerManager()
         .addJobListener(nexusTaskJobListener, keyEquals(jobDetail.getKey()));
     return nexusTaskJobListener.getNexusTaskInfo();

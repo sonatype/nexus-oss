@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
-import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
 import org.quartz.JobDataMap;
@@ -39,18 +38,14 @@ public class NexusTaskState
 
   private final Schedule schedule;
 
-  private final State state;
-
   private final Date nextExecutionTime;
 
-  public NexusTaskState(final State state,
-                        final TaskConfiguration taskConfiguration,
+  public NexusTaskState(final TaskConfiguration taskConfiguration,
                         final Schedule schedule,
                         final @Nullable Date nextExecutionTime)
   {
     this.taskConfiguration = checkNotNull(taskConfiguration);
     this.schedule = checkNotNull(schedule);
-    this.state = checkNotNull(state);
     this.nextExecutionTime = nextExecutionTime;
   }
 
@@ -62,23 +57,13 @@ public class NexusTaskState
     return schedule;
   }
 
-  public State getState() {
-    return state;
-  }
-
   public Date getNextExecutionTime() {
     return nextExecutionTime;
   }
 
   @Nullable
   public LastRunState getLastRunState() {
-    if (taskConfiguration.getMap().containsKey("lastRunState.endState")) {
-      final String endStateString = taskConfiguration.getString("lastRunState.endState");
-      final long runStarted = taskConfiguration.getLong("lastRunState.runStarted", -1);
-      final long runDuration = taskConfiguration.getLong("lastRunState.runDuration", -1);
-      return new LS(EndState.valueOf(endStateString), new Date(runStarted), runDuration);
-    }
-    return null;
+    return getLastRunState(taskConfiguration);
   }
 
   /**
@@ -98,12 +83,35 @@ public class NexusTaskState
     config.put("lastRunState.runDuration", Long.toString(runDuration));
   }
 
+  /**
+   * Helper to get ending state from a map. Returns {@code null} if no ending state in task configuration.
+   */
+  @Nullable
+  public static LastRunState getLastRunState(final TaskConfiguration taskConfiguration)
+  {
+    if (hasLastRunState(taskConfiguration.getMap())) {
+      final String endStateString = taskConfiguration.getString("lastRunState.endState");
+      final long runStarted = taskConfiguration.getLong("lastRunState.runStarted", System.currentTimeMillis());
+      final long runDuration = taskConfiguration.getLong("lastRunState.runDuration", 0);
+      return new LS(EndState.valueOf(endStateString), new Date(runStarted), runDuration);
+    }
+    return null;
+  }
+
+  /**
+   * Helper to check existence of ending state on a map.
+   */
+  public static boolean hasLastRunState(final Map config)
+  {
+    checkNotNull(config);
+    return config.containsKey("lastRunState.endState");
+  }
+
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "taskConfiguration=" + taskConfiguration +
         ", schedule=" + schedule +
-        ", state=" + state +
         ", nextExecutionTime=" + nextExecutionTime +
         '}';
   }
