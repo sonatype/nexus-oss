@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -237,7 +238,7 @@ public class QuartzNexusSchedulerSPI
             State.WAITING,
             toTaskConfiguration(jobDetail.getJobDataMap()),
             nexusScheduleConverter.toSchedule(trigger),
-            trigger.getNextFireTime()
+            trigger.getFireTimeAfter(new Date())
         ));
     quartzSupport.getScheduler().getListenerManager()
         .addJobListener(nexusTaskJobListener, keyEquals(jobDetail.getKey()));
