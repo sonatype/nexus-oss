@@ -30,5 +30,12 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
     { xtype: 'nx-coreui-capability-settings', title: 'Settings', weight: 20 },
     { xtype: 'nx-coreui-capability-status', title: 'Status', weight: 30 },
     { xtype: 'nx-coreui-capability-about', title: 'About', weight: 40 }
+  ],
+
+  actions: [
+    { xtype: 'button', text: 'Delete', action: 'delete', disabled: true, glyph: 'xf056@FontAwesome' /* fa-minus-circle */ },
+    '-',
+    { xtype: 'button', text: 'Enable', action: 'enable', disabled: true, glyph: 'xf04b@FontAwesome' /* fa-play */ },
+    { xtype: 'button', text: 'Disable', action: 'disable', disabled: true, glyph: 'xf04d@FontAwesome' /* fa-stop */ }
   ]
 });

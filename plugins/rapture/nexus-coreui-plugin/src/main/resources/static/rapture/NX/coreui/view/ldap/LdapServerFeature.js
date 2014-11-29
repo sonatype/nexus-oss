@@ -29,6 +29,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
     { xtype: 'nx-coreui-ldapserver-connection', title: 'Connection', weight: 10 },
     { xtype: 'nx-coreui-ldapserver-backup', title: 'Backup Mirror', weight: 20 },
     { xtype: 'nx-coreui-ldapserver-userandgroup', title: 'User & Group', weight: 30 }
-  ]
+  ],
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+  ]
 });

@@ -38,8 +38,6 @@ Ext.define('NX.controller.MasterDetail', {
 
   permission: undefined,
 
-  onSelection: Ext.emptyFn,
-
   getDescription: Ext.emptyFn,
 
   /**
@@ -67,19 +65,22 @@ Ext.define('NX.controller.MasterDetail', {
 
     componentListener[me.list] = {
       afterrender: me.onAfterRender,
-      selectionchange: me.onSelectionChange,
-      selection: me.onSelection
+      selection: me.onSelection,
+      cellclick: me.onCellClick
     };
     componentListener[me.list + ' button[action=new]'] = {
       afterrender: me.bindNewButton
     };
     componentListener[me.list + ' ^ nx-masterdetail-panel nx-masterdetail-tabs > tabpanel'] = {
-      tabchange: me.bookmark
+      tabchange: function() {
+        var selected = me.getList().getSelectionModel().getSelection();
+        me.bookmark(selected.length === 1 ? selected[0] : null);
+      }
     };
 
     // bind to a delete button if delete function defined
     if (me.deleteModel) {
-      componentListener[me.list + ' button[action=delete]'] = {
+      componentListener[me.list + ' ^ nx-masterdetail-panel nx-masterdetail-tabs button[action=delete]'] = {
         afterrender: me.bindDeleteButton,
         click: me.onDelete
       };
@@ -159,42 +160,54 @@ Ext.define('NX.controller.MasterDetail', {
     me.loadStore();
   },
 
-  onSelectionChange: function (selectionModel, selected) {
+  onCellClick: function(list, td, cellIndex, model) {
     var me = this;
 
-    me.onModelChanged(selected.length === 1 ? selected[0] : undefined);
-    me.bookmark();
+    me.loadView(list, model, true);
+    me.bookmark(model);
   },
 
   onModelChanged: function (model) {
     var me = this,
         list = me.getList(),
-        tabs = list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs');
+        masterdetail = list.up('nx-masterdetail-panel');
 
     if (model) {
-      tabs.show();
       list.getView().focusRow(model);
-      tabs.setDescription(me.getDescription(model));
+      masterdetail.setDescription(me.getDescription(model));
     }
     else {
-      tabs.hide();
-      tabs.setDescription('Empty selection');
+      masterdetail.setDescription('Empty selection');
     }
+  },
 
-    me.getList().fireEvent('selection', me.getList(), model);
+  /**
+   * Make the detail view appear, update models and bookmarks
+   */
+  loadView: function (list, model, animate) {
+    var me = this;
+
+    if (model) {
+      me.getList().fireEvent("selection", list, model);
+      me.onModelChanged(model);
+      me.getList().up('#nx-drilldown').setItemBookmark(0, NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)), me);
+      me.getList().up('#nx-drilldown').showChild(1, animate);
+    } else {
+      me.getList().up('#nx-drilldown').showChild(0, animate);
+    }
   },
 
   /**
    * Bookmark current selected model / selected tab.
    */
-  bookmark: function () {
+  bookmark: function (model) {
     var me = this,
-        selected = me.getList().getSelectionModel().getSelection(),
         modelId;
 
-    if (selected.length === 1) {
-      modelId = selected[0].getId();
+    if (model && model.getId) {
+      modelId = model.getId();
     }
+
     me.bookmarkAt(modelId);
   },
 
@@ -241,7 +254,8 @@ Ext.define('NX.controller.MasterDetail', {
           list.getSelectionModel().deselectAll(true);
           list.getSelectionModel().select(model, false, true);
           list.getView().focusRow(model);
-          me.onModelChanged(model);
+          me.loadView(list, model, false);
+          list.fireEvent('selectionchange', list, [model]);
         }
         if (tabBookmark) {
           list.up('nx-masterdetail-panel').down('nx-masterdetail-tabs').setActiveTabByBookmark(tabBookmark);
@@ -249,6 +263,7 @@ Ext.define('NX.controller.MasterDetail', {
       }
       else {
         list.getSelectionModel().deselectAll();
+        me.loadView(list, null, false);
       }
     }
   },
@@ -262,6 +277,7 @@ Ext.define('NX.controller.MasterDetail', {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
         me.deleteModel(selection[0]);
+        me.bookmark(null);
       }, {scope: me});
     }
   },
@@ -307,8 +323,7 @@ Ext.define('NX.controller.MasterDetail', {
     var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list)
+            NX.Conditions.isPermitted(me.permission, 'delete')
         ),
         {
           satisfied: button.enable,

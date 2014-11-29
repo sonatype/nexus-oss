@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-role-list',
   requires: [
     'NX.Icons'
@@ -60,8 +60,7 @@ Ext.define('NX.coreui.view.role.RoleList', {
         menu: [
           { text: 'Nexus Role', action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
         ]
-      },
-      { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+      }
     ];
 
     me.callParent();

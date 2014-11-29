@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.search.SearchResultList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-search-result-list',
 
   store: 'SearchResult',
@@ -44,24 +44,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       resizable: false,
       flex: 1
     },
-    { header: 'Format', dataIndex: 'format', width: 70, hidden: true },
-    {
-      width: 24,
-      hideable: false,
-      sortable: false,
-      menuDisabled: true,
-      resizable: false,
-
-      defaultRenderer: function() {
-        return Ext.DomHelper.markup(
-          {
-            tag: 'span',
-            html: '&#xf105;', // Right angle
-            style: 'font-family: FontAwesome;'
-          }
-        )
-      }
-    }
+    { header: 'Format', dataIndex: 'format', width: 70, hidden: true }
   ],
 
   dockedItems: [

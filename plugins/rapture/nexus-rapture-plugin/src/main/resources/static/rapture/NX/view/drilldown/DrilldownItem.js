@@ -24,6 +24,7 @@ Ext.define('NX.view.drilldown.DrilldownItem', {
 
   itemName: 'item',
   itemClass: null,
+  itemBookmark: null,
 
   /**
    * @override
@@ -37,6 +38,13 @@ Ext.define('NX.view.drilldown.DrilldownItem', {
 
     me.setItemClass = function(cls) {
       this.itemClass = cls;
+    }
+
+    me.setItemBookmark = function(bookmark, scope) {
+      this.itemBookmark = {
+        obj: bookmark,
+        scope: scope
+      };
     }
 
     me.callParent(arguments);

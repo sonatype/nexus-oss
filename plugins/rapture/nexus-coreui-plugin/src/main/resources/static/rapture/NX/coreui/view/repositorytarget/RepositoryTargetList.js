@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-repositorytarget-list',
 
   store: 'RepositoryTarget',
@@ -43,8 +43,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [

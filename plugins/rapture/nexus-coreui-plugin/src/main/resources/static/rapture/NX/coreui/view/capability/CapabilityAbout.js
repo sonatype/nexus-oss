@@ -18,12 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.CapabilityAbout', {
-  extend: 'Ext.panel.Panel',
+  extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-about',
 
   autoScroll: true,
   html: '',
-  bodyPadding: 10,
 
   /**
    * @public

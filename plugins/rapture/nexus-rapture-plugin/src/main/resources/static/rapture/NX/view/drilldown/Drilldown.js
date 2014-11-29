@@ -32,8 +32,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
     flex: 1
   },
 
-  rootName: 'default',
-
   /**
    * @override
    */
@@ -60,14 +58,20 @@ Ext.define('NX.view.drilldown.Drilldown', {
             xtype: 'image',
             height: 32,
             width: 32,
-            cls: me.items.items[0].itemClass
+            cls: content.currentIconCls
           },
           {
             xtype: 'nx-drilldown-link',
             scale: 'large',
-            text: me.items.items[0].itemName,
+            text: content.currentTitle,
             handler: function() {
               me.showChild(0, true);
+
+              // Set the bookmark
+              var bookmark = me.items.items[0].itemBookmark;
+              if (bookmark) {
+                NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+              }
             }
           }
         );
@@ -96,6 +100,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
                 text: me.items.items[j].itemName,
                 handler: function() {
                   me.showChild(j, true);
+
+                  // Set the bookmark
+                  var bookmark = me.items.items[j].itemBookmark;
+                  if (bookmark) {
+                    NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+                  }
                 }
               }
             })(i)
@@ -105,7 +115,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         root.hide();
         breadcrumb.show();
       }
-    },
+    };
 
     me.syncSizeToOwner = function () {
       var me = this;
@@ -113,7 +123,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         me.setSize(me.ownerCt.el.getWidth() * me.items.items.length, me.ownerCt.el.getHeight());
         me.showChild(me.currentIndex, false);
       }
-    },
+    };
 
     me.showChild = function (index, animate) {
       var me = this;
@@ -126,22 +136,29 @@ Ext.define('NX.view.drilldown.Drilldown', {
           setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
         }
 
+        // Show the new panel
         var left = me.items.items[index].el.getLeft() - me.el.getLeft();
         me.el.first().move('l', left, animate);
         me.currentIndex = index;
 
         me.refreshBreadcrumb();
       }
-    },
+    };
 
     me.setItemName = function (index, text) {
       var me = this;
       me.items.items[index].setItemName(text);
-    },
+      console.log("Setting the item name");
+    };
 
     me.setItemClass = function (index, cls) {
       var me = this;
       me.items.items[index].setItemClass(cls);
+    };
+
+    me.setItemBookmark = function (index, bookmark, scope) {
+      var me = this;
+      me.items.items[index].setItemBookmark(bookmark, scope);
     },
 
     me.callParent(arguments);
