@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.scheduling.NexusTaskFactory;
@@ -50,25 +51,24 @@ public class DefaultNexusTaskScheduler
 
   private final List<TaskDescriptor> taskDescriptors;
 
-  private final List<NexusTaskExecutorSPI> schedulers;
+  private final Provider<NexusTaskExecutorSPI> schedulerProvider;
 
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
                                    final List<TaskDescriptor> taskDescriptors,
-                                   final List<NexusTaskExecutorSPI> schedulers)
+                                   final Provider<NexusTaskExecutorSPI> schedulerProvider)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.taskDescriptors = checkNotNull(taskDescriptors);
-    this.schedulers = checkNotNull(schedulers);
+    this.schedulerProvider = checkNotNull(schedulerProvider);
   }
 
   protected NexusTaskExecutorSPI getScheduler() {
-    if (schedulers.isEmpty()) {
+    final NexusTaskExecutorSPI provider = schedulerProvider.get();
+    if (provider == null) {
       throw new IllegalStateException("No scheduler present in system!");
     }
-    else {
-      return schedulers.get(0);
-    }
+    return provider;
   }
 
   @Override
