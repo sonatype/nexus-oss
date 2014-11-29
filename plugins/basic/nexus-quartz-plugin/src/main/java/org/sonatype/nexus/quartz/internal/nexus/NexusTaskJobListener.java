@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
@@ -23,6 +25,7 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,7 +35,6 @@ import org.quartz.Trigger;
 import org.quartz.listeners.JobListenerSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.quartz.TriggerKey.triggerKey;
 import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
@@ -89,12 +91,10 @@ public class NexusTaskJobListener<T>
    */
   private Trigger getJobTrigger(final JobExecutionContext context) {
     try {
-      final Trigger trigger = context.getScheduler().getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
-      checkState(trigger != null, "NX Task job %s not having a trigger", jobKey);
-      return trigger;
+      return context.getScheduler().getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
     }
     catch (SchedulerException e) {
-      return null;
+      throw Throwables.propagate(e);
     }
   }
 
@@ -150,17 +150,20 @@ public class NexusTaskJobListener<T>
     // must never be null, so use this or that
     Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
 
+    // the job trigger's next fire time
+    final Date nextFireTime = jobTrigger != null ? jobTrigger.getNextFireTime() : null;
+
     // actual schedule
     final Schedule jobSchedule = nexusScheduleConverter.toSchedule(currentTrigger);
     // state: if not removed and will fire again: WAITING, otherwise DONE
-    final State state = jobTrigger != null && jobTrigger.getNextFireTime() != null ? State.WAITING : State.DONE;
+    final State state = nextFireTime != null ? State.WAITING : State.DONE;
     // update task state, w/ respect to future: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
         state,
         new NexusTaskState(
             toTaskConfiguration(jobDataMap),
             jobSchedule,
-            jobTrigger.getNextFireTime()
+            nextFireTime
         ),
         State.DONE == state ? future : null
     );
