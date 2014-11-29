@@ -118,21 +118,26 @@ public class NexusTaskJobListener<T>
       endState = EndState.OK;
     }
     final JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-    jobDataMap.put("lastRunState.endState", endState.name());
-    jobDataMap.putAsString("lastRunState.runStarted", future.getStartedAt().getTime());
-    jobDataMap.putAsString("lastRunState.runDuration", System.currentTimeMillis() - future.getStartedAt().getTime());
+    NexusTaskState.setLastRunState(
+        jobDataMap,
+        endState,
+        future.getStartedAt(),
+        System.currentTimeMillis() - future.getStartedAt().getTime());
 
+    boolean jobTriggerFound;
     Trigger jobTrigger;
     try {
       jobTrigger = getJobTrigger(context);
+      jobTriggerFound = true;
     }
     catch (IllegalStateException e) {
       // jobs removed while running, but not detecting cancellation (or not in time), will have no jobTriggers
       // as they were removed too, just like the job itself
       jobTrigger = context.getTrigger();
+      jobTriggerFound = false;
     }
     final Schedule jobSchedule = nexusScheduleConverter.toSchedule(jobTrigger);
-    final State state = jobTrigger.getNextFireTime() == null ? State.DONE : State.WAITING;
+    final State state = jobTriggerFound && jobTrigger.getNextFireTime() != null ? State.WAITING : State.DONE;
     // update task state, w/ respect to state: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
         new NexusTaskState(
@@ -146,7 +151,7 @@ public class NexusTaskJobListener<T>
 
     // DONE tasks or those already removed should be cleaned up
     // as jobs might reschedule themselves
-    if (State.DONE == state || jobTrigger.equals(context.getTrigger())) {
+    if (State.DONE == state) {
       try {
         quartzSupport.removeTask(jobKey);
       }

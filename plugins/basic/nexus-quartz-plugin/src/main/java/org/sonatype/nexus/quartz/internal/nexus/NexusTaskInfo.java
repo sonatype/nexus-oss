@@ -126,9 +126,7 @@ public class NexusTaskInfo<T>
     if (nexusTaskFuture != null) {
       nexusTaskFuture.cancel(true);
     }
-    nexusTaskState.getConfiguration().getMap().put("lastRunState.endState", EndState.CANCELED.name());
-    nexusTaskState.getConfiguration().getMap().put("lastRunState.runStarted", Long.toString(new Date().getTime()));
-    nexusTaskState.getConfiguration().getMap().put("lastRunState.runDuration", Long.toString(0L));
+    NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
     log.info("NX Task remove: {}", nexusTaskState);
     return quartzSupport.removeTask(jobKey.getName());
   }

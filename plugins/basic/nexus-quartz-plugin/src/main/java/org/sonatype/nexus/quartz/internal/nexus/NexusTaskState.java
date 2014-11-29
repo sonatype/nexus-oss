@@ -13,6 +13,7 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -22,6 +23,9 @@ import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 
+import org.quartz.JobDataMap;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -75,6 +79,23 @@ public class NexusTaskState
       return new LS(EndState.valueOf(endStateString), new Date(runStarted), runDuration);
     }
     return null;
+  }
+
+  /**
+   * Helper to set ending state on a map. The maps might be {@link JobDataMap} or {@link TaskConfiguration}.
+   */
+  public static void setLastRunState(final Map config,
+                                     final EndState endState,
+                                     final Date runStarted,
+                                     final long runDuration)
+  {
+    checkNotNull(config);
+    checkNotNull(endState);
+    checkNotNull(runStarted);
+    checkArgument(runDuration >= 0);
+    config.put("lastRunState.endState", endState.name());
+    config.put("lastRunState.runStarted", Long.toString(runStarted.getTime()));
+    config.put("lastRunState.runDuration", Long.toString(runDuration));
   }
 
   @Override
