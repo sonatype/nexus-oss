@@ -13,7 +13,9 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
+import org.sonatype.nexus.scheduling.schedule.Hourly;
 import org.sonatype.nexus.scheduling.schedule.Monthly;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -23,6 +25,7 @@ import org.mockito.internal.util.collections.Sets;
 import org.quartz.CronTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -35,6 +38,17 @@ public class NexusScheduleConverterTest
     extends TestSupport
 {
   final NexusScheduleConverter converter = new NexusScheduleConverter();
+
+  @Test
+  public void hourly() {
+    final Date now = new Date();
+    final Hourly hourly = new Hourly(now);
+    final TriggerBuilder triggerBuilder = converter.toTrigger(hourly);
+    final Trigger trigger = triggerBuilder.build();
+    assertThat(trigger, instanceOf(SimpleTriggerImpl.class));
+    assertThat(trigger.getFireTimeAfter(new Date(now.getTime())),
+        equalTo(new Date(now.getTime() + TimeUnit.HOURS.toMillis(1L))));
+  }
 
   @Test
   public void weekly1() {
