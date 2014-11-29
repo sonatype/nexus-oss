@@ -155,7 +155,11 @@ public class NexusTaskJobListener<T>
       }
     }
 
-    future.setResult((T) context.getResult(), jobException);
+    // unwrap the QZ wrapped exception
+    future.setResult(
+        (T) context.getResult(),
+        jobException != null && jobException.getCause() instanceof Exception ? (Exception) jobException.getCause() : jobException
+    );
   }
 
   @Override

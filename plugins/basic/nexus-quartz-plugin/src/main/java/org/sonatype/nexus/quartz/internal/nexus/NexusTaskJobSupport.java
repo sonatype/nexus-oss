@@ -29,7 +29,6 @@ import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.quartz.DisallowConcurrentExecution;
@@ -111,7 +110,7 @@ public class NexusTaskJobSupport<T>
       ex = e;
     }
     if (ex != null) {
-      throw Throwables.propagate(ex);
+      throw ex;
     }
   }
 

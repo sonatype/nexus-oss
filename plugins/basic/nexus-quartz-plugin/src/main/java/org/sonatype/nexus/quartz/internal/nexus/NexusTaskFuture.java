@@ -125,6 +125,8 @@ public class NexusTaskFuture<T>
     countDownLatch.await();
     if (exception != null) {
       Throwables.propagateIfPossible(exception);
+      Throwables.propagateIfInstanceOf(exception, InterruptedException.class);
+      Throwables.propagateIfInstanceOf(exception, ExecutionException.class);
       throw new ExecutionException("Job failure: ", exception);
     }
     return result;
@@ -137,6 +139,8 @@ public class NexusTaskFuture<T>
     countDownLatch.await(timeout, unit);
     if (exception != null) {
       Throwables.propagateIfPossible(exception);
+      Throwables.propagateIfInstanceOf(exception, InterruptedException.class);
+      Throwables.propagateIfInstanceOf(exception, ExecutionException.class);
       throw new ExecutionException("Job failure: ", exception);
     }
     return result;
