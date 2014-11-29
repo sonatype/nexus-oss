@@ -14,9 +14,13 @@ package org.sonatype.nexus.quartz.internal.nexus;
 
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,6 +45,8 @@ import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTas
 public class NexusTaskJobListener<T>
     extends JobListenerSupport
 {
+  private final EventBus eventBus;
+
   private final QuartzNexusSchedulerSPI quartzSupport;
 
   private final JobKey jobKey;
@@ -49,11 +55,13 @@ public class NexusTaskJobListener<T>
 
   private final NexusTaskInfo<T> nexusTaskInfo;
 
-  public NexusTaskJobListener(final QuartzNexusSchedulerSPI quartzSupport,
+  public NexusTaskJobListener(final EventBus eventBus,
+                              final QuartzNexusSchedulerSPI quartzSupport,
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
                               final NexusTaskState initialState)
   {
+    this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
     this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
@@ -73,7 +81,7 @@ public class NexusTaskJobListener<T>
   /**
    * Returns the trigger associated with NX Task wrapping job. The trigger executing this Job does NOT have to be
    * THAT trigger, think about "runNow"! So, this method returns the associated trigger, while the trigger in
-   * context might be something completely different.
+   * context might be something completely different. If not found, returns {@code null}.
    */
   private Trigger getJobTrigger(final JobExecutionContext context) {
     try {
@@ -82,7 +90,7 @@ public class NexusTaskJobListener<T>
       return trigger;
     }
     catch (SchedulerException e) {
-      throw Throwables.propagate(e);
+      return null;
     }
   }
 
@@ -102,17 +110,18 @@ public class NexusTaskJobListener<T>
     );
     context.put(NexusTaskFuture.FUTURE_KEY, future);
     context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
+    eventBus.post(new NexusTaskEventStarted<>(nexusTaskInfo));
   }
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
     final EndState endState;
-    if (jobException != null) {
-      endState = EndState.FAILED;
-    }
-    else if (future.isCancelled()) {
+    if (future.isCancelled()) {
       endState = EndState.CANCELED;
+    }
+    else if (jobException != null) {
+      endState = EndState.FAILED;
     }
     else {
       endState = EndState.OK;
@@ -124,21 +133,16 @@ public class NexusTaskJobListener<T>
         future.getStartedAt(),
         System.currentTimeMillis() - future.getStartedAt().getTime());
 
-    boolean jobTriggerFound;
-    Trigger jobTrigger;
-    try {
-      jobTrigger = getJobTrigger(context);
-      jobTriggerFound = true;
-    }
-    catch (IllegalStateException e) {
-      // jobs removed while running, but not detecting cancellation (or not in time), will have no jobTriggers
-      // as they were removed too, just like the job itself
-      jobTrigger = context.getTrigger();
-      jobTriggerFound = false;
-    }
-    final Schedule jobSchedule = nexusScheduleConverter.toSchedule(jobTrigger);
-    final State state = jobTriggerFound && jobTrigger.getNextFireTime() != null ? State.WAITING : State.DONE;
-    // update task state, w/ respect to state: if DONE keep future, if WAITING drop it
+    // might be null: job Removed
+    Trigger jobTrigger = getJobTrigger(context);
+    // must never be null, so use this or that
+    Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
+
+    // actual schedule
+    final Schedule jobSchedule = nexusScheduleConverter.toSchedule(currentTrigger);
+    // state: if not removed and will fire again: WAITING, otherwise DONE
+    final State state = jobTrigger != null && jobTrigger.getNextFireTime() != null ? State.WAITING : State.DONE;
+    // update task state, w/ respect to future: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
         new NexusTaskState(
             state,
@@ -149,8 +153,7 @@ public class NexusTaskJobListener<T>
         State.DONE == state ? future : null
     );
 
-    // DONE tasks or those already removed should be cleaned up
-    // as jobs might reschedule themselves
+    // DONE tasks (or those already removed) should be cleaned up, as they might reschedule themselve
     if (State.DONE == state) {
       try {
         quartzSupport.removeTask(jobKey);
@@ -160,11 +163,27 @@ public class NexusTaskJobListener<T>
       }
     }
 
-    // unwrap the QZ wrapped exception
+    // unwrap the QZ wrapped exception and set future result
+    final Exception failure =
+        jobException != null && jobException.getCause() instanceof Exception ?
+            (Exception) jobException.getCause() : jobException;
     future.setResult(
         (T) context.getResult(),
-        jobException != null && jobException.getCause() instanceof Exception ? (Exception) jobException.getCause() : jobException
+        failure
     );
+
+    // fire events
+    switch (endState) {
+      case OK:
+        eventBus.post(new NexusTaskEventStoppedDone<>(nexusTaskInfo));
+        break;
+      case FAILED:
+        eventBus.post(new NexusTaskEventStoppedFailed<>(nexusTaskInfo, failure));
+        break;
+      case CANCELED:
+        eventBus.post(new NexusTaskEventStoppedCanceled<>(nexusTaskInfo));
+        break;
+    }
   }
 
   @Override

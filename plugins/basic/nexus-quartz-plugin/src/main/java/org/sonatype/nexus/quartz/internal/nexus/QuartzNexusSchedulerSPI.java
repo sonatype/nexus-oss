@@ -30,6 +30,7 @@ import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -68,14 +69,18 @@ public class QuartzNexusSchedulerSPI
    */
   static final String QZ_NEXUS_GROUP = "nexus";
 
+  private final EventBus eventBus;
+
   private final QuartzSupport quartzSupport;
 
   private final NexusScheduleConverter nexusScheduleConverter;
 
   @Inject
-  public QuartzNexusSchedulerSPI(final QuartzSupport quartzSupport,
+  public QuartzNexusSchedulerSPI(final EventBus eventBus,
+                                 final QuartzSupport quartzSupport,
                                  final NexusScheduleConverter nexusScheduleConverter)
   {
+    this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
     this.nexusScheduleConverter = checkNotNull(nexusScheduleConverter);
   }
@@ -231,6 +236,7 @@ public class QuartzNexusSchedulerSPI
    */
   <T> TaskInfo<T> initializeTaskState(final JobDetail jobDetail, final Trigger trigger) throws SchedulerException {
     final NexusTaskJobListener<T> nexusTaskJobListener = new NexusTaskJobListener<>(
+        eventBus,
         this,
         jobDetail.getKey(),
         nexusScheduleConverter,

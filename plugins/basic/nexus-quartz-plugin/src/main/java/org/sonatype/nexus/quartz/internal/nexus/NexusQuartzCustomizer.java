@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -22,7 +21,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.quartz.internal.QuartzCustomizer;
-import org.sonatype.nexus.scheduling.TaskLifecycleListener;
 
 import com.google.common.base.Throwables;
 import org.quartz.JobDetail;
@@ -50,14 +48,10 @@ public class NexusQuartzCustomizer
   // TODO: this is due cycle
   private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
 
-  private final List<TaskLifecycleListener> taskLifecycleListeners;
-
   @Inject
-  public NexusQuartzCustomizer(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider,
-                               final List<TaskLifecycleListener> taskLifecycleListeners)
+  public NexusQuartzCustomizer(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider)
   {
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
-    this.taskLifecycleListeners = checkNotNull(taskLifecycleListeners);
   }
 
   @Override
@@ -72,12 +66,6 @@ public class NexusQuartzCustomizer
             .getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
         checkState(trigger != null);
         quartzNexusSchedulerSPIProvider.get().initializeTaskState(jobDetail, trigger);
-      }
-
-      // Install global listeners
-      for (TaskLifecycleListener taskLifecycleListener : taskLifecycleListeners) {
-        final NexusTaskLifecycleListener listener = new NexusTaskLifecycleListener(taskLifecycleListener);
-        scheduler.getListenerManager().addJobListener(listener, jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
       }
     }
     catch (SchedulerException e) {

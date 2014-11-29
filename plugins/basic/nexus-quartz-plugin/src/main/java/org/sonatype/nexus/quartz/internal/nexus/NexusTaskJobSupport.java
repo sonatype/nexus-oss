@@ -27,6 +27,8 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventCanceled;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -38,6 +40,7 @@ import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.UnableToInterruptJobException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A {#link JobSupport} wrapping NX Task that is also {@link InterruptableJob} (but actual interruption ability depends
@@ -68,6 +71,8 @@ public class NexusTaskJobSupport<T>
     }
   }
 
+  private final EventBus eventBus;
+
   private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
 
   private final NexusTaskFactory nexusTaskFactory;
@@ -75,9 +80,11 @@ public class NexusTaskJobSupport<T>
   private Task<T> nexusTask;
 
   @Inject
-  public NexusTaskJobSupport(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider,
+  public NexusTaskJobSupport(final EventBus eventBus,
+                             final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider,
                              final NexusTaskFactory nexusTaskFactory)
   {
+    this.eventBus = checkNotNull(eventBus);
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
   }
@@ -151,6 +158,9 @@ public class NexusTaskJobSupport<T>
     }
     if (nexusTask instanceof Cancelable) {
       ((Cancelable) nexusTask).cancel();
+      final NexusTaskInfo<T> taskInfo = (NexusTaskInfo) context.get(NexusTaskInfo.TASK_INFO_KEY);
+      checkState(taskInfo != null);
+      eventBus.post(new NexusTaskEventCanceled<>(taskInfo));
     }
     else {
       throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
