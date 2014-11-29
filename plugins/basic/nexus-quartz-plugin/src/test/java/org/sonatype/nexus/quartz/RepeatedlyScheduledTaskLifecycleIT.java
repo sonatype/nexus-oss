@@ -91,8 +91,14 @@ public class RepeatedlyScheduledTaskLifecycleIT
       // and block for the result
       final String result = future.get();
       assertThat(result, equalTo(RESULT));
+      // taskInfo for DONE task is terminal
+      assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     }
 
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
     // done
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
 
