@@ -12,12 +12,11 @@
  */
 package org.sonatype.nexus.atlas.internal
 
-import com.google.inject.Key
 import org.eclipse.sisu.Parameters
-import org.eclipse.sisu.inject.BeanLocator
 import org.sonatype.nexus.SystemStatus
 import org.sonatype.nexus.atlas.SystemInformationGenerator
 import org.sonatype.nexus.configuration.application.ApplicationDirectories
+import org.sonatype.nexus.guice.GlobalComponentLookupHelper
 import org.sonatype.nexus.plugin.PluginIdentity
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -42,7 +41,7 @@ class SystemInformationGeneratorImpl
     extends ComponentSupport
     implements SystemInformationGenerator
 {
-  private final BeanLocator beanLocator
+  private final GlobalComponentLookupHelper componentLookupHelper
 
   private final ApplicationDirectories applicationDirectories
 
@@ -53,13 +52,13 @@ class SystemInformationGeneratorImpl
   private final List<PluginIdentity> pluginIdentities
 
   @Inject
-  SystemInformationGeneratorImpl(final BeanLocator beanLocator,
+  SystemInformationGeneratorImpl(final GlobalComponentLookupHelper componentLookupHelper,
                                  final ApplicationDirectories applicationDirectories,
                                  final Provider<SystemStatus> systemStatusProvider,
                                  final @Parameters Map<String, String> parameters,
                                  final List<PluginIdentity> pluginIdentities)
   {
-    this.beanLocator = checkNotNull(beanLocator)
+    this.componentLookupHelper = checkNotNull(componentLookupHelper)
     this.applicationDirectories = checkNotNull(applicationDirectories)
     this.systemStatusProvider = checkNotNull(systemStatusProvider)
     this.parameters = checkNotNull(parameters);
@@ -71,7 +70,7 @@ class SystemInformationGeneratorImpl
     log.info 'Generating system information report'
 
     // HACK: provide local references to prevent problems with Groovy BUG accessing private fields
-    def beanLocator = this.beanLocator
+    def componentLookupHelper = this.componentLookupHelper
     def applicationDirectories = this.applicationDirectories
     def systemStatus = this.systemStatusProvider.get()
     def parameters = this.parameters
@@ -162,26 +161,6 @@ class SystemInformationGeneratorImpl
       return data
     }
 
-    // helper to lookup a component dynamically by class-name
-    def lookupComponent = { String className ->
-      Class type
-      try {
-        log.trace 'Looking up component: {}', className
-        type = getClass().classLoader.loadClass(className)
-        def iter = beanLocator.locate(Key.get(type)).iterator()
-        if (iter.hasNext()) {
-          return iter.next().getValue()
-        }
-        else {
-          log.trace 'Component not found: {}', className
-        }
-      }
-      catch (Exception e) {
-        log.trace 'Unable to load class: {}; ignoring', className, e
-      }
-      return null
-    }
-
     def reportNexusLicense = {
       def data = [
           'licenseInstalled': systemStatus.licenseInstalled
@@ -194,7 +173,7 @@ class SystemInformationGeneratorImpl
         ]
 
         // Add license details if we can resolve the license manager component
-        def plm = lookupComponent('org.sonatype.licensing.product.ProductLicenseManager')
+        def plm = componentLookupHelper.lookup('org.sonatype.licensing.product.ProductLicenseManager')
         if (plm) {
           def license = plm.licenseDetails
           data += [
@@ -212,7 +191,7 @@ class SystemInformationGeneratorImpl
         }
 
         // Add license fingerprint details if we can resolve the license fingerprinter
-        def fp = lookupComponent('org.sonatype.licensing.product.util.LicenseFingerprinter')
+        def fp = componentLookupHelper.lookup('org.sonatype.licensing.product.util.LicenseFingerprinter')
         if (fp) {
           data += [
               'fingerprint': fp.calculate()

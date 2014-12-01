@@ -13,8 +13,10 @@
 
 package org.sonatype.nexus.analytics;
 
+import java.io.Serializable;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 /**
@@ -23,7 +25,10 @@ import com.google.common.collect.Maps;
  * @since 3.0
  */
 public class EventData
+  implements Cloneable, Serializable
 {
+  private static final long serialVersionUID = 1L;
+
   /**
    * Event type.
    */
@@ -57,7 +62,7 @@ public class EventData
   /**
    * Event attributes.
    */
-  private final Map<String, String> attributes = Maps.newHashMap();
+  private Map<String, String> attributes = Maps.newHashMap();
 
   public String getType() {
     return type;
@@ -109,6 +114,20 @@ public class EventData
 
   public Map<String, String> getAttributes() {
     return attributes;
+  }
+
+  /**
+   * Returns a deeply cloned copy.
+   */
+  public EventData copy() {
+    try {
+      EventData copy = (EventData) clone();
+      copy.attributes = Maps.newHashMap(this.attributes);
+      return copy;
+    }
+    catch (CloneNotSupportedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
