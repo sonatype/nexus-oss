@@ -70,8 +70,8 @@ public class TaskSubscriber
   @AllowConcurrentEvents
   public void on(final NexusTaskEventStoppedDone evt) {
     final Map<String, String> data = Maps.newHashMap();
-    // TODO: ?
-    putIfNotNull(data, "taskStarted", String.valueOf(evt.getNexusTaskInfo().getCurrentState().getRunStarted().getTime()));
+    long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
+    putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
     putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
@@ -92,8 +92,8 @@ public class TaskSubscriber
   @AllowConcurrentEvents
   public void on(final NexusTaskEventStoppedCanceled evt) {
     final Map<String, String> data = Maps.newHashMap();
-    // TODO: ?
-    putIfNotNull(data, "taskStarted", String.valueOf(evt.getNexusTaskInfo().getCurrentState().getRunStarted().getTime()));
+    long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
+    putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
     putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
@@ -114,8 +114,8 @@ public class TaskSubscriber
   @AllowConcurrentEvents
   public void on(final NexusTaskEventStoppedFailed evt) {
     final Map<String, String> data = Maps.newHashMap();
-    // TODO: ?
-    putIfNotNull(data, "taskStarted", String.valueOf(evt.getNexusTaskInfo().getCurrentState().getRunStarted().getTime()));
+    long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
+    putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
     putIfNotNull(data, "taskFailure", String.valueOf(evt.getFailureCause()));
     putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
