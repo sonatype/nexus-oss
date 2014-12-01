@@ -65,6 +65,19 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>target/rubygems-provided</directory>
+	<includes>
+	  <include>gems/**</include>
+	  <include>specifications/*</include>
+	</includes>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
@@ -77,7 +90,7 @@
           </execution>
         </executions>
         <configuration>
-          <includeGemsInResources>provided</includeGemsInResources>
+          <includeRubygemsInResources>true</includeRubygemsInResources>
         </configuration>
       </plugin>
 

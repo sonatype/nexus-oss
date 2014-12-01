@@ -28,8 +28,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jruby.version>1.7.12</jruby.version>
-    <jruby-plugins.version>1.0.1</jruby-plugins.version>
+    <jruby.version>1.7.18</jruby.version>
+    <jruby-plugins.version>1.0.7</jruby-plugins.version>
   </properties>
 
   <repositories>

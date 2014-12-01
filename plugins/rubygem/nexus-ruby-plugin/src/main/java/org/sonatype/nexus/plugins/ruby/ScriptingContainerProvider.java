@@ -17,10 +17,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.ruby.DefaultRubygemsGateway;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import org.jruby.embed.IsolatedScriptingContainer;
 import org.jruby.embed.ScriptingContainer;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * A provider for JRuby scripting container that creates it lazily (ie. if NX instance does not have rubygems
@@ -36,14 +37,14 @@ public class ScriptingContainerProvider
     extends ComponentSupport
     implements Provider<ScriptingContainer>
 {
-  private ScriptingContainer scriptingContainer;
+  private IsolatedScriptingContainer scriptingContainer;
 
   @Override
   public synchronized ScriptingContainer get() {
     if (scriptingContainer == null) {
       log.debug("Creating JRuby ScriptingContainer");
-      scriptingContainer = new ScriptingContainer();
-      scriptingContainer.setClassLoader(DefaultRubygemsGateway.class.getClassLoader());
+      scriptingContainer = new IsolatedScriptingContainer();
+      scriptingContainer.addBundleToGemPath( FrameworkUtil.getBundle( ScriptingContainerProvider.class ) );
     }
     return scriptingContainer;
   }
