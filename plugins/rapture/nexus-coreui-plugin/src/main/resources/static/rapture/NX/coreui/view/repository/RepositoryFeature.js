@@ -27,6 +27,14 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
 
   tabs: [
     { xtype: 'nx-coreui-repository-settings', title: 'Settings', weight: 10 }
-  ]
+  ],
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
+    { xtype: 'button', text: 'More&hellip;', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more',
+      menu: []
+    },
+    '-',
+    { xtype: 'button', text: 'Browse', glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse' }
+  ]
 });

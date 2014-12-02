@@ -34,6 +34,7 @@
     <module>nexus-testsuite-support</module>
     <module>nexus-it-helper-plugin</module>
     <module>nexus-test-harness-launcher</module>
+    <module>nexus-ldap-testsupport</module>
   </modules>
 
   <dependencyManagement>

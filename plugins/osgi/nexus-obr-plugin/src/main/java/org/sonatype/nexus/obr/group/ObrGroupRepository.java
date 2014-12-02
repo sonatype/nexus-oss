@@ -35,7 +35,9 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -203,50 +205,56 @@ public class ObrGroupRepository
         final StorageFileItem item = ObrUtils.retrieveObrItem(r);
         modified = Math.max(modified, item.getModified());
         memberObrItems.add(item);
-
-        if (item.isExpired()) {
-          lastModified = Long.MIN_VALUE;
-        }
       }
       catch (final StorageException e) {
         // ignore this particular OBR and continue
       }
     }
 
+    RepositoryItemUidLock uidLock = obrUid.getLock();
     if (null == obrItem || lastModified < modified) {
-      ObrResourceReader reader = null;
-      ObrResourceWriter writer = null;
-
+      uidLock.lock(Action.create);
       try {
-        writer = obrMetadataSource.getWriter(createUid(request.getRequestPath()));
-        for (final StorageFileItem f : memberObrItems) {
+        obrItem = ObrUtils.getCachedItem(obrUid);
+        if (null == obrItem || lastModified < modified) {
+          ObrResourceReader reader = null;
+          ObrResourceWriter writer = null;
+
           try {
-            reader = obrMetadataSource.getReader(new ManagedObrSite(f));
-            for (Resource i = reader.readResource(); i != null; i = reader.readResource()) {
-              writer.append(i);
+            writer = obrMetadataSource.getWriter(obrUid);
+            for (final StorageFileItem f : memberObrItems) {
+              try {
+                reader = obrMetadataSource.getReader(new ManagedObrSite(f));
+                for (Resource i = reader.readResource(); i != null; i = reader.readResource()) {
+                  writer.append(i);
+                }
+              }
+              catch (final IOException e) {
+                log.warn("Problem merging OBR metadata from " + f.getRepositoryItemUid(), e);
+              }
+              finally {
+                IOUtils.closeQuietly(reader);
+              }
             }
-          }
-          catch (final IOException e) {
-            log.warn("Problem merging OBR metadata from " + f.getRepositoryItemUid(), e);
+
+            writer.complete(); // the OBR is only updated once the stream is complete and closed
           }
           finally {
-            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(writer);
           }
-        }
 
-        writer.complete(); // the OBR is only updated once the stream is complete and closed
+          obrItem = ObrUtils.getCachedItem(obrUid);
+          if (null == obrItem) {
+            // this shouldn't happen as we just saved it, but just in case...
+            throw new StorageException("Problem reading OBR metadata from repository " + getId());
+          }
+
+          lastModified = modified;
+        }
       }
       finally {
-        IOUtils.closeQuietly(writer);
+        uidLock.unlock();
       }
-
-      obrItem = ObrUtils.getCachedItem(obrUid);
-      if (null == obrItem) {
-        // this shouldn't happen as we just saved it, but just in case...
-        throw new StorageException("Problem reading OBR metadata from repository " + getId());
-      }
-
-      lastModified = modified;
     }
 
     return obrItem;

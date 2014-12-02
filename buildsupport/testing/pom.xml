@@ -125,6 +125,12 @@
         <version>1.3</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-server-unit</artifactId>
+        <version>1.5.5</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

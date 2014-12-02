@@ -132,6 +132,7 @@ Ext.define('NX.coreui.controller.Privileges', {
       if (model.get('repositoryName')) {
         info['Repository'] = model.get('repositoryName');
       }
+
       me.getInfo().showInfo(info);
     }
   },

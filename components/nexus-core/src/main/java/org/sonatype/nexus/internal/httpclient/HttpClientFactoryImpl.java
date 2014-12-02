@@ -127,7 +127,7 @@ public class HttpClientFactoryImpl
   // ==
 
   private final Provider<SystemStatus> systemStatusProvider;
-  
+
   private final Provider<RemoteStorageContext> globalRemoteStorageContextProvider;
 
   /**
@@ -182,7 +182,8 @@ public class HttpClientFactoryImpl
     this.jmxInstaller = checkNotNull(jmxInstaller);
     this.sharedConnectionManager = createClientConnectionManager(selectors);
 
-    long connectedPoolIdleTime = SystemPropertiesHelper.getLong(CONNECTION_POOL_IDLE_TIME_KEY, CONNECTION_POOL_IDLE_TIME_DEFAULT);
+    long connectedPoolIdleTime = SystemPropertiesHelper
+        .getLong(CONNECTION_POOL_IDLE_TIME_KEY, CONNECTION_POOL_IDLE_TIME_DEFAULT);
     this.evictingThread = new EvictingThread(sharedConnectionManager, connectedPoolIdleTime);
     this.evictingThread.start();
 
@@ -196,12 +197,13 @@ public class HttpClientFactoryImpl
     final Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
         .register("http", PlainConnectionSocketFactory.getSocketFactory())
         .register("https", new NexusSSLConnectionSocketFactory(
-            (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
-            SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER, selectors)
+                (javax.net.ssl.SSLSocketFactory) javax.net.ssl.SSLSocketFactory.getDefault(),
+                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER, selectors)
         ).build();
 
     final ManagedClientConnectionManager connManager = new ManagedClientConnectionManager(registry);
-    final int maxConnectionCount = SystemPropertiesHelper.getInteger(CONNECTION_POOL_MAX_SIZE_KEY, CONNECTION_POOL_MAX_SIZE_DEFAULT);
+    final int maxConnectionCount = SystemPropertiesHelper
+        .getInteger(CONNECTION_POOL_MAX_SIZE_KEY, CONNECTION_POOL_MAX_SIZE_DEFAULT);
     final int poolSize = SystemPropertiesHelper.getInteger(CONNECTION_POOL_SIZE_KEY, CONNECTION_POOL_SIZE_DEFAULT);
     final int perRouteConnectionCount = Math.min(poolSize, maxConnectionCount);
 
@@ -291,7 +293,8 @@ public class HttpClientFactoryImpl
     int poolTimeout = SystemPropertiesHelper.getInteger(CONNECTION_POOL_TIMEOUT_KEY, CONNECTION_POOL_TIMEOUT_DEFAULT);
     builder.getRequestConfigBuilder().setConnectionRequestTimeout(poolTimeout);
 
-    long keepAliveDuration = SystemPropertiesHelper.getLong(KEEP_ALIVE_MAX_DURATION_KEY, KEEP_ALIVE_MAX_DURATION_DEFAULT);
+    long keepAliveDuration = SystemPropertiesHelper
+        .getLong(KEEP_ALIVE_MAX_DURATION_KEY, KEEP_ALIVE_MAX_DURATION_DEFAULT);
     builder.getHttpClientBuilder().setKeepAliveStrategy(new NexusConnectionKeepAliveStrategy(keepAliveDuration));
 
     // defaults
@@ -303,7 +306,8 @@ public class HttpClientFactoryImpl
     // Apply default user-agent
     final String userAgent = getUserAgent();
     builder.setUserAgent(userAgent);
-    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor() {
+    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
+    {
       @Override
       public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
           throws HttpException, IOException
@@ -315,7 +319,7 @@ public class HttpClientFactoryImpl
         super.preProcess(request, processor, ctx);
       }
     });
-    
+
     customizer.customize(builder);
 
     return builder;
@@ -324,7 +328,7 @@ public class HttpClientFactoryImpl
   private String userAgent;
 
   private String platformEditionShort;
-  
+
   private synchronized String getUserAgent() {
     SystemStatus status = systemStatusProvider.get();
 

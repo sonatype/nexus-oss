@@ -52,6 +52,7 @@ public class TokenMatcher
   public TokenMatcher(final String templatePattern) {
     final List<Token> tokens = new PatternParser(templatePattern).getTokens();
     pattern = Pattern.compile(regexp(tokens));
+    System.err.println(pattern);
 
     // Separate the variable tokens
     variables = new ArrayList<>();

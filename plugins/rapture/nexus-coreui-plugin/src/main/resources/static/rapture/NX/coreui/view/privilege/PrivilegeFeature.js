@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   list: 'nx-coreui-privilege-list',
 
-  iconName: 'privilege-default'
+  iconName: 'privilege-default',
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+  ]
 });

@@ -15,8 +15,9 @@ package org.sonatype.nexus.views.rawbinaries.view;
 import java.util.Collections;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Envelope;
+import org.sonatype.nexus.component.source.AssetResponse;
 import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentResponse;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.HandlerContext;
@@ -89,14 +90,12 @@ public class ProxyingRawBinariesHandlerTest
     // There's no matching local raw binary
     when(store.getForPath(PATH)).thenReturn(Collections.<Asset>emptyList());
 
-    final Envelope mockComponent = mock(Envelope.class);
-    when(mockComponent.getAssets()).thenReturn(asList(new Asset("")));
-
-    Iterable<Envelope> fetchedComponents = asList(mockComponent);
+    final ComponentResponse mockComponentResponse = mock(ComponentResponse.class);
+    when(mockComponentResponse.getAssets()).thenReturn(asList(mock(AssetResponse.class)));
 
     final ImmutableMap<String, String> fetchParameters = ImmutableMap.of("path", PATH);
     final ComponentRequest fetchRequest = new ComponentRequest(fetchParameters);
-    when(source.fetchComponents(eq(fetchRequest))).thenReturn(fetchedComponents);
+    when(source.fetchComponents(eq(fetchRequest))).thenReturn(mockComponentResponse);
 
     final ViewResponse handle = handler.handle(context);
 

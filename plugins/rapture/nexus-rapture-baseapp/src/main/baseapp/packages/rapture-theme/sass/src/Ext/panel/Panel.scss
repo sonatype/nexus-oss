@@ -30,12 +30,14 @@
 @include extjs-panel-ui(
   $ui: 'inset',
 
-  $ui-padding: 0 0 0 20px
+  $ui-padding: 12px 0 0 12px
 );
 
 .x-panel-inset {
-  .x-toolbar {
-    padding: 6px 0 6px 0;
+  .x-panel-body {
+    .x-toolbar {
+      padding: 6px 0 6px 0;
+    }
   }
 }
 
@@ -74,7 +76,7 @@
   $ui: 'masterdetail-tabs',
 
   $ui-header-color: $color-night-rider,
-  $ui-header-background-color: $color-light-smoke,
+  $ui-header-background-color: $color-white,
   $ui-header-font-size: 16px,
   $ui-header-line-height: 20px
 );

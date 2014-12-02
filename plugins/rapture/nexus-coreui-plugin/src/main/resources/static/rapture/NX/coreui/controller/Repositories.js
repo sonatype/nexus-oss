@@ -108,15 +108,11 @@ Ext.define('NX.coreui.controller.Repositories', {
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
-        'nx-coreui-repository-list button[action=browse]': {
-          afterrender: me.bindBrowseButton,
+        'nx-coreui-repository-feature button[action=browse]': {
           click: me.navigateToBrowseMode
         },
         'nx-coreui-repository-list button[action=new]': {
           click: me.showSelectTemplateWindow
-        },
-        'nx-coreui-repository-list button[action=more]': {
-          afterrender: me.bindMoreButton
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
@@ -141,7 +137,7 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   onSelection: function(list, model) {
     var me = this,
-        moreButton = list.down('button[action=more]'),
+        moreButton = list.up('nx-feature-content').down('button[action=more]'),
         settingsPanel = me.getSettings(),
         settingsForm = settingsPanel.down('nx-settingsform'),
         settingsFormClass, template;
@@ -160,6 +156,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel.add({ xtype: settingsFormClass.xtype, template: template });
       }
       settingsPanel.loadRecord(model);
+
       Ext.resumeLayouts(true);
     }
   },
@@ -424,42 +421,6 @@ Ext.define('NX.coreui.controller.Repositories', {
         repositoryModel.commit(true);
       }
     });
-  },
-
-  /**
-   * @protected
-   * Enable 'Browse' when user has selected a repository.
-   */
-  bindBrowseButton: function(button) {
-    var me = this;
-    button.mon(
-        NX.Conditions.and(
-            NX.Conditions.gridHasSelection(me.list)
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
-  },
-
-  /**
-   * @protected
-   * Enable 'More' when user has selected a repository.
-   */
-  bindMoreButton: function(button) {
-    var me = this;
-    button.mon(
-        NX.Conditions.and(
-            NX.Conditions.gridHasSelection(me.list)
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
   },
 
   /**

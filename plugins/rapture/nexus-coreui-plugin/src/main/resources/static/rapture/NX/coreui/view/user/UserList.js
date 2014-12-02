@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.user.UserList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-user-list',
 
   store: 'User',
@@ -47,13 +47,6 @@ Ext.define('NX.coreui.view.user.UserList', {
 
   tbar: [
     { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
-      menu: [
-        { text: 'Reset Password', glyph: 'xf084@FontAwesome' /* fa-key */, action: 'resetpassword' },
-        { text: 'Change Password', glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
-      ]
-    },
     '-',
     '<b>Source:</b>',
     { xtype: 'button', text: 'Default', action: 'filter', menu: [] },

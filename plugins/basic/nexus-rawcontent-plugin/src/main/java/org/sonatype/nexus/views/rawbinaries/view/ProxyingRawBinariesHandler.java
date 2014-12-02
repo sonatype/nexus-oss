@@ -18,8 +18,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.component.model.Asset;
-import org.sonatype.nexus.component.model.Envelope;
+import org.sonatype.nexus.component.source.AssetResponse;
 import org.sonatype.nexus.component.source.ComponentRequest;
+import org.sonatype.nexus.component.source.ComponentResponse;
 import org.sonatype.nexus.component.source.ComponentSource;
 import org.sonatype.nexus.component.source.ComponentSourceRegistry;
 import org.sonatype.nexus.componentviews.Handler;
@@ -88,14 +89,10 @@ public class ProxyingRawBinariesHandler
 
         try {
           final ComponentRequest path = new ComponentRequest(ImmutableMap.of("path", requestPath));
+          final ComponentResponse componentResponse = getSource().fetchComponents(path);
 
-          // Here we presume we're getting Component back, since we don't actually use the component metadata
-          final Iterable<Envelope> envelopes = getSource().fetchComponents(path);
-
-          for (Envelope envelope : envelopes) {
-            for (Asset asset : envelope.getAssets()) {
-              binaryStore.create(requestPath, asset.get(P_CONTENT_TYPE, String.class), asset.openStream());
-            }
+          for (AssetResponse asset : componentResponse.getAssets()) {
+            binaryStore.create(requestPath, asset.getContentType(), asset.openStream());
           }
         }
         catch (IOException e) {

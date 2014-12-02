@@ -25,6 +25,9 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteFeature', {
 
   iconName: 'repositoryroute-default',
 
-  tabs: { xtype: 'nx-coreui-repositoryroute-settings' }
+  tabs: { xtype: 'nx-coreui-repositoryroute-settings' },
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+  ]
 });

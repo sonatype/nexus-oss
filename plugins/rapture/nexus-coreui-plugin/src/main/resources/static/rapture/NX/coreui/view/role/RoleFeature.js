@@ -29,6 +29,9 @@ Ext.define('NX.coreui.view.role.RoleFeature', {
     { xtype: 'nx-coreui-role-settings', title: 'Settings', weight: 10 },
     { xtype: 'nx-coreui-privilege-trace', title: 'Privilege Trace', weight: 20 },
     { xtype: 'nx-coreui-role-tree', title: 'Role Tree', weight: 30 }
-  ]
+  ],
 
+  actions: [
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+  ]
 });

@@ -73,6 +73,19 @@ public class TokenMatcherTest
   }
 
   @Test
+  public void testNugetOperations() {
+    final String pattern = "/{operation}({paramString:.*})";
+    final TokenMatcher tokenMatcher = new TokenMatcher(pattern);
+    final Map<String, String> tokens = tokenMatcher.matchTokens("/Packages()");
+
+    assertThat(tokens, is(notNullValue()));
+    assertThat(tokens.entrySet(), hasSize(2));
+
+    assertThat(tokens.get("operation"), is(equalTo("Packages")));
+    assertThat(tokens.get("paramString"), is(equalTo("")));
+  }
+
+  @Test
   public void slashesInTheSecondGroup() {
     final String pattern = "/{singleSegment}/{manySegments:.+}";
     final TokenMatcher tokenMatcher = new TokenMatcher(pattern);

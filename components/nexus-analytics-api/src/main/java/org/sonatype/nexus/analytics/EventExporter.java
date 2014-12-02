@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.analytics;
 
-import java.io.File;
-
 /**
  * Analytics data exporter.
  *
@@ -21,5 +19,5 @@ import java.io.File;
  */
 public interface EventExporter
 {
-  File export(boolean dropAfterExport) throws Exception;
+  void export(EventWriter writer, boolean dropAfterExport) throws Exception;
 }

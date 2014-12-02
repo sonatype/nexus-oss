@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.task.TaskList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.masterdetail.Master',
   alias: 'widget.nx-coreui-task-list',
 
   store: 'Task',
@@ -47,10 +47,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
-    { xtype: 'button', text: 'Run', glyph: 'xf04b@FontAwesome' /* fa-play */, action: 'run', disabled: true },
-    { xtype: 'button', text: 'Stop', glyph: 'xf04d@FontAwesome' /* fa-stop */, action: 'stop', disabled: true }
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [

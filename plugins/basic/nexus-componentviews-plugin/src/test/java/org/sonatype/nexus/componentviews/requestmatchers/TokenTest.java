@@ -25,9 +25,9 @@ public class TokenTest
 {
   @Test
   public void literalToken() {
-    checkRegexpForm("/", "/");
-    checkRegexpForm("/--a", "/--a");
-    checkRegexpForm("[]", "\\[\\]");
+    checkRegexpForm("/", "\\Q/\\E");
+    checkRegexpForm("/--a", "\\Q/--a\\E");
+    checkRegexpForm("[]", "\\Q[]\\E");
   }
 
   private void checkRegexpForm(final String token, final String regexp) {
