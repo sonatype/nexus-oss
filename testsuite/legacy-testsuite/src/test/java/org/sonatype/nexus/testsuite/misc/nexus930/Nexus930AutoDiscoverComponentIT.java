@@ -64,7 +64,7 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertTrue(result1.size() > 0);
 
     // 403 test
-    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "2");
+    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "login");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     this.getContentClasses(this.getXMLXStream(), MediaType.APPLICATION_XML, 403);
@@ -87,7 +87,7 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertTrue("Expected list larger then 1.", result1.size() > 1);
 
     // 403 test
-    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "2");
+    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "login");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     Response response = sendMessage(role, this.getXMLXStream(), MediaType.APPLICATION_XML);

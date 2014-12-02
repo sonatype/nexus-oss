@@ -64,7 +64,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("CreateRole");
     resource.setSessionTimeout(30);
     resource.addPrivilege("status");
-    resource.addPrivilege("2");
+    resource.addPrivilege("login");
 
     this.messageUtil.createRole(resource);
   }
@@ -81,7 +81,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setId("CreateRoleWithID");
     resource.setSessionTimeout(30);
     resource.addPrivilege("status");
-    resource.addPrivilege("2");
+    resource.addPrivilege("login");
 
     this.messageUtil.createRole(resource);
   }
