@@ -52,7 +52,7 @@ public class DefaultSecurityConfigurationCleaner
             configuration.updateRole(currentRole);
           }
           catch (NoSuchRoleException e) {
-            // role was removed in the mean time
+            // role was removed in the meantime
           }
           catch (ConcurrentModificationException e) {
             concurrentlyUpdated = true;
@@ -77,7 +77,7 @@ public class DefaultSecurityConfigurationCleaner
             configuration.updateRole(currentRole);
           }
           catch (NoSuchRoleException e) {
-            // role was removed in the mean time
+            // role was removed in the meantime
           }
           catch (ConcurrentModificationException e) {
             concurrentlyUpdated = true;
@@ -98,7 +98,7 @@ public class DefaultSecurityConfigurationCleaner
             configuration.updateUserRoleMapping(currentMapping);
           }
           catch (NoSuchRoleMappingException e) {
-            // mapping was removed in the mean time
+            // mapping was removed in the meantime
           }
           catch (ConcurrentModificationException e) {
             concurrentlyUpdated = true;

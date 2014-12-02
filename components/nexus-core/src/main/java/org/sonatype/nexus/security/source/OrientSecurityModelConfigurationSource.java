@@ -246,7 +246,7 @@ public class OrientSecurityModelConfigurationSource
         }
         if (user.getVersion() != null && !Objects.equals(user.getVersion(), valueOf(document.getVersion()))) {
           throw new ConcurrentModificationException(
-              "User " + user.getId() + " updated in the mean time"
+              "User " + user.getId() + " updated in the meantime"
           );
         }
         userEntityAdapter.write(document, user);
@@ -265,7 +265,7 @@ public class OrientSecurityModelConfigurationSource
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "User " + user.getId() + " updated in the mean time"
+            "User " + user.getId() + " updated in the meantime"
         );
       }
     }
@@ -282,7 +282,7 @@ public class OrientSecurityModelConfigurationSource
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "User " + id + " updated in the mean time"
+            "User " + id + " updated in the meantime"
         );
       }
     }
@@ -329,14 +329,14 @@ public class OrientSecurityModelConfigurationSource
         }
         if (mapping.getVersion() != null && !Objects.equals(mapping.getVersion(), valueOf(document.getVersion()))) {
           throw new ConcurrentModificationException(
-              "User " + mapping.getUserId() + " role mappings updated in the mean time"
+              "User " + mapping.getUserId() + " role mappings updated in the meantime"
           );
         }
         userRoleMappingEntityAdapter.write(document, mapping);
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "User " + mapping.getUserId() + " role mappings updated in the mean time"
+            "User " + mapping.getUserId() + " role mappings updated in the meantime"
         );
       }
     }
@@ -350,7 +350,7 @@ public class OrientSecurityModelConfigurationSource
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "User " + userId + " role mappings updated in the mean time"
+            "User " + userId + " role mappings updated in the meantime"
         );
       }
     }
@@ -394,14 +394,14 @@ public class OrientSecurityModelConfigurationSource
         }
         if (privilege.getVersion() != null && !Objects.equals(privilege.getVersion(), valueOf(document.getVersion()))) {
           throw new ConcurrentModificationException(
-              "Privilege " + privilege.getId() + " updated in the mean time"
+              "Privilege " + privilege.getId() + " updated in the meantime"
           );
         }
         privilegeEntityAdapter.write(document, privilege);
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "Privilege " + privilege.getId() + " updated in the mean time"
+            "Privilege " + privilege.getId() + " updated in the meantime"
         );
       }
     }
@@ -414,7 +414,7 @@ public class OrientSecurityModelConfigurationSource
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "Privilege " + id + " updated in the mean time"
+            "Privilege " + id + " updated in the meantime"
         );
       }
     }
@@ -458,14 +458,14 @@ public class OrientSecurityModelConfigurationSource
         }
         if (role.getVersion() != null && !Objects.equals(role.getVersion(), valueOf(document.getVersion()))) {
           throw new ConcurrentModificationException(
-              "Role " + role.getId() + " updated in the mean time"
+              "Role " + role.getId() + " updated in the meantime"
           );
         }
         roleEntityAdapter.write(document, role);
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "Role " + role.getId() + " updated in the mean time"
+            "Role " + role.getId() + " updated in the meantime"
         );
       }
     }
@@ -478,7 +478,7 @@ public class OrientSecurityModelConfigurationSource
       }
       catch (OConcurrentModificationException e) {
         throw new ConcurrentModificationException(
-            "Role " + id + " updated in the mean time"
+            "Role " + id + " updated in the meantime"
         );
       }
     }
