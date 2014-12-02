@@ -28,7 +28,7 @@ public class RebuildAttributesTaskDescriptor
     extends TaskDescriptorSupport
 {
   public RebuildAttributesTaskDescriptor() {
-    super(RebuildAttributesTask.class, "Rebuild Repository Attributes", false, false,
+    super(RebuildAttributesTask.class, "Rebuild Repository Attributes", true, false,
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
