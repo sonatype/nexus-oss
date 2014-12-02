@@ -30,16 +30,13 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.registry.RootContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,7 +57,8 @@ public class NexusViewSecurityResource
 
   @Inject
   public NexusViewSecurityResource(final EventBus eventBus, final RepositoryRegistry repoRegistry,
-      final RepositoryTypeRegistry repoTypeRegistry, final @Named("default") ConfigurationManager configManager)
+                                   final RepositoryTypeRegistry repoTypeRegistry,
+                                   final ConfigurationManager configManager)
   {
     this.repoRegistry = checkNotNull(repoRegistry);
     this.repoTypeRegistry = checkNotNull(repoTypeRegistry);
@@ -108,7 +106,6 @@ public class NexusViewSecurityResource
 
     method = StringUtils.capitalizeFirstLetter(method);
     view.setName("Repo: All " + contentClassName + " Repositories (" + method + ")");
-    view.setSessionTimeout(60);
 
     List<? extends Repository> repos = getRepositoriesWithContentClass(entry.getValue());
     for (Repository repo : repos) {
@@ -135,11 +132,7 @@ public class NexusViewSecurityResource
     priv.setName(name);
     priv.setDescription(description);
     priv.setType(RepositoryViewPrivilegeDescriptor.TYPE);
-
-    CProperty prop = new CProperty();
-    prop.setKey(RepositoryPropertyDescriptor.ID);
-    prop.setValue(repoId);
-    priv.addProperty(prop);
+    priv.setProperty(RepositoryPropertyDescriptor.ID, repoId);
 
     return priv;
   }
@@ -158,21 +151,7 @@ public class NexusViewSecurityResource
   @Subscribe
   public void onEvent(final RepositoryRegistryEventRemove event) {
     setDirty(true);
-
-    try {
-      configManager.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run()
-            throws Exception
-        {
-          configManager.cleanRemovedPrivilege(createPrivilegeId(event.getRepository().getId()));
-        }
-
-      });
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    configManager.cleanRemovedPrivilege(createPrivilegeId(event.getRepository().getId()));
   }
+
 }

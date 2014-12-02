@@ -26,7 +26,7 @@ import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Role
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
+import org.sonatype.security.usermanagement.UserManagerImpl
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -47,7 +47,7 @@ class RoleComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
 
   @Inject
   SecuritySystem securitySystem
@@ -133,6 +133,7 @@ extends DirectComponentSupport
     return asRoleXO(securitySystem.getAuthorizationManager(DEFAULT_SOURCE).updateRole(
         new Role(
             roleId: roleXO.id,
+            version: roleXO.version,
             source: roleXO.source,
             name: roleXO.name,
             description: roleXO.description,
@@ -158,6 +159,7 @@ extends DirectComponentSupport
   private static RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
+        version: input.version,
         source: (input.source == DEFAULT_SOURCE || !input.source) ? 'Nexus' : input.source,
         name: input.name,
         description: input.description,

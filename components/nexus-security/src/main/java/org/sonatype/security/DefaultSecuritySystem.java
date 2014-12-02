@@ -47,7 +47,6 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserManagerFacade;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
@@ -90,7 +89,7 @@ public class DefaultSecuritySystem
 
   private CacheManager cacheManager;
 
-  private UserManagerFacade userManagerFacade;
+  private Map<String, UserManager> userManagers;
 
   private Map<String, Realm> realmMap;
 
@@ -117,7 +116,7 @@ public class DefaultSecuritySystem
                                SecurityConfigurationManager securityConfiguration,
                                RealmSecurityManager securityManager,
                                CacheManager cacheManager,
-                               UserManagerFacade userManagerFacade)
+                               Map<String, UserManager> userManagers)
   {
     this.securityEmailers = securityEmailers;
     this.eventBus = eventBus;
@@ -129,7 +128,7 @@ public class DefaultSecuritySystem
     this.cacheManager = cacheManager;
 
     this.eventBus.register(this);
-    this.userManagerFacade = userManagerFacade;
+    this.userManagers = userManagers;
     SecurityUtils.setSecurityManager(this.getSecurityManager());
     started = false;
   }
@@ -296,7 +295,7 @@ public class DefaultSecuritySystem
 
     // first save the user
     // this is the UserManager that owns the user
-    UserManager userManager = userManagerFacade.getUserManager(user.getSource());
+    UserManager userManager = getUserManager(user.getSource());
 
     if (!userManager.supportsWrite()) {
       throw new InvalidConfigurationException("UserManager: " + userManager.getSource()
@@ -306,7 +305,7 @@ public class DefaultSecuritySystem
     userManager.addUser(user, password);
 
     // then save the users Roles
-    for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager tmpUserManager : getUserManagers()) {
       // skip the user manager that owns the user, we already did that
       // these user managers will only save roles
       if (!tmpUserManager.getSource().equals(user.getSource())
@@ -337,7 +336,7 @@ public class DefaultSecuritySystem
   {
     // first update the user
     // this is the UserManager that owns the user
-    UserManager userManager = userManagerFacade.getUserManager(user.getSource());
+    UserManager userManager = getUserManager(user.getSource());
 
     if (!userManager.supportsWrite()) {
       throw new InvalidConfigurationException("UserManager: " + userManager.getSource()
@@ -352,7 +351,7 @@ public class DefaultSecuritySystem
     }
 
     // then save the users Roles
-    for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager tmpUserManager : getUserManagers()) {
       // skip the user manager that owns the user, we already did that
       // these user managers will only save roles
       if (!tmpUserManager.getSource().equals(user.getSource())
@@ -411,7 +410,7 @@ public class DefaultSecuritySystem
       );
     }
 
-    UserManager userManager = userManagerFacade.getUserManager(source);
+    UserManager userManager = getUserManager(source);
     userManager.deleteUser(userId);
 
     // flush authc
@@ -433,7 +432,7 @@ public class DefaultSecuritySystem
 
     boolean foundUser = false;
 
-    for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager tmpUserManager : getUserManagers()) {
       if (RoleMappingUserManager.class.isInstance(tmpUserManager)) {
         RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
         try {
@@ -482,7 +481,7 @@ public class DefaultSecuritySystem
   {
     // first get the user
     // this is the UserManager that owns the user
-    UserManager userManager = userManagerFacade.getUserManager(source);
+    UserManager userManager = getUserManager(source);
     User user = userManager.getUser(userId);
 
     if (user == null) {
@@ -498,7 +497,7 @@ public class DefaultSecuritySystem
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
-    for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager tmpUserManager : getUserManagers()) {
       users.addAll(tmpUserManager.listUsers());
     }
 
@@ -517,7 +516,7 @@ public class DefaultSecuritySystem
     // if the source is not set search all realms.
     if (StringUtils.isEmpty(criteria.getSource())) {
       // search all user managers
-      for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+      for (UserManager tmpUserManager : getUserManagers()) {
         Set<User> result = tmpUserManager.searchUsers(criteria);
         if (result != null) {
           users.addAll(result);
@@ -526,7 +525,7 @@ public class DefaultSecuritySystem
     }
     else {
       try {
-        users.addAll(userManagerFacade.getUserManager(criteria.getSource()).searchUsers(criteria));
+        users.addAll(getUserManager(criteria.getSource()).searchUsers(criteria));
       }
       catch (NoSuchUserManagerException e) {
         this.logger.warn("UserManager: " + criteria.getSource() + " was not found.", e);
@@ -554,11 +553,11 @@ public class DefaultSecuritySystem
   private List<UserManager> orderUserManagers() {
     List<UserManager> orderedLocators = new ArrayList<UserManager>();
 
-    List<UserManager> unOrderdLocators = new ArrayList<UserManager>(userManagerFacade.getUserManagers().values());
+    List<UserManager> unOrderdLocators = new ArrayList<UserManager>(getUserManagers());
 
     Map<String, UserManager> realmToUserManagerMap = new HashMap<String, UserManager>();
 
-    for (UserManager userManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager userManager : getUserManagers()) {
       if (userManager.getAuthenticationRealmName() != null) {
         realmToUserManagerMap.put(userManager.getAuthenticationRealmName(), userManager);
       }
@@ -586,7 +585,7 @@ public class DefaultSecuritySystem
 
   private void addOtherRolesToUser(User user) {
     // then save the users Roles
-    for (UserManager tmpUserManager : userManagerFacade.getUserManagers().values()) {
+    for (UserManager tmpUserManager : getUserManagers()) {
       // skip the user manager that owns the user, we already did that
       // these user managers will only have roles
       if (!tmpUserManager.getSource().equals(user.getSource())
@@ -651,7 +650,7 @@ public class DefaultSecuritySystem
     User user = this.getUser(userId);
 
     try {
-      UserManager userManager = userManagerFacade.getUserManager(user.getSource());
+      UserManager userManager = getUserManager(user.getSource());
       userManager.changePassword(userId, newPassword);
     }
     catch (NoSuchUserManagerException e) {
@@ -898,6 +897,17 @@ public class DefaultSecuritySystem
     if (cache != null) {
       cache.clear();
     }
+  }
+
+  private Collection<UserManager> getUserManagers() {
+    return userManagers.values();
+  }
+
+  private UserManager getUserManager(final String source) throws NoSuchUserManagerException {
+    if (!userManagers.containsKey(source)) {
+      throw new NoSuchUserManagerException("UserManager with source: '" + source + "' could not be found.");
+    }
+    return userManagers.get(source);
   }
 
   // ==

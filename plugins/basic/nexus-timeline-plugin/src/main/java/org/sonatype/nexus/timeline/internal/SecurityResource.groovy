@@ -13,7 +13,6 @@
 package org.sonatype.nexus.timeline.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Feeds - (read)',
                 description: 'Give permission to view the different feeds. The extents of this privilege are related to the allowed targets.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:feeds')
+                    'method': 'read',
+                    'permission': 'nexus:feeds'
                 ]
             )
         ],

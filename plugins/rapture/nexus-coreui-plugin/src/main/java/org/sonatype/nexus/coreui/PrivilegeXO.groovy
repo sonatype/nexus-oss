@@ -13,6 +13,8 @@
 package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
+import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.validation.Update
 
 /**
  * Privilege exchange object.
@@ -23,6 +25,10 @@ import groovy.transform.ToString
 class PrivilegeXO
 {
   String id
+
+  @NotEmpty(groups = Update)
+  String version
+
   String name
   String description
   String type

@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ssl.plugin.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Nexus SSL Trust Store - (read)',
                 description: 'Give permission to read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
+                    'method': 'read',
+                    'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
@@ -51,8 +50,8 @@ implements StaticSecurityResource
                 name: 'Nexus SSL Trust Store - (create,read)',
                 description: 'Give permission to create,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
+                    'method': 'create,read',
+                    'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
@@ -61,8 +60,8 @@ implements StaticSecurityResource
                 name: 'Nexus SSL Trust Store - (create,read)',
                 description: 'Give permission to update,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
+                    'method': 'update,read',
+                    'permission': 'nexus:ssl:truststore'
                 ]
             ),
             new CPrivilege(
@@ -71,8 +70,8 @@ implements StaticSecurityResource
                 name: 'Nexus SSL Trust Store - (delete,read)',
                 description: 'Give permission to delete,read certificates from Nexus SSL Trust Store.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:ssl:truststore')
+                    'method': 'delete,read',
+                    'permission': 'nexus:ssl:truststore'
                 ]
             )
         ],

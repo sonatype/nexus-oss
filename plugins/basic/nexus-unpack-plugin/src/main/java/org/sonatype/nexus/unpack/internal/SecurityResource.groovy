@@ -13,7 +13,6 @@
 package org.sonatype.nexus.unpack.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Unpack',
                 description: 'Gives access to deploy compressed bundles onto Nexus',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,update,delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:contentcompressed')
+                    'method': 'create,update,delete,read',
+                    'permission': 'nexus:contentcompressed'
                 ]
             )
         ],

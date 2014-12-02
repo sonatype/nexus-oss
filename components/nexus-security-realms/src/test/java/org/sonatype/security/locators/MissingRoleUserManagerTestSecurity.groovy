@@ -13,7 +13,6 @@
 package org.sonatype.security.locators
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
@@ -27,7 +26,6 @@ class MissingRoleUserManagerTestSecurity
 
   static Configuration securityModel() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
                 id: 'admin',
@@ -90,8 +88,8 @@ class MissingRoleUserManagerTestSecurity
                 name: '1',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -100,8 +98,8 @@ class MissingRoleUserManagerTestSecurity
                 name: '2',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -110,8 +108,8 @@ class MissingRoleUserManagerTestSecurity
                 name: '3',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -120,8 +118,8 @@ class MissingRoleUserManagerTestSecurity
                 name: '4',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],

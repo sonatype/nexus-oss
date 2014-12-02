@@ -33,7 +33,7 @@ public class Nexus1563ExternalRealmsIT
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-    settings.setSecurityRealms(asList("Simple", "XmlAuthenticatingRealm", "XmlAuthorizingRealm"));
+    settings.setSecurityRealms(asList("Simple", "NexusAuthenticatingRealm", "NexusAuthorizingRealm"));
     SettingsMessageUtil.save(settings);
   }
 

@@ -21,16 +21,14 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
-import org.sonatype.security.realms.XmlAuthenticatingRealm;
-import org.sonatype.security.realms.XmlAuthorizingRealm;
+import org.sonatype.security.realms.AuthenticatingRealmImpl;
+import org.sonatype.security.realms.AuthorizingRealmImpl;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -58,7 +56,7 @@ public class EmptyRoleTest
     authManager.addRole(emptyRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
@@ -96,7 +94,7 @@ public class EmptyRoleTest
       throws Exception
   {
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
-    securitySystem.setRealms(Arrays.asList(XmlAuthenticatingRealm.ROLE, XmlAuthorizingRealm.ROLE));
+    securitySystem.setRealms(Arrays.asList(AuthenticatingRealmImpl.ROLE, AuthorizingRealmImpl.ROLE));
     AuthorizationManager authManager = securitySystem.getAuthorizationManager("default");
 
     // create an empty role
@@ -112,7 +110,7 @@ public class EmptyRoleTest
     authManager.addRole(normalRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.addRole(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId()));
     user.addRole(new RoleIdentifier(normalRole.getSource(), normalRole.getRoleId()));
 
@@ -138,7 +136,7 @@ public class EmptyRoleTest
     authManager.addRole(emptyRole);
 
     // now create a user and add it to the user
-    DefaultUser user = this.buildTestUser();
+    User user = this.buildTestUser();
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
@@ -153,8 +151,8 @@ public class EmptyRoleTest
 
   }
 
-  private DefaultUser buildTestUser() {
-    DefaultUser user = new DefaultUser();
+  private User buildTestUser() {
+    User user = new User();
     user.setUserId("test-user-" + Math.random());
     user.setEmailAddress("test@foo.com");
     user.setFirstName("test");
@@ -168,21 +166,13 @@ public class EmptyRoleTest
   private String createTestPriv()
       throws InvalidConfigurationException
   {
-    CProperty permissionProp = new CProperty();
-    permissionProp.setKey(ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    permissionProp.setValue("app:config");
-
-    CProperty methodProp = new CProperty();
-    methodProp.setKey(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    methodProp.setValue("read");
-
     CPrivilege priv = new CPrivilege();
     priv.setId("priv-" + Math.random());
     priv.setName("somepriv");
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.addProperty(permissionProp);
-    priv.addProperty(methodProp);
+    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "app:config");
+    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
 
     this.lookup(DefaultConfigurationManager.class).createPrivilege(priv);
 

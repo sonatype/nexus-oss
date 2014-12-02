@@ -47,20 +47,21 @@ public class ResourceMergingManagerThreadedTest
   public void configure(Binder binder) {
     super.configure(binder);
 
-    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default")).to(StaticSecurityResource2.class);
+    binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("default"))
+        .toInstance(new StaticSecurityResource2());
     binder.bind(DynamicSecurityResource.class).annotatedWith(Names.named("default"))
-        .to(UnitTestDynamicSecurityResource.class);
+        .toInstance(new UnitTestDynamicSecurityResource());
 
     int staticResourceCount = 100;
     for (int ii = 0; ii < staticResourceCount - 1; ii++) {
       binder.bind(StaticSecurityResource.class).annotatedWith(Names.named("test-" + ii))
-          .to(StaticSecurityResource2.class);
+          .toInstance(new StaticSecurityResource3());
     }
 
     int dynamicResourceCount = 100;
     for (int ii = 0; ii < dynamicResourceCount - 1; ii++) {
       binder.bind(DynamicSecurityResource.class).annotatedWith(Names.named("test-" + ii))
-          .to(UnitTestDynamicSecurityResource.class);
+          .toInstance(new UnitTestDynamicSecurityResource());
     }
   }
 
@@ -70,7 +71,7 @@ public class ResourceMergingManagerThreadedTest
   {
     super.setUp();
 
-    this.manager = (ConfigurationManager) lookup(ConfigurationManager.class, "resourceMerging");
+    this.manager = lookup(ConfigurationManager.class);
 
     // test the lookup, make sure we have 100
     Assert.assertEquals(100, injectedStaticResources.size());

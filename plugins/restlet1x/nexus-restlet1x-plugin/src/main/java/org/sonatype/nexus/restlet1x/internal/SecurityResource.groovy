@@ -13,7 +13,6 @@
 package org.sonatype.nexus.restlet1x.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
 
@@ -40,8 +39,8 @@ implements StaticSecurityResource
                 name: 'Security administrator privilege (ALL)',
                 description: 'Give permission to everything security related.',
                 properties: [
-                    new CProperty(key: 'method', value: '*'),
-                    new CProperty(key: 'permission', value: 'security:*')
+                    'method': '*',
+                    'permission': 'security:*'
                 ]
             ),
             new CPrivilege(
@@ -50,8 +49,8 @@ implements StaticSecurityResource
                 name: 'User Privileges - (create,read)',
                 description: 'Give permission to create,read privileges.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:privileges')
+                    'method': 'create,read',
+                    'permission': 'security:privileges'
                 ]
             ),
             new CPrivilege(
@@ -60,8 +59,8 @@ implements StaticSecurityResource
                 name: 'User Privileges - (read)',
                 description: 'Give permission to read existing privilege configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:privileges')
+                    'method': 'read',
+                    'permission': 'security:privileges'
                 ]
             ),
             new CPrivilege(
@@ -70,8 +69,8 @@ implements StaticSecurityResource
                 name: 'User Privileges - (update,read)',
                 description: 'Give permission to update,read existing privilege configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'security:privileges')
+                    'method': 'update,read',
+                    'permission': 'security:privileges'
                 ]
             ),
             new CPrivilege(
@@ -80,8 +79,8 @@ implements StaticSecurityResource
                 name: 'User Privileges - (delete,read)',
                 description: 'Give permission to delete,read existing privileges.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'security:privileges')
+                    'method': 'delete,read',
+                    'permission': 'security:privileges'
                 ]
             ),
             new CPrivilege(
@@ -90,8 +89,8 @@ implements StaticSecurityResource
                 name: 'User Roles - (create,read)',
                 description: 'Give permission to create,read user roles.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:roles')
+                    'method': 'create,read',
+                    'permission': 'security:roles'
                 ]
             ),
             new CPrivilege(
@@ -100,8 +99,8 @@ implements StaticSecurityResource
                 name: 'User Roles - (read)',
                 description: 'Give permission to read existing user role configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:roles')
+                    'method': 'read',
+                    'permission': 'security:roles'
                 ]
             ),
             new CPrivilege(
@@ -110,8 +109,8 @@ implements StaticSecurityResource
                 name: 'User Roles - (update,read)',
                 description: 'Give permission to update,read existing user role configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'security:roles')
+                    'method': 'update,read',
+                    'permission': 'security:roles'
                 ]
             ),
             new CPrivilege(
@@ -120,8 +119,8 @@ implements StaticSecurityResource
                 name: 'User Roles - (delete,read)',
                 description: 'Give permission to delete,read existing user roles.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'security:roles')
+                    'method': 'delete,read',
+                    'permission': 'security:roles'
                 ]
             ),
             new CPrivilege(
@@ -130,8 +129,8 @@ implements StaticSecurityResource
                 name: 'Users - (create,read)',
                 description: 'Give permission to create,read users.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:users')
+                    'method': 'create,read',
+                    'permission': 'security:users'
                 ]
             ),
             new CPrivilege(
@@ -140,8 +139,8 @@ implements StaticSecurityResource
                 name: 'Users - (read)',
                 description: 'Give permission to read existing user configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:users')
+                    'method': 'read',
+                    'permission': 'security:users'
                 ]
             ),
             new CPrivilege(
@@ -150,8 +149,8 @@ implements StaticSecurityResource
                 name: 'Users - (update,read)',
                 description: 'Give permission to update,read existing user configuration.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'security:users')
+                    'method': 'update,read',
+                    'permission': 'security:users'
                 ]
             ),
             new CPrivilege(
@@ -160,8 +159,8 @@ implements StaticSecurityResource
                 name: 'Users - (delete,read)',
                 description: 'Give permission to delete,read existing users.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'security:users')
+                    'method': 'delete,read',
+                    'permission': 'security:users'
                 ]
             ),
             new CPrivilege(
@@ -170,8 +169,8 @@ implements StaticSecurityResource
                 name: 'User Forgot Password - (create,read)',
                 description: 'Give permission to request that a password be generated an emailed to a certain user.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:usersforgotpw')
+                    'method': 'create,read',
+                    'permission': 'security:usersforgotpw'
                 ]
             ),
             new CPrivilege(
@@ -180,8 +179,8 @@ implements StaticSecurityResource
                 name: 'User Forgot User Id - (create,read)',
                 description: 'Give permission to request that a username be emailed to a certain email address.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:usersforgotid')
+                    'method': 'create,read',
+                    'permission': 'security:usersforgotid'
                 ]
             ),
             new CPrivilege(
@@ -190,8 +189,8 @@ implements StaticSecurityResource
                 name: 'User Reset Password - (delete,read)',
                 description: 'Give permission to reset any user\'s password.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'security:usersreset')
+                    'method': 'delete,read',
+                    'permission': 'security:usersreset'
                 ]
             ),
             new CPrivilege(
@@ -200,8 +199,8 @@ implements StaticSecurityResource
                 name: 'User Change Password - (create,read)',
                 description: 'Give permission to change a user\'s password.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:userschangepw')
+                    'method': 'create,read',
+                    'permission': 'security:userschangepw'
                 ]
             ),
             new CPrivilege(
@@ -210,8 +209,8 @@ implements StaticSecurityResource
                 name: 'User Set Password - (create,read)',
                 description: 'Give permission to set a user\'s password.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'security:userssetpw')
+                    'method': 'create,read',
+                    'permission': 'security:userssetpw'
                 ]
             ),
             new CPrivilege(
@@ -220,8 +219,8 @@ implements StaticSecurityResource
                 name: 'User Locator Types Component - (read)',
                 description: 'Give permission to retrieve the list of User Locator types supported by nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:componentsuserlocatortypes')
+                    'method': 'read',
+                    'permission': 'security:componentsuserlocatortypes'
                 ]
             ),
             new CPrivilege(
@@ -230,8 +229,8 @@ implements StaticSecurityResource
                 name: 'User Privilege Types - (read)',
                 description: 'Give permission to read existing privilege types.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:privilegetypes')
+                    'method': 'read',
+                    'permission': 'security:privilegetypes'
                 ]
             )
         ]

@@ -71,20 +71,20 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
-
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -560,7 +560,7 @@ public class DefaultNexusConfiguration
       throws InvalidConfigurationException
   {
     try {
-      final User anonymousUser = getSecuritySystem().getUser(anonymousUsername, SecurityXmlUserManager.SOURCE);
+      final User anonymousUser = getSecuritySystem().getUser(anonymousUsername, UserManagerImpl.SOURCE);
       final UserStatus oldStatus = anonymousUser.getStatus();
       if (enabled) {
         anonymousUser.setStatus(UserStatus.active);

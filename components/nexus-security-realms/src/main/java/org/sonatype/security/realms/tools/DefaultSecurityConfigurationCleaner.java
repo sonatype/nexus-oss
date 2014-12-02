@@ -12,14 +12,16 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.util.List;
+import java.util.ConcurrentModificationException;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
@@ -36,42 +38,74 @@ public class DefaultSecurityConfigurationCleaner
     extends ComponentSupport
     implements SecurityConfigurationCleaner
 {
-  public void privilegeRemoved(EnhancedConfiguration configuration, String privilegeId) {
+  public void privilegeRemoved(SecurityModelConfiguration configuration, String privilegeId) {
     log.debug("Cleaning privilege id {} from roles.", privilegeId);
-    List<CRole> roles = configuration.getRoles();
-
-    for (CRole role : roles) {
-      if (role.getPrivileges().contains(privilegeId)) {
-        log.debug("removing privilege {} from role {}", privilegeId, role.getId());
-        role.getPrivileges().remove(privilegeId);
-        configuration.removeRoleById(role.getId());
-        configuration.addRole(role);
+    for (CRole role : configuration.getRoles()) {
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CRole currentRole = configuration.getRole(role.getId());
+        if (currentRole != null && currentRole.getPrivileges().contains(privilegeId)) {
+          log.debug("removing privilege {} from role {}", privilegeId, currentRole.getId());
+          currentRole.removePrivilege(privilegeId);
+          try {
+            configuration.updateRole(currentRole);
+          }
+          catch (NoSuchRoleException e) {
+            // role was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
+        }
       }
+      while (concurrentlyUpdated);
     }
   }
 
-  public void roleRemoved(EnhancedConfiguration configuration, String roleId) {
+  public void roleRemoved(SecurityModelConfiguration configuration, String roleId) {
     log.debug("Cleaning role id {} from users and roles.", roleId);
-    List<CRole> roles = configuration.getRoles();
-
-    for (CRole role : roles) {
-      if (role.getRoles().contains(roleId)) {
-        log.debug("removing ref to role {} from role {}", roleId, role.getId());
-        role.getRoles().remove(roleId);
-        configuration.removeRoleById(role.getId());
-        configuration.addRole(role);
+    for (CRole role : configuration.getRoles()) {
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CRole currentRole = configuration.getRole(role.getId());
+        if (currentRole != null && currentRole.getRoles().contains(roleId)) {
+          log.debug("removing ref to role {} from role {}", roleId, currentRole.getId());
+          currentRole.removeRole(roleId);
+          try {
+            configuration.updateRole(currentRole);
+          }
+          catch (NoSuchRoleException e) {
+            // role was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
+        }
       }
+      while (concurrentlyUpdated);
     }
-
-    List<CUserRoleMapping> mappings = configuration.getUserRoleMappings();
-
-    for (CUserRoleMapping mapping : mappings) {
-      if (mapping.getRoles().contains(roleId)) {
-        log.debug("removing ref to role {} from user {}", mapping.getUserId());
-        mapping.removeRole(roleId);
-        configuration.removeUserRoleMappingByUserId(mapping.getUserId(), mapping.getSource());
-        configuration.addUserRoleMapping(mapping);
+    for (CUserRoleMapping mapping : configuration.getUserRoleMappings()) {
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CUserRoleMapping currentMapping = configuration.getUserRoleMapping(mapping.getUserId(), mapping.getSource());
+        if (currentMapping != null && currentMapping.getRoles().contains(roleId)) {
+          log.debug("removing ref to role {} from user {}", currentMapping.getUserId());
+          currentMapping.removeRole(roleId);
+          try {
+            configuration.updateUserRoleMapping(currentMapping);
+          }
+          catch (NoSuchRoleMappingException e) {
+            // mapping was removed in the mean time
+          }
+          catch (ConcurrentModificationException e) {
+            concurrentlyUpdated = true;
+          }
+        }
       }
+      while (concurrentlyUpdated);
     }
   }
 }

@@ -21,6 +21,7 @@ Ext.define('NX.coreui.model.Role', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
+    'version',
     'source',
     'name',
     'description',

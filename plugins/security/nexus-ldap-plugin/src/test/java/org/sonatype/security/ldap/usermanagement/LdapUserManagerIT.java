@@ -194,7 +194,7 @@ public class LdapUserManagerIT
     securitySystem.start();
 
     List<String> realms = new ArrayList<String>();
-    realms.add("XmlAuthenticatingRealm");
+    realms.add("NexusAuthenticatingRealm");
     realms.add(LdapPlugin.REALM_NAME);
 
     securitySystem.setRealms(realms);
@@ -205,7 +205,7 @@ public class LdapUserManagerIT
 
     realms.clear();
     realms.add(LdapPlugin.REALM_NAME);
-    realms.add("XmlAuthenticatingRealm");
+    realms.add("NexusAuthenticatingRealm");
     securitySystem.setRealms(realms);
 
     // now the user should belong to the LDAP realm

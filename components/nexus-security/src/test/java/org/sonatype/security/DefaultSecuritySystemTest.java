@@ -19,9 +19,8 @@ import java.util.Set;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserStatus;
 
 import junit.framework.Assert;
@@ -150,7 +149,7 @@ public class DefaultSecuritySystemTest
   {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
-    User user = new DefaultUser();
+    User user = new User();
     user.setEmailAddress("email@foo.com");
     user.setName("testAddUser");
     user.setSource("MockUserManagerA");

@@ -19,7 +19,6 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserStatus;
@@ -40,7 +39,7 @@ public class MockUserManagerA
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
-    DefaultUser a = new DefaultUser();
+    User a = new User();
     a.setName("Joe Coder");
     a.setEmailAddress("jcoder@sonatype.org");
     a.setSource(this.getSource());
@@ -50,7 +49,7 @@ public class MockUserManagerA
     a.addRole(this.createFakeRole("RoleB"));
     a.addRole(this.createFakeRole("RoleC"));
 
-    DefaultUser b = new DefaultUser();
+    User b = new User();
     b.setName("Christine H. Dugas");
     b.setEmailAddress("cdugas@sonatype.org");
     b.setSource(this.getSource());
@@ -60,14 +59,14 @@ public class MockUserManagerA
     b.addRole(this.createFakeRole("RoleB"));
     b.addRole(this.createFakeRole("Role1"));
 
-    DefaultUser c = new DefaultUser();
+    User c = new User();
     c.setName("Patricia P. Peralez");
     c.setEmailAddress("pperalez@sonatype.org");
     c.setSource(this.getSource());
     c.setUserId("pperalez");
     c.setStatus(UserStatus.active);
 
-    DefaultUser d = new DefaultUser();
+    User d = new User();
     d.setName("Danille S. Knudsen");
     d.setEmailAddress("dknudsen@sonatype.org");
     d.setSource(this.getSource());

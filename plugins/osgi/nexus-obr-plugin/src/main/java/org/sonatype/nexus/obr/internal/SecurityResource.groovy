@@ -13,7 +13,6 @@
 package org.sonatype.nexus.obr.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,10 +40,10 @@ implements StaticSecurityResource
                 name: 'All OBR Repositories - (create)',
                 description: 'Give permission to create any content in any OBR.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'obr'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'create,read',
+                    'repositoryTargetId': 'obr',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -53,10 +52,10 @@ implements StaticSecurityResource
                 name: 'All OBR Repositories - (read)',
                 description: 'Give permission to read any content in any OBR.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'obr'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'read',
+                    'repositoryTargetId': 'obr',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -65,10 +64,10 @@ implements StaticSecurityResource
                 name: 'All OBR Repositories - (update)',
                 description: 'Give permission to update any content in any OBR.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'obr'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'update,read',
+                    'repositoryTargetId': 'obr',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -77,10 +76,10 @@ implements StaticSecurityResource
                 name: 'All OBR Repositories - (delete)',
                 description: 'Give permission to delete any content in any OBR.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'obr'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'delete,read',
+                    'repositoryTargetId': 'obr',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             )
         ],

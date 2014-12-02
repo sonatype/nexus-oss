@@ -12,10 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.util.List;
-
 import org.sonatype.security.AbstractSecurityTestCase;
-import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -39,14 +36,14 @@ public class DefaultSecurityConfigurationCleanerTest
   {
     Configuration configuration = DefaultSecurityConfigurationCleanerTestSecurity.securityModel();
 
-    CPrivilege priv = (CPrivilege) configuration.getPrivileges().get(0);
+    String privilegeId = configuration.getPrivileges().get(0).getId();
 
-    configuration.removePrivilege(priv);
+    configuration.removePrivilege(privilegeId);
 
-    cleaner.privilegeRemoved(new EnhancedConfiguration(configuration), priv.getId());
+    cleaner.privilegeRemoved(configuration, privilegeId);
 
-    for (CRole role : (List<CRole>) configuration.getRoles()) {
-      assertFalse(role.getPrivileges().contains(priv.getId()));
+    for (CRole role : configuration.getRoles()) {
+      assertFalse(role.getPrivileges().contains(privilegeId));
     }
   }
 
@@ -55,18 +52,18 @@ public class DefaultSecurityConfigurationCleanerTest
   {
     Configuration configuration = DefaultSecurityConfigurationCleanerTestSecurity.securityModel();
 
-    CRole role = (CRole) configuration.getRoles().get(0);
+    String roleId = configuration.getRoles().get(0).getId();
 
-    configuration.removeRole(role);
+    configuration.removeRole(roleId);
 
-    cleaner.roleRemoved(new EnhancedConfiguration(configuration), role.getId());
+    cleaner.roleRemoved(configuration, roleId);
 
-    for (CRole crole : (List<CRole>) configuration.getRoles()) {
-      assertFalse(crole.getPrivileges().contains(role.getId()));
+    for (CRole crole : configuration.getRoles()) {
+      assertFalse(crole.getPrivileges().contains(roleId));
     }
 
-    for (CUserRoleMapping mapping : (List<CUserRoleMapping>) configuration.getUserRoleMappings()) {
-      assertFalse(mapping.getRoles().contains(role.getId()));
+    for (CUserRoleMapping mapping : configuration.getUserRoleMappings()) {
+      assertFalse(mapping.getRoles().contains(roleId));
     }
   }
 }

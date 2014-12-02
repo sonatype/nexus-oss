@@ -20,7 +20,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -68,7 +67,7 @@ public class MockUserLocator
   }
 
   private User toUser(String userId) {
-    DefaultUser user = new DefaultUser();
+    User user = new User();
 
     user.setUserId(userId);
     user.setName(userId);

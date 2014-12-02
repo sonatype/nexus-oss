@@ -12,11 +12,11 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 public interface SecurityConfigurationModifier
 {
 
-  boolean apply(Configuration configuration);
+  boolean apply(SecurityModelConfiguration configuration);
 
 }

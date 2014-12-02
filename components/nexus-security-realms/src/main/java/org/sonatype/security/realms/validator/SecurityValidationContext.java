@@ -28,13 +28,9 @@ public class SecurityValidationContext
 
   private List<String> existingUserIds;
 
-  private Map<String, String> existingEmailMap;
-
   private Map<String, List<String>> roleContainmentMap;
 
   private Map<String, String> existingRoleNameMap;
-
-  private Map<String, List<String>> existingUserRoleMap;
 
   public void addExistingPrivilegeIds() {
     if (this.existingPrivilegeIds == null) {
@@ -54,19 +50,11 @@ public class SecurityValidationContext
     if (this.existingRoleNameMap == null) {
       this.existingRoleNameMap = new HashMap<String, String>();
     }
-
-    if (this.existingUserRoleMap == null) {
-      this.existingUserRoleMap = new HashMap<String, List<String>>();
-    }
   }
 
   public void addExistingUserIds() {
     if (this.existingUserIds == null) {
       this.existingUserIds = new ArrayList<String>();
-    }
-
-    if (this.existingEmailMap == null) {
-      this.existingEmailMap = new HashMap<String, String>();
     }
   }
 
@@ -82,20 +70,12 @@ public class SecurityValidationContext
     return existingUserIds;
   }
 
-  public Map<String, String> getExistingEmailMap() {
-    return existingEmailMap;
-  }
-
   public Map<String, List<String>> getRoleContainmentMap() {
     return roleContainmentMap;
   }
 
   public Map<String, String> getExistingRoleNameMap() {
     return existingRoleNameMap;
-  }
-
-  public Map<String, List<String>> getExistingUserRoleMap() {
-    return existingUserRoleMap;
   }
 
 }

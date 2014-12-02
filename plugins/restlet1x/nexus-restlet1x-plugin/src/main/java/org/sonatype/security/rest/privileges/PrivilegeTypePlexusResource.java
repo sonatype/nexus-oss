@@ -27,7 +27,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.rest.model.PrivilegeTypePropertyResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
@@ -37,6 +36,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * REST resource to retrieve the list of Privilege Types. Each type of privilege that can be created is described by a
@@ -57,9 +58,12 @@ public class PrivilegeTypePlexusResource
 
   public static final String RESOURCE_URI = "/privilege_types";
 
+  private final List<PrivilegeDescriptor> privilegeDescriptors;
+
   @Inject
-  @Named("default")
-  private ConfigurationManager configurationManager;
+  public PrivilegeTypePlexusResource(final List<PrivilegeDescriptor> privilegeDescriptors) {
+    this.privilegeDescriptors = checkNotNull(privilegeDescriptors);
+  }
 
   @Override
   public Object getPayloadInstance() {
@@ -86,9 +90,7 @@ public class PrivilegeTypePlexusResource
   {
     PrivilegeTypeResourceResponse result = new PrivilegeTypeResourceResponse();
 
-    List<PrivilegeDescriptor> privDescriptors = this.configurationManager.listPrivilegeDescriptors();
-
-    for (PrivilegeDescriptor privDescriptor : privDescriptors) {
+    for (PrivilegeDescriptor privDescriptor : privilegeDescriptors) {
       PrivilegeTypeResource type = new PrivilegeTypeResource();
       type.setId(privDescriptor.getType());
       type.setName(privDescriptor.getName());

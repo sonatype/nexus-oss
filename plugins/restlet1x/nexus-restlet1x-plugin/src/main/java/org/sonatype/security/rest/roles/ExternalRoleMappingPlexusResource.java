@@ -28,7 +28,7 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
+import org.sonatype.security.usermanagement.UserManagerImpl;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -106,7 +106,7 @@ public class ExternalRoleMappingPlexusResource
 
     Role defaultRole;
     try {
-      defaultRole = getSecuritySystem().getAuthorizationManager(SecurityXmlUserManager.SOURCE).getRole(roleId);
+      defaultRole = getSecuritySystem().getAuthorizationManager(UserManagerImpl.SOURCE).getRole(roleId);
     }
     catch (NoSuchRoleException e) {
       defaultRole = null;

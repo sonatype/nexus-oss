@@ -63,7 +63,7 @@ public class DefaultConfigurationValidatorTest
 
     assertEquals(3, response.getValidationWarnings().size());
 
-    assertEquals(12, response.getValidationErrors().size());
+    assertEquals(10, response.getValidationErrors().size());
   }
 
   public void testBad3()
@@ -77,7 +77,7 @@ public class DefaultConfigurationValidatorTest
 
     assertTrue(response.isModified());
 
-    assertEquals(2, response.getValidationWarnings().size());
+    assertEquals(1, response.getValidationWarnings().size());
 
     assertEquals(2, response.getValidationErrors().size());
   }
@@ -98,7 +98,6 @@ public class DefaultConfigurationValidatorTest
     role1.setId("role1");
     role1.setName("role1");
     role1.setDescription("desc");
-    role1.setSessionTimeout(50);
     role1.addPrivilege(priv.getId());
     role1.addRole("role2");
     ArrayList<String> containedRoles = new ArrayList<String>();
@@ -111,7 +110,6 @@ public class DefaultConfigurationValidatorTest
     role2.setId("role2");
     role2.setName("role2");
     role2.setDescription("desc");
-    role2.setSessionTimeout(50);
     role2.addPrivilege(priv.getId());
     role2.addRole("role3");
     containedRoles = new ArrayList<String>();
@@ -124,7 +122,6 @@ public class DefaultConfigurationValidatorTest
     role3.setId("role3");
     role3.setName("role3");
     role3.setDescription("desc");
-    role3.setSessionTimeout(50);
     role3.addPrivilege(priv.getId());
     role3.addRole("role1");
     containedRoles = new ArrayList<String>();
@@ -157,7 +154,6 @@ public class DefaultConfigurationValidatorTest
     role1.setId("role1");
     role1.setName("role1");
     role1.setDescription("desc");
-    role1.setSessionTimeout(50);
     role1.addPrivilege(priv.getId());
     role1.addPrivilege("foo");
 

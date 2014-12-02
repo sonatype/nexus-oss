@@ -28,15 +28,13 @@ import org.sonatype.nexus.security.targets.TargetPrivilegeGroupPropertyDescripto
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.security.targets.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.AuthorizationManagerImpl;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.ConfigurationManagerAction;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Throwables;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
@@ -116,29 +114,15 @@ public class SecurityCleanupEventInspector
       if (!privilege.isReadOnly() && privilege.getType().equals(TargetPrivilegeDescriptor.TYPE)
           && (propertyValue.equals(privilege.getPrivilegeProperty(propertyId)))) {
         log.debug("Removing Privilege {} because repository was removed", privilege.getName());
-        security.getAuthorizationManager(SecurityXmlAuthorizationManager.SOURCE).deletePrivilege(
+        security.getAuthorizationManager(AuthorizationManagerImpl.SOURCE).deletePrivilege(
             privilege.getId());
         removedIds.add(privilege.getId());
       }
     }
 
-    try {
-      configManager.runWrite(new ConfigurationManagerAction()
-      {
-        @Override
-        public void run()
-            throws Exception
-        {
-          for (String privilegeId : removedIds) {
-            configManager.cleanRemovedPrivilege(privilegeId);
-          }
-          configManager.save();
-        }
+    for (String privilegeId : removedIds) {
+      configManager.cleanRemovedPrivilege(privilegeId);
+    }
 
-      });
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
   }
 }

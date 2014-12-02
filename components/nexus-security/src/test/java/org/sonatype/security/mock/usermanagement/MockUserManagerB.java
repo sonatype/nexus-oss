@@ -16,7 +16,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserStatus;
@@ -30,7 +30,7 @@ public class MockUserManagerB
 {
   public MockUserManagerB() {
 
-    DefaultUser a = new DefaultUser();
+    User a = new User();
     a.setName("Brenda D. Burton");
     a.setEmailAddress("bburton@sonatype.org");
     a.setSource(this.getSource());
@@ -40,7 +40,7 @@ public class MockUserManagerB
     a.addRole(new RoleIdentifier(this.getSource(), "RoleB"));
     a.addRole(new RoleIdentifier(this.getSource(), "RoleC"));
 
-    DefaultUser b = new DefaultUser();
+    User b = new User();
     b.setName("Julian R. Blevins");
     b.setEmailAddress("jblevins@sonatype.org");
     b.setSource(this.getSource());
@@ -49,7 +49,7 @@ public class MockUserManagerB
     b.addRole(new RoleIdentifier(this.getSource(), "RoleA"));
     b.addRole(new RoleIdentifier(this.getSource(), "RoleB"));
 
-    DefaultUser c = new DefaultUser();
+    User c = new User();
     c.setName("Kathryn J. Simmons");
     c.setEmailAddress("ksimmons@sonatype.org");
     c.setSource(this.getSource());
@@ -58,7 +58,7 @@ public class MockUserManagerB
     c.addRole(new RoleIdentifier(this.getSource(), "RoleA"));
     c.addRole(new RoleIdentifier(this.getSource(), "RoleB"));
 
-    DefaultUser d = new DefaultUser();
+    User d = new User();
     d.setName("Florence T. Dahmen");
     d.setEmailAddress("fdahmen@sonatype.org");
     d.setSource(this.getSource());
@@ -67,14 +67,14 @@ public class MockUserManagerB
     d.addRole(new RoleIdentifier(this.getSource(), "RoleA"));
     d.addRole(new RoleIdentifier(this.getSource(), "RoleB"));
 
-    DefaultUser e = new DefaultUser();
+    User e = new User();
     e.setName("Jill  Codar");
     e.setEmailAddress("jcodar@sonatype.org");
     e.setSource(this.getSource());
     e.setUserId("jcodar");
     e.setStatus(UserStatus.active);
 
-    DefaultUser f = new DefaultUser();
+    User f = new User();
     f.setName("Joe Coder");
     f.setEmailAddress("jcoder@sonatype.org");
     f.setSource(this.getSource());

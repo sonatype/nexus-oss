@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.validator
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUser
 import org.sonatype.security.model.CUserRoleMapping
@@ -27,23 +26,15 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel1() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         users: [
             new CUser(
+                id: ''
             ),
             new CUser(
                 id: 'ausernostatus',
                 password: 'fjsf8j4r3',
                 firstName: 'Alex',
                 lastName: 'User',
-                email: 'auser@auser.com'
-            ),
-            new CUser(
-                id: 'auser',
-                password: 'fjsf8j4r3',
-                firstName: 'Alex',
-                lastName: 'User',
-                status: 'active',
                 email: 'auser@auser.com'
             ),
             new CUser(
@@ -65,9 +56,12 @@ class DefaultConfigurationValidatorTestSecurity
         ],
         userRoleMappings: [
             new CUserRoleMapping(
+                userId: '',
+                source: '',
                 roles: ['id1']
             ),
             new CUserRoleMapping(
+                userId: '',
                 source: 'default',
                 roles: ['id1']
             ),
@@ -83,8 +77,8 @@ class DefaultConfigurationValidatorTestSecurity
                 type: 'method',
                 name: 'priv',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],
@@ -100,15 +94,14 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel2() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: '1',
                 type: 'method',
                 name: 'priv',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],
@@ -118,11 +111,7 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'name',
             ),
             new CRole(
-                privileges: ['1']
-            ),
-            new CRole(
-                id: 'arole',
-                name: 'name',
+                id: '',
                 privileges: ['1']
             ),
             new CRole(
@@ -181,15 +170,13 @@ class DefaultConfigurationValidatorTestSecurity
 
   static Configuration securityModel3() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: '',
                 type: '',
                 name: '',
                 description: '',
-                properties: [
-                ]
+                properties: [:]
             ),
             new CPrivilege(
                 id: '25',
@@ -197,8 +184,8 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'priv',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             ),
             new CPrivilege(
@@ -207,18 +194,8 @@ class DefaultConfigurationValidatorTestSecurity
                 name: 'priv',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: '/some/path/')
-                ]
-            ),
-            new CPrivilege(
-                id: '5',
-                type: 'method',
-                name: 'priv',
-                description: '',
-                properties: [
-                    new CProperty(key: 'method', value: 'create'),
-                    new CProperty(key: 'permission', value: '/some/path/')
+                    'method': 'read',
+                    'permission': '/some/path/'
                 ]
             )
         ],
