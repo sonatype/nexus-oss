@@ -50,7 +50,7 @@ public class Nexus448PrivilegeUrlIT
       throws IOException
   {
 
-    PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource("T2");
+    PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource("repository-m1-read");
     Assert.assertEquals("Type", resource.getType(), TargetPrivilegeDescriptor.TYPE);
 
     resource = this.messageUtil.getPrivilegeResource("1");
