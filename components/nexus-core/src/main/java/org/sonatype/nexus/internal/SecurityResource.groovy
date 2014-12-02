@@ -93,7 +93,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: 'T5',
+                id: 'repository-m2-create', // T5
                 type: 'target',
                 name: 'All M2 Repositories - (create)',
                 description: 'Give permission to create any content in any Maven 2 type repositories.',
@@ -776,7 +776,7 @@ implements StaticSecurityResource
                 id: 'repo-all-full',
                 name: 'Repo: All Maven Repositories (Full Control)',
                 description: 'Gives access to create/read/update/delete ALL content of ALL Maven1 and Maven2 repositories in Nexus.',
-                privileges: ['repository-m2-read', 'repository-m1-read', 'repository-m2-update', 'repository-m1-update', 'T5', 'T6', 'T7', 'T8', 'repository-all']
+                privileges: ['repository-m2-read', 'repository-m1-read', 'repository-m2-update', 'repository-m1-update', 'repository-m2-create', 'T6', 'T7', 'T8', 'repository-all']
             ),
             new CRole(
                 id: 'repository-any-read',

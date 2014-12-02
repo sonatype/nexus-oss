@@ -137,7 +137,7 @@ public class Nexus429WagonDeployPrivilegeIT
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T5");
+    this.giveUserPrivilege("test-user", "repository-m2-create");
 
     // if this fails it will throw an error
     verifier =
