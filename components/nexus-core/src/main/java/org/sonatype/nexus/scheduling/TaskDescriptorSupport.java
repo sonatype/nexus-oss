@@ -18,9 +18,10 @@ import org.sonatype.nexus.formfields.FormField;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Support class for {@link TaskDescriptor}s.
@@ -122,12 +123,6 @@ public abstract class TaskDescriptorSupport<T extends Task>
 
   @Override
   public final List<TaskInfo<?>> filter(final List<TaskInfo<?>> tasks) {
-    final List<TaskInfo<?>> result = Lists.newArrayList();
-    for (TaskInfo<?> task : tasks) {
-      if (predicate.apply(task)) {
-        result.add(task);
-      }
-    }
-    return result;
+    return newArrayList(Iterables.filter(tasks, predicate()));
   }
 }

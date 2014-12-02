@@ -66,7 +66,8 @@ public interface TaskDescriptor<T extends Task>
 
   /**
    * Filters the supplied list for tasks of this type. This is just a handy method to free caller to cope with
-   * casting, uses filtering with predicate from {@link #predicate()}.
+   * filtering, uses Guava filtering with predicate from {@link #predicate()}, returns a new list with filtered
+   * elements.
    */
   List<TaskInfo<?>> filter(List<TaskInfo<?>> tasks);
 }
