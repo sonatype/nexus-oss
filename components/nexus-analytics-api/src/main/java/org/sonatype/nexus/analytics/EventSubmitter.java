@@ -21,12 +21,5 @@ import java.io.File;
  */
 public interface EventSubmitter
 {
-  // FIXME: Any reason we need to expose URL details here?
-
-  /**
-   * @return analytics service url
-   */
-  String getServiceUrl();
-
   void submit(File file) throws Exception;
 }

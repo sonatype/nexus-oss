@@ -12,12 +12,23 @@
  */
 package org.sonatype.nexus.analytics;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
- * Analytics data exporter.
+ * Analytics event data writer.
  *
  * @since 3.0
  */
-public interface EventExporter
+public interface EventWriter
+  extends Closeable
 {
-  void export(EventWriter writer, boolean dropAfterExport) throws Exception;
+  /**
+   * Open event stream and write header.
+   *
+   * This must be done prior to any {@link #write} operations.
+   */
+  void open(EventHeader header) throws IOException;
+
+  void write(EventData data) throws IOException;
 }
