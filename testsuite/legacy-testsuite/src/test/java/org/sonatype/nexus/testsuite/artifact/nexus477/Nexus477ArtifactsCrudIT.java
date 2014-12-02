@@ -96,7 +96,7 @@ public class Nexus477ArtifactsCrudIT
     Assert.assertEquals("Artifact should not have been deleted", response.getStatus().getCode(), 403);
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T7");
+    this.giveUserPrivilege("test-user", "repository-m2-delete");
 
     // delete implies read
     // we need to check read first...
