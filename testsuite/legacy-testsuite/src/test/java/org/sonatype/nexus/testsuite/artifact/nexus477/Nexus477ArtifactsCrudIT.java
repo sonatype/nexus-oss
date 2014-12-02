@@ -56,7 +56,7 @@ public class Nexus477ArtifactsCrudIT
     // URLConnection.set
 
     // use the test-user
-    // this.giveUserPrivilege( "test-user", "T3" ); // the Wagon does a PUT not a POST, so this is correct
+    // this.giveUserPrivilege( "test-user", "repository-m2-update" ); // the Wagon does a PUT not a POST, so this is correct
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
     this.resetTestUserPrivs();

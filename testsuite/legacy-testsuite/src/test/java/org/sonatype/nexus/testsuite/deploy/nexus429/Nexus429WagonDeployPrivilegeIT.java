@@ -159,7 +159,7 @@ public class Nexus429WagonDeployPrivilegeIT
 
     // now the user should be able to redeploy
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T3");
+    this.giveUserPrivilege("test-user", "repository-m2-update");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
