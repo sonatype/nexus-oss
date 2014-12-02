@@ -63,7 +63,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Create Test Role");
     resource.setName("CreateRole");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
     resource.addPrivilege("2");
 
     this.messageUtil.createRole(resource);
@@ -80,7 +80,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("CreateRoleWithID");
     resource.setId("CreateRoleWithID");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
     resource.addPrivilege("2");
 
     this.messageUtil.createRole(resource);
@@ -96,7 +96,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Create Test Role");
     resource.setName("ListTestRole");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
 
     // create a role
     this.messageUtil.createRole(resource);
@@ -111,7 +111,7 @@ public class Nexus156RolesCrudJsonIT
     }
     assertThat(foundRole, is(notNullValue()));
     assertThat(resource.getDescription(), equalTo(foundRole.getDescription()));
-    assertThat(resource.getPrivileges(), containsInAnyOrder("1"));
+    assertThat(resource.getPrivileges(), containsInAnyOrder("status"));
   }
 
   public void readTest()

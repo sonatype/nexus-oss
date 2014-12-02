@@ -185,7 +185,7 @@ public class Nexus778SearchResultsFilteringIT
       role.addPrivilege(privilegeId);
     }
 
-    role.addPrivilege("1");
+    role.addPrivilege("status");
     role.addPrivilege("6");
     role.addPrivilege("14");
     role.addPrivilege("17");

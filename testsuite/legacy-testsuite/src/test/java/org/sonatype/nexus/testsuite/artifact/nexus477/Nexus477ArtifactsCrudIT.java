@@ -114,7 +114,7 @@ public class Nexus477ArtifactsCrudIT
   public void readTest()
       throws IOException, URISyntaxException, Exception
   {
-    this.overwriteUserRole("test-user", "read-test-role", "1");
+    this.overwriteUserRole("test-user", "read-test-role", "status");
 
     Gav gav =
         new Gav(this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,

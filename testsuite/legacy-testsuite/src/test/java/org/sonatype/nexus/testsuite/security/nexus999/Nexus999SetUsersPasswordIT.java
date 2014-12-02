@@ -49,7 +49,7 @@ public class Nexus999SetUsersPasswordIT
     overwriteUserRole(
         TEST_USER_NAME,
         "anonymous-with-login-setpw",
-        "1",
+        "status",
         "2" /* login */,
         "6",
         "14",
@@ -89,7 +89,7 @@ public class Nexus999SetUsersPasswordIT
     overwriteUserRole(
         TEST_USER_NAME,
         "anonymous-with-login-but-setpw",
-        "1",
+        "status",
         "2" /* login */,
         "6",
         "14",

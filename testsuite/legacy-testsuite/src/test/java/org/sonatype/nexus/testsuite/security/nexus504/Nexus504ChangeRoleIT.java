@@ -45,7 +45,7 @@ public class Nexus504ChangeRoleIT
   @Override
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
-    createRole(NEXUS504_ROLE, asList("1", "3"));
+    createRole(NEXUS504_ROLE, asList("status", "3"));
     createUser(NEXUS504_USER, TEST_USER_PASSWORD, asList(NEXUS504_ROLE));
   }
 

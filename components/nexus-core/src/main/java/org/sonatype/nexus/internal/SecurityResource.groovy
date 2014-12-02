@@ -199,7 +199,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '1',
+                id: 'status', // 1
                 type: 'method',
                 name: 'Status - (read)',
                 description: 'Give permission to query the nexus server for it\'s status.  This privilege is required by the anonymous user so that the UI can retrieve anonymous permissions on startup.',
@@ -757,7 +757,7 @@ implements StaticSecurityResource
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
-                privileges: ['1', '54', '57', '58', '70', '74'],
+                privileges: ['status', '54', '57', '58', '70', '74'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
@@ -862,7 +862,7 @@ implements StaticSecurityResource
                 id: 'ui-basic',
                 name: 'UI: Base UI Privileges',
                 description: 'Generic privileges for users in the Nexus UI',
-                privileges: ['1', '2', '64']
+                privileges: ['status', '2', '64']
             ),
             new CRole(
                 id: 'nx-apikey-access',
