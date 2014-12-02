@@ -52,7 +52,7 @@ public class NowScheduledTaskLifecycleIT
     assertThat(taskInfo, notNullValue());
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
     assertThat(taskInfo.getName(), equalTo(taskConfiguration.getName()));
-    assertThat(taskInfo.getConfiguration().getType(), equalTo(taskConfiguration.getType()));
+    assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));

@@ -13,17 +13,27 @@
 
 package org.sonatype.nexus.scheduling.internal;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.eclipse.sisu.BeanEntry;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -39,20 +49,49 @@ public class DefaultNexusTaskFactory
 {
   private final Iterable<BeanEntry<Named, Task>> tasks;
 
+  private final List<TaskDescriptor<?>> taskDescriptors;
+
   @Inject
-  public DefaultNexusTaskFactory(final Iterable<BeanEntry<Named, Task>> tasks)
+  public DefaultNexusTaskFactory(final Iterable<BeanEntry<Named, Task>> tasks,
+                                 final List<TaskDescriptor<?>> taskDescriptors)
   {
     this.tasks = checkNotNull(tasks);
+    this.taskDescriptors = checkNotNull(taskDescriptors);
   }
 
   @Override
-  public boolean isTask(final String taskType) {
-    checkNotNull(taskType);
-    final BeanEntry<Named, Task> taskEntry = locateTask(taskType);
-    if (taskEntry != null) {
-      return true;
+  public List<TaskDescriptor<?>> listTaskDescriptors() {
+    final Map<Class<? extends Task>, TaskDescriptor<?>> descriptorMap = Maps.newHashMap();
+    for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
+      descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
     }
-    return false;
+    for (BeanEntry<Named, Task> entry : tasks) {
+      if (!descriptorMap.containsKey(entry.getImplementationClass())) {
+        final TaskDescriptor<?> taskDescriptor = createTaskDescriptor(entry);
+        descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
+      }
+    }
+    return Lists.newArrayList(descriptorMap.values());
+  }
+
+  @Override
+  public <T extends Task> TaskDescriptor<T> resolveTaskDescriptorByTypeId(final String taskTypeId) {
+    // look for descriptors first
+    for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
+      if (taskDescriptor.getId().equals(taskTypeId)) {
+        return (TaskDescriptor<T>) taskDescriptor;
+      }
+    }
+    // not found by descriptor, try tasks directly
+    for (BeanEntry<Named, Task> entry : tasks) {
+      // checks: task FQCN, task SimpleName or @Named
+      if (entry.getImplementationClass().getName().equals(taskTypeId)
+          || entry.getImplementationClass().getSimpleName().equals(taskTypeId)
+          || entry.getKey().value().equals(taskTypeId)) {
+        return (TaskDescriptor<T>) findTaskDescriptor(entry);
+      }
+    }
+    return null;
   }
 
   @Override
@@ -62,24 +101,51 @@ public class DefaultNexusTaskFactory
     checkNotNull(taskConfiguration);
     taskConfiguration.validate();
     log.debug("Creating task by hint: {}", taskConfiguration);
-    final BeanEntry<Named, Task> taskEntry = locateTask(taskConfiguration.getType());
-    if (taskEntry != null) {
-      final Task task = taskEntry.getProvider().get();
-      task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
-      return task;
+    final TaskDescriptor<?> taskDescriptor = resolveTaskDescriptorByTypeId(taskConfiguration.getTypeId());
+    checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskConfiguration.getTypeId());
+    taskConfiguration.setTypeId(taskDescriptor.getId());
+    for (BeanEntry<Named, Task> entry : tasks) {
+      if (entry.getImplementationClass().equals(taskDescriptor.getType())) {
+        final Task task = entry.getProvider().get();
+        task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
+        return task;
+      }
     }
-    throw new IllegalArgumentException("No Task type \'" + taskConfiguration.getType() + "\' found");
+    throw new IllegalArgumentException("No Task of type \'" + taskConfiguration.getTypeId() + "\' found");
   }
 
   // ==
 
-  private BeanEntry<Named, Task> locateTask(final String taskType) {
-    for (BeanEntry<Named, Task> entry : tasks) {
-      // TODO: consider other strategies? like by @Name?
-      if (entry.getImplementationClass().getName().equals(taskType)) {
-        return entry;
+  /**
+   * Returns {@link TaskDescriptor} by given Task's bean entry. Will perform a search for provided task descriptors,
+   * and if not found, will create one using {@link #createTaskDescriptor(BeanEntry)}.
+   */
+  private <T extends Task> TaskDescriptor<T> findTaskDescriptor(final BeanEntry<Named, Task> taskBeanEntry) {
+    // look for descriptors first
+    for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
+      if (taskDescriptor.getType().equals(taskBeanEntry.getImplementationClass())) {
+        return (TaskDescriptor<T>) taskDescriptor;
       }
     }
-    return null;
+    // not found by descriptor, try tasks directly
+    return (TaskDescriptor<T>) createTaskDescriptor(taskBeanEntry);
+  }
+
+  /**
+   * Creates {@link TaskDescriptor} for given Task's bean entry class. To be used For tasks without descriptors, it
+   * will create one on the fly with defaults.
+   */
+  private <T extends Task> TaskDescriptor<T> createTaskDescriptor(final BeanEntry<Named, Task> taskBeanEntry) {
+    final String taskName =
+        taskBeanEntry.getDescription() != null
+            ? taskBeanEntry.getDescription()
+            : taskBeanEntry.getImplementationClass().getSimpleName();
+    // by default, tasks w/o descriptors are not exposed, and not visible while run/scheduled
+    return new TaskDescriptorSupport<T>(
+        (Class<T>) taskBeanEntry.getImplementationClass(),
+        taskName,
+        false,
+        false
+    ) { };
   }
 }

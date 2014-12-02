@@ -200,7 +200,7 @@ public class GenerateMetadataTaskSettingsIT
     final TaskConfiguration configuration = new TaskConfiguration();
     configuration.setId("id");
     configuration.setName("name");
-    configuration.setType(GenerateMetadataTask.class.getName());
+    configuration.setTypeId(GenerateMetadataTask.class.getSimpleName());
     configuration.setRepositoryId(repo);
     configuration.setString(GenerateMetadataTask.PARAM_VERSION, version);
     TaskInfo task = mock(TaskInfo.class);
@@ -230,7 +230,7 @@ public class GenerateMetadataTaskSettingsIT
         return null;
       }
     };
-    task.getConfiguration().setType(GenerateMetadataTask.class.getName());
+    task.getConfiguration().setTypeId(GenerateMetadataTask.class.getSimpleName());
     task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
     task.setRepoDir(rpmsDir());

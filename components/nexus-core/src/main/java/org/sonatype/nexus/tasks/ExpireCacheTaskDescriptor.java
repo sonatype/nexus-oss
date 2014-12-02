@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,38 +24,25 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class ExpireCacheTaskDescriptor
     extends TaskDescriptorSupport
 {
   public ExpireCacheTaskDescriptor() {
-    super(ExpireCacheTask.class, "Expire Repository Caches");
-  }
-
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the proxy repository to expire cache.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
-
-  private final StringTextFormField resourceStorePathField =
-      new StringTextFormField(
-          TaskConfiguration.PATH_KEY,
-          "Repository path",
-          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-          FormField.OPTIONAL);
-
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-
-    fields.add(repoField);
-    fields.add(resourceStorePathField);
-
-    return fields;
+    super(ExpireCacheTask.class, "Expire Repository Caches",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the proxy repository to expire cache.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+            .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
 }

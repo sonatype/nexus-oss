@@ -24,6 +24,7 @@ import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
+import org.sonatype.nexus.yum.internal.task.GenerateMetadataTaskDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -75,6 +76,7 @@ public class YumHostedImplDeletionsTest
 
     yum = new YumHostedImpl(
         nexusScheduler,
+        new GenerateMetadataTaskDescriptor(),
         new ScheduledThreadPoolExecutor(10),
         new BlockSqliteDatabasesRequestStrategy(),
         repository,

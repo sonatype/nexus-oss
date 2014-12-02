@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.index.tasks.descriptors;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -25,29 +23,19 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class PublishIndexesTaskDescriptor
     extends TaskDescriptorSupport<PublishIndexesTask>
 {
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the Maven repository to publish the index.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfContentClasses(Maven2ContentClass.ID);
-
   public PublishIndexesTaskDescriptor() {
-    super(PublishIndexesTask.class, "Publish Indexes");
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-    fields.add(repoField);
-    return fields;
+    super(PublishIndexesTask.class, "Publish Indexes",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the Maven repository to publish the index.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories().includingAnyOfContentClasses(Maven2ContentClass.ID)
+    );
   }
 }

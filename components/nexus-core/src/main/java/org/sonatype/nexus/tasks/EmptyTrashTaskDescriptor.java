@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,39 +22,26 @@ import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class EmptyTrashTaskDescriptor
     extends TaskDescriptorSupport
 {
-  public EmptyTrashTaskDescriptor() {
-    super(EmptyTrashTask.class, "Empty Trash");
-  }
-
   public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
 
-  private final NumberTextFormField olderThanField =
-      new NumberTextFormField(
-          OLDER_THAN_FIELD_ID,
-          "Purge items older than (days)",
-          "Set the number of days, to purge all items that were trashed before the given number of days.",
-          FormField.OPTIONAL);
-
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the repository to empty the trash.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories();
-
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-
-    fields.add(repoField);
-    fields.add(olderThanField);
-
-    return fields;
+  public EmptyTrashTaskDescriptor() {
+    super(EmptyTrashTask.class, "Empty Trash",
+        new NumberTextFormField(
+            OLDER_THAN_FIELD_ID,
+            "Purge items older than (days)",
+            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            FormField.OPTIONAL),
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to empty the trash.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+    );
   }
 }

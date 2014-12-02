@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,41 +22,24 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class RebuildAttributesTaskDescriptor
     extends TaskDescriptorSupport
 {
   public RebuildAttributesTaskDescriptor() {
-    super(RebuildAttributesTask.class, "Rebuild Repository Attributes");
-  }
-
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the repository to rebuild attributes",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories();
-
-  private final StringTextFormField resourceStorePathField =
-      new StringTextFormField(
-          TaskConfiguration.PATH_KEY,
-          "Repository path",
-          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-          FormField.OPTIONAL);
-
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-    fields.add(repoField);
-    fields.add(resourceStorePathField);
-    return fields;
-  }
-
-  // TODO: this is internal task, not meant for users. But why does it have descriptor then?
-  @Override
-  public boolean isExposed() {
-    return false;
+    super(RebuildAttributesTask.class, "Rebuild Repository Attributes", false, false,
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to rebuild attributes",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories(),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
 }

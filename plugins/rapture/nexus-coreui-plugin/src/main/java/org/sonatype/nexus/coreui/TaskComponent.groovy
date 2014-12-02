@@ -27,7 +27,6 @@ import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
 import org.sonatype.nexus.scheduling.NexusTaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
-import org.sonatype.nexus.scheduling.TaskDescriptor
 import org.sonatype.nexus.scheduling.TaskInfo
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState
 import org.sonatype.nexus.scheduling.TaskInfo.EndState
@@ -67,9 +66,6 @@ class TaskComponent
   @Inject
   NexusTaskScheduler nexusScheduler
 
-  @Inject
-  List<TaskDescriptor> descriptors
-
   /**
    * Retrieve a list of scheduled tasks.
    */
@@ -91,7 +87,7 @@ class TaskComponent
   @DirectMethod
   @RequiresPermissions('nexus:tasktypes:read')
   List<TaskTypeXO> readTypes() {
-    return descriptors.findAll { descriptor ->
+    return nexusScheduler.listTaskDescriptors().findAll { descriptor ->
       descriptor.exposed ? descriptor : null
     }.collect { descriptor ->
       def result = new TaskTypeXO(
@@ -137,9 +133,7 @@ class TaskComponent
       nexusTask.getMap().put(key, value)
     }
     nexusTask.setAlertEmail(taskXO.alertEmail)
-    // TODO: this should not be set by user, it's description instead
     nexusTask.setName(taskXO.name)
-    nexusTask.setDescription(taskXO.description)
     nexusTask.setEnabled(taskXO.enabled)
 
     TaskInfo<?> task = nexusScheduler.scheduleTask(nexusTask, schedule)
@@ -162,7 +156,6 @@ class TaskComponent
     validateState(task)
     task.configuration.enabled = taskXO.enabled
     task.configuration.name = taskXO.name
-    task.configuration.description = taskXO.description
     task.configuration.map.putAll(taskXO.properties)
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
@@ -316,8 +309,8 @@ class TaskComponent
         id: task.id,
         enabled: task.configuration.enabled,
         name: task.name,
-        typeId: task.configuration.type,
-        typeName: (descriptors.find { it.id == task.configuration.type })?.name,
+        typeId: task.configuration.typeId,
+        typeName: task.configuration.typeName,
         status: task.currentState.state,
         statusDescription: task.configuration.enabled ? getStatusDescription(task.currentState) : 'Disabled',
         schedule: getSchedule(task.schedule),

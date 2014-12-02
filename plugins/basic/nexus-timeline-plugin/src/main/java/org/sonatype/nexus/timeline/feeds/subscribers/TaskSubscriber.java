@@ -50,10 +50,10 @@ public class TaskSubscriber
   @AllowConcurrentEvents
   public void on(final NexusTaskEventStarted evt) {
     final Map<String, String> data = Maps.newHashMap();
-    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getTypeId());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
-    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getTypeName());
     putIfNotNull(data, "taskMessage", evt.getNexusTaskInfo().getConfiguration().getMessage());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
@@ -72,10 +72,10 @@ public class TaskSubscriber
     final Map<String, String> data = Maps.newHashMap();
     long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
     putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
-    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getTypeId());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
-    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getTypeName());
     putIfNotNull(data, "taskMessage", evt.getNexusTaskInfo().getConfiguration().getMessage());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
@@ -94,10 +94,10 @@ public class TaskSubscriber
     final Map<String, String> data = Maps.newHashMap();
     long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
     putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
-    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getTypeId());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
-    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getTypeName());
     putIfNotNull(data, "taskMessage", evt.getNexusTaskInfo().getConfiguration().getMessage());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,
@@ -117,10 +117,10 @@ public class TaskSubscriber
     long taskStarted = evt.getNexusTaskInfo().getLastRunState() != null ? evt.getNexusTaskInfo().getLastRunState().getRunStarted().getTime() : -1;
     putIfNotNull(data, "taskStarted", String.valueOf(taskStarted));
     putIfNotNull(data, "taskFailure", String.valueOf(evt.getFailureCause()));
-    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskType", evt.getNexusTaskInfo().getConfiguration().getTypeId());
     putIfNotNull(data, "taskId", evt.getNexusTaskInfo().getId());
     putIfNotNull(data, "taskName", evt.getNexusTaskInfo().getName());
-    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getType());
+    putIfNotNull(data, "taskAction", evt.getNexusTaskInfo().getConfiguration().getTypeName());
     putIfNotNull(data, "taskMessage", evt.getNexusTaskInfo().getConfiguration().getMessage());
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_TASK,

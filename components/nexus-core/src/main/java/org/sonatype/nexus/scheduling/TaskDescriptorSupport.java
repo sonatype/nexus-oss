@@ -12,10 +12,13 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.nexus.formfields.FormField;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,23 +26,70 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Support class for {@link TaskDescriptor}s.
  *
  * @since 3.0
- * TODO: would fit very nicely as a groovy class ;)
  */
 public abstract class TaskDescriptorSupport<T extends Task>
     implements TaskDescriptor<T>
 {
-  private final Class<T> type;
+  private final String id;
 
   private final String name;
 
-  public TaskDescriptorSupport(final Class<T> type, final String name) {
-    this.type = checkNotNull(type);
-    this.name = checkNotNull(name);
+  private final Class<T> type;
+
+  private final boolean visible;
+
+  private final boolean exposed;
+
+  private final List<FormField> formFields;
+
+  private final Predicate<TaskInfo<?>> predicate;
+
+  /**
+   * Simplified constructor that will create visible and exposed descriptor without any formField.
+   */
+  public TaskDescriptorSupport(final Class<T> type, final String name)
+  {
+    this(type, name, true, true);
+  }
+
+  /**
+   * Simplified constructor that will create visible and exposed descriptor with formFields.
+   */
+  public TaskDescriptorSupport(final Class<T> type, final String name, final FormField... formFields)
+  {
+    this(type, name, true, true, formFields);
+  }
+
+  /**
+   * Constructor with all bells and whistles.
+   */
+  public TaskDescriptorSupport(final Class<T> type,
+                               final String name,
+                               final boolean visible,
+                               final boolean exposed,
+                               final FormField... formFields)
+  {
+    checkNotNull(type);
+    checkNotNull(name);
+    checkNotNull(formFields);
+    this.id = type.getSimpleName();
+    this.name = name;
+    this.type = type;
+    this.visible = visible;
+    this.exposed = exposed;
+    this.formFields = ImmutableList.copyOf(formFields);
+    this.predicate = new Predicate<TaskInfo<?>>()
+    {
+      @Override
+      public boolean apply(final TaskInfo<?> input) {
+        return id.equals(input.getConfiguration().getTypeId());
+      }
+    };
   }
 
   @Override
   public final String getId() {
-    return type.getName();
+    return id;
   }
 
   @Override
@@ -53,17 +103,31 @@ public abstract class TaskDescriptorSupport<T extends Task>
   }
 
   @Override
-  public boolean isVisible() {
-    return true;
+  public final boolean isVisible() { return visible; }
+
+  @Override
+  public final boolean isExposed() {
+    return exposed;
   }
 
   @Override
-  public boolean isExposed() {
-    return true;
+  public final List<FormField> formFields() {
+    return formFields;
   }
 
   @Override
-  public List<FormField> formFields() {
-    return Collections.emptyList();
+  public final Predicate<TaskInfo<?>> predicate() {
+    return predicate;
+  }
+
+  @Override
+  public final List<TaskInfo<?>> filter(final List<TaskInfo<?>> tasks) {
+    final List<TaskInfo<?>> result = Lists.newArrayList();
+    for (TaskInfo<?> task : tasks) {
+      if (predicate.apply(task)) {
+        result.add(task);
+      }
+    }
+    return result;
   }
 }

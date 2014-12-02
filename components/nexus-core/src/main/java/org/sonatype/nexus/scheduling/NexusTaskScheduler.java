@@ -26,6 +26,11 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 public interface NexusTaskScheduler
 {
   /**
+   * Returns the list of task descriptors for all known tasks in system.
+   */
+  List<TaskDescriptor<?>> listTaskDescriptors();
+
+  /**
    * A factory for task configurations (by actual type). It will honor descriptor if exists for given type, otherwise
    * will use sane default values. See {@link #createTaskConfigurationInstance(String)}.
    */

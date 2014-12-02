@@ -19,8 +19,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * The task configuration backed by plain map. The configuration is persisted by actual underlying scheduler, so it
@@ -59,9 +59,14 @@ public final class TaskConfiguration
   static final String NAME_KEY = PRIVATE_PROP_PREFIX + "name";
 
   /**
-   * Key of type property (private).
+   * Key of type ID property (private).
    */
-  static final String TYPE_KEY = PRIVATE_PROP_PREFIX + "type";
+  static final String TYPE_ID_KEY = PRIVATE_PROP_PREFIX + "typeId";
+
+  /**
+   * Key of type name property (private).
+   */
+  static final String TYPE_NAME_KEY = PRIVATE_PROP_PREFIX + "typeName";
 
   /**
    * Key of enabled property (private).
@@ -94,11 +99,6 @@ public final class TaskConfiguration
   static final String MESSAGE_KEY = PRIVATE_PROP_PREFIX + "message";
 
   /**
-   * Key of description.
-   */
-  public static final String DESCRIPTION_KEY = "description";
-
-  /**
    * Key of repository.
    */
   public static final String REPOSITORY_ID_KEY = "repositoryId";
@@ -111,14 +111,12 @@ public final class TaskConfiguration
   private final Map<String, String> configuration = Maps.newHashMap();
 
   /**
-   * Performs a "self" validation of the configuration for completeness and correctness.
-   * TODO: hook this into validator somehow? Currently, this method is only a "shortcut" to not have it
-   * spread across task factory and scheduler.
+   * Performs a "self" validation of the configuration for minimal completeness and correctness.
    */
-  public final void validate() throws IllegalStateException {
+  public final void validate() throws IllegalArgumentException {
     // Minimum requirements
-    checkState(!Strings.isNullOrEmpty(getId()), "Incomplete task configuration: id");
-    checkState(!Strings.isNullOrEmpty(getType()), "Incomplete task configuration: type");
+    checkArgument(!Strings.isNullOrEmpty(getId()), "Incomplete task configuration: id");
+    checkArgument(!Strings.isNullOrEmpty(getTypeId()), "Incomplete task configuration: typeId");
   }
 
   /**
@@ -159,18 +157,33 @@ public final class TaskConfiguration
   }
 
   /**
-   * Returns a type of the task instance.
+   * Returns a type ID of the task instance.
    */
-  public String getType() {
-    return getString(TYPE_KEY);
+  public String getTypeId() {
+    return getString(TYPE_ID_KEY);
   }
 
   /**
-   * Sets the task type.
+   * Sets the task type ID.
    */
-  public void setType(final String type) {
-    checkNotNull(type);
-    getMap().put(TYPE_KEY, type);
+  public void setTypeId(final String typeId) {
+    checkNotNull(typeId);
+    getMap().put(TYPE_ID_KEY, typeId);
+  }
+
+  /**
+   * Returns a type name of the task instance.
+   */
+  public String getTypeName() {
+    return getString(TYPE_NAME_KEY);
+  }
+
+  /**
+   * Sets the task type name.
+   */
+  public void setTypeName(final String typeName) {
+    checkNotNull(typeName);
+    getMap().put(TYPE_NAME_KEY, typeName);
   }
 
   /**
@@ -266,29 +279,6 @@ public final class TaskConfiguration
     }
     else {
       getMap().put(MESSAGE_KEY, message);
-    }
-  }
-
-  /**
-   * Returns the description of the task.
-   */
-  public String getDescription() {
-    final String description = getString(DESCRIPTION_KEY);
-    if (Strings.isNullOrEmpty(description)) {
-      return getName();
-    }
-    return description;
-  }
-
-  /**
-   * Sets or resets the description of the task.
-   */
-  public void setDescription(final String description) {
-    if (Strings.isNullOrEmpty(description)) {
-      getMap().remove(DESCRIPTION_KEY);
-    }
-    else {
-      getMap().put(DESCRIPTION_KEY, description);
     }
   }
 

@@ -13,18 +13,27 @@
 
 package org.sonatype.nexus.scheduling;
 
+import java.util.List;
+
 /**
  * The factory for {@link Task} instances.
  */
 public interface NexusTaskFactory
 {
   /**
-   * Test whether taskType belongs to a known task implementation.
+   * Returns the list of task descriptors for all known tasks in system.
    */
-  boolean isTask(String taskType);
+  List<TaskDescriptor<?>> listTaskDescriptors();
+
+  /**
+   * Resolves the task descriptor by type ID of the task. Returns {@code null} if no task found for given task ID.
+   */
+  <T extends Task> TaskDescriptor<T> resolveTaskDescriptorByTypeId(String taskTypeId);
 
   /**
    * A factory for tasks based on passed in task configuration. Returns a configured task instance.
+   *
+   * @throws IllegalArgumentException if taskType carried by configuration is not a valid task type.
    */
   <T extends Task> T createTaskInstance(TaskConfiguration taskConfiguration)
       throws IllegalArgumentException;

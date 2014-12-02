@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.plugins.p2.repository.internal.tasks;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -31,27 +28,20 @@ import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 public class P2MetadataGeneratorTaskDescriptor
     extends TaskDescriptorSupport<P2MetadataGeneratorTask>
 {
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the repository to generate P2 metadata.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .excludingAnyOfFacets(GroupRepository.class);
-
-  private final StringTextFormField resourceStorePathField = new StringTextFormField(
-      TaskConfiguration.PATH_KEY,
-      "Repository path",
-      "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-      FormField.OPTIONAL);
-
   public P2MetadataGeneratorTaskDescriptor()
   {
-    super(P2MetadataGeneratorTask.class, "Rebuild P2 metadata");
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return Arrays.asList(repoField, resourceStorePathField);
+    super(P2MetadataGeneratorTask.class, "Rebuild P2 metadata",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to generate P2 metadata.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories().excludingAnyOfFacets(GroupRepository.class),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
 }

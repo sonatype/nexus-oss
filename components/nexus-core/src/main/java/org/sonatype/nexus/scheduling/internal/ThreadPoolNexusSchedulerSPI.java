@@ -208,16 +208,16 @@ public class ThreadPoolNexusSchedulerSPI
     public T call() throws Exception {
       final long now = System.currentTimeMillis();
       EndState endState = null;
-      log.info("Task started: {} : {}", getConfiguration().getType(), getName());
+      log.info("Task started: {} : {}", getConfiguration().getTypeName(), getName());
       try {
         T result = task.call();
         endState = EndState.OK;
-        log.info("Task ended: {} : {}", getConfiguration().getType(), getName());
+        log.info("Task ended: {} : {}", getConfiguration().getTypeName(), getName());
         return result;
       }
       catch (Exception e) {
         endState = EndState.FAILED;
-        log.info("Task failed: {} : {}", getConfiguration().getType(), getName(), e);
+        log.info("Task failed: {} : {}", getConfiguration().getTypeName(), getName(), e);
         throw e;
       }
       finally {

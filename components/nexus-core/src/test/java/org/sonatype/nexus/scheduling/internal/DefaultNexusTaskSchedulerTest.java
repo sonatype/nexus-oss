@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.scheduling.internal;
 
-import java.util.Collections;
-
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.Task;
@@ -26,6 +24,7 @@ import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
 import org.eclipse.sisu.BeanEntry;
 import org.junit.Before;
@@ -49,9 +48,8 @@ public class DefaultNexusTaskSchedulerTest
     final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
     final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
-        ImmutableList.of(be1, be2));
+        ImmutableList.of(be1, be2), Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        ImmutableList.<TaskDescriptor>of(new TaskWithDescriptorDescriptor()),
         Providers.<NexusTaskExecutorSPI>of(null));
   }
 
@@ -59,15 +57,17 @@ public class DefaultNexusTaskSchedulerTest
   public void createTaskConfigurationInstance() {
     final TaskConfiguration c1 = nexusTaskScheduler.createTaskConfigurationInstance(TaskWithDescriptor.class);
     assertThat(c1.getId(), notNullValue());
-    assertThat(c1.getName(), equalTo(TaskWithDescriptor.class.getSimpleName()));
-    assertThat(c1.getType(), equalTo(TaskWithDescriptor.class.getName()));
+    assertThat(c1.getName(), equalTo("Task with descriptor"));
+    assertThat(c1.getTypeId(), equalTo(TaskWithDescriptor.class.getSimpleName()));
+    assertThat(c1.getTypeName(), equalTo("Task with descriptor"));
     assertThat(c1.isVisible(), is(true));
     assertThat(c1.isEnabled(), is(true));
 
     final TaskConfiguration c2 = nexusTaskScheduler.createTaskConfigurationInstance(TaskWithoutDescriptor.class);
     assertThat(c2.getId(), notNullValue());
-    assertThat(c2.getName(), equalTo(TaskWithoutDescriptor.class.getName()));
-    assertThat(c2.getType(), equalTo(TaskWithoutDescriptor.class.getName()));
+    assertThat(c2.getName(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
+    assertThat(c2.getTypeId(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
+    assertThat(c2.getTypeName(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
     assertThat(c2.isVisible(), is(false));
     assertThat(c2.isEnabled(), is(true));
 

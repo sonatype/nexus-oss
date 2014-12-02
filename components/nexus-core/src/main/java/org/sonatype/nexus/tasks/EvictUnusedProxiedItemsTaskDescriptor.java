@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,40 +24,27 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class EvictUnusedProxiedItemsTaskDescriptor
     extends TaskDescriptorSupport
 {
-  public EvictUnusedProxiedItemsTaskDescriptor() {
-    super(EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches");
-  }
-
   public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
 
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the proxy repository to evict unused items.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
-
-  private final NumberTextFormField olderThanField =
-      new NumberTextFormField(
-          OLDER_THAN_FIELD_ID,
-          "Evict items older than (days)",
-          "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
-          FormField.MANDATORY);
-
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-
-    fields.add(repoField);
-    fields.add(olderThanField);
-
-    return fields;
+  public EvictUnusedProxiedItemsTaskDescriptor() {
+    super(EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the proxy repository to evict unused items.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+            .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class),
+        new NumberTextFormField(
+            OLDER_THAN_FIELD_ID,
+            "Evict items older than (days)",
+            "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
+            FormField.MANDATORY)
+    );
   }
 }

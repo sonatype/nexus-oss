@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.scheduling.internal;
 
-import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
@@ -30,9 +29,9 @@ import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.util.Providers;
 import org.eclipse.sisu.BeanEntry;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,9 +50,8 @@ public class NexusTaskSchedulerTest
   public void prepare() {
     final BeanEntry<Named, Task> task = beanEntry(SleeperTask.class);
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
-        ImmutableList.of(task));
+        ImmutableList.of(task), Lists.<TaskDescriptor<?>>newArrayList());
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        Collections.<TaskDescriptor>emptyList(),
         Providers.<NexusTaskExecutorSPI>of(new ThreadPoolNexusSchedulerSPI(nexusTaskFactory)));
   }
 
@@ -70,7 +68,7 @@ public class NexusTaskSchedulerTest
     assertThat(taskInfo, notNullValue());
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
     assertThat(taskInfo.getName(), equalTo(taskConfiguration.getName()));
-    assertThat(taskInfo.getConfiguration().getType(), equalTo(taskConfiguration.getType()));
+    assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));

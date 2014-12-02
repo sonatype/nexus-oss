@@ -24,6 +24,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
 import com.google.common.base.Throwables;
 import com.google.inject.Provider;
 import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.Description;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,7 +49,7 @@ public class Tasks
       extends TaskDescriptorSupport
   {
     public TaskWithDescriptorDescriptor() {
-      super(TaskWithDescriptor.class, TaskWithDescriptor.class.getSimpleName());
+      super(TaskWithDescriptor.class, "Task with descriptor");
     }
   }
 

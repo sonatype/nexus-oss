@@ -35,12 +35,12 @@ class TaskXO
   String name
 
   String message
-  String description
 
   @NotEmpty(groups = Create)
   String typeId
-
+  @NotEmpty(groups = Create)
   String typeName
+
   String status
   String statusDescription
 

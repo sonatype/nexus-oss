@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.sonatype.nexus.formfields.FormField;
 
+import com.google.common.base.Predicate;
+
 /**
  * Task descriptor that makes task visible in UI and user manageable. Task that is meant for end users to use over UI
  * should have descriptors too. Still, a Task implementation does NOT have to have descriptor. One notable difference
@@ -33,14 +35,14 @@ public interface TaskDescriptor<T extends Task>
   String getId();
 
   /**
-   * The actual type of task.
-   */
-  Class<T> getType();
-
-  /**
    * Short, descriptive name of task.
    */
   String getName();
+
+  /**
+   * The actual type of task.
+   */
+  Class<T> getType();
 
   /**
    * UI elements of the task.
@@ -56,4 +58,15 @@ public interface TaskDescriptor<T extends Task>
    * Is the task <strong>type</strong> exposed over UI and available for users to create instances of it, schedule it?
    */
   boolean isExposed();
+
+  /**
+   * Returns the predicate to filter for tasks based on this type.
+   */
+  Predicate<TaskInfo<?>> predicate();
+
+  /**
+   * Filters the supplied list for tasks of this type. This is just a handy method to free caller to cope with
+   * casting, uses filtering with predicate from {@link #predicate()}.
+   */
+  List<TaskInfo<?>> filter(List<TaskInfo<?>> tasks);
 }

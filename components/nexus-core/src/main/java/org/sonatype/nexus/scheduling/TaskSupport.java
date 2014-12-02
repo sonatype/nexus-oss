@@ -62,11 +62,6 @@ public abstract class TaskSupport<T>
     return getConfiguration().getName();
   }
 
-  @Override
-  public String getDescription() {
-    return getConfiguration().getDescription();
-  }
-
   /**
    * Returns running tasks having same type as this task.
    */
@@ -78,7 +73,7 @@ public abstract class TaskSupport<T>
       public boolean apply(final TaskInfo<?> taskInfo) {
         // blockedBy: running tasks of same type as me
         return State.RUNNING == taskInfo.getCurrentState().getState()
-            && getConfiguration().getType().equals(taskInfo.getConfiguration().getType());
+            && getConfiguration().getTypeId().equals(taskInfo.getConfiguration().getTypeId());
       }
     }));
   }

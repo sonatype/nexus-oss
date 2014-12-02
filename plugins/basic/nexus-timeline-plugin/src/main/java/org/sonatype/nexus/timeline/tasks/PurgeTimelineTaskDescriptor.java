@@ -13,16 +13,12 @@
 
 package org.sonatype.nexus.timeline.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Task descriptor for {@link PurgeTimelineTask}.
@@ -36,21 +32,13 @@ public class PurgeTimelineTaskDescriptor
 {
   public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
-  private final NumberTextFormField olderThanField;
-
-  private final List<FormField> formFields;
-
   public PurgeTimelineTaskDescriptor() {
-    super(PurgeTimelineTask.class, "Purge Timeline");
-    this.olderThanField = new NumberTextFormField(OLDER_THAN_FIELD_ID,
-        "Purge items older than (days)",
-        "Set the number of days, to purge all items that were trashed before the given number of days.",
-        FormField.MANDATORY);
-    this.formFields = ImmutableList.<FormField>of(olderThanField);
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return formFields;
+    super(PurgeTimelineTask.class, "Purge Timeline",
+        new NumberTextFormField(
+            OLDER_THAN_FIELD_ID,
+            "Purge items older than (days)",
+            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            FormField.MANDATORY)
+    );
   }
 }

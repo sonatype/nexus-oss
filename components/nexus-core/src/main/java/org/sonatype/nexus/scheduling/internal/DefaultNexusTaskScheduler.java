@@ -49,26 +49,58 @@ public class DefaultNexusTaskScheduler
 {
   private final NexusTaskFactory nexusTaskFactory;
 
-  private final List<TaskDescriptor> taskDescriptors;
-
   private final Provider<NexusTaskExecutorSPI> schedulerProvider;
 
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
-                                   final List<TaskDescriptor> taskDescriptors,
                                    final Provider<NexusTaskExecutorSPI> schedulerProvider)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
-    this.taskDescriptors = checkNotNull(taskDescriptors);
     this.schedulerProvider = checkNotNull(schedulerProvider);
   }
 
-  protected NexusTaskExecutorSPI getScheduler() {
+  // ==
+
+  /**
+   * Returns the actual SPI present in system.
+   */
+  private NexusTaskExecutorSPI getScheduler() {
     final NexusTaskExecutorSPI provider = schedulerProvider.get();
     if (provider == null) {
       throw new IllegalStateException("No scheduler present in system!");
     }
     return provider;
+  }
+
+  // ==
+
+  @Override
+  public List<TaskDescriptor<?>> listTaskDescriptors() {
+    return nexusTaskFactory.listTaskDescriptors();
+  }
+
+  @Override
+  public TaskConfiguration createTaskConfigurationInstance(final Class<? extends Task> taskType)
+      throws IllegalArgumentException
+  {
+    checkNotNull(taskType);
+    return createTaskConfigurationInstance(taskType.getName());
+  }
+
+  @Override
+  public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
+    checkNotNull(taskType);
+    final TaskDescriptor<?> taskDescriptor = nexusTaskFactory.resolveTaskDescriptorByTypeId(taskType);
+    checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskType);
+    return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
+  }
+
+  @Override
+  public <T extends Task> T createTaskInstance(final TaskConfiguration taskConfiguration)
+      throws IllegalArgumentException
+  {
+    checkNotNull(taskConfiguration);
+    return nexusTaskFactory.createTaskInstance(taskConfiguration);
   }
 
   @Override
@@ -113,42 +145,6 @@ public class DefaultNexusTaskScheduler
     return getScheduler().removeTask(id);
   }
 
-  @Override
-  public <T extends Task> T createTaskInstance(final TaskConfiguration taskConfiguration)
-      throws IllegalArgumentException
-  {
-    checkNotNull(taskConfiguration);
-    return nexusTaskFactory.createTaskInstance(taskConfiguration);
-  }
-
-  @Override
-  public TaskConfiguration createTaskConfigurationInstance(final Class<? extends Task> taskType)
-      throws IllegalArgumentException
-  {
-    checkNotNull(taskType);
-    return createTaskConfigurationInstance(taskType.getName());
-  }
-
-  @Override
-  public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
-    checkNotNull(taskType);
-    checkArgument(nexusTaskFactory.isTask(taskType), "Type '%s' is not a task", taskType);
-    // try to match a descriptor for class, and use that
-    for (TaskDescriptor taskDescriptor : taskDescriptors) {
-      if (taskDescriptor.getType().getName().equals(taskType)) {
-        return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
-      }
-    }
-    // sane fallback for internal tasks not having descriptor
-    log.debug("Creating task configuration for task class: {}", taskType);
-    final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setId(generateId(taskType, taskConfiguration));
-    taskConfiguration.setName(taskType);
-    taskConfiguration.setType(taskType);
-    taskConfiguration.setVisible(false); // tasks w/o descriptors are invisible in UI by default
-    return taskConfiguration;
-  }
-
   /**
    * Creates configuration from descriptor.
    */
@@ -158,8 +154,9 @@ public class DefaultNexusTaskScheduler
     log.debug("Creating task configuration for task descriptor: {}", taskDescriptor.getId());
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
     taskConfiguration.setId(generateId(taskDescriptor.getType().getName(), taskConfiguration));
+    taskConfiguration.setTypeId(taskDescriptor.getId());
+    taskConfiguration.setTypeName(taskDescriptor.getName());
     taskConfiguration.setName(taskDescriptor.getName());
-    taskConfiguration.setType(taskDescriptor.getType().getName());
     taskConfiguration.setVisible(taskDescriptor.isVisible());
     return taskConfiguration;
   }

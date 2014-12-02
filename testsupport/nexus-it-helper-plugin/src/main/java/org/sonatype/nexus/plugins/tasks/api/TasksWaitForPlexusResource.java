@@ -158,7 +158,7 @@ public class TasksWaitForPlexusResource
     {
       @Override
       public boolean apply(final TaskInfo<?> input) {
-        return taskType == null || taskType.equals(input.getConfiguration().getType());
+        return taskType == null || taskType.equals(input.getConfiguration().getTypeId());
       }
     }));
   }

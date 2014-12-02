@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,8 +24,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class UpdateSiteMirrorTaskDescriptor
@@ -35,27 +31,19 @@ public class UpdateSiteMirrorTaskDescriptor
 {
   public static final String FORCE_MIRROR_FIELD_ID = "ForceMirror";
 
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select Eclipse Update Site repository to assign to this task.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfFacets(UpdateSiteProxyRepository.class, GroupRepository.class);
-
-  private final CheckboxFormField forceField = new CheckboxFormField(FORCE_MIRROR_FIELD_ID, "Force mirror",
-      "Mirror eclipse update site content even if site.xml did not change.", FormField.OPTIONAL);
-
   public UpdateSiteMirrorTaskDescriptor()
   {
-    super(UpdateSiteMirrorTask.class, "Mirror Eclipse Update Site");
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    final List<FormField> fields = Lists.newArrayList();
-    fields.add(repoField);
-    fields.add(forceField);
-    return fields;
+    super(UpdateSiteMirrorTask.class, "Mirror Eclipse Update Site",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select Eclipse Update Site repository to assign to this task.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories().includingAnyOfFacets(UpdateSiteProxyRepository.class,
+            GroupRepository.class),
+        new CheckboxFormField(
+            FORCE_MIRROR_FIELD_ID, "Force mirror",
+            "Mirror eclipse update site content even if site.xml did not change.", FormField.OPTIONAL)
+    );
   }
 }

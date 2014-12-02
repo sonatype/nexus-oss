@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.index.tasks.descriptors;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,31 +25,22 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 @Named
 @Singleton
 public class DownloadIndexesTaskDescriptor
     extends TaskDescriptorSupport<DownloadIndexesTask>
 {
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository",
-      "Select the Maven proxy repository to download the index.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfFacets(MavenProxyRepository.class, GroupRepository.class)
-      .includingAnyOfContentClasses(Maven2ContentClass.ID);
-
   public DownloadIndexesTaskDescriptor()
   {
-    super(DownloadIndexesTask.class, "Download Indexes");
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    List<FormField> fields = Lists.newArrayList();
-    fields.add(repoField);
-    return fields;
+    super(DownloadIndexesTask.class, "Download Indexes",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the Maven proxy repository to download the index.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+            .includingAnyOfFacets(MavenProxyRepository.class, GroupRepository.class)
+            .includingAnyOfContentClasses(Maven2ContentClass.ID)
+    );
   }
 }

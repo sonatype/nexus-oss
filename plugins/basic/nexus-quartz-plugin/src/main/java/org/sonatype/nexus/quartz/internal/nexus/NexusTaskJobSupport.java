@@ -108,7 +108,7 @@ public class NexusTaskJobSupport<T>
         }
       }
       catch (Exception e) {
-        log.warn("Task execution failure: {}:{}", taskConfiguration.getType(), taskConfiguration.getId(), e);
+        log.warn("Task execution failure: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
         ex = e;
       }
     }

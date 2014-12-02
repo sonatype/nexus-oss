@@ -38,15 +38,9 @@ public interface Task<T>
   /**
    * Returns a descriptive name of the task instance. Shorthand method for {@link #getConfiguration()#getName()}. This
    * method returns always same string for same typed tasks, and it describes what task is about. Example: "Empty
-   * trash"
+   * trash". It is modifiable by user/caller of this code, like over UI or REST.
    */
   String getName();
-
-  /**
-   * Returns the description of task instance. Initially same as {@link #getName()} but is actually meant for users
-   * to set custom task description over UI or REST.
-   */
-  String getDescription();
 
   /**
    * Returns short generated message of current task's instance work. This message is based on task configuration and

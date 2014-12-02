@@ -12,15 +12,20 @@
  */
 package org.sonatype.nexus.scheduling.internal;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
 import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.eclipse.sisu.BeanEntry;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +33,10 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.fail;
 import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 
@@ -41,34 +49,42 @@ public class DefaultNexusTaskFactoryTest
   public void prepare() {
     final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
     final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
-    nexusTaskFactory = new DefaultNexusTaskFactory(ImmutableList.of(be1, be2));
+    nexusTaskFactory = new DefaultNexusTaskFactory(ImmutableList.of(be1, be2),
+        Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
   }
 
   @Test
-  public void isTask() {
-    assertThat(nexusTaskFactory.isTask(TaskWithDescriptor.class.getName()), is(true));
-    assertThat(nexusTaskFactory.isTask(TaskWithoutDescriptor.class.getName()), is(true));
-    assertThat(nexusTaskFactory.isTask(String.class.getName()), is(false));
-    assertThat(nexusTaskFactory.isTask("foobar"), is(false));
+  public void listTaskDescriptors() {
+    final List<TaskDescriptor<?>> descriptorList = nexusTaskFactory.listTaskDescriptors();
+    assertThat(descriptorList, hasSize(2));
+  }
+
+  @Test
+  public void resolveTaskDescriptorByTypeId() {
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()), is(notNullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithoutDescriptor.class.getName()),
+        is(notNullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(String.class.getName()), is(nullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId("foobar"), is(nullValue()));
   }
 
   @Test
   public void createTaskInstance() {
     final TaskConfiguration c1 = new TaskConfiguration();
     c1.setId("id");
-    c1.setType(TaskWithDescriptor.class.getName());
+    c1.setTypeId(TaskWithDescriptor.class.getName());
     final Task<?> task1 = nexusTaskFactory.createTaskInstance(c1);
     assertThat(task1, is(instanceOf(TaskWithDescriptor.class)));
 
     final TaskConfiguration c2 = new TaskConfiguration();
     c2.setId("id");
-    c2.setType(TaskWithoutDescriptor.class.getName());
+    c2.setTypeId(TaskWithoutDescriptor.class.getName());
     final Task<?> task2 = nexusTaskFactory.createTaskInstance(c2);
     assertThat(task2, is(instanceOf(TaskWithoutDescriptor.class)));
 
     final TaskConfiguration c3 = new TaskConfiguration();
     c3.setId("id");
-    c2.setType("foobar");
+    c2.setTypeId("foobar");
     try {
       final Task<?> task3 = nexusTaskFactory.createTaskInstance(c2);
       fail("This should not return");

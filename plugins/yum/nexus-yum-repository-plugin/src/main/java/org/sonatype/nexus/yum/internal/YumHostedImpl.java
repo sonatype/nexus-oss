@@ -35,6 +35,7 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
+import org.sonatype.nexus.yum.internal.task.GenerateMetadataTaskDescriptor;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
@@ -61,6 +62,8 @@ public class YumHostedImpl
 
   private final NexusTaskScheduler nexusScheduler;
 
+  private final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor;
+
   private final ScheduledThreadPoolExecutor executor;
 
   private final HostedRepository repository;
@@ -85,6 +88,7 @@ public class YumHostedImpl
 
   @Inject
   public YumHostedImpl(final NexusTaskScheduler nexusScheduler,
+                       final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor,
                        final ScheduledThreadPoolExecutor executor,
                        final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,
                        final @Assisted HostedRepository repository,
@@ -93,6 +97,7 @@ public class YumHostedImpl
 
   {
     this.nexusScheduler = checkNotNull(nexusScheduler);
+    this.generateMetadataTaskDescriptor = checkNotNull(generateMetadataTaskDescriptor);
     this.executor = checkNotNull(executor);
     this.repository = checkNotNull(repository);
     this.temporaryDirectory = checkNotNull(temporaryDirectory);
@@ -220,11 +225,10 @@ public class YumHostedImpl
   }
 
   private TaskInfo<YumRepository> submitTask(final TaskConfiguration task) {
-    final List<TaskInfo<?>> taskInfos = nexusScheduler.listsTasks();
+    final List<TaskInfo<?>> taskInfos = generateMetadataTaskDescriptor.filter(nexusScheduler.listsTasks());
     // type + repoId + version wil conflict
     for (TaskInfo<?> taskInfo : taskInfos) {
-      if (taskInfo.getConfiguration().getType().equals(task.getType()) &&
-          Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
+      if (Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
           Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION), task.getString(
               GenerateMetadataTask.PARAM_VERSION))) {
         return mergeAddedFiles((TaskInfo<YumRepository>) taskInfo, task);
@@ -280,7 +284,8 @@ public class YumHostedImpl
   }
 
   private GenerateMetadataTask createTask() {
-    final TaskConfiguration taskCfg = nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class);
+    final TaskConfiguration taskCfg = nexusScheduler
+        .createTaskConfigurationInstance(generateMetadataTaskDescriptor.getId());
     final GenerateMetadataTask task = nexusScheduler.createTaskInstance(taskCfg);
     if (task == null) {
       throw new IllegalStateException(

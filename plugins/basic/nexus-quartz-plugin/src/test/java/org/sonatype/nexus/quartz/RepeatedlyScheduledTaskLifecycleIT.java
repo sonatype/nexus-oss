@@ -63,7 +63,7 @@ public class RepeatedlyScheduledTaskLifecycleIT
     assertThat(taskInfo, notNullValue());
     assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
     assertThat(taskInfo.getName(), equalTo(taskConfiguration.getName()));
-    assertThat(taskInfo.getConfiguration().getType(), equalTo(taskConfiguration.getType()));
+    assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
     assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
@@ -108,7 +108,7 @@ public class RepeatedlyScheduledTaskLifecycleIT
       assertThat(ti, notNullValue());
       assertThat(ti.getId(), equalTo(taskConfiguration.getId()));
       assertThat(ti.getName(), equalTo(taskConfiguration.getName()));
-      assertThat(ti.getConfiguration().getType(), equalTo(taskConfiguration.getType()));
+      assertThat(ti.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
       assertThat(ti.getConfiguration().getCreated(), notNullValue());
       assertThat(ti.getConfiguration().getUpdated(), notNullValue());
 

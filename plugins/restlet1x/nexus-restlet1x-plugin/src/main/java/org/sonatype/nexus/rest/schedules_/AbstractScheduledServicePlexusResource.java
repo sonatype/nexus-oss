@@ -450,7 +450,7 @@ public abstract class AbstractScheduledServicePlexusResource
       resource.setEnabled(taskConfiguration.isEnabled());
       resource.setName(taskConfiguration.getName());
       resource.setSchedule(getScheduleShortName(schedule));
-      resource.setTypeId(taskConfiguration.getType());
+      resource.setTypeId(taskConfiguration.getTypeId());
       resource.setProperties(formatServiceProperties(taskConfiguration.getMap()));
       resource.setAlertEmail(taskConfiguration.getAlertEmail());
     }

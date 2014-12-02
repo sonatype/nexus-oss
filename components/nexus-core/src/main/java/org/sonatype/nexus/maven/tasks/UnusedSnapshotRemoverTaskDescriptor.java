@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.maven.tasks;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,8 +25,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-import com.google.common.collect.Lists;
-
 /**
  * @since 2.7.0
  */
@@ -37,17 +33,12 @@ import com.google.common.collect.Lists;
 public class UnusedSnapshotRemoverTaskDescriptor
     extends TaskDescriptorSupport
 {
-  public static final String ID = "UnusedSnapshotRemoverTask";
-
   public static final String DAYS_SINCE_LAST_REQUESTED_FIELD_ID = "daysSinceLastRequested";
-
-  private final List<FormField> formFields;
 
   @Inject
   public UnusedSnapshotRemoverTaskDescriptor()
   {
-    super(UnusedSnapshotRemoverTask.class, "Remove Unused Snapshots From Repository");
-    formFields = Lists.<FormField>newArrayList(
+    super(UnusedSnapshotRemoverTask.class, "Remove Unused Snapshots From Repository",
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
@@ -63,10 +54,5 @@ public class UnusedSnapshotRemoverTaskDescriptor
             FormField.MANDATORY
         )
     );
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return formFields;
   }
 }

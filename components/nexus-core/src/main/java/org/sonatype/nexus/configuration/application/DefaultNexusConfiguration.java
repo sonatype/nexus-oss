@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -122,8 +121,6 @@ public class DefaultNexusConfiguration
 
   private final RepositoryRegistry repositoryRegistry;
 
-  private final List<TaskDescriptor> scheduledTaskDescriptors;
-
   private final SecuritySystem securitySystem;
 
   private final VetoFormatter vetoFormatter;
@@ -178,7 +175,6 @@ public class DefaultNexusConfiguration
                                    final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
                                    final RepositoryTypeRegistry repositoryTypeRegistry,
                                    final RepositoryRegistry repositoryRegistry,
-                                   final List<TaskDescriptor> scheduledTaskDescriptors,
                                    final SecuritySystem securitySystem,
                                    final VetoFormatter vetoFormatter,
                                    final List<ConfigurationModifier> configurationModifiers,
@@ -194,7 +190,6 @@ public class DefaultNexusConfiguration
     this.runtimeConfigurationBuilder = checkNotNull(runtimeConfigurationBuilder);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.scheduledTaskDescriptors = checkNotNull(scheduledTaskDescriptors);
     this.securitySystem = checkNotNull(securitySystem);
     this.vetoFormatter = checkNotNull(vetoFormatter);
     this.configurationModifiers = checkNotNull(configurationModifiers);
@@ -448,22 +443,6 @@ public class DefaultNexusConfiguration
   @Override
   public File getConfigurationDirectory() {
     return configurationDirectory;
-  }
-
-  @Override
-  public List<TaskDescriptor> listScheduledTaskDescriptors() {
-    return Collections.unmodifiableList(scheduledTaskDescriptors);
-  }
-
-  @Override
-  public TaskDescriptor getScheduledTaskDescriptor(String id) {
-    for (TaskDescriptor descriptor : scheduledTaskDescriptors) {
-      if (descriptor.getId().equals(id)) {
-        return descriptor;
-      }
-    }
-
-    return null;
   }
 
   // ------------------------------------------------------------------

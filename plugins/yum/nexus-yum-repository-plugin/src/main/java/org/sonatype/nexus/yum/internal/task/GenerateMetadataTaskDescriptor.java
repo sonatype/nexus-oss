@@ -13,14 +13,10 @@
 
 package org.sonatype.nexus.yum.internal.task;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.CheckboxFormField;
-import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -45,43 +41,34 @@ public class GenerateMetadataTaskDescriptor
 
   public static final String NAME = "Yum: Generate Metadata";
 
-  private final FormField repoField = new RepositoryCombobox(
-      TaskConfiguration.REPOSITORY_ID_KEY,
-      "Repository for createrepo",
-      "Maven Repository for which the yum metadata is generated via createrepo.",
-      MANDATORY
-  ).includingAnyOfFacets(MavenRepository.class).excludingAnyOfFacets(GroupRepository.class);
-
-  private final StringTextFormField outputField = new StringTextFormField(
-      PARAM_REPO_DIR,
-      "Optional Output Directory",
-      "Directory which should contain the yum metadata after generation."
-          + " If not set, yum will generate the metadata into the root directory of the selected repository.",
-      OPTIONAL
-  );
-
-  private final CheckboxFormField singleRpmPerDir = new CheckboxFormField(
-      PARAM_SINGLE_RPM_PER_DIR,
-      "Single RPM per directory",
-      "Only process one RPM per directory",
-      OPTIONAL
-  ).withInitialValue(true);
-
-  private final CheckboxFormField forceFullScan = new CheckboxFormField(
-      PARAM_FORCE_FULL_SCAN,
-      "Full Rebuild",
-      "Forces a full rebuild and does not use the cached RPM file list.",
-      OPTIONAL
-  ).withInitialValue(false);
-
   public GenerateMetadataTaskDescriptor()
   {
-    super(GenerateMetadataTask.class, NAME);
+    super(GenerateMetadataTask.class, NAME,
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository for createrepo",
+            "Maven Repository for which the yum metadata is generated via createrepo.",
+            MANDATORY
+        ).includingAnyOfFacets(MavenRepository.class).excludingAnyOfFacets(GroupRepository.class),
+        new StringTextFormField(
+            PARAM_REPO_DIR,
+            "Optional Output Directory",
+            "Directory which should contain the yum metadata after generation."
+                + " If not set, yum will generate the metadata into the root directory of the selected repository.",
+            OPTIONAL
+        ),
+        new CheckboxFormField(
+            PARAM_SINGLE_RPM_PER_DIR,
+            "Single RPM per directory",
+            "Only process one RPM per directory",
+            OPTIONAL
+        ).withInitialValue(true),
+        new CheckboxFormField(
+            PARAM_FORCE_FULL_SCAN,
+            "Full Rebuild",
+            "Forces a full rebuild and does not use the cached RPM file list.",
+            OPTIONAL
+        ).withInitialValue(false)
+    );
   }
-
-  @Override
-  public List<FormField> formFields() {
-    return Arrays.asList(repoField, outputField, singleRpmPerDir, forceFullScan);
-  }
-
 }

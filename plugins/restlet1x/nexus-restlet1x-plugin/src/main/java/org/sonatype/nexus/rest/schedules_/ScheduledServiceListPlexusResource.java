@@ -121,8 +121,8 @@ public class ScheduledServiceListPlexusResource
 
         item.setStatus(getState(task));
         item.setReadableStatus(getReadableState(task));
-        item.setTypeId(task.getConfiguration().getType());
-        item.setTypeName(task.getConfiguration().getName());
+        item.setTypeId(task.getConfiguration().getTypeId());
+        item.setTypeName(task.getConfiguration().getTypeName());
         item.setCreated(task.getConfiguration().getCreated().toString());
         item.setCreatedInMillis(task.getConfiguration().getUpdated().getTime());
 
@@ -164,7 +164,7 @@ public class ScheduledServiceListPlexusResource
         final TaskConfiguration nexusTask = getModelNexusTask(serviceResource, request);
 
         if (getLogger().isDebugEnabled()) {
-          getLogger().debug("Creating task with type '" + nexusTask.getType() + "': " + nexusTask.getName() + " (" +
+          getLogger().debug("Creating task with type '" + nexusTask.getTypeId() + "': " + nexusTask.getName() + " (" +
               nexusTask.getId() + ")");
         }
 
