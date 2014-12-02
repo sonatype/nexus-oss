@@ -189,7 +189,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '1000',
+                id: 'admin', // 1000
                 type: 'method',
                 name: 'Administrator privilege (ALL)',
                 description: 'Give permission to everything available in nexus.',
@@ -744,7 +744,7 @@ implements StaticSecurityResource
                 id: 'nx-admin',
                 name: 'Nexus Administrator Role',
                 description: 'Administration role for Nexus',
-                privileges: ['1000', '1001', '83']
+                privileges: ['admin', '1001', '83']
             ),
             new CRole(
                 id: 'nx-deployment',

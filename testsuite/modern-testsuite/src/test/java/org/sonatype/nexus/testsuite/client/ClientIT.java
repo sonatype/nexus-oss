@@ -767,7 +767,7 @@ public class ClientIT
   @Test
   public void getPrivilege() {
     // admin privilege
-    final Privilege privilege = privileges().get("1000");
+    final Privilege privilege = privileges().get("admin");
     assertThat(privilege, is(not(nullValue())));
     assertThat(privilege.name(), containsString("Administrator"));
   }
