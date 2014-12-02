@@ -121,18 +121,18 @@ public class DefaultNexusTaskFactory
    * and if not found, will create one using {@link #createTaskDescriptor(BeanEntry)}.
    */
   private <T extends Task> TaskDescriptor<T> findTaskDescriptor(final BeanEntry<Named, Task> taskBeanEntry) {
-    // look for descriptors first
+    // look for descriptor first
     for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
       if (taskDescriptor.getType().equals(taskBeanEntry.getImplementationClass())) {
         return (TaskDescriptor<T>) taskDescriptor;
       }
     }
-    // not found by descriptor, try tasks directly
+    // not found by descriptor, create one for it
     return (TaskDescriptor<T>) createTaskDescriptor(taskBeanEntry);
   }
 
   /**
-   * Creates {@link TaskDescriptor} for given Task's bean entry class. To be used For tasks without descriptors, it
+   * Creates {@link TaskDescriptor} for given Task's bean entry class. To be used for tasks without descriptors, it
    * will create one on the fly with defaults.
    */
   private <T extends Task> TaskDescriptor<T> createTaskDescriptor(final BeanEntry<Named, Task> taskBeanEntry) {
