@@ -26,6 +26,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Status;
 
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
     extends AbstractNexusIntegrationTest
 {
@@ -57,8 +61,9 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
     E scheduledTask = getTaskScheduled();
 
     ScheduledServiceListResource task = TaskScheduleUtil.getTask(scheduledTask.getName());
-    Assert.assertEquals(task.getName(), scheduledTask.getName());
-    Assert.assertEquals(task.getTypeId(), scheduledTask.getTypeId());
+    assertThat(task.getName(), equalTo(scheduledTask.getName()));
+    // Note: FQCN typeId accepted, but "canonical" is the ID from TaskDescriptor and that is now class.simpleName
+    assertThat(scheduledTask.getTypeId(), endsWith(task.getTypeId()));
   }
 
   public void updateTasks()
