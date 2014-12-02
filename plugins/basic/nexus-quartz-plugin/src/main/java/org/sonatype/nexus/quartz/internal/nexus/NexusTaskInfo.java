@@ -64,7 +64,9 @@ public class NexusTaskInfo<T>
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
-    setNexusTaskState(nexusTaskFuture != null ? State.RUNNING : State.WAITING, nexusTaskState, nexusTaskFuture);
+    this.state = nexusTaskFuture != null ? State.RUNNING : State.WAITING;
+    this.nexusTaskState = nexusTaskState;
+    this.nexusTaskFuture = nexusTaskFuture;
   }
 
   public synchronized void setNexusTaskState(final State state,
