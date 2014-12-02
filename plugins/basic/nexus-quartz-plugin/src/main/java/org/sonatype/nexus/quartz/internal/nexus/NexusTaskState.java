@@ -145,5 +145,14 @@ public class NexusTaskState
     public long getRunDuration() {
       return runDuration;
     }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "endState=" + endState +
+          ", runStarted=" + runStarted +
+          ", runDuration=" + runDuration +
+          '}';
+    }
   }
 }

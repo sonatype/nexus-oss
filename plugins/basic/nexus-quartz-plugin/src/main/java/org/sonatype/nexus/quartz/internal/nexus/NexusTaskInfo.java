@@ -101,12 +101,12 @@ public class NexusTaskInfo<T>
   }
 
   @Override
-  public TaskConfiguration getConfiguration() {
+  public synchronized TaskConfiguration getConfiguration() {
     return nexusTaskState.getConfiguration();
   }
 
   @Override
-  public Schedule getSchedule() {
+  public synchronized Schedule getSchedule() {
     return nexusTaskState.getSchedule();
   }
 
@@ -117,7 +117,7 @@ public class NexusTaskInfo<T>
 
   @Nullable
   @Override
-  public LastRunState getLastRunState() {
+  public synchronized LastRunState getLastRunState() {
     return nexusTaskState.getLastRunState();
   }
 
