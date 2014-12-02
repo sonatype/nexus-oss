@@ -102,7 +102,7 @@ public class Nexus1765RepositoryServicesIT
   public void testGetRepoContent()
       throws Exception
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "T1"); //read all M2
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-m2-read"); //read all M2
 
     // use test user
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -118,7 +118,7 @@ public class Nexus1765RepositoryServicesIT
   public void testGetRepoIndexContent()
       throws Exception
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "T1"); //read all M2
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-m2-read"); //read all M2
 
     // use test user
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);

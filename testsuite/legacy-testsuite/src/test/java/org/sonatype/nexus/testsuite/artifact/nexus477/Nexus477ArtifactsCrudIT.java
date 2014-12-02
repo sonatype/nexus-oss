@@ -130,7 +130,7 @@ public class Nexus477ArtifactsCrudIT
     Assert.assertEquals("Artifact should not have been read", response.getStatus().getCode(), 403);
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T1");
+    this.giveUserPrivilege("test-user", "repository-m2-read");
     this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");

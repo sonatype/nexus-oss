@@ -62,7 +62,7 @@ public class Nexus999SetUsersPasswordIT
         "58",
         "59",
         "72"/* set pw */,
-        "T1",
+        "repository-m2-read",
         "T2");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -101,7 +101,7 @@ public class Nexus999SetUsersPasswordIT
         "57",
         "58",
         "59", /* "72" set pw, */
-        "T1",
+        "repository-m2-read",
         "T2");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
