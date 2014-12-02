@@ -13,7 +13,6 @@
 
 package org.sonatype.nexus.scheduling.internal;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.scheduling.NexusTaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
