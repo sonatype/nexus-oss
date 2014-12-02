@@ -141,7 +141,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: 'T9',
+                id: 'repository-any-read', // T9
                 type: 'target',
                 name: 'All Repositories - (read)',
                 description: 'Give permission to read any content in any repository.',
@@ -782,13 +782,13 @@ implements StaticSecurityResource
                 id: 'repository-any-read',
                 name: 'Repo: All Repositories (Read)',
                 description: 'Gives access to read ALL content of ALL repositories in Nexus.',
-                privileges: ['T9', 'repository-all']
+                privileges: ['repository-any-read', 'repository-all']
             ),
             new CRole(
                 id: 'repository-any-full',
                 name: 'Repo: All Repositories (Full Control)',
                 description: 'Gives access to create/read/update/delete ALL content of ALL repositories in Nexus.',
-                privileges: ['T9', 'T10', 'T11', 'T12', 'repository-all']
+                privileges: ['repository-any-read', 'T10', 'T11', 'T12', 'repository-all']
             ),
             new CRole(
                 id: 'ui-repo-browser',
