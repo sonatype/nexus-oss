@@ -849,7 +849,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '57',
+                id: 'usersforgotpw', // 57
                 type: 'method',
                 name: 'User Forgot Password - (create,read)',
                 description: 'Give permission to request that a password be generated an emailed to a certain user.',
@@ -937,7 +937,7 @@ implements StaticSecurityResource
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
-                privileges: ['status', 'artifact-read', '57', '58', 'contentclasses-read', 'repotypes-read'],
+                privileges: ['status', 'artifact-read', 'usersforgotpw', '58', 'contentclasses-read', 'repotypes-read'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
