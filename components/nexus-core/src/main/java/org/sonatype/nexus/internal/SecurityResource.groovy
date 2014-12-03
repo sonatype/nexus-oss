@@ -269,7 +269,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '8',
+                id: 'repositories-delete', // 8
                 type: 'method',
                 name: 'Repositories - (delete,read)',
                 description: 'Give permission to delete,read existing repositories.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', 'repositories-update', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', '10', '78', '79', '81', '82', '74', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(

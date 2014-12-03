@@ -245,7 +245,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give delete
-    this.giveUserPrivilege(TEST_USER_NAME, "8");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-delete");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
