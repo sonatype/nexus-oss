@@ -309,7 +309,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '12',
+                id: 'repotemplates-delete', // 12
                 type: 'method',
                 name: 'Repository Templates - (delete,read)',
                 description: 'Give permission to delete,read existing repository templates.  Note that this privilege is not currently invoked by the Nexus UI.',
