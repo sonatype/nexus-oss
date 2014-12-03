@@ -58,7 +58,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "22");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
