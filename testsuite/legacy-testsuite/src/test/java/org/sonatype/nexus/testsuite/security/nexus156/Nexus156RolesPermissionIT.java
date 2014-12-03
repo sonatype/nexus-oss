@@ -58,7 +58,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "34");
+    this.giveUserPrivilege("test-user", "roles-create");
 
 
     // now.... it should work...
