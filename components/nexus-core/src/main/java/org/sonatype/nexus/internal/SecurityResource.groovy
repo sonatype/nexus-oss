@@ -529,7 +529,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '51',
+                id: 'wastebasket-delete', // 51
                 type: 'method',
                 name: 'Wastebasket - (delete,read)',
                 description: 'Give permission to delete,read the contents of the nexus trash.',
