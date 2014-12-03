@@ -34,11 +34,68 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
 /**
- * IT for repeatedly scheduled tasks (except for "now", see {@link NowScheduledTaskLifecycleIT}).
+ * IT for scheduled tasks and their TaskInfo.
  */
-public class RepeatedlyScheduledTaskLifecycleIT
+public class ScheduledTaskInfoLifecycleIT
     extends QuartzITSupport
 {
+  /**
+   * "one shot", aka "runNow", aka "bg jobs" tasks are getting into DONE state once run.
+   */
+  @Test
+  public void taskLifecycleRunNow() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+
+    // create the task
+    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+        .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = nexusTaskScheduler.submit(taskConfiguration);
+
+    // give it some time to start
+    SleeperTask.youWait.await();
+
+    assertThat(taskInfo, notNullValue());
+    assertThat(taskInfo.getId(), equalTo(taskConfiguration.getId()));
+    assertThat(taskInfo.getName(), equalTo(taskConfiguration.getName()));
+    assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
+    assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
+    assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
+    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
+
+    final CurrentState<String> currentState = taskInfo.getCurrentState();
+    assertThat(currentState, notNullValue());
+    assertThat(currentState.getState(), equalTo(State.RUNNING));
+    assertThat(currentState.getRunState(), equalTo(RunState.RUNNING));
+    assertThat(currentState.getRunStarted(), notNullValue());
+    assertThat(currentState.getRunStarted().getTime(), lessThan(System.currentTimeMillis()));
+    final Future<String> future = currentState.getFuture();
+    assertThat(future, notNullValue());
+
+    // make it be done
+    SleeperTask.meWait.countDown();
+    Thread.yield();
+
+    // and block for the result
+    final String result = future.get();
+    assertThat(result, equalTo(RESULT));
+    // taskInfo for DONE task is terminal
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+
+    // done
+    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+  }
+
+  /**
+   * Repeatedly run tasks are bouncing between "running" and "waiting".
+   */
   @Test
   public void taskLifecycleRunRepeatedly() throws Exception {
     // reset the latch

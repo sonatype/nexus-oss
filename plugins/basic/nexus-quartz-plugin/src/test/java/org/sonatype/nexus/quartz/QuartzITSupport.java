@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
@@ -30,16 +31,16 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.space.BeanScanning;
-import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.space.URLClassSpace;
 import org.eclipse.sisu.wire.ParameterKeys;
 import org.eclipse.sisu.wire.WireModule;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.mockito.Mock;
+import org.junit.BeforeClass;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,65 +48,60 @@ import static org.mockito.Mockito.when;
  */
 public abstract class QuartzITSupport
     extends TestSupport
-    implements Module
 {
-  @Inject
-  protected Injector injector;
+  static protected final TestUtil util = new TestUtil(QuartzITSupport.class);
 
   @Inject
-  protected MutableBeanLocator locator;
+  static protected Injector injector;
 
   @Inject
-  protected NexusTaskScheduler nexusTaskScheduler;
+  static protected MutableBeanLocator locator;
 
   @Inject
-  protected QuartzSupportImpl quartzSupport;
+  static protected NexusTaskScheduler nexusTaskScheduler;
+
+  @Inject
+  static protected QuartzSupportImpl quartzSupport;
 
 
   // ==
 
-  @Mock
-  protected ApplicationDirectories applicationDirectories;
+  static protected ApplicationDirectories applicationDirectories;
 
-  @Mock
-  protected ApplicationConfiguration applicationConfiguration;
+  static protected ApplicationConfiguration applicationConfiguration;
 
-  @Before
-  public void prepare() throws Exception {
-    final Module testModule = new AbstractModule()
-    {
-      @Override
-      protected void configure() {
-        bind(ApplicationDirectories.class).toInstance(applicationDirectories);
-      }
-    };
-    Guice.createInjector(new WireModule(new SetUpModule(), spaceModule()));
-
+  @BeforeClass
+  public static void prepare() throws Exception {
+    applicationDirectories = mock(ApplicationDirectories.class);
+    applicationConfiguration = mock(ApplicationConfiguration.class);
+    Guice.createInjector(new WireModule(new SetUpModule(),
+        new SpaceModule(new URLClassSpace(QuartzITSupport.class.getClassLoader()), BeanScanning.CACHE)));
     quartzSupport.start();
   }
 
-  @After
-  public void tearDown()
+  @AfterClass
+  public static void tearDown()
       throws Exception
   {
     quartzSupport.stop();
     locator.clear();
   }
 
-  final class SetUpModule
+  @Before
+  public void inject() {
+    injector.injectMembers(this);
+  }
+
+  final static class SetUpModule
       implements Module
   {
     public void configure(final Binder binder)
     {
-      binder.install(QuartzITSupport.this);
-
       final Properties properties = new Properties();
       properties.put("basedir", util.getBaseDir());
 
-      QuartzITSupport.this.configure(properties);
-
       final File workDir = util.createTempDir(util.getTargetDir(), "workdir");
-      log("Workdir: {}", workDir);
+      System.out.println("Workdir: " + workDir);
       when(applicationDirectories.getWorkDirectory(anyString())).thenReturn(workDir);
       binder.bind(ApplicationDirectories.class).toInstance(applicationDirectories);
 
@@ -114,43 +110,7 @@ public abstract class QuartzITSupport
 
       binder.bind(ParameterKeys.PROPERTIES).toInstance(properties);
 
-      binder.requestInjection(QuartzITSupport.this);
+      binder.requestStaticInjection(QuartzITSupport.class);
     }
-  }
-
-  public SpaceModule spaceModule()
-  {
-    return new SpaceModule(space(), scanning());
-  }
-
-  public ClassSpace space()
-  {
-    return new URLClassSpace(getClass().getClassLoader());
-  }
-
-  public BeanScanning scanning()
-  {
-    return BeanScanning.CACHE;
-  }
-
-  /**
-   * Custom injection bindings.
-   *
-   * @param binder The Guice binder
-   */
-  @Override
-  public void configure(final Binder binder)
-  {
-    // place any per-test bindings here...
-  }
-
-  /**
-   * Custom property values.
-   *
-   * @param properties The test properties
-   */
-  public void configure(final Properties properties)
-  {
-    // put any per-test properties here...
   }
 }

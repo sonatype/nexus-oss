@@ -13,9 +13,12 @@
 package org.sonatype.nexus.quartz;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.scheduling.Cancelable;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskSupport;
 
 /**
@@ -24,6 +27,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
 @Named
 public class SleeperTask
     extends TaskSupport<String>
+    implements Cancelable
 {
   static final String RESULT_KEY = "result";
 
@@ -31,15 +35,26 @@ public class SleeperTask
 
   static CountDownLatch youWait;
 
+  static Exception exception;
+
   static void reset() {
     meWait = new CountDownLatch(1);
     youWait = new CountDownLatch(1);
+    exception = null;
   }
 
   @Override
   protected String execute() throws Exception {
     youWait.countDown(); // task signals "started" to test
-    meWait.await(); // test signals "finish" to this task
+
+    while (!meWait.await(1L, TimeUnit.SECONDS)) { // test signals "finish" to this task
+      CancelableSupport.checkCancellation();
+    }
+
+    if (exception != null) {
+      throw exception;
+    }
+
     return getConfiguration().getString(RESULT_KEY);
   }
 
