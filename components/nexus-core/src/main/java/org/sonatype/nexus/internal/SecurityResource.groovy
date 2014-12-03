@@ -599,7 +599,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '69',
+                id: 'tasktypes-read', // 69
                 type: 'method',
                 name: 'Scheduled Task Types - (read)',
                 description: 'Give permission to retrieve list of support task types available in nexus.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-scheduled-tasks-admin',
                 name: 'UI: Scheduled Task Administration',
                 description: 'Gives access to the Scheduled Task Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', 'tasksrun', '69', '71']
+                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', 'tasksrun', 'tasktypes-read', '71']
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
