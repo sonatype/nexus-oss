@@ -227,7 +227,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "25");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-delete");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");

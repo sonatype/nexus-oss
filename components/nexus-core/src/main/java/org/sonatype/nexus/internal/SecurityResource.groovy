@@ -409,7 +409,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '25',
+                id: 'routes-delete', // 25
                 type: 'method',
                 name: 'Repository Routes - (delete,read)',
                 description: 'Give permission to delete,read existing repository routes.',
@@ -826,7 +826,7 @@ implements StaticSecurityResource
                 id: 'ui-routing-admin',
                 name: 'UI: Routing Administration',
                 description: 'Gives access to the Routing Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', 'routes-create', 'routes-read', 'routes-update', '25']
+                privileges: ['repositories-read', 'repogroups-read', 'routes-create', 'routes-read', 'routes-update', 'routes-delete']
             ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
