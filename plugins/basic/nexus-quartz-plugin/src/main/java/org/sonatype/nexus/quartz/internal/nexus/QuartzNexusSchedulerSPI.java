@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -91,6 +92,10 @@ public class QuartzNexusSchedulerSPI
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       return taskByKey(jobKey);
     }
+    catch (IllegalStateException e) {
+      // no listener found in taskByKey, means no job exists
+      return null;
+    }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
@@ -129,7 +134,7 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
-      log.info("NX Task scheduleTask: {}", jobKey);
+      log.debug("NX Task {} scheduled", jobKey);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
         final TaskInfo<T> old = taskByKey(jobKey);
@@ -174,11 +179,22 @@ public class QuartzNexusSchedulerSPI
       if (task == null) {
         return null;
       }
-      log.info("NX Task rescheduleTask: {}: {} -> {}", jobKey, task.getSchedule(), schedule);
+      checkState(task.getCurrentState().getState() != State.DONE, "Done task cannot be rescheduled");
+      log.debug("NX Task rescheduleTask: {}: {} -> {}", jobKey, task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
       quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
-      return taskByKey(jobKey);
+      // update TaskInfo, but only if it's WAITING, as running one will pick up the change by job listener when done
+      task.setNexusTaskStateIfInState(
+          State.WAITING,
+          new NexusTaskState(
+              task.getConfiguration(),
+              schedule,
+              trigger.getFireTimeAfter(new Date())
+          ),
+          task.getNexusTaskFuture()
+      );
+      return task;
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
