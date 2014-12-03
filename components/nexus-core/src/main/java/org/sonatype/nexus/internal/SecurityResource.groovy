@@ -211,8 +211,8 @@ implements StaticSecurityResource
             new CPrivilege(
                 id: 'signin', // 2
                 type: 'method',
-                name: 'Login to UI',
-                description: 'Give permission to allow a user to login to nexus.',
+                name: 'Sign-in',
+                description: 'Give permission to allow a user to sign-in into nexus.',
                 properties: [
                     'method': 'read',
                     'permission': 'nexus:authentication'
