@@ -519,16 +519,6 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '49',
-                type: 'method',
-                name: 'Server Status - (update,read)',
-                description: 'Give permission to update,read the status of the nexus server.  Note that this privilege is not currently invoked by the Nexus UI.',
-                properties: [
-                    'method': 'update,read',
-                    'permission': 'nexus:status'
-                ]
-            ),
-            new CPrivilege(
                 id: '50',
                 type: 'method',
                 name: 'Wastebasket - (read)',
