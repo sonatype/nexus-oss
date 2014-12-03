@@ -166,7 +166,7 @@ public class ScheduledServicePlexusResource
         }
 
         // Store the changes
-        getNexusScheduler().scheduleTask(task.getConfiguration(), schedule);
+        task = getNexusScheduler().scheduleTask(task.getConfiguration(), schedule);
 
         ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
         resourceStatus.setResource(resource);

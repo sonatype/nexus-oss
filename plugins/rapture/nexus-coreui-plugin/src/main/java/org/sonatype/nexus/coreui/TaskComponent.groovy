@@ -160,7 +160,7 @@ class TaskComponent
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
 
-    nexusScheduler.scheduleTask(task.configuration, task.schedule)
+    task = nexusScheduler.scheduleTask(task.configuration, task.schedule)
 
     return asTaskXO(task)
   }
@@ -179,7 +179,7 @@ class TaskComponent
     validateState(task)
     Schedule schedule = asSchedule(taskXO)
 
-    nexusScheduler.scheduleTask(task.configuration, schedule)
+    task = nexusScheduler.scheduleTask(task.configuration, schedule)
 
     return asTaskXO(task)
   }
