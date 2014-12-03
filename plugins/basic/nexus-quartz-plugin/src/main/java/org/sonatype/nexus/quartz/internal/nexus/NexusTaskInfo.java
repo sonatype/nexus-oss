@@ -141,7 +141,7 @@ public class NexusTaskInfo<T>
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
-    log.info("NX Task remove: {}", nexusTaskState);
+    log.info("NX Task remove: {}, state={}", jobKey, state);
     return quartzSupport.removeTask(jobKey);
   }
 
@@ -149,7 +149,7 @@ public class NexusTaskInfo<T>
   public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
     checkState(State.RUNNING != state, "Task already running");
     checkState(!removed, "Task already removed");
-    log.info("NX Task runNow: {}", nexusTaskState);
+    log.info("NX Task runNow: {}, state={}", jobKey, state);
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,
