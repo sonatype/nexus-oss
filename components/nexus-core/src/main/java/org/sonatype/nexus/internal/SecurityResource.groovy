@@ -639,7 +639,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '74',
+                id: 'repotypes-read', // 74
                 type: 'method',
                 name: 'Repository Types - (read)',
                 description: 'Give permission to retrieve the list of repository types supported by nexus.',
@@ -737,7 +737,7 @@ implements StaticSecurityResource
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
-                privileges: ['status', 'artifact-read', '57', '58', 'contentclasses-read', '74'],
+                privileges: ['status', 'artifact-read', '57', '58', 'contentclasses-read', 'repotypes-read'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
@@ -792,7 +792,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', '78', '79', '81', '82', '74', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', '78', '79', '81', '82', 'repotypes-read', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
@@ -818,7 +818,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', 'contentclasses-read', '74']
+                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', 'contentclasses-read', 'repotypes-read']
             ),
             new CRole(
                 id: 'ui-users-admin',
