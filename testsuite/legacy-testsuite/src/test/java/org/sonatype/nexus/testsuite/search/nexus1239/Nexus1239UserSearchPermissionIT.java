@@ -40,7 +40,7 @@ public class Nexus1239UserSearchPermissionIT
   public void userExactSearchTest()
       throws IOException
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "39");
+    this.giveUserPrivilege(TEST_USER_NAME, "users-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -70,7 +70,7 @@ public class Nexus1239UserSearchPermissionIT
       throws IOException
   {
 
-    this.giveUserPrivilege(TEST_USER_NAME, "39");
+    this.giveUserPrivilege(TEST_USER_NAME, "users-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -94,7 +94,7 @@ public class Nexus1239UserSearchPermissionIT
   public void emptySearchTest()
       throws IOException
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "39");
+    this.giveUserPrivilege(TEST_USER_NAME, "users-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
