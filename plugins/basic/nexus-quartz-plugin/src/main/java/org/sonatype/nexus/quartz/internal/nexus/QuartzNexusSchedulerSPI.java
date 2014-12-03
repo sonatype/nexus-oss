@@ -131,6 +131,7 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
+      log.info("NX Task scheduleTask: {}", jobKey);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
         final TaskInfo<T> old = taskByKey(jobKey);
@@ -175,16 +176,9 @@ public class QuartzNexusSchedulerSPI
       if (task == null) {
         return null;
       }
+      log.info("NX Task rescheduleTask: {}: {} -> {}", jobKey, task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
-      task.setNexusTaskState(
-          task.getCurrentState().getState(),
-          new NexusTaskState(
-              task.getConfiguration(),
-              schedule,
-              trigger.getFireTimeAfter(new Date())),
-          task.getNexusTaskFuture()
-      );
       quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
       return taskByKey(jobKey);
     }
@@ -329,7 +323,7 @@ public class QuartzNexusSchedulerSPI
     try {
       boolean result = quartzSupport.getScheduler().deleteJob(jobKey);
       if (result) {
-        quartzSupport.getScheduler().getListenerManager().removeJobListener(jobKey.getName());
+        quartzSupport.getScheduler().getListenerManager().removeJobListener(NexusTaskJobListener.listenerName(jobKey));
       }
       return result;
     }
