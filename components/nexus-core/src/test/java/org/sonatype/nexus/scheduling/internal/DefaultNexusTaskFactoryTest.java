@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -72,13 +73,14 @@ public class DefaultNexusTaskFactoryTest
   public void createTaskInstance() {
     final TaskConfiguration c1 = new TaskConfiguration();
     c1.setId("id");
-    c1.setTypeId(TaskWithDescriptor.class.getName());
+    c1.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()).getId());
     final Task<?> task1 = nexusTaskFactory.createTaskInstance(c1);
     assertThat(task1, is(instanceOf(TaskWithDescriptor.class)));
+    assertThat(task1.getConfiguration().getTypeId(), equalTo(new TaskWithDescriptorDescriptor().getId()));
 
     final TaskConfiguration c2 = new TaskConfiguration();
     c2.setId("id");
-    c2.setTypeId(TaskWithoutDescriptor.class.getName());
+    c2.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithoutDescriptor.class.getName()).getId());
     final Task<?> task2 = nexusTaskFactory.createTaskInstance(c2);
     assertThat(task2, is(instanceOf(TaskWithoutDescriptor.class)));
 

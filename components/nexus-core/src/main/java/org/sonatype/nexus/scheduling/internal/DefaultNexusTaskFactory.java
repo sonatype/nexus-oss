@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.eclipse.sisu.BeanEntry;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -59,17 +58,7 @@ public class DefaultNexusTaskFactory
 
   @Override
   public List<TaskDescriptor<?>> listTaskDescriptors() {
-    final Map<Class<? extends Task>, TaskDescriptor<?>> descriptorMap = Maps.newHashMap();
-    for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
-      descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
-    }
-    for (BeanEntry<Named, Task> entry : tasks) {
-      if (!descriptorMap.containsKey(entry.getImplementationClass())) {
-        final TaskDescriptor<?> taskDescriptor = createTaskDescriptor(entry);
-        descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
-      }
-    }
-    return Lists.newArrayList(descriptorMap.values());
+    return Lists.newArrayList(allTaskDescriptors().values());
   }
 
   @Override
@@ -93,20 +82,16 @@ public class DefaultNexusTaskFactory
   }
 
   @Override
-  public Task<?> createTaskInstance(final TaskConfiguration taskConfiguration)
+  public <T extends Task> T createTaskInstance(final TaskConfiguration taskConfiguration)
       throws IllegalArgumentException
   {
     checkNotNull(taskConfiguration);
     taskConfiguration.validate();
     log.debug("Creating task by hint: {}", taskConfiguration);
-    // TODO: might optimize this to not go thru "loops" of laxed resolve, as taskConfig should be created via
-    // taskDescriptor, and the typeId here is known to not be laxed!
-    final TaskDescriptor<?> taskDescriptor = resolveTaskDescriptorByTypeId(taskConfiguration.getTypeId());
-    checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskConfiguration.getTypeId());
-    taskConfiguration.setTypeId(taskDescriptor.getId());
+    final TaskDescriptor<T> taskDescriptor = getTaskDescriptorByTypeId(taskConfiguration.getTypeId());
     for (BeanEntry<Named, Task> entry : tasks) {
       if (entry.getImplementationClass().equals(taskDescriptor.getType())) {
-        final Task task = entry.getProvider().get();
+        final T task = (T) entry.getProvider().get();
         task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
         return task;
       }
@@ -115,6 +100,44 @@ public class DefaultNexusTaskFactory
   }
 
   // ==
+
+  /**
+   * Gets TaskDescriptor by it's ID, when the taskTypeId is know to be coming from a trusted value. This method,
+   * unlike {@link #resolveTaskDescriptorByTypeId(String)} is not "laxed".
+   */
+  private <T extends Task> TaskDescriptor<T> getTaskDescriptorByTypeId(final String taskTypeId) {
+    final Map<String, TaskDescriptor<?>> all = allTaskDescriptors();
+    if (all.containsKey(taskTypeId)) {
+      return (TaskDescriptor<T>) all.get(taskTypeId);
+    }
+    throw new IllegalArgumentException("No Task of type \'" + taskTypeId + "\' found");
+  }
+
+  /**
+   * Returns a map with "typeId" Task descriptor mapping for all existing tasks. For tasks without descriptors,
+   * descriptor will be created.
+   */
+  private Map<String, TaskDescriptor<?>> allTaskDescriptors() {
+    // TODO: consistency checks? a) task : descriptors are 1:1, b) descriptor IDs are unique?
+    // TODO: we might emit warning if some of those does not stand
+    // using task class as "key" to detect tasks w/ descriptor vs tasks w/o descriptor
+    final Map<Class<? extends Task>, TaskDescriptor<?>> descriptorMap = Maps.newHashMap();
+    for (TaskDescriptor<?> taskDescriptor : taskDescriptors) {
+      descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
+    }
+    for (BeanEntry<Named, Task> entry : tasks) {
+      if (!descriptorMap.containsKey(entry.getImplementationClass())) {
+        final TaskDescriptor<?> taskDescriptor = createTaskDescriptor(entry);
+        descriptorMap.put(taskDescriptor.getType(), taskDescriptor);
+      }
+    }
+    // repack the map into result map keyed by typeId
+    final Map<String, TaskDescriptor<?>> result = Maps.newHashMap();
+    for (TaskDescriptor<?> taskDescriptor : descriptorMap.values()) {
+      result.put(taskDescriptor.getId(), taskDescriptor);
+    }
+    return result;
+  }
 
   /**
    * Returns {@link TaskDescriptor} by given Task's bean entry. Will perform a search for provided task descriptors,

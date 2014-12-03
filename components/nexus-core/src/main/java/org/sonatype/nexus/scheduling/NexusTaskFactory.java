@@ -26,7 +26,9 @@ public interface NexusTaskFactory
   List<TaskDescriptor<?>> listTaskDescriptors();
 
   /**
-   * Resolves the task descriptor by type ID of the task. Returns {@code null} if no task found for given task ID.
+   * Resolves the task descriptor by type ID of the task. Returns {@code null} if no task found for given task ID. This
+   * "resolution" is laxed, in a way it will not work only for actual type ID (as reported by Task descriptor), but
+   * also by task FQCN, Simple Class name and @Named value.
    */
   <T extends Task> TaskDescriptor<T> resolveTaskDescriptorByTypeId(String taskTypeId);
 
