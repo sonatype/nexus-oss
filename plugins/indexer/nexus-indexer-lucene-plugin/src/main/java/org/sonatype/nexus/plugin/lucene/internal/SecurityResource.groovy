@@ -35,7 +35,7 @@ implements StaticSecurityResource
     return new Configuration(
         privileges: [
             new CPrivilege(
-                id: '17',
+                id: 'search', // 17
                 type: 'method',
                 name: 'Search Repositories',
                 description: 'Give permission to perform searches of repository content.',
@@ -70,7 +70,7 @@ implements StaticSecurityResource
                 id: 'ui-search',
                 name: 'UI: Search',
                 description: 'Gives access to the Search screen in Nexus UI',
-                privileges: ['17', '19', 'artifact-read']
+                privileges: ['search', '19', 'artifact-read']
             ),
             new CRole(
                 id: 'anonymous',

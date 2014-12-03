@@ -188,7 +188,7 @@ public class Nexus778SearchResultsFilteringIT
     role.addPrivilege("status");
     role.addPrivilege("repositories-read");
     role.addPrivilege("repogroups-read");
-    role.addPrivilege("17");
+    role.addPrivilege("search");
     role.addPrivilege("19");
     role.addPrivilege("44");
     role.addPrivilege("artifact-read");

@@ -142,7 +142,7 @@ public class Nexus537RepoTargetsIT
   public void resetTestUserPrivs()
       throws Exception
   {
-    this.overwriteUserRole(TEST_USER_NAME, "doReadTest-noAccess", "17");
+    this.overwriteUserRole(TEST_USER_NAME, "doReadTest-noAccess", "search");
     this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
     // "repositories-read", "repogroups-read","19","44","artifact-read","repostatus-read","usersforgotpw","usersforgotid","userschangepw","contentclasses-read"
     this.printUserPrivs(TEST_USER_NAME);
