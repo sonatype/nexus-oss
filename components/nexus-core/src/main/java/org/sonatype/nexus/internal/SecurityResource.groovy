@@ -219,7 +219,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: 'settings-read',
+                id: 'settings-read', // 3
                 type: 'method',
                 name: 'Server Settings - (read)',
                 description: 'Give permission to read the nexus server settings.',
