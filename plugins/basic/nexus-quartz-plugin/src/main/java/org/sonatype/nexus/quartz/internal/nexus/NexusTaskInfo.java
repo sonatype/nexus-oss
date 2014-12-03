@@ -117,6 +117,7 @@ public class NexusTaskInfo<T>
 
   @Override
   public synchronized CurrentState<T> getCurrentState() {
+    checkState(state == State.DONE || !removed, "Task already removed/updated");
     return new CS<>(state, nexusTaskState, nexusTaskFuture);
   }
 
@@ -148,7 +149,9 @@ public class NexusTaskInfo<T>
   @Override
   public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
     checkState(State.RUNNING != state, "Task already running");
-    checkState(!removed, "Task already removed");
+    if (removed) {
+      throw new TaskRemovedException("Task removed: " + jobKey);
+    }
     log.info("NX Task runNow: {}, state={}", jobKey, state);
     setNexusTaskState(
         State.RUNNING,
@@ -161,6 +164,7 @@ public class NexusTaskInfo<T>
         )
     );
     try {
+      // DONE jobs are removed, and here will fail
       quartzSupport.runNow(jobKey);
     }
     catch (Exception e) {
