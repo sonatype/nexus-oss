@@ -679,7 +679,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '79',
+                id: 'repositorymirrors-create', // 79
                 type: 'method',
                 name: 'Repository Mirrors - (create,read)',
                 description: 'Give permission to create repository mirror configuration',
@@ -792,7 +792,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', 'repositorymirrors-read', '79', '81', '82', 'repotypes-read', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', 'repositorymirrors-read', 'repositorymirrors-create', '81', '82', 'repotypes-read', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
