@@ -559,7 +559,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '56',
+                id: 'repostatus-update', // 56
                 type: 'method',
                 name: 'Update Repository Status',
                 description: 'Give permission to update the status of a repository.',

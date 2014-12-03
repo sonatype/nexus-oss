@@ -59,7 +59,7 @@ public class Nexus1765RepositoryServicesIT
   {
 
     this.giveUserPrivilege(TEST_USER_NAME, "repostatus-read"); //nexus:repostatus:read
-    this.giveUserPrivilege(TEST_USER_NAME, "56"); //nexus:repostatus:update
+    this.giveUserPrivilege(TEST_USER_NAME, "repostatus-update"); //nexus:repostatus:update
 
     String repoId = this.getTestRepositoryId();
 
