@@ -171,7 +171,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give read
-    this.giveUserPrivilege("test-user", "35");
+    this.giveUserPrivilege("test-user", "roles-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
