@@ -124,7 +124,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("ReadRole");
     resource.setSessionTimeout(31);
     resource.addPrivilege("settings-read");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-update");
     resource = this.messageUtil.createRole(resource);
 
     // get the Resource object
@@ -148,7 +148,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("UpdateRole");
     resource.setSessionTimeout(99999);
     resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-update");
 
     RoleResource responseResource = this.messageUtil.createRole(resource);
 

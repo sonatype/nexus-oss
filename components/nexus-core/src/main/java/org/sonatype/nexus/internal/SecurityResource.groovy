@@ -229,7 +229,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '4',
+                id: 'settings-update', // 4
                 type: 'method',
                 name: 'Server Settings - (update,read)',
                 description: 'Give permission to update,read the nexus server settings.',
@@ -806,7 +806,7 @@ implements StaticSecurityResource
                 id: 'ui-server-admin',
                 name: 'UI: Server Administration',
                 description: 'Gives access to the Server Administration screen in Nexus UI',
-                privileges: ['settings-read', '4', '73']
+                privileges: ['settings-read', 'settings-update', '73']
             ),
             new CRole(
                 id: 'ui-repository-admin',

@@ -207,7 +207,7 @@ public class Nexus156RolesValidationIT
     resource.setName("updateValidationTests");
     resource.setSessionTimeout(99999);
     resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-update");
 
     Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
@@ -236,7 +236,7 @@ public class Nexus156RolesValidationIT
     resource.setName(null);
     resource.setSessionTimeout(99999);
     resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-update");
 
     response = this.messageUtil.sendMessage(Method.PUT, resource);
 
@@ -283,7 +283,7 @@ public class Nexus156RolesValidationIT
     resource.setId("NEW-ID-WILL-FAIL");
     resource.setSessionTimeout(99999);
     resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-update");
 
     response = this.messageUtil.sendMessage(Method.PUT, resource);
     String responseText = response.getEntity().getText();
