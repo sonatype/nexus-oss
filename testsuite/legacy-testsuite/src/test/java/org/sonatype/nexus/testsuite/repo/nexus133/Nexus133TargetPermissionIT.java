@@ -210,7 +210,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "48");
+    this.giveUserPrivilege("test-user", "targets-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

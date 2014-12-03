@@ -509,7 +509,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '48',
+                id: 'targets-delete', // 48
                 type: 'method',
                 name: 'Repository Targets - (delete,read)',
                 description: 'Give permission to delete,read existing repository targets.',
@@ -838,7 +838,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['targets-create', 'targets-read', 'targets-update', '48', '70', '74']
+                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', '70', '74']
             ),
             new CRole(
                 id: 'ui-users-admin',
