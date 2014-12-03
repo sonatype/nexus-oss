@@ -241,7 +241,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give delete
-    this.giveUserPrivilege("test-user", "16");
+    this.giveUserPrivilege("test-user", "repogroups-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

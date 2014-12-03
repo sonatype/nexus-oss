@@ -349,7 +349,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '16',
+                id: 'repogroups-delete', // 16
                 type: 'method',
                 name: 'Repository Groups - (delete,read)',
                 description: 'Give permission to delete,read existing repository groups.',
@@ -819,7 +819,7 @@ implements StaticSecurityResource
                 id: 'ui-group-admin',
                 name: 'UI: Group Administration',
                 description: 'Gives access to the Group Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', 'repogroups-update', '16', 'repository-all'],
+                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', 'repogroups-update', 'repogroups-delete', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
