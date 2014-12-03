@@ -45,7 +45,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '18',
+                id: 'reindex', // 18
                 type: 'method',
                 name: 'Reindex',
                 description: 'Give permission to Reindex repository content.  The extents of this privilege are related to the allowed targets.',
