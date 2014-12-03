@@ -98,6 +98,11 @@ public class NexusTaskFuture<T>
     this.runState = runState;
   }
 
+  public void doCancel() {
+    setRunState(RunState.CANCELED);
+    setResult(null, new CancellationException("Task canceled"));
+  }
+
   // == TaskFuture
 
   @Override
@@ -105,8 +110,7 @@ public class NexusTaskFuture<T>
     if (isCancelled()) {
       return true;
     }
-    setRunState(RunState.CANCELED);
-    setResult(null, new CancellationException("Task canceled"));
+    doCancel();
     return quartzSupport.cancelJob(jobKey);
   }
 

@@ -27,6 +27,7 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventCanceled;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -107,6 +108,10 @@ public class NexusTaskJobSupport<T>
           context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
         }
       }
+      catch (TaskInterruptedException e) {
+        log.warn("Task canceled: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
+        getTaskInfo().getNexusTaskFuture().doCancel();
+      }
       catch (Exception e) {
         log.warn("Task execution failure: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
         ex = e;
@@ -158,13 +163,17 @@ public class NexusTaskJobSupport<T>
     }
     if (nexusTask instanceof Cancelable) {
       ((Cancelable) nexusTask).cancel();
-      final NexusTaskInfo<T> taskInfo = (NexusTaskInfo) context.get(NexusTaskInfo.TASK_INFO_KEY);
-      checkState(taskInfo != null);
-      eventBus.post(new NexusTaskEventCanceled<>(taskInfo));
+      eventBus.post(new NexusTaskEventCanceled<>(getTaskInfo()));
     }
     else {
       throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
     }
+  }
+
+  private NexusTaskInfo<T> getTaskInfo() {
+    final NexusTaskInfo<T> taskInfo = (NexusTaskInfo) context.get(NexusTaskInfo.TASK_INFO_KEY);
+    checkState(taskInfo != null);
+    return taskInfo;
   }
 
   /**
