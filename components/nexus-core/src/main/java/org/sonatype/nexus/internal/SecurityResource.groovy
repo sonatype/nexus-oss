@@ -499,7 +499,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '47',
+                id: 'targets-update', // 47
                 type: 'method',
                 name: 'Repository Targets - (update,read)',
                 description: 'Give permission to update,read existing repository target configuration.',
@@ -838,7 +838,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['targets-create', 'targets-read', '47', '48', '70', '74']
+                privileges: ['targets-create', 'targets-read', 'targets-update', '48', '70', '74']
             ),
             new CRole(
                 id: 'ui-users-admin',
