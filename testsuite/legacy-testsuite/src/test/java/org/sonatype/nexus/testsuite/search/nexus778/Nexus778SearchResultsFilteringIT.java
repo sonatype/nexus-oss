@@ -192,7 +192,7 @@ public class Nexus778SearchResultsFilteringIT
     role.addPrivilege("19");
     role.addPrivilege("44");
     role.addPrivilege("artifact-read");
-    role.addPrivilege("55");
+    role.addPrivilege("repostatus-read");
     role.addPrivilege("57");
     role.addPrivilege("58");
     role.addPrivilege("64");

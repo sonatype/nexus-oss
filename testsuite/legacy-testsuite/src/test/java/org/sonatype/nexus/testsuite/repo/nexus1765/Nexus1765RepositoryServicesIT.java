@@ -42,7 +42,7 @@ public class Nexus1765RepositoryServicesIT
   public void testGetRepoStatus()
       throws Exception
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "55"); //nexus:repostatus:read
+    this.giveUserPrivilege(TEST_USER_NAME, "repostatus-read"); //nexus:repostatus:read
     // use test user
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -58,7 +58,7 @@ public class Nexus1765RepositoryServicesIT
       throws Exception
   {
 
-    this.giveUserPrivilege(TEST_USER_NAME, "55"); //nexus:repostatus:read
+    this.giveUserPrivilege(TEST_USER_NAME, "repostatus-read"); //nexus:repostatus:read
     this.giveUserPrivilege(TEST_USER_NAME, "56"); //nexus:repostatus:update
 
     String repoId = this.getTestRepositoryId();

@@ -549,7 +549,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '55',
+                id: 'repostatus-read', // 55
                 type: 'method',
                 name: 'Read Repository Status',
                 description: 'Give permission to retrieve the status of a repository.',
@@ -784,7 +784,7 @@ implements StaticSecurityResource
                 id: 'ui-repo-browser',
                 name: 'UI: Repository Browser',
                 description: 'Gives access to the Repository Browser screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', '55']
+                privileges: ['repositories-read', 'repogroups-read', 'repostatus-read']
             ),
             new CRole(
                 id: 'ui-logs-config-files',

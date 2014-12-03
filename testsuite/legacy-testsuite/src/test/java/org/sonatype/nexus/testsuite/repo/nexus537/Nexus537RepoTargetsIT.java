@@ -144,7 +144,7 @@ public class Nexus537RepoTargetsIT
   {
     this.overwriteUserRole(TEST_USER_NAME, "doReadTest-noAccess", "17");
     this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
-    // "repositories-read", "repogroups-read","19","44","artifact-read","55","57","58","64","70"
+    // "repositories-read", "repogroups-read","19","44","artifact-read","repostatus-read","57","58","64","70"
     this.printUserPrivs(TEST_USER_NAME);
   }
 

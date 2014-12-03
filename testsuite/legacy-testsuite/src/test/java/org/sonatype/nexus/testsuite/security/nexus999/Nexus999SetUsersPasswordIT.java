@@ -57,7 +57,7 @@ public class Nexus999SetUsersPasswordIT
         "19",
         "44",
         "artifact-read",
-        "55",
+        "repostatus-read",
         "57",
         "58",
         "59",
@@ -97,7 +97,7 @@ public class Nexus999SetUsersPasswordIT
         "19",
         "44",
         "artifact-read",
-        "55",
+        "repostatus-read",
         "57",
         "58",
         "59", /* "72" set pw, */
