@@ -159,7 +159,7 @@ public class NexusTaskJobListener<T>
     Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
 
     // the job trigger's next fire time
-    final Date nextFireTime = jobTrigger != null ? jobTrigger.getFireTimeAfter(new Date()) : null;
+    final Date nextFireTime = jobTrigger != null ? jobTrigger.getNextFireTime() : null;
 
     // actual schedule
     final Schedule jobSchedule = nexusScheduleConverter.toSchedule(currentTrigger);
