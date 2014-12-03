@@ -194,7 +194,7 @@ public class Nexus778SearchResultsFilteringIT
     role.addPrivilege("artifact-read");
     role.addPrivilege("repostatus-read");
     role.addPrivilege("usersforgotpw");
-    role.addPrivilege("58");
+    role.addPrivilege("usersforgotid");
     role.addPrivilege("64");
 
     return this.roleUtil.createRole(role);

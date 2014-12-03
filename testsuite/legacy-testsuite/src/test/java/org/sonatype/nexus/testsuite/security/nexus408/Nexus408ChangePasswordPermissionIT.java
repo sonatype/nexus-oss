@@ -40,7 +40,7 @@ public class Nexus408ChangePasswordPermissionIT
       throws Exception
   {
     overwriteUserRole(TEST_USER_NAME, "anonymous-with-login-changepw", "status", "signin", "repositories-read", "repogroups-read", "17",
-        "19", "44", "artifact-read", "repostatus-read", "usersforgotpw", "58", "59", "64"/* change pw */, "repository-m2-read", "repository-m1-read");
+        "19", "44", "artifact-read", "repostatus-read", "usersforgotpw", "usersforgotid", "59", "64"/* change pw */, "repository-m2-read", "repository-m1-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -71,7 +71,7 @@ public class Nexus408ChangePasswordPermissionIT
       throws Exception
   {
     overwriteUserRole(TEST_USER_NAME, "anonymous-with-login-but-changepw", "status", "signin", "repositories-read", "repogroups-read",
-        "17", "19", "44", "artifact-read", "repostatus-read", "usersforgotpw", "58", "59", /* "64" change pw, */"repository-m2-read", "repository-m1-read");
+        "17", "19", "44", "artifact-read", "repostatus-read", "usersforgotpw", "usersforgotid", "59", /* "64" change pw, */"repository-m2-read", "repository-m1-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
