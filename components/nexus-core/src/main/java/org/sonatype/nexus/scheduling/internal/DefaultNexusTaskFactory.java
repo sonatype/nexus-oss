@@ -99,6 +99,8 @@ public class DefaultNexusTaskFactory
     checkNotNull(taskConfiguration);
     taskConfiguration.validate();
     log.debug("Creating task by hint: {}", taskConfiguration);
+    // TODO: might optimize this to not go thru "loops" of laxed resolve, as taskConfig should be created via
+    // taskDescriptor, and the typeId here is known to not be laxed!
     final TaskDescriptor<?> taskDescriptor = resolveTaskDescriptorByTypeId(taskConfiguration.getTypeId());
     checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskConfiguration.getTypeId());
     taskConfiguration.setTypeId(taskDescriptor.getId());
