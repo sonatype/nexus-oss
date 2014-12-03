@@ -629,7 +629,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '73',
+                id: 'realmtypes-read', // 73
                 type: 'method',
                 name: 'Realm Types Component - (read)',
                 description: 'Give permission to retrieve list of support realms available in nexus.',
@@ -786,7 +786,7 @@ implements StaticSecurityResource
                 id: 'ui-server-admin',
                 name: 'UI: Server Administration',
                 description: 'Gives access to the Server Administration screen in Nexus UI',
-                privileges: ['settings-read', 'settings-update', '73']
+                privileges: ['settings-read', 'settings-update', 'realmtypes-read']
             ),
             new CRole(
                 id: 'ui-repository-admin',
