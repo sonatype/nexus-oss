@@ -649,7 +649,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '76',
+                id: 'maven-metadata-delete', // 76
                 type: 'method',
                 name: 'Rebuild Maven Metadata',
                 description: 'Give permission to rebuild the maven metadata of repository content.  The extents of this privilege are related to the allowed targets.',
