@@ -689,7 +689,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '81',
+                id: 'repositorypredefinedmirrors-read', // 81
                 type: 'method',
                 name: 'Repository Mirrors, Retrieve Predefined List - (read)',
                 description: 'Give permission to retrieve predefined list of mirrors from the server',
@@ -792,7 +792,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', 'repositorymirrors-read', 'repositorymirrors-create', '81', '82', 'repotypes-read', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', 'repositorymirrors-read', 'repositorymirrors-create', 'repositorypredefinedmirrors-read', '82', 'repotypes-read', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
