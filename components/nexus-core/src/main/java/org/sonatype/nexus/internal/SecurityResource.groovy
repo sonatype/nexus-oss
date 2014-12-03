@@ -212,7 +212,7 @@ implements StaticSecurityResource
                 id: 'signin', // 2
                 type: 'method',
                 name: 'Sign-in',
-                description: 'Give permission to allow a user to sign-in into nexus.',
+                description: 'Give permission to allow a user to sign-in to nexus.',
                 properties: [
                     'method': 'read',
                     'permission': 'nexus:authentication'
