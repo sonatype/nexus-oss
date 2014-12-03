@@ -170,7 +170,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give read
-    this.giveUserPrivilege(TEST_USER_NAME, "23");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");

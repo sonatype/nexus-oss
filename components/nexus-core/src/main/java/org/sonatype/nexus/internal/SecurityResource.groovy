@@ -389,7 +389,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '23',
+                id: 'routes-read', // 23
                 type: 'method',
                 name: 'Repository Routes - (read)',
                 description: 'Give permission to read existing repository route configuration.',
@@ -826,7 +826,7 @@ implements StaticSecurityResource
                 id: 'ui-routing-admin',
                 name: 'UI: Routing Administration',
                 description: 'Gives access to the Routing Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', 'routes-create', '23', '24', '25']
+                privileges: ['repositories-read', 'repogroups-read', 'routes-create', 'routes-read', '24', '25']
             ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
