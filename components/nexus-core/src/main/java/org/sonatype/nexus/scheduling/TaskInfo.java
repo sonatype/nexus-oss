@@ -174,7 +174,10 @@ public interface TaskInfo<T>
   boolean remove();
 
   /**
-   * Executes the scheduled task now, unrelated to it's actual schedule.
+   * Executes the scheduled task now, unrelated to it's actual schedule. This also implies that this method will NOT
+   * change the state of tasks "original" schedule! For example: hourly schedule, has 30 minutes to run, and
+   * task is getting run now. When the task is done, there will be still 30 minutes for it's original schedule
+   * to run (minus the task execution time).
    *
    * @throws TaskRemovedException  if task with this ID has been removed from scheduler.
    * @throws IllegalStateException if task is already running.
