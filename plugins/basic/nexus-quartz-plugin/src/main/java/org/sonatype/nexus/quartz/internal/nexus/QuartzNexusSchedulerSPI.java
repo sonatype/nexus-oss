@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.quartz.QuartzSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -39,7 +38,6 @@ import org.eclipse.sisu.Priority;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
@@ -251,19 +249,12 @@ public class QuartzNexusSchedulerSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final List<JobExecutionContext> jobExecutionContexts = quartzSupport.getScheduler().getCurrentlyExecutingJobs();
-      for (JobExecutionContext context : jobExecutionContexts) {
-        result.put(context.getJobDetail().getKey(), (NexusTaskInfo<?>) context.get(NexusTaskInfo.TASK_INFO_KEY));
-      }
-
       final Set<JobKey> jobKeys = quartzSupport.getScheduler().getJobKeys(jobGroupEquals(QZ_NEXUS_GROUP));
       for (JobKey jobKey : jobKeys) {
-        if (!result.containsKey(jobKey)) {
-          final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
-              .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-          checkState(nexusTaskJobListener != null, "NX task must have listener");
-          result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
-        }
+        final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
+            .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
+        checkState(nexusTaskJobListener != null, "NX task must have listener");
+        result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
       }
       return result;
     }
