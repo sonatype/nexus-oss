@@ -879,7 +879,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '64',
+                id: 'userschangepw', // 64
                 type: 'method',
                 name: 'User Change Password - (create,read)',
                 description: 'Give permission to change a user\'s password.',
@@ -1042,7 +1042,7 @@ implements StaticSecurityResource
                 id: 'ui-basic',
                 name: 'UI: Base UI Privileges',
                 description: 'Generic privileges for users in the Nexus UI',
-                privileges: ['status', 'signin', '64']
+                privileges: ['status', 'signin', 'userschangepw']
             ),
             new CRole(
                 id: 'nx-apikey-access',

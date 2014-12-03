@@ -195,7 +195,7 @@ public class Nexus778SearchResultsFilteringIT
     role.addPrivilege("repostatus-read");
     role.addPrivilege("usersforgotpw");
     role.addPrivilege("usersforgotid");
-    role.addPrivilege("64");
+    role.addPrivilege("userschangepw");
 
     return this.roleUtil.createRole(role);
   }
