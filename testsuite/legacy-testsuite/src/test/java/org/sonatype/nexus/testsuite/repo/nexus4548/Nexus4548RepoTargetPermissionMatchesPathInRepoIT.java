@@ -59,7 +59,7 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
     List<String> rolePrivileges = Lists.newArrayList();
-    rolePrivileges.add("65"); //artifact upload
+    rolePrivileges.add("artifact-create"); //artifact upload
     rolePrivileges.addAll(privilegeIds(createPrivileges("GAV", "119035e2c095")));
     createRole("GAV", rolePrivileges);
 

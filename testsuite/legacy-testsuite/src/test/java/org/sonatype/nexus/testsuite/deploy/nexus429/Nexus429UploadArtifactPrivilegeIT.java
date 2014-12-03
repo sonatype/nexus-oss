@@ -70,7 +70,7 @@ public class Nexus429UploadArtifactPrivilegeIT
 
     // give deployment role
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "65");
+    this.giveUserPrivilege("test-user", "artifact-create");
     this.giveUserRole("test-user", "repo-all-full");
 
     // try again
@@ -106,7 +106,7 @@ public class Nexus429UploadArtifactPrivilegeIT
 
     // give deployment role
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "65");
+    this.giveUserPrivilege("test-user", "artifact-create");
     this.giveUserRole("test-user", "repo-all-full");
 
     // try again

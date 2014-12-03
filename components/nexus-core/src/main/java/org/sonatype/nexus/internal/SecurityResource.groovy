@@ -569,7 +569,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '65',
+                id: 'artifact-create', // 65
                 type: 'method',
                 name: 'Artifact Upload',
                 description: 'Give permission to upload artifacts (using /artifact service, not the /content service).  The extents of this privilege are related to the allowed targets.',
