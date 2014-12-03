@@ -96,7 +96,7 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertEquals(403, response.getStatus().getCode());
 
     // only content class priv
-    this.overwriteUserRole(TEST_USER_NAME, "schedule_types" + role, "71");
+    this.overwriteUserRole(TEST_USER_NAME, "schedule_types" + role, "scheduletypes-read");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     response = sendMessage(role, this.getXMLXStream(), MediaType.APPLICATION_XML);
