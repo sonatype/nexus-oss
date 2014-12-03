@@ -369,7 +369,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '21',
+                id: 'cache-delete', // 21
                 type: 'method',
                 name: 'Clear Repository Cache',
                 description: 'Give permission to clear the content of a repositories not found cache.  The extents of this privilege are related to the allowed targets.',
