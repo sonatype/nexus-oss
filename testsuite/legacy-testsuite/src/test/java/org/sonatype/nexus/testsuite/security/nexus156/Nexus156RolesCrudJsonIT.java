@@ -158,7 +158,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("UpdateRole Again");
     resource.setDescription("Update Test Role Again");
     resource.getPrivileges().clear(); // clear the privs
-    resource.addPrivilege("6");
+    resource.addPrivilege("repositories-read");
     resource.setSessionTimeout(10);
 
     Response response = this.messageUtil.sendMessage(Method.PUT, resource);

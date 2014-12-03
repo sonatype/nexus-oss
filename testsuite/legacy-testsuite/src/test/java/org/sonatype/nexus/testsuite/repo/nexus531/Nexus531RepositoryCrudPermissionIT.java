@@ -185,7 +185,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give read
-    this.giveUserPrivilege(TEST_USER_NAME, "6");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
