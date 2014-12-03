@@ -55,7 +55,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "45");
+    this.giveUserPrivilege("test-user", "targets-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");

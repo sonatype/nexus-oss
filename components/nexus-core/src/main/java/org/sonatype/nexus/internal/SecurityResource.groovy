@@ -479,7 +479,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '45',
+                id: 'targets-create', // 45
                 type: 'method',
                 name: 'Repository Targets - (create,read)',
                 description: 'Give permission to create,read repository targets.',
@@ -838,7 +838,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['45', '46', '47', '48', '70', '74']
+                privileges: ['targets-create', '46', '47', '48', '70', '74']
             ),
             new CRole(
                 id: 'ui-users-admin',
