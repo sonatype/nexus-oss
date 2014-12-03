@@ -66,7 +66,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "13");
+    this.giveUserPrivilege("test-user", "repogroups-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");

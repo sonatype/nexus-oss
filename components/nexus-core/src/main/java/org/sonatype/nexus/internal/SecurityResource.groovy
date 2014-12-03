@@ -319,7 +319,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '13',
+                id: 'repogroups-create', // 13
                 type: 'method',
                 name: 'Repository Groups - (create,read)',
                 description: 'Give permission to create,read new repository groups.',
@@ -819,7 +819,7 @@ implements StaticSecurityResource
                 id: 'ui-group-admin',
                 name: 'UI: Group Administration',
                 description: 'Gives access to the Group Administration screen in Nexus UI',
-                privileges: ['repositories-read', '13', '14', '15', '16', 'repository-all'],
+                privileges: ['repositories-read', 'repogroups-create', '14', '15', '16', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
