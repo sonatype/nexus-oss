@@ -899,7 +899,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '75',
+                id: 'userlocatortypes-read', // 75
                 type: 'method',
                 name: 'User Locator Types Component - (read)',
                 description: 'Give permission to retrieve the list of User Locator types supported by nexus.',
@@ -1024,7 +1024,7 @@ implements StaticSecurityResource
                 id: 'ui-users-admin',
                 name: 'UI: User Administration',
                 description: 'Gives access to the User Administration screen in Nexus UI',
-                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', 'userssetpw', '75']
+                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', 'userssetpw', 'userlocatortypes-read']
             ),
             new CRole(
                 id: 'ui-roles-admin',
