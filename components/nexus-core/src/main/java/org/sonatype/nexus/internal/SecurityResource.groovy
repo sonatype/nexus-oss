@@ -709,7 +709,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '83',
+                id: 'apikey-access', // 83
                 type: 'method',
                 name: 'API-Key Access',
                 description: 'Give permission to use an API-Key to access the server.',
@@ -724,13 +724,13 @@ implements StaticSecurityResource
                 id: 'nx-admin',
                 name: 'Nexus Administrator Role',
                 description: 'Administration role for Nexus',
-                privileges: ['admin', '1001', '83']
+                privileges: ['admin', '1001', 'apikey-access']
             ),
             new CRole(
                 id: 'nx-deployment',
                 name: 'Nexus Deployment Role',
                 description: 'Deployment role for Nexus',
-                privileges: ['83'],
+                privileges: ['apikey-access'],
                 roles: ['anonymous', 'ui-basic']
             ),
             new CRole(
@@ -848,7 +848,7 @@ implements StaticSecurityResource
                 id: 'nx-apikey-access',
                 name: 'Nexus API-Key Access',
                 description: 'API-Key Access role for Nexus.',
-                privileges: ['83']
+                privileges: ['apikey-access']
             ),
             new CRole(
                 id: 'metrics-endpoints',
