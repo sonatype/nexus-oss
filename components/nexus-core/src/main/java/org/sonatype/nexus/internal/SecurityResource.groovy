@@ -329,7 +329,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '14',
+                id: 'repogroups-read', // 14
                 type: 'method',
                 name: 'Repository Groups - (read)',
                 description: 'Give permission to read existing repository group configuration.',
@@ -794,7 +794,7 @@ implements StaticSecurityResource
                 id: 'ui-repo-browser',
                 name: 'UI: Repository Browser',
                 description: 'Gives access to the Repository Browser screen in Nexus UI',
-                privileges: ['repositories-read', '14', '55']
+                privileges: ['repositories-read', 'repogroups-read', '55']
             ),
             new CRole(
                 id: 'ui-logs-config-files',
@@ -819,20 +819,20 @@ implements StaticSecurityResource
                 id: 'ui-group-admin',
                 name: 'UI: Group Administration',
                 description: 'Gives access to the Group Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-create', '14', '15', '16', 'repository-all'],
+                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', '15', '16', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
                 id: 'ui-routing-admin',
                 name: 'UI: Routing Administration',
                 description: 'Gives access to the Routing Administration screen in Nexus UI',
-                privileges: ['repositories-read', '14', '22', '23', '24', '25']
+                privileges: ['repositories-read', 'repogroups-read', '22', '23', '24', '25']
             ),
             new CRole(
                 id: 'ui-scheduled-tasks-admin',
                 name: 'UI: Scheduled Task Administration',
                 description: 'Gives access to the Scheduled Task Administration screen in Nexus UI',
-                privileges: ['repositories-read', '14', '26', '27', '28', '29', '68', '69', '71']
+                privileges: ['repositories-read', 'repogroups-read', '26', '27', '28', '29', '68', '69', '71']
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
@@ -856,7 +856,7 @@ implements StaticSecurityResource
                 id: 'ui-privileges-admin',
                 name: 'UI: Privilege Administration',
                 description: 'Gives access to the Privilege Administration screen in Nexus UI',
-                privileges: ['repositories-read', '14', '30', '31', '32', '33', '46', '80']
+                privileges: ['repositories-read', 'repogroups-read', '30', '31', '32', '33', '46', '80']
             ),
             new CRole(
                 id: 'ui-basic',
