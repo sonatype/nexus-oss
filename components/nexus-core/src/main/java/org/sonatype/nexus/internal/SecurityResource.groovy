@@ -589,7 +589,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '68',
+                id: 'tasksrun', // 68
                 type: 'method',
                 name: 'Scheduled Tasks - (run,stop)',
                 description: 'Give permission to run and stop existing scheduled tasks manually.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-scheduled-tasks-admin',
                 name: 'UI: Scheduled Task Administration',
                 description: 'Gives access to the Scheduled Task Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', '68', '69', '71']
+                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', 'tasksrun', '69', '71']
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
