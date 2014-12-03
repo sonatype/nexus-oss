@@ -139,12 +139,6 @@ public class DefaultNexusTaskScheduler
     return getScheduler().rescheduleTask(id, schedule);
   }
 
-  @Override
-  public boolean removeTask(final String id) {
-    checkNotNull(id);
-    return getScheduler().removeTask(id);
-  }
-
   /**
    * Creates configuration from descriptor.
    */

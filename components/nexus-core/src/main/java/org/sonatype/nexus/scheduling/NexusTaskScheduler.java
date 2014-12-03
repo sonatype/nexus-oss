@@ -82,11 +82,6 @@ public interface NexusTaskScheduler
   @Nullable
   <T> TaskInfo<T> rescheduleTask(String id, Schedule schedule);
 
-  /**
-   * Removes task by ID.
-   */
-  boolean removeTask(String id);
-
   // -- tests
 
   /**

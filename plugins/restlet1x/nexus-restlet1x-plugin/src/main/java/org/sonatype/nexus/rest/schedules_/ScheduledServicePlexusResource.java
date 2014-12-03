@@ -217,7 +217,7 @@ public class ScheduledServicePlexusResource
   {
     final TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
     if (task != null) {
-      getNexusScheduler().removeTask(task.getId());
+      task.remove();
       response.setStatus(Status.SUCCESS_NO_CONTENT);
       return;
     }

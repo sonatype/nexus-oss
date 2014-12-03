@@ -57,6 +57,8 @@ public class NexusTaskInfo<T>
 
   private volatile NexusTaskFuture<T> nexusTaskFuture;
 
+  private volatile boolean removed;
+
   public NexusTaskInfo(final QuartzNexusSchedulerSPI quartzSupport,
                        final JobKey jobKey,
                        final NexusTaskState nexusTaskState,
@@ -67,6 +69,7 @@ public class NexusTaskInfo<T>
     this.state = nexusTaskFuture != null ? State.RUNNING : State.WAITING;
     this.nexusTaskState = nexusTaskState;
     this.nexusTaskFuture = nexusTaskFuture;
+    this.removed = false;
   }
 
   public synchronized void setNexusTaskState(final State state,
@@ -125,6 +128,10 @@ public class NexusTaskInfo<T>
 
   @Override
   public synchronized boolean remove() {
+    if (removed || state == State.DONE) {
+      // already removed
+      return false;
+    }
     if (nexusTaskFuture != null) {
       nexusTaskFuture.cancel(true);
     }
@@ -133,13 +140,15 @@ public class NexusTaskInfo<T>
       // if was running and is cancelable, the task will itself set a proper ending state
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
     }
+    removed = true;
     log.info("NX Task remove: {}", nexusTaskState);
-    return quartzSupport.removeTask(jobKey.getName());
+    return quartzSupport.removeTask(jobKey);
   }
 
   @Override
   public synchronized TaskInfo<T> runNow() throws TaskRemovedException {
     checkState(State.RUNNING != state, "Task already running");
+    checkState(!removed, "Task already removed");
     log.info("NX Task runNow: {}", nexusTaskState);
     setNexusTaskState(
         State.RUNNING,

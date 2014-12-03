@@ -66,7 +66,13 @@ public interface TaskInfo<T>
    * Task instance might be waiting (to be run, either by schedule or manually), or might be running, or might be
    * done (will never run again, is "done"). The "done" state is ending state for task, it will according to it's
    * {@link Schedule} not execute anymore.
+   * Scheduler will never give out "fresh" task info instances with state "done" as done task is also removed.
+   * These states might be get into only by having a "single shot" task ended. Instances in
+   * this "ending" state, while still holding valid configuration and schedule, might be used to reschedule a
+   * NEW task instance, but the reference to this instance should be dropped and let for GC to collect it, and
+   * continue with the newly returned task info.
    *
+   * Transitions:
    * WAITING -> RUNNING
    * RUNNING -> WAITING
    * RUNNING -> DONE

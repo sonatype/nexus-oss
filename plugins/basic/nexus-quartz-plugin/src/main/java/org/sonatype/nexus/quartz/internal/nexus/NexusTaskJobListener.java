@@ -170,12 +170,7 @@ public class NexusTaskJobListener<T>
 
     // DONE tasks (or those already removed) should be cleaned up, as they might reschedule themselves
     if (State.DONE == state) {
-      try {
-        quartzSupport.removeTask(jobKey);
-      }
-      catch (SchedulerException e) {
-        // mute
-      }
+      nexusTaskInfo.remove();
     }
 
     // unwrap the QZ wrapped exception and set future result

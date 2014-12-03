@@ -256,17 +256,6 @@ public class ThreadPoolNexusSchedulerSPI
   }
 
   @Override
-  public boolean removeTask(final String id) {
-    final TaskInfo<?> taskInfo = getTaskById(id);
-    if (taskInfo == null) {
-      return false;
-    }
-    taskInfo.getCurrentState().getFuture().cancel(false);
-    tasks.remove(id);
-    return true;
-  }
-
-  @Override
   public int getRunningTaskCount() {
     return executorService.getActiveCount();
   }
