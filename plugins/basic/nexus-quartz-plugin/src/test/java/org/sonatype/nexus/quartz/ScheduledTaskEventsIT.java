@@ -22,6 +22,7 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.scheduling.events.NexusTaskEvent;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventCanceled;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
@@ -164,7 +165,7 @@ public class ScheduledTaskEventsIT
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.FAILED));
 
-    // started, stoppedDone
+    // started, stoppedFailed
     assertThat(listener.arrivedEvents, hasSize(2));
     assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
     assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventStoppedFailed.class));
@@ -202,7 +203,43 @@ public class ScheduledTaskEventsIT
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
 
-    // started, stoppedDone
+    // started, canceled, stoppedCanceled
+    assertThat(listener.arrivedEvents, hasSize(3));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(NexusTaskEventStoppedCanceled.class));
+  }
+
+  @Test
+  public void canceledRunByThrowingTaskInterruptedEx() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+    SleeperTask.exception = new TaskInterruptedException("foo", true);
+
+    // create the task
+    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+        .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+
+    // give it some time to start
+    SleeperTask.youWait.await();
+
+    // make it be done
+    SleeperTask.meWait.countDown();
+    Thread.yield();
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+    // done
+    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
+    assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
+
+    // started, canceled, stoppedCanceled
     assertThat(listener.arrivedEvents, hasSize(3));
     assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
     assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventCanceled.class));

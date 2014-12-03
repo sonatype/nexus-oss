@@ -113,8 +113,9 @@ public class NexusTaskJobSupport<T>
         }
       }
       catch (TaskInterruptedException e) {
-        log.warn("Task canceled: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
+        log.info("Task canceled: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
         getTaskInfo().getNexusTaskFuture().doCancel();
+        eventBus.post(new NexusTaskEventCanceled<>(getTaskInfo()));
       }
       catch (Exception e) {
         log.warn("Task execution failure: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
