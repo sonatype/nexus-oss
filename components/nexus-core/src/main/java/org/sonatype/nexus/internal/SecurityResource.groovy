@@ -889,7 +889,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '72',
+                id: 'userssetpw', // 72
                 type: 'method',
                 name: 'User Set Password - (create,read)',
                 description: 'Give permission to set a user\'s password.',
@@ -1024,7 +1024,7 @@ implements StaticSecurityResource
                 id: 'ui-users-admin',
                 name: 'UI: User Administration',
                 description: 'Gives access to the User Administration screen in Nexus UI',
-                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', '72', '75']
+                privileges: ['roles-read', 'users-create', 'users-read', 'users-update', 'users-delete', 'userssetpw', '75']
             ),
             new CRole(
                 id: 'ui-roles-admin',
