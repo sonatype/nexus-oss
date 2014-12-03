@@ -125,7 +125,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give update
-    this.giveUserPrivilege("test-user", "15");
+    this.giveUserPrivilege("test-user", "repogroups-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

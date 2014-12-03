@@ -339,7 +339,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '15',
+                id: 'repogroups-update', // 15
                 type: 'method',
                 name: 'Repository Groups - (update,read)',
                 description: 'Give permission to update,read existing repository group configuration.',
@@ -819,7 +819,7 @@ implements StaticSecurityResource
                 id: 'ui-group-admin',
                 name: 'UI: Group Administration',
                 description: 'Gives access to the Group Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', '15', '16', 'repository-all'],
+                privileges: ['repositories-read', 'repogroups-create', 'repogroups-read', 'repogroups-update', '16', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
