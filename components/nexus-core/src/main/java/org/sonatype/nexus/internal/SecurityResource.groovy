@@ -471,8 +471,8 @@ implements StaticSecurityResource
             new CPrivilege(
                 id: 'configuration-read', // 43
                 type: 'method',
-                name: 'Configuration File - (read)',
-                description: 'Give permission to retrieve the nexus.xml configuration file.',
+                name: 'Configuration - (read)',
+                description: 'Give permission to retrieve the nexus configuration.',
                 properties: [
                     'method': 'read',
                     'permission': 'nexus:configuration'
