@@ -102,10 +102,14 @@ public class NexusTaskJobSupport<T>
         if (!future.isCancelled()) {
           future.setRunState(RunState.RUNNING);
           nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
-          final T result = nexusTask.call();
-          context.setResult(result);
-          // put back any state task modified to have it persisted
-          context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
+          try {
+            final T result = nexusTask.call();
+            context.setResult(result);
+          }
+          finally {
+            // put back any state task modified to have it persisted
+            context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
+          }
         }
       }
       catch (TaskInterruptedException e) {
