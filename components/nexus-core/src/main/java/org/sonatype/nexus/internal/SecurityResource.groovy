@@ -729,7 +729,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '30',
+                id: 'privileges-create', // 30
                 type: 'method',
                 name: 'User Privileges - (create,read)',
                 description: 'Give permission to create,read privileges.',
@@ -1036,7 +1036,7 @@ implements StaticSecurityResource
                 id: 'ui-privileges-admin',
                 name: 'UI: Privilege Administration',
                 description: 'Gives access to the Privilege Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', '30', '31', '32', '33', 'targets-read', '80']
+                privileges: ['repositories-read', 'repogroups-read', 'privileges-create', '31', '32', '33', 'targets-read', '80']
             ),
             new CRole(
                 id: 'ui-basic',

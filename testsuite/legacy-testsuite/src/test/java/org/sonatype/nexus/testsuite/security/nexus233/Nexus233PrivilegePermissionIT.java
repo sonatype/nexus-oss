@@ -53,7 +53,7 @@ public class Nexus233PrivilegePermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "30");
+    this.giveUserPrivilege("test-user", "privileges-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");
