@@ -98,7 +98,7 @@ public class Upgrade250to270
     for (CScheduledTask task : tasks) {
       if ("EmptyTrashTask".equals(task.getType())) {
         final Map<String, String> taskConfig = getMapFromConfigList(task.getProperties());
-        // TODO: Humm? EmptyTrashTaskDescriptor.REPO_OR_GROUP_FIELD_ID)
+        // putting original value in here, as TaskConfiguration#getRepositoryId handles them all
         if (!taskConfig.containsKey(TaskConfiguration.REPOSITORY_ID_KEY)) {
           taskConfig.put(TaskConfiguration.REPOSITORY_ID_KEY, "all_repo");
           task.setProperties(getConfigListFromMap(taskConfig));
