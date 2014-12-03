@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
+import org.sonatype.nexus.scheduling.schedule.Manual;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -79,10 +80,27 @@ public class NexusTaskInfo<T>
     checkNotNull(state);
     checkNotNull(nexusTaskState);
     checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
-    log.debug("NX Task transition {} -> {}", this.state, state);
+    log.debug("NX Task {} transition {} -> {}, nextRun={}", jobKey, this.state, state, nexusTaskState.getNextExecutionTime());
     this.state = state;
     this.nexusTaskState = nexusTaskState;
     this.nexusTaskFuture = nexusTaskFuture;
+  }
+
+  /**
+   * Sets task state only if it's in given state, otherwise does nothing.
+   */
+  public synchronized void setNexusTaskStateIfInState(final State state,
+                                                      final NexusTaskState nexusTaskState,
+                                                      final @Nullable NexusTaskFuture<T> nexusTaskFuture)
+  {
+    if (this.state == state) {
+      checkNotNull(state);
+      checkNotNull(nexusTaskState);
+      checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
+      log.debug("NX Task {} transition in state {}, nextRun={}", jobKey, state, nexusTaskState.getNextExecutionTime());
+      this.nexusTaskState = nexusTaskState;
+      this.nexusTaskFuture = nexusTaskFuture;
+    }
   }
 
   @Nullable
@@ -118,7 +136,12 @@ public class NexusTaskInfo<T>
   @Override
   public synchronized CurrentState<T> getCurrentState() {
     checkState(state == State.DONE || !removed, "Task already removed/updated");
-    return new CS<>(state, nexusTaskState, nexusTaskFuture);
+    if (nexusTaskState.getSchedule() instanceof Manual) {
+      return new CS<>(state, null, nexusTaskFuture);
+    }
+    else {
+      return new CS<>(state, nexusTaskState.getNextExecutionTime(), nexusTaskFuture);
+    }
   }
 
   @Nullable
@@ -142,7 +165,7 @@ public class NexusTaskInfo<T>
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
-    log.info("NX Task remove: {}, state={}", jobKey, state);
+    log.debug("NX Task {} remove; state={}", jobKey, state);
     return quartzSupport.removeTask(jobKey);
   }
 
@@ -152,7 +175,7 @@ public class NexusTaskInfo<T>
     if (removed) {
       throw new TaskRemovedException("Task removed: " + jobKey);
     }
-    log.info("NX Task runNow: {}, state={}", jobKey, state);
+    log.debug("NX Task {} runNow; state={}", jobKey, state);
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,
@@ -185,10 +208,10 @@ public class NexusTaskInfo<T>
 
     private final NexusTaskFuture<T> future;
 
-    public CS(final State state, final NexusTaskState nexusTaskState, final NexusTaskFuture<T> nexusTaskFuture)
+    public CS(final State state, final Date nextRun, final NexusTaskFuture<T> nexusTaskFuture)
     {
       this.state = state;
-      this.nextRun = nexusTaskState.getNextExecutionTime();
+      this.nextRun = nextRun;
       this.future = nexusTaskFuture;
     }
 
