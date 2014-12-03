@@ -789,7 +789,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '36',
+                id: 'roles-update', // 36
                 type: 'method',
                 name: 'User Roles - (update,read)',
                 description: 'Give permission to update,read existing user role configuration.',
@@ -1030,7 +1030,7 @@ implements StaticSecurityResource
                 id: 'ui-roles-admin',
                 name: 'UI: Role Administration',
                 description: 'Gives access to the Role Administration screen in Nexus UI',
-                privileges: ['privileges-read', 'roles-create', 'roles-read', '36', '37']
+                privileges: ['privileges-read', 'roles-create', 'roles-read', 'roles-update', '37']
             ),
             new CRole(
                 id: 'ui-privileges-admin',
