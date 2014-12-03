@@ -31,6 +31,7 @@ import org.restlet.data.Response;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -133,7 +134,10 @@ public class Nexus156RolesCrudJsonIT
     Assert.assertEquals(responseResource.getId(), resource.getId());
     Assert.assertEquals(responseResource.getDescription(), resource.getDescription());
     Assert.assertEquals(responseResource.getName(), resource.getName());
-    Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
+    assertThat(
+        responseResource.getPrivileges(),
+        hasItems(resource.getPrivileges().toArray(new String[resource.getPrivileges().size()]))
+    );
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
   }
 
@@ -174,7 +178,10 @@ public class Nexus156RolesCrudJsonIT
     Assert.assertEquals(responseResource.getDescription(), resource.getDescription());
     Assert.assertEquals(responseResource.getName(), resource.getName());
     Assert.assertEquals(resource.getSessionTimeout(), responseResource.getSessionTimeout());
-    Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
+    assertThat(
+        responseResource.getPrivileges(),
+        hasItems(resource.getPrivileges().toArray(new String[resource.getPrivileges().size()]))
+    );
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
   }
 
