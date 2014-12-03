@@ -299,7 +299,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '11',
+                id: 'repotemplates-update',  // 11
                 type: 'method',
                 name: 'Repository Templates - (update,read)',
                 description: 'Give permission to update,read existing repository template configuration.  Note that this privilege is not currently invoked by the Nexus UI.',
