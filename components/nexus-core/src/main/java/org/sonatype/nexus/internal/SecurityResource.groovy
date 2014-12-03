@@ -489,7 +489,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '46',
+                id: 'targets-read', // 46
                 type: 'method',
                 name: 'Repository Targets - (read)',
                 description: 'Give permission to read existing repository target configuration.',
@@ -838,7 +838,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['targets-create', '46', '47', '48', '70', '74']
+                privileges: ['targets-create', 'targets-read', '47', '48', '70', '74']
             ),
             new CRole(
                 id: 'ui-users-admin',
@@ -856,7 +856,7 @@ implements StaticSecurityResource
                 id: 'ui-privileges-admin',
                 name: 'UI: Privilege Administration',
                 description: 'Gives access to the Privilege Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', '30', '31', '32', '33', '46', '80']
+                privileges: ['repositories-read', 'repogroups-read', '30', '31', '32', '33', 'targets-read', '80']
             ),
             new CRole(
                 id: 'ui-basic',
