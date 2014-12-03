@@ -62,7 +62,8 @@ public abstract class TaskDescriptorSupport<T extends Task>
   }
 
   /**
-   * Constructor with all bells and whistles.
+   * Constructor with all bells and whistles making task class' "simple class name" as type ID. Basically this
+   * is somewhat backward compatible with old scheduler, where @Named was used with usually simple class name.
    */
   public TaskDescriptorSupport(final Class<T> type,
                                final String name,
@@ -70,10 +71,24 @@ public abstract class TaskDescriptorSupport<T extends Task>
                                final boolean exposed,
                                final FormField... formFields)
   {
+    this(type.getSimpleName(), type, name, visible, exposed, formFields);
+  }
+
+  /**
+   * Constructor with all bells and whistles.
+   */
+  public TaskDescriptorSupport(final String id,
+                               final Class<T> type,
+                               final String name,
+                               final boolean visible,
+                               final boolean exposed,
+                               final FormField... formFields)
+  {
+    checkNotNull(id);
     checkNotNull(type);
     checkNotNull(name);
     checkNotNull(formFields);
-    this.id = type.getSimpleName();
+    this.id = id;
     this.name = name;
     this.type = type;
     this.visible = visible;
