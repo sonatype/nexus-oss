@@ -359,7 +359,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '20',
+                id: 'attributes-delete', // 20
                 type: 'method',
                 name: 'Rebuild Repository Attributes',
                 description: 'Give permission to rebuild the attributes of repository content.  The extents of this privilege are related to the allowed targets.',
