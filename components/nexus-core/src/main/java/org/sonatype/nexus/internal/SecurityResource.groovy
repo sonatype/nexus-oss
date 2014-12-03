@@ -539,7 +539,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '54',
+                id: 'artifact-read', // 54
                 type: 'method',
                 name: 'Artifact Download',
                 description: 'Give permission to download artifacts (using /artifact service, not the /content url).  The extents of this privilege are related to the allowed targets..  Note that this privilege is not currently invoked by the Nexus UI.',
@@ -747,7 +747,7 @@ implements StaticSecurityResource
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
-                privileges: ['status', '54', '57', '58', '70', '74'],
+                privileges: ['status', 'artifact-read', '57', '58', '70', '74'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(

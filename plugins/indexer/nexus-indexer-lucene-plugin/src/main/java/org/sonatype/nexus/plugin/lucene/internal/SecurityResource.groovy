@@ -70,7 +70,7 @@ implements StaticSecurityResource
                 id: 'ui-search',
                 name: 'UI: Search',
                 description: 'Gives access to the Search screen in Nexus UI',
-                privileges: ['17', '19', '54']
+                privileges: ['17', '19', 'artifact-read']
             ),
             new CRole(
                 id: 'anonymous',
