@@ -64,7 +64,7 @@ public class NxApplication
 
   private final SecuritySystem securitySystem;
 
-  private final NexusTaskScheduler nexusTaskExecutor;
+  private final NexusTaskScheduler nexusTaskScheduler;
 
   private final RepositoryRegistry repositoryRegistry;
 
@@ -79,7 +79,7 @@ public class NxApplication
                        final NexusConfiguration nexusConfiguration,
                        final ApplicationStatusSource applicationStatusSource,
                        final SecuritySystem securitySystem,
-                       final NexusTaskScheduler nexusTaskExecutor,
+                       final NexusTaskScheduler nexusTaskScheduler,
                        final RepositoryRegistry repositoryRegistry,
                        final EventSubscriberHost eventSubscriberHost,
                        final OrientBootstrap orientBootstrap,
@@ -89,7 +89,7 @@ public class NxApplication
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.securitySystem = checkNotNull(securitySystem);
-    this.nexusTaskExecutor = checkNotNull(nexusTaskExecutor);
+    this.nexusTaskScheduler = checkNotNull(nexusTaskScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
@@ -219,11 +219,11 @@ public class NxApplication
     final Collection<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet(ShadowRepository.class);
     for (ShadowRepository shadow : shadows) {
       if (shadow.isSynchronizeAtStartup()) {
-        final TaskConfiguration taskConfiguration = nexusTaskExecutor
+        final TaskConfiguration taskConfiguration = nexusTaskScheduler
             .createTaskConfigurationInstance(SynchronizeShadowsTask.class);
         taskConfiguration.setRepositoryId(shadow.getId());
         taskConfiguration.setName("Shadow Sync (" + shadow.getId() + ")");
-        nexusTaskExecutor.submit(taskConfiguration);
+        nexusTaskScheduler.submit(taskConfiguration);
       }
     }
   }
