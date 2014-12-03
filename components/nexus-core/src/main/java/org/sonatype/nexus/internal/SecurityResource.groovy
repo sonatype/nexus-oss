@@ -579,7 +579,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '67',
+                id: 'repometa-read', // 67
                 type: 'method',
                 name: 'Repository Summary Info (read)',
                 description: 'Give permission to read the repository summary information.',

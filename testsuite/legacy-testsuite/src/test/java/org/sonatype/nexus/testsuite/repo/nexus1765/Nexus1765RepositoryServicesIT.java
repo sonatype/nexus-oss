@@ -86,7 +86,7 @@ public class Nexus1765RepositoryServicesIT
   public void testGetRepoMeta()
       throws Exception
   {
-    this.giveUserPrivilege(TEST_USER_NAME, "67"); //nexus:repometa:read
+    this.giveUserPrivilege(TEST_USER_NAME, "repometa-read"); //nexus:repometa:read
 
     // use test user
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
