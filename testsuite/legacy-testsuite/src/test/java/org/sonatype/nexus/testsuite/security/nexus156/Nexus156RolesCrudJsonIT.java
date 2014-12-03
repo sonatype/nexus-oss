@@ -123,7 +123,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Read Test Role");
     resource.setName("ReadRole");
     resource.setSessionTimeout(31);
-    resource.addPrivilege("3");
+    resource.addPrivilege("settings-read");
     resource.addPrivilege("4");
     resource = this.messageUtil.createRole(resource);
 

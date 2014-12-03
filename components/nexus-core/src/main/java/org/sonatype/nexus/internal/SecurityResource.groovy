@@ -219,7 +219,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '3',
+                id: 'settings-read',
                 type: 'method',
                 name: 'Server Settings - (read)',
                 description: 'Give permission to read the nexus server settings.',
@@ -806,7 +806,7 @@ implements StaticSecurityResource
                 id: 'ui-server-admin',
                 name: 'UI: Server Administration',
                 description: 'Gives access to the Server Administration screen in Nexus UI',
-                privileges: ['3', '4', '73']
+                privileges: ['settings-read', '4', '73']
             ),
             new CRole(
                 id: 'ui-repository-admin',
