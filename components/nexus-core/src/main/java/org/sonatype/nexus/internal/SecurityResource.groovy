@@ -449,7 +449,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '29',
+                id: 'tasks-delete', // 29
                 type: 'method',
                 name: 'Scheduled Tasks - (delete,read)',
                 description: 'Give permission to delete,read existing scheduled tasks.',
@@ -832,7 +832,7 @@ implements StaticSecurityResource
                 id: 'ui-scheduled-tasks-admin',
                 name: 'UI: Scheduled Task Administration',
                 description: 'Gives access to the Scheduled Task Administration screen in Nexus UI',
-                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', '29', '68', '69', '71']
+                privileges: ['repositories-read', 'repogroups-read', 'tasks-create', 'tasks-read', 'tasks-update', 'tasks-delete', '68', '69', '71']
             ),
             new CRole(
                 id: 'ui-repository-targets-admin',
