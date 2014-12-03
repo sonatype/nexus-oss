@@ -259,7 +259,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '7',
+                id: 'repositories-update', // 7
                 type: 'method',
                 name: 'Repositories - (update,read)',
                 description: 'Give permission to update,read existing repository configuration.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', '7', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(

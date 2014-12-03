@@ -188,7 +188,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Delete Test Role");
     resource.setName("deleteRole");
     resource.setSessionTimeout(1);
-    resource.addPrivilege("7");
+    resource.addPrivilege("repositories-update");
     resource.addPrivilege("8");
 
     RoleResource responseResource = this.messageUtil.createRole(resource);
