@@ -227,7 +227,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "37");
+    this.giveUserPrivilege("test-user", "roles-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

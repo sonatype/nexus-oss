@@ -799,7 +799,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '37',
+                id: 'roles-delete', // 37
                 type: 'method',
                 name: 'User Roles - (delete,read)',
                 description: 'Give permission to delete,read existing user roles.',
@@ -1030,7 +1030,7 @@ implements StaticSecurityResource
                 id: 'ui-roles-admin',
                 name: 'UI: Role Administration',
                 description: 'Gives access to the Role Administration screen in Nexus UI',
-                privileges: ['privileges-read', 'roles-create', 'roles-read', 'roles-update', '37']
+                privileges: ['privileges-read', 'roles-create', 'roles-read', 'roles-update', 'roles-delete']
             ),
             new CRole(
                 id: 'ui-privileges-admin',
