@@ -55,7 +55,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '19',
+                id: 'search-checksum',
                 type: 'method',
                 name: 'Checksum Search',
                 description: 'Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.',
@@ -70,7 +70,7 @@ implements StaticSecurityResource
                 id: 'ui-search',
                 name: 'UI: Search',
                 description: 'Gives access to the Search screen in Nexus UI',
-                privileges: ['search', '19', 'artifact-read']
+                privileges: ['search', 'search-checksum', 'artifact-read']
             ),
             new CRole(
                 id: 'anonymous',
