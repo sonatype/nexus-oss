@@ -55,7 +55,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: 'search-checksum',
+                id: 'search-checksum', // 19
                 type: 'method',
                 name: 'Checksum Search',
                 description: 'Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.',
