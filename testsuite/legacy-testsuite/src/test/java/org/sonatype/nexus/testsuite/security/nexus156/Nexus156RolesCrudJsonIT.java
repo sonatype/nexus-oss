@@ -147,7 +147,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Update Test Role");
     resource.setName("UpdateRole");
     resource.setSessionTimeout(99999);
-    resource.addPrivilege("5");
+    resource.addPrivilege("repositories-create");
     resource.addPrivilege("settings-update");
 
     RoleResource responseResource = this.messageUtil.createRole(resource);

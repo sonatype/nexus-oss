@@ -66,7 +66,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "5");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);

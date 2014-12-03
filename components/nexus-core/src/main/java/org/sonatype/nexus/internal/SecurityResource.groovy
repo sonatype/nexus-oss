@@ -239,7 +239,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '5',
+                id: 'repositories-create', // 5
                 type: 'method',
                 name: 'Repositories - (create,read)',
                 description: 'Give permission to create,read new repositories.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['5', '6', '7', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
+                privileges: ['repositories-create', '6', '7', '8', '10', '78', '79', '81', '82', '74', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
