@@ -209,7 +209,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: 'login', // 2
+                id: 'signin', // 2
                 type: 'method',
                 name: 'Login to UI',
                 description: 'Give permission to allow a user to login to nexus.',
@@ -862,7 +862,7 @@ implements StaticSecurityResource
                 id: 'ui-basic',
                 name: 'UI: Base UI Privileges',
                 description: 'Generic privileges for users in the Nexus UI',
-                privileges: ['status', 'login', '64']
+                privileges: ['status', 'signin', '64']
             ),
             new CRole(
                 id: 'nx-apikey-access',

@@ -72,7 +72,7 @@ public class Nexus504ChangeRoleIT
     testContext.useAdminForRequests();
 
     RoleResource role = roleUtil.getRole(NEXUS504_ROLE);
-    role.addPrivilege("login");
+    role.addPrivilege("signin");
     assertThat("Unable to add login privilege to role " + NEXUS504_ROLE + "\n"
         + RoleMessageUtil.update(role).getDescription(), RoleMessageUtil.update(role), isSuccess());
 
