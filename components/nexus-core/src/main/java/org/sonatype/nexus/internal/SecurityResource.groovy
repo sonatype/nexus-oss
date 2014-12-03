@@ -659,7 +659,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '77',
+                id: 'logconfig-update', // 77
                 type: 'method',
                 name: 'Log Configuration - (read,update)',
                 description: 'Give permission to read and update log configuration',
