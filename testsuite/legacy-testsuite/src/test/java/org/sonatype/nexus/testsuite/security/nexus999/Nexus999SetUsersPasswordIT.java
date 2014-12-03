@@ -60,7 +60,7 @@ public class Nexus999SetUsersPasswordIT
         "repostatus-read",
         "usersforgotpw",
         "usersforgotid",
-        "59",
+        "usersresetpw",
         "72"/* set pw */,
         "repository-m2-read",
         "repository-m1-read");
@@ -100,7 +100,7 @@ public class Nexus999SetUsersPasswordIT
         "repostatus-read",
         "usersforgotpw",
         "usersforgotid",
-        "59", /* "72" set pw, */
+        "usersresetpw",
         "repository-m2-read",
         "repository-m1-read");
 

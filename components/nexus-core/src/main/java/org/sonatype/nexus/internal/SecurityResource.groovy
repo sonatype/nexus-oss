@@ -869,7 +869,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '59',
+                id: 'usersresetpw', // 59
                 type: 'method',
                 name: 'User Reset Password - (delete,read)',
                 description: 'Give permission to reset any user\'s password.',
