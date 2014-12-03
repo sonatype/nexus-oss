@@ -13,7 +13,6 @@
 package org.sonatype.nexus.atlas.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Atlas: Support Tools',
                 description: 'Give permission to use Atlas support tools',
                 properties: [
-                    new CProperty(key: 'method', value: '*'),
-                    new CProperty(key: 'permission', value: 'nexus:atlas')
+                    'method': '*',
+                    'permission': 'nexus:atlas'
                 ]
             )
         ],

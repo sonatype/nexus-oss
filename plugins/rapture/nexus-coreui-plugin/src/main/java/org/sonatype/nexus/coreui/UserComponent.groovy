@@ -37,12 +37,11 @@ import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.wonderland.AuthTicketService
 import org.sonatype.security.SecuritySystem
-import org.sonatype.security.usermanagement.DefaultUser
 import org.sonatype.security.usermanagement.RoleIdentifier
 import org.sonatype.security.usermanagement.User
 import org.sonatype.security.usermanagement.UserManager
+import org.sonatype.security.usermanagement.UserManagerImpl
 import org.sonatype.security.usermanagement.UserSearchCriteria
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -64,7 +63,7 @@ class UserComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
 
   @Inject
   SecuritySystem securitySystem
@@ -137,7 +136,7 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:create')
   @Validate(groups = [Create.class, Default.class])
   UserXO create(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.addUser(new DefaultUser(
+    asUserXO(securitySystem.addUser(new User(
         userId: userXO.userId,
         source: DEFAULT_SOURCE,
         firstName: userXO.firstName,
@@ -160,16 +159,18 @@ extends DirectComponentSupport
   @RequiresPermissions('security:users:update')
   @Validate(groups = [Update.class, Default.class])
   UserXO update(final @NotNull(message = '[userXO] may not be null') @Valid UserXO userXO) {
-    asUserXO(securitySystem.updateUser(securitySystem.getUser(userXO.userId).with {
-      firstName = userXO.firstName
-      lastName = userXO.lastName
-      emailAddress = validateEmail(userXO.email)
-      status = userXO.status
-      roles = userXO.roles?.collect { id ->
-        new RoleIdentifier(DEFAULT_SOURCE, id)
-      }
-      return it
-    }))
+    asUserXO(securitySystem.updateUser(new User(
+        userId: userXO.userId,
+        version: userXO.version,
+        source: DEFAULT_SOURCE,
+        firstName: userXO.firstName,
+        lastName: userXO.lastName,
+        emailAddress: validateEmail(userXO.email),
+        status: userXO.status,
+        roles: userXO.roles?.collect { id ->
+          new RoleIdentifier(DEFAULT_SOURCE, id)
+        }
+    )))
   }
 
   /**
@@ -296,6 +297,7 @@ extends DirectComponentSupport
   private static asUserXO(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
+        version: user.version,
         realm: user.source,
         firstName: user.firstName,
         lastName: user.lastName,

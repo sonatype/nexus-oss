@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.SecurityTestSupportSecurity;
-import org.sonatype.security.TestSecurityConfigurationSource;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -104,8 +104,8 @@ public class SecurityModuleTest
       @Override
       protected void configure() {
         bind(SecurityConfigurationSource.class)
-            .annotatedWith(Names.named("static"))
-            .toInstance(new TestSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
+            .annotatedWith(Names.named("default"))
+            .toInstance(new PreconfiguredSecurityConfigurationSource(SecurityTestSupportSecurity.security()));
       }
     };
   }
@@ -120,7 +120,6 @@ public class SecurityModuleTest
       @Override
       protected void configure() {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security-xml-file", util.resolvePath("target/foo/security.xml"));
         properties.put("application-conf", util.resolvePath("target/plexus-home/etc"));
         binder().bind(ParameterKeys.PROPERTIES).toInstance(properties);
       }

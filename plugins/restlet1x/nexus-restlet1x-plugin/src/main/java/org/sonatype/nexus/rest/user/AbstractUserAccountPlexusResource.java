@@ -18,7 +18,6 @@ import org.sonatype.nexus.rest.model.UserAccount;
 import org.sonatype.nexus.rest.model.UserAccountRequestResponseWrapper;
 import org.sonatype.nexus.security.UserAccountManager;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
-import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -57,7 +56,7 @@ public abstract class AbstractUserAccountPlexusResource
   }
 
   protected User restToNexusModel(UserAccount dto) {
-    User user = new DefaultUser();
+    User user = new User();
 
     user.setUserId(dto.getUserId());
 

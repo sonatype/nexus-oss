@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.validator.ConfigurationIdGenerator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
@@ -30,16 +29,6 @@ public abstract class AbstractPrivilegeDescriptor
 {
   @Inject
   private ConfigurationIdGenerator idGenerator;
-
-  protected String getProperty(CPrivilege privilege, String key) {
-    for (CProperty property : (List<CProperty>) privilege.getProperties()) {
-      if (property.getKey().equals(key)) {
-        return property.getValue();
-      }
-    }
-
-    return null;
-  }
 
   public ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update) {
     ValidationResponse response = new ValidationResponse();

@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
@@ -75,8 +74,8 @@ public class ApplicationPrivilegeDescriptor
       return null;
     }
 
-    String permission = getProperty(privilege, ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    String method = getProperty(privilege, ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
+    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
 
     if (StringUtils.isEmpty(permission)) {
       permission = "*:*";
@@ -101,17 +100,8 @@ public class ApplicationPrivilegeDescriptor
     // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
     // so, 'read' method is correct, but so is also 'create,update,delete'
     // '*' means ALL POSSIBLE value for this "field"
-    String method = null;
-    String permission = null;
-
-    for (CProperty property : (List<CProperty>) privilege.getProperties()) {
-      if (property.getKey().equals(ApplicationPrivilegeMethodPropertyDescriptor.ID)) {
-        method = property.getValue();
-      }
-      else if (property.getKey().equals(ApplicationPrivilegePermissionPropertyDescriptor.ID)) {
-        permission = property.getValue();
-      }
-    }
+    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
 
     if (StringUtils.isEmpty(permission)) {
       response.addValidationError("Permission cannot be empty on a privilege!");

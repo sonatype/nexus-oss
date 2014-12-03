@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 
 import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
+import org.sonatype.nexus.validation.Update
 
 /**
  * Role exchange object.
@@ -26,6 +27,9 @@ class RoleXO
 {
   @NotEmpty
   String id
+
+  @NotEmpty(groups = Update)
+  String version
 
   String source
 

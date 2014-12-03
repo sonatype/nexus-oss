@@ -16,9 +16,12 @@ import java.io.File;
 import java.util.Properties;
 
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
+import org.sonatype.security.model.source.PreconfiguredSecurityModelConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
 
@@ -40,7 +43,6 @@ public abstract class AbstractSecurityTestCase
   @Override
   public void configure(Properties properties) {
     properties.put("application-conf", CONFIG_DIR.getAbsolutePath());
-    properties.put("security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml");
     super.configure(properties);
   }
 
@@ -48,11 +50,11 @@ public abstract class AbstractSecurityTestCase
   public void configure(final Binder binder) {
     binder.install(new SecurityModule());
     binder.bind(SecurityConfigurationSource.class)
-        .annotatedWith(Names.named("static"))
-        .toInstance(new TestSecurityConfigurationSource(getSecurityConfig()));
+        .annotatedWith(Names.named("default"))
+        .toInstance(new PreconfiguredSecurityConfigurationSource(getSecurityConfig()));
     binder.bind(SecurityModelConfigurationSource.class)
-        .annotatedWith(Names.named("static"))
-        .toInstance(new TestSecurityModelConfigurationSource(getSecurityModelConfig()));
+        .annotatedWith(Names.named("default"))
+        .toInstance(new PreconfiguredSecurityModelConfigurationSource(getSecurityModelConfig()));
   }
 
   protected SecurityConfiguration getSecurityConfig() {
@@ -99,8 +101,8 @@ public abstract class AbstractSecurityTestCase
     return this.lookup(UserManager.class);
   }
 
-  protected Configuration getSecurityConfiguration() {
-    return lookup(SecurityModelConfigurationSource.class, "file").getConfiguration();
+  protected SecurityModelConfiguration getSecurityConfiguration() {
+    return lookup(SecurityModelConfigurationSource.class, "default").getConfiguration();
   }
 
 }

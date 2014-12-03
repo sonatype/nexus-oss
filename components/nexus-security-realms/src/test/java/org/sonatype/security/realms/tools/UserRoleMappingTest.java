@@ -13,7 +13,7 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CUser;
@@ -79,8 +79,6 @@ public class UserRoleMappingTest
 
     // try to update empty role
     config.updateUserRoleMapping(mapping);
-    config.save();
-    config.clearCache();
 
     // make sure we still have the role mappings
     mapping = config.readUserRoleMapping("test-user-with-empty-role", "default");
@@ -103,7 +101,7 @@ public class UserRoleMappingTest
     CUser user = config.readUser("test-user");
 
     CUserRoleMapping roleMapping = config.readUserRoleMapping("test-user", "default");
-    List<String> roles = roleMapping.getRoles();
+    Set<String> roles = roleMapping.getRoles();
     roles.add("role3");
 
     // update the user

@@ -75,7 +75,7 @@ public class WastebasketWalker
       }
     }
     catch (final ItemNotFoundException ignore) {
-      // someone else removed the item in the mean time. yet we anyhow wanted to remove it so... nevermind
+      // someone else removed the item in the meantime. yet we anyhow wanted to remove it so... nevermind
     }
   }
 }

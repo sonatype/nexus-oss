@@ -21,6 +21,7 @@ Ext.define('NX.coreui.model.Privilege', {
   extend: 'Ext.data.Model',
   fields: [
     'id',
+    'version',
     'name',
     'description',
     'type',

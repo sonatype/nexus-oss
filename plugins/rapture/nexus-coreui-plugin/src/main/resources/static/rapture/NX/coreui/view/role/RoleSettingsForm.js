@@ -77,6 +77,10 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
     me.items = [
       {
         xtype: 'hiddenfield',
+        name: 'version'
+      },
+      {
+        xtype: 'hiddenfield',
         name: 'source',
         value: me.source || 'default'
       },

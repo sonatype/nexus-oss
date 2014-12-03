@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 /**
  * A DynamicSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
@@ -25,7 +25,7 @@ public interface DynamicSecurityResource
   /**
    * Gets the security configuration.
    */
-  Configuration getConfiguration();
+  SecurityModelConfiguration getConfiguration();
 
   /**
    * Marks the Configuration dirty so it can be reloaded.

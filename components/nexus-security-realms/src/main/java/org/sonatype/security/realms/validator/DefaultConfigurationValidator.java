@@ -303,9 +303,7 @@ public class DefaultConfigurationValidator
     }
 
     if (context.getExistingPrivilegeIds() != null) {
-      List<String> privIds = role.getPrivileges();
-
-      for (String privId : privIds) {
+      for (String privId : role.getPrivileges()) {
         if (!context.getExistingPrivilegeIds().contains(privId)) {
           ValidationMessage message =
               new ValidationMessage("privileges", "Role ID '" + role.getId() + "' Invalid privilege id '"
@@ -315,8 +313,6 @@ public class DefaultConfigurationValidator
       }
     }
 
-    List<String> roleIds = role.getRoles();
-
     List<String> containedRoles = context.getRoleContainmentMap().get(role.getId());
 
     if (containedRoles == null) {
@@ -324,7 +320,7 @@ public class DefaultConfigurationValidator
       context.getRoleContainmentMap().put(role.getId(), containedRoles);
     }
 
-    for (String roleId : roleIds) {
+    for (String roleId : role.getRoles()) {
       if (roleId.equals(role.getId())) {
         ValidationMessage message =
             new ValidationMessage("roles", "Role ID '" + role.getId() + "' cannot contain itself.",
@@ -430,7 +426,7 @@ public class DefaultConfigurationValidator
       response.addValidationError(message);
     }
 
-    if (context.getExistingRoleIds() != null && context.getExistingUserRoleMap() != null) {
+    if (context.getExistingRoleIds() != null) {
 
       if (roles != null && roles.size() > 0) {
         for (String roleId : roles) {
@@ -472,9 +468,9 @@ public class DefaultConfigurationValidator
       response.addValidationError(message);
     }
 
-    List<String> roles = userRoleMapping.getRoles();
+    Set<String> roles = userRoleMapping.getRoles();
     // all roles must be real
-    if (context.getExistingRoleIds() != null && context.getExistingUserRoleMap() != null) {
+    if (context.getExistingRoleIds() != null) {
 
       if (roles != null && roles.size() > 0) {
         for (String roleId : roles) {

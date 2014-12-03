@@ -13,7 +13,6 @@
 package org.sonatype.nexus.yum.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Yum Versioned Repositories - (read)',
                 description: 'Give permission to read versioned repositories.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:yumVersionedRepositories')
+                    'method': 'read',
+                    'permission': 'nexus:yumVersionedRepositories'
                 ]
             ),
             new CPrivilege(
@@ -51,8 +50,8 @@ implements StaticSecurityResource
                 name: 'Yum Alias - (read)',
                 description: 'Give permission to read yum version aliases.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:yumAlias')
+                    'method': 'read',
+                    'permission': 'nexus:yumAlias'
                 ]
             ),
             new CPrivilege(
@@ -61,8 +60,8 @@ implements StaticSecurityResource
                 name: 'Yum Alias - (update,read)',
                 description: 'Give permission to create,update and read yum version aliases.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:yumAlias')
+                    'method': 'create,update,read',
+                    'permission': 'nexus:yumAlias'
                 ]
             )
         ],

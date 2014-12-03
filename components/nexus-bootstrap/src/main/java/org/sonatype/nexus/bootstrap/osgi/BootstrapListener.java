@@ -95,7 +95,6 @@ public class BootstrapListener
       requireProperty(properties, "nexus-work");
       requireProperty(properties, "nexus-app");
       requireProperty(properties, "application-conf");
-      requireProperty(properties, "security-xml-file");
 
       // pass bootstrap properties to embedded servlet listener
       servletContext.setAttribute("nexus.properties", properties);

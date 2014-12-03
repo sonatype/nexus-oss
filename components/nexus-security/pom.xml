@@ -176,59 +176,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>java</goal>
-              <goal>xsd</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-            </goals>
-            <configuration>
-              <version>2.0.8</version>
-              <models>
-                <model>src/main/mdo/security-configuration.xml</model>
-              </models>
-              <packagedVersions>
-                <packagedVersion>2.0.3</packagedVersion>
-                <packagedVersion>2.0.4</packagedVersion>
-                <packagedVersion>2.0.5</packagedVersion>
-                <packagedVersion>2.0.7</packagedVersion>
-              </packagedVersions>
-              <packageWithVersion>false</packageWithVersion>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>modello-plugin-upgrade</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>upgrade</goal>
-            </goals>
-            <configuration>
-              <version>2.0.8</version>
-              <models>
-                <model>src/main/mdo/security-configuration.xml</model>
-              </models>
-              <packagedVersions>
-                <packagedVersion>2.0.3</packagedVersion>
-                <packagedVersion>2.0.4</packagedVersion>
-                <packagedVersion>2.0.5</packagedVersion>
-                <packagedVersion>2.0.7</packagedVersion>
-              </packagedVersions>
-              <packageWithVersion>false</packageWithVersion>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>

@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
@@ -50,10 +49,11 @@ public class TargetPrivilegeDescriptor
   private final PrivilegePropertyDescriptor groupProperty;
 
   @Inject
-  public TargetPrivilegeDescriptor(final @Named("ApplicationPrivilegeMethodPropertyDescriptor") PrivilegePropertyDescriptor methodProperty,
-                                   final @Named("TargetPrivilegeRepositoryTargetPropertyDescriptor") PrivilegePropertyDescriptor targetProperty,
-                                   final @Named("TargetPrivilegeRepositoryPropertyDescriptor") PrivilegePropertyDescriptor repositoryProperty,
-                                   final @Named("TargetPrivilegeGroupPropertyDescriptor") PrivilegePropertyDescriptor groupProperty)
+  public TargetPrivilegeDescriptor(
+      final @Named("ApplicationPrivilegeMethodPropertyDescriptor") PrivilegePropertyDescriptor methodProperty,
+      final @Named("TargetPrivilegeRepositoryTargetPropertyDescriptor") PrivilegePropertyDescriptor targetProperty,
+      final @Named("TargetPrivilegeRepositoryPropertyDescriptor") PrivilegePropertyDescriptor repositoryProperty,
+      final @Named("TargetPrivilegeGroupPropertyDescriptor") PrivilegePropertyDescriptor groupProperty)
   {
     this.methodProperty = checkNotNull(methodProperty);
     this.targetProperty = checkNotNull(targetProperty);
@@ -89,10 +89,10 @@ public class TargetPrivilegeDescriptor
       return null;
     }
 
-    String method = getProperty(privilege, ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    String repositoryTargetId = getProperty(privilege, TargetPrivilegeRepositoryTargetPropertyDescriptor.ID);
-    String repositoryId = getProperty(privilege, TargetPrivilegeRepositoryPropertyDescriptor.ID);
-    String groupId = getProperty(privilege, TargetPrivilegeGroupPropertyDescriptor.ID);
+    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String repositoryTargetId = privilege.getProperty(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID);
+    String repositoryId = privilege.getProperty(TargetPrivilegeRepositoryPropertyDescriptor.ID);
+    String groupId = privilege.getProperty(TargetPrivilegeGroupPropertyDescriptor.ID);
 
     StringBuilder basePermString = new StringBuilder();
 
@@ -140,25 +140,10 @@ public class TargetPrivilegeDescriptor
     // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
     // so, 'read' method is correct, but so is also 'create,update,delete'
     // '*' means ALL POSSIBLE value for this "field"
-    String method = null;
-    String repositoryId = null;
-    String repositoryTargetId = null;
-    String repositoryGroupId = null;
-
-    for (CProperty property : (List<CProperty>) privilege.getProperties()) {
-      if (property.getKey().equals(ApplicationPrivilegeMethodPropertyDescriptor.ID)) {
-        method = property.getValue();
-      }
-      else if (property.getKey().equals(TargetPrivilegeRepositoryPropertyDescriptor.ID)) {
-        repositoryId = property.getValue();
-      }
-      else if (property.getKey().equals(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID)) {
-        repositoryTargetId = property.getValue();
-      }
-      else if (property.getKey().equals(TargetPrivilegeGroupPropertyDescriptor.ID)) {
-        repositoryGroupId = property.getValue();
-      }
-    }
+    String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
+    String repositoryId = privilege.getProperty(TargetPrivilegeRepositoryPropertyDescriptor.ID);
+    String repositoryTargetId = privilege.getProperty(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID);
+    String repositoryGroupId = privilege.getProperty(TargetPrivilegeGroupPropertyDescriptor.ID);
 
     if (StringUtils.isEmpty(repositoryTargetId)) {
       ValidationMessage message = new ValidationMessage("repositoryTargetId", "Privilege ID '"

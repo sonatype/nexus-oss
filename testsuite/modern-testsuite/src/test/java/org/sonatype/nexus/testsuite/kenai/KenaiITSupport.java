@@ -97,7 +97,7 @@ public class KenaiITSupport
 
   void configureKenaiRealm() {
     Security security = client().getSubsystem(ServerConfiguration.class).security();
-    security.settings().setRealms(asList("XmlAuthenticatingRealm", "XmlAuthorizingRealm", "kenai"));
+    security.settings().setRealms(asList("NexusAuthenticatingRealm", "NexusAuthorizingRealm", "kenai"));
     security.save();
   }
 

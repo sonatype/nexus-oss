@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugins.p2.repository.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,10 +40,10 @@ implements StaticSecurityResource
                 name: 'All P2 Repositories - (create)',
                 description: 'Give permission to create any content in any P2 repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'p2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'create,read',
+                    'repositoryTargetId': 'p2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -53,10 +52,10 @@ implements StaticSecurityResource
                 name: 'All P2 Repositories - (read)',
                 description: 'Give permission to read any content in any P2 Repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'p2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'read',
+                    'repositoryTargetId': 'p2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -65,10 +64,10 @@ implements StaticSecurityResource
                 name: 'All P2 Repositories - (update)',
                 description: 'Give permission to update any content in any P2 Repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'p2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'update,read',
+                    'repositoryTargetId': 'p2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             ),
             new CPrivilege(
@@ -77,10 +76,10 @@ implements StaticSecurityResource
                 name: 'All P2 Repositories - (delete)',
                 description: 'Give permission to delete any content in any P2 Repository.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'repositoryTargetId', value: 'p2'),
-                    new CProperty(key: 'repositoryId', value: ''),
-                    new CProperty(key: 'repositoryGroupId', value: '')
+                    'method': 'delete,read',
+                    'repositoryTargetId': 'p2',
+                    'repositoryId': '',
+                    'repositoryGroupId': ''
                 ]
             )
         ],

@@ -13,7 +13,6 @@
 package org.sonatype.nexus.capability.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'Capabilities - (create,read)',
                 description: 'Give permission to create,read capability configurations.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create,read'),
-                    new CProperty(key: 'permission', value: 'nexus:capabilities')
+                    'method': 'create,read',
+                    'permission': 'nexus:capabilities'
                 ]
             ),
             new CPrivilege(
@@ -51,8 +50,8 @@ implements StaticSecurityResource
                 name: 'Capabilities - (read)',
                 description: 'Give permission to read existing configured capabilities.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:capabilities')
+                    'method': 'read',
+                    'permission': 'nexus:capabilities'
                 ]
             ),
             new CPrivilege(
@@ -61,8 +60,8 @@ implements StaticSecurityResource
                 name: 'Capabilities - (update,read)',
                 description: 'Give permission to update,read existing configured capabilities.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update,read'),
-                    new CProperty(key: 'permission', value: 'nexus:capabilities')
+                    'method': 'update,read',
+                    'permission': 'nexus:capabilities'
                 ]
             ),
             new CPrivilege(
@@ -71,8 +70,8 @@ implements StaticSecurityResource
                 name: 'Capabilities - (delete,read)',
                 description: 'Give permission to delete,read existing configured capabilities.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'nexus:capabilities')
+                    'method': 'delete,read',
+                    'permission': 'nexus:capabilities'
                 ]
             ),
             new CPrivilege(
@@ -81,8 +80,8 @@ implements StaticSecurityResource
                 name: 'Capability Types - (read)',
                 description: 'Give permission to retrieve list of support capability types available in nexus.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'nexus:capabilityTypes')
+                    'method': 'read',
+                    'permission': 'nexus:capabilityTypes'
                 ]
             )
         ],

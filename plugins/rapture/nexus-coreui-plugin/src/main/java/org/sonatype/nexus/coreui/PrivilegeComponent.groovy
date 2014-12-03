@@ -36,7 +36,7 @@ import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Privilege
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor
-import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager
+import org.sonatype.security.usermanagement.UserManagerImpl
 
 import javax.inject.Inject
 import javax.inject.Named
@@ -57,7 +57,7 @@ class PrivilegeComponent
 extends DirectComponentSupport
 {
 
-  public static final String DEFAULT_SOURCE = SecurityXmlUserManager.SOURCE
+  public static final String DEFAULT_SOURCE = UserManagerImpl.SOURCE
 
   @Inject
   SecuritySystem securitySystem
@@ -144,6 +144,7 @@ extends DirectComponentSupport
   def PrivilegeXO asPrivilegeXO(Privilege input) {
     def privilege = new PrivilegeXO(
         id: input.id,
+        version: input.version,
         name: input.name,
         description: input.description,
         type: input.type,

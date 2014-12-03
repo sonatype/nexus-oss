@@ -12,113 +12,220 @@
  */
 package org.sonatype.security.usermanagement;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
- * A user contains attributes, userId, name, email address, roles, etc.
+ * Default implementation of a User.
  *
  * @author Brian Demers
  */
-public interface User
+public class User
+    implements Comparable<User>
 {
-  /**
-   * @return The users Id.
-   */
-  public String getUserId();
 
-  /**
-   * Set the user Id.
-   */
-  public void setUserId(String userId);
+  private String userId;
 
-  /**
-   * @return the Users name.
-   * @deprecated use getFirstName, and getLastName
-   */
-  @Deprecated
-  public String getName();
+  private String firstName;
 
-  /**
-   * Sets the users name.
-   *
-   * @deprecated use setFirstName, and setLastName
-   */
-  @Deprecated
-  public void setName(String name);
+  private String lastName;
 
-  /**
-   * Gets the users first name.
-   */
-  public String getFirstName();
+  private String emailAddress;
 
-  /**
-   * Sets the users first name.
-   */
-  public void setFirstName(String firstName);
+  private String source;
 
-  /**
-   * Gets the users last name.
-   */
-  public String getLastName();
+  private UserStatus status;
 
-  /**
-   * Sets the users last name.
-   */
-  public void setLastName(String lastName);
+  private boolean readOnly;
 
-  /**
-   * @return the users email address.
-   */
-  public String getEmailAddress();
+  private String version;
 
-  /**
-   * Set the users email address.
-   */
-  public void setEmailAddress(String emailAddress);
+  private Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
 
-  /**
-   * @return the users source Id.
-   */
-  public String getSource();
+  public String getUserId() {
+    return userId;
+  }
 
-  /**
-   * Set the users source.
-   */
-  public void setSource(String source);
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-  /**
-   * Adds a role Identifier to the user.
-   */
-  public void addRole(RoleIdentifier roleIdentifier);
+  public String getName() {
+    String name = this.getFirstName() != null ? this.getFirstName() : "";
+    if (StringUtils.isNotEmpty(this.getLastName())) {
+      name += " " + this.getLastName();
+    }
+    return name;
+  }
 
-  /**
-   * Remove a Role Identifier from the user.
-   */
-  public boolean removeRole(RoleIdentifier roleIdentifier);
+  public void setName(String name) {
+    // deprecated, but attempt to use
+    if (StringUtils.isNotEmpty(name)) {
+      String[] nameParts = name.trim().split(" ", 2);
+      this.setFirstName(nameParts[0]);
+      if (nameParts.length > 1) {
+        this.setLastName(nameParts[1]);
+      }
+    }
+  }
 
-  /**
-   * Adds a set of RoleIdentifier to the user.
-   */
-  public void addAllRoles(Set<RoleIdentifier> roleIdentifiers);
+  public String getFirstName() {
+    return firstName;
+  }
 
-  /**
-   * @return returns all the users roles.
-   */
-  public Set<RoleIdentifier> getRoles();
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-  /**
-   * Sets the users roles.
-   */
-  public void setRoles(Set<RoleIdentifier> roles);
+  public String getLastName() {
+    return lastName;
+  }
 
-  /**
-   * @return the users status.
-   */
-  public UserStatus getStatus();
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-  /**
-   * Sets the users status.
-   */
-  public void setStatus(UserStatus status);
+  public String getEmailAddress() {
+    return emailAddress;
+  }
+
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public Set<RoleIdentifier> getRoles() {
+    return Collections.unmodifiableSet(roleIdentifiers);
+  }
+
+  public void addRole(RoleIdentifier roleIdentifier) {
+    this.roleIdentifiers.add(roleIdentifier);
+  }
+
+  public boolean removeRole(RoleIdentifier roleIdentifier) {
+    return this.roleIdentifiers.remove(roleIdentifier);
+  }
+
+  public void addAllRoles(Set<RoleIdentifier> roleIdentifiers) {
+    this.roleIdentifiers.addAll(roleIdentifiers);
+  }
+
+  public void setRoles(Set<RoleIdentifier> roles) {
+    this.roleIdentifiers = roles;
+  }
+
+  public UserStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(UserStatus status) {
+    this.status = status;
+  }
+
+  public boolean isReadOnly() {
+    return readOnly;
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
+
+  @Override
+  public String toString() {
+    return "UserId: " + this.userId + ", Name: " + this.firstName + " " + this.lastName;
+  }
+
+  public int compareTo(User o) {
+    final int before = -1;
+    final int equal = 0;
+    final int after = 1;
+
+    if (this == o) {
+      return equal;
+    }
+
+    if (o == null) {
+      return after;
+    }
+
+    if (getUserId() == null && o.getUserId() != null) {
+      return before;
+    }
+    else if (getUserId() != null && o.getUserId() == null) {
+      return after;
+    }
+
+    // the userIds are not null
+    int result = getUserId().compareTo(o.getUserId());
+    if (result != equal) {
+      return result;
+    }
+
+    if (getSource() == null) {
+      return before;
+    }
+
+    // if we are all the way to this point, the userIds are equal and this.getSource != null, so just return a
+    // compareTo on the source
+    return getSource().compareTo(o.getSource());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((source == null) ? 0 : source.hashCode());
+    result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final User other = (User) obj;
+    if (source == null) {
+      if (other.getSource() != null) {
+        return false;
+      }
+    }
+    else if (!source.equals(other.getSource())) {
+      return false;
+    }
+    if (userId == null) {
+      if (other.getUserId() != null) {
+        return false;
+      }
+    }
+    else if (!userId.equals(other.getUserId())) {
+      return false;
+    }
+    return true;
+  }
 
 }

@@ -12,27 +12,26 @@
  */
 package org.sonatype.security.model.source;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.sonatype.configuration.source.ConfigurationSource;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.SecurityModelConfiguration;
 
 /**
- * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
- * stores one instance of Configuration object maintained thru life of the application. This component is also able to
- * persist security config.
- *
- * @author cstamas
+ * Source of {@link SecurityModelConfiguration}.
  */
 public interface SecurityModelConfigurationSource
-    extends ConfigurationSource<Configuration>
 {
 
-  InputStream getConfigurationAsStream()
-      throws IOException;
+  /**
+   * Gets the current configuration.
+   *
+   * @return the configuration, null if not loaded
+   */
+  SecurityModelConfiguration getConfiguration();
 
-  void backupConfiguration()
-      throws IOException;
+  /**
+   * Forces reloading the user configuration.
+   *
+   * @return the configuration
+   */
+  SecurityModelConfiguration loadConfiguration();
 
 }

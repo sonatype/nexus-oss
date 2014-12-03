@@ -13,7 +13,6 @@
 package com.sonatype.nexus.ldap.internal
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 import org.sonatype.security.realms.tools.StaticSecurityResource
@@ -41,8 +40,8 @@ implements StaticSecurityResource
                 name: 'LDAP (create,read)',
                 description: 'Give permission to create new LDAP Servers.',
                 properties: [
-                    new CProperty(key: 'method', value: 'create'),
-                    new CProperty(key: 'permission', value: 'security:ldapconfig')
+                    'method': 'create',
+                    'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
@@ -51,8 +50,8 @@ implements StaticSecurityResource
                 name: 'LDAP (read)',
                 description: 'Give permission to read LDAP Server configurations.',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'security:ldapconfig')
+                    'method': 'read',
+                    'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
@@ -61,8 +60,8 @@ implements StaticSecurityResource
                 name: 'LDAP (update,read)',
                 description: 'Give permission to update LDAP Server configurations.',
                 properties: [
-                    new CProperty(key: 'method', value: 'update'),
-                    new CProperty(key: 'permission', value: 'security:ldapconfig')
+                    'method': 'update',
+                    'permission': 'security:ldapconfig'
                 ]
             ),
             new CPrivilege(
@@ -71,8 +70,8 @@ implements StaticSecurityResource
                 name: 'LDAP (delete,read)',
                 description: 'Give permission to delete LDAP Servers.',
                 properties: [
-                    new CProperty(key: 'method', value: 'delete,read'),
-                    new CProperty(key: 'permission', value: 'security:ldapconfig')
+                    'method': 'delete,read',
+                    'permission': 'security:ldapconfig'
                 ]
             )
         ],

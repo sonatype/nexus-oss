@@ -27,9 +27,8 @@ import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserNotFoundTransientException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
@@ -96,7 +95,7 @@ public class LdapUserManager
   }
 
   private User toPlexusUser(LdapUser ldapUser) {
-    User user = new DefaultUser();
+    User user = new User();
 
     String email = ldapUser.getEmail();
     if (email != null) {

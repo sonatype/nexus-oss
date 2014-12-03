@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.tools
 
 import org.sonatype.security.model.CPrivilege
-import org.sonatype.security.model.CProperty
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.Configuration
 
@@ -29,7 +28,6 @@ implements StaticSecurityResource
   @Override
   Configuration getConfiguration() {
     return new Configuration(
-        version: Configuration.MODEL_VERSION,
         privileges: [
             new CPrivilege(
                 id: 'priv1',
@@ -37,8 +35,8 @@ implements StaticSecurityResource
                 name: 'priv1',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'priv1-ONE')
+                    'method': 'read',
+                    'permission': 'priv1-ONE'
                 ])
             ,
             new CPrivilege(
@@ -47,8 +45,8 @@ implements StaticSecurityResource
                 name: 'priv2',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'priv2-TWO')
+                    'method': 'read',
+                    'permission': 'priv2-TWO'
                 ])
             ,
             new CPrivilege(
@@ -57,8 +55,8 @@ implements StaticSecurityResource
                 name: 'priv3',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'priv3-THREE')
+                    'method': 'read',
+                    'permission': 'priv3-THREE'
                 ])
             ,
             new CPrivilege(
@@ -67,8 +65,8 @@ implements StaticSecurityResource
                 name: 'priv4',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'priv4-FOUR')
+                    'method': 'read',
+                    'permission': 'priv4-FOUR'
                 ])
             ,
             new CPrivilege(
@@ -77,8 +75,8 @@ implements StaticSecurityResource
                 name: 'priv5',
                 description: '',
                 properties: [
-                    new CProperty(key: 'method', value: 'read'),
-                    new CProperty(key: 'permission', value: 'priv5-FIVE')
+                    'method': 'read',
+                    'permission': 'priv5-FIVE'
                 ])
         ],
         roles: [

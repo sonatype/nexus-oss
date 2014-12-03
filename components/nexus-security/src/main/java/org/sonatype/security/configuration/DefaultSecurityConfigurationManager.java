@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.configuration;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
@@ -50,7 +48,7 @@ public class DefaultSecurityConfigurationManager
   private ReentrantLock lock = new ReentrantLock();
 
   @Inject
-  public DefaultSecurityConfigurationManager(@Named("file") SecurityConfigurationSource configurationSource,
+  public DefaultSecurityConfigurationManager(SecurityConfigurationSource configurationSource,
                                              SecurityConfigurationValidator validator)
   {
     this.configurationSource = configurationSource;
@@ -99,10 +97,6 @@ public class DefaultSecurityConfigurationManager
     }
   }
 
-  public int getHashIterations() {
-    return this.getConfiguration().getHashIterations();
-  }
-
   public List<String> getRealms() {
     return Collections.unmodifiableList(this.getConfiguration().getRealms());
   }
@@ -132,12 +126,6 @@ public class DefaultSecurityConfigurationManager
 
       configuration = this.configurationSource.getConfiguration();
     }
-    catch (IOException e) {
-      this.log.error("IOException while retrieving configuration file", e);
-    }
-    catch (ConfigurationException e) {
-      this.log.error("Invalid Configuration", e);
-    }
     finally {
       lock.unlock();
     }
@@ -157,9 +145,6 @@ public class DefaultSecurityConfigurationManager
 
     try {
       this.configurationSource.storeConfiguration();
-    }
-    catch (IOException e) {
-      this.log.error("IOException while storing configuration file", e);
     }
     finally {
       lock.unlock();

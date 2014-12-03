@@ -50,6 +50,8 @@ public class Privilege
 
   private boolean readOnly;
 
+  private String version;
+
   public Privilege() {
 
   }
@@ -121,4 +123,11 @@ public class Privilege
     return this.properties.get(key);
   }
 
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(final String version) {
+    this.version = version;
+  }
 }

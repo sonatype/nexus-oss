@@ -20,9 +20,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
@@ -94,7 +93,7 @@ public class SimpleUserManager
 
   private User toUser(SimpleUser simpleUser) {
     // simple conversion of object
-    User user = new DefaultUser();
+    User user = new User();
     user.setEmailAddress(simpleUser.getEmail());
     user.setName(simpleUser.getName());
     user.setUserId(simpleUser.getUserId());

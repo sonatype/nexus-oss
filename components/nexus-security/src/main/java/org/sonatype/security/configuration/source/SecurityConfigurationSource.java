@@ -12,17 +12,31 @@
  */
 package org.sonatype.security.configuration.source;
 
-import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 /**
- * The Interface ApplicationConfigurationSource, responsible to fetch security configuration by some means. It also
- * stores one instance of Configuration object maintained thru life of the application. This component is also able to
- * persist security config.
- *
- * @author cstamas
+ * Source of {@link SecurityConfiguration}.
  */
 public interface SecurityConfigurationSource
-    extends ConfigurationSource<SecurityConfiguration>
 {
+
+  /**
+   * Persists the current configuration.
+   */
+  void storeConfiguration();
+
+  /**
+   * Gets the current configuration.
+   *
+   * @return the configuration, null if not loaded
+   */
+  SecurityConfiguration getConfiguration();
+
+  /**
+   * Forces reloading the user configuration.
+   *
+   * @return the configuration
+   */
+  SecurityConfiguration loadConfiguration();
+
 }

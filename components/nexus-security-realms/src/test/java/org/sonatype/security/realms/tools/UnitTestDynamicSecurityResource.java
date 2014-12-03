@@ -12,16 +12,12 @@
  */
 package org.sonatype.security.realms.tools;
 
-import javax.inject.Singleton;
-
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 
-@Singleton
 public class UnitTestDynamicSecurityResource
     extends AbstractDynamicSecurityResource
 {
@@ -46,15 +42,8 @@ public class UnitTestDynamicSecurityResource
     priv.setName(privId);
     priv.setReadOnly(true);
     priv.setType(ApplicationPrivilegeDescriptor.TYPE);
-    CProperty method = new CProperty();
-    method.setKey(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-    method.setValue("read");
-    priv.addProperty(method);
-
-    CProperty permission = new CProperty();
-    permission.setKey(ApplicationPrivilegePermissionPropertyDescriptor.ID);
-    permission.setValue("foo:bar:" + privId);
-    priv.addProperty(permission);
+    priv.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, "read");
+    priv.setProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID, "foo:bar:" + privId);
 
     config.addPrivilege(priv);
 
