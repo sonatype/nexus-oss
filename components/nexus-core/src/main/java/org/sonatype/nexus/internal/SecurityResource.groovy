@@ -579,16 +579,6 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '66',
-                type: 'method',
-                name: 'Nexus Remote Control',
-                description: 'Give permission to remotely control nexus server (start, stop, etc.).  Note that this privilege is not currently invoked by the Nexus UI.',
-                properties: [
-                    'method': 'update,read',
-                    'permission': 'nexus:command'
-                ]
-            ),
-            new CPrivilege(
                 id: '67',
                 type: 'method',
                 name: 'Repository Summary Info (read)',
