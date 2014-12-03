@@ -279,7 +279,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '9',
+                id: 'repotemplates-create', // 9
                 type: 'method',
                 name: 'Repository Templates - (create,read)',
                 description: 'Give permission to create,read new repository templates.  Note that this privilege is not currently invoked by the Nexus UI.',
