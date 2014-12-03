@@ -459,7 +459,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '42',
+                id: 'logs-read', // 42
                 type: 'method',
                 name: 'Logs - (read)',
                 description: 'Give permission to retrieve the nexus log files.',
@@ -800,7 +800,7 @@ implements StaticSecurityResource
                 id: 'ui-logs-config-files',
                 name: 'UI: Logs and Config Files',
                 description: 'Gives access to the Logs and Config Files screen in Nexus UI',
-                privileges: ['42', '43']
+                privileges: ['logs-read', '43']
             ),
             new CRole(
                 id: 'ui-server-admin',
