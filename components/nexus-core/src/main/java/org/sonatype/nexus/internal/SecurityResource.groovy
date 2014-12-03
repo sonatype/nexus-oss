@@ -289,7 +289,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '10',
+                id: 'repotemplates-read', // 10
                 type: 'method',
                 name: 'Repository Templates - (read)',
                 description: 'Give permission to read existing repository template configuration.  This privilege is required to add a new Repository in the UI, as the default values are retrieved from the template on the server.',
@@ -812,7 +812,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-admin',
                 name: 'UI: Repository Administration',
                 description: 'Gives access to the Repository Administration screen in Nexus UI',
-                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', '10', '78', '79', '81', '82', '74', 'repository-all'],
+                privileges: ['repositories-create', 'repositories-read', 'repositories-update', 'repositories-delete', 'repotemplates-read', '78', '79', '81', '82', '74', 'repository-all'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
