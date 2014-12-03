@@ -110,7 +110,7 @@ public class Nexus142UserPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give update
-    this.giveUserPrivilege("test-user", "40");
+    this.giveUserPrivilege("test-user", "users-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
