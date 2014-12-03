@@ -70,7 +70,7 @@ public class Nexus930AutoDiscoverComponentIT
     this.getContentClasses(this.getXMLXStream(), MediaType.APPLICATION_XML, 403);
 
     // only content class priv
-    this.overwriteUserRole(TEST_USER_NAME, "content-classes" + role, "70");
+    this.overwriteUserRole(TEST_USER_NAME, "content-classes" + role, "contentclasses-read");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     Assert.assertNotNull(this.getContentClasses(this.getXMLXStream(), MediaType.APPLICATION_XML));

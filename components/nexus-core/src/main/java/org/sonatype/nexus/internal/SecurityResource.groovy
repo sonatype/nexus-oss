@@ -609,7 +609,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '70',
+                id: 'contentclasses-read', // 70
                 type: 'method',
                 name: 'Repository Content Classes Component - (read)',
                 description: 'Give permission to retrieve the list of repository content classes supported by nexus.',
@@ -737,7 +737,7 @@ implements StaticSecurityResource
                 id: 'anonymous',
                 name: 'Nexus Anonymous Role',
                 description: 'Anonymous role for Nexus',
-                privileges: ['status', 'artifact-read', '57', '58', '70', '74'],
+                privileges: ['status', 'artifact-read', '57', '58', 'contentclasses-read', '74'],
                 roles: ['ui-repo-browser']
             ),
             new CRole(
@@ -818,7 +818,7 @@ implements StaticSecurityResource
                 id: 'ui-repository-targets-admin',
                 name: 'UI: Repository Target Administration',
                 description: 'Gives access to the Repository Target Administration screen in Nexus UI',
-                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', '70', '74']
+                privileges: ['targets-create', 'targets-read', 'targets-update', 'targets-delete', 'contentclasses-read', '74']
             ),
             new CRole(
                 id: 'ui-users-admin',

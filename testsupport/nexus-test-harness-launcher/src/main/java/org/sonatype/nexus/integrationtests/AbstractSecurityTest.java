@@ -104,7 +104,7 @@ public abstract class AbstractSecurityTest
   {
     // remove repo access from anon user
     // this should remove all target related permissions
-    overwriteUserRole("anonymous", "anonymous", "status", "artifact-read", "57", "58", "70", "74");
+    overwriteUserRole("anonymous", "anonymous", "status", "artifact-read", "57", "58", "contentclasses-read", "74");
 
     // look at setup your priv
     RepositoryTargetResource target = new RepositoryTargetResource();
