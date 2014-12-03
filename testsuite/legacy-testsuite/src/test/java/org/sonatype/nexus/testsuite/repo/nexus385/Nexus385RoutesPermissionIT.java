@@ -115,7 +115,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give update
-    this.giveUserPrivilege(TEST_USER_NAME, "24");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-update");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
