@@ -159,7 +159,7 @@ public class Nexus233PrivilegePermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give delete
-    this.giveUserPrivilege("test-user", "33");
+    this.giveUserPrivilege("test-user", "privileges-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
