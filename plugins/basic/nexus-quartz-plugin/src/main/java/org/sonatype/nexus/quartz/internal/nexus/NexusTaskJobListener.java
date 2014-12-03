@@ -33,6 +33,8 @@ import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.listeners.JobListenerSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.quartz.TriggerKey.triggerKey;
@@ -49,6 +51,8 @@ import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTas
 public class NexusTaskJobListener<T>
     extends JobListenerSupport
 {
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
   private final EventBus eventBus;
 
   private final QuartzNexusSchedulerSPI quartzSupport;
@@ -100,6 +104,7 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
+    log.trace("Job {} jobToBeExecuted", jobKey);
     // might be null: job Removed
     final Trigger jobTrigger = getJobTrigger(context);
     // must never be null, so use this or that
@@ -107,6 +112,7 @@ public class NexusTaskJobListener<T>
 
     NexusTaskFuture<T> future = nexusTaskInfo.getNexusTaskFuture();
     if (future == null) {
+      log.trace("Job {} has no future, creating it", jobKey);
       future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
           nexusScheduleConverter.toSchedule(context.getTrigger()));
       // set the future on taskinfo
@@ -127,6 +133,7 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
+    log.trace("Job {} jobWasExecuted", jobKey);
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
     final EndState endState;
     if (future.isCancelled()) {
@@ -144,6 +151,7 @@ public class NexusTaskJobListener<T>
         endState,
         future.getStartedAt(),
         System.currentTimeMillis() - future.getStartedAt().getTime());
+    log.trace("Job {} lastRunState={}", jobKey, endState);
 
     // might be null: job Removed
     Trigger jobTrigger = getJobTrigger(context);
