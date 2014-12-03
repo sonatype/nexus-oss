@@ -519,7 +519,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '50',
+                id: 'wastebasket-read', // 50
                 type: 'method',
                 name: 'Wastebasket - (read)',
                 description: 'Give permission to read the contents of the nexus trash.  Note that this privilege is not currently invoked by the Nexus UI.',
