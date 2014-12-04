@@ -31,6 +31,7 @@ import org.restlet.data.Response;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -63,8 +64,8 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Create Test Role");
     resource.setName("CreateRole");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
-    resource.addPrivilege("2");
+    resource.addPrivilege("status");
+    resource.addPrivilege("signin");
 
     this.messageUtil.createRole(resource);
   }
@@ -80,8 +81,8 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("CreateRoleWithID");
     resource.setId("CreateRoleWithID");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
-    resource.addPrivilege("2");
+    resource.addPrivilege("status");
+    resource.addPrivilege("signin");
 
     this.messageUtil.createRole(resource);
   }
@@ -96,7 +97,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Create Test Role");
     resource.setName("ListTestRole");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
 
     // create a role
     this.messageUtil.createRole(resource);
@@ -111,7 +112,7 @@ public class Nexus156RolesCrudJsonIT
     }
     assertThat(foundRole, is(notNullValue()));
     assertThat(resource.getDescription(), equalTo(foundRole.getDescription()));
-    assertThat(resource.getPrivileges(), containsInAnyOrder("1"));
+    assertThat(resource.getPrivileges(), containsInAnyOrder("status"));
   }
 
   public void readTest()
@@ -123,8 +124,8 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Read Test Role");
     resource.setName("ReadRole");
     resource.setSessionTimeout(31);
-    resource.addPrivilege("3");
-    resource.addPrivilege("4");
+    resource.addPrivilege("settings-read");
+    resource.addPrivilege("settings-update");
     resource = this.messageUtil.createRole(resource);
 
     // get the Resource object
@@ -133,7 +134,10 @@ public class Nexus156RolesCrudJsonIT
     Assert.assertEquals(responseResource.getId(), resource.getId());
     Assert.assertEquals(responseResource.getDescription(), resource.getDescription());
     Assert.assertEquals(responseResource.getName(), resource.getName());
-    Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
+    assertThat(
+        responseResource.getPrivileges(),
+        hasItems(resource.getPrivileges().toArray(new String[resource.getPrivileges().size()]))
+    );
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
   }
 
@@ -147,8 +151,8 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Update Test Role");
     resource.setName("UpdateRole");
     resource.setSessionTimeout(99999);
-    resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("repositories-create");
+    resource.addPrivilege("settings-update");
 
     RoleResource responseResource = this.messageUtil.createRole(resource);
 
@@ -158,7 +162,7 @@ public class Nexus156RolesCrudJsonIT
     resource.setName("UpdateRole Again");
     resource.setDescription("Update Test Role Again");
     resource.getPrivileges().clear(); // clear the privs
-    resource.addPrivilege("6");
+    resource.addPrivilege("repositories-read");
     resource.setSessionTimeout(10);
 
     Response response = this.messageUtil.sendMessage(Method.PUT, resource);
@@ -174,7 +178,10 @@ public class Nexus156RolesCrudJsonIT
     Assert.assertEquals(responseResource.getDescription(), resource.getDescription());
     Assert.assertEquals(responseResource.getName(), resource.getName());
     Assert.assertEquals(resource.getSessionTimeout(), responseResource.getSessionTimeout());
-    Assert.assertEquals(resource.getPrivileges(), responseResource.getPrivileges());
+    assertThat(
+        responseResource.getPrivileges(),
+        hasItems(resource.getPrivileges().toArray(new String[resource.getPrivileges().size()]))
+    );
     Assert.assertEquals(resource.getRoles(), responseResource.getRoles());
   }
 
@@ -188,8 +195,8 @@ public class Nexus156RolesCrudJsonIT
     resource.setDescription("Delete Test Role");
     resource.setName("deleteRole");
     resource.setSessionTimeout(1);
-    resource.addPrivilege("7");
-    resource.addPrivilege("8");
+    resource.addPrivilege("repositories-update");
+    resource.addPrivilege("repositories-delete");
 
     RoleResource responseResource = this.messageUtil.createRole(resource);
 

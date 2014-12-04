@@ -54,7 +54,7 @@ public class Nexus142UserPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "38");
+    this.giveUserPrivilege("test-user", "users-create");
 
     // print out the users privs
     // this.printUserPrivs( "test-user" );
@@ -110,7 +110,7 @@ public class Nexus142UserPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give update
-    this.giveUserPrivilege("test-user", "40");
+    this.giveUserPrivilege("test-user", "users-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -166,7 +166,7 @@ public class Nexus142UserPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give read
-    this.giveUserPrivilege("test-user", "39");
+    this.giveUserPrivilege("test-user", "users-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -221,7 +221,7 @@ public class Nexus142UserPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give delete
-    this.giveUserPrivilege("test-user", "41");
+    this.giveUserPrivilege("test-user", "users-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

@@ -55,7 +55,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "45");
+    this.giveUserPrivilege("test-user", "targets-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");
@@ -107,7 +107,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "47");
+    this.giveUserPrivilege("test-user", "targets-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -158,7 +158,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "46");
+    this.giveUserPrivilege("test-user", "targets-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -210,7 +210,7 @@ public class Nexus133TargetPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "48");
+    this.giveUserPrivilege("test-user", "targets-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

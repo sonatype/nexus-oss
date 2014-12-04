@@ -185,17 +185,17 @@ public class Nexus778SearchResultsFilteringIT
       role.addPrivilege(privilegeId);
     }
 
-    role.addPrivilege("1");
-    role.addPrivilege("6");
-    role.addPrivilege("14");
-    role.addPrivilege("17");
-    role.addPrivilege("19");
-    role.addPrivilege("44");
-    role.addPrivilege("54");
-    role.addPrivilege("55");
-    role.addPrivilege("57");
-    role.addPrivilege("58");
-    role.addPrivilege("64");
+    role.addPrivilege("status");
+    role.addPrivilege("repositories-read");
+    role.addPrivilege("repogroups-read");
+    role.addPrivilege("search");
+    role.addPrivilege("search-checksum");
+    role.addPrivilege("feeds-read");
+    role.addPrivilege("artifact-read");
+    role.addPrivilege("repostatus-read");
+    role.addPrivilege("usersforgotpw");
+    role.addPrivilege("usersforgotid");
+    role.addPrivilege("userschangepw");
 
     return this.roleUtil.createRole(role);
   }

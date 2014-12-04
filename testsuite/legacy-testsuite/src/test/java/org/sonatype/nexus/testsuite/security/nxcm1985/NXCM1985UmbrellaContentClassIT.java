@@ -101,7 +101,7 @@ public class NXCM1985UmbrellaContentClassIT
     super.resetTestUserPrivs();
 
     if (addPrivs) {
-      addPrivilege(TEST_USER_NAME, "65", rootPrivIds.toArray(new String[0]));
+      addPrivilege(TEST_USER_NAME, "artifact-create", rootPrivIds.toArray(new String[0]));
     }
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);

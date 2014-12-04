@@ -90,7 +90,7 @@ implements StaticSecurityResource
                 id: 'ui-capabilities-admin',
                 name: 'UI: Capabilities Administration',
                 description: 'Gives access to Capabilities Administration screen in Nexus UI',
-                privileges: ['6', '14', 'capabilities-create-read', 'capabilities-read', 'capabilities-update-read', 'capabilities-delete-read', 'capability-types-read']
+                privileges: ['repositories-read', 'repogroups-read', 'capabilities-create-read', 'capabilities-read', 'capabilities-update-read', 'capabilities-delete-read', 'capability-types-read']
             )
         ]
     )

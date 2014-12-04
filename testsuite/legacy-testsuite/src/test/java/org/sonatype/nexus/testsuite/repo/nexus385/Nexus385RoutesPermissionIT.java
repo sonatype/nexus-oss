@@ -58,7 +58,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "22");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -115,7 +115,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give update
-    this.giveUserPrivilege(TEST_USER_NAME, "24");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-update");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -170,7 +170,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give read
-    this.giveUserPrivilege(TEST_USER_NAME, "23");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -227,7 +227,7 @@ public class Nexus385RoutesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "25");
+    this.giveUserPrivilege(TEST_USER_NAME, "routes-delete");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");

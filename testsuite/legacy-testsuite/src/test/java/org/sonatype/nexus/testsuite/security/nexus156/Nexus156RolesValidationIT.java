@@ -76,7 +76,7 @@ public class Nexus156RolesValidationIT
     resource.setDescription("roleWithNoName");
     // resource.setName( "roleWithNoName" );
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
 
     Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
@@ -96,7 +96,7 @@ public class Nexus156RolesValidationIT
     resource.setDescription("roleWithSpaceInId");
     resource.setName("roleWithSpaceInId");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
 
     Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
@@ -120,7 +120,7 @@ public class Nexus156RolesValidationIT
     resource.setName("duplicateIdTest");
     resource.setId("duplicateIdTest");
     resource.setSessionTimeout(30);
-    resource.addPrivilege("1");
+    resource.addPrivilege("status");
 
     // create
     resource = this.messageUtil.createRole(resource);
@@ -143,7 +143,7 @@ public class Nexus156RolesValidationIT
     RoleResource resourceA = new RoleResource();
     resourceA.setName("recursive1");
     resourceA.setSessionTimeout(60);
-    resourceA.addPrivilege("1");
+    resourceA.addPrivilege("status");
 
     Response response = this.messageUtil.sendMessage(Method.POST, resourceA);
 
@@ -206,8 +206,8 @@ public class Nexus156RolesValidationIT
     resource.setDescription("updateValidationTests");
     resource.setName("updateValidationTests");
     resource.setSessionTimeout(99999);
-    resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("repositories-create");
+    resource.addPrivilege("settings-update");
 
     Response response = this.messageUtil.sendMessage(Method.POST, resource);
 
@@ -235,8 +235,8 @@ public class Nexus156RolesValidationIT
     resource.setDescription("updateValidationTests");
     resource.setName(null);
     resource.setSessionTimeout(99999);
-    resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("repositories-create");
+    resource.addPrivilege("settings-update");
 
     response = this.messageUtil.sendMessage(Method.PUT, resource);
 
@@ -282,8 +282,8 @@ public class Nexus156RolesValidationIT
     resource.setName("updateValidationTests");
     resource.setId("NEW-ID-WILL-FAIL");
     resource.setSessionTimeout(99999);
-    resource.addPrivilege("5");
-    resource.addPrivilege("4");
+    resource.addPrivilege("repositories-create");
+    resource.addPrivilege("settings-update");
 
     response = this.messageUtil.sendMessage(Method.PUT, resource);
     String responseText = response.getEntity().getText();

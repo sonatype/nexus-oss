@@ -41,7 +41,7 @@ public class Nexus4038DeleteSystemFeedIT
   public void delete()
       throws Exception
   {
-    giveUserPrivilege(TEST_USER_NAME, "1000");
+    giveUserPrivilege(TEST_USER_NAME, "admin");
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     Gav gav = GavUtil.newGav("nexus4038", "artifact", "1.0");

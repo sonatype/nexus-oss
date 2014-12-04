@@ -64,13 +64,13 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertTrue(result1.size() > 0);
 
     // 403 test
-    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "2");
+    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "signin");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     this.getContentClasses(this.getXMLXStream(), MediaType.APPLICATION_XML, 403);
 
     // only content class priv
-    this.overwriteUserRole(TEST_USER_NAME, "content-classes" + role, "70");
+    this.overwriteUserRole(TEST_USER_NAME, "content-classes" + role, "contentclasses-read");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     Assert.assertNotNull(this.getContentClasses(this.getXMLXStream(), MediaType.APPLICATION_XML));
@@ -87,7 +87,7 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertTrue("Expected list larger then 1.", result1.size() > 1);
 
     // 403 test
-    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "2");
+    this.overwriteUserRole(TEST_USER_NAME, "login-only" + role, "signin");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     Response response = sendMessage(role, this.getXMLXStream(), MediaType.APPLICATION_XML);
@@ -96,7 +96,7 @@ public class Nexus930AutoDiscoverComponentIT
     Assert.assertEquals(403, response.getStatus().getCode());
 
     // only content class priv
-    this.overwriteUserRole(TEST_USER_NAME, "schedule_types" + role, "71");
+    this.overwriteUserRole(TEST_USER_NAME, "schedule_types" + role, "scheduletypes-read");
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
     response = sendMessage(role, this.getXMLXStream(), MediaType.APPLICATION_XML);

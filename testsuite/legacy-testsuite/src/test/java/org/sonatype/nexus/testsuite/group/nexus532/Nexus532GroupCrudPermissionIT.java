@@ -66,7 +66,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege("test-user", "13");
+    this.giveUserPrivilege("test-user", "repogroups-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");
@@ -125,7 +125,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give update
-    this.giveUserPrivilege("test-user", "15");
+    this.giveUserPrivilege("test-user", "repogroups-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -183,7 +183,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give read
-    this.giveUserPrivilege("test-user", "14");
+    this.giveUserPrivilege("test-user", "repogroups-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -241,7 +241,7 @@ public class Nexus532GroupCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give delete
-    this.giveUserPrivilege("test-user", "16");
+    this.giveUserPrivilege("test-user", "repogroups-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

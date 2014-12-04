@@ -45,7 +45,7 @@ public class Nexus504ChangeRoleIT
   @Override
   protected void prepareSecurity() throws Exception {
     super.prepareSecurity();
-    createRole(NEXUS504_ROLE, asList("1", "3"));
+    createRole(NEXUS504_ROLE, asList("status", "settings-read"));
     createUser(NEXUS504_USER, TEST_USER_PASSWORD, asList(NEXUS504_ROLE));
   }
 
@@ -72,7 +72,7 @@ public class Nexus504ChangeRoleIT
     testContext.useAdminForRequests();
 
     RoleResource role = roleUtil.getRole(NEXUS504_ROLE);
-    role.addPrivilege("2"/* login */);
+    role.addPrivilege("signin");
     assertThat("Unable to add login privilege to role " + NEXUS504_ROLE + "\n"
         + RoleMessageUtil.update(role).getDescription(), RoleMessageUtil.update(role), isSuccess());
 

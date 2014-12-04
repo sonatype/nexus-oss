@@ -651,7 +651,7 @@ public class ClientIT
     final String roleId = testName.getMethodName();
     roles().create(roleId)
         .withName(roleId)
-        .withPrivilege("19")
+        .withPrivilege("search-checksum")
         .save();
     final Role role = roles().get(roleId);
     assertThat(role, is(notNullValue()));
@@ -664,7 +664,7 @@ public class ClientIT
     final String roleId = testName.getMethodName();
     roles().create(roleId)
         .withName(roleId)
-        .withPrivilege("19")
+        .withPrivilege("search-checksum")
         .save()
         .withName(roleId + "Bar")
         .save();
@@ -678,7 +678,7 @@ public class ClientIT
     final String roleId = testName.getMethodName();
     final Role role = roles().create(roleId)
         .withName(roleId)
-        .withPrivilege("19")
+        .withPrivilege("search-checksum")
         .save();
     role.remove();
   }
@@ -688,7 +688,7 @@ public class ClientIT
     final String roleId = testName.getMethodName();
     Role role = roles().create(roleId)
         .withName(roleId)
-        .withPrivilege("19")
+        .withPrivilege("search-checksum")
         .save()
         .withName(roleId + "Bar")
         .refresh();
@@ -767,7 +767,7 @@ public class ClientIT
   @Test
   public void getPrivilege() {
     // admin privilege
-    final Privilege privilege = privileges().get("1000");
+    final Privilege privilege = privileges().get("admin");
     assertThat(privilege, is(not(nullValue())));
     assertThat(privilege.name(), containsString("Administrator"));
   }
