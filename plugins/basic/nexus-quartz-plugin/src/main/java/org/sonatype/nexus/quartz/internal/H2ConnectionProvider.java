@@ -43,7 +43,7 @@ public class H2ConnectionProvider
     implements ConnectionProvider
 {
   private static final String H2_SETTINGS =
-      "${nexus-quartz-h2-settings:-;FILE_LOCK=SOCKET;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;MULTI_THREADED=1;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000}";
+      "${nexus-quartz-h2-settings:-;FILE_LOCK=SOCKET;MVCC=TRUE;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000}";
 
   private static final String DATABASE_NAME = "quartz";
 
@@ -142,7 +142,9 @@ public class H2ConnectionProvider
       }
       // connection checks out, so now create lazy pool
       pool = JdbcConnectionPool.create(url, "sa", "");
-      pool.setMaxConnections(8);
+      // TODO: this should be QZ threadPoolSize + 2!!!
+      // Set manually now, but config should be passed over?
+      pool.setMaxConnections(22);
       return pool;
     }
     catch (final Exception e) {

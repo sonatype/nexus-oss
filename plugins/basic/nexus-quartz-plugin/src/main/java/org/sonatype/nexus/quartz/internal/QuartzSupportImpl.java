@@ -121,6 +121,7 @@ public class QuartzSupportImpl
     jobStoreTX.setDataSource(QuartzPlugin.STORE_NAME);
     jobStoreTX.setTablePrefix("QRTZ_");
     jobStoreTX.setIsClustered(false);
+    jobStoreTX.setUseProperties(Boolean.TRUE.toString());
     jobStoreTX.setThreadExecutor(threadExecutor);
 
     // start the pool
