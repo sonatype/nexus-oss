@@ -203,6 +203,10 @@ public class OrientSecurityModelConfigurationSource
 
     @Override
     public List<CUser> getUsers() {
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving all users");
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return Lists.newArrayList(userEntityAdapter.get(db));
       }
@@ -211,6 +215,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public CUser getUser(final String id) {
       checkNotNull(id, "user id");
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving user {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userEntityAdapter.get(db, id);
         if (document != null) {
@@ -224,6 +232,10 @@ public class OrientSecurityModelConfigurationSource
     public void addUser(final CUser user, final Set<String> roles) {
       checkNotNull(user, "user");
       checkNotNull(user.getId(), "user id");
+      if (log.isTraceEnabled()) {
+        log.trace("Adding user {}", user.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.create(db, user);
 
@@ -239,6 +251,10 @@ public class OrientSecurityModelConfigurationSource
     public void updateUser(final CUser user, final Set<String> roles) throws UserNotFoundException {
       checkNotNull(user, "user");
       checkNotNull(user.getId(), "user id");
+      if (log.isTraceEnabled()) {
+        log.trace("Updating user {}", user.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userEntityAdapter.get(db, user.getId());
         if (document == null) {
@@ -273,6 +289,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public boolean removeUser(final String id) {
       checkNotNull(id, "user id");
+      if (log.isTraceEnabled()) {
+        log.trace("Removing user {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         if (userEntityAdapter.delete(db, id)) {
           userRoleMappingEntityAdapter.delete(db, id, UserManagerImpl.SOURCE);
@@ -289,6 +309,10 @@ public class OrientSecurityModelConfigurationSource
 
     @Override
     public List<CUserRoleMapping> getUserRoleMappings() {
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving all user/role mappings");
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return Lists.newArrayList(userRoleMappingEntityAdapter.get(db));
       }
@@ -298,6 +322,10 @@ public class OrientSecurityModelConfigurationSource
     public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
       checkNotNull(userId, "user id");
       checkNotNull(source, "source");
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving user/role mappings of {}/{}", userId, source);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userRoleMappingEntityAdapter.get(db, userId, source);
         if (document != null) {
@@ -312,6 +340,10 @@ public class OrientSecurityModelConfigurationSource
       checkNotNull(mapping, "mapping");
       checkNotNull(mapping.getUserId(), "user id");
       checkNotNull(mapping.getSource(), "source");
+      if (log.isTraceEnabled()) {
+        log.trace("Adding user/role mappings for {}/{}", mapping.getUserId(), mapping.getSource());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         userRoleMappingEntityAdapter.create(db, mapping);
       }
@@ -322,6 +354,10 @@ public class OrientSecurityModelConfigurationSource
       checkNotNull(mapping, "mapping");
       checkNotNull(mapping.getUserId(), "user id");
       checkNotNull(mapping.getSource(), "source");
+      if (log.isTraceEnabled()) {
+        log.trace("Updating user/role mappings for {}/{}", mapping.getUserId(), mapping.getSource());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
         if (document == null) {
@@ -345,6 +381,10 @@ public class OrientSecurityModelConfigurationSource
     public boolean removeUserRoleMapping(final String userId, final String source) {
       checkNotNull(userId, "user id");
       checkNotNull(source, "source");
+      if (log.isTraceEnabled()) {
+        log.trace("Removing user/role mappings for {}/{}", userId, source);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return userRoleMappingEntityAdapter.delete(db, userId, source);
       }
@@ -357,6 +397,10 @@ public class OrientSecurityModelConfigurationSource
 
     @Override
     public List<CPrivilege> getPrivileges() {
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving all privileges");
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return Lists.newArrayList(privilegeEntityAdapter.get(db));
       }
@@ -365,6 +409,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public CPrivilege getPrivilege(final String id) {
       checkNotNull(id, "privilege id");
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving privilege {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = privilegeEntityAdapter.get(db, id);
         if (document != null) {
@@ -378,6 +426,10 @@ public class OrientSecurityModelConfigurationSource
     public void addPrivilege(final CPrivilege privilege) {
       checkNotNull(privilege, "privilege");
       checkNotNull(privilege.getId(), "privilege id");
+      if (log.isTraceEnabled()) {
+        log.trace("Adding privilege {}", privilege.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         privilegeEntityAdapter.create(db, privilege);
       }
@@ -387,6 +439,10 @@ public class OrientSecurityModelConfigurationSource
     public void updatePrivilege(final CPrivilege privilege) throws NoSuchPrivilegeException {
       checkNotNull(privilege, "privilege");
       checkNotNull(privilege.getId(), "privilege id");
+      if (log.isTraceEnabled()) {
+        log.trace("Updating privilege {}", privilege.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = privilegeEntityAdapter.get(db, privilege.getId());
         if (document == null) {
@@ -409,6 +465,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public boolean removePrivilege(final String id) {
       checkNotNull(id, "privilege id");
+      if (log.isTraceEnabled()) {
+        log.trace("Removing privilege {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return privilegeEntityAdapter.delete(db, id);
       }
@@ -421,6 +481,10 @@ public class OrientSecurityModelConfigurationSource
 
     @Override
     public List<CRole> getRoles() {
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving all roles");
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return Lists.newArrayList(roleEntityAdapter.get(db));
       }
@@ -429,6 +493,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public CRole getRole(final String id) {
       checkNotNull(id, "role id");
+      if (log.isTraceEnabled()) {
+        log.trace("Retrieving role {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = roleEntityAdapter.get(db, id);
         if (document != null) {
@@ -442,6 +510,10 @@ public class OrientSecurityModelConfigurationSource
     public void addRole(final CRole role) {
       checkNotNull(role, "role");
       checkNotNull(role.getId(), "role id");
+      if (log.isTraceEnabled()) {
+        log.trace("Adding role {}", role.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         roleEntityAdapter.create(db, role);
       }
@@ -451,6 +523,10 @@ public class OrientSecurityModelConfigurationSource
     public void updateRole(final CRole role) throws NoSuchRoleException {
       checkNotNull(role, "role");
       checkNotNull(role.getId(), "role id");
+      if (log.isTraceEnabled()) {
+        log.trace("Updating role {}", role.getId());
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         ODocument document = roleEntityAdapter.get(db, role.getId());
         if (document == null) {
@@ -473,6 +549,10 @@ public class OrientSecurityModelConfigurationSource
     @Override
     public boolean removeRole(final String id) {
       checkNotNull(id, "role id");
+      if (log.isTraceEnabled()) {
+        log.trace("Removing role {}", id);
+      }
+
       try (ODatabaseDocumentTx db = openDb()) {
         return roleEntityAdapter.delete(db, id);
       }
