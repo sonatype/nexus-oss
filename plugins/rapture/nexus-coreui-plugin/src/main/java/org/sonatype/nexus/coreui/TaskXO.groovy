@@ -34,8 +34,6 @@ class TaskXO
   @NotEmpty(groups = [Create, Update])
   String name
 
-  String message
-
   @NotEmpty(groups = Create)
   String typeId
 
