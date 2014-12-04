@@ -38,9 +38,8 @@ class TaskXO
 
   @NotEmpty(groups = Create)
   String typeId
-  @NotEmpty(groups = Create)
-  String typeName
 
+  String typeName
   String status
   String statusDescription
 
