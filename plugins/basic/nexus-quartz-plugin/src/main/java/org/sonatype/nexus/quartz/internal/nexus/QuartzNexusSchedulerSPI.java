@@ -90,11 +90,13 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
-      return taskByKey(jobKey);
+      final NexusTaskInfo<T> taskInfo = taskByKey(jobKey);
+      if (!taskInfo.isRemovedOrDone()) {
+        return taskInfo;
+      }
     }
     catch (IllegalStateException e) {
       // no listener found in taskByKey, means no job exists
-      return null;
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
@@ -102,6 +104,7 @@ public class QuartzNexusSchedulerSPI
     finally {
       Thread.currentThread().setContextClassLoader(classLoader);
     }
+    return null;
   }
 
   @Override
@@ -112,8 +115,9 @@ public class QuartzNexusSchedulerSPI
       final List<TaskInfo<?>> result = Lists.newArrayList();
       final Map<JobKey, NexusTaskInfo<?>> allTasks = allTasks();
       for (NexusTaskInfo<?> nexusTaskInfo : allTasks.values()) {
-        // TODO: filter out DONE tasks? They did not appear before
-        result.add(nexusTaskInfo);
+        if (!nexusTaskInfo.isRemovedOrDone()) {
+          result.add(nexusTaskInfo);
+        }
       }
       return result;
     }
@@ -179,7 +183,7 @@ public class QuartzNexusSchedulerSPI
       if (task == null) {
         return null;
       }
-      checkState(task.getCurrentState().getState() != State.DONE, "Done task cannot be rescheduled");
+      checkState(!task.isRemovedOrDone(), "Done task cannot be rescheduled");
       log.debug("NX Task rescheduleTask: {}: {} -> {}", jobKey, task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();

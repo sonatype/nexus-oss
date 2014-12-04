@@ -176,11 +176,6 @@ public class NexusTaskJobListener<T>
         State.DONE == state ? future : null
     );
 
-    // DONE tasks (or those already removed) should be cleaned up, as they might reschedule themselves
-    if (State.DONE == state) {
-      nexusTaskInfo.remove();
-    }
-
     // unwrap the QZ wrapped exception and set future result
     final Exception failure =
         jobException != null && jobException.getCause() instanceof Exception ?
