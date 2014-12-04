@@ -49,21 +49,21 @@ public class Nexus999SetUsersPasswordIT
     overwriteUserRole(
         TEST_USER_NAME,
         "anonymous-with-login-setpw",
-        "1",
-        "2" /* login */,
-        "6",
-        "14",
-        "17",
-        "19",
-        "44",
-        "54",
-        "55",
-        "57",
-        "58",
-        "59",
-        "72"/* set pw */,
-        "T1",
-        "T2");
+        "status",
+        "signin",
+        "repositories-read",
+        "repogroups-read",
+        "search",
+        "search-checksum",
+        "feeds-read",
+        "artifact-read",
+        "repostatus-read",
+        "usersforgotpw",
+        "usersforgotid",
+        "usersresetpw",
+        "userssetpw",
+        "repository-m2-read",
+        "repository-m1-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -89,20 +89,20 @@ public class Nexus999SetUsersPasswordIT
     overwriteUserRole(
         TEST_USER_NAME,
         "anonymous-with-login-but-setpw",
-        "1",
-        "2" /* login */,
-        "6",
-        "14",
-        "17",
-        "19",
-        "44",
-        "54",
-        "55",
-        "57",
-        "58",
-        "59", /* "72" set pw, */
-        "T1",
-        "T2");
+        "status",
+        "signin",
+        "repositories-read",
+        "repogroups-read",
+        "search",
+        "search-checksum",
+        "feeds-read",
+        "artifact-read",
+        "repostatus-read",
+        "usersforgotpw",
+        "usersforgotid",
+        "usersresetpw",
+        "repository-m2-read",
+        "repository-m1-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);

@@ -54,7 +54,7 @@ public class Nexus1599ViewPrivilegeIT
       throws Exception
   {
     this.giveUserRole(TEST_USER_NAME, "ui-search");
-    this.giveUserPrivilege(TEST_USER_NAME, "T1"); // all m2 repo, read
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-m2-read"); // all m2 repo, read
 
     // without view privilege
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -69,7 +69,7 @@ public class Nexus1599ViewPrivilegeIT
 
     Assert.assertEquals(1, getSearchMessageUtil().searchFor(getTestId()).size());
 
-    this.removePrivilege(TEST_USER_NAME, "T1");
+    this.removePrivilege(TEST_USER_NAME, "repository-m2-read");
   }
 
   @Test
@@ -77,7 +77,7 @@ public class Nexus1599ViewPrivilegeIT
       throws Exception
   {
     this.giveUserRole(TEST_USER_NAME, "ui-system-feeds");
-    this.giveUserPrivilege(TEST_USER_NAME, "T1"); // all m2 repo, read
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-m2-read"); // all m2 repo, read
 
     // without view privilege
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -92,7 +92,7 @@ public class Nexus1599ViewPrivilegeIT
 
     Assert.assertFalse(FeedUtil.getFeed("recentlyChangedArtifacts").getEntries().isEmpty());
 
-    this.removePrivilege(TEST_USER_NAME, "T1");
+    this.removePrivilege(TEST_USER_NAME, "repository-m2-read");
   }
 
   @Test

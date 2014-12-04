@@ -117,7 +117,7 @@ public class Nexus3615ArtifactInfoSecurityIT
     getSearchMessageUtil().reindexGAV(REPO_TEST_HARNESS_REPO, gav);
 
     this.giveUserRole(TEST_USER_NAME, "ui-search", true);
-    this.giveUserPrivilege(TEST_USER_NAME, "T1"); // all m2 repo, read
+    this.giveUserPrivilege(TEST_USER_NAME, "repository-m2-read"); // all m2 repo, read
     this.giveUserPrivilege(TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO);
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);

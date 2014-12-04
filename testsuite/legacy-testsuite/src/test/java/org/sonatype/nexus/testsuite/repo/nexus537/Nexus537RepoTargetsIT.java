@@ -142,9 +142,9 @@ public class Nexus537RepoTargetsIT
   public void resetTestUserPrivs()
       throws Exception
   {
-    this.overwriteUserRole(TEST_USER_NAME, "doReadTest-noAccess", "17");
+    this.overwriteUserRole(TEST_USER_NAME, "doReadTest-noAccess", "search");
     this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
-    // "6", "14","19","44","54","55","57","58","64","70"
+    // "repositories-read", "repogroups-read","search-checksum","feeds-read","artifact-read","repostatus-read","usersforgotpw","usersforgotid","userschangepw","contentclasses-read"
     this.printUserPrivs(TEST_USER_NAME);
   }
 
@@ -276,7 +276,7 @@ public class Nexus537RepoTargetsIT
     this.upload(repo2FooArtifact, REPO2_ID, this.getTestFile("repo2-foo-artifact.jar"), false);
 
     // now give
-    this.overwriteUserRole(TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, "65"); // 65
+    this.overwriteUserRole(TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, "artifact-create"); // 65
     // is
     // upload
     // priv
@@ -290,7 +290,7 @@ public class Nexus537RepoTargetsIT
     this.upload(repo2FooArtifact, REPO2_ID, this.getTestFile("repo2-foo-artifact.jar"), false);
 
     // now give
-    this.overwriteUserRole(TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, "65");
+    this.overwriteUserRole(TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, "artifact-create");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);
@@ -301,7 +301,7 @@ public class Nexus537RepoTargetsIT
     this.upload(repo2FooArtifact, REPO2_ID, this.getTestFile("repo2-foo-artifact.jar"), false);
 
     // now give
-    this.overwriteUserRole(TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, "65");
+    this.overwriteUserRole(TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, "artifact-create");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword(TEST_USER_PASSWORD);

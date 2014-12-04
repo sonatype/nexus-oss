@@ -53,7 +53,7 @@ public class Nexus233PrivilegePermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "30");
+    this.giveUserPrivilege("test-user", "privileges-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername("test-user");
@@ -107,7 +107,7 @@ public class Nexus233PrivilegePermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "31");
+    this.giveUserPrivilege("test-user", "privileges-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -159,7 +159,7 @@ public class Nexus233PrivilegePermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give delete
-    this.giveUserPrivilege("test-user", "33");
+    this.giveUserPrivilege("test-user", "privileges-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

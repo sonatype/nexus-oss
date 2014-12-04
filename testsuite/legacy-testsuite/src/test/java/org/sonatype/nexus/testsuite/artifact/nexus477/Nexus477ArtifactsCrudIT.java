@@ -56,7 +56,7 @@ public class Nexus477ArtifactsCrudIT
     // URLConnection.set
 
     // use the test-user
-    // this.giveUserPrivilege( "test-user", "T3" ); // the Wagon does a PUT not a POST, so this is correct
+    // this.giveUserPrivilege( "test-user", "repository-m2-update" ); // the Wagon does a PUT not a POST, so this is correct
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
     this.resetTestUserPrivs();
@@ -96,7 +96,7 @@ public class Nexus477ArtifactsCrudIT
     Assert.assertEquals("Artifact should not have been deleted", response.getStatus().getCode(), 403);
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T7");
+    this.giveUserPrivilege("test-user", "repository-m2-delete");
 
     // delete implies read
     // we need to check read first...
@@ -114,7 +114,7 @@ public class Nexus477ArtifactsCrudIT
   public void readTest()
       throws IOException, URISyntaxException, Exception
   {
-    this.overwriteUserRole("test-user", "read-test-role", "1");
+    this.overwriteUserRole("test-user", "read-test-role", "status");
 
     Gav gav =
         new Gav(this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
@@ -130,7 +130,7 @@ public class Nexus477ArtifactsCrudIT
     Assert.assertEquals("Artifact should not have been read", response.getStatus().getCode(), 403);
 
     TestContainer.getInstance().getTestContext().useAdminForRequests();
-    this.giveUserPrivilege("test-user", "T1");
+    this.giveUserPrivilege("test-user", "repository-m2-read");
     this.giveUserPrivilege(TEST_USER_NAME, "repository-all");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");

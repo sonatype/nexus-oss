@@ -45,7 +45,7 @@ public class Nexus156RolesPermissionIT
     role.setDescription("testCreatePermission");
     role.setName("testCreatePermission");
     role.setSessionTimeout(30);
-    role.addPrivilege("1");
+    role.addPrivilege("status");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -58,7 +58,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "34");
+    this.giveUserPrivilege("test-user", "roles-create");
 
 
     // now.... it should work...
@@ -96,7 +96,7 @@ public class Nexus156RolesPermissionIT
     role.setDescription("testUpdatePermission");
     role.setName("testUpdatePermission");
     role.setSessionTimeout(30);
-    role.addPrivilege("1");
+    role.addPrivilege("status");
 
     Response response = this.roleUtil.sendMessage(Method.POST, role);
     Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
@@ -116,7 +116,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give update
-    this.giveUserPrivilege("test-user", "36");
+    this.giveUserPrivilege("test-user", "roles-update");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -154,7 +154,7 @@ public class Nexus156RolesPermissionIT
     role.setDescription("testReadPermission");
     role.setName("testReadPermission");
     role.setSessionTimeout(30);
-    role.addPrivilege("1");
+    role.addPrivilege("status");
 
     Response response = this.roleUtil.sendMessage(Method.POST, role);
     Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
@@ -171,7 +171,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give read
-    this.giveUserPrivilege("test-user", "35");
+    this.giveUserPrivilege("test-user", "roles-read");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -209,7 +209,7 @@ public class Nexus156RolesPermissionIT
     role.setDescription("testUpdatePermission");
     role.setName("testUpdatePermission");
     role.setSessionTimeout(30);
-    role.addPrivilege("1");
+    role.addPrivilege("status");
 
     Response response = this.roleUtil.sendMessage(Method.POST, role);
     Assert.assertEquals("Response status: ", response.getStatus().getCode(), 201);
@@ -227,7 +227,7 @@ public class Nexus156RolesPermissionIT
     TestContainer.getInstance().getTestContext().setPassword("admin123");
 
     // now give create
-    this.giveUserPrivilege("test-user", "37");
+    this.giveUserPrivilege("test-user", "roles-delete");
 
     TestContainer.getInstance().getTestContext().setUsername("test-user");
     TestContainer.getInstance().getTestContext().setPassword("admin123");

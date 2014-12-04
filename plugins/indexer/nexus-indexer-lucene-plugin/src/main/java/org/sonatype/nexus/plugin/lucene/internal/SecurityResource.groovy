@@ -35,7 +35,7 @@ implements StaticSecurityResource
     return new Configuration(
         privileges: [
             new CPrivilege(
-                id: '17',
+                id: 'search', // 17
                 type: 'method',
                 name: 'Search Repositories',
                 description: 'Give permission to perform searches of repository content.',
@@ -45,7 +45,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '18',
+                id: 'reindex', // 18
                 type: 'method',
                 name: 'Reindex',
                 description: 'Give permission to Reindex repository content.  The extents of this privilege are related to the allowed targets.',
@@ -55,7 +55,7 @@ implements StaticSecurityResource
                 ]
             ),
             new CPrivilege(
-                id: '19',
+                id: 'search-checksum', // 19
                 type: 'method',
                 name: 'Checksum Search',
                 description: 'Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.',
@@ -70,7 +70,7 @@ implements StaticSecurityResource
                 id: 'ui-search',
                 name: 'UI: Search',
                 description: 'Gives access to the Search screen in Nexus UI',
-                privileges: ['17', '19', '54']
+                privileges: ['search', 'search-checksum', 'artifact-read']
             ),
             new CRole(
                 id: 'anonymous',

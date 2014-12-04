@@ -284,8 +284,8 @@ public abstract class AbstractNexusIntegrationTest
           @Override
           public Object call() throws Exception {
             createUser(TEST_USER_NAME, TEST_USER_PASSWORD, asList("anonymous"));
-            createRole("role1", asList("1", "2"));
-            createRole("role2", asList("3", "4"));
+            createRole("role1", asList("status", "signin"));
+            createRole("role2", asList("settings-read", "settings-update"));
             prepareSecurity();
             return null;
           }

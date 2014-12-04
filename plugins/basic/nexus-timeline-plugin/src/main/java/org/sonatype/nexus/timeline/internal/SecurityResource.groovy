@@ -35,7 +35,7 @@ implements StaticSecurityResource
     return new Configuration(
         privileges: [
             new CPrivilege(
-                id: '44',
+                id: 'feeds-read', // 44
                 type: 'method',
                 name: 'Feeds - (read)',
                 description: 'Give permission to view the different feeds. The extents of this privilege are related to the allowed targets.',
@@ -50,7 +50,7 @@ implements StaticSecurityResource
                 id: 'ui-system-feeds',
                 name: 'UI: System Feeds',
                 description: 'Gives access to the System Feeds screen in Nexus UI',
-                privileges: ['44']
+                privileges: ['feeds-read']
             )
         ]
     )

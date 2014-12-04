@@ -46,7 +46,7 @@ public class Nexus1071AnonAccessIT
 
     createRole("r1", asList(p1, p2));
     createRole("r2", asList(p3));
-    createRole("r3", asList("T5", "T7", "T1", p3));
+    createRole("r3", asList("repository-m2-create", "repository-m2-delete", "repository-m2-read", p3));
 
     UserResource deployment = userUtil.getUser("deployment");
     deployment.setRoles(asList("nx-deployment", "r3"));

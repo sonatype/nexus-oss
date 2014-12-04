@@ -66,7 +66,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give create
-    this.giveUserPrivilege(TEST_USER_NAME, "5");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-create");
 
     // now.... it should work...
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
@@ -126,7 +126,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give update
-    this.giveUserPrivilege(TEST_USER_NAME, "7");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-update");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -185,7 +185,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give read
-    this.giveUserPrivilege(TEST_USER_NAME, "6");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-read");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
@@ -245,7 +245,7 @@ public class Nexus531RepositoryCrudPermissionIT
     TestContainer.getInstance().getTestContext().useAdminForRequests();
 
     // now give delete
-    this.giveUserPrivilege(TEST_USER_NAME, "8");
+    this.giveUserPrivilege(TEST_USER_NAME, "repositories-delete");
 
     TestContainer.getInstance().getTestContext().setUsername(TEST_USER_NAME);
     TestContainer.getInstance().getTestContext().setPassword("admin123");
