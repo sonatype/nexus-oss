@@ -114,6 +114,7 @@ public class DefaultIndexerManagerIT
     r.setRemoteUrl("http://repository.sonatyp.org/content/repositories/snapshots");
 
     nexusConfiguration().saveConfiguration();
+    waitForTasksToStop();
 
     indexerManager.reindexRepository("/", r.getId(), true);
   }

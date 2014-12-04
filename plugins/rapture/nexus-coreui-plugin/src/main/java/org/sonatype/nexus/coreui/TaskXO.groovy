@@ -17,7 +17,6 @@ import groovy.transform.ToString
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
-import org.sonatype.scheduling.TaskState
 
 /**
  * Task exchange object.
@@ -35,11 +34,14 @@ class TaskXO
   @NotEmpty(groups = [Create, Update])
   String name
 
+  String message
+
   @NotEmpty(groups = Create)
   String typeId
-
+  @NotEmpty(groups = Create)
   String typeName
-  TaskState status
+
+  String status
   String statusDescription
 
   Date nextRun

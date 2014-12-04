@@ -14,28 +14,28 @@ package org.sonatype.nexus.plugins.tasks.api;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.Cancelable;
+import org.sonatype.nexus.scheduling.CancelableSupport;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
-import org.codehaus.plexus.util.StringUtils;
-
-@Named("SleepRepositoryTask")
+@Named
 public class SleepRepositoryTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
+    implements Cancelable
 {
-
   private boolean cancellable;
 
   @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
-    cancellable = Boolean.parseBoolean(getParameter("cancellable"));
+    cancellable = getConfiguration().getBoolean("cancellable", false);
 
-    getLogger().debug(getMessage());
+    log.debug(getMessage());
 
     final int time = getTime();
     sleep(time);
-    getRepositoryRegistry().getRepository(getRepositoryId());
+    getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId());
     sleep(time);
     return null;
   }
@@ -46,30 +46,17 @@ public class SleepRepositoryTask
     for (int i = 0; i < time; i++) {
       Thread.sleep(1000 / 2);
       if (cancellable) {
-        checkInterruption();
+        CancelableSupport.checkCancellation();
       }
     }
   }
 
   private int getTime() {
-    String t = getParameter("time");
-
-    if (StringUtils.isEmpty(t)) {
-      return 5;
-    }
-    else {
-      return new Integer(t);
-    }
+    return getConfiguration().getInteger("time", 5);
   }
 
   @Override
-  protected String getAction() {
-    return "Sleeping";
-  }
-
-  @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Sleeping for " + getTime() + " seconds (cancellable: " + cancellable + ")!";
   }
-
 }

@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.maven.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,9 +22,8 @@ import org.sonatype.nexus.formfields.RepoTargetComboFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
-
-import com.google.common.collect.ImmutableList;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 /**
  * @since 2.5
@@ -34,42 +31,25 @@ import com.google.common.collect.ImmutableList;
 @Named
 @Singleton
 public class ReleaseRemovalTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-
-  public static final String ID = "ReleaseRemoverTask";
-
-  public static final String REPOSITORY_FIELD_ID = "repositoryId";
-
   public static final String NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID = "numberOfVersionsToKeep";
 
   public static final String REPOSITORY_TARGET_FIELD_ID = "repositoryTarget";
 
-  private final List<FormField> formFields = ImmutableList.<FormField>of(
-      new RepositoryCombobox(
-          REPOSITORY_FIELD_ID,
-          "Repository",
-          "Select Maven repository to remove releases.",
-          FormField.MANDATORY
-      ).includingAnyOfContentClasses(Maven2ContentClass.ID)
-          .excludingAnyOfFacets(GroupRepository.class),
-      new NumberTextFormField(
-          NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
-          FormField.MANDATORY),
-      new RepoTargetComboFormField(REPOSITORY_TARGET_FIELD_ID, "Repository Target",
-          "Select a repository target to apply", FormField.OPTIONAL)
-  );
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Remove Releases From Repository";
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return formFields;
+  public ReleaseRemovalTaskDescriptor() {
+    super(ReleaseRemovalTask.class, "Remove Releases From Repository",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select Maven repository to remove releases.",
+            FormField.MANDATORY
+        ).includingAnyOfContentClasses(Maven2ContentClass.ID).excludingAnyOfFacets(GroupRepository.class),
+        new NumberTextFormField(
+            NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
+            FormField.MANDATORY),
+        new RepoTargetComboFormField(REPOSITORY_TARGET_FIELD_ID, "Repository Target",
+            "Select a repository target to apply", FormField.OPTIONAL)
+    );
   }
 }

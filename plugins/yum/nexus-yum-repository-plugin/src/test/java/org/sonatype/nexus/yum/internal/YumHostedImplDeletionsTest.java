@@ -20,9 +20,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
+import org.sonatype.nexus.yum.internal.task.GenerateMetadataTaskDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
@@ -56,7 +58,7 @@ public class YumHostedImplDeletionsTest
 
   private HostedRepository repository;
 
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   @Before
   public void prepareService()
@@ -66,13 +68,15 @@ public class YumHostedImplDeletionsTest
     when(repository.getId()).thenReturn(REPO_ID);
     when(repository.getLocalUrl()).thenReturn("/target");
 
-    nexusScheduler = mock(NexusScheduler.class);
-    when(nexusScheduler.createTaskInstance(GenerateMetadataTask.class)).thenReturn(
-        mock(GenerateMetadataTask.class)
+    nexusScheduler = mock(NexusTaskScheduler.class);
+    when(nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class)).thenReturn(
+        new TaskConfiguration()
     );
+    when(nexusScheduler.createTaskInstance(Mockito.any(TaskConfiguration.class))).thenReturn(mock(GenerateMetadataTask.class));
 
     yum = new YumHostedImpl(
         nexusScheduler,
+        new GenerateMetadataTaskDescriptor(),
         new ScheduledThreadPoolExecutor(10),
         new BlockSqliteDatabasesRequestStrategy(),
         repository,
@@ -88,7 +92,7 @@ public class YumHostedImplDeletionsTest
     yum.regenerateWhenDirectoryIsRemoved(BASE_PATH);
     sleep(TIMEOUT_IN_SEC * 2000);
     verify(nexusScheduler, times(0)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
   }
 
@@ -105,7 +109,7 @@ public class YumHostedImplDeletionsTest
     sleep(TIMEOUT_IN_SEC * 2000);
 
     verify(nexusScheduler, times(1)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
   }
 
@@ -124,7 +128,7 @@ public class YumHostedImplDeletionsTest
     sleep(TIMEOUT_IN_SEC * 2000);
 
     verify(nexusScheduler, times(1)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
   }
 
@@ -143,12 +147,12 @@ public class YumHostedImplDeletionsTest
 
     sleep(TIMEOUT_IN_SEC * 1500);
     verify(nexusScheduler, times(0)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
 
     sleep(TIMEOUT_IN_SEC * 2500);
     verify(nexusScheduler, times(1)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
   }
 
@@ -158,7 +162,7 @@ public class YumHostedImplDeletionsTest
   {
     yum.regenerateWhenPathIsRemoved(SUB_PATH1);
     verify(nexusScheduler, times(1)).submit(
-        Mockito.anyString(), Mockito.any(GenerateMetadataTask.class)
+        Mockito.any(TaskConfiguration.class)
     );
   }
 }

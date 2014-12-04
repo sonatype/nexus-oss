@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,7 +65,7 @@ import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -122,8 +121,6 @@ public class DefaultNexusConfiguration
 
   private final RepositoryRegistry repositoryRegistry;
 
-  private final List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
-
   private final SecuritySystem securitySystem;
 
   private final VetoFormatter vetoFormatter;
@@ -178,7 +175,6 @@ public class DefaultNexusConfiguration
                                    final ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder,
                                    final RepositoryTypeRegistry repositoryTypeRegistry,
                                    final RepositoryRegistry repositoryRegistry,
-                                   final List<ScheduledTaskDescriptor> scheduledTaskDescriptors,
                                    final SecuritySystem securitySystem,
                                    final VetoFormatter vetoFormatter,
                                    final List<ConfigurationModifier> configurationModifiers,
@@ -194,7 +190,6 @@ public class DefaultNexusConfiguration
     this.runtimeConfigurationBuilder = checkNotNull(runtimeConfigurationBuilder);
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    this.scheduledTaskDescriptors = checkNotNull(scheduledTaskDescriptors);
     this.securitySystem = checkNotNull(securitySystem);
     this.vetoFormatter = checkNotNull(vetoFormatter);
     this.configurationModifiers = checkNotNull(configurationModifiers);
@@ -448,22 +443,6 @@ public class DefaultNexusConfiguration
   @Override
   public File getConfigurationDirectory() {
     return configurationDirectory;
-  }
-
-  @Override
-  public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors() {
-    return Collections.unmodifiableList(scheduledTaskDescriptors);
-  }
-
-  @Override
-  public ScheduledTaskDescriptor getScheduledTaskDescriptor(String id) {
-    for (ScheduledTaskDescriptor descriptor : scheduledTaskDescriptors) {
-      if (descriptor.getId().equals(id)) {
-        return descriptor;
-      }
-    }
-
-    return null;
   }
 
   // ------------------------------------------------------------------

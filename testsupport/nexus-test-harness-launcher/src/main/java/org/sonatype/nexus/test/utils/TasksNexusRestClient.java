@@ -22,7 +22,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -78,6 +78,7 @@ public class TasksNexusRestClient
   {
     List<ScheduledServiceListResource> list = getTasks();
     for (ScheduledServiceListResource task : list) {
+      LOG.debug("getTask: {} : {} : {}", task.getId(), task.getName(), task.getStatus());
       if (name.equals(task.getName())) {
         return task;
       }
@@ -179,7 +180,7 @@ public class TasksNexusRestClient
    *
    * @param taskClass task type
    */
-  public void waitForAllTasksToStop(Class<? extends NexusTask<?>> taskClass)
+  public void waitForAllTasksToStop(Class<? extends Task<?>> taskClass)
       throws Exception
   {
     waitForAllTasksToStop(taskClass.getSimpleName());

@@ -13,6 +13,9 @@
 
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskConfiguration
+
 import com.google.common.base.Predicate
 import com.google.common.base.Predicates
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -63,7 +66,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory
 import org.sonatype.nexus.rapture.TrustStoreKeys
-import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.tasks.ExpireCacheTask
 import org.sonatype.nexus.templates.TemplateManager
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider
@@ -125,7 +127,7 @@ extends DirectComponentSupport
   ClassLoader uberClassLoader
 
   @Inject
-  NexusScheduler nexusScheduler
+  NexusTaskScheduler nexusScheduler
 
   @Inject
   @Nullable
@@ -390,10 +392,11 @@ extends DirectComponentSupport
   {
     // validate repository id
     protectedRepositoryRegistry.getRepository(id)
-    ExpireCacheTask task = nexusScheduler.createTaskInstance(ExpireCacheTask)
-    task.setRepositoryId(id)
-    task.setResourceStorePath(path)
-    nexusScheduler.submit("Clear cache ${id}:${path}", task)
+    TaskConfiguration taskConfiguration = nexusScheduler.createTaskConfigurationInstance(ExpireCacheTask)
+    taskConfiguration.setRepositoryId(id)
+    taskConfiguration.setPath(path)
+    taskConfiguration.setName("Clear cache ${id}:${path}")
+    nexusScheduler.submit(taskConfiguration)
   }
 
   /**

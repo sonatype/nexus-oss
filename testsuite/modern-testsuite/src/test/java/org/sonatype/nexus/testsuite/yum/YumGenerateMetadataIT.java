@@ -198,10 +198,10 @@ public class YumGenerateMetadataIT
     }
 
     final Map<String, String> properties = Maps.newHashMap();
-    properties.put("repoId", repository.id());
+    properties.put("repositoryId", repository.id());
     properties.put("forceFullScan", Boolean.TRUE.toString());
 
-    scheduler().run("GenerateMetadataTask", properties);
+    scheduler().run("org.sonatype.nexus.yum.internal.task.GenerateMetadataTask", properties);
 
     {
       final String primaryXml = repodata().getMetadata(repository.id(), PRIMARY_XML, String.class);

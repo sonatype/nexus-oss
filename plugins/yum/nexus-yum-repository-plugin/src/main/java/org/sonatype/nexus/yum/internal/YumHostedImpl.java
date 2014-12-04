@@ -16,7 +16,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -27,12 +29,13 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
-import org.sonatype.nexus.yum.internal.task.TaskAlreadyScheduledException;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.yum.internal.task.GenerateMetadataTaskDescriptor;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
@@ -44,7 +47,6 @@ import static java.io.File.pathSeparator;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
 
 /**
  * @since yum 3.0
@@ -58,7 +60,9 @@ public class YumHostedImpl
 
   private static final int MAX_EXECUTION_COUNT = 100;
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
+
+  private final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor;
 
   private final ScheduledThreadPoolExecutor executor;
 
@@ -83,7 +87,8 @@ public class YumHostedImpl
       new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
 
   @Inject
-  public YumHostedImpl(final NexusScheduler nexusScheduler,
+  public YumHostedImpl(final NexusTaskScheduler nexusScheduler,
+                       final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor,
                        final ScheduledThreadPoolExecutor executor,
                        final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,
                        final @Assisted HostedRepository repository,
@@ -92,6 +97,7 @@ public class YumHostedImpl
 
   {
     this.nexusScheduler = checkNotNull(nexusScheduler);
+    this.generateMetadataTaskDescriptor = checkNotNull(generateMetadataTaskDescriptor);
     this.executor = checkNotNull(executor);
     this.repository = checkNotNull(repository);
     this.temporaryDirectory = checkNotNull(temporaryDirectory);
@@ -185,8 +191,8 @@ public class YumHostedImpl
     return getYumRepository(null);
   }
 
-  ScheduledTask<YumRepository> createYumRepository(final String version,
-                                                   final File yumRepoBaseDir)
+  TaskInfo<YumRepository> createYumRepository(final String version,
+                                              final File yumRepoBaseDir)
   {
     try {
       File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
@@ -196,7 +202,7 @@ public class YumHostedImpl
       task.setRepositoryId(repository.getId());
       task.setVersion(version);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
-      return submitTask(task);
+      return submitTask(task.getConfiguration());
     }
     catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -209,26 +215,30 @@ public class YumHostedImpl
   {
     YumRepositoryImpl yumRepository = cache.lookup(repository.getId(), version);
     if ((yumRepository == null) || yumRepository.isDirty()) {
-      final ScheduledTask<YumRepository> future = createYumRepository(
+      final TaskInfo<YumRepository> taskInfo = createYumRepository(
           version, createRepositoryTempDir(repository, version)
       );
-      yumRepository = (YumRepositoryImpl) future.get();
+      yumRepository = (YumRepositoryImpl) taskInfo.getCurrentState().getFuture().get();
       cache.cache(yumRepository);
     }
     return yumRepository;
   }
 
-  private ScheduledTask<YumRepository> submitTask(GenerateMetadataTask task) {
-    try {
-      return nexusScheduler.submit(ID, task);
+  private TaskInfo<YumRepository> submitTask(final TaskConfiguration task) {
+    final List<TaskInfo<?>> taskInfos = generateMetadataTaskDescriptor.filter(nexusScheduler.listsTasks());
+    // type + repoId + version wil conflict
+    for (TaskInfo<?> taskInfo : taskInfos) {
+      if (Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
+          Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION), task.getString(
+              GenerateMetadataTask.PARAM_VERSION))) {
+        return mergeAddedFiles((TaskInfo<YumRepository>) taskInfo, task);
+      }
     }
-    catch (TaskAlreadyScheduledException e) {
-      return mergeAddedFiles(e.getOriginal(), task);
-    }
+    return nexusScheduler.submit(task);
   }
 
   @Override
-  public ScheduledTask<YumRepository> regenerate() {
+  public TaskInfo<YumRepository> regenerate() {
     return addRpmAndRegenerate(null);
   }
 
@@ -238,7 +248,7 @@ public class YumHostedImpl
   }
 
   @Override
-  public ScheduledTask<YumRepository> addRpmAndRegenerate(@Nullable String filePath) {
+  public TaskInfo<YumRepository> addRpmAndRegenerate(@Nullable String filePath) {
     try {
       LOG.debug("Processing added rpm {}:{}", repository.getId(), filePath);
       final File rpmBaseDir = RepositoryUtils.getBaseDir(repository);
@@ -247,7 +257,7 @@ public class YumHostedImpl
       task.setRepositoryId(repository.getId());
       task.setAddedFiles(filePath);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
-      return submitTask(task);
+      return submitTask(task.getConfiguration());
     }
     catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -255,24 +265,28 @@ public class YumHostedImpl
   }
 
   @SuppressWarnings("unchecked")
-  private ScheduledTask<YumRepository> mergeAddedFiles(ScheduledTask<?> existingScheduledTask,
-                                                       GenerateMetadataTask taskToMerge)
+  private TaskInfo<YumRepository> mergeAddedFiles(final TaskInfo<YumRepository> existingScheduledTask,
+                                                  final TaskConfiguration taskToMerge)
   {
-    if (isNotBlank(taskToMerge.getAddedFiles())) {
-      final GenerateMetadataTask existingTask = (GenerateMetadataTask) existingScheduledTask.getTask();
-      if (isBlank(existingTask.getAddedFiles())) {
-        existingTask.setAddedFiles(taskToMerge.getAddedFiles());
+    if (isNotBlank(taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
+      final TaskConfiguration existingTask = existingScheduledTask.getConfiguration();
+      if (isBlank(existingTask.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
+        existingTask.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
+            taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES));
       }
       else {
-        existingTask.setAddedFiles(
-            existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles());
+        existingTask.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
+            existingTask.getString(GenerateMetadataTask.PARAM_ADDED_FILES) + pathSeparator +
+                taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES));
       }
     }
-    return (ScheduledTask<YumRepository>) existingScheduledTask;
+    return existingScheduledTask;
   }
 
   private GenerateMetadataTask createTask() {
-    final GenerateMetadataTask task = nexusScheduler.createTaskInstance(GenerateMetadataTask.class);
+    final TaskConfiguration taskCfg = nexusScheduler
+        .createTaskConfigurationInstance(generateMetadataTaskDescriptor.getId());
+    final GenerateMetadataTask task = nexusScheduler.createTaskInstance(taskCfg);
     if (task == null) {
       throw new IllegalStateException(
           "Could not create a task fo type " + GenerateMetadataTask.class.getName()

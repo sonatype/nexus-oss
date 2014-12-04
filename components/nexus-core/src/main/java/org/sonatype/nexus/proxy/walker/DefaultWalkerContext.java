@@ -22,8 +22,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
+import org.sonatype.nexus.scheduling.CancelableSupport;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -139,7 +139,7 @@ public class DefaultWalkerContext
   @Override
   public boolean isStopped() {
     try {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
     }
     catch (TaskInterruptedException e) {
       if (stopCause == null) {

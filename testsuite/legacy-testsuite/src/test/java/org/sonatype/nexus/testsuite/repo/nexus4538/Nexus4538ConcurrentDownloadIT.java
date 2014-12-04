@@ -20,6 +20,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -53,7 +54,7 @@ public class Nexus4538ConcurrentDownloadIT
     File f = new File(nexusWorkDir + "/storage/" + REPO_TEST_HARNESS_REPO, getRelitiveArtifactPath(gav));
     populate(f, 5);
 
-    TaskScheduleUtil.runTask(RebuildAttributesTaskDescriptor.ID);
+    TaskScheduleUtil.runTask(RebuildAttributesTask.class.getName());
   }
 
   @Test

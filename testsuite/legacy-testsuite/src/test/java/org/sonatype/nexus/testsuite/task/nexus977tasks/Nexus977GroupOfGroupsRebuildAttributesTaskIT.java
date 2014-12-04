@@ -16,6 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -54,7 +55,7 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
     // task "RebuildAttributesTask" does not _cascade_!!!
     // repo.setKey( "repositoryId" );
     // repo.setValue( "g4" );
-    TaskScheduleUtil.runTask(RebuildAttributesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask(RebuildAttributesTask.class.getName(), repo);
 
     DirectoryScanner scan = new DirectoryScanner();
     scan.setBasedir(new File(nexusWorkDir, "storage"));

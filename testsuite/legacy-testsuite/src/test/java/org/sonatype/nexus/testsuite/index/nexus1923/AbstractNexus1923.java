@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
@@ -217,7 +218,7 @@ public abstract class AbstractNexus1923
     scheduledTask.setEnabled(true);
     scheduledTask.setId(null);
     scheduledTask.setName(taskName);
-    scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
+    scheduledTask.setTypeId(UpdateIndexTask.class.getName());
     scheduledTask.setSchedule("manual");
     scheduledTask.addProperty(prop);
     Status status = TaskScheduleUtil.create(scheduledTask);

@@ -14,8 +14,10 @@ package org.sonatype.nexus.testsuite.p2.p2r01;
 
 import java.io.File;
 
+import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2MetadataGeneratorTask;
 import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2MetadataGeneratorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusP2GeneratorIT;
 
@@ -45,9 +47,9 @@ public class P2R0102RunP2MetadataGeneratorTaskIT
     createP2MetadataGeneratorCapability();
 
     final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-    repo.setKey(P2MetadataGeneratorTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    repo.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     repo.setValue(getTestRepositoryId());
-    TaskScheduleUtil.runTask(P2MetadataGeneratorTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask(P2MetadataGeneratorTask.class.getName(), repo);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     final File p2Artifacts = downloadP2ArtifactsFor("org.ops4j.base", "ops4j-base-lang", "1.2.3");

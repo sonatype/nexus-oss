@@ -13,55 +13,32 @@
 
 package org.sonatype.nexus.timeline.tasks;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
-
-import com.google.common.collect.ImmutableList;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 /**
  * Task descriptor for {@link PurgeTimelineTask}.
  *
  * @since 3.0
  */
-@Named(PurgeTimelineTaskDescriptor.ID)
+@Named
 @Singleton
 public class PurgeTimelineTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport<PurgeTimelineTask>
 {
-  public static final String ID = "PurgeTimelineTask";
-
   public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
-  private final NumberTextFormField olderThanField;
-
-  private final List<FormField> formFields;
-
   public PurgeTimelineTaskDescriptor() {
-    this.olderThanField = new NumberTextFormField(OLDER_THAN_FIELD_ID,
-        "Purge items older than (days)",
-        "Set the number of days, to purge all items that were trashed before the given number of days.",
-        FormField.MANDATORY);
-    this.formFields = ImmutableList.<FormField>of(olderThanField);
-  }
-
-  @Override
-  public String getId() {
-    return ID;
-  }
-
-  @Override
-  public String getName() {
-    return "Purge Timeline";
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return formFields;
+    super(PurgeTimelineTask.class, "Purge Timeline",
+        new NumberTextFormField(
+            OLDER_THAN_FIELD_ID,
+            "Purge items older than (days)",
+            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            FormField.MANDATORY)
+    );
   }
 }

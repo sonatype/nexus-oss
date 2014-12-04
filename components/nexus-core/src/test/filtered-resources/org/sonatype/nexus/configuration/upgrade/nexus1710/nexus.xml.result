@@ -1662,7 +1662,7 @@
       <enabled>true</enabled>
       <type>EmptyTrashTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1235788200000</nextRun>
+      <getNextRun>1235788200000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>
@@ -1680,7 +1680,7 @@
       <enabled>true</enabled>
       <type>SnapshotRemoverTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1235790000000</nextRun>
+      <getNextRun>1235790000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230778800000</startDate>
@@ -1710,7 +1710,7 @@
       <enabled>true</enabled>
       <type>UpdateIndexTask</type>
       <status>RUNNING</status>
-      <nextRun>1235772900000</nextRun>
+      <getNextRun>1235772900000</getNextRun>
       <schedule>
         <type>advanced</type>
         <cronCommand>0 15 0-23/4 * * ?</cronCommand>
@@ -1728,7 +1728,7 @@
       <enabled>true</enabled>
       <type>PublishIndexesTask</type>
       <status>RUNNING</status>
-      <nextRun>1235854080000</nextRun>
+      <getNextRun>1235854080000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1235422080000</startDate>

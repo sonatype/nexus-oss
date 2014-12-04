@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.task.nexus4341;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.plugins.tasks.api.SleepRepositoryTask;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -35,7 +36,8 @@ public class Nexus4341RunningTaskNotEditableIT
       throws Exception
   {
     final String taskName = "SleepRepositoryTask_" + getTestRepositoryId() + "_" + System.nanoTime();
-    TaskScheduleUtil.runTask(taskName, "SleepRepositoryTask", 0,
+    TaskScheduleUtil.runTask(taskName, SleepRepositoryTask.class.getName(), 0,
+        TaskScheduleUtil.newProperty(".visible", Boolean.TRUE.toString()),
         TaskScheduleUtil.newProperty("repositoryId", getTestRepositoryId()),
         TaskScheduleUtil.newProperty("time", String.valueOf(10)));
 

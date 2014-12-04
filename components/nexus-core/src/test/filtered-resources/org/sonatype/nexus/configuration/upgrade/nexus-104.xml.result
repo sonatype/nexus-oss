@@ -643,7 +643,7 @@
       <enabled>true</enabled>
       <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1229291340000</nextRun>
+      <getNextRun>1229291340000</getNextRun>
       <schedule>
         <type>weekly</type>
         <startDate>1229032140000</startDate>

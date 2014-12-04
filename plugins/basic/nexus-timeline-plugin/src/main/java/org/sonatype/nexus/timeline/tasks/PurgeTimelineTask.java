@@ -16,7 +16,7 @@ package org.sonatype.nexus.timeline.tasks;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.TaskSupport;
 import org.sonatype.nexus.timeline.Timeline;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Named(PurgeTimelineTaskDescriptor.ID)
+@Named
 public class PurgeTimelineTask
-    extends AbstractNexusTask<Object>
+    extends TaskSupport<Void>
 {
   private final Timeline timeline;
 
@@ -38,20 +38,15 @@ public class PurgeTimelineTask
   }
 
   public int getPurgeOlderThan() {
-    return Integer.parseInt(getParameters().get(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID));
+    return getConfiguration().getInteger(PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, 10);
   }
 
   @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
     timeline.purgeOlderThan(getPurgeOlderThan());
     return null;
-  }
-
-  @Override
-  public String getAction() {
-    return "TL_PURGE";
   }
 
   @Override

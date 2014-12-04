@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.schedules_;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Named;
@@ -33,15 +32,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
-import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.RunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.Schedule;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -110,59 +107,42 @@ public class ScheduledServiceListPlexusResource
       throws ResourceException
   {
     boolean allTasks = isAllTasks(request);
-
-    Map<String, List<ScheduledTask<?>>> tasksMap = getNexusScheduler().getAllTasks();
-
+    final List<TaskInfo<?>> tasks = getNexusScheduler().listsTasks();
     ScheduledServiceListResourceResponse result = new ScheduledServiceListResourceResponse();
 
-    for (String key : tasksMap.keySet()) {
-      List<ScheduledTask<?>> tasks = tasksMap.get(key);
+    for (TaskInfo<?> task : tasks) {
+      boolean isExposed = task.getConfiguration().isVisible();
+      if (allTasks || isExposed) {
+        ScheduledServiceListResource item = new ScheduledServiceListResource();
+        item.setResourceURI(createChildReference(request, this, task.getId()).toString());
+        item.setLastRunResult(getLastRunResult(task));
+        item.setId(task.getId());
+        item.setName(task.getName());
 
-      for (ScheduledTask<?> task : tasks) {
-        boolean isExposed = true;
+        item.setStatus(getState(task));
+        item.setReadableStatus(getReadableState(task));
+        item.setTypeId(task.getConfiguration().getTypeId());
+        item.setTypeName(task.getConfiguration().getTypeName());
+        item.setCreated(task.getConfiguration().getCreated().toString());
+        item.setCreatedInMillis(task.getConfiguration().getUpdated().getTime());
 
-        SchedulerTask<?> st = task.getSchedulerTask();
-
-        if (st != null && st instanceof NexusTask<?>) {
-          isExposed = ((NexusTask<?>) st).isExposed();
+        final Date lastRunTime = getLastRunTime(task);
+        final Date nextRunTime = getNextRunTime(task);
+        item.setLastRunTime(lastRunTime == null ? "n/a" : lastRunTime.toString());
+        if (lastRunTime != null) {
+          item.setLastRunTimeInMillis(lastRunTime.getTime());
+        }
+        item.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
+        if (nextRunTime != null) {
+          item.setNextRunTimeInMillis(nextRunTime.getTime());
         }
 
-        if (allTasks || isExposed) {
-          ScheduledServiceListResource item = new ScheduledServiceListResource();
-          item.setResourceURI(createChildReference(request, this, task.getId()).toString());
-          item.setLastRunResult(getLastRunResult(task));
-          item.setId(task.getId());
-          item.setName(task.getName());
-          item.setStatus(task.getTaskState().toString());
-          item.setReadableStatus(getReadableState(task.getTaskState()));
-          item.setTypeId(task.getType());
-          ScheduledTaskDescriptor descriptor =
-              getNexusConfiguration().getScheduledTaskDescriptor(task.getType());
-          if (descriptor != null) {
-            item.setTypeName(descriptor.getName());
-          }
-          item.setCreated(task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString());
-          item.setLastRunTime(task.getLastRun() == null ? "n/a" : task.getLastRun().toString());
-          final Date nextRunTime = getNextRunTime(task);
-          item.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
-          if (task.getScheduledAt() != null) {
-            item.setCreatedInMillis(task.getScheduledAt().getTime());
-          }
-          if (task.getLastRun() != null) {
-            item.setLastRunTimeInMillis(task.getLastRun().getTime());
-          }
-          if (nextRunTime != null) {
-            item.setNextRunTimeInMillis(nextRunTime.getTime());
-          }
-          item.setSchedule(getScheduleShortName(task.getSchedule()));
-          item.setEnabled(task.isEnabled());
+        item.setSchedule(getScheduleShortName(task.getSchedule()));
+        item.setEnabled(task.getConfiguration().isEnabled());
 
-          result.addData(item);
-        }
+        result.addData(item);
       }
-
     }
-
     return result;
   }
 
@@ -180,52 +160,33 @@ public class ScheduledServiceListPlexusResource
     if (serviceRequest != null) {
       ScheduledServiceBaseResource serviceResource = serviceRequest.getData();
       try {
-        Schedule schedule = getModelSchedule(serviceRequest.getData());
-        ScheduledTask<?> task = null;
-
-        final NexusTask<?> nexusTask = getModelNexusTask(serviceResource, request);
+        final Schedule schedule = getModelSchedule(serviceRequest.getData());
+        final TaskConfiguration nexusTask = getModelNexusTask(serviceResource, request);
 
         if (getLogger().isDebugEnabled()) {
-          getLogger().debug("Creating task with type '" + nexusTask.getClass() + "': " + nexusTask.getName() + " (" +
+          getLogger().debug("Creating task with type '" + nexusTask.getTypeId() + "': " + nexusTask.getName() + " (" +
               nexusTask.getId() + ")");
         }
 
-        if (schedule != null) {
-          task =
-              getNexusScheduler().schedule(getModelName(serviceResource),
-                  nexusTask, schedule);
-        }
-        else {
-          task =
-              getNexusScheduler().schedule(getModelName(serviceResource),
-                  nexusTask, new ManualRunSchedule());
-        }
-
-
-        task.setEnabled(serviceResource.isEnabled());
-
-        // Need to store the enabled flag update
-        getNexusScheduler().updateSchedule(task);
+        final TaskInfo<?> task = getNexusScheduler().scheduleTask(nexusTask, schedule);
 
         ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
         resourceStatus.setResource(serviceResource);
         // Just need to update the id, as the incoming data is a POST w/ no id
         resourceStatus.getResource().setId(task.getId());
         resourceStatus.setResourceURI(createChildReference(request, this, task.getId()).toString());
-        resourceStatus.setStatus(task.getTaskState().toString());
-        resourceStatus.setReadableStatus(getReadableState(task.getTaskState()));
-        resourceStatus.setCreated(task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString());
-        resourceStatus.setLastRunResult(TaskState.BROKEN.equals(task.getTaskState()) ? "Error" : "Ok");
-        resourceStatus.setLastRunTime(task.getLastRun() == null ? "n/a" : task.getLastRun().toString());
-        resourceStatus.setNextRunTime(task.getNextRun() == null ? "n/a" : task.getNextRun().toString());
-        if (task.getScheduledAt() != null) {
-          resourceStatus.setCreatedInMillis(task.getScheduledAt().getTime());
+        resourceStatus.setStatus(task.getCurrentState().getState().name());
+        resourceStatus.setReadableStatus(getReadableState(task));
+        resourceStatus.setCreated(task.getConfiguration().getCreated().toString());
+        resourceStatus.setLastRunResult(task.getLastRunState() == null ? "n/a" : task.getLastRunState().getEndState().toString());
+        resourceStatus.setLastRunTime(task.getLastRunState() == null ? "n/a" : task.getLastRunState().getRunStarted().toString());
+        resourceStatus.setNextRunTime(task.getCurrentState().getNextRun() == null ? "n/a" : task.getCurrentState().getNextRun().toString());
+        resourceStatus.setCreatedInMillis(task.getConfiguration().getCreated().getTime());
+        if (task.getLastRunState() != null) {
+          resourceStatus.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
         }
-        if (task.getLastRun() != null) {
-          resourceStatus.setLastRunTimeInMillis(task.getLastRun().getTime());
-        }
-        if (task.getNextRun() != null) {
-          resourceStatus.setNextRunTimeInMillis(task.getNextRun().getTime());
+        if (task.getCurrentState().getNextRun() != null) {
+          resourceStatus.setNextRunTimeInMillis(task.getCurrentState().getNextRun().getTime());
         }
 
         result = new ScheduledServiceResourceStatusResponse();

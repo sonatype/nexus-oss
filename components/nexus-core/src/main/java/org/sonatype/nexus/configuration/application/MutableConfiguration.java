@@ -22,7 +22,6 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {
@@ -54,14 +53,6 @@ public interface MutableConfiguration
 
   void setRealms(List<String> realms)
       throws InvalidConfigurationException;
-
-  // ----------------------------------------------------------------------------
-  // Scheduled Tasks
-  // ----------------------------------------------------------------------------
-
-  List<ScheduledTaskDescriptor> listScheduledTaskDescriptors();
-
-  ScheduledTaskDescriptor getScheduledTaskDescriptor(String id);
 
   // ----------------------------------------------------------------------------------------------------------
   // Repositories

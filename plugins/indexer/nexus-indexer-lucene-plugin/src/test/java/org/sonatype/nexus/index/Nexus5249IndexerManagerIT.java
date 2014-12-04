@@ -158,8 +158,8 @@ public class Nexus5249IndexerManagerIT
     }
 
     // as things above will trigger some bg tasks (failingRepository will be reindexed with a task)
-    waitForTasksToStop();
     wairForAsyncEventsToCalmDown();
+    waitForTasksToStop();
 
     // reset counters
     fetchCountingInvocationHandler.reset();
@@ -194,7 +194,7 @@ public class Nexus5249IndexerManagerIT
       throws Exception
   {
     // HTTP 401/403/etc boils down as some other IOException
-    final IOException ex = new IOException("something bad happened");
+    final IOException ex = new IOException("something bad happened 404");
     prepare(ex);
 
     try {
@@ -224,7 +224,7 @@ public class Nexus5249IndexerManagerIT
       throws Exception
   {
     // HTTP 401/403/etc boils down as some other IOException
-    final IOException ex = new IOException("something bad happened");
+    final IOException ex = new IOException("something bad happened Ioex");
     prepare(ex);
 
     try {

@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalTask;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -159,7 +161,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
       throws Exception
   {
     ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-    repositoryProp.setKey(SnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    repositoryProp.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     repositoryProp.setValue(getTestRepositoryId());
 
     ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
@@ -178,7 +180,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     deleteImmediatelyProp.setKey(SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY);
     deleteImmediatelyProp.setValue(Boolean.toString(deleteImmediately));
 
-    TaskScheduleUtil.runTask(name, SnapshotRemovalTaskDescriptor.ID, repositoryProp,
+    TaskScheduleUtil.runTask(name, SnapshotRemovalTask.class.getName(), repositoryProp,
         keepSnapshotsProp, ageProp,
         removeReleasedProp, deleteImmediatelyProp);
     TaskScheduleUtil.waitForAllTasksToStop();

@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.plugins.p2.repository.internal.tasks;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -23,48 +20,28 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.ScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
 @Named
 @Singleton
 public class P2MetadataGeneratorTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends TaskDescriptorSupport<P2MetadataGeneratorTask>
 {
-
-  public static final String ID = "P2MetadataGeneratorTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the repository to generate P2 metadata.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .excludingAnyOfFacets(GroupRepository.class);
-
-  private final StringTextFormField resourceStorePathField = new StringTextFormField(RESOURCE_STORE_PATH_FIELD_ID,
-      "Repository path",
-      "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-      FormField.OPTIONAL);
-
-  @Override
-  public String getId() {
-    return ID;
+  public P2MetadataGeneratorTaskDescriptor()
+  {
+    super(P2MetadataGeneratorTask.class, "Rebuild P2 metadata",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to generate P2 metadata.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories().excludingAnyOfFacets(GroupRepository.class),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
-
-  @Override
-  public String getName() {
-    return "Rebuild P2 metadata";
-  }
-
-  @Override
-  public List<FormField> formFields() {
-    return Arrays.<FormField>asList(repoField, resourceStorePathField);
-  }
-
 }

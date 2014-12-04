@@ -12,26 +12,22 @@
  */
 package org.sonatype.nexus.yum.internal.task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
-import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.yum.internal.task.MergeMetadataTask.ID;
-import static org.sonatype.scheduling.TaskState.RUNNING;
 
 public class MergeMetadataTaskIT
     extends YumNexusTestSupport
@@ -46,12 +42,11 @@ public class MergeMetadataTaskIT
       throws Exception
   {
     final MergeMetadataTask task = new MergeMetadataTask(
-        mock(EventBus.class), mock(YumRegistry.class), mock(CommandLineExecutor.class)
+        mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    final GroupRepository group = mock(GroupRepository.class);
-    when(group.getId()).thenReturn(GROUP_ID_1);
-    task.setGroupRepository(group);
-    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group)), is(false));
+    task.getConfiguration().setTypeId(MergeMetadataTask.class.getSimpleName());
+    task.getConfiguration().setRepositoryId(GROUP_ID_1);
+    assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_1)).isEmpty(), is(false));
   }
 
   @Test
@@ -59,33 +54,30 @@ public class MergeMetadataTaskIT
       throws Exception
   {
     final MergeMetadataTask task = new MergeMetadataTask(
-        mock(EventBus.class), mock(YumRegistry.class), mock(CommandLineExecutor.class)
+        mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    final GroupRepository group1 = mock(GroupRepository.class);
-    when(group1.getId()).thenReturn(GROUP_ID_1);
-    final GroupRepository group2 = mock(GroupRepository.class);
-    when(group2.getId()).thenReturn(GROUP_ID_2);
-    task.setGroupRepository(group1);
-    assertThat(task.allowConcurrentExecution(createRunningTaskForGroups(group2)), is(true));
+    task.getConfiguration().setTypeId(MergeMetadataTask.class.getSimpleName());
+    task.getConfiguration().setRepositoryId(GROUP_ID_1);
+    assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_2)).isEmpty(), is(true));
   }
 
-  private Map<String, List<ScheduledTask<?>>> createRunningTaskForGroups(final GroupRepository... groups) {
-    final Map<String, List<ScheduledTask<?>>> map = new HashMap<String, List<ScheduledTask<?>>>();
-    final List<ScheduledTask<?>> taskList = new ArrayList<ScheduledTask<?>>();
-    for (final GroupRepository group : groups) {
-      taskList.add(runningTask(group));
+  private List<TaskInfo<?>> createRunningTaskForGroups(final String... groupIds) {
+    final List<TaskInfo<?>> taskList = Lists.newArrayList();
+    for (final String groupId : groupIds) {
+      taskList.add(runningTask(groupId));
     }
-    map.put(ID, taskList);
-    return map;
+    return taskList;
   }
 
-  @SuppressWarnings({"unchecked"})
-  private ScheduledTask<?> runningTask(final GroupRepository group) {
-    final ScheduledTask<?> task = mock(ScheduledTask.class);
-    final MergeMetadataTask otherGenerationTask = mock(MergeMetadataTask.class);
-    when(otherGenerationTask.getGroupRepository()).thenReturn(group);
-    when(task.getTaskState()).thenReturn(RUNNING);
-    when(task.getTask()).thenReturn((Callable) otherGenerationTask);
+  private TaskInfo<?> runningTask(final String repoId) {
+    final TaskInfo<?> task = mock(TaskInfo.class);
+    final TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setRepositoryId(repoId);
+    taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
+    when(task.getConfiguration()).thenReturn(taskConfiguration);
+    CurrentState currentState = mock(CurrentState.class);
+    when(currentState.getState()).thenReturn(State.RUNNING);
+    when(task.getCurrentState()).thenReturn(currentState);
     return task;
   }
 

@@ -20,6 +20,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.SynchronizeShadowTaskDescriptor;
+import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -87,7 +88,7 @@ public class Nexus642SynchShadowTaskIT
     age.setValue(shadowRepo);
 
     // clean unused
-    TaskScheduleUtil.runTask(taskName, SynchronizeShadowTaskDescriptor.ID, repo, age);
+    TaskScheduleUtil.runTask(taskName, SynchronizeShadowsTask.class.getName(), repo, age);
   }
 
 }

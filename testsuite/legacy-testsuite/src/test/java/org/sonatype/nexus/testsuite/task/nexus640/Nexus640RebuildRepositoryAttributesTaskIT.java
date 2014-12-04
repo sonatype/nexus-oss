@@ -16,6 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -38,7 +39,7 @@ public class Nexus640RebuildRepositoryAttributesTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue(REPO_TEST_HARNESS_REPO);
-    TaskScheduleUtil.runTask(RebuildAttributesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask(RebuildAttributesTask.class.getName(), repo);
 
     File jar = new File(nexusWorkDir, attributePath + "artifact-1.0.0.jar");
     Assert.assertTrue("Attribute files should be generated after rebuild", jar.exists());

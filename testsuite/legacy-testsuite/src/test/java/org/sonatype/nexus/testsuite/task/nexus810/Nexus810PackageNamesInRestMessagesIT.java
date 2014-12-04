@@ -20,6 +20,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Response;
 

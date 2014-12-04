@@ -14,6 +14,7 @@ package org.sonatype.nexus.rest.metadata;
 
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -36,7 +37,7 @@ public abstract class AbstractMetadataPlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    RebuildMavenMetadataTask task = getNexusScheduler().createTaskInstance(RebuildMavenMetadataTask.class);
+    TaskConfiguration task = getNexusScheduler().createTaskConfigurationInstance(RebuildMavenMetadataTask.class);
 
     String repositoryId = getRepositoryId(request);
     if (repositoryId == null) {
@@ -44,7 +45,7 @@ public abstract class AbstractMetadataPlexusResource
     }
     task.setRepositoryId(repositoryId);
 
-    task.setResourceStorePath(getResourceStorePath(request));
+    task.setPath(getResourceStorePath(request));
 
     handleDelete(task, request);
   }

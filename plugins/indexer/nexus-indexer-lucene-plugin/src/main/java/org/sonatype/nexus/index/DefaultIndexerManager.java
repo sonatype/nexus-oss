@@ -69,9 +69,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.scheduling.CancelableSupport;
+import org.sonatype.nexus.scheduling.TaskInterruptedException;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.scheduling.TaskInterruptedException;
-import org.sonatype.scheduling.TaskUtil;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
@@ -379,7 +379,7 @@ public class DefaultIndexerManager
       if (ISGROUP(repository)) {
         List<Repository> members = repository.adaptToFacet(GroupRepository.class).getMemberRepositories();
         for (Repository member : members) {
-          TaskUtil.checkInterruption();
+          CancelableSupport.checkCancellation();
           try {
             perform(member);
           }
@@ -902,7 +902,7 @@ public class DefaultIndexerManager
     final List<Repository> reposes = repositoryRegistry.getRepositories();
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
     for (Repository repository : reposes) {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
       try {
         // going directly to single-shot, we are iterating over all reposes anyway
         reindexRepository(repository, fromPath, fullReindex);
@@ -916,7 +916,7 @@ public class DefaultIndexerManager
     // containing a member that is not yet updated
     if (REINDEX_PUBLISHES) {
       for (Repository repository : reposes) {
-        TaskUtil.checkInterruption();
+        CancelableSupport.checkCancellation();
         try {
           publishRepositoryIndex(repository);
         }
@@ -957,7 +957,7 @@ public class DefaultIndexerManager
       }
     }.perform();
 
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
     reindexRepository(repository, path, fullReindex);
 
     if (REINDEX_PUBLISHES) {
@@ -1057,7 +1057,7 @@ public class DefaultIndexerManager
         updateRemoteIndex(this.repository.adaptToFacet(ProxyRepository.class), context, this.fullReindex);
       }
 
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
 
       // igorf, this needs be merged back to maven indexer, see MINDEXER-65
       final IndexSearcher contextIndexSearcher = context.acquireIndexSearcher();
@@ -1123,7 +1123,7 @@ public class DefaultIndexerManager
     }.perform();
 
     if (ISPROXY(repository)) {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
       downloadRepositoryIndex(repository.adaptToFacet(ProxyRepository.class), false);
     }
     if (!exceptions.isEmpty()) {
@@ -1134,7 +1134,7 @@ public class DefaultIndexerManager
   protected void downloadRepositoryIndex(final ProxyRepository repository, final boolean forceFullUpdate)
       throws IOException
   {
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
 
     if (!INDEXABLE(repository) || !ISPROXY(repository)) {
       return;
@@ -1235,7 +1235,7 @@ public class DefaultIndexerManager
       public InputStream retrieve(String name)
           throws IOException
       {
-        TaskUtil.checkInterruption();
+        CancelableSupport.checkCancellation();
 
         ResourceStoreRequest req = new ResourceStoreRequest(PUBLISHING_PATH_PREFIX + "/" + name);
 
@@ -1380,7 +1380,7 @@ public class DefaultIndexerManager
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
     // just publish all, since we use merged context, no need for double pass
     for (Repository repository : reposes) {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
       try {
         publishRepositoryIndex(repository);
       }
@@ -1418,7 +1418,7 @@ public class DefaultIndexerManager
       }
     }.perform();
 
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
     publishRepositoryIndex(repository);
     if (!exceptions.isEmpty()) {
       throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
@@ -1464,7 +1464,7 @@ public class DefaultIndexerManager
     File targetDir = null;
 
     try {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
 
       log.info("Publishing index for repository " + repository.getId());
 
@@ -1483,7 +1483,7 @@ public class DefaultIndexerManager
 
       if (files != null) {
         for (File file : files) {
-          TaskUtil.checkInterruption();
+          CancelableSupport.checkCancellation();
 
           storeIndexItem(repository, file, context);
         }
@@ -1578,7 +1578,7 @@ public class DefaultIndexerManager
     final List<Repository> repos = repositoryRegistry.getRepositories();
     final ArrayList<IOException> exceptions = new ArrayList<IOException>();
     for (Repository repository : repos) {
-      TaskUtil.checkInterruption();
+      CancelableSupport.checkCancellation();
       try {
         optimizeRepositoryIndex(repository);
       }
@@ -1617,7 +1617,7 @@ public class DefaultIndexerManager
       }
     }.perform();
 
-    TaskUtil.checkInterruption();
+    CancelableSupport.checkCancellation();
     optimizeRepositoryIndex(repository);
     if (!exceptions.isEmpty()) {
       throw Throwables2.composite(new IOException("Exception(s) happened during reindexAllRepositories()"), exceptions);
@@ -1639,7 +1639,7 @@ public class DefaultIndexerManager
       public void run(IndexingContext context)
           throws IOException
       {
-        TaskUtil.checkInterruption();
+        CancelableSupport.checkCancellation();
 
         log.debug("Optimizing index for repository {} ", repository.getId());
 
@@ -2448,14 +2448,14 @@ public class DefaultIndexerManager
       }
       if (log.isDebugEnabled()) {
         log.warn("Could not acquire {} lock on repository {} in {} seconds. " //
-            + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
-            + "The operation has been aborted.", //
+                + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                + "The operation has been aborted.", //
             lockName, repository.getId(), lockTimeoutSeconds, new Exception(ARTIFICIAL_EXCEPTION));
       }
       else {
         log.warn("Could not acquire {} lock on repository {} in {} seconds. " //
-            + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
-            + "Enable debug log to recieve more information.", //
+                + "Consider increasing value of ''nexus.indexer.locktimeout'' parameter. " //
+                + "Enable debug log to recieve more information.", //
             lockName, repository.getId(), lockTimeoutSeconds);
       }
     }

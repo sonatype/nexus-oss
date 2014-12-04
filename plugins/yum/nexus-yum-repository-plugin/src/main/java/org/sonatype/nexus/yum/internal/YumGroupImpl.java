@@ -15,6 +15,7 @@ package org.sonatype.nexus.yum.internal;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,7 +24,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
@@ -44,7 +45,7 @@ public class YumGroupImpl
 
   private final static Logger log = LoggerFactory.getLogger(YumGroupImpl.class);
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
 
   private final GroupRepository repository;
 
@@ -55,7 +56,7 @@ public class YumGroupImpl
   private YumRepository yumRepository;
 
   @Inject
-  public YumGroupImpl(final NexusScheduler nexusScheduler,
+  public YumGroupImpl(final NexusTaskScheduler nexusScheduler,
                       final MergeMetadataRequestStrategy mergeMetadataRequestStrategy,
                       final @Assisted GroupRepository repository)
       throws MalformedURLException, URISyntaxException
@@ -88,7 +89,11 @@ public class YumGroupImpl
         lock.writeLock().lock();
         try {
           if (yumRepository == null) {
-            yumRepository = MergeMetadataTask.createTaskFor(nexusScheduler, repository).get();
+            final Future<YumRepository> future = MergeMetadataTask.createTaskFor(nexusScheduler, repository)
+                .getCurrentState().getFuture();
+            if (future != null) {
+              yumRepository = future.get();
+            }
           }
         }
         finally {

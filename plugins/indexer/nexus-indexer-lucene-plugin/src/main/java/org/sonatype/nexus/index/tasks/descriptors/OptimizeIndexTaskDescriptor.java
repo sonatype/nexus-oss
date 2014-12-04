@@ -13,47 +13,30 @@
 
 package org.sonatype.nexus.index.tasks.descriptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.index.tasks.OptimizeIndexTask;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("OptimizeIndex")
+@Named
 @Singleton
 public class OptimizeIndexTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport<OptimizeIndexTask>
 {
-  public static final String ID = "OptimizeIndexTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the Maven repository to optimize the index.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfContentClasses(Maven2ContentClass.ID);
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Optimize Repository Index";
-  }
-
-  public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
-    fields.add(repoField);
-
-    return fields;
+  public OptimizeIndexTaskDescriptor() {
+    super(OptimizeIndexTask.class, "Optimize Repository Index",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the Maven repository to optimize the index.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+            .includingAnyOfContentClasses(Maven2ContentClass.ID)
+    );
   }
 }

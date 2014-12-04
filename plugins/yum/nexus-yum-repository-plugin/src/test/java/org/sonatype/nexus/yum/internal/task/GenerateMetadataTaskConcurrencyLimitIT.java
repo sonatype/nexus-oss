@@ -17,18 +17,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.EventsRouter;
 import org.sonatype.nexus.yum.internal.support.SchedulerYumNexusTestSupport;
-import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
@@ -41,8 +39,6 @@ import org.slf4j.LoggerFactory;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
-import static org.sonatype.scheduling.TaskState.RUNNING;
 
 /**
  * @author sherold
@@ -61,7 +57,7 @@ public class GenerateMetadataTaskConcurrencyLimitIT
   public RepeatingRule repeatedly = new RepeatingRule();
 
   @Inject
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   @Inject
   private EventsRouter handler;
@@ -107,15 +103,6 @@ public class GenerateMetadataTaskConcurrencyLimitIT
   }
 
   private int getRunningTasks() {
-    List<ScheduledTask<?>> tasks = nexusScheduler.getActiveTasks().get(ID);
-    int count = 0;
-    if (tasks != null) {
-      for (ScheduledTask<?> task : tasks) {
-        if (RUNNING.equals(task.getTaskState())) {
-          count++;
-        }
-      }
-    }
-    return count;
+    return nexusScheduler.getRunningTaskCount();
   }
 }

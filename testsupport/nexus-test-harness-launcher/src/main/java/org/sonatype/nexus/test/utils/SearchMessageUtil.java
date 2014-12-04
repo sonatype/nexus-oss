@@ -339,11 +339,11 @@ public class SearchMessageUtil
     scheduledTask.setName(taskName);
     if (force) {
       // TODO: these are constants, but it's expensive to reference whole nexus core just to get these
-      scheduledTask.setTypeId("RepairIndexTask");
+      scheduledTask.setTypeId("org.sonatype.nexus.index.tasks.RepairIndexTask");
     }
     else {
       // TODO: these are constants, but it's expensive to reference whole nexus core just to get these
-      scheduledTask.setTypeId("UpdateIndexTask");
+      scheduledTask.setTypeId("org.sonatype.nexus.index.tasks.UpdateIndexTask");
     }
     scheduledTask.setSchedule("manual");
 

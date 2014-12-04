@@ -53,7 +53,6 @@
     <module>nexus-plugin-api</module>
     <module>nexus-repository-metadata-api</module>
     <module>nexus-repository-metadata-model</module>
-    <module>nexus-scheduler</module>
     <module>nexus-security</module>
     <module>nexus-security-realms</module>
     <module>nexus-supportzip-api</module>

@@ -17,6 +17,7 @@ import org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -89,7 +90,7 @@ public class Nexus1111ProxyRemote500ErrorIT
     ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
     prop.setKey("repositoryId");
     prop.setValue(getTestRepositoryId());
-    TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(ExpireCacheTask.class.getName(), prop);
 
     try {
       // the proxy is now working <- NOT TRUE, it is auto blocked!

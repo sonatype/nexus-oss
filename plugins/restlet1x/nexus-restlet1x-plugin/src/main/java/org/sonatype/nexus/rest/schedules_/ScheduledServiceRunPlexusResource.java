@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.rest.schedules_;
 
+import java.util.Date;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
@@ -22,10 +24,14 @@ import javax.ws.rs.Produces;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.TaskRemovedException;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -72,38 +78,46 @@ public class ScheduledServiceRunPlexusResource
    */
   @Override
   @GET
-  public ScheduledServiceResourceStatusResponse get(Context context, Request request, Response response, Variant variant)
+  public ScheduledServiceResourceStatusResponse get(Context context, Request request, Response response,
+                                                    Variant variant)
       throws ResourceException
   {
     ScheduledServiceResourceStatusResponse result = null;
 
     final String scheduledServiceId = getScheduledServiceId(request);
 
+    TaskInfo<?> task = getNexusScheduler().getTaskById(scheduledServiceId);
+    if (task == null) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + scheduledServiceId);
+    }
+
     try {
-      ScheduledTask<?> task = getNexusScheduler().getTaskById(scheduledServiceId);
-
       task.runNow();
+      final TaskConfiguration taskConfiguration = task.getConfiguration();
+      final Schedule schedule = task.getSchedule();
+      final CurrentState currentState = task.getCurrentState();
+      final LastRunState lastRunState = task.getLastRunState();
 
-      ScheduledServiceBaseResource resource = getServiceRestModel(task);
+      ScheduledServiceBaseResource resource = getServiceRestModel(taskConfiguration, schedule);
 
       if (resource != null) {
         ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
         resourceStatus.setResource(resource);
-        resourceStatus.setResourceURI(createChildReference(request, this, task.getId()).toString());
-        resourceStatus.setStatus(task.getTaskState().toString());
-        resourceStatus.setReadableStatus(getReadableState(task.getTaskState()));
-        resourceStatus.setCreated(task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString());
-        resourceStatus.setLastRunResult(TaskState.BROKEN.equals(task.getTaskState()) ? "Error" : "Ok");
-        resourceStatus.setLastRunTime(task.getLastRun() == null ? "n/a" : task.getLastRun().toString());
-        resourceStatus.setNextRunTime(task.getNextRun() == null ? "n/a" : task.getNextRun().toString());
-        if (task.getScheduledAt() != null) {
-          resourceStatus.setCreatedInMillis(task.getScheduledAt().getTime());
+        resourceStatus.setResourceURI(createChildReference(request, this, taskConfiguration.getId()).toString());
+        resourceStatus.setStatus(currentState.getState().name());
+        resourceStatus.setReadableStatus(getReadableState(task));
+        resourceStatus.setCreated(taskConfiguration.getCreated().toString());
+        resourceStatus.setLastRunResult(getLastRunResult(task));
+        resourceStatus.setLastRunTime(lastRunState == null ? "n/a" : lastRunState.getRunStarted().toString());
+        final Date nextRunTime = getNextRunTime(task);
+        resourceStatus.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
+        resourceStatus.setCreatedInMillis(taskConfiguration.getCreated().getTime());
+        if (lastRunState != null) {
+          resourceStatus.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
         }
-        if (task.getLastRun() != null) {
-          resourceStatus.setLastRunTimeInMillis(task.getLastRun().getTime());
-        }
-        if (task.getNextRun() != null) {
-          resourceStatus.setNextRunTimeInMillis(task.getNextRun().getTime());
+        if (currentState.getNextRun() != null) {
+          resourceStatus.setNextRunTimeInMillis(task.getCurrentState().getNextRun().getTime());
         }
 
         result = new ScheduledServiceResourceStatusResponse();
@@ -114,8 +128,13 @@ public class ScheduledServiceRunPlexusResource
             + scheduledServiceId + "), can't load task.");
       }
       return result;
+
     }
-    catch (NoSuchTaskException e) {
+    catch (TaskRemovedException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + scheduledServiceId);
+    }
+    catch (IllegalStateException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
           + scheduledServiceId);
     }
@@ -131,14 +150,15 @@ public class ScheduledServiceRunPlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    try {
-      getNexusScheduler().getTaskById(getScheduledServiceId(request)).cancelOnly();
-
+    final TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
+    if (task != null) {
+      if (State.RUNNING == task.getCurrentState().getState()) {
+        task.getCurrentState().getFuture().cancel(false);
+      }
       response.setStatus(Status.SUCCESS_NO_CONTENT);
+      return;
     }
-    catch (NoSuchTaskException e) {
-      response.setStatus(Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!");
-    }
+    throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Resource not found");
   }
 
   // ==

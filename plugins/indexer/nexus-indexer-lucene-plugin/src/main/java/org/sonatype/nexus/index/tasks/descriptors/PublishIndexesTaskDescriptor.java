@@ -13,47 +13,29 @@
 
 package org.sonatype.nexus.index.tasks.descriptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.index.tasks.PublishIndexesTask;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.tasks.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("PublishIndexes")
+@Named
 @Singleton
 public class PublishIndexesTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport<PublishIndexesTask>
 {
-  public static final String ID = "PublishIndexesTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the Maven repository to publish the index.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfContentClasses(Maven2ContentClass.ID);
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Publish Indexes";
-  }
-
-  public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
-    fields.add(repoField);
-
-    return fields;
+  public PublishIndexesTaskDescriptor() {
+    super(PublishIndexesTask.class, "Publish Indexes",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the Maven repository to publish the index.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories().includingAnyOfContentClasses(Maven2ContentClass.ID)
+    );
   }
 }

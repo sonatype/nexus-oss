@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.coreui
 
+import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskConfiguration
+
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresAuthentication
@@ -24,7 +27,6 @@ import org.sonatype.nexus.proxy.maven.MavenRepository
 import org.sonatype.nexus.proxy.maven.gav.Gav
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
-import org.sonatype.nexus.scheduling.NexusScheduler
 import org.sonatype.nexus.validation.Validate
 
 import javax.inject.Inject
@@ -47,7 +49,7 @@ extends DirectComponentSupport
   @Named("protected") RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
-  NexusScheduler nexusScheduler
+  NexusTaskScheduler nexusScheduler
 
   /**
    * Retrieves Maven related information.
@@ -105,10 +107,11 @@ extends DirectComponentSupport
   {
     // validate repository id
     protectedRepositoryRegistry.getRepository(id)
-    RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance(RebuildMavenMetadataTask)
+    TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(RebuildMavenMetadataTask)
     task.setRepositoryId(id)
-    task.setResourceStorePath(path)
-    nexusScheduler.submit("Rebuild metadata ${id}:${path}", task)
+    task.setPath(path)
+    task.setName("Rebuild metadata ${id}:${path}")
+    nexusScheduler.submit(task)
   }
 
 }

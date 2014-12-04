@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -100,7 +101,7 @@ public class Nexus3233IndexPomSha1IT
 
     repo.setValue(REPO_TEST_HARNESS_REPO);
 
-    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTask.class.getName(), repo);
 
     RepositoryMessageUtil.updateIndexes(REPO_TEST_HARNESS_REPO);
     TaskScheduleUtil.waitForAllTasksToStop();

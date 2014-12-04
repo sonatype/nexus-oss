@@ -283,6 +283,14 @@
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
+      <!-- quartz -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-quartz-plugin</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
       <!-- rapture -->
 
       <dependency>

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -40,66 +41,69 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.scheduling.TaskUtils;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
-import org.sonatype.scheduling.schedules.CronSchedule;
-import org.sonatype.scheduling.schedules.DailySchedule;
-import org.sonatype.scheduling.schedules.HourlySchedule;
-import org.sonatype.scheduling.schedules.ManualRunSchedule;
-import org.sonatype.scheduling.schedules.MonthlySchedule;
-import org.sonatype.scheduling.schedules.OnceSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
-import org.sonatype.scheduling.schedules.Schedule;
-import org.sonatype.scheduling.schedules.WeeklySchedule;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.Task;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.schedule.Cron;
+import org.sonatype.nexus.scheduling.schedule.Daily;
+import org.sonatype.nexus.scheduling.schedule.Hourly;
+import org.sonatype.nexus.scheduling.schedule.Manual;
+import org.sonatype.nexus.scheduling.schedule.Monthly;
+import org.sonatype.nexus.scheduling.schedule.Now;
+import org.sonatype.nexus.scheduling.schedule.Once;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
+import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.nexus.util.NexusUberClassloader;
 
+import com.google.common.base.Strings;
 import org.restlet.data.Request;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractFormFieldResource
 {
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
   private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
   @Inject
-  public void setNexusScheduler(final NexusScheduler nexusScheduler) {
+  public void setNexusScheduler(final NexusTaskScheduler nexusScheduler) {
     this.nexusScheduler = nexusScheduler;
   }
 
-  protected NexusScheduler getNexusScheduler() {
+  protected NexusTaskScheduler getNexusScheduler() {
     return nexusScheduler;
   }
 
   protected String getScheduleShortName(Schedule schedule) {
-    if (ManualRunSchedule.class.isAssignableFrom(schedule.getClass())) {
+    if (schedule instanceof Manual) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MANUAL;
     }
-    else if (RunNowSchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Now) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_RUN_NOW;
     }
-    else if (OnceSchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Once) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ONCE;
     }
-    else if (HourlySchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Hourly) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_HOURLY;
     }
-    else if (DailySchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Daily) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_DAILY;
     }
-    else if (WeeklySchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Weekly) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_WEEKLY;
     }
-    else if (MonthlySchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Monthly) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MONTHLY;
     }
-    else if (CronSchedule.class.isAssignableFrom(schedule.getClass())) {
+    else if (schedule instanceof Cron) {
       return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ADVANCED;
     }
     else {
@@ -119,7 +123,7 @@ public abstract class AbstractScheduledServicePlexusResource
     List<ScheduledServicePropertyResource> list = new ArrayList<ScheduledServicePropertyResource>();
 
     for (String key : map.keySet()) {
-      if (!TaskUtils.isPrivateProperty(key)) {
+      if (!TaskConfiguration.isPrivateProperty(key)) {
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey(key);
         prop.setValue(map.get(key));
@@ -203,7 +207,7 @@ public abstract class AbstractScheduledServicePlexusResource
     List<String> list = new ArrayList<String>();
 
     for (Integer day : days) {
-      if (MonthlySchedulerIterator.LAST_DAY_OF_MONTH.equals(day)) {
+      if (Monthly.LAST_DAY_OF_MONTH.equals(day)) {
         list.add("last");
       }
       else {
@@ -219,7 +223,7 @@ public abstract class AbstractScheduledServicePlexusResource
 
     for (String day : days) {
       if ("last".equals(day)) {
-        set.add(MonthlySchedulerIterator.LAST_DAY_OF_MONTH);
+        set.add(Monthly.LAST_DAY_OF_MONTH);
       }
       else {
         set.add(Integer.valueOf(day));
@@ -255,23 +259,30 @@ public abstract class AbstractScheduledServicePlexusResource
     return model.getName();
   }
 
-  public NexusTask<?> getModelNexusTask(ScheduledServiceBaseResource model, Request request)
+  public TaskConfiguration getModelNexusTask(ScheduledServiceBaseResource model, Request request)
       throws IllegalArgumentException, ResourceException
   {
-    String serviceType = model.getTypeId();
+    try {
+      TaskConfiguration task = getNexusScheduler().createTaskConfigurationInstance(model.getTypeId());
 
-    NexusTask<?> task = getNexusScheduler().createTaskInstance(serviceType);
+      for (Iterator iter = model.getProperties().iterator(); iter.hasNext(); ) {
+        ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
+        task.getMap().put(prop.getKey(), prop.getValue());
+      }
 
-    for (Iterator iter = model.getProperties().iterator(); iter.hasNext(); ) {
-      ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
-      task.addParameter(prop.getKey(), prop.getValue());
+      task.setAlertEmail(model.getAlertEmail());
+      // new tasks will have this empty
+      if (!Strings.isNullOrEmpty(model.getId())) {
+        task.setId(model.getId());
+      }
+      task.setName(model.getName());
+      task.setEnabled(model.isEnabled());
+
+      return task;
     }
-
-    TaskUtils.setAlertEmail(task, model.getAlertEmail());
-    TaskUtils.setId(task, model.getId());
-    TaskUtils.setName(task, model.getName());
-
-    return task;
+    catch (IllegalArgumentException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+    }
   }
 
   public void validateStartDate(String date)
@@ -319,7 +330,7 @@ public abstract class AbstractScheduledServicePlexusResource
     Schedule schedule = null;
 
     if (ScheduledServiceAdvancedResource.class.isAssignableFrom(model.getClass())) {
-      schedule = new CronSchedule(((ScheduledServiceAdvancedResource) model).getCronCommand());
+      schedule = new Cron(new Date(), ((ScheduledServiceAdvancedResource) model).getCronCommand());
     }
     else if (ScheduledServiceMonthlyResource.class.isAssignableFrom(model.getClass())) {
       Date date =
@@ -327,7 +338,7 @@ public abstract class AbstractScheduledServicePlexusResource
               ((ScheduledServiceMonthlyResource) model).getRecurringTime());
 
       schedule =
-          new MonthlySchedule(date, null,
+          new Monthly(date,
               formatRecurringDayOfMonth(((ScheduledServiceMonthlyResource) model).getRecurringDay()));
     }
     else if (ScheduledServiceWeeklyResource.class.isAssignableFrom(model.getClass())) {
@@ -336,7 +347,7 @@ public abstract class AbstractScheduledServicePlexusResource
               ((ScheduledServiceWeeklyResource) model).getRecurringTime());
 
       schedule =
-          new WeeklySchedule(date, null,
+          new Weekly(date,
               formatRecurringDayOfWeek(((ScheduledServiceWeeklyResource) model).getRecurringDay()));
     }
     else if (ScheduledServiceDailyResource.class.isAssignableFrom(model.getClass())) {
@@ -344,14 +355,14 @@ public abstract class AbstractScheduledServicePlexusResource
           parseDate(((ScheduledServiceDailyResource) model).getStartDate(),
               ((ScheduledServiceDailyResource) model).getRecurringTime());
 
-      schedule = new DailySchedule(date, null);
+      schedule = new Daily(date);
     }
     else if (ScheduledServiceHourlyResource.class.isAssignableFrom(model.getClass())) {
       Date date =
           parseDate(((ScheduledServiceHourlyResource) model).getStartDate(),
               ((ScheduledServiceHourlyResource) model).getStartTime());
 
-      schedule = new HourlySchedule(date, null);
+      schedule = new Hourly(date);
     }
     else if (ScheduledServiceOnceResource.class.isAssignableFrom(model.getClass())) {
       Date date =
@@ -362,148 +373,191 @@ public abstract class AbstractScheduledServicePlexusResource
       validateTime("startTime", date);
 
       schedule =
-          new OnceSchedule(parseDate(((ScheduledServiceOnceResource) model).getStartDate(),
+          new Once(parseDate(((ScheduledServiceOnceResource) model).getStartDate(),
               ((ScheduledServiceOnceResource) model).getStartTime()));
     }
     else {
-      schedule = new ManualRunSchedule();
+      schedule = new Manual();
     }
 
     return schedule;
   }
 
-  public <T> ScheduledServiceBaseResource getServiceRestModel(ScheduledTask<T> task) {
+  public <T> ScheduledServiceBaseResource getServiceRestModel(TaskConfiguration taskConfiguration, Schedule schedule) {
     ScheduledServiceBaseResource resource = null;
-
-    if (RunNowSchedule.class.isAssignableFrom(task.getSchedule().getClass())
-        || ManualRunSchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    if (Now.class.isAssignableFrom(schedule.getClass())
+        || Manual.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceBaseResource();
     }
-    else if (OnceSchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Once.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceOnceResource();
 
-      OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
+      Once taskSchedule = (Once) schedule;
       ScheduledServiceOnceResource res = (ScheduledServiceOnceResource) resource;
 
-      res.setStartDate(formatDate(taskSchedule.getStartDate()));
-      res.setStartTime(formatTime(taskSchedule.getStartDate()));
+      res.setStartDate(formatDate(taskSchedule.getStartAt()));
+      res.setStartTime(formatTime(taskSchedule.getStartAt()));
     }
-    else if (HourlySchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Hourly.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceHourlyResource();
 
-      HourlySchedule taskSchedule = (HourlySchedule) task.getSchedule();
+      Hourly taskSchedule = (Hourly) schedule;
       ScheduledServiceHourlyResource res = (ScheduledServiceHourlyResource) resource;
 
-      res.setStartDate(formatDate(taskSchedule.getStartDate()));
-      res.setStartTime(formatTime(taskSchedule.getStartDate()));
+      res.setStartDate(formatDate(taskSchedule.getStartAt()));
+      res.setStartTime(formatTime(taskSchedule.getStartAt()));
     }
-    else if (DailySchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Daily.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceDailyResource();
 
-      DailySchedule taskSchedule = (DailySchedule) task.getSchedule();
+      Daily taskSchedule = (Daily) schedule;
       ScheduledServiceDailyResource res = (ScheduledServiceDailyResource) resource;
 
-      res.setStartDate(formatDate(taskSchedule.getStartDate()));
-      res.setRecurringTime(formatTime(taskSchedule.getStartDate()));
+      res.setStartDate(formatDate(taskSchedule.getStartAt()));
+      res.setRecurringTime(formatTime(taskSchedule.getStartAt()));
     }
-    else if (WeeklySchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Weekly.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceWeeklyResource();
 
-      WeeklySchedule taskSchedule = (WeeklySchedule) task.getSchedule();
+      Weekly taskSchedule = (Weekly) schedule;
       ScheduledServiceWeeklyResource res = (ScheduledServiceWeeklyResource) resource;
 
-      res.setStartDate(formatDate(taskSchedule.getStartDate()));
-      res.setRecurringTime(formatTime(taskSchedule.getStartDate()));
+      res.setStartDate(formatDate(taskSchedule.getStartAt()));
+      res.setRecurringTime(formatTime(taskSchedule.getStartAt()));
       res.setRecurringDay(formatRecurringDayOfWeek(taskSchedule.getDaysToRun()));
     }
-    else if (MonthlySchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Monthly.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceMonthlyResource();
 
-      MonthlySchedule taskSchedule = (MonthlySchedule) task.getSchedule();
+      Monthly taskSchedule = (Monthly) schedule;
       ScheduledServiceMonthlyResource res = (ScheduledServiceMonthlyResource) resource;
 
-      res.setStartDate(formatDate(taskSchedule.getStartDate()));
-      res.setRecurringTime(formatTime(taskSchedule.getStartDate()));
+      res.setStartDate(formatDate(taskSchedule.getStartAt()));
+      res.setRecurringTime(formatTime(taskSchedule.getStartAt()));
       res.setRecurringDay(formatRecurringDayOfMonth(taskSchedule.getDaysToRun()));
     }
-    else if (CronSchedule.class.isAssignableFrom(task.getSchedule().getClass())) {
+    else if (Cron.class.isAssignableFrom(schedule.getClass())) {
       resource = new ScheduledServiceAdvancedResource();
 
-      CronSchedule taskSchedule = (CronSchedule) task.getSchedule();
+      Cron taskSchedule = (Cron) schedule;
       ScheduledServiceAdvancedResource res = (ScheduledServiceAdvancedResource) resource;
 
-      res.setCronCommand(taskSchedule.getCronString());
+      res.setCronCommand(taskSchedule.getCronExpression());
     }
 
     if (resource != null) {
-      resource.setId(task.getId());
-      resource.setEnabled(task.isEnabled());
-      resource.setName(task.getName());
-      resource.setSchedule(getScheduleShortName(task.getSchedule()));
-      resource.setTypeId(task.getType());
-      resource.setProperties(formatServiceProperties(task.getTaskParams()));
-      resource.setAlertEmail(TaskUtils.getAlertEmail(task));
+      resource.setId(taskConfiguration.getId());
+      resource.setEnabled(taskConfiguration.isEnabled());
+      resource.setName(taskConfiguration.getName());
+      resource.setSchedule(getScheduleShortName(schedule));
+      resource.setTypeId(taskConfiguration.getTypeId());
+      resource.setProperties(formatServiceProperties(taskConfiguration.getMap()));
+      resource.setAlertEmail(taskConfiguration.getAlertEmail());
     }
 
     return resource;
   }
 
-  protected <T> Date getNextRunTime(ScheduledTask<T> task) {
-    Date nextRunTime = null;
-
-    // Run now type tasks should never have a next run time
-    if (!task.getSchedule().getClass().isAssignableFrom(RunNowSchedule.class) && task.getNextRun() != null) {
-      nextRunTime = task.getNextRun();
+  /**
+   * Returns last run time (when task started). Restlet1x API has slight difference of how this value is interpreted
+   * from current Tasks API, as it includes the current run if task in question is running.
+   */
+  protected <T> Date getLastRunTime(final TaskInfo<T> task) {
+    if (State.RUNNING == task.getCurrentState().getState()) {
+      return task.getCurrentState().getRunStarted();
     }
-
-    return nextRunTime;
+    else if (task.getLastRunState() != null) {
+      return task.getLastRunState().getRunStarted();
+    }
+    return null;
   }
 
-  protected String getLastRunResult(ScheduledTask<?> task) {
+  /**
+   * Returns next run time of the task.
+   */
+  @Nullable
+  protected <T> Date getNextRunTime(final TaskInfo<T> task) {
+    return task.getCurrentState().getNextRun();
+  }
+
+  protected String getLastRunResult(TaskInfo<?> task) {
     String lastRunResult = "n/a";
+    try {
+      LastRunState lastRunState = task.getLastRunState();
 
-    if (task.getLastStatus() != null) {
-      lastRunResult = TaskState.BROKEN.equals(task.getLastStatus()) ? "Error" : "Ok";
-      if (task.getDuration() != 0) {
-        long milliseconds = task.getDuration();
-        int hours = (int) ((milliseconds / 1000) / 3600);
-        int minutes = (int) ((milliseconds / 1000) / 60 - hours * 60);
-        int seconds = (int) ((milliseconds / 1000) % 60);
+      if (lastRunState != null) {
+        lastRunResult = "n/a";
+        switch (lastRunState.getEndState()) {
+          case OK:
+            lastRunResult = "Ok";
+            break;
+          case CANCELED:
+            lastRunResult = "Canceled";
+            break;
+          case FAILED:
+            lastRunResult = "Error";
+        }
+        if (lastRunState.getRunDuration() != 0) {
+          long milliseconds = lastRunState.getRunDuration();
+          int hours = (int) ((milliseconds / 1000) / 3600);
+          int minutes = (int) ((milliseconds / 1000) / 60 - hours * 60);
+          int seconds = (int) ((milliseconds / 1000) % 60);
 
-        lastRunResult += " [";
-        if (hours != 0) {
-          lastRunResult += hours;
-          lastRunResult += "h";
+          lastRunResult += " [";
+          if (hours != 0) {
+            lastRunResult += hours;
+            lastRunResult += "h";
+          }
+          if (minutes != 0 || hours != 0) {
+            lastRunResult += minutes;
+            lastRunResult += "m";
+          }
+          lastRunResult += seconds;
+          lastRunResult += "s";
+          lastRunResult += "]";
         }
-        if (minutes != 0 || hours != 0) {
-          lastRunResult += minutes;
-          lastRunResult += "m";
-        }
-        lastRunResult += seconds;
-        lastRunResult += "s";
-        lastRunResult += "]";
       }
+    } catch (IllegalStateException e) {
+      // nop
     }
     return lastRunResult;
   }
 
-  protected String getReadableState(TaskState taskState) {
-    switch (taskState) {
-      case SUBMITTED:
+  protected String getState(final TaskInfo info) {
+    if (State.RUNNING != info.getCurrentState().getState()) {
+      return info.getCurrentState().getState().name();
+    }
+    else {
+      // is running
+      switch (info.getCurrentState().getRunState()) {
+        case BLOCKED:
+          return "SLEEPING";
+        case CANCELED:
+          return "CANCELLING";
+        default:
+          return "RUNNING";
+      }
+    }
+  }
+
+  protected String getReadableState(final TaskInfo info) {
+    switch (info.getCurrentState().getState()) {
       case WAITING:
-      case FINISHED:
-      case BROKEN:
         return "Waiting";
-      case RUNNING:
-        return "Running";
-      case SLEEPING:
-        return "Blocked";
-      case CANCELLING:
-        return "Cancelling";
-      case CANCELLED:
-        return "Cancelled";
+      case DONE:
+        return "Done";
+      case RUNNING: {
+        switch (info.getCurrentState().getRunState()) {
+          case BLOCKED:
+            return "Blocked";
+          case CANCELED:
+            return "Cancelling";
+          default:
+            return "Running";
+        }
+      }
       default:
-        throw new IllegalStateException();
+        return String.valueOf(info.getCurrentState().getState());
     }
   }
 

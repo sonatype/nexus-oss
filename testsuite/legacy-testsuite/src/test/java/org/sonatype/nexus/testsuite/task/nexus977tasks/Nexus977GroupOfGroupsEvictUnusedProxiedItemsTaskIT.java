@@ -16,7 +16,8 @@ import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -47,7 +48,7 @@ public class Nexus977GroupOfGroupsEvictUnusedProxiedItemsTaskIT
     age.setKey("evictOlderCacheItemsThen");
     age.setValue(String.valueOf(0));
 
-    TaskScheduleUtil.runTask(EvictUnusedItemsTaskDescriptor.ID, repo, age);
+    TaskScheduleUtil.runTask(EvictUnusedProxiedItemsTask.class.getName(), repo, age);
 
     Assert.assertFalse(new File(nexusWorkDir, "storage/r4/nexus977tasks/project/0.8/project-0.8.jar").exists());
     Assert.assertFalse(new File(nexusWorkDir, "storage/r5/nexus977tasks/project/2.1/project-2.1.jar").exists());

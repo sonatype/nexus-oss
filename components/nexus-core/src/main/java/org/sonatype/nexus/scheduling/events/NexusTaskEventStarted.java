@@ -12,18 +12,17 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
  * Event fired when a task is started (might be running or sleeping if blocked).
  *
- * @author cstamas
  * @since 2.0
  */
 public class NexusTaskEventStarted<T>
     extends NexusTaskEvent<T>
 {
-  public NexusTaskEventStarted(final NexusTask<T> task) {
-    super(task);
+  public NexusTaskEventStarted(final TaskInfo<T> taskInfo) {
+    super(taskInfo);
   }
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers;
@@ -56,11 +57,11 @@ public abstract class AbstractLegacyRulesIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue(REPO_TEST_HARNESS_REPO);
-    TaskScheduleUtil.runTask("nexus1560-repo", RebuildMavenMetadataTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("nexus1560-repo", RebuildMavenMetadataTask.class.getName(), repo);
     ScheduledServicePropertyResource repo2 = new ScheduledServicePropertyResource();
     repo2.setKey("repositoryId");
     repo2.setValue(REPO_TEST_HARNESS_REPO2);
-    TaskScheduleUtil.runTask("nexus1560-repo2", RebuildMavenMetadataTaskDescriptor.ID, repo2);
+    TaskScheduleUtil.runTask("nexus1560-repo2", RebuildMavenMetadataTask.class.getName(), repo2);
   }
 
   protected void download(String downloadUrl, Matcher<Response> matcher)

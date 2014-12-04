@@ -12,34 +12,33 @@
  */
 package org.sonatype.nexus.tasks;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.TaskSupport;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-@Named(PurgeApiKeysTaskDescriptor.ID)
+@Named
 public class PurgeApiKeysTask
-    extends AbstractNexusTask<Void>
+    extends TaskSupport<Void>
 {
-  /**
-   * System event action: purge API keys
-   */
-  public static final String ACTION = "PURGE_API_KEYS";
+  private EventBus eventBus;
+
+  @Inject
+  public void setEventBus(final EventBus eventBus) {
+    this.eventBus = eventBus;
+  }
 
   @Override
-  protected Void doRun() {
+  protected Void execute() {
     // triggers the expiry of any orphaned cached user principals
-    notifyEventListeners(new AuthorizationConfigurationChanged());
+    eventBus.post(new AuthorizationConfigurationChanged());
     return null;
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
-  protected String getMessage() {
+  public String getMessage() {
     return "Purging Orphaned API Keys.";
   }
 

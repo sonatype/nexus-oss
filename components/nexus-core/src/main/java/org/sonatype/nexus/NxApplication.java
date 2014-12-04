@@ -33,7 +33,8 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -47,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This is a component that "boots" Nexus up. See org.sonatype.nexus.web.NexusBooterListener for example.
- * 
+ *
  * @since 2.7.0
  */
 @Singleton
@@ -63,7 +64,7 @@ public class NxApplication
 
   private final SecuritySystem securitySystem;
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusTaskScheduler;
 
   private final RepositoryRegistry repositoryRegistry;
 
@@ -78,7 +79,7 @@ public class NxApplication
                        final NexusConfiguration nexusConfiguration,
                        final ApplicationStatusSource applicationStatusSource,
                        final SecuritySystem securitySystem,
-                       final NexusScheduler nexusScheduler,
+                       final NexusTaskScheduler nexusTaskScheduler,
                        final RepositoryRegistry repositoryRegistry,
                        final EventSubscriberHost eventSubscriberHost,
                        final OrientBootstrap orientBootstrap,
@@ -88,7 +89,7 @@ public class NxApplication
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.securitySystem = checkNotNull(securitySystem);
-    this.nexusScheduler = checkNotNull(nexusScheduler);
+    this.nexusTaskScheduler = checkNotNull(nexusTaskScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
@@ -140,7 +141,6 @@ public class NxApplication
       securitySystem.start();
       securitySystem.getAnonymousUsername();
       nexusConfiguration.createInternals();
-      nexusScheduler.initializeTasks();
 
       // notify about start other components participating in configuration framework
       eventBus.post(new ConfigurationChangeEvent(nexusConfiguration, null, null));
@@ -199,8 +199,6 @@ public class NxApplication
     eventBus.post(new NexusStoppingEvent(this));
 
     // kill services + notify
-    nexusScheduler.shutdown();
-
     eventBus.post(new NexusStoppedEvent(this));
     eventSubscriberHost.stop();
 
@@ -221,9 +219,11 @@ public class NxApplication
     final Collection<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet(ShadowRepository.class);
     for (ShadowRepository shadow : shadows) {
       if (shadow.isSynchronizeAtStartup()) {
-        final SynchronizeShadowsTask task = nexusScheduler.createTaskInstance(SynchronizeShadowsTask.class);
-        task.setShadowRepositoryId(shadow.getId());
-        nexusScheduler.submit("Shadow Sync (" + shadow.getId() + ")", task);
+        final TaskConfiguration taskConfiguration = nexusTaskScheduler
+            .createTaskConfigurationInstance(SynchronizeShadowsTask.class);
+        taskConfiguration.setRepositoryId(shadow.getId());
+        taskConfiguration.setName("Shadow Sync (" + shadow.getId() + ")");
+        nexusTaskScheduler.submit(taskConfiguration);
       }
     }
   }

@@ -18,8 +18,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -36,11 +36,12 @@ public class RepositoryConfigurationUpdatedEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusTaskExecutor;
 
   @Inject
-  public RepositoryConfigurationUpdatedEventInspector(final NexusScheduler nexusScheduler) {
-    this.nexusScheduler = nexusScheduler;
+  public RepositoryConfigurationUpdatedEventInspector(final NexusTaskScheduler nexusTaskExecutor)
+  {
+    this.nexusTaskExecutor = nexusTaskExecutor;
   }
 
   @Subscribe
@@ -76,9 +77,10 @@ public class RepositoryConfigurationUpdatedEventInspector
                 + event.getRepository().getId() + ") has been changed, expiring its caches.";
       }
 
-      ExpireCacheTask task = nexusScheduler.createTaskInstance(ExpireCacheTask.class);
-      task.setRepositoryId(event.getRepository().getId());
-      nexusScheduler.submit(taskName, task);
+      final TaskConfiguration taskConfiguration = nexusTaskExecutor.createTaskConfigurationInstance(ExpireCacheTask.class);
+      taskConfiguration.setRepositoryId(event.getRepository().getId());
+      taskConfiguration.setName(taskName);
+      nexusTaskExecutor.submit(taskConfiguration);
       log.info(logMessage);
     }
   }

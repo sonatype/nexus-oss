@@ -14,52 +14,43 @@ package org.sonatype.nexus.tasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+
+import com.google.common.collect.Lists;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Evicts unused proxied items.
  */
-@Named(EvictUnusedItemsTaskDescriptor.ID)
+@Named
 public class EvictUnusedProxiedItemsTask
-    extends AbstractNexusRepositoriesTask<Collection<String>>
+    extends RepositoryTaskSupport<Collection<String>>
 {
-  /**
-   * System event action: evict unused proxied items
-   */
-  public static final String ACTION = "EVICT_UNUSED_PROXIED_ITEMS";
-
   @Override
-  protected String getRepositoryFieldId() {
-    return EvictUnusedItemsTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  public int getEvictOlderCacheItemsThen() {
-    return Integer.parseInt(getParameters().get(EvictUnusedItemsTaskDescriptor.OLDER_THAN_FIELD_ID));
-  }
-
-  public void setEvictOlderCacheItemsThen(int evictOlderCacheItemsThen) {
-    getParameters().put(EvictUnusedItemsTaskDescriptor.OLDER_THAN_FIELD_ID,
-        Integer.toString(evictOlderCacheItemsThen));
-  }
-
-  @Override
-  protected Collection<String> doRun()
+  protected Collection<String> execute()
       throws Exception
   {
     ResourceStoreRequest req = new ResourceStoreRequest("/");
 
-    long olderThan = System.currentTimeMillis() - (getEvictOlderCacheItemsThen() * A_DAY);
+    final int olderThanDays = getConfiguration()
+        .getInteger(EvictUnusedProxiedItemsTaskDescriptor.OLDER_THAN_FIELD_ID, -1);
+    checkArgument(olderThanDays > -1);
 
-    if (getRepositoryId() != null) {
-      return getRepositoryRegistry().getRepository(getRepositoryId()).evictUnusedItems(req, olderThan);
+    long olderThan = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(olderThanDays);
+
+    if (getConfiguration().getRepositoryId() != null) {
+      return getRepositoryRegistry().getRepository(getConfiguration().getRepositoryId())
+          .evictUnusedItems(req, olderThan);
     }
     else {
-      ArrayList<String> result = new ArrayList<String>();
+      ArrayList<String> result = Lists.newArrayList();
 
       for (Repository repository : getRepositoryRegistry().getRepositories()) {
         result.addAll(repository.evictUnusedItems(req, olderThan));
@@ -70,14 +61,9 @@ public class EvictUnusedProxiedItemsTask
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
-  }
-
-  @Override
-  protected String getMessage() {
-    if (getRepositoryId() != null) {
-      return "Evicting unused proxied items for repository " + getRepositoryName() + ".";
+  public String getMessage() {
+    if (getConfiguration().getRepositoryId() != null) {
+      return "Evicting unused proxied items for repository " + getConfiguration().getRepositoryId() + ".";
     }
     else {
       return "Evicting unused proxied items for all registered proxy repositories.";

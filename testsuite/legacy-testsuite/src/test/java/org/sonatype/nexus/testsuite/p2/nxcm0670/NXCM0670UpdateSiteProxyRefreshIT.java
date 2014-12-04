@@ -14,6 +14,8 @@ package org.sonatype.nexus.testsuite.p2.nxcm0670;
 
 import java.io.File;
 
+import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
@@ -39,14 +41,20 @@ public class NXCM0670UpdateSiteProxyRefreshIT
     final File nexusDir = new File(nexusWorkDir + "/storage/nxcm0670");
     final File remoteDir = new File(localStorageDir + "/nxcm0670");
 
-    TaskScheduleUtil.run("1");
+    ScheduledServicePropertyResource forceMirror = new ScheduledServicePropertyResource();
+    forceMirror.setKey("ForceMirror");
+    forceMirror.setValue(Boolean.TRUE.toString());
+    ScheduledServicePropertyResource repositoryId = new ScheduledServicePropertyResource();
+    repositoryId.setKey("repositoryId");
+    repositoryId.setValue("nxcm0670");
+    TaskScheduleUtil.runTask("test", UpdateSiteMirrorTask.class.getName(), forceMirror, repositoryId);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     assertThat(new File(nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar"), exists());
 
     copyFile(new File(remoteDir, "site-empty.xml"), new File(remoteDir, "site.xml"));
 
-    TaskScheduleUtil.run("1");
+    TaskScheduleUtil.runTask("test", UpdateSiteMirrorTask.class.getName(), forceMirror, repositoryId);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     assertThat(new File(nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar"), not(exists()));

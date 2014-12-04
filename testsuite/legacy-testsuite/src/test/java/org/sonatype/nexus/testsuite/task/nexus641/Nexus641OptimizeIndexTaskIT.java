@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.task.nexus641;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.index.tasks.OptimizeIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -49,7 +50,7 @@ public class Nexus641OptimizeIndexTaskIT
     prop.setValue("nexus-test-harness-repo");
 
     // reindex
-    TaskScheduleUtil.runTask(OptimizeIndexTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(OptimizeIndexTask.class.getName(), prop);
 
   }
 

@@ -16,6 +16,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
@@ -36,13 +37,13 @@ public class NXCM2558RedirectUrlUpdateSiteIT
   {
     if (setRepo) {
       final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-      repo.setKey(UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+      repo.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
       repo.setValue(repoId);
 
-      runTask(UpdateSiteMirrorTask.ROLE_HINT + System.nanoTime(), UpdateSiteMirrorTask.ROLE_HINT, repo);
+      runTask(UpdateSiteMirrorTask.class.getName() + System.nanoTime(), UpdateSiteMirrorTask.class.getName(), repo);
     }
     else {
-      runTask(UpdateSiteMirrorTask.ROLE_HINT + System.nanoTime(), UpdateSiteMirrorTask.ROLE_HINT);
+      runTask(UpdateSiteMirrorTask.class.getName() + System.nanoTime(), UpdateSiteMirrorTask.class.getName());
     }
     waitForAllTasksToStop();
 

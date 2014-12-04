@@ -12,53 +12,25 @@
  */
 package org.sonatype.nexus.yum.internal.task;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.scheduling.TaskSupport;
 
 @Named("WaitTask")
 public class WaitTask
-    extends AbstractNexusTask<Object>
+    extends TaskSupport<Void>
 {
-
-  public static final Logger LOG = LoggerFactory.getLogger(WaitTask.class);
-
-  @Inject
-  public WaitTask(final EventBus eventBus) {
-    super(eventBus, null);
-  }
-
   @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
-    LOG.debug("Go to sleep for a sec.");
+    log.debug("Go to sleep for a sec.");
     Thread.sleep(1000);
     return null;
   }
 
   @Override
-  public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
-    return true;
-  }
-
-  @Override
-  protected String getAction() {
+  public String getMessage() {
     return "Wait";
   }
-
-  @Override
-  protected String getMessage() {
-    return "Wait";
-  }
-
 }

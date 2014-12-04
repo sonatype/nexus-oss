@@ -13,61 +13,33 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("RebuildAttributes")
+@Named
 @Singleton
 public class RebuildAttributesTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "RebuildAttributesTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the repository to rebuild attributes",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories();
-
-  private final StringTextFormField resourceStorePathField =
-      new StringTextFormField(
-          RESOURCE_STORE_PATH_FIELD_ID,
-          "Repository path",
-          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-          FormField.OPTIONAL);
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Rebuild Repository Attributes";
-  }
-
-  public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
-    fields.add(repoField);
-
-    fields.add(resourceStorePathField);
-
-    return fields;
-  }
-
-  @Override
-  public boolean isExposed() {
-    return false;
+  public RebuildAttributesTaskDescriptor() {
+    super(RebuildAttributesTask.class, "Rebuild Repository Attributes", true, false,
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to rebuild attributes",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories(),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
 }

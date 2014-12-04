@@ -14,6 +14,8 @@ package org.sonatype.nexus.testsuite.task.nexus977tasks;
 
 import java.io.File;
 
+import org.sonatype.nexus.index.tasks.DownloadIndexesTask;
+import org.sonatype.nexus.index.tasks.PublishIndexesTask;
 import org.sonatype.nexus.index.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.index.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
@@ -40,12 +42,12 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("r4");
-    TaskScheduleUtil.runTask("r4", DownloadIndexesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("r4", DownloadIndexesTask.class.getName(), repo);
 
     repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("r5");
-    TaskScheduleUtil.runTask("r5", DownloadIndexesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("r5", DownloadIndexesTask.class.getName(), repo);
   }
 
   @Test
@@ -60,7 +62,7 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("g4");
-    TaskScheduleUtil.runTask("PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("PublishIndexesTaskDescriptor-snapshot", PublishIndexesTask.class.getName(), repo);
 
     Assert.assertTrue(new File(nexusWorkDir, "storage/r1/.index").exists());
     Assert.assertTrue(new File(nexusWorkDir, "storage/r2/.index").exists());

@@ -22,8 +22,7 @@ import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -37,10 +36,11 @@ public class RepositoryUpdateMirrorEventListener
     extends ComponentSupport
     implements EventSubscriber
 {
-  private final NexusScheduler scheduler;
+  private final NexusTaskScheduler scheduler;
 
   @Inject
-  public RepositoryUpdateMirrorEventListener(final NexusScheduler scheduler) {
+  public RepositoryUpdateMirrorEventListener(final NexusTaskScheduler scheduler)
+  {
     this.scheduler = checkNotNull(scheduler);
   }
 
@@ -63,8 +63,8 @@ public class RepositoryUpdateMirrorEventListener
     if (updateSite != null
         && (evt instanceof RepositoryEventExpireNotFoundCaches ||
         ((RepositoryConfigurationUpdatedEvent) evt).isRemoteUrlChanged())) {
-      final ScheduledTask<?> mirrorTask = UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
-      log.debug("Submitted " + mirrorTask.getName());
+      UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
+      log.debug("Submitted UpdateSiteMirrorTask for {}", updateSite);
     }
   }
 }

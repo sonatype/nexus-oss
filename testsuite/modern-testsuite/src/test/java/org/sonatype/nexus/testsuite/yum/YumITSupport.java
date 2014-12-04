@@ -167,8 +167,9 @@ public class YumITSupport
       throws Exception
   {
     remoteLogger().info("Waiting for Nexus to settle down...");
-    scheduler().waitForAllTasksToStop();
+    // wait in this order: events (may spawn tasks), tasks and finally routing
     client().getSubsystem(Events.class).waitForCalmPeriod();
+    scheduler().waitForAllTasksToStop();
     client().getSubsystem(RoutingTest.class).waitForAllRoutingUpdateJobToStop();
     remoteLogger().info("Nexus is quiet. Done waiting.");
   }

@@ -12,31 +12,24 @@
  */
 package org.sonatype.nexus.yum.internal.task;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.support.YumNexusTestSupport;
-import org.sonatype.scheduling.DefaultScheduledTask;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.OnceSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,13 +38,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.ID;
-import static org.sonatype.scheduling.TaskState.RUNNING;
 
 @SuppressWarnings("unchecked")
 public class GenerateMetadataTaskSettingsIT
@@ -80,8 +69,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, NO_VERSION);
-    assertFalse(task.allowConcurrentExecution(createMap(scheduledTask(task),
-        scheduledTask(REPO, NO_VERSION, RUNNING))));
+    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, NO_VERSION))).isEmpty());
   }
 
   @Test
@@ -89,8 +77,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, VERSION);
-    assertFalse(task.allowConcurrentExecution(createMap(scheduledTask(task),
-        scheduledTask(REPO, VERSION, RUNNING))));
+    assertFalse(task.isBlockedBy(asList(scheduledTask(REPO, VERSION))).isEmpty());
   }
 
   @Test
@@ -98,8 +85,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, VERSION);
-    assertTrue(task.allowConcurrentExecution(createMap(scheduledTask(task),
-        scheduledTask(REPO, ANOTHER_VERSION, RUNNING))));
+    assertTrue(task.isBlockedBy(asList(scheduledTask(REPO, ANOTHER_VERSION))).isEmpty());
   }
 
   @Test
@@ -107,8 +93,7 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = task(REPO, NO_VERSION);
-    assertTrue(task.allowConcurrentExecution(createMap(scheduledTask(task),
-        scheduledTask(ANOTHER_REPO, NO_VERSION, RUNNING))));
+    assertTrue(task.isBlockedBy(asList(scheduledTask(ANOTHER_REPO, NO_VERSION))).isEmpty());
   }
 
   @Test
@@ -117,13 +102,12 @@ public class GenerateMetadataTaskSettingsIT
   {
     // given
     GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        repoRegistry(),
         mock(YumRegistry.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
+    task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
     // when
     task.setDefaults();
@@ -137,13 +121,12 @@ public class GenerateMetadataTaskSettingsIT
   {
     // given
     GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        repoRegistry(),
         mock(YumRegistry.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
+    task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
     // when
     task.setDefaults();
@@ -157,18 +140,17 @@ public class GenerateMetadataTaskSettingsIT
       throws Exception
   {
     GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        mock(RepositoryRegistry.class),
         mock(YumRegistry.class),
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
+    task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
 
     thrown.expect(IllegalStateException.class);
     thrown.expectMessage("enabled 'Yum: Generate Metadata' capability");
-    task.doRun();
+    task.execute();
   }
 
   @Test
@@ -186,18 +168,17 @@ public class GenerateMetadataTaskSettingsIT
     when(yumRegistry.get(REPO)).thenReturn(yum);
 
     GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        mock(RepositoryRegistry.class),
         yumRegistry,
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     );
+    task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
 
     thrown.expect(IllegalStateException.class);
     thrown.expectMessage("hosted repositories");
-    task.doRun();
+    task.execute();
   }
 
   private RepositoryRegistry repoRegistry()
@@ -211,43 +192,46 @@ public class GenerateMetadataTaskSettingsIT
     return repoRegistry;
   }
 
-  private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state, Date scheduledAt) {
-    MockScheduledTask<YumRepository> scheduledTask = scheduledTask(task(repo, version));
-    scheduledTask.setTaskState(state);
-    scheduledTask.setSchedule(new OnceSchedule(new Date(scheduledAt.getTime() + 400)));
-    return scheduledTask;
+  private List<TaskInfo<?>> asList(TaskInfo<?> task) {
+    return ImmutableList.<TaskInfo<?>>of(task);
   }
 
-  private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state) {
-    return scheduledTask(repo, version, state, new Date());
+  private TaskInfo<YumRepository> scheduledTask(String repo, String version) {
+    final TaskConfiguration configuration = new TaskConfiguration();
+    configuration.setId("id");
+    configuration.setName("name");
+    configuration.setTypeId(GenerateMetadataTask.class.getSimpleName());
+    configuration.setRepositoryId(repo);
+    configuration.setString(GenerateMetadataTask.PARAM_VERSION, version);
+    TaskInfo task = mock(TaskInfo.class);
+    when(task.getConfiguration()).thenReturn(configuration);
+    when(task.getId()).thenReturn(configuration.getId());
+    CurrentState currentState = mock(CurrentState.class);
+    when(currentState.getState()).thenReturn(State.RUNNING);
+    when(task.getCurrentState()).thenReturn(currentState);
+    return task;
   }
 
-  private MockScheduledTask<YumRepository> scheduledTask(GenerateMetadataTask task) {
-    return new MockScheduledTask<YumRepository>(task);
-  }
-
-  private GenerateMetadataTask task(String repo, String version) {
+  private GenerateMetadataTask task(String repo, String version) throws Exception {
     final YumRegistry yumRegistry = mock(YumRegistry.class);
     when(yumRegistry.maxNumberOfParallelThreads()).thenReturn(YumRegistry.DEFAULT_MAX_NUMBER_PARALLEL_THREADS);
 
     GenerateMetadataTask task = new GenerateMetadataTask(
-        mock(EventBus.class),
-        mock(RepositoryRegistry.class),
         yumRegistry,
         mock(RpmScanner.class),
         mock(Manager.class),
         mock(CommandLineExecutor.class)
     )
     {
-
       @Override
-      protected YumRepository doRun()
+      protected YumRepository execute()
           throws Exception
       {
         return null;
       }
-
     };
+    task.getConfiguration().setTypeId(GenerateMetadataTask.class.getSimpleName());
+    task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
     task.setRepoDir(rpmsDir());
     task.setRepositoryId(repo);
@@ -256,34 +240,5 @@ public class GenerateMetadataTaskSettingsIT
     task.setSingleRpmPerDirectory(true);
 
     return task;
-  }
-
-  private Map<String, List<ScheduledTask<?>>> createMap(ScheduledTask<YumRepository>... scheduledTasks) {
-    List<ScheduledTask<?>> list = new ArrayList<ScheduledTask<?>>();
-    for (ScheduledTask<YumRepository> task : scheduledTasks) {
-      list.add(task);
-    }
-    return createMap(list);
-  }
-
-  private Map<String, List<ScheduledTask<?>>> createMap(List<ScheduledTask<?>> yumTaskList) {
-    Map<String, List<ScheduledTask<?>>> activeTasks = new HashMap<String, List<ScheduledTask<?>>>();
-    activeTasks.put(ID, yumTaskList);
-    return activeTasks;
-  }
-
-  private static class MockScheduledTask<T>
-      extends DefaultScheduledTask<T>
-  {
-
-    public MockScheduledTask(Callable<T> callable) {
-      super(ID, "", "", null, callable, new RunNowSchedule());
-    }
-
-    @Override
-    public void setTaskState(TaskState state) {
-      super.setTaskState(state);
-    }
-
   }
 }

@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.task.nexus533;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.sonatype.nexus.index.tasks.UpdateIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -40,7 +41,7 @@ public class Nexus533TaskCronIT
       startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
       scheduledTask.setCronCommand("0 0 12 ? * WED");
 
-      scheduledTask.setTypeId(UpdateIndexTaskDescriptor.ID);
+      scheduledTask.setTypeId(UpdateIndexTask.class.getName());
 
       ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
       prop.setKey("repositoryId");

@@ -15,67 +15,28 @@ package org.sonatype.nexus.tasks;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 /**
- * Publish indexes task.
+ * Synchronize shadow task.
  */
-@Named(SynchronizeShadowTaskDescriptor.ID)
+@Named
 public class SynchronizeShadowsTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-  /**
-   * System event action: shadow sync
-   */
-  public static final String ACTION = "SYNC_SHADOW";
-
   @Override
-  protected String getRepositoryFieldId() {
-    return SynchronizeShadowTaskDescriptor.REPO_FIELD_ID;
-  }
-
-  public String getShadowRepositoryId() {
-    return getRepositoryId();
-  }
-
-  public void setShadowRepositoryId(String shadowRepositoryId) {
-    setRepositoryId(shadowRepositoryId);
-  }
-
-  @Override
-  public String getRepositoryId() {
-    return getParameters().get(getRepositoryFieldId());
-  }
-
-  @Override
-  public void setRepositoryId(String repositoryId) {
-    if (!StringUtils.isEmpty(repositoryId)) {
-      getParameters().put(getRepositoryFieldId(), repositoryId);
-    }
-  }
-
-  @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
     ShadowRepository shadow =
-        getRepositoryRegistry().getRepositoryWithFacet(getShadowRepositoryId(), ShadowRepository.class);
-
+        getRepositoryRegistry().getRepositoryWithFacet(getConfiguration().getRepositoryId(), ShadowRepository.class);
     shadow.synchronizeWithMaster();
-
     return null;
   }
 
   @Override
-  protected String getAction() {
-    return ACTION;
+  public String getMessage() {
+    return "Synchronizing virtual repository '" + getConfiguration().getRepositoryId() +
+        "' with it's master repository.";
   }
-
-  @Override
-  protected String getMessage() {
-    return "Synchronizing virtual repository ID='" + getShadowRepositoryId() + "') with it's master repository.";
-  }
-
 }

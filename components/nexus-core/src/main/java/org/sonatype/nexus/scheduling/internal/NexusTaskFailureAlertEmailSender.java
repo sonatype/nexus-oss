@@ -19,7 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.email.NexusPostOffice;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.Task;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -29,7 +30,7 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link EventSubscriber} that will send alert email (if necessary) in case of a failing {@link NexusTask}.
+ * {@link EventSubscriber} that will send alert email (if necessary) in case of a failing {@link Task}.
  *
  * @author Alin Dreghiciu
  */
@@ -43,7 +44,8 @@ public class NexusTaskFailureAlertEmailSender
   private final NexusPostOffice m_postOffice;
 
   @Inject
-  public NexusTaskFailureAlertEmailSender(final NexusPostOffice m_postOffice) {
+  public NexusTaskFailureAlertEmailSender(final NexusPostOffice m_postOffice)
+  {
     this.m_postOffice = checkNotNull(m_postOffice);
   }
 
@@ -53,12 +55,13 @@ public class NexusTaskFailureAlertEmailSender
   @Subscribe
   @AllowConcurrentEvents
   public void inspect(final NexusTaskEventStoppedFailed<?> failureEvent) {
-    final NexusTask<?> failedTask = failureEvent.getNexusTask();
-    if (failedTask == null || !failedTask.shouldSendAlertEmail()) {
+    final TaskInfo<?> failedTask = failureEvent.getNexusTaskInfo();
+    if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }
-    m_postOffice.sendNexusTaskFailure(failedTask.getAlertEmail(), failedTask.getId(), failedTask.getName(),
-        failureEvent.getFailureCause());
+    m_postOffice
+        .sendNexusTaskFailure(failedTask.getConfiguration().getAlertEmail(), failedTask.getId(), failedTask.getName(),
+            failureEvent.getFailureCause());
   }
 
 }

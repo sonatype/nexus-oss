@@ -30,8 +30,8 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -54,13 +54,13 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
 {
   private final RepositoryRegistry repoRegistry;
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
 
   private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public IndexingRepositoryRegistryRepositoryAsyncEventInspector(final RepositoryRegistry repoRegistry,
-                                                                 final NexusScheduler nexusScheduler,
+                                                                 final NexusTaskScheduler nexusScheduler,
                                                                  final Provider<SystemStatus> systemStatusProvider)
   {
     this.repoRegistry = repoRegistry;
@@ -164,17 +164,18 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
   }
 
   private void reindexRepo(Repository repository, boolean full, String taskName) {
-    AbstractNexusRepositoriesPathAwareTask<Object> rt;
+    TaskConfiguration rt;
     if (full) {
-      rt = nexusScheduler.createTaskInstance(RepairIndexTask.class);
+      rt = nexusScheduler.createTaskConfigurationInstance(RepairIndexTask.class);
     }
     else {
-      rt = nexusScheduler.createTaskInstance(UpdateIndexTask.class);
+      rt = nexusScheduler.createTaskConfigurationInstance(UpdateIndexTask.class);
     }
 
     rt.setRepositoryId(repository.getId());
+    rt.setName(taskName);
 
-    nexusScheduler.submit(taskName, rt);
+    nexusScheduler.submit(rt);
   }
 
   private String append(String message, String append) {

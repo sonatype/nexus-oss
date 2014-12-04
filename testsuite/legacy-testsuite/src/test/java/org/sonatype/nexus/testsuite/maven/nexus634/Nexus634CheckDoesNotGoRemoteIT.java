@@ -16,6 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -100,7 +101,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
     ScheduledServicePropertyResource repoOrGroupProp = new ScheduledServicePropertyResource();
     repoOrGroupProp.setKey("repositoryId");
     repoOrGroupProp.setValue(REPO_RELEASE_PROXY_REPO1);
-    TaskScheduleUtil.runTask(ExpireCacheTaskDescriptor.ID, repoOrGroupProp);
+    TaskScheduleUtil.runTask(ExpireCacheTask.class.getName(), repoOrGroupProp);
 
     // run snapshot remover
     runSnapshotRemover("nexus-test-harness-snapshot-repo", 0, 0, true);

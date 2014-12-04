@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.task.nexus977tasks;
 import java.io.File;
 import java.util.List;
 
+import org.sonatype.nexus.index.tasks.RepairIndexTask;
 import org.sonatype.nexus.index.tasks.descriptors.RepairIndexTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -53,7 +54,7 @@ public class Nexus977GroupOfGroupsReindexTaskIT
     ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
     repo.setKey("repositoryId");
     repo.setValue("g4");
-    TaskScheduleUtil.runTask("ReindexTaskDescriptor-snapshot", RepairIndexTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask("ReindexTaskDescriptor-snapshot", RepairIndexTask.class.getName(), repo);
 
     result = getSearchMessageUtil().searchForGav(getTestId(), "project", null, "g4");
     Assert.assertEquals(8, result.size());

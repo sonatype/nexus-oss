@@ -13,9 +13,6 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,47 +21,28 @@ import org.sonatype.nexus.formfields.RepositoryCombobox;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("ExpireCache")
+@Named
 @Singleton
 public class ExpireCacheTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "ExpireCacheTask";
-
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the proxy repository to expire cache.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories()
-      .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class);
-
-  private final StringTextFormField resourceStorePathField =
-      new StringTextFormField(
-          RESOURCE_STORE_PATH_FIELD_ID,
-          "Repository path",
-          "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
-          FormField.OPTIONAL);
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Expire Repository Caches";
-  }
-
-  public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
-    fields.add(repoField);
-    fields.add(resourceStorePathField);
-
-    return fields;
+  public ExpireCacheTaskDescriptor() {
+    super(ExpireCacheTask.class, "Expire Repository Caches",
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the proxy repository to expire cache.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+            .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class),
+        new StringTextFormField(
+            TaskConfiguration.PATH_KEY,
+            "Repository path",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            FormField.OPTIONAL)
+    );
   }
 }

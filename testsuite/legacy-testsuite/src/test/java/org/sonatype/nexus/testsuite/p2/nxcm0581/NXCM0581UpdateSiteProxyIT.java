@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.testsuite.p2.nxcm0581;
 
+import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
@@ -29,7 +31,13 @@ public class NXCM0581UpdateSiteProxyIT
   public void test()
       throws Exception
   {
-    TaskScheduleUtil.run("1");
+    ScheduledServicePropertyResource forceMirror = new ScheduledServicePropertyResource();
+    forceMirror.setKey("ForceMirror");
+    forceMirror.setValue(Boolean.TRUE.toString());
+    ScheduledServicePropertyResource repositoryId = new ScheduledServicePropertyResource();
+    repositoryId.setKey("repositoryId");
+    repositoryId.setValue("nxcm0581");
+    TaskScheduleUtil.runTask("test", UpdateSiteMirrorTask.class.getName(), forceMirror, repositoryId);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     installAndVerifyP2Feature();

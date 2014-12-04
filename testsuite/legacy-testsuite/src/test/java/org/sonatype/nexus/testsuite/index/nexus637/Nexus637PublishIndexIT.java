@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.index.nexus637;
 import java.io.File;
 import java.util.Arrays;
 
+import org.sonatype.nexus.index.tasks.PublishIndexesTask;
 import org.sonatype.nexus.index.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -70,7 +71,7 @@ public class Nexus637PublishIndexIT
     prop.setKey("repositoryId");
     prop.setValue("nexus-test-harness-repo");
 
-    TaskScheduleUtil.runTask(PublishIndexesTaskDescriptor.ID, prop);
+    TaskScheduleUtil.runTask(PublishIndexesTask.class.getName(), prop);
 
     Assert.assertTrue(".index should exists after publish index task was run.", index.exists());
   }

@@ -32,9 +32,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -66,7 +65,7 @@ public abstract class AbstractIndexPlexusResource
 
   public static final String TARGET_ID = "target";
 
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   private List<Searcher> searchers;
 
@@ -75,7 +74,7 @@ public abstract class AbstractIndexPlexusResource
   }
 
   @Inject
-  public void setNexusScheduler(final NexusScheduler nexusScheduler) {
+  public void setNexusScheduler(final NexusTaskScheduler nexusScheduler) {
     this.nexusScheduler = nexusScheduler;
   }
 
@@ -272,12 +271,12 @@ public abstract class AbstractIndexPlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    AbstractNexusRepositoriesPathAwareTask<Object> task;
+    TaskConfiguration task;
     if (getIsFullReindex()) {
-      task = getNexusScheduler().createTaskInstance(RepairIndexTask.class);
+      task = getNexusScheduler().createTaskConfigurationInstance(RepairIndexTask.class);
     }
     else {
-      task = getNexusScheduler().createTaskInstance(UpdateIndexTask.class);
+      task = getNexusScheduler().createTaskConfigurationInstance(UpdateIndexTask.class);
     }
 
     String repositoryId = getRepositoryId(request);
@@ -285,14 +284,14 @@ public abstract class AbstractIndexPlexusResource
       repositoryId = getRepositoryGroupId(request);
     }
     task.setRepositoryId(repositoryId);
-    task.setResourceStorePath(getResourceStorePath(request));
+    task.setPath(getResourceStorePath(request));
 
     handleDelete(task, request);
   }
 
   protected abstract boolean getIsFullReindex();
 
-  protected NexusScheduler getNexusScheduler() {
+  protected NexusTaskScheduler getNexusScheduler() {
     return nexusScheduler;
   }
 
@@ -363,7 +362,7 @@ public abstract class AbstractIndexPlexusResource
     return path;
   }
 
-  public void handleDelete(NexusTask<?> task, Request request)
+  public void handleDelete(TaskConfiguration task, Request request)
       throws ResourceException
   {
     try {
@@ -380,7 +379,7 @@ public abstract class AbstractIndexPlexusResource
         }
       }
 
-      getNexusScheduler().submit("Internal", task);
+      getNexusScheduler().submit(task);
 
       throw new ResourceException(Status.SUCCESS_NO_CONTENT);
     }

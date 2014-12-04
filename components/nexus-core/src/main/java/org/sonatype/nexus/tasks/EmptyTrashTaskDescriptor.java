@@ -13,55 +13,35 @@
 
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepositoryCombobox;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
 
-@Named("EmptyTrash")
+@Named
 @Singleton
 public class EmptyTrashTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "EmptyTrashTask";
-
   public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
 
-  public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
-
-  private final NumberTextFormField olderThanField =
-      new NumberTextFormField(
-          OLDER_THAN_FIELD_ID,
-          "Purge items older than (days)",
-          "Set the number of days, to purge all items that were trashed before the given number of days.",
-          FormField.OPTIONAL);
-
-  private final FormField repoField = new RepositoryCombobox(
-      REPO_OR_GROUP_FIELD_ID,
-      "Repository",
-      "Select the repository to empty the trash.",
-      FormField.MANDATORY
-  ).includeAnEntryForAllRepositories();
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Empty Trash";
-  }
-
-  public List<FormField> formFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-
-    fields.add(repoField);
-    fields.add(olderThanField);
-
-    return fields;
+  public EmptyTrashTaskDescriptor() {
+    super(EmptyTrashTask.class, "Empty Trash",
+        new NumberTextFormField(
+            OLDER_THAN_FIELD_ID,
+            "Purge items older than (days)",
+            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            FormField.OPTIONAL),
+        new RepositoryCombobox(
+            TaskConfiguration.REPOSITORY_ID_KEY,
+            "Repository",
+            "Select the repository to empty the trash.",
+            FormField.MANDATORY
+        ).includeAnEntryForAllRepositories()
+    );
   }
 }

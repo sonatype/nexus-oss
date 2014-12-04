@@ -12,13 +12,9 @@
  */
 package org.sonatype.nexus.testsuite.task.nexus533;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -29,6 +25,10 @@ import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Status;
+
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
     extends AbstractNexusIntegrationTest
@@ -56,18 +56,14 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
   }
 
   protected void assertTasks()
-      throws IOException
+      throws Exception
   {
-    Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
-
-    List<CScheduledTask> tasks = nexusConfig.getTasks();
-    Assert.assertEquals(1, tasks.size());
-
-    CScheduledTask task = tasks.get(0);
     E scheduledTask = getTaskScheduled();
 
-    Assert.assertEquals(task.getName(), scheduledTask.getName());
-    Assert.assertEquals(task.getType(), scheduledTask.getTypeId());
+    ScheduledServiceListResource task = TaskScheduleUtil.getTask(scheduledTask.getName());
+    assertThat(task.getName(), equalTo(scheduledTask.getName()));
+    // Note: FQCN typeId accepted, but "canonical" is the ID from TaskDescriptor and that is now class.simpleName
+    assertThat(scheduledTask.getTypeId(), endsWith(task.getTypeId()));
   }
 
   public void updateTasks()

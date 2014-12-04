@@ -16,37 +16,27 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@Named(P2RepositoryAggregatorTaskDescriptor.ID)
+@Named
 public class P2RepositoryAggregatorTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends RepositoryTaskSupport<Void>
 {
-
   private final P2RepositoryAggregator p2RepositoryAggregator;
 
   @Inject
-  public P2RepositoryAggregatorTask(final P2RepositoryAggregator p2RepositoryAggregator) {
+  public P2RepositoryAggregatorTask(final P2RepositoryAggregator p2RepositoryAggregator)
+  {
     this.p2RepositoryAggregator = checkNotNull(p2RepositoryAggregator);
   }
 
   @Override
-  protected String getRepositoryFieldId() {
-    return P2RepositoryAggregatorTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-  }
-
-  @Override
-  protected String getAction() {
-    return "REBUILD";
-  }
-
-  @Override
-  protected String getMessage() {
-    if (getRepositoryId() != null) {
+  public String getMessage() {
+    if (getConfiguration().getRepositoryId() != null) {
       return String.format("Rebuild p2 repository on repository [%s] from root path and bellow",
-          getRepositoryId());
+          getConfiguration().getRepositoryId());
     }
     else {
       return "Rebuild p2 repository for all repositories (with a P2 Repository Generator Capability enabled)";
@@ -54,18 +44,16 @@ public class P2RepositoryAggregatorTask
   }
 
   @Override
-  protected Object doRun()
+  protected Void execute()
       throws Exception
   {
-    final String repositoryId = getRepositoryId();
+    final String repositoryId = getConfiguration().getRepositoryId();
     if (repositoryId != null) {
       p2RepositoryAggregator.scanAndRebuild(repositoryId);
     }
     else {
       p2RepositoryAggregator.scanAndRebuild();
     }
-
     return null;
   }
-
 }

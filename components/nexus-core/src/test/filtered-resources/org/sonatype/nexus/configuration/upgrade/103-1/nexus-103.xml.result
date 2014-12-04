@@ -294,7 +294,7 @@
       <type>SnapshotRemoverTask</type>
       <status>RUNNING</status>
       <lastRun>1216164600141</lastRun>
-      <nextRun>1216251000000</nextRun>
+      <getNextRun>1216251000000</getNextRun>
       <schedule>
         <type>daily</type>
         <startDate>1214350200000</startDate>
@@ -325,7 +325,7 @@
       <type>UpdateIndexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
-      <nextRun>1216257300000</nextRun>
+      <getNextRun>1216257300000</getNextRun>
       <schedule>
         <type>advanced</type>
         <cronCommand>0 15 0-23/4 * * ?</cronCommand>
@@ -344,7 +344,7 @@
       <type>UpdateIndexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
-      <nextRun>1216257300000</nextRun>
+      <getNextRun>1216257300000</getNextRun>
       <schedule>
         <type>manual</type>
       </schedule>

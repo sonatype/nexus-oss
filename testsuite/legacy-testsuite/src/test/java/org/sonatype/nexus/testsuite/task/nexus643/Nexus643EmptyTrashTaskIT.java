@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.EmptyTrashTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -59,13 +60,13 @@ public class Nexus643EmptyTrashTaskIT
     age.setKey(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID);
     age.setValue("1");
 
-    TaskScheduleUtil.runTask("Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, age);
+    TaskScheduleUtil.runTask("Empty Trash Older Than", EmptyTrashTask.class.getName(), age);
 
     Assert.assertTrue("New trash content should be kept! ", newTrashFile.exists());
     Assert.assertFalse("Old trash content should be removed!", oldTrashFile.exists());
 
     // Empty the whole trash
-    TaskScheduleUtil.runTask("Empty Whole Trash", EmptyTrashTaskDescriptor.ID);
+    TaskScheduleUtil.runTask("Empty Whole Trash", EmptyTrashTask.class.getName());
 
     Assert.assertFalse("Trash should be empty!", trashContent.exists());
   }

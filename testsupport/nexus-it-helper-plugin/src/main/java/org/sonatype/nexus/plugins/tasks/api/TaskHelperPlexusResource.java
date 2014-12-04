@@ -16,10 +16,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.ScheduledTask;
 
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -39,10 +39,11 @@ public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {
 
-  private final NexusScheduler nexusScheduler;
+  private final NexusTaskScheduler nexusScheduler;
 
   @Inject
-  public TaskHelperPlexusResource(final NexusScheduler nexusScheduler) {
+  public TaskHelperPlexusResource(final NexusTaskScheduler nexusScheduler)
+  {
     this.nexusScheduler = nexusScheduler;
   }
 
@@ -80,7 +81,7 @@ public class TaskHelperPlexusResource
       }
     }
 
-    final ScheduledTask<?> namedTask = getTaskByName(nexusScheduler, name);
+    final TaskInfo<?> namedTask = getTaskByName(nexusScheduler, name);
 
     if (name != null && namedTask == null) {
       // task wasn't found, so bounce on outta here

@@ -13,7 +13,9 @@
 package org.sonatype.nexus.rest.schedules_;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Named;
@@ -31,11 +33,10 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
-import org.sonatype.nexus.scheduling.TaskUtils;
+import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskInfo.State;
+import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -93,11 +94,14 @@ public class ScheduledServicePlexusResource
       throws ResourceException
   {
     ScheduledServiceResourceResponse result = new ScheduledServiceResourceResponse();
+    TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
+    if (task == null) {
+      throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+          + getScheduledServiceId(request));
+    }
+
     try {
-      ScheduledTask<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
-
-      ScheduledServiceBaseResource resource = getServiceRestModel(task);
-
+      ScheduledServiceBaseResource resource = getServiceRestModel(task.getConfiguration(), task.getSchedule());
       if (resource != null) {
         result.setData(resource);
       }
@@ -105,13 +109,13 @@ public class ScheduledServicePlexusResource
         throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id ("
             + getScheduledServiceId(request) + "), can't load task.");
       }
+
+      return result;
     }
-    catch (NoSuchTaskException e) {
+    catch (IllegalStateException e) {
       throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
           + getScheduledServiceId(request));
     }
-
-    return result;
   }
 
   /**
@@ -135,64 +139,58 @@ public class ScheduledServicePlexusResource
         // task name
         // task schedule (even to another type)
         // task params
-        ScheduledTask<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
-        TaskState state = task.getTaskState();
-        if (TaskState.RUNNING.equals(state) || TaskState.CANCELLING.equals(state)
-            || TaskState.SLEEPING.equals(state)) {
+        TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
+        if (task == null) {
+          getLogger().warn("Unable to locate task id:" + resource.getId());
+          throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!");
+        }
+        if (task.getCurrentState().getState() == State.RUNNING) {
           throw new ResourceException(Status.CLIENT_ERROR_CONFLICT,
               "Task can't be edited while it is being executed or it is in line to be executed");
         }
 
-        task.setEnabled(resource.isEnabled());
+        task.getConfiguration().setEnabled(resource.isEnabled());
 
-        task.setName(getModelName(resource));
+        task.getConfiguration().setName(getModelName(resource));
 
-        task.setSchedule(getModelSchedule(resource));
+        Schedule schedule = getModelSchedule(resource);
 
         for (Iterator<ScheduledServicePropertyResource> iter = resource.getProperties().iterator(); iter.hasNext(); ) {
           ScheduledServicePropertyResource prop = iter.next();
-
-          task.getTaskParams().put(prop.getKey(), prop.getValue());
+          task.getConfiguration().getMap().put(prop.getKey(), prop.getValue());
         }
 
-        TaskUtils.setAlertEmail(task, resource.getAlertEmail());
-        TaskUtils.setId(task, resource.getId());
-        TaskUtils.setName(task, resource.getName());
-
-        task.reset();
+        task.getConfiguration().setAlertEmail(resource.getAlertEmail());
+        if (resource.getName() != null) {
+          task.getConfiguration().setName(resource.getName());
+        }
 
         // Store the changes
-        getNexusScheduler().updateSchedule(task);
+        task = getNexusScheduler().scheduleTask(task.getConfiguration(), schedule);
 
         ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
         resourceStatus.setResource(resource);
         // Just need to update the id, as the incoming data is a POST w/ no id
         resourceStatus.getResource().setId(task.getId());
         resourceStatus.setResourceURI(createChildReference(request, this, task.getId()).toString());
-        resourceStatus.setStatus(task.getTaskState().toString());
-        resourceStatus.setReadableStatus(getReadableState(task.getTaskState()));
-        resourceStatus.setCreated(task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString());
+        resourceStatus.setStatus(task.getCurrentState().getState().name());
+        resourceStatus.setReadableStatus(getReadableState(task));
+        resourceStatus.setCreated(task.getConfiguration().getCreated().toString());
         resourceStatus.setLastRunResult(getLastRunResult(task));
-        resourceStatus.setLastRunTime(task.getLastRun() == null ? "n/a" : task.getLastRun().toString());
-        resourceStatus.setNextRunTime(task.getNextRun() == null ? "n/a" : task.getNextRun().toString());
-        if (task.getScheduledAt() != null) {
-          resourceStatus.setCreatedInMillis(task.getScheduledAt().getTime());
+        resourceStatus.setLastRunTime(task.getLastRunState() == null ? "n/a" : task.getLastRunState().getRunStarted().toString());
+        final Date nextRunTime = getNextRunTime(task);
+        resourceStatus.setNextRunTime(nextRunTime == null ? "n/a" : nextRunTime.toString());
+        resourceStatus.setCreatedInMillis(task.getConfiguration().getUpdated().getTime());
+        if (task.getLastRunState() != null) {
+          resourceStatus.setLastRunTimeInMillis(task.getLastRunState().getRunStarted().getTime());
         }
-        if (task.getLastRun() != null) {
-          resourceStatus.setLastRunTimeInMillis(task.getLastRun().getTime());
-        }
-        if (task.getNextRun() != null) {
-          resourceStatus.setNextRunTimeInMillis(task.getNextRun().getTime());
+        if (nextRunTime != null) {
+          resourceStatus.setNextRunTimeInMillis(nextRunTime.getTime());
         }
 
         result = new ScheduledServiceResourceStatusResponse();
         result.setData(resourceStatus);
 
-      }
-      catch (NoSuchTaskException e) {
-        getLogger().warn("Unable to locate task id:" + resource.getId(), e);
-
-        throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!");
       }
       catch (RejectedExecutionException e) {
         throw new ResourceException(Status.CLIENT_ERROR_CONFLICT, e.getMessage());
@@ -217,14 +215,13 @@ public class ScheduledServicePlexusResource
   public void delete(Context context, Request request, Response response)
       throws ResourceException
   {
-    try {
-      getNexusScheduler().getTaskById(getScheduledServiceId(request)).cancel();
-
+    final TaskInfo<?> task = getNexusScheduler().getTaskById(getScheduledServiceId(request));
+    if (task != null) {
+      task.remove();
       response.setStatus(Status.SUCCESS_NO_CONTENT);
+      return;
     }
-    catch (NoSuchTaskException e) {
-      response.setStatus(Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!");
-    }
+    throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Resource not found");
   }
 
 }

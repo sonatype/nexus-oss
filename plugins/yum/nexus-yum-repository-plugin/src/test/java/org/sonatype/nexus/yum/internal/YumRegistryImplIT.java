@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.support.SchedulerYumNexusTestSupport;
 
@@ -45,7 +45,7 @@ public class YumRegistryImplIT
   private YumRegistry yumRegistry;
 
   @Inject
-  private NexusScheduler nexusScheduler;
+  private NexusTaskScheduler nexusScheduler;
 
   @Test
   public void shouldScanRepository()
@@ -107,7 +107,7 @@ public class YumRegistryImplIT
     {
       @Override
       public boolean isSatisfied() {
-        return nexusScheduler.getActiveTasks().isEmpty();
+        return nexusScheduler.getRunningTaskCount() == 0;
       }
     });
   }

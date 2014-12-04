@@ -15,8 +15,10 @@ package org.sonatype.nexus.testsuite.p2.p2r03;
 import java.io.File;
 import java.net.URL;
 
+import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTask;
 import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.testsuite.p2.AbstractNexusP2GeneratorIT;
 
@@ -48,9 +50,9 @@ public class P2R0303RunP2RepositoryAggregatorTaskIT
     createP2RepositoryAggregatorCapability();
 
     final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-    repo.setKey(P2RepositoryAggregatorTaskDescriptor.REPO_OR_GROUP_FIELD_ID);
+    repo.setKey(TaskConfiguration.REPOSITORY_ID_KEY);
     repo.setValue(getTestRepositoryId());
-    TaskScheduleUtil.runTask(P2RepositoryAggregatorTaskDescriptor.ID, repo);
+    TaskScheduleUtil.runTask(P2RepositoryAggregatorTask.class.getName(), repo);
     TaskScheduleUtil.waitForAllTasksToStop();
 
     // ensure link created

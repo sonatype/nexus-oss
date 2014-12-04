@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.sonatype.nexus.index.tasks.MockedIndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.ProxyMode;

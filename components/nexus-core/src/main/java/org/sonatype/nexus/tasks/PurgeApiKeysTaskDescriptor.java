@@ -15,18 +15,14 @@ package org.sonatype.nexus.tasks;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Named("PurgeApiKeys")
+import org.sonatype.nexus.scheduling.TaskDescriptorSupport;
+
+@Named
 @Singleton
 public class PurgeApiKeysTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends TaskDescriptorSupport
 {
-  public static final String ID = "PurgeApiKeysTask";
-
-  public String getId() {
-    return ID;
-  }
-
-  public String getName() {
-    return "Purge Orphaned API Keys";
+  public PurgeApiKeysTaskDescriptor() {
+    super(PurgeApiKeysTask.class, "Purge Orphaned API Keys");
   }
 }

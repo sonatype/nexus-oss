@@ -59,7 +59,7 @@ import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
-import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.p2.bridge.Publisher;
 
 import org.apache.commons.io.FileUtils;
@@ -90,7 +90,7 @@ public class UpdateSiteProxyRepositoryImpl
 
   private final ContentClass contentClass;
 
-  private final NexusScheduler scheduler;
+  private final NexusTaskScheduler scheduler;
 
   private final UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator;
 
@@ -102,7 +102,7 @@ public class UpdateSiteProxyRepositoryImpl
 
   @Inject
   public UpdateSiteProxyRepositoryImpl(final @Named(P2ContentClass.ID) ContentClass contentClass,
-                                       final NexusScheduler scheduler,
+                                       final NexusTaskScheduler scheduler,
                                        final UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator,
                                        final Publisher publisher)
   {
@@ -617,6 +617,7 @@ public class UpdateSiteProxyRepositoryImpl
     if (AbstractP2MetadataSource.isP2MetadataItem(request.getRequestPath())) {
       if (!isItemValid(P2Constants.SITE_XML)) {
         UpdateSiteMirrorTask.submit(scheduler, this, false);
+        log.debug("Submitted UpdateSiteMirrorTask for {}", this);
       }
     }
 

@@ -19,7 +19,7 @@ import org.sonatype.nexus.index.tasks.descriptors.RepairIndexTaskDescriptor;
 /**
  * Repair index task.
  */
-@Named(RepairIndexTaskDescriptor.ID)
+@Named
 public class RepairIndexTask
     extends AbstractIndexerTask
 {
