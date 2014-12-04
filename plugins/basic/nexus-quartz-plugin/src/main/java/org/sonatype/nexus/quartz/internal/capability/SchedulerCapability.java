@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
@@ -30,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-@Named(SchedulerCapabilityDescriptor.TYPE_ID)
+@Named(QuartzPlugin.CAPABILITY_ID)
 public class SchedulerCapability
     extends CapabilitySupport<SchedulerCapabilityConfiguration>
 {
@@ -103,7 +104,7 @@ public class SchedulerCapability
       return messages.disabledDescription();
     }
 
-    return render(SchedulerCapabilityDescriptor.TYPE_ID + "-status.vm", new TemplateParameters()
+    return render(QuartzPlugin.CAPABILITY_ID + "-status.vm", new TemplateParameters()
         .set("status", renderDescription())
         .set("active", quartzImpl.isActive())
         .set("threadPoolSize", quartzImpl.getThreadPoolSize())

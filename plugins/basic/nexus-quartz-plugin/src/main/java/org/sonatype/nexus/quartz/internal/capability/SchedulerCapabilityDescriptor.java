@@ -19,19 +19,17 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
-import org.sonatype.nexus.formfields.CheckboxFormField;
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.capability.CapabilityType;
 import org.sonatype.nexus.capability.Tag;
 import org.sonatype.nexus.capability.Taggable;
 import org.sonatype.nexus.capability.Validator;
+import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
+import org.sonatype.nexus.formfields.CheckboxFormField;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
-
-import org.jetbrains.annotations.NonNls;
 
 import static org.sonatype.nexus.capability.CapabilityType.capabilityType;
 import static org.sonatype.nexus.capability.Tag.categoryTag;
@@ -43,16 +41,13 @@ import static org.sonatype.nexus.quartz.QuartzPlugin.CAPABILITY_CATEGORY_TAG;
  *
  * @since 3.0
  */
-@Named(SchedulerCapabilityDescriptor.TYPE_ID)
+@Named(QuartzPlugin.CAPABILITY_ID)
 @Singleton
 public class SchedulerCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements Taggable
 {
-  @NonNls
-  public static final String TYPE_ID = QuartzPlugin.ID_PREFIX + ".scheduler";
-
-  public static final CapabilityType TYPE = capabilityType(TYPE_ID);
+  public static final CapabilityType TYPE = capabilityType(QuartzPlugin.CAPABILITY_ID);
 
   private static interface Messages
       extends MessageBundle
@@ -120,7 +115,7 @@ public class SchedulerCapabilityDescriptor
 
   @Override
   protected String renderAbout() throws Exception {
-    return render(TYPE_ID + "-about.vm");
+    return render(QuartzPlugin.CAPABILITY_ID + "-about.vm");
   }
 
   @Override
