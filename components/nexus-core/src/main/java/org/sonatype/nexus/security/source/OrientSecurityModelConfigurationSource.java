@@ -16,6 +16,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,7 +40,9 @@ import org.sonatype.security.usermanagement.UserManagerImpl;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
@@ -167,7 +170,7 @@ public class OrientSecurityModelConfigurationSource
 
   @Override
   public SecurityModelConfiguration loadConfiguration() {
-    configuration = new OrientSecurityModelConfiguration();
+    configuration = new CachingOrientSecurityModelConfiguration();
     return getConfiguration();
   }
 
@@ -238,12 +241,7 @@ public class OrientSecurityModelConfigurationSource
 
       try (ODatabaseDocumentTx db = openDb()) {
         userEntityAdapter.create(db, user);
-
-        CUserRoleMapping mapping = new CUserRoleMapping();
-        mapping.setUserId(user.getId());
-        mapping.setSource(UserManagerImpl.SOURCE);
-        mapping.setRoles(roles);
-        userRoleMappingEntityAdapter.create(db, mapping);
+        addUserRoleMapping(mapping(user.getId(), roles));
       }
     }
 
@@ -267,16 +265,12 @@ public class OrientSecurityModelConfigurationSource
         }
         userEntityAdapter.write(document, user);
 
-        CUserRoleMapping mapping = new CUserRoleMapping();
-        mapping.setUserId(user.getId());
-        mapping.setSource(UserManagerImpl.SOURCE);
-        mapping.setRoles(roles);
-        document = userRoleMappingEntityAdapter.get(db, mapping.getUserId(), mapping.getSource());
-        if (document != null) {
-          userRoleMappingEntityAdapter.write(document, mapping);
+        CUserRoleMapping mapping = mapping(user.getId(), roles);
+        try {
+          updateUserRoleMapping(mapping);
         }
-        else {
-          userRoleMappingEntityAdapter.create(db, mapping);
+        catch (NoSuchRoleMappingException e) {
+          addUserRoleMapping(mapping);
         }
       }
       catch (OConcurrentModificationException e) {
@@ -295,7 +289,7 @@ public class OrientSecurityModelConfigurationSource
 
       try (ODatabaseDocumentTx db = openDb()) {
         if (userEntityAdapter.delete(db, id)) {
-          userRoleMappingEntityAdapter.delete(db, id, UserManagerImpl.SOURCE);
+          removeUserRoleMapping(id, UserManagerImpl.SOURCE);
           return true;
         }
         return false;
@@ -563,6 +557,63 @@ public class OrientSecurityModelConfigurationSource
       }
     }
 
+    private CUserRoleMapping mapping(final String userId, final Set<String> roles) {
+      CUserRoleMapping mapping = new CUserRoleMapping();
+      mapping.setUserId(userId);
+      mapping.setSource(UserManagerImpl.SOURCE);
+      mapping.setRoles(roles);
+      return mapping;
+    }
+
+  }
+
+  private class CachingOrientSecurityModelConfiguration
+      extends OrientSecurityModelConfiguration
+  {
+
+    private final ConcurrentMap<String, CUserRoleMapping> userRoleMappings;
+
+    private CachingOrientSecurityModelConfiguration() {
+      userRoleMappings = Maps.newConcurrentMap();
+      for (CUserRoleMapping mapping : super.getUserRoleMappings()) {
+        userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
+      }
+    }
+
+    @Override
+    public List<CUserRoleMapping> getUserRoleMappings() {
+      return ImmutableList.copyOf(userRoleMappings.values());
+    }
+
+    @Override
+    public CUserRoleMapping getUserRoleMapping(final String userId, final String source) {
+      checkNotNull(userId, "user id");
+      checkNotNull(source, "source");
+      return userRoleMappings.get(userRoleMappingKey(userId, source));
+    }
+
+    @Override
+    public void addUserRoleMapping(final CUserRoleMapping mapping) {
+      super.addUserRoleMapping(mapping);
+      userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
+    }
+
+    @Override
+    public void updateUserRoleMapping(final CUserRoleMapping mapping) throws NoSuchRoleMappingException {
+      super.updateUserRoleMapping(mapping);
+      userRoleMappings.put(userRoleMappingKey(mapping.getUserId(), mapping.getSource()), mapping);
+    }
+
+    @Override
+    public boolean removeUserRoleMapping(final String userId, final String source) {
+      boolean found = super.removeUserRoleMapping(userId, source);
+      userRoleMappings.remove(userRoleMappingKey(userId, source));
+      return found;
+    }
+
+    private String userRoleMappingKey(final String userId, final String source) {
+      return userId + "|" + source;
+    }
   }
 
 }
