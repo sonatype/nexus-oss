@@ -246,10 +246,11 @@ public class ExtDirectServlet
       }
 
       private Response handleException(final RegisteredMethod method, final Throwable e) {
-        log.debug("Failed to invoke action method: {}, java-method: {}", method.getFullName(),
-            method.getFullJavaMethodName(), e);
-
         if (e instanceof InvalidConfigurationException) {
+          log.debug(
+              "Failed to invoke action method: {}, java-method: {}",
+              method.getFullName(), method.getFullJavaMethodName(), e
+          );
           InvalidConfigurationException cause = (InvalidConfigurationException) e;
           ValidationResponse vr = cause.getValidationResponse();
           if (vr == null || vr.getValidationErrors() == null || vr.getValidationErrors().size() == 0) {
@@ -259,6 +260,10 @@ public class ExtDirectServlet
         }
 
         if (e instanceof ConstraintViolationException) {
+          log.debug(
+              "Failed to invoke action method: {}, java-method: {}",
+              method.getFullName(), method.getFullJavaMethodName(), e
+          );
           ConstraintViolationException cause = (ConstraintViolationException) e;
           Set<ConstraintViolation<?>> violations = cause.getConstraintViolations();
           if (violations == null || violations.size() == 0) {
@@ -267,6 +272,10 @@ public class ExtDirectServlet
           return asResponse(invalid(cause));
         }
 
+        log.error(
+            "Failed to invoke action method: {}, java-method: {}",
+            method.getFullName(), method.getFullJavaMethodName(), e
+        );
         return asResponse(error(e));
       }
 
