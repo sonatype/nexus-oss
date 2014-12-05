@@ -79,9 +79,11 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
         submitValue: false
       },
       {
-        xtype: 'fieldcontainer',
+        xtype: 'checkboxgroup',
         fieldLabel: 'Days',
         helpText: 'Days of week when this task should run.',
+        allowBlank: false,
+        blankText: 'At least one day should be selected',
         items: {
           xtype: 'panel',
           layout: 'column',
