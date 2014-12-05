@@ -36,7 +36,7 @@ implements SecurityModelConfigurationSource
         users: [
             new CUser(
                 id: 'admin',
-                password: 'f865b53623b121fd34ee5426c792e5c33af8c227',
+                password: '$shiro1$SHA-512$1024$NE+wqQq/TmjZMvfI7ENh/g==$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA==',
                 firstName: 'Administrator',
                 lastName: 'User',
                 status: 'active',
@@ -44,7 +44,7 @@ implements SecurityModelConfigurationSource
             ),
             new CUser(
                 id: 'deployment',
-                password: 'b2a0e378437817cebdf753d7dff3dd75483af9e0',
+                password: '$shiro1$SHA-512$1024$xaOIRR7k7PL9Gf8SzkZ/eg==$CkCu6iigYnoWPb7vVkqCp7bt0rFAvHmHoA61S2H+59ithA6vhW8PsgoidziAirE1uglffKrcAJ++8RdHvIpTLA==',
                 firstName: 'Deployment',
                 lastName: 'User',
                 status: 'active',
@@ -52,7 +52,7 @@ implements SecurityModelConfigurationSource
             ),
             new CUser(
                 id: 'anonymous',
-                password: '0a92fab3230134cca6eadd9898325b9b2ae67998',
+                password: '$shiro1$SHA-512$1024$CPJm1XWdYNg5eCAYp4L4HA==$HIGwnJhC07ZpgeVblZcFRD1F6KH+xPG8t7mIcEMbfycC+n5Ljudyoj9dzdinrLmChTrmKMCw2/z29F7HeLbTbQ==',
                 firstName: 'Nexus',
                 lastName: 'Anonymous User',
                 status: 'active',
