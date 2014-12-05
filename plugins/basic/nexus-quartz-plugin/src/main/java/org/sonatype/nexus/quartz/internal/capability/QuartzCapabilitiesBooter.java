@@ -34,8 +34,7 @@ public class QuartzCapabilitiesBooter
   protected void boot(final CapabilityRegistry registry) throws Exception {
     maybeAddCapability(registry, SchedulerCapabilityDescriptor.TYPE, true, null,
         ImmutableMap.of(
-            SchedulerCapabilityConfiguration.ACTIVE, String.valueOf(SchedulerCapabilityConfiguration.DEFAULT_ACTIVE),
-            SchedulerCapabilityConfiguration.THREAD_POOL_SIZE, String.valueOf(SchedulerCapabilityConfiguration.DEFAULT_THREAD_POOL_SIZE)
+            SchedulerCapabilityConfiguration.ACTIVE, String.valueOf(SchedulerCapabilityConfiguration.DEFAULT_ACTIVE)
         )
     );
   }
