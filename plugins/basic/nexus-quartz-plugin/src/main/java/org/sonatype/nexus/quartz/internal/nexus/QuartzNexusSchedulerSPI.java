@@ -92,7 +92,7 @@ public class QuartzNexusSchedulerSPI
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       final NexusTaskInfo<T> taskInfo = taskByKey(jobKey);
-      if (!taskInfo.isRemovedOrDone()) {
+      if (taskInfo != null && !taskInfo.isRemovedOrDone()) {
         return taskInfo;
       }
     }
@@ -275,8 +275,13 @@ public class QuartzNexusSchedulerSPI
       for (JobKey jobKey : jobKeys) {
         final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
             .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-        checkState(nexusTaskJobListener != null, "NX task must have listener");
-        result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
+        // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
+        // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
+        // but QZ did not remove job yet.
+        // checkState(nexusTaskJobListener != null, "NX task must have listener");
+        if (nexusTaskJobListener != null) {
+          result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
+        }
       }
       return result;
     }
@@ -291,12 +296,18 @@ public class QuartzNexusSchedulerSPI
     try {
       final NexusTaskJobListener<T> nexusTaskJobListener = (NexusTaskJobListener<T>) quartzSupport.getScheduler()
           .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-      checkState(nexusTaskJobListener != null, "NX task must have listener");
-      return nexusTaskJobListener.getNexusTaskInfo();
+      // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
+      // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
+      // but QZ did not remove job yet.
+      // checkState(nexusTaskJobListener != null, "NX task must have listener");
+      if (nexusTaskJobListener != null) {
+        return nexusTaskJobListener.getNexusTaskInfo();
+      }
     }
     finally {
       Thread.currentThread().setContextClassLoader(classLoader);
     }
+    return null;
   }
 
   boolean cancelJob(final JobKey jobKey) {

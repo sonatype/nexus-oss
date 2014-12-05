@@ -158,8 +158,13 @@ public class GenerateMetadataTaskConcurrencyIT
 
     waitFor(futures);
     // then
-    assertThat(second, is(first));
-    assertThat(first.getConfiguration().getString(GenerateMetadataTask.PARAM_ADDED_FILES),
+
+    // instance not anymore, rescheduled task's taskInfo is recreated
+    // assertThat(second, is(first));
+    // but is same task
+    assertThat(second.getId(), is(first.getId()));
+    // but second one has the "actual" config! first shows state at the moment it was scheduled
+    assertThat(second.getConfiguration().getString(GenerateMetadataTask.PARAM_ADDED_FILES),
         is(file1 + pathSeparator + file2));
   }
 
@@ -201,6 +206,8 @@ public class GenerateMetadataTaskConcurrencyIT
       }
     };
     final TaskConfiguration taskCfg = nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class);
+    taskCfg.setId("foo");
+    taskCfg.setTypeId(GenerateMetadataTask.class.getSimpleName());
     task.configure(taskCfg);
     task.setRepositoryId("REPO_" + repositoryId);
     return task;

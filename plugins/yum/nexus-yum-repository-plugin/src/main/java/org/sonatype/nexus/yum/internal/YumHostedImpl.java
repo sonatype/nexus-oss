@@ -231,7 +231,8 @@ public class YumHostedImpl
       if (Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
           Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION), task.getString(
               GenerateMetadataTask.PARAM_VERSION))) {
-        return mergeAddedFiles((TaskInfo<YumRepository>) taskInfo, task);
+        final TaskConfiguration taskConfiguration =  mergeAddedFiles((TaskInfo<YumRepository>) taskInfo, task);
+        return nexusScheduler.scheduleTask(taskConfiguration, taskInfo.getSchedule());
       }
     }
     return nexusScheduler.submit(task);
@@ -265,22 +266,22 @@ public class YumHostedImpl
   }
 
   @SuppressWarnings("unchecked")
-  private TaskInfo<YumRepository> mergeAddedFiles(final TaskInfo<YumRepository> existingScheduledTask,
+  private TaskConfiguration mergeAddedFiles(final TaskInfo<YumRepository> existingScheduledTask,
                                                   final TaskConfiguration taskToMerge)
   {
+    final TaskConfiguration existingTaskConfiguration = existingScheduledTask.getConfiguration();
     if (isNotBlank(taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
-      final TaskConfiguration existingTask = existingScheduledTask.getConfiguration();
-      if (isBlank(existingTask.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
-        existingTask.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
+      if (isBlank(existingTaskConfiguration.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
+        existingTaskConfiguration.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
             taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES));
       }
       else {
-        existingTask.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
-            existingTask.getString(GenerateMetadataTask.PARAM_ADDED_FILES) + pathSeparator +
+        existingTaskConfiguration.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
+            existingTaskConfiguration.getString(GenerateMetadataTask.PARAM_ADDED_FILES) + pathSeparator +
                 taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES));
       }
     }
-    return existingScheduledTask;
+    return existingTaskConfiguration;
   }
 
   private GenerateMetadataTask createTask() {

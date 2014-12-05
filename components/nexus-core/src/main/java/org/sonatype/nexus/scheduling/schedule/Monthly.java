@@ -32,11 +32,11 @@ public class Monthly
     checkNotNull(daysToRun);
     checkArgument(!daysToRun.isEmpty(), "No days of month set to run");
     for (Integer integer : daysToRun) {
-      checkArgument((integer >= 1 && integer <= 31) || integer == LAST_DAY_OF_MONTH, "Invalid monthly argument: %s",
+      checkArgument((integer >= 1 && integer <= 31) || LAST_DAY_OF_MONTH.equals(integer), "Invalid monthly argument: %s",
           daysToRun);
     }
     properties.put("schedule.startAt", dateToString(startAt));
-    properties.put("schedule.daysToRun", setToList(daysToRun));
+    properties.put("schedule.daysToRun", setToCsv(daysToRun));
   }
 
   public Date getStartAt() {
@@ -44,6 +44,6 @@ public class Monthly
   }
 
   public Set<Integer> getDaysToRun() {
-    return listToSet(properties.get("schedule.daysToRun"));
+    return csvToSet(properties.get("schedule.daysToRun"));
   }
 }

@@ -44,7 +44,8 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    TaskConfiguration taskConfiguration = task.taskConfiguration();
+    TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
     taskConfiguration.setRepositoryId(GROUP_ID_1);
     task.configure(taskConfiguration);
@@ -58,7 +59,8 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    TaskConfiguration taskConfiguration = task.taskConfiguration();
+    TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
     taskConfiguration.setRepositoryId(GROUP_ID_1);
     task.configure(taskConfiguration);
@@ -76,8 +78,9 @@ public class MergeMetadataTaskIT
   private TaskInfo<?> runningTask(final String repoId) {
     final TaskInfo<?> task = mock(TaskInfo.class);
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setRepositoryId(repoId);
+    taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
+    taskConfiguration.setRepositoryId(repoId);
     when(task.getConfiguration()).thenReturn(taskConfiguration);
     CurrentState currentState = mock(CurrentState.class);
     when(currentState.getState()).thenReturn(State.RUNNING);
