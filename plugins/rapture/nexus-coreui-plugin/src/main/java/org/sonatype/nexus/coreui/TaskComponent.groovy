@@ -181,7 +181,7 @@ class TaskComponent
     validateState(task)
     Schedule schedule = asSchedule(taskXO)
 
-    task = nexusScheduler.scheduleTask(task.configuration, schedule)
+    task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
 
     return asTaskXO(task)
   }
