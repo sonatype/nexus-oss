@@ -60,19 +60,11 @@ public class SchedulerCapabilityDescriptor
 
     @DefaultMessage("If active, jobs will be executed as scheduled. If not active, no jobs will be executed, scheduler is in \'stand-by\' mode.")
     String activeHelp();
-
-    @DefaultMessage("Thread Pool Size")
-    String threadPoolSizeLabel();
-
-    @DefaultMessage("Size of the thread pool to be used with Quartz Scheduler. Is applied when scheduler is created (this capability disabled/enabled or on Nexus reboot).")
-    String threadPoolSizeHelp();
   }
 
   private static final Messages messages = I18N.create(Messages.class);
 
   private final FormField active;
-
-  private final FormField threadPoolSize;
 
   public SchedulerCapabilityDescriptor() {
     this.active = new CheckboxFormField(
@@ -80,12 +72,6 @@ public class SchedulerCapabilityDescriptor
         messages.activeLabel(),
         messages.activeHelp(),
         FormField.OPTIONAL // Bug? Checkbox not sent when unchecked
-    );
-    this.threadPoolSize = new NumberTextFormField(
-        SchedulerCapabilityConfiguration.THREAD_POOL_SIZE,
-        messages.threadPoolSizeLabel(),
-        messages.threadPoolSizeHelp(),
-        FormField.MANDATORY
     );
   }
 
@@ -102,8 +88,7 @@ public class SchedulerCapabilityDescriptor
   @Override
   public List<FormField> formFields() {
     return Arrays.asList(
-        active,
-        threadPoolSize
+        active
     );
   }
 
