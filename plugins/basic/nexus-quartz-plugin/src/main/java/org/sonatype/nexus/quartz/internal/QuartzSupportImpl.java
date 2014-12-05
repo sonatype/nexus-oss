@@ -16,6 +16,8 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,6 +50,7 @@ import org.quartz.spi.ThreadExecutor;
 import org.quartz.spi.TriggerFiredBundle;
 import org.quartz.utils.DBConnectionManager;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -61,7 +64,19 @@ public class QuartzSupportImpl
     extends LifecycleSupport
     implements QuartzSupport, JobFactory
 {
+  private static final String QUARTZ_POOL_SIZE_KEY = QuartzPlugin.CONFIG_PREFIX + ".poolSize";
+
+  private static final int QUARTZ_POOL_SIZE_DEFAULT = 20;
+
+  /**
+   * Used by {@link H2ConnectionProvider} too to size pool.
+   */
+  static final String QUARTZ_POOL_SIZE =
+      "${" + QUARTZ_POOL_SIZE_KEY + ":-" + QUARTZ_POOL_SIZE_DEFAULT + "}";
+
   private final String SCHEDULER_NAME = "NX-Quartz-Scheduler";
+
+  private final int threadPoolSize;
 
   private final H2ConnectionProvider h2ConnectionProvider;
 
@@ -75,21 +90,21 @@ public class QuartzSupportImpl
 
   private boolean active;
 
-  private int threadPoolSize;
-
   @Inject
-  public QuartzSupportImpl(final H2ConnectionProvider h2ConnectionProvider,
+  public QuartzSupportImpl(final @Named(QUARTZ_POOL_SIZE) int threadPoolSize,
+                           final H2ConnectionProvider h2ConnectionProvider,
                            final QuartzDatabaseMigrator migrator,
                            final Iterable<BeanEntry<Named, Job>> jobEntries,
                            final List<QuartzCustomizer> quartzCustomizers)
       throws Exception
   {
+    checkArgument(threadPoolSize > 0, "Invalid thread pool size: %s", threadPoolSize);
+    this.threadPoolSize = threadPoolSize;
     this.h2ConnectionProvider = checkNotNull(h2ConnectionProvider);
     this.migrator = checkNotNull(migrator);
     this.jobEntries = checkNotNull(jobEntries);
     this.quartzCustomizers = checkNotNull(quartzCustomizers);
     this.active = true;
-    this.threadPoolSize = 20;
   }
 
   /**
@@ -99,6 +114,26 @@ public class QuartzSupportImpl
   @Override
   public boolean isStarted() {
     return super.isStarted();
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+    try {
+      start();
+    }
+    catch (Exception e) {
+      Throwables.propagate(e);
+    }
+  }
+
+  @PreDestroy
+  public void preDestroy() {
+    try {
+      stop();
+    }
+    catch (Exception e) {
+      Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -233,16 +268,6 @@ public class QuartzSupportImpl
    */
   public int getThreadPoolSize() {
     return threadPoolSize;
-  }
-
-  /**
-   * Sets the thread pool size to be used with Quartz scheduler. <em>This method has effect only if is called
-   * before {@link #start()}!</em>, otherwise the call is completely neglected.
-   */
-  public void setThreadPoolSize(final int threadPoolSize) {
-    if (scheduler == null) {
-      this.threadPoolSize = threadPoolSize;
-    }
   }
 
   // JobFactory

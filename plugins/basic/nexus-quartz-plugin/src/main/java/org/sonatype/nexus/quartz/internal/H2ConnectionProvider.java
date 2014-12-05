@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.quartz.QuartzPlugin;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -44,11 +45,13 @@ public class H2ConnectionProvider
     extends ComponentSupport
     implements ConnectionProvider
 {
+  private static final String H2_SETTINGS_KEY = QuartzPlugin.CONFIG_PREFIX + ".h2-settings";
+
   private static final String H2_DEFAULTS =
       ";FILE_LOCK=FS;MVCC=TRUE;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000";
 
   private static final String H2_SETTINGS =
-      "${nexus-quartz-h2-settings:-" + H2_DEFAULTS + "}";
+      "${" + H2_SETTINGS_KEY + ":-" + H2_DEFAULTS + "}";
 
   private static final String DATABASE_NAME = "quartz";
 
@@ -56,13 +59,19 @@ public class H2ConnectionProvider
 
   private final String settings;
 
+  private final int poolSize;
+
   private JdbcConnectionPool pool;
 
   @Inject
-  public H2ConnectionProvider(final ApplicationDirectories cfg, @Named(H2_SETTINGS) final String settings)
+  public H2ConnectionProvider(final ApplicationDirectories cfg,
+                              final @Named(H2_SETTINGS) String settings,
+                              final @Named(QuartzSupportImpl.QUARTZ_POOL_SIZE) int threadPoolSize)
   {
     this.cfg = cfg;
     this.settings = settings;
+    // QZ recommendation: threadPoolSize + 2 is the possible max connection count needed
+    this.poolSize = threadPoolSize + 2;
   }
 
   @Override
@@ -82,7 +91,7 @@ public class H2ConnectionProvider
     try {
       try {
         DirSupport.mkdir(workDir.toPath());
-        pool = open(database, settings);
+        pool = open(database, settings, poolSize);
       }
       catch (final SQLException e) {
         if (e.getErrorCode() == ErrorCode.DATABASE_ALREADY_OPEN_1 ||
@@ -98,7 +107,7 @@ public class H2ConnectionProvider
           if (lockFile.exists()) {
             Files.move(lockFile, new File(backup.getPath() + ".lock"));
           }
-          pool = open(database, settings);
+          pool = open(database, settings, poolSize);
         }
         else {
           throw e; // not locked, re-throw as DB is probably corrupt...
@@ -111,7 +120,7 @@ public class H2ConnectionProvider
         final File backup = new File(workDir, DATABASE_NAME + ".corrupt." + System.currentTimeMillis());
         log.info("Moving corrupt database to {}", backup);
         Files.move(databaseFile, backup);
-        pool = open(database, settings);
+        pool = open(database, settings, poolSize);
       }
       catch (final Exception ignore) {
         throw new SQLException("Problem rebooting Quartz DB", e);
@@ -135,7 +144,7 @@ public class H2ConnectionProvider
     }
   }
 
-  private static JdbcConnectionPool open(final String database, final String settings)
+  private static JdbcConnectionPool open(final String database, final String settings, final int poolSize)
       throws Exception
   {
     JdbcConnectionPool pool = null;
@@ -152,9 +161,7 @@ public class H2ConnectionProvider
       }
       // connection checks out, so now create lazy pool
       pool = JdbcConnectionPool.create(url, "sa", "");
-      // TODO: this should be QZ threadPoolSize + 2!!!
-      // Set manually now, but config should be passed over?
-      pool.setMaxConnections(22);
+      pool.setMaxConnections(poolSize);
       return pool;
     }
     catch (final Exception e) {

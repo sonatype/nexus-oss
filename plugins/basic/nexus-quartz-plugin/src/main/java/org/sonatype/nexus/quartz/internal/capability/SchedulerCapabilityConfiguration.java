@@ -32,39 +32,26 @@ public class SchedulerCapabilityConfiguration
 
   public static final boolean DEFAULT_ACTIVE = true;
 
-  public static final String THREAD_POOL_SIZE = "threadPoolSize";
-
-  public static final int DEFAULT_THREAD_POOL_SIZE = 20;
-
   private boolean active;
-
-  private int threadPoolSize;
 
   public SchedulerCapabilityConfiguration(final Map<String, String> properties) {
     checkNotNull(properties);
 
     this.active = Boolean.valueOf(properties.get(ACTIVE));
-    this.threadPoolSize = Integer.parseInt(properties.get(THREAD_POOL_SIZE));
   }
 
   public boolean isActive() { return active; }
 
-  public int getThreadPoolSize() {
-    return threadPoolSize;
-  }
-
   public Map<String, String> asMap() {
     Map<String, String> props = Maps.newHashMap();
     props.put(ACTIVE, String.valueOf(active));
-    props.put(THREAD_POOL_SIZE, String.valueOf(threadPoolSize));
     return props;
   }
 
   @Override
   public String toString() {
     return "SchedulerCapabilityConfiguration{" +
-        "threadPoolSize='" + threadPoolSize + '\'' +
-        ", active='" + active + '\'' +
+        "active='" + active + '\'' +
         '}';
   }
 }
