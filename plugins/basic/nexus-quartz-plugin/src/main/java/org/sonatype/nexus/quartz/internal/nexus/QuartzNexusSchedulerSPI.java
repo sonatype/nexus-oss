@@ -139,6 +139,12 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
+      // get trigger, but use identity of jobKey
+      // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
+      // ! create the trigger before eventual TaskInfo remove bellow to avoid task removal in case of an invalid trigger
+      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
+          .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
+
       log.debug("NX Task {} scheduled", jobKey);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
@@ -150,11 +156,6 @@ public class QuartzNexusSchedulerSPI
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
-
-      // get trigger, but use identity of jobKey
-      // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
-      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
-          .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
       // register job specific listener with initial state
       final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) initializeTaskState(jobDetail, trigger);
