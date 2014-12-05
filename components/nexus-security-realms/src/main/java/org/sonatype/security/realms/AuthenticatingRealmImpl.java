@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.realms;
 
+import java.util.ConcurrentModificationException;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,10 +94,10 @@ public class AuthenticatingRealmImpl
     }
 
     if (CUser.STATUS_ACTIVE.equals(user.getStatus())) {
-      //Check for legacy user that has unsalted password hash
-      //Update if legacy user, and valid credentials were specified
-      if (this.isLegacyUser(user) && this.isValidCredentials(upToken, user)) {
-        this.reHashPassword(user, new String(upToken.getPassword()));
+      // Check for legacy user that has unsalted password hash
+      // Update if unsalted password hash and valid credentials were specified
+      if (hasLegacyPassword(user) && isValidCredentials(upToken, user)) {
+        reHashPassword(user, new String(upToken.getPassword()));
       }
 
       return this.createAuthenticationInfo(user);
@@ -110,22 +112,30 @@ public class AuthenticatingRealmImpl
   }
 
   /*
-   * Re-hash user password, and persist changes
+   * Re-hash user password, and persist changes.
    *
    * @param user to update
-   * @param password cleartext password to hash
+   * @param password clear-text password to hash
    */
   private void reHashPassword(final CUser user, final String password) {
-    //Store current values to rollback if update fails
-    final String currentPasswordHash = user.getPassword();
-
+    String hashedPassword = passwordService.encryptPassword(password);
     try {
-      user.setPassword(passwordService.encryptPassword(password));
-      configuration.updateUser(user);
+      boolean concurrentlyUpdated;
+      do {
+        concurrentlyUpdated = false;
+        CUser toUpdate = configuration.readUser(user.getId());
+        toUpdate.setPassword(hashedPassword);
+        try {
+          configuration.updateUser(user);
+        }
+        catch (ConcurrentModificationException e) {
+          concurrentlyUpdated = true;
+        }
+      }
+      while (concurrentlyUpdated);
+      user.setPassword(hashedPassword);
     }
     catch (Exception e) {
-      //Update failed, rollback to previous values
-      user.setPassword(currentPasswordHash);
       logger.error("Unable to update hash for user {}", user.getId(), e);
     }
   }
@@ -160,7 +170,7 @@ public class AuthenticatingRealmImpl
    * @param user to check
    * @return true if legacy user, false otherwise
    */
-  private boolean isLegacyUser(CUser user) {
+  private boolean hasLegacyPassword(CUser user) {
     //Legacy users have a shorter, unsalted, SHA1 or MD5 based hash
     return user.getPassword().length() <= this.MAX_LEGACY_PASSWORD_LENGTH;
   }
