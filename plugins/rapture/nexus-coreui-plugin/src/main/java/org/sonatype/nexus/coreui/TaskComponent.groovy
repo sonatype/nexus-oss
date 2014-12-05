@@ -130,7 +130,7 @@ class TaskComponent
 
     TaskConfiguration nexusTask = nexusScheduler.createTaskConfigurationInstance(taskXO.typeId)
     taskXO.properties.each { key, value ->
-      nexusTask.getMap().put(key, value)
+      nexusTask.setString(key, value)
     }
     nexusTask.setAlertEmail(taskXO.alertEmail)
     nexusTask.setName(taskXO.name)
@@ -156,7 +156,9 @@ class TaskComponent
     validateState(task)
     task.configuration.enabled = taskXO.enabled
     task.configuration.name = taskXO.name
-    task.configuration.map.putAll(taskXO.properties)
+    taskXO.properties.each { key, value ->
+      task.configuration.setString(key, value)
+    }
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
 
@@ -320,7 +322,7 @@ class TaskComponent
         runnable: task.currentState.state in [State.WAITING],
         stoppable: task.currentState.state in [State.RUNNING],
         alertEmail: task.configuration.alertEmail,
-        properties: task.configuration.map
+        properties: task.configuration.asMap()
     )
     def schedule = task.schedule
     if (schedule instanceof Once) {
