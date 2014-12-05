@@ -230,7 +230,8 @@ public class GenerateMetadataTaskSettingsIT
         return null;
       }
     };
-    TaskConfiguration taskConfiguration = task.taskConfiguration();
+    TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(GenerateMetadataTask.class.getSimpleName());
     task.configure(taskConfiguration);
     task.setRepositoryRegistry(repoRegistry());
