@@ -15,6 +15,7 @@ package org.sonatype.nexus.extender;
 import org.sonatype.nexus.extender.modules.NexusBundleModule;
 
 import com.google.inject.Module;
+import org.eclipse.sisu.bean.LifecycleModule;
 import org.eclipse.sisu.inject.MutableBeanLocator;
 import org.eclipse.sisu.launch.SisuBundlePlan;
 import org.osgi.framework.Bundle;
@@ -27,6 +28,8 @@ import org.osgi.framework.Bundle;
 public class NexusBundlePlan
     extends SisuBundlePlan
 {
+  private final LifecycleModule lifecycleModule = new LifecycleModule();
+
   public NexusBundlePlan(final MutableBeanLocator locator) {
     super(locator);
   }
@@ -38,6 +41,6 @@ public class NexusBundlePlan
 
   @Override
   protected Module compose(Bundle bundle) {
-    return new NexusBundleModule(bundle, locator);
+    return new NexusBundleModule(bundle, locator, lifecycleModule);
   }
 }
