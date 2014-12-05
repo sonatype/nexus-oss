@@ -106,7 +106,7 @@ public class ThreadPoolNexusSchedulerSPI
 
     @Override
     public TaskConfiguration getConfiguration() {
-      return task.getConfiguration();
+      return task.taskConfiguration();
     }
 
     @Override

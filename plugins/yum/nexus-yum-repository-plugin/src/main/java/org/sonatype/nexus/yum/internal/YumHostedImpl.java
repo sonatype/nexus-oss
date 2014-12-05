@@ -202,7 +202,7 @@ public class YumHostedImpl
       task.setRepositoryId(repository.getId());
       task.setVersion(version);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
-      return submitTask(task.getConfiguration());
+      return submitTask(task.taskConfiguration());
     }
     catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -257,7 +257,7 @@ public class YumHostedImpl
       task.setRepositoryId(repository.getId());
       task.setAddedFiles(filePath);
       task.setYumGroupsDefinitionFile(getYumGroupsDefinitionFile());
-      return submitTask(task.getConfiguration());
+      return submitTask(task.taskConfiguration());
     }
     catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);

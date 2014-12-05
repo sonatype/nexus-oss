@@ -26,18 +26,25 @@ public interface Task<T>
     extends Callable<T>
 {
   /**
-   * Returns the configuration of the task.
+   * Returns the copy of the task configuration, modifying this map has no effect on effective configuration of the
+   * task..
    */
-  TaskConfiguration getConfiguration();
+  TaskConfiguration taskConfiguration();
 
   /**
-   * Returns a unique ID of the task instance. Shorthand method for {@link #getConfiguration()#getId()}
+   * Configures the task.
+   *
+   * @throws IllegalArgumentException if passed in configuration is invalid.
+   */
+  void configure(TaskConfiguration taskConfiguration) throws IllegalArgumentException;
+
+  /**
+   * Returns a unique ID of the task instance. Shorthand method for {@link TaskConfiguration#getId()}
    */
   String getId();
 
   /**
-   * Returns a descriptive name of the task instance. Shorthand method for {@link #getConfiguration()#getName()}. This
-   * method returns always same string for same typed tasks, and it describes what task is about. Example: "Empty
+   * Returns a descriptive name of the task instance, usually set by user. Example: "Empty
    * trash". It is modifiable by user/caller of this code, like over UI or REST.
    */
   String getName();

@@ -147,7 +147,7 @@ public class QuartzNexusSchedulerSPI
           old.remove();
         }
       }
-      final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
+      final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
 

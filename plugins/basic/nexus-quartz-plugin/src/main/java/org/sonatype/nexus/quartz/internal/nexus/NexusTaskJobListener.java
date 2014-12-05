@@ -16,6 +16,7 @@ import java.util.Date;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
@@ -26,7 +27,6 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -145,9 +145,10 @@ public class NexusTaskJobListener<T>
     else {
       endState = EndState.OK;
     }
-    final JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
+
+    final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
     NexusTaskState.setLastRunState(
-        jobDataMap,
+        taskConfiguration,
         endState,
         future.getStartedAt(),
         System.currentTimeMillis() - future.getStartedAt().getTime());
@@ -169,7 +170,7 @@ public class NexusTaskJobListener<T>
     nexusTaskInfo.setNexusTaskState(
         state,
         new NexusTaskState(
-            toTaskConfiguration(jobDataMap),
+            taskConfiguration,
             jobSchedule,
             nextFireTime
         ),

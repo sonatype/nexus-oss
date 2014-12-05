@@ -63,6 +63,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractFormFieldResource
 {
@@ -267,7 +269,10 @@ public abstract class AbstractScheduledServicePlexusResource
 
       for (Iterator iter = model.getProperties().iterator(); iter.hasNext(); ) {
         ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
-        task.getMap().put(prop.getKey(), prop.getValue());
+        // TODO: for some reason, null=null mapping is in here too!
+        if (prop.getKey() != null) {
+          task.setString(prop.getKey(), prop.getValue());
+        }
       }
 
       task.setAlertEmail(model.getAlertEmail());
@@ -451,7 +456,7 @@ public abstract class AbstractScheduledServicePlexusResource
       resource.setName(taskConfiguration.getName());
       resource.setSchedule(getScheduleShortName(schedule));
       resource.setTypeId(taskConfiguration.getTypeId());
-      resource.setProperties(formatServiceProperties(taskConfiguration.getMap()));
+      resource.setProperties(formatServiceProperties(taskConfiguration.asMap()));
       resource.setAlertEmail(taskConfiguration.getAlertEmail());
     }
 

@@ -230,7 +230,9 @@ public class GenerateMetadataTaskSettingsIT
         return null;
       }
     };
-    task.getConfiguration().setTypeId(GenerateMetadataTask.class.getSimpleName());
+    TaskConfiguration taskConfiguration = task.taskConfiguration();
+    taskConfiguration.setTypeId(GenerateMetadataTask.class.getSimpleName());
+    task.configure(taskConfiguration);
     task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
     task.setRepoDir(rpmsDir());

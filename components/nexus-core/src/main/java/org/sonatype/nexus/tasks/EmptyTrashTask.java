@@ -47,7 +47,7 @@ public class EmptyTrashTask
   }
 
   public void setEmptyOlderCacheItemsThan(int emptyOlderCacheItemsThan) {
-    getConfiguration().getMap().put(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, String.valueOf(
+    getConfiguration().setString(EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, String.valueOf(
         emptyOlderCacheItemsThan));
   }
 

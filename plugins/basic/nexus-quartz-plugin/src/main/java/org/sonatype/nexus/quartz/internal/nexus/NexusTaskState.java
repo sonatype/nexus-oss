@@ -13,7 +13,6 @@
 package org.sonatype.nexus.quartz.internal.nexus;
 
 import java.util.Date;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -69,7 +68,7 @@ public class NexusTaskState
   /**
    * Helper to set ending state on a map. The maps might be {@link JobDataMap} or {@link TaskConfiguration}.
    */
-  public static void setLastRunState(final Map config,
+  public static void setLastRunState(final TaskConfiguration config,
                                      final EndState endState,
                                      final Date runStarted,
                                      final long runDuration)
@@ -78,9 +77,9 @@ public class NexusTaskState
     checkNotNull(endState);
     checkNotNull(runStarted);
     checkArgument(runDuration >= 0);
-    config.put("lastRunState.endState", endState.name());
-    config.put("lastRunState.runStarted", Long.toString(runStarted.getTime()));
-    config.put("lastRunState.runDuration", Long.toString(runDuration));
+    config.setString("lastRunState.endState", endState.name());
+    config.setLong("lastRunState.runStarted", runStarted.getTime());
+    config.setLong("lastRunState.runDuration", runDuration);
   }
 
   /**
@@ -89,7 +88,7 @@ public class NexusTaskState
   @Nullable
   public static LastRunState getLastRunState(final TaskConfiguration taskConfiguration)
   {
-    if (hasLastRunState(taskConfiguration.getMap())) {
+    if (hasLastRunState(taskConfiguration)) {
       final String endStateString = taskConfiguration.getString("lastRunState.endState");
       final long runStarted = taskConfiguration.getLong("lastRunState.runStarted", System.currentTimeMillis());
       final long runDuration = taskConfiguration.getLong("lastRunState.runDuration", 0);
@@ -101,10 +100,10 @@ public class NexusTaskState
   /**
    * Helper to check existence of ending state on a map.
    */
-  public static boolean hasLastRunState(final Map config)
+  public static boolean hasLastRunState(final TaskConfiguration config)
   {
     checkNotNull(config);
-    return config.containsKey("lastRunState.endState");
+    return config.getString("lastRunState.endState") != null;
   }
 
   @Override

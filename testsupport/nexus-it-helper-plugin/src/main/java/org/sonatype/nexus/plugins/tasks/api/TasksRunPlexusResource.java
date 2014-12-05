@@ -86,7 +86,7 @@ public class TasksRunPlexusResource
         final Map<String, String> valuesMap = request.getResourceRef().getQueryAsForm().getValuesMap();
         if (valuesMap != null && !valuesMap.isEmpty()) {
           for (Map.Entry<String, String> entry : valuesMap.entrySet()) {
-            taskInstance.getMap().put(entry.getKey(), entry.getValue());
+            taskInstance.setString(entry.getKey(), entry.getValue());
           }
         }
         final TaskInfo<?> scheduledTask = nexusScheduler.submit(taskInstance);

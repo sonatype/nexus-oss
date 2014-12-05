@@ -17,6 +17,9 @@ import org.sonatype.nexus.tasks.EmptyTrashTask;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 /**
  * Smoke support.
  */
@@ -27,8 +30,8 @@ public class SmokeIT
   public void smoke() throws Exception {
     final TaskConfiguration taskConfiguration = nexusTaskScheduler
         .createTaskConfigurationInstance(EmptyTrashTask.class);
-    System.out.println(taskConfiguration);
     final EmptyTrashTask task = nexusTaskScheduler.createTaskInstance(taskConfiguration);
-    System.out.println(task.getConfiguration());
+
+    assertThat(taskConfiguration.getTypeId(), equalTo(task.taskConfiguration().getTypeId()));
   }
 }

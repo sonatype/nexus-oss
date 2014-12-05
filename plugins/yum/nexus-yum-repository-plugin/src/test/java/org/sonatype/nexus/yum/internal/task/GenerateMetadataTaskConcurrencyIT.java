@@ -104,7 +104,7 @@ public class GenerateMetadataTaskConcurrencyIT
     List<TaskInfo<?>> futures = Lists.newArrayList();
 
     for (int repositoryId = 0; repositoryId < PARALLEL_THREAD_COUNT; repositoryId++) {
-      futures.add(nexusScheduler.submit(createYumRepositoryTask(repositoryId).getConfiguration()));
+      futures.add(nexusScheduler.submit(createYumRepositoryTask(repositoryId).taskConfiguration()));
     }
 
     waitFor(futures);
@@ -201,7 +201,7 @@ public class GenerateMetadataTaskConcurrencyIT
       }
     };
     final TaskConfiguration taskCfg = nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class);
-    task.getConfiguration().getMap().putAll(taskCfg.getMap());
+    task.configure(taskCfg);
     task.setRepositoryId("REPO_" + repositoryId);
     return task;
   }

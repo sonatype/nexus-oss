@@ -107,7 +107,7 @@ public class GenerateMetadataTask
     this.routingManager = checkNotNull(routingManager);
     this.commandLineExecutor = checkNotNull(commandLineExecutor);
 
-    getConfiguration().getMap().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
+    getConfiguration().setString(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
   }
 
   /**
@@ -336,7 +336,7 @@ public class GenerateMetadataTask
   }
 
   public void setAddedFiles(String addedFiles) {
-    getConfiguration().getMap().put(PARAM_ADDED_FILES, addedFiles);
+    getConfiguration().setString(PARAM_ADDED_FILES, addedFiles);
   }
 
   public File getRepoDir() {
@@ -344,7 +344,7 @@ public class GenerateMetadataTask
   }
 
   public void setRepoDir(File repoDir) {
-    getConfiguration().getMap().put(PARAM_REPO_DIR, repoDir.getAbsolutePath());
+    getConfiguration().setString(PARAM_REPO_DIR, repoDir.getAbsolutePath());
   }
 
   public String getRpmDir() {
@@ -352,7 +352,7 @@ public class GenerateMetadataTask
   }
 
   public void setRpmDir(String rpmDir) {
-    getConfiguration().getMap().put(PARAM_RPM_DIR, rpmDir);
+    getConfiguration().setString(PARAM_RPM_DIR, rpmDir);
   }
 
   public String getVersion() {
@@ -360,7 +360,7 @@ public class GenerateMetadataTask
   }
 
   public void setVersion(String version) {
-    getConfiguration().getMap().put(PARAM_VERSION, version);
+    getConfiguration().setString(PARAM_VERSION, version);
   }
 
   public String getYumGroupsDefinitionFile() {
@@ -368,7 +368,7 @@ public class GenerateMetadataTask
   }
 
   public void setYumGroupsDefinitionFile(String file) {
-    getConfiguration().getMap().put(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
+    getConfiguration().setString(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
   }
 
   public boolean isSingleRpmPerDirectory() {

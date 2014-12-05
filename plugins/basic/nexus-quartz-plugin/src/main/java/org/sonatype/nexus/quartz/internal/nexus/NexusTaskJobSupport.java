@@ -101,14 +101,13 @@ public class NexusTaskJobSupport<T>
         mayBlock(nexusTask, future);
         if (!future.isCancelled()) {
           future.setRunState(RunState.RUNNING);
-          nexusTask.getConfiguration().setMessage(nexusTask.getMessage());
           try {
             final T result = nexusTask.call();
             context.setResult(result);
           }
           finally {
             // put back any state task modified to have it persisted
-            context.getJobDetail().getJobDataMap().putAll(nexusTask.getConfiguration().getMap());
+            context.getJobDetail().getJobDataMap().putAll(nexusTask.taskConfiguration().asMap());
           }
         }
       }
@@ -189,7 +188,7 @@ public class NexusTaskJobSupport<T>
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
     for (Entry<String, Object> entry : jobDataMap.entrySet()) {
       if (entry.getValue() instanceof String) {
-        taskConfiguration.getMap().put(entry.getKey(), String.valueOf(entry.getValue()));
+        taskConfiguration.setString(entry.getKey(), (String) entry.getValue());
       }
     }
     return taskConfiguration;
