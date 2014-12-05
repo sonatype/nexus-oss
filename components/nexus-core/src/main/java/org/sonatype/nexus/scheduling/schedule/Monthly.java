@@ -36,7 +36,7 @@ public class Monthly
           daysToRun);
     }
     properties.put("schedule.startAt", dateToString(startAt));
-    properties.put("schedule.daysToRun", setToList(daysToRun));
+    properties.put("schedule.daysToRun", setToCsv(daysToRun));
   }
 
   public Date getStartAt() {
@@ -44,6 +44,6 @@ public class Monthly
   }
 
   public Set<Integer> getDaysToRun() {
-    return listToSet(properties.get("schedule.daysToRun"));
+    return csvToSet(properties.get("schedule.daysToRun"));
   }
 }

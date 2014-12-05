@@ -39,7 +39,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 import static org.quartz.TriggerBuilder.newTrigger;
-import static org.sonatype.nexus.scheduling.schedule.Schedule.listToSet;
+import static org.sonatype.nexus.scheduling.schedule.Schedule.csvToSet;
 import static org.sonatype.nexus.scheduling.schedule.Schedule.stringToDate;
 
 /**
@@ -183,12 +183,12 @@ public class NexusScheduleConverter
     }
     else if ("weekly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
       return new Weekly(startAt, daysToRun);
     }
     else if ("monthly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
       return new Monthly(startAt, daysToRun);
     }
     else if ("manual".equals(type)) {

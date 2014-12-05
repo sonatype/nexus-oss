@@ -66,7 +66,7 @@ public abstract class Schedule
     return DateTime.parse(string).toDate();
   }
 
-  public static String setToList(Set<Integer> set) {
+  public static String setToCsv(Set<Integer> set) {
     return Joiner.on(',').join(Collections2.transform(set, new Function<Integer, String>()
     {
       @Override
@@ -76,7 +76,7 @@ public abstract class Schedule
     }));
   }
 
-  public static Set<Integer> listToSet(String value) {
+  public static Set<Integer> csvToSet(String value) {
     final Collection<Integer> enums = Collections2.transform(Splitter.on(',').splitToList(value),
         new Function<String, Integer>()
         {
