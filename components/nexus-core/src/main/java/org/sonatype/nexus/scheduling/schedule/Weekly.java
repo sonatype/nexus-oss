@@ -43,6 +43,7 @@ public class Weekly
     super("weekly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
+    checkArgument(!daysToRun.isEmpty(), "No days of week set to run");
     for (Integer integer : daysToRun) {
       checkArgument(integer >= SUN && integer <= SAT, "Invalid weekly argument: %s", daysToRun);
     }

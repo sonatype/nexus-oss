@@ -30,6 +30,7 @@ public class Monthly
     super("monthly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
+    checkArgument(!daysToRun.isEmpty(), "No days of month set to run");
     for (Integer integer : daysToRun) {
       checkArgument((integer >= 1 && integer <= 31) || integer == LAST_DAY_OF_MONTH, "Invalid monthly argument: %s",
           daysToRun);

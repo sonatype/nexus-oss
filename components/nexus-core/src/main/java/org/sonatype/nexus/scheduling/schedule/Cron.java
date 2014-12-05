@@ -13,7 +13,9 @@
 package org.sonatype.nexus.scheduling.schedule;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -22,12 +24,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Cron
     extends Schedule
 {
+  private static final Pattern cronPatters = Pattern.compile(
+      "^([[0-9]|\\-|,|\\*]+) ([[0-9]|\\-|,|\\*]+) ([[0-9]|\\-|,|\\*]+) (\\?|\\*|[[0-9]|\\-|,|/|L|W]+) (\\*|[JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|[0-9]|\\-|,]+) (\\*|\\?|[MON|TUE|WED|THU|FRI|SAT|SUN|[0-9]|\\-|,|/|L|W]+)( [[0-9]{4}|,]+)?$");
+
   public Cron(final Date startAt, final String cronExpression) {
     super("cron");
     checkNotNull(startAt);
     checkNotNull(cronExpression);
+    checkArgument(cronPatters.matcher(cronExpression).matches(), "Invalid Cron expression: %s", cronExpression);
     properties.put("schedule.startAt", dateToString(startAt));
     properties.put("schedule.cronExpression", cronExpression);
+
   }
 
   public Date getStartAt() {
