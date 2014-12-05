@@ -323,6 +323,9 @@ class TaskComponent
         properties: task.configuration.map
     )
     def schedule = task.schedule
+    if (schedule instanceof Once) {
+      result.startDate = schedule.startAt
+    }
     if (schedule instanceof Hourly) {
       result.startDate = schedule.startAt
     }
