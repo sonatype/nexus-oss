@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -109,7 +110,7 @@ public class NexusScheduleConverter
         }
       }));
       triggerBuilder = newTrigger().startAt(s.getStartAt())
-          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 ? * " + daysToRun));
+          .withSchedule(CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " ? * " + daysToRun));
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
@@ -126,11 +127,11 @@ public class NexusScheduleConverter
         }));
         triggerBuilder = newTrigger().startAt(s.getStartAt())
             .withSchedule(
-                CronScheduleBuilder.cronSchedule("0 0 0 " + daysToRunStr + " * ?"));
+                CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " " + daysToRunStr + " * ?"));
       }
       else {
         triggerBuilder = newTrigger().startAt(s.getStartAt())
-            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"));
+            .withSchedule(CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " L * ?"));
       }
     }
     else if (schedule instanceof Manual) {
@@ -198,4 +199,11 @@ public class NexusScheduleConverter
       throw new IllegalArgumentException("Trigger unknown key: '" + trigger.getKey() + "', type: '" + type + "'");
     }
   }
+
+  private String cronTimeParts(final Date date) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    return "0 " + cal.get(Calendar.MINUTE) + " " + cal.get(Calendar.HOUR_OF_DAY);
+  }
+
 }
