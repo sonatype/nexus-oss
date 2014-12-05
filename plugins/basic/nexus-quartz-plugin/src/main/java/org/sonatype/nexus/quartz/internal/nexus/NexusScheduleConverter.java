@@ -31,6 +31,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -200,7 +201,8 @@ public class NexusScheduleConverter
     }
   }
 
-  private String cronTimeParts(final Date date) {
+  @VisibleForTesting
+  String cronTimeParts(final Date date) {
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
     return "0 " + cal.get(Calendar.MINUTE) + " " + cal.get(Calendar.HOUR_OF_DAY);

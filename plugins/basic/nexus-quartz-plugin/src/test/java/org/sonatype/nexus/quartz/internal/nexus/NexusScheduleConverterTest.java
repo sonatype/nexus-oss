@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import org.sonatype.nexus.scheduling.schedule.Monthly;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.quartz.CronTrigger;
@@ -40,6 +42,20 @@ public class NexusScheduleConverterTest
   final NexusScheduleConverter converter = new NexusScheduleConverter();
 
   @Test
+  public void cronTimeParts() {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.HOUR_OF_DAY, 7);
+    cal.set(Calendar.MINUTE, 15);
+    assertThat(converter.cronTimeParts(cal.getTime()), equalTo("0 15 7"));
+    cal.set(Calendar.HOUR_OF_DAY, 22);
+    cal.set(Calendar.MINUTE, 59);
+    assertThat(converter.cronTimeParts(cal.getTime()), equalTo("0 59 22"));
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.MINUTE, 0);
+    assertThat(converter.cronTimeParts(cal.getTime()), equalTo("0 0 0"));
+  }
+
+  @Test
   public void hourly() {
     final Date now = new Date();
     final Hourly hourly = new Hourly(now);
@@ -57,7 +73,7 @@ public class NexusScheduleConverterTest
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
-    assertThat(cronExpression, equalTo("0 0 0 ? * SAT"));
+    assertThat(cronExpression, equalTo(converter.cronTimeParts(weekly.getStartAt()) + " ? * SAT"));
   }
 
   @Test
@@ -67,7 +83,7 @@ public class NexusScheduleConverterTest
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
-    assertThat(cronExpression, equalTo("0 0 0 ? * FRI,SAT"));
+    assertThat(cronExpression, equalTo(converter.cronTimeParts(weekly.getStartAt()) + " ? * FRI,SAT"));
   }
 
   @Test
@@ -77,7 +93,7 @@ public class NexusScheduleConverterTest
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
-    assertThat(cronExpression, equalTo("0 0 0 2 * ?"));
+    assertThat(cronExpression, equalTo(converter.cronTimeParts(monthly.getStartAt()) + " 2 * ?"));
   }
 
   @Test
@@ -87,7 +103,7 @@ public class NexusScheduleConverterTest
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
-    assertThat(cronExpression, equalTo("0 0 0 1,2,3,10,11,12 * ?"));
+    assertThat(cronExpression, equalTo(converter.cronTimeParts(monthly.getStartAt()) + " 1,2,3,10,11,12 * ?"));
   }
 
   @Test
@@ -97,6 +113,6 @@ public class NexusScheduleConverterTest
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
     final String cronExpression = ((CronTrigger) trigger).getCronExpression();
-    assertThat(cronExpression, equalTo("0 0 0 L * ?"));
+    assertThat(cronExpression, equalTo(converter.cronTimeParts(monthly.getStartAt()) + " L * ?"));
   }
 }
