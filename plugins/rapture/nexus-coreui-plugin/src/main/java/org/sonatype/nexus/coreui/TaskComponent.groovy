@@ -173,7 +173,7 @@ class TaskComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:update')
-  @Validate(groups = [Schedule.class, Default.class])
+  @Validate(groups = [TaskXO.Schedule.class, Default.class])
   TaskXO updateSchedule(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
     TaskInfo task = nexusScheduler.getTaskById(taskXO.id);
     validateState(task)
