@@ -22,11 +22,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.h2.Driver;
+import org.h2.constant.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.util.JdbcUtils;
 import org.quartz.utils.ConnectionProvider;
@@ -42,8 +44,11 @@ public class H2ConnectionProvider
     extends ComponentSupport
     implements ConnectionProvider
 {
+  private static final String H2_DEFAULTS =
+      ";FILE_LOCK=FS;MVCC=TRUE;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000";
+
   private static final String H2_SETTINGS =
-      "${nexus-quartz-h2-settings:-;FILE_LOCK=SOCKET;MVCC=TRUE;QUERY_CACHE_SIZE=0;CACHE_SIZE=0;CACHE_TYPE=SOFT_LRU;LOCK_TIMEOUT=60000;MAX_MEMORY_ROWS=1000000}";
+      "${nexus-quartz-h2-settings:-" + H2_DEFAULTS + "}";
 
   private static final String DATABASE_NAME = "quartz";
 
@@ -71,15 +76,17 @@ public class H2ConnectionProvider
     if (null != pool) {
       return; // already started
     }
-    final File workDir = cfg.getWorkDirectory("db").getAbsoluteFile();
-    final String database = workDir + File.separator + DATABASE_NAME + File.separator + DATABASE_NAME;
+    final File workDir = new File(cfg.getWorkDirectory("db"), DATABASE_NAME).getAbsoluteFile();
+    final String database = workDir + File.separator + DATABASE_NAME;
     final File databaseFile = new File(database + ".h2.db");
     try {
       try {
+        DirSupport.mkdir(workDir.toPath());
         pool = open(database, settings);
       }
       catch (final SQLException e) {
-        if (Strings.nullToEmpty(e.getMessage()).contains("Locked")) {
+        if (e.getErrorCode() == ErrorCode.DATABASE_ALREADY_OPEN_1 ||
+            Strings.nullToEmpty(e.getMessage()).contains("Database may be already in use")) {
           log.warn("Database locked, is another instance of Nexus running? ({})", e.getMessage());
           final File backup = new File(workDir, DATABASE_NAME + ".backup." + System.currentTimeMillis());
           if (databaseFile.exists()) {
@@ -87,7 +94,10 @@ public class H2ConnectionProvider
             Files.move(databaseFile, backup);
             Files.copy(backup, databaseFile);
           }
-          Files.move(new File(database + ".lock.db"), new File(backup.getPath() + ".lock"));
+          final File lockFile = new File(database + ".lock.db");
+          if (lockFile.exists()) {
+            Files.move(lockFile, new File(backup.getPath() + ".lock"));
+          }
           pool = open(database, settings);
         }
         else {
