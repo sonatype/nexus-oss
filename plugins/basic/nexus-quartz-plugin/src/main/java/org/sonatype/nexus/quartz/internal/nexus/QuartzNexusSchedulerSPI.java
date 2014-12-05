@@ -92,7 +92,7 @@ public class QuartzNexusSchedulerSPI
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       final NexusTaskInfo<T> taskInfo = taskByKey(jobKey);
-      if (!taskInfo.isRemovedOrDone()) {
+      if (taskInfo != null && !taskInfo.isRemovedOrDone()) {
         return taskInfo;
       }
     }
