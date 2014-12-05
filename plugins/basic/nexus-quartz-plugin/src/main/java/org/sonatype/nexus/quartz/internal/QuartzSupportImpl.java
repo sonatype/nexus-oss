@@ -124,6 +124,7 @@ public class QuartzSupportImpl
     jobStoreTX.setIsClustered(false);
     jobStoreTX.setUseProperties(Boolean.TRUE.toString());
     jobStoreTX.setThreadExecutor(threadExecutor);
+    jobStoreTX.setAcquireTriggersWithinLock(true);
 
     // start the pool
     h2ConnectionProvider.initialize();
