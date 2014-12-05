@@ -36,6 +36,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.DefaultThreadExecutor;
 import org.quartz.impl.DirectSchedulerFactory;
@@ -331,7 +332,7 @@ public class QuartzSupportImpl
     cancelJob(jobKey);
     try {
       log.debug("Removing job with key {}", jobKey);
-      return scheduler.deleteJob(jobKey);
+      return scheduler.unscheduleJob(new TriggerKey(jobKey.getName(), jobKey.getGroup()));
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);

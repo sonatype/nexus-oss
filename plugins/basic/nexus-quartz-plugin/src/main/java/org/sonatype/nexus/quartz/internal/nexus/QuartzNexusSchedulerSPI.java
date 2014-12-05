@@ -43,6 +43,7 @@ import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -332,7 +333,7 @@ public class QuartzNexusSchedulerSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      boolean result = quartzSupport.getScheduler().deleteJob(jobKey);
+      boolean result = quartzSupport.getScheduler().unscheduleJob(new TriggerKey(jobKey.getName(), jobKey.getGroup()));
       if (result) {
         quartzSupport.getScheduler().getListenerManager().removeJobListener(NexusTaskJobListener.listenerName(jobKey));
       }
