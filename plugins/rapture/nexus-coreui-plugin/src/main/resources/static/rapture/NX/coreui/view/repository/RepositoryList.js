@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
 
   store: 'Repository',
 
+  /*
+   * @override
+   */
   initComponent: function() {
     var me = this;
 

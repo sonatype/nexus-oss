@@ -60,8 +60,6 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
   initComponent: function () {
     var me = this;
 
-    me.iconCls = NX.Icons.cls('feed-default', 'x16');
-
     me.callParent();
   }
 });
