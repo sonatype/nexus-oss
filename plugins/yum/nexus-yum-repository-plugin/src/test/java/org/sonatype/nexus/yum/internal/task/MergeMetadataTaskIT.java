@@ -44,8 +44,11 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    task.getConfiguration().setTypeId(MergeMetadataTask.class.getSimpleName());
-    task.getConfiguration().setRepositoryId(GROUP_ID_1);
+    TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId("foo");
+    taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
+    taskConfiguration.setRepositoryId(GROUP_ID_1);
+    task.configure(taskConfiguration);
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_1)).isEmpty(), is(false));
   }
 
@@ -56,8 +59,11 @@ public class MergeMetadataTaskIT
     final MergeMetadataTask task = new MergeMetadataTask(
         mock(YumRegistry.class), mock(CommandLineExecutor.class)
     );
-    task.getConfiguration().setTypeId(MergeMetadataTask.class.getSimpleName());
-    task.getConfiguration().setRepositoryId(GROUP_ID_1);
+    TaskConfiguration taskConfiguration = new TaskConfiguration();
+    taskConfiguration.setId("foo");
+    taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
+    taskConfiguration.setRepositoryId(GROUP_ID_1);
+    task.configure(taskConfiguration);
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_2)).isEmpty(), is(true));
   }
 
@@ -72,8 +78,9 @@ public class MergeMetadataTaskIT
   private TaskInfo<?> runningTask(final String repoId) {
     final TaskInfo<?> task = mock(TaskInfo.class);
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setRepositoryId(repoId);
+    taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
+    taskConfiguration.setRepositoryId(repoId);
     when(task.getConfiguration()).thenReturn(taskConfiguration);
     CurrentState currentState = mock(CurrentState.class);
     when(currentState.getState()).thenReturn(State.RUNNING);

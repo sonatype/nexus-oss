@@ -130,7 +130,7 @@ class TaskComponent
 
     TaskConfiguration nexusTask = nexusScheduler.createTaskConfigurationInstance(taskXO.typeId)
     taskXO.properties.each { key, value ->
-      nexusTask.getMap().put(key, value)
+      nexusTask.setString(key, value)
     }
     nexusTask.setAlertEmail(taskXO.alertEmail)
     nexusTask.setName(taskXO.name)
@@ -156,7 +156,9 @@ class TaskComponent
     validateState(task)
     task.configuration.enabled = taskXO.enabled
     task.configuration.name = taskXO.name
-    task.configuration.map.putAll(taskXO.properties)
+    taskXO.properties.each { key, value ->
+      task.configuration.setString(key, value)
+    }
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
 
@@ -173,13 +175,13 @@ class TaskComponent
   @DirectMethod
   @RequiresAuthentication
   @RequiresPermissions('nexus:tasks:update')
-  @Validate(groups = [Schedule.class, Default.class])
+  @Validate(groups = [TaskXO.Schedule.class, Default.class])
   TaskXO updateSchedule(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
     TaskInfo task = nexusScheduler.getTaskById(taskXO.id);
     validateState(task)
     Schedule schedule = asSchedule(taskXO)
 
-    task = nexusScheduler.scheduleTask(task.configuration, schedule)
+    task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
 
     return asTaskXO(task)
   }
@@ -320,9 +322,12 @@ class TaskComponent
         runnable: task.currentState.state in [State.WAITING],
         stoppable: task.currentState.state in [State.RUNNING],
         alertEmail: task.configuration.alertEmail,
-        properties: task.configuration.map
+        properties: task.configuration.asMap()
     )
     def schedule = task.schedule
+    if (schedule instanceof Once) {
+      result.startDate = schedule.startAt
+    }
     if (schedule instanceof Hourly) {
       result.startDate = schedule.startAt
     }

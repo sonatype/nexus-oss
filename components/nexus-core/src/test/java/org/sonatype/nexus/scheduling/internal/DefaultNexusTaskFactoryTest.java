@@ -19,6 +19,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskSupport;
 import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
 import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
 import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
@@ -74,9 +75,9 @@ public class DefaultNexusTaskFactoryTest
     final TaskConfiguration c1 = new TaskConfiguration();
     c1.setId("id");
     c1.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()).getId());
-    final Task<?> task1 = nexusTaskFactory.createTaskInstance(c1);
+    final TaskSupport<?> task1 = nexusTaskFactory.createTaskInstance(c1);
     assertThat(task1, is(instanceOf(TaskWithDescriptor.class)));
-    assertThat(task1.getConfiguration().getTypeId(), equalTo(new TaskWithDescriptorDescriptor().getId()));
+    assertThat(task1.taskConfiguration().getTypeId(), equalTo(new TaskWithDescriptorDescriptor().getId()));
 
     final TaskConfiguration c2 = new TaskConfiguration();
     c2.setId("id");

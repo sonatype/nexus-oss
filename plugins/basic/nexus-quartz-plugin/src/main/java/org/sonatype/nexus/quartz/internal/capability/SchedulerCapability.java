@@ -63,22 +63,7 @@ public class SchedulerCapability
   }
 
   @Override
-  protected void onActivate(final SchedulerCapabilityConfiguration config) throws Exception {
-    quartzImpl.setThreadPoolSize(config.getThreadPoolSize());
-    quartzImpl.setActive(config.isActive());
-    quartzImpl.start();
-    log.debug("Quartz Scheduler activated");
-  }
-
-  @Override
-  protected void onPassivate(final SchedulerCapabilityConfiguration config) throws Exception {
-    quartzImpl.stop();
-    log.debug("Quartz Scheduler passivated");
-  }
-
-  @Override
   protected void onUpdate(final SchedulerCapabilityConfiguration config) throws Exception {
-    quartzImpl.setThreadPoolSize(config.getThreadPoolSize());
     quartzImpl.setActive(config.isActive());
     log.debug("Quartz Scheduler updated: {}", config);
   }

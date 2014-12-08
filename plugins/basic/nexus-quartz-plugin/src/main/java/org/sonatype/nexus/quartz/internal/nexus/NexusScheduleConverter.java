@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.quartz.internal.nexus;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -39,7 +41,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 import static org.quartz.TriggerBuilder.newTrigger;
-import static org.sonatype.nexus.scheduling.schedule.Schedule.listToSet;
+import static org.sonatype.nexus.scheduling.schedule.Schedule.csvToSet;
 import static org.sonatype.nexus.scheduling.schedule.Schedule.stringToDate;
 
 /**
@@ -109,7 +111,7 @@ public class NexusScheduleConverter
         }
       }));
       triggerBuilder = newTrigger().startAt(s.getStartAt())
-          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 ? * " + daysToRun));
+          .withSchedule(CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " ? * " + daysToRun));
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
@@ -126,11 +128,11 @@ public class NexusScheduleConverter
         }));
         triggerBuilder = newTrigger().startAt(s.getStartAt())
             .withSchedule(
-                CronScheduleBuilder.cronSchedule("0 0 0 " + daysToRunStr + " * ?"));
+                CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " " + daysToRunStr + " * ?"));
       }
       else {
         triggerBuilder = newTrigger().startAt(s.getStartAt())
-            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"));
+            .withSchedule(CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " L * ?"));
       }
     }
     else if (schedule instanceof Manual) {
@@ -183,12 +185,12 @@ public class NexusScheduleConverter
     }
     else if ("weekly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
       return new Weekly(startAt, daysToRun);
     }
     else if ("monthly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = listToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
       return new Monthly(startAt, daysToRun);
     }
     else if ("manual".equals(type)) {
@@ -198,4 +200,12 @@ public class NexusScheduleConverter
       throw new IllegalArgumentException("Trigger unknown key: '" + trigger.getKey() + "', type: '" + type + "'");
     }
   }
+
+  @VisibleForTesting
+  String cronTimeParts(final Date date) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    return "0 " + cal.get(Calendar.MINUTE) + " " + cal.get(Calendar.HOUR_OF_DAY);
+  }
+
 }

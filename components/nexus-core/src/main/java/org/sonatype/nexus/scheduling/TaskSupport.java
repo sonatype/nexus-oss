@@ -19,9 +19,12 @@ import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.slf4j.MDC;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Support for {@link Task} implementations. Subclasses may implement {@link Cancelable} interface if they are
@@ -47,10 +50,24 @@ public abstract class TaskSupport<T>
     return new TaskConfiguration();
   }
 
+  protected TaskConfiguration getConfiguration() { return configuration; }
+
   // == NexusTask
 
+  public TaskConfiguration taskConfiguration() {
+    return new TaskConfiguration(configuration);
+  }
+
   @Override
-  public TaskConfiguration getConfiguration() { return configuration; }
+  public void configure(final TaskConfiguration configuration) throws IllegalArgumentException {
+    checkNotNull(configuration);
+    configuration.validate();
+    this.configuration.apply(configuration);
+    final String message = getMessage();
+    if (!Strings.isNullOrEmpty(message)) {
+      this.configuration.setMessage(message);
+    }
+  }
 
   @Override
   public String getId() {

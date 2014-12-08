@@ -45,6 +45,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author tstevens
  */
@@ -157,7 +159,10 @@ public class ScheduledServicePlexusResource
 
         for (Iterator<ScheduledServicePropertyResource> iter = resource.getProperties().iterator(); iter.hasNext(); ) {
           ScheduledServicePropertyResource prop = iter.next();
-          task.getConfiguration().getMap().put(prop.getKey(), prop.getValue());
+          // TODO: for some reason, null=null mapping is in here too!
+          if (prop.getKey() != null) {
+            task.getConfiguration().setString(prop.getKey(), prop.getValue());
+          }
         }
 
         task.getConfiguration().setAlertEmail(resource.getAlertEmail());

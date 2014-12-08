@@ -191,7 +191,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       'Name': model.get('name'),
       'Type': model.get('typeName'),
       'Status': model.get('statusDescription'),
-      'Next Run': model.get('getNextRun'),
+      'Next Run': model.get('nextRun'),
       'Last Run': model.get('lastRun'),
       'Last Result': model.get('lastRunResult')
     });

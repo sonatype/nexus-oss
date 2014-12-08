@@ -55,14 +55,16 @@ public class NexusBundleModule
 
   private final List<AbstractInterceptorModule> interceptorModules;
 
-  private final LifecycleModule lifecycleModule = new LifecycleModule();
+  private final LifecycleModule lifecycleModule;
 
   private final String imports;
 
   private final boolean hasPlexus;
 
-  public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator) {
+  public NexusBundleModule(final Bundle bundle, final MutableBeanLocator locator, final LifecycleModule lifecycleModule) {
     super(bundle, locator);
+
+    this.lifecycleModule = lifecycleModule;
 
     interceptorModules = new EntryListAdapter<>(locator.locate(Key.get(AbstractInterceptorModule.class)));
     imports = Strings.nullToEmpty(bundle.getHeaders().get(Constants.IMPORT_PACKAGE));

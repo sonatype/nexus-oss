@@ -170,10 +170,10 @@ public class NexusTaskInfo<T>
     if (nexusTaskFuture != null) {
       nexusTaskFuture.cancel(true);
     }
-    if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration().getMap())) {
+    if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration())) {
       // if no last state (removed even before 1st run), add one noting it got removed/canceled
       // if was running and is cancelable, the task will itself set a proper ending state
-      NexusTaskState.setLastRunState(nexusTaskState.getConfiguration().getMap(), EndState.CANCELED, new Date(), 0L);
+      NexusTaskState.setLastRunState(nexusTaskState.getConfiguration(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
     log.debug("NX Task {} remove; state={}", jobKey, state);

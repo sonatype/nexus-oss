@@ -14,8 +14,10 @@ package org.sonatype.nexus.scheduling;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
@@ -27,6 +29,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * MUST contain strings only (and string encoded primitives). Still, you can circumvent this primitive configuration by
  * storing some custom string as key here, and using that key fetch some custom configuration for your task via some
  * injected component.
+ *
+ * As this configuration may get persisted, for simplicity's sake there are some HARD requirements against the
+ * contents. Those are:
+ * For keys: only {@link String}s are accepted, {@code null} keys are NOT accepted.
+ * For values: only {@link String}s are accepted, {@code null} keys are NOT accepted. If you must have {@code null} for
+ * value, you can use some sentinel value to mark "undefined" state. Still, the best is to not set the mapping at all,
+ * as that also might be interpret as "unset". Many of the methods does this: set the key-value is value is non-null,
+ * otherwise REMOVE it. Also, many getter method accept "default value", that are returned in case mapping of key
+ * is not present in the map.
+ *
+ * This class is not thread safe.
  *
  * @since 3.0
  */
@@ -108,22 +121,40 @@ public final class TaskConfiguration
    */
   public static final String PATH_KEY = "path";
 
-  private final Map<String, String> configuration = Maps.newHashMap();
+  private final Map<String, String> configuration;
+
+  /**
+   * Constructor creating empty configuration.
+   */
+  public TaskConfiguration()
+  {
+    this.configuration = Maps.newHashMap();
+  }
+
+  /**
+   * Copy constructor that creates copy of the passed in configuration. Does not accept {@code null} values
+   * and validates the configuration passed in.
+   */
+  public TaskConfiguration(final TaskConfiguration configuration) throws IllegalArgumentException
+  {
+    checkNotNull(configuration);
+    this.configuration = Maps.newHashMap(configuration.configuration);
+    validate();
+  }
 
   /**
    * Performs a "self" validation of the configuration for minimal completeness and correctness.
    */
-  public final void validate() throws IllegalArgumentException {
+  public void validate() throws IllegalArgumentException {
     // Minimum requirements
     checkArgument(!Strings.isNullOrEmpty(getId()), "Incomplete task configuration: id");
     checkArgument(!Strings.isNullOrEmpty(getTypeId()), "Incomplete task configuration: typeId");
-  }
-
-  /**
-   * Exposes the "live" backing map.
-   */
-  public Map<String, String> getMap() {
-    return configuration;
+    for (Entry<?, ?> entry : configuration.entrySet()) {
+      checkArgument(
+          entry.getKey() instanceof String
+              && entry.getValue() instanceof String,
+          "Invalid entry in map: %s", configuration);
+    }
   }
 
   /**
@@ -138,7 +169,7 @@ public final class TaskConfiguration
    */
   public void setId(final String id) {
     checkNotNull(id);
-    getMap().put(ID_KEY, id);
+    configuration.put(ID_KEY, id);
   }
 
   /**
@@ -153,7 +184,7 @@ public final class TaskConfiguration
    */
   public void setName(final String name) {
     checkNotNull(name);
-    getMap().put(NAME_KEY, name);
+    configuration.put(NAME_KEY, name);
   }
 
   /**
@@ -168,7 +199,7 @@ public final class TaskConfiguration
    */
   public void setTypeId(final String typeId) {
     checkNotNull(typeId);
-    getMap().put(TYPE_ID_KEY, typeId);
+    configuration.put(TYPE_ID_KEY, typeId);
   }
 
   /**
@@ -183,7 +214,7 @@ public final class TaskConfiguration
    */
   public void setTypeName(final String typeName) {
     checkNotNull(typeName);
-    getMap().put(TYPE_NAME_KEY, typeName);
+    configuration.put(TYPE_NAME_KEY, typeName);
   }
 
   /**
@@ -197,7 +228,7 @@ public final class TaskConfiguration
    * Sets is task enabled.
    */
   public void setEnabled(final boolean enabled) {
-    getMap().put(ENABLED_KEY, Boolean.toString(enabled));
+    configuration.put(ENABLED_KEY, Boolean.toString(enabled));
   }
 
   /**
@@ -211,7 +242,7 @@ public final class TaskConfiguration
    * Sets is running task visible.
    */
   public void setVisible(final boolean visible) {
-    getMap().put(VISIBLE_KEY, Boolean.toString(visible));
+    configuration.put(VISIBLE_KEY, Boolean.toString(visible));
   }
 
   /**
@@ -226,10 +257,10 @@ public final class TaskConfiguration
    */
   public void setAlertEmail(final String email) {
     if (Strings.isNullOrEmpty(email)) {
-      getMap().remove(ALERT_EMAIL_KEY);
+      configuration.remove(ALERT_EMAIL_KEY);
     }
     else {
-      getMap().put(ALERT_EMAIL_KEY, email);
+      configuration.put(ALERT_EMAIL_KEY, email);
     }
   }
 
@@ -275,10 +306,10 @@ public final class TaskConfiguration
    */
   public void setMessage(final String message) {
     if (Strings.isNullOrEmpty(message)) {
-      getMap().remove(MESSAGE_KEY);
+      configuration.remove(MESSAGE_KEY);
     }
     else {
-      getMap().put(MESSAGE_KEY, message);
+      configuration.put(MESSAGE_KEY, message);
     }
   }
 
@@ -301,10 +332,10 @@ public final class TaskConfiguration
   public void setRepositoryId(final String repoId) {
     // TODO: this might change?
     if (Strings.isNullOrEmpty(repoId) || "*".equals(repoId) || "all_repo".equals(repoId)) {
-      getMap().remove(REPOSITORY_ID_KEY);
+      configuration.remove(REPOSITORY_ID_KEY);
     }
     else {
-      getMap().put(REPOSITORY_ID_KEY, repoId);
+      configuration.put(REPOSITORY_ID_KEY, repoId);
     }
   }
 
@@ -320,10 +351,10 @@ public final class TaskConfiguration
    */
   public void setPath(final String path) {
     if (Strings.isNullOrEmpty(path)) {
-      getMap().remove(PATH_KEY);
+      configuration.remove(PATH_KEY);
     }
     else {
-      getMap().put(PATH_KEY, path);
+      configuration.put(PATH_KEY, path);
     }
   }
 
@@ -333,7 +364,7 @@ public final class TaskConfiguration
    * Returns date parameter by key.
    */
   public Date getDate(final String key, final Date defaultValue) {
-    if (getMap().containsKey(key)) {
+    if (configuration.containsKey(key)) {
       // TODO: will NPE if value is null
       return new DateTime(getString(key)).toDate();
     }
@@ -348,10 +379,10 @@ public final class TaskConfiguration
   public void setDate(final String key, final Date date) {
     checkNotNull(key);
     if (date == null) {
-      getMap().remove(key);
+      configuration.remove(key);
     }
     else {
-      getMap().put(key, new DateTime(date).toString());
+      configuration.put(key, new DateTime(date).toString());
     }
   }
 
@@ -367,7 +398,7 @@ public final class TaskConfiguration
    */
   public void setBoolean(final String key, final boolean value) {
     checkNotNull(key);
-    getMap().put(key, String.valueOf(value));
+    configuration.put(key, String.valueOf(value));
   }
 
   /**
@@ -382,7 +413,7 @@ public final class TaskConfiguration
    */
   public void setInteger(final String key, final int value) {
     checkNotNull(key);
-    getMap().put(key, String.valueOf(value));
+    configuration.put(key, String.valueOf(value));
   }
 
   /**
@@ -397,7 +428,7 @@ public final class TaskConfiguration
    */
   public void setLong(final String key, final long value) {
     checkNotNull(key);
-    getMap().put(key, String.valueOf(value));
+    configuration.put(key, String.valueOf(value));
   }
 
   /**
@@ -412,8 +443,8 @@ public final class TaskConfiguration
    */
   public String getString(final String key, final String defaultValue) {
     checkNotNull(key);
-    if (getMap().containsKey(key)) {
-      return getMap().get(key);
+    if (configuration.containsKey(key)) {
+      return configuration.get(key);
     }
     else {
       return defaultValue;
@@ -426,16 +457,34 @@ public final class TaskConfiguration
   public void setString(final String key, final String value) {
     checkNotNull(key);
     if (value == null) {
-      getMap().remove(key);
+      configuration.remove(key);
     }
     else {
-      getMap().put(key, value);
+      configuration.put(key, value);
     }
+  }
+
+  /**
+   * Applies another task configuration on this task configuration.
+   */
+  public void apply(final TaskConfiguration taskConfiguration) throws IllegalArgumentException {
+    checkNotNull(taskConfiguration);
+    taskConfiguration.validate();
+    for (Entry<String, String> entry : taskConfiguration.configuration.entrySet()) {
+      this.configuration.put(entry.getKey(), entry.getValue());
+    }
+  }
+
+  /**
+   * Returns an immutable copy of this configuration as {@link Map<String,String>}.
+   */
+  public Map<String, String> asMap() {
+    return ImmutableMap.copyOf(configuration);
   }
 
   // ==
 
   public String toString() {
-    return getMap().toString();
+    return configuration.toString();
   }
 }

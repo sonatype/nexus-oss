@@ -92,7 +92,7 @@ public class DefaultNexusTaskFactory
     for (BeanEntry<Named, Task> entry : tasks) {
       if (entry.getImplementationClass().equals(taskDescriptor.getType())) {
         final T task = (T) entry.getProvider().get();
-        task.getConfiguration().getMap().putAll(taskConfiguration.getMap());
+        task.configure(taskConfiguration);
         return task;
       }
     }

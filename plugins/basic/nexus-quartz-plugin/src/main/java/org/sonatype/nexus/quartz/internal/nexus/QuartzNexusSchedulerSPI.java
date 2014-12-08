@@ -92,7 +92,7 @@ public class QuartzNexusSchedulerSPI
     try {
       final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
       final NexusTaskInfo<T> taskInfo = taskByKey(jobKey);
-      if (!taskInfo.isRemovedOrDone()) {
+      if (taskInfo != null && !taskInfo.isRemovedOrDone()) {
         return taskInfo;
       }
     }
@@ -139,6 +139,12 @@ public class QuartzNexusSchedulerSPI
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
+      // get trigger, but use identity of jobKey
+      // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
+      // ! create the trigger before eventual TaskInfo remove bellow to avoid task removal in case of an invalid trigger
+      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
+          .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
+
       log.debug("NX Task {} scheduled", jobKey);
       if (quartzSupport.getScheduler().checkExists(jobKey)) {
         // this is update
@@ -147,14 +153,9 @@ public class QuartzNexusSchedulerSPI
           old.remove();
         }
       }
-      final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.getMap());
+      final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
-
-      // get trigger, but use identity of jobKey
-      // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
-      final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
-          .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
       // register job specific listener with initial state
       final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) initializeTaskState(jobDetail, trigger);
@@ -274,8 +275,13 @@ public class QuartzNexusSchedulerSPI
       for (JobKey jobKey : jobKeys) {
         final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
             .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-        checkState(nexusTaskJobListener != null, "NX task must have listener");
-        result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
+        // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
+        // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
+        // but QZ did not remove job yet.
+        // checkState(nexusTaskJobListener != null, "NX task must have listener");
+        if (nexusTaskJobListener != null) {
+          result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
+        }
       }
       return result;
     }
@@ -290,12 +296,18 @@ public class QuartzNexusSchedulerSPI
     try {
       final NexusTaskJobListener<T> nexusTaskJobListener = (NexusTaskJobListener<T>) quartzSupport.getScheduler()
           .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-      checkState(nexusTaskJobListener != null, "NX task must have listener");
-      return nexusTaskJobListener.getNexusTaskInfo();
+      // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
+      // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
+      // but QZ did not remove job yet.
+      // checkState(nexusTaskJobListener != null, "NX task must have listener");
+      if (nexusTaskJobListener != null) {
+        return nexusTaskJobListener.getNexusTaskInfo();
+      }
     }
     finally {
       Thread.currentThread().setContextClassLoader(classLoader);
     }
+    return null;
   }
 
   boolean cancelJob(final JobKey jobKey) {
