@@ -122,7 +122,7 @@ public class QuartzSupportImpl
       start();
     }
     catch (Exception e) {
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
   }
 
@@ -132,7 +132,7 @@ public class QuartzSupportImpl
       stop();
     }
     catch (Exception e) {
-      Throwables.propagate(e);
+      throw Throwables.propagate(e);
     }
   }
 
