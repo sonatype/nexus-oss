@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
+import java.util.Date;
+
 import org.sonatype.nexus.scheduling.TaskInfo;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Abstract super class for task related events.
@@ -21,17 +24,22 @@ import org.sonatype.nexus.scheduling.TaskInfo;
  * @since 2.0
  */
 public abstract class NexusTaskEvent<T>
-    extends AbstractEvent<TaskInfo<T>>
 {
+  private final Date eventDate;
+
+  private final TaskInfo taskInfo;
+
   public NexusTaskEvent(final TaskInfo<T> taskInfo) {
-    super(taskInfo);
+    this.eventDate = new Date();
+    this.taskInfo = checkNotNull(taskInfo);
   }
 
-  /**
-   * Returns the task that failed.
-   */
+  public Date getEventDate() {
+    return eventDate;
+  }
+
   public TaskInfo<T> getNexusTaskInfo() {
-    return getEventSender();
+    return taskInfo;
   }
 
   @Override
