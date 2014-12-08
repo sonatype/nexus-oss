@@ -120,19 +120,19 @@ public class AuthenticatingRealmImpl
   private void reHashPassword(final CUser user, final String password) {
     String hashedPassword = passwordService.encryptPassword(password);
     try {
-      boolean concurrentlyUpdated;
+      boolean updated = false;
       do {
-        concurrentlyUpdated = false;
         CUser toUpdate = configuration.readUser(user.getId());
         toUpdate.setPassword(hashedPassword);
         try {
           configuration.updateUser(user);
+          updated = true;
         }
         catch (ConcurrentModificationException e) {
-          concurrentlyUpdated = true;
+          logger.debug("Could not re-hash user {} password as user was concurrently being updated. Retrying...");
         }
       }
-      while (concurrentlyUpdated);
+      while (!updated);
       user.setPassword(hashedPassword);
     }
     catch (Exception e) {
