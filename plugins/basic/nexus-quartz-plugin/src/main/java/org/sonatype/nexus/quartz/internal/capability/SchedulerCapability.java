@@ -69,6 +69,12 @@ public class SchedulerCapability
   }
 
   @Override
+  protected void onRemove(final SchedulerCapabilityConfiguration config) throws Exception {
+    quartzImpl.setActive(true);
+    log.debug("Quartz Scheduler capability removed: {}", config);
+  }
+
+  @Override
   protected String renderDescription() throws Exception {
     if (!context().isActive()) {
       return messages.disabledDescription();
