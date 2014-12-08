@@ -14,7 +14,6 @@ package org.sonatype.nexus.testsuite.p2.nxcm2558;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
-import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.ResponseMatchers;

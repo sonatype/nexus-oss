@@ -16,7 +16,6 @@ import java.io.File;
 import java.net.URL;
 
 import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTask;
-import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;

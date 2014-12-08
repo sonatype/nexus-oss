@@ -42,7 +42,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
-import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
@@ -56,7 +55,6 @@ import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Once;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
-import org.sonatype.nexus.util.NexusUberClassloader;
 
 import com.google.common.base.Strings;
 import org.restlet.data.Request;

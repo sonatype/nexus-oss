@@ -19,7 +19,6 @@ import java.io.InputStream;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
-import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;

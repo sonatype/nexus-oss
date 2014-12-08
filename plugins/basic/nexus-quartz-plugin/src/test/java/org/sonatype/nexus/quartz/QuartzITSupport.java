@@ -24,7 +24,6 @@ import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

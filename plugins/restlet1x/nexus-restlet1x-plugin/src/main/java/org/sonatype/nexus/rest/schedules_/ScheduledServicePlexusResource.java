@@ -15,7 +15,6 @@ package org.sonatype.nexus.rest.schedules_;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import javax.inject.Named;
