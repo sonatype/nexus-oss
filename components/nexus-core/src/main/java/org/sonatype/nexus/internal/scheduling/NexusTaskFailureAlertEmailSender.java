@@ -21,7 +21,7 @@ import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedFailed;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -54,8 +54,8 @@ public class NexusTaskFailureAlertEmailSender
    */
   @Subscribe
   @AllowConcurrentEvents
-  public void inspect(final NexusTaskEventStoppedFailed<?> failureEvent) {
-    final TaskInfo<?> failedTask = failureEvent.getNexusTaskInfo();
+  public void inspect(final TaskEventStoppedFailed<?> failureEvent) {
+    final TaskInfo<?> failedTask = failureEvent.getTaskInfo();
     if (failedTask == null || failedTask.getConfiguration().getAlertEmail() == null) {
       return;
     }

@@ -20,7 +20,7 @@ import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
@@ -49,7 +49,7 @@ public class DefaultNexusTaskSchedulerTest
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
         ImmutableList.of(be1, be2), Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        Providers.<NexusTaskExecutorSPI>of(null));
+        Providers.<TaskExecutorSPI>of(null));
   }
 
   @Test

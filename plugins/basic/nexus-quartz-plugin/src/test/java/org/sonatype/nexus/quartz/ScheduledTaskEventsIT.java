@@ -23,12 +23,12 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskInterruptedException;
-import org.sonatype.nexus.scheduling.events.NexusTaskEvent;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventCanceled;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
+import org.sonatype.nexus.scheduling.events.TaskEvent;
+import org.sonatype.nexus.scheduling.events.TaskEventCanceled;
+import org.sonatype.nexus.scheduling.events.TaskEventStarted;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedCanceled;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedDone;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Hourly;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -95,8 +95,8 @@ public class ScheduledTaskEventsIT
 
     // started, stoppedDone
     assertThat(listener.arrivedEvents, hasSize(2));
-    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventStoppedDone.class));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedDone.class));
   }
 
   @Test
@@ -130,9 +130,9 @@ public class ScheduledTaskEventsIT
 
     // started, stoppedDone
     assertThat(listener.arrivedEvents, hasSize(2));
-    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventStoppedFailed.class));
-    assertThat(((NexusTaskEventStoppedFailed) listener.arrivedEvents.get(1)).getFailureCause(),
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedFailed.class));
+    assertThat(((TaskEventStoppedFailed) listener.arrivedEvents.get(1)).getFailureCause(),
         instanceOf(IOException.class));
   }
 
@@ -167,9 +167,9 @@ public class ScheduledTaskEventsIT
 
     // started, stoppedFailed
     assertThat(listener.arrivedEvents, hasSize(2));
-    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventStoppedFailed.class));
-    assertThat(((NexusTaskEventStoppedFailed) listener.arrivedEvents.get(1)).getFailureCause(),
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedFailed.class));
+    assertThat(((TaskEventStoppedFailed) listener.arrivedEvents.get(1)).getFailureCause(),
         instanceOf(IllegalArgumentException.class));
   }
 
@@ -205,9 +205,9 @@ public class ScheduledTaskEventsIT
 
     // started, canceled, stoppedCanceled
     assertThat(listener.arrivedEvents, hasSize(3));
-    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventCanceled.class));
-    assertThat(listener.arrivedEvents.get(2), instanceOf(NexusTaskEventStoppedCanceled.class));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventStoppedCanceled.class));
   }
 
   @Test
@@ -241,17 +241,17 @@ public class ScheduledTaskEventsIT
 
     // started, canceled, stoppedCanceled
     assertThat(listener.arrivedEvents, hasSize(3));
-    assertThat(listener.arrivedEvents.get(0), instanceOf(NexusTaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(NexusTaskEventCanceled.class));
-    assertThat(listener.arrivedEvents.get(2), instanceOf(NexusTaskEventStoppedCanceled.class));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventStoppedCanceled.class));
   }
 
   static class Listener
   {
-    final List<NexusTaskEvent> arrivedEvents = Lists.newArrayList();
+    final List<TaskEvent> arrivedEvents = Lists.newArrayList();
 
     @Subscribe
-    public void on(final NexusTaskEvent e) {
+    public void on(final TaskEvent e) {
       arrivedEvents.add(e);
     }
   }

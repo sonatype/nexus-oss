@@ -15,14 +15,15 @@ package org.sonatype.nexus.scheduling.events;
 import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
- * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
+ * Event fired when a task is cancelled (more precisely, not WHEN is cancelled, but when task detected that is being
+ * canceled and gives up the work).
  *
  * @since 2.0
  */
-public abstract class NexusTaskEventStopped<T>
-    extends NexusTaskEvent<T>
+public class TaskEventStoppedCanceled<T>
+    extends TaskEventStopped<T>
 {
-  public NexusTaskEventStopped(final TaskInfo<T> taskInfo) {
+  public TaskEventStoppedCanceled(final TaskInfo<T> taskInfo) {
     super(taskInfo);
   }
 }

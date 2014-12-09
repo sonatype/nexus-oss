@@ -31,7 +31,7 @@ import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -50,9 +50,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 // TODO: I want this implementation to be last, see DefaultNexusTaskScheduler#getScheduler method
 @Priority(1000) // be last, sorta fallback? (and used in tests)
-public class ThreadPoolNexusSchedulerSPI
+public class ThreadPoolTaskExecutorSPI
     extends ComponentSupport
-    implements NexusTaskExecutorSPI
+    implements TaskExecutorSPI
 {
   private final NexusTaskFactory nexusTaskFactory;
 
@@ -61,7 +61,7 @@ public class ThreadPoolNexusSchedulerSPI
   private final ConcurrentMap<String, TaskInfo<?>> tasks;
 
   @Inject
-  public ThreadPoolNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
+  public ThreadPoolTaskExecutorSPI(final NexusTaskFactory nexusTaskFactory)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);

@@ -29,7 +29,7 @@ import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -49,11 +49,11 @@ public class DefaultNexusTaskScheduler
 {
   private final NexusTaskFactory nexusTaskFactory;
 
-  private final Provider<NexusTaskExecutorSPI> schedulerProvider;
+  private final Provider<TaskExecutorSPI> schedulerProvider;
 
   @Inject
   public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
-                                   final Provider<NexusTaskExecutorSPI> schedulerProvider)
+                                   final Provider<TaskExecutorSPI> schedulerProvider)
   {
     this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
     this.schedulerProvider = checkNotNull(schedulerProvider);
@@ -64,8 +64,8 @@ public class DefaultNexusTaskScheduler
   /**
    * Returns the actual SPI present in system.
    */
-  private NexusTaskExecutorSPI getScheduler() {
-    final NexusTaskExecutorSPI provider = schedulerProvider.get();
+  private TaskExecutorSPI getScheduler() {
+    final TaskExecutorSPI provider = schedulerProvider.get();
     if (provider == null) {
       throw new IllegalStateException("No scheduler present in system!");
     }

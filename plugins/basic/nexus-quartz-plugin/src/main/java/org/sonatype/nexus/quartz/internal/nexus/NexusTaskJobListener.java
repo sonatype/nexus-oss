@@ -19,10 +19,10 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo.EndState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
-import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
+import org.sonatype.nexus.scheduling.events.TaskEventStarted;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedCanceled;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedDone;
+import org.sonatype.nexus.scheduling.events.TaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -55,7 +55,7 @@ public class NexusTaskJobListener<T>
 
   private final EventBus eventBus;
 
-  private final QuartzNexusSchedulerSPI quartzSupport;
+  private final QuartzTaskExecutorSPI quartzSupport;
 
   private final JobKey jobKey;
 
@@ -64,7 +64,7 @@ public class NexusTaskJobListener<T>
   private final NexusTaskInfo<T> nexusTaskInfo;
 
   public NexusTaskJobListener(final EventBus eventBus,
-                              final QuartzNexusSchedulerSPI quartzSupport,
+                              final QuartzTaskExecutorSPI quartzSupport,
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
                               final NexusTaskState initialState,
@@ -128,7 +128,7 @@ public class NexusTaskJobListener<T>
     }
     context.put(NexusTaskFuture.FUTURE_KEY, future);
     context.put(NexusTaskInfo.TASK_INFO_KEY, nexusTaskInfo);
-    eventBus.post(new NexusTaskEventStarted<>(nexusTaskInfo));
+    eventBus.post(new TaskEventStarted<>(nexusTaskInfo));
   }
 
   @Override
@@ -189,13 +189,13 @@ public class NexusTaskJobListener<T>
     // fire events
     switch (endState) {
       case OK:
-        eventBus.post(new NexusTaskEventStoppedDone<>(nexusTaskInfo));
+        eventBus.post(new TaskEventStoppedDone<>(nexusTaskInfo));
         break;
       case FAILED:
-        eventBus.post(new NexusTaskEventStoppedFailed<>(nexusTaskInfo, failure));
+        eventBus.post(new TaskEventStoppedFailed<>(nexusTaskInfo, failure));
         break;
       case CANCELED:
-        eventBus.post(new NexusTaskEventStoppedCanceled<>(nexusTaskInfo));
+        eventBus.post(new TaskEventStoppedCanceled<>(nexusTaskInfo));
         break;
     }
   }

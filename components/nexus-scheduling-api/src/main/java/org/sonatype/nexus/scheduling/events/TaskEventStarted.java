@@ -15,15 +15,14 @@ package org.sonatype.nexus.scheduling.events;
 import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
- * Event fired when a task is stopped, is cleanly done what was it doing (whatever the ending resolution is: finished,
- * cancelled or failed).
+ * Event fired when a task is started (might be running or sleeping if blocked).
  *
  * @since 2.0
  */
-public class NexusTaskEventStoppedDone<T>
-    extends NexusTaskEventStopped<T>
+public class TaskEventStarted<T>
+    extends TaskEvent<T>
 {
-  public NexusTaskEventStoppedDone(final TaskInfo<T> taskInfo) {
+  public TaskEventStarted(final TaskInfo<T> taskInfo) {
     super(taskInfo);
   }
 }

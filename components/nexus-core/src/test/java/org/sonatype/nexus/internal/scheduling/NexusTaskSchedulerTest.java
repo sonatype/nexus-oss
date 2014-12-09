@@ -25,7 +25,7 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
@@ -51,7 +51,7 @@ public class NexusTaskSchedulerTest
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
         ImmutableList.of(task), Lists.<TaskDescriptor<?>>newArrayList());
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        Providers.<NexusTaskExecutorSPI>of(new ThreadPoolNexusSchedulerSPI(nexusTaskFactory)));
+        Providers.<TaskExecutorSPI>of(new ThreadPoolTaskExecutorSPI(nexusTaskFactory)));
   }
 
   @Test
