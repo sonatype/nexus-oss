@@ -28,7 +28,6 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <!-- Formfields -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-formfields</artifactId>
