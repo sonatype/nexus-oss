@@ -10,15 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.util.List;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithDescriptor;
-import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithDescriptorDescriptor;
-import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithoutDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;

@@ -11,26 +11,26 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.internal.scheduling;
+package org.sonatype.nexus.scheduling.internal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.TaskFactory;
-import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
-import org.sonatype.nexus.util.DigesterUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -162,11 +162,7 @@ public class DefaultTaskScheduler
                             final TaskConfiguration taskConfiguration)
   {
     // TODO: call into quartz for this? Must not clash with existing persisted job IDs!
-    return DigesterUtils.getSha1Digest(
-        taskFQCName
-            + System.identityHashCode(taskConfiguration)
-            + System.nanoTime()
-    );
+    return UUID.randomUUID().toString();
   }
 
   // ==

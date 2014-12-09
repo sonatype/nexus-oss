@@ -253,7 +253,7 @@
     <!-- Scheduling -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-scheduling-api</artifactId>
+      <artifactId>nexus-scheduling</artifactId>
     </dependency>
 
     <!-- SISU Container -->
