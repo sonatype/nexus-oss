@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.scheduling.internal;
+package org.sonatype.nexus.internal.scheduling;
 
 import java.util.Date;
 import java.util.List;

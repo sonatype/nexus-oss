@@ -10,13 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.internal;
+package org.sonatype.nexus.internal.scheduling;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.internal.scheduling.Tasks.SleeperTask;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
@@ -24,7 +25,6 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.internal.Tasks.SleeperTask;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -39,7 +39,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
-import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 
 public class NexusTaskSchedulerTest
     extends TestSupport
@@ -48,7 +47,7 @@ public class NexusTaskSchedulerTest
 
   @Before
   public void prepare() {
-    final BeanEntry<Named, Task> task = beanEntry(SleeperTask.class);
+    final BeanEntry<Named, Task> task = Tasks.beanEntry(SleeperTask.class);
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
         ImmutableList.of(task), Lists.<TaskDescriptor<?>>newArrayList());
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,

@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusTaskScheduler;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumRegistry;

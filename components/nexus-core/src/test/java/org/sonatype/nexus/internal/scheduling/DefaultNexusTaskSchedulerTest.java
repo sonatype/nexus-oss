@@ -10,16 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.internal;
+package org.sonatype.nexus.internal.scheduling;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithDescriptor;
+import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithDescriptorDescriptor;
+import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
@@ -36,7 +36,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 
 public class DefaultNexusTaskSchedulerTest
     extends TestSupport
@@ -45,8 +44,8 @@ public class DefaultNexusTaskSchedulerTest
 
   @Before
   public void prepare() {
-    final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
-    final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
+    final BeanEntry<Named, Task> be1 = Tasks.beanEntry(TaskWithDescriptor.class);
+    final BeanEntry<Named, Task> be2 = Tasks.beanEntry(TaskWithoutDescriptor.class);
     final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
         ImmutableList.of(be1, be2), Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
     nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,

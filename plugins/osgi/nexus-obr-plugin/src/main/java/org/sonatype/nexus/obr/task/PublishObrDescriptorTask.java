@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.walker.Walker;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
