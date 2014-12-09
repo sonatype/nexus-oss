@@ -34,6 +34,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,6 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class TasksWaitForPlexusResource
     extends AbstractPlexusResource
 {
+  private static final Logger log = LoggerFactory.getLogger(TasksWaitForPlexusResource.class);
 
   private static final String RESOURCE_URI = "/tasks/waitFor";
 
@@ -148,7 +151,9 @@ public class TasksWaitForPlexusResource
   }
 
   private static boolean isTaskCompleted(TaskInfo<?> task) {
-    System.out.println(task.getName() + " " + task.getCurrentState().getState() + " " + task.getLastRunState());
+    log.debug("task: {} : {}, currentState: {}, endState: {}", task.getId(), task.getName(),
+        task.getCurrentState().getState(),
+        task.getLastRunState() != null ? task.getLastRunState().getEndState() : "n/a");
     return State.RUNNING != task.getCurrentState().getState() && task.getLastRunState() != null;
   }
 
