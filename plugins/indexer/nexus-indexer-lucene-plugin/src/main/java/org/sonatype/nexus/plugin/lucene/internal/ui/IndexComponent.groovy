@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.plugin.lucene.internal.ui
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -51,7 +51,7 @@ extends DirectComponentSupport
   RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
-  NexusTaskScheduler nexusScheduler
+  TaskScheduler nexusScheduler
 
   @DirectMethod
   @RequiresAuthentication

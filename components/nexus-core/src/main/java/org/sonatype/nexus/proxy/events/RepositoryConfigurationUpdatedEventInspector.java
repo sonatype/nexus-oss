@@ -18,7 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -36,10 +36,10 @@ public class RepositoryConfigurationUpdatedEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
-  private final NexusTaskScheduler nexusTaskExecutor;
+  private final TaskScheduler nexusTaskExecutor;
 
   @Inject
-  public RepositoryConfigurationUpdatedEventInspector(final NexusTaskScheduler nexusTaskExecutor)
+  public RepositoryConfigurationUpdatedEventInspector(final TaskScheduler nexusTaskExecutor)
   {
     this.nexusTaskExecutor = nexusTaskExecutor;
   }

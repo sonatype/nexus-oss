@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -54,16 +54,16 @@ public class ThreadPoolTaskExecutorSPI
     extends ComponentSupport
     implements TaskExecutorSPI
 {
-  private final NexusTaskFactory nexusTaskFactory;
+  private final TaskFactory taskFactory;
 
   private final ThreadPoolExecutor executorService;
 
   private final ConcurrentMap<String, TaskInfo<?>> tasks;
 
   @Inject
-  public ThreadPoolTaskExecutorSPI(final NexusTaskFactory nexusTaskFactory)
+  public ThreadPoolTaskExecutorSPI(final TaskFactory taskFactory)
   {
-    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.taskFactory = checkNotNull(taskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);
     this.tasks = Maps.newConcurrentMap();
   }
@@ -242,7 +242,7 @@ public class ThreadPoolTaskExecutorSPI
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
-    final Task<T> task = nexusTaskFactory.createTaskInstance(taskConfiguration);
+    final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
     final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
     taskInfo.setFuture(future);

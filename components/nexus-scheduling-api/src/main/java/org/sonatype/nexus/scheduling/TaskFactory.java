@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * The factory for {@link Task} instances.
  */
-public interface NexusTaskFactory
+public interface TaskFactory
 {
   /**
    * Returns the list of task descriptors for all known tasks in system.

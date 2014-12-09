@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.coreui
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 
 import com.google.common.base.Predicate
@@ -127,7 +127,7 @@ extends DirectComponentSupport
   ClassLoader uberClassLoader
 
   @Inject
-  NexusTaskScheduler nexusScheduler
+  TaskScheduler nexusScheduler
 
   @Inject
   @Nullable

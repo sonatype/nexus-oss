@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.security.SecuritySystem;
@@ -64,7 +64,7 @@ public class NxApplication
 
   private final SecuritySystem securitySystem;
 
-  private final NexusTaskScheduler nexusTaskScheduler;
+  private final TaskScheduler taskScheduler;
 
   private final RepositoryRegistry repositoryRegistry;
 
@@ -79,7 +79,7 @@ public class NxApplication
                        final NexusConfiguration nexusConfiguration,
                        final ApplicationStatusSource applicationStatusSource,
                        final SecuritySystem securitySystem,
-                       final NexusTaskScheduler nexusTaskScheduler,
+                       final TaskScheduler taskScheduler,
                        final RepositoryRegistry repositoryRegistry,
                        final EventSubscriberHost eventSubscriberHost,
                        final OrientBootstrap orientBootstrap,
@@ -89,7 +89,7 @@ public class NxApplication
     this.applicationStatusSource = checkNotNull(applicationStatusSource);
     this.nexusConfiguration = checkNotNull(nexusConfiguration);
     this.securitySystem = checkNotNull(securitySystem);
-    this.nexusTaskScheduler = checkNotNull(nexusTaskScheduler);
+    this.taskScheduler = checkNotNull(taskScheduler);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
@@ -219,11 +219,11 @@ public class NxApplication
     final Collection<ShadowRepository> shadows = repositoryRegistry.getRepositoriesWithFacet(ShadowRepository.class);
     for (ShadowRepository shadow : shadows) {
       if (shadow.isSynchronizeAtStartup()) {
-        final TaskConfiguration taskConfiguration = nexusTaskScheduler
+        final TaskConfiguration taskConfiguration = taskScheduler
             .createTaskConfigurationInstance(SynchronizeShadowsTask.class);
         taskConfiguration.setRepositoryId(shadow.getId());
         taskConfiguration.setName("Shadow Sync (" + shadow.getId() + ")");
-        nexusTaskScheduler.submit(taskConfiguration);
+        taskScheduler.submit(taskConfiguration);
       }
     }
   }

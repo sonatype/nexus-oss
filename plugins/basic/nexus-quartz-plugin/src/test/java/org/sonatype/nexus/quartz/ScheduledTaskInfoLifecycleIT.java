@@ -48,11 +48,11 @@ public class ScheduledTaskInfoLifecycleIT
     SleeperTask.reset();
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.submit(taskConfiguration);
+    final TaskInfo<String> taskInfo = taskScheduler.submit(taskConfiguration);
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -63,7 +63,7 @@ public class ScheduledTaskInfoLifecycleIT
     assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(1));
 
     final CurrentState<String> currentState = taskInfo.getCurrentState();
     assertThat(currentState, notNullValue());
@@ -90,7 +90,7 @@ public class ScheduledTaskInfoLifecycleIT
     Thread.sleep(500);
 
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
   }
 
   /**
@@ -102,11 +102,11 @@ public class ScheduledTaskInfoLifecycleIT
     SleeperTask.reset();
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // task message is available after task is done (as it comes from persisted dataMap)
     assertThat(taskInfo.getMessage(), nullValue());
@@ -123,7 +123,7 @@ public class ScheduledTaskInfoLifecycleIT
     assertThat(taskInfo.getConfiguration().getTypeId(), equalTo(taskConfiguration.getTypeId()));
     assertThat(taskInfo.getConfiguration().getCreated(), notNullValue());
     assertThat(taskInfo.getConfiguration().getUpdated(), notNullValue());
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(1));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(1));
 
     Date runStarted;
     {
@@ -157,11 +157,11 @@ public class ScheduledTaskInfoLifecycleIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
 
     // repeating tasks when done are waiting, call for state is okay at any time
     {
-      final TaskInfo<String> ti = nexusTaskScheduler.getTaskById(taskInfo.getId());
+      final TaskInfo<String> ti = taskScheduler.getTaskById(taskInfo.getId());
       assertThat(ti, notNullValue());
       assertThat(ti.getId(), equalTo(taskConfiguration.getId()));
       assertThat(ti.getName(), equalTo(taskConfiguration.getName()));

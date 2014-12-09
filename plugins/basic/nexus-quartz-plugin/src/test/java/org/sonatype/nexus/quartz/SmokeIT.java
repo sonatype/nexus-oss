@@ -28,9 +28,9 @@ public class SmokeIT
 {
   @Test
   public void smoke() throws Exception {
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(EmptyTrashTask.class);
-    final EmptyTrashTask task = nexusTaskScheduler.createTaskInstance(taskConfiguration);
+    final EmptyTrashTask task = taskScheduler.createTaskInstance(taskConfiguration);
 
     assertThat(taskConfiguration.getTypeId(), equalTo(task.taskConfiguration().getTypeId()));
   }

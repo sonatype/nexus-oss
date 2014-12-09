@@ -41,7 +41,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.LastRunState;
@@ -66,18 +66,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractFormFieldResource
 {
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
   private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
   @Inject
-  public void setNexusScheduler(final NexusTaskScheduler nexusScheduler) {
+  public void setNexusScheduler(final TaskScheduler nexusScheduler) {
     this.nexusScheduler = nexusScheduler;
   }
 
-  protected NexusTaskScheduler getNexusScheduler() {
+  protected TaskScheduler getNexusScheduler() {
     return nexusScheduler;
   }
 

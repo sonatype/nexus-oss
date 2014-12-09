@@ -40,17 +40,17 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
 
-public class NexusTaskSchedulerTest
+public class TaskSchedulerTest
     extends TestSupport
 {
-  private DefaultNexusTaskScheduler nexusTaskScheduler;
+  private DefaultTaskScheduler nexusTaskScheduler;
 
   @Before
   public void prepare() {
     final BeanEntry<Named, Task> task = Tasks.beanEntry(SleeperTask.class);
-    final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
+    final DefaultTaskFactory nexusTaskFactory = new DefaultTaskFactory(
         ImmutableList.of(task), Lists.<TaskDescriptor<?>>newArrayList());
-    nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
+    nexusTaskScheduler = new DefaultTaskScheduler(nexusTaskFactory,
         Providers.<TaskExecutorSPI>of(new ThreadPoolTaskExecutorSPI(nexusTaskFactory)));
   }
 

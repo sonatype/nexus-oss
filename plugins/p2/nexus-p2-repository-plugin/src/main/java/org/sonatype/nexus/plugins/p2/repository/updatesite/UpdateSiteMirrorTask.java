@@ -20,7 +20,7 @@ import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
 public class UpdateSiteMirrorTask
     extends RepositoryTaskSupport<Void>
 {
-  public static TaskInfo<Void> submit(final NexusTaskScheduler scheduler,
+  public static TaskInfo<Void> submit(final TaskScheduler scheduler,
                                       final UpdateSiteProxyRepository updateSite,
                                       final boolean force)
   {

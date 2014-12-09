@@ -21,8 +21,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskFactory;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
@@ -43,19 +43,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
-public class DefaultNexusTaskScheduler
+public class DefaultTaskScheduler
     extends ComponentSupport
-    implements NexusTaskScheduler
+    implements TaskScheduler
 {
-  private final NexusTaskFactory nexusTaskFactory;
+  private final TaskFactory taskFactory;
 
   private final Provider<TaskExecutorSPI> schedulerProvider;
 
   @Inject
-  public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
-                                   final Provider<TaskExecutorSPI> schedulerProvider)
+  public DefaultTaskScheduler(final TaskFactory taskFactory,
+                              final Provider<TaskExecutorSPI> schedulerProvider)
   {
-    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.taskFactory = checkNotNull(taskFactory);
     this.schedulerProvider = checkNotNull(schedulerProvider);
   }
 
@@ -76,7 +76,7 @@ public class DefaultNexusTaskScheduler
 
   @Override
   public List<TaskDescriptor<?>> listTaskDescriptors() {
-    return nexusTaskFactory.listTaskDescriptors();
+    return taskFactory.listTaskDescriptors();
   }
 
   @Override
@@ -90,7 +90,7 @@ public class DefaultNexusTaskScheduler
   @Override
   public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
     checkNotNull(taskType);
-    final TaskDescriptor<?> taskDescriptor = nexusTaskFactory.resolveTaskDescriptorByTypeId(taskType);
+    final TaskDescriptor<?> taskDescriptor = taskFactory.resolveTaskDescriptorByTypeId(taskType);
     checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskType);
     return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
   }
@@ -100,7 +100,7 @@ public class DefaultNexusTaskScheduler
       throws IllegalArgumentException
   {
     checkNotNull(taskConfiguration);
-    return nexusTaskFactory.createTaskInstance(taskConfiguration);
+    return taskFactory.createTaskInstance(taskConfiguration);
   }
 
   @Override

@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumHosted;
@@ -73,7 +73,7 @@ public class GenerateMetadataTaskConcurrencyIT
   private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
 
   @Inject
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   @Inject
   private RepositoryRegistry repositoryRegistry;

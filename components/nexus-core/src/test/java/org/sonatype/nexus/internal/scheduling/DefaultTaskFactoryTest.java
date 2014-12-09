@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.internal.scheduling;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithDescriptor;
@@ -20,58 +22,73 @@ import org.sonatype.nexus.internal.scheduling.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
-import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
+import org.sonatype.nexus.scheduling.TaskSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.inject.util.Providers;
 import org.eclipse.sisu.BeanEntry;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.fail;
 
-public class DefaultNexusTaskSchedulerTest
+public class DefaultTaskFactoryTest
     extends TestSupport
 {
-  private DefaultNexusTaskScheduler nexusTaskScheduler;
+  private DefaultTaskFactory nexusTaskFactory;
 
   @Before
   public void prepare() {
     final BeanEntry<Named, Task> be1 = Tasks.beanEntry(TaskWithDescriptor.class);
     final BeanEntry<Named, Task> be2 = Tasks.beanEntry(TaskWithoutDescriptor.class);
-    final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
-        ImmutableList.of(be1, be2), Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
-    nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        Providers.<TaskExecutorSPI>of(null));
+    nexusTaskFactory = new DefaultTaskFactory(ImmutableList.of(be1, be2),
+        Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
   }
 
   @Test
-  public void createTaskConfigurationInstance() {
-    final TaskConfiguration c1 = nexusTaskScheduler.createTaskConfigurationInstance(TaskWithDescriptor.class);
-    assertThat(c1.getId(), notNullValue());
-    assertThat(c1.getName(), equalTo("Task with descriptor"));
-    assertThat(c1.getTypeId(), equalTo(TaskWithDescriptor.class.getSimpleName()));
-    assertThat(c1.getTypeName(), equalTo("Task with descriptor"));
-    assertThat(c1.isVisible(), is(true));
-    assertThat(c1.isEnabled(), is(true));
+  public void listTaskDescriptors() {
+    final List<TaskDescriptor<?>> descriptorList = nexusTaskFactory.listTaskDescriptors();
+    assertThat(descriptorList, hasSize(2));
+  }
 
-    final TaskConfiguration c2 = nexusTaskScheduler.createTaskConfigurationInstance(TaskWithoutDescriptor.class);
-    assertThat(c2.getId(), notNullValue());
-    assertThat(c2.getName(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
-    assertThat(c2.getTypeId(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
-    assertThat(c2.getTypeName(), equalTo(TaskWithoutDescriptor.class.getSimpleName()));
-    assertThat(c2.isVisible(), is(false));
-    assertThat(c2.isEnabled(), is(true));
+  @Test
+  public void resolveTaskDescriptorByTypeId() {
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()), is(notNullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithoutDescriptor.class.getName()),
+        is(notNullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId(String.class.getName()), is(nullValue()));
+    assertThat(nexusTaskFactory.resolveTaskDescriptorByTypeId("foobar"), is(nullValue()));
+  }
 
+  @Test
+  public void createTaskInstance() {
+    final TaskConfiguration c1 = new TaskConfiguration();
+    c1.setId("id");
+    c1.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithDescriptor.class.getName()).getId());
+    final TaskSupport<?> task1 = nexusTaskFactory.createTaskInstance(c1);
+    assertThat(task1, is(instanceOf(TaskWithDescriptor.class)));
+    assertThat(task1.taskConfiguration().getTypeId(), equalTo(new TaskWithDescriptorDescriptor().getId()));
+
+    final TaskConfiguration c2 = new TaskConfiguration();
+    c2.setId("id");
+    c2.setTypeId(nexusTaskFactory.resolveTaskDescriptorByTypeId(TaskWithoutDescriptor.class.getName()).getId());
+    final Task<?> task2 = nexusTaskFactory.createTaskInstance(c2);
+    assertThat(task2, is(instanceOf(TaskWithoutDescriptor.class)));
+
+    final TaskConfiguration c3 = new TaskConfiguration();
+    c3.setId("id");
+    c2.setTypeId("foobar");
     try {
-      final TaskConfiguration c3 = nexusTaskScheduler.createTaskConfigurationInstance("foobar");
+      final Task<?> task3 = nexusTaskFactory.createTaskInstance(c2);
       fail("This should not return");
     }
     catch (IllegalArgumentException e) {

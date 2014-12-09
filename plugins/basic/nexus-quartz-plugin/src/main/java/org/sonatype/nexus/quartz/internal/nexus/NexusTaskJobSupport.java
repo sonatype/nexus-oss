@@ -21,7 +21,7 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.quartz.JobSupport;
 import org.sonatype.nexus.scheduling.Cancelable;
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -76,18 +76,18 @@ public class NexusTaskJobSupport<T>
 
   private final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider;
 
-  private final NexusTaskFactory nexusTaskFactory;
+  private final TaskFactory taskFactory;
 
   private Task<T> nexusTask;
 
   @Inject
   public NexusTaskJobSupport(final EventBus eventBus,
                              final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider,
-                             final NexusTaskFactory nexusTaskFactory)
+                             final TaskFactory taskFactory)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
-    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.taskFactory = checkNotNull(taskFactory);
   }
 
   @Override
@@ -96,7 +96,7 @@ public class NexusTaskJobSupport<T>
     try {
       final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
       final NexusTaskFuture<T> future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
-      nexusTask = nexusTaskFactory.createTaskInstance(taskConfiguration);
+      nexusTask = taskFactory.createTaskInstance(taskConfiguration);
       try {
         mayBlock(nexusTask, future);
         if (!future.isCancelled()) {

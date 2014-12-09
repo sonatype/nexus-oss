@@ -71,11 +71,11 @@ public class ScheduledTaskEventsIT
     SleeperTask.reset();
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -89,7 +89,7 @@ public class ScheduledTaskEventsIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.OK));
 
@@ -106,11 +106,11 @@ public class ScheduledTaskEventsIT
     SleeperTask.exception = new IOException("foo");
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -124,7 +124,7 @@ public class ScheduledTaskEventsIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.FAILED));
 
@@ -143,11 +143,11 @@ public class ScheduledTaskEventsIT
     SleeperTask.exception = new IllegalArgumentException("foo");
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -161,7 +161,7 @@ public class ScheduledTaskEventsIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.FAILED));
 
@@ -179,11 +179,11 @@ public class ScheduledTaskEventsIT
     SleeperTask.reset();
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -199,7 +199,7 @@ public class ScheduledTaskEventsIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
 
@@ -217,11 +217,11 @@ public class ScheduledTaskEventsIT
     SleeperTask.exception = new TaskInterruptedException("foo", true);
 
     // create the task
-    final TaskConfiguration taskConfiguration = nexusTaskScheduler
+    final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
-    final TaskInfo<String> taskInfo = nexusTaskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
 
     // give it some time to start
     SleeperTask.youWait.await();
@@ -235,7 +235,7 @@ public class ScheduledTaskEventsIT
     // so let's sleep for some
     Thread.sleep(500);
     // done
-    assertThat(nexusTaskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
 

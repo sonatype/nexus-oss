@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -194,7 +194,7 @@ public class MergeMetadataTask
     );
   }
 
-  public static TaskInfo<YumRepository> createTaskFor(final NexusTaskScheduler nexusScheduler,
+  public static TaskInfo<YumRepository> createTaskFor(final TaskScheduler nexusScheduler,
                                                       final GroupRepository groupRepository)
   {
     TaskConfiguration task = nexusScheduler.createTaskConfigurationInstance(MergeMetadataTask.class);

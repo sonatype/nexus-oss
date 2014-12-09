@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 
 import org.junit.Test;
 
@@ -35,14 +35,14 @@ public class EvictUnusedProxiedItemsTaskTest
 {
   private static final long A_DAY = 24L * 60L * 60L * 1000L;
 
-  NexusTaskScheduler scheduler;
+  TaskScheduler scheduler;
 
   @Override
   protected void setUp()
       throws Exception
   {
     super.setUp();
-    scheduler = lookup(NexusTaskScheduler.class);
+    scheduler = lookup(TaskScheduler.class);
   }
 
   @Override

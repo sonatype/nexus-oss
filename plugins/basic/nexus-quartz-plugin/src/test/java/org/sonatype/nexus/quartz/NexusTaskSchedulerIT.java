@@ -42,33 +42,33 @@ public class NexusTaskSchedulerIT
 {
   @Test
   public void taskRemove() throws Exception {
-    final TaskConfiguration configuration = nexusTaskScheduler.createTaskConfigurationInstance(EmptyTrashTask.class);
-    nexusTaskScheduler.scheduleTask(configuration, new Manual());
+    final TaskConfiguration configuration = taskScheduler.createTaskConfigurationInstance(EmptyTrashTask.class);
+    taskScheduler.scheduleTask(configuration, new Manual());
 
     String id;
     {
-      List<TaskInfo<?>> taskInfos = nexusTaskScheduler.listsTasks();
+      List<TaskInfo<?>> taskInfos = taskScheduler.listsTasks();
       assertThat(taskInfos, hasSize(1));
       assertThat(taskInfos.get(0).getConfiguration().getTypeId(), equalTo(configuration.getTypeId()));
       id = taskInfos.get(0).getId();
     }
 
     {
-      TaskInfo<?> taskInfo = nexusTaskScheduler.getTaskById("foo-bar-not-exists");
+      TaskInfo<?> taskInfo = taskScheduler.getTaskById("foo-bar-not-exists");
       assertThat(taskInfo, nullValue());
 
-      taskInfo = nexusTaskScheduler.getTaskById(id);
+      taskInfo = taskScheduler.getTaskById(id);
       assertThat(taskInfo, notNullValue());
       assertThat(taskInfo.getSchedule(), instanceOf(Manual.class));
       assertThat(taskInfo.getCurrentState().getState(), is(State.WAITING));
       assertThat(taskInfo.getCurrentState().getNextRun(), nullValue());
       // reschedule it (but in future)
-      nexusTaskScheduler.rescheduleTask(id,
+      taskScheduler.rescheduleTask(id,
           new Weekly(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1L)), ImmutableSet.of(Weekly.FRI)));
     }
 
     {
-      TaskInfo<?> taskInfo = nexusTaskScheduler.getTaskById(id);
+      TaskInfo<?> taskInfo = taskScheduler.getTaskById(id);
       assertThat(taskInfo, notNullValue());
       assertThat(taskInfo.getSchedule(), instanceOf(Weekly.class));
       assertThat(taskInfo.getCurrentState().getState(), is(State.WAITING));
@@ -78,10 +78,10 @@ public class NexusTaskSchedulerIT
     }
 
     {
-      TaskInfo<?> taskInfo = nexusTaskScheduler.getTaskById(id);
+      TaskInfo<?> taskInfo = taskScheduler.getTaskById(id);
       assertThat(taskInfo, nullValue());
 
-      List<TaskInfo<?>> taskInfos = nexusTaskScheduler.listsTasks();
+      List<TaskInfo<?>> taskInfos = taskScheduler.listsTasks();
       assertThat(taskInfos, hasSize(0));
     }
   }
