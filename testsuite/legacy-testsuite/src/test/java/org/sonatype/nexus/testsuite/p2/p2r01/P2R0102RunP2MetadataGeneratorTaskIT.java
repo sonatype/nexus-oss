@@ -15,7 +15,6 @@ package org.sonatype.nexus.testsuite.p2.p2r01;
 import java.io.File;
 
 import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2MetadataGeneratorTask;
-import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2MetadataGeneratorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
