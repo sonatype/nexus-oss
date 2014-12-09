@@ -116,6 +116,18 @@
       <artifactId>maven-verifier</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-npm-repository-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

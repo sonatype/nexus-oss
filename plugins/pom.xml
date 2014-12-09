@@ -50,6 +50,7 @@
     <module>indexer</module>
     <module>internal</module>
     <module>maven</module>
+    <module>npm</module>
     <module>osgi</module>
     <module>p2</module>
     <module>restlet1x</module>
@@ -398,6 +399,28 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-maven-bridge-plugin</artifactId>
         <type>jar</type>
+        <version>2.11.1-SNAPSHOT</version>
+      </dependency>
+
+      <!-- npm -->
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-npm-repository-plugin</artifactId>
+        <type>nexus-plugin</type>
+        <version>2.11.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-npm-repository-plugin</artifactId>
+        <type>jar</type>
+        <version>2.11.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-npm-repository-client</artifactId>
         <version>2.11.1-SNAPSHOT</version>
       </dependency>
 

@@ -568,6 +568,7 @@
               -->
               <exclude>import/**</exclude>
               <exclude>plugins/rubygem/nexus-gem/**</exclude>
+              <exclude>plugins/npm/**</exclude>
             </excludes>
           </configuration>
         </plugin>
