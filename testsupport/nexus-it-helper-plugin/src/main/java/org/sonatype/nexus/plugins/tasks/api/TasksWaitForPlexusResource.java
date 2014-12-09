@@ -148,7 +148,7 @@ public class TasksWaitForPlexusResource
   }
 
   private static boolean isTaskCompleted(TaskInfo<?> task) {
-    System.out.println(task.getName() + " " + task.getCurrentState().getState() + " " + task.getLastRunState());
+    System.out.println(task.getId() + " " + task.getName() + " " + task.getCurrentState().getState() + " " + task.getLastRunState());
     return State.RUNNING != task.getCurrentState().getState() && task.getLastRunState() != null;
   }
 
