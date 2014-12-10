@@ -272,7 +272,7 @@ public abstract class ComponentStoreImplITSupport
   }
 
   protected void checkComponent(Entity actual, Entity expected) {
-    assertThat(actual.get(P_BINARY, Byte[].class), is(expected.get(P_BINARY, Byte[].class)));
+    assertThat(actual.get(P_BINARY, byte[].class), is(expected.get(P_BINARY, byte[].class)));
     assertThat(actual.get(P_BOOLEAN, Boolean.class), is(expected.get(P_BOOLEAN, Boolean.class)));
     assertThat(actual.get(P_BYTE, Byte.class), is(expected.get(P_BYTE, Byte.class)));
     assertThat(actual.get(P_DATETIME, DateTime.class), is(expected.get(P_DATETIME, DateTime.class)));
