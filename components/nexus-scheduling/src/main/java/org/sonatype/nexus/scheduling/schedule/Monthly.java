@@ -29,6 +29,10 @@ public class Monthly
 {
   public static final class CalendarDay
   {
+    /**
+     * A special "sentinel" value for a CalendarDay that marks the "last day in the month", as the normal days
+     * would not be suited for that, nor 30, nor 31, nor 28 nor 29 would work.
+     */
     private static final int LAST_DAY_OF_MONTH = 999;
 
     private static final CalendarDay LAST_DAY = new CalendarDay(LAST_DAY_OF_MONTH);
