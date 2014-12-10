@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
+import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -39,7 +40,6 @@ import static org.sonatype.nexus.test.utils.TaskScheduleUtil.newProperty;
  * run, one will "loose" and wait for winner to finish).
  */
 @RunWith(Parameterized.class)
-@Ignore
 public class Nexus4066TaskMutualExclusionIT
     extends AbstractNexusIntegrationTest
 {
@@ -124,12 +124,17 @@ public class Nexus4066TaskMutualExclusionIT
         msg.append(allTask.getStatus()).append("\n");
       }
 
+      // refresh it, to let QZ do it's bookeeping, as in the moment of scheduling the fact
+      // about BLOCKED will not yet be known
+      task2 = TaskScheduleUtil.getTask(task2.getName());
+
       if (shouldWait) {
-        assertThat(task2.getStatus(), equalTo(State.RUNNING.name()));
+        // legacy REST API does not expose RunState, hence we can assert only against "readable state" that includes this information
+        assertThat(task2.getReadableStatus(), equalTo("Blocked"));
       }
       else {
-        // TODO: was SLEEPING
-        assertThat(task2.getStatus(), equalTo(State.RUNNING.name()));
+        // legacy REST API does not expose RunState, hence we can assert only against "readable state" that includes this information
+        assertThat(task2.getReadableStatus(), equalTo("Running"));
       }
     }
     catch (java.lang.AssertionError e) {
@@ -144,8 +149,9 @@ public class Nexus4066TaskMutualExclusionIT
     final String taskName = "SleepRepositoryTask_" + repo + "_" + System.nanoTime();
     TaskScheduleUtil.runTask(taskName, "SleepRepositoryTask", 0,
         newProperty("repositoryId", repo),
-        newProperty("time", String.valueOf(50)),
-        newProperty("cancellable", Boolean.toString(true))
+        newProperty("time", Integer.toString(50)),
+        newProperty("cancellable", Boolean.TRUE.toString()),
+        newProperty(".visible", Boolean.TRUE.toString())
     );
 
     Thread.sleep(2000);

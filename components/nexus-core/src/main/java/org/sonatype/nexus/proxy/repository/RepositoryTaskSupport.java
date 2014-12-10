@@ -13,7 +13,9 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
+import java.util.Set;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -22,6 +24,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 /**
@@ -62,15 +65,46 @@ public abstract class RepositoryTaskSupport<T>
       return blockedBy;
     }
     else {
-      // am gonna work on X, am blocked if any other running task works on X or all repositories
+      // am gonna work on X, so am blocked if any other running task works on all or X repositories
       return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
       {
         @Override
         public boolean apply(final TaskInfo<?> taskInfo) {
-          return taskInfo.getConfiguration().getRepositoryId() == null
-              || getConfiguration().getRepositoryId().equals(taskInfo.getConfiguration().getRepositoryId());
+          return taskInfo.getConfiguration().getRepositoryId() == null ||
+              !intersect(getConfiguration().getRepositoryId(), taskInfo.getConfiguration().getRepositoryId()).isEmpty();
         }
       }));
     }
+  }
+
+  /**
+   * Returns the intersection of all (directly or indirectly) affected repositories calculated from "this task"'s
+   * repository and "other task"'s repository. If any of those two are group, their transitive members are pulled in
+   * too.
+   */
+  private Set<String> intersect(final String thisRepositoryId, final String thatRepositoryId) {
+    // this transitive hull
+    final Set<String> thisRepositoryIds = Sets.newHashSet();
+    try {
+      final GroupRepository thisGroup = repositoryRegistry
+          .getRepositoryWithFacet(thisRepositoryId, GroupRepository.class);
+      thisRepositoryIds.addAll(thisGroup.getTransitiveMemberRepositoryIds());
+    }
+    catch (NoSuchRepositoryException e) {
+      // thisRepositoryId is not a group, we are done with "this"
+      thisRepositoryIds.add(thisRepositoryId);
+    }
+    // that transitive hull
+    final Set<String> thatRepositoryIds = Sets.newHashSet();
+    try {
+      final GroupRepository thatGroup = repositoryRegistry
+          .getRepositoryWithFacet(thatRepositoryId, GroupRepository.class);
+      thatRepositoryIds.addAll(thatGroup.getTransitiveMemberRepositoryIds());
+    }
+    catch (NoSuchRepositoryException e) {
+      // thatRepositoryId is not a group, we are done with "that"
+      thatRepositoryIds.add(thatRepositoryId);
+    }
+    return Sets.intersection(thisRepositoryIds, thatRepositoryIds);
   }
 }
