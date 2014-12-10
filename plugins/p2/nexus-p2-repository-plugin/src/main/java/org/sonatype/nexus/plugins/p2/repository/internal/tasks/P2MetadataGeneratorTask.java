@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 @Named
 public class P2MetadataGeneratorTask

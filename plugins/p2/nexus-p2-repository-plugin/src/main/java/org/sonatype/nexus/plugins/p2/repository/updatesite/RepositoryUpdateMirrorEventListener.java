@@ -22,7 +22,7 @@ import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -36,10 +36,10 @@ public class RepositoryUpdateMirrorEventListener
     extends ComponentSupport
     implements EventSubscriber
 {
-  private final NexusTaskScheduler scheduler;
+  private final TaskScheduler scheduler;
 
   @Inject
-  public RepositoryUpdateMirrorEventListener(final NexusTaskScheduler scheduler)
+  public RepositoryUpdateMirrorEventListener(final TaskScheduler scheduler)
   {
     this.scheduler = checkNotNull(scheduler);
   }

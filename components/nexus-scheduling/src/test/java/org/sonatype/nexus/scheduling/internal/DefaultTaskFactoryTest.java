@@ -16,13 +16,13 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
+import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
 import org.sonatype.nexus.scheduling.TaskSupport;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptor;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithDescriptorDescriptor;
-import org.sonatype.nexus.scheduling.internal.Tasks.TaskWithoutDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
@@ -40,18 +40,17 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.fail;
-import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 
-public class DefaultNexusTaskFactoryTest
+public class DefaultTaskFactoryTest
     extends TestSupport
 {
-  private DefaultNexusTaskFactory nexusTaskFactory;
+  private DefaultTaskFactory nexusTaskFactory;
 
   @Before
   public void prepare() {
-    final BeanEntry<Named, Task> be1 = beanEntry(TaskWithDescriptor.class);
-    final BeanEntry<Named, Task> be2 = beanEntry(TaskWithoutDescriptor.class);
-    nexusTaskFactory = new DefaultNexusTaskFactory(ImmutableList.of(be1, be2),
+    final BeanEntry<Named, Task> be1 = Tasks.beanEntry(TaskWithDescriptor.class);
+    final BeanEntry<Named, Task> be2 = Tasks.beanEntry(TaskWithoutDescriptor.class);
+    nexusTaskFactory = new DefaultTaskFactory(ImmutableList.of(be1, be2),
         Lists.<TaskDescriptor<?>>newArrayList(new TaskWithDescriptorDescriptor()));
   }
 

@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -54,13 +54,13 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
 {
   private final RepositoryRegistry repoRegistry;
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   private final Provider<SystemStatus> systemStatusProvider;
 
   @Inject
   public IndexingRepositoryRegistryRepositoryAsyncEventInspector(final RepositoryRegistry repoRegistry,
-                                                                 final NexusTaskScheduler nexusScheduler,
+                                                                 final TaskScheduler nexusScheduler,
                                                                  final Provider<SystemStatus> systemStatusProvider)
   {
     this.repoRegistry = repoRegistry;

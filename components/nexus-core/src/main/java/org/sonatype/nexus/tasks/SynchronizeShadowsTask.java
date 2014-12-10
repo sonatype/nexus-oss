@@ -15,7 +15,7 @@ package org.sonatype.nexus.tasks;
 import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 /**
  * Synchronize shadow task.

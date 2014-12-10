@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
@@ -29,14 +29,14 @@ import static org.junit.Assert.assertTrue;
 public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
 {
-  protected NexusTaskScheduler nexusScheduler;
+  protected TaskScheduler nexusScheduler;
 
   protected void setUp()
       throws Exception
   {
     super.setUp();
 
-    nexusScheduler = lookup(NexusTaskScheduler.class);
+    nexusScheduler = lookup(TaskScheduler.class);
   }
 
   protected void tearDown()

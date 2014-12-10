@@ -29,7 +29,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.YumHosted;
@@ -60,7 +60,7 @@ public class YumHostedImpl
 
   private static final int MAX_EXECUTION_COUNT = 100;
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   private final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor;
 
@@ -87,7 +87,7 @@ public class YumHostedImpl
       new HashMap<DelayedDirectoryDeletionTask, ScheduledFuture<?>>();
 
   @Inject
-  public YumHostedImpl(final NexusTaskScheduler nexusScheduler,
+  public YumHostedImpl(final TaskScheduler nexusScheduler,
                        final GenerateMetadataTaskDescriptor generateMetadataTaskDescriptor,
                        final ScheduledThreadPoolExecutor executor,
                        final BlockSqliteDatabasesRequestStrategy blockSqliteDatabasesRequestStrategy,

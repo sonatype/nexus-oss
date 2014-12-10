@@ -250,6 +250,12 @@
       <artifactId>shiro-web</artifactId>
     </dependency>
 
+    <!-- Scheduling -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-scheduling</artifactId>
+    </dependency>
+
     <!-- SISU Container -->
     <dependency>
       <groupId>org.eclipse.sisu</groupId>

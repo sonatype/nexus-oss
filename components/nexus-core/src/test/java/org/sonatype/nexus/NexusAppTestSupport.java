@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.NexusProxyTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
@@ -39,7 +39,7 @@ public abstract class NexusAppTestSupport
     extends NexusProxyTestSupport
 {
 
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   private EventSubscriberHost eventSubscriberHost;
 
@@ -126,7 +126,7 @@ public abstract class NexusAppTestSupport
     super.setUp();
 
     eventBus = lookup(EventBus.class);
-    nexusScheduler = lookup(NexusTaskScheduler.class);
+    nexusScheduler = lookup(TaskScheduler.class);
     eventSubscriberHost = lookup(EventSubscriberHost.class);
     nexusConfiguration = lookup(NexusConfiguration.class);
     templateManager = lookup(TemplateManager.class);

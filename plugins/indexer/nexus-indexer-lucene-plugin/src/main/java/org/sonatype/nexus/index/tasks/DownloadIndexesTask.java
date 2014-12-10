@@ -16,8 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.tasks.descriptors.DownloadIndexesTaskDescriptor;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

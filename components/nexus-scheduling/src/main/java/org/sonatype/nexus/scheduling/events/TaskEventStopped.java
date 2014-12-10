@@ -12,32 +12,17 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
- * Abstract super class for task related events.
+ * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
  *
  * @since 2.0
  */
-public abstract class NexusTaskEvent<T>
-    extends AbstractEvent<TaskInfo<T>>
+public abstract class TaskEventStopped<T>
+    extends TaskEvent<T>
 {
-  public NexusTaskEvent(final TaskInfo<T> taskInfo) {
+  public TaskEventStopped(final TaskInfo<T> taskInfo) {
     super(taskInfo);
-  }
-
-  /**
-   * Returns the task that failed.
-   */
-  public TaskInfo<T> getNexusTaskInfo() {
-    return getEventSender();
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "nexusTask=" + getNexusTaskInfo().getConfiguration() +
-        '}';
   }
 }

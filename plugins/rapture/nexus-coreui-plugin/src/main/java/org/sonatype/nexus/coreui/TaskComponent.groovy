@@ -25,7 +25,7 @@ import org.sonatype.configuration.validation.ValidationResponse
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.formfields.Selectable
-import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 import org.sonatype.nexus.scheduling.TaskInfo
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState
@@ -64,7 +64,7 @@ class TaskComponent
 {
 
   @Inject
-  NexusTaskScheduler nexusScheduler
+  TaskScheduler nexusScheduler
 
   /**
    * Retrieve a list of scheduled tasks.

@@ -23,7 +23,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
 /**
  * Executor facade component of Nexus, responsible for task executing and scheduling.
  */
-public interface NexusTaskScheduler
+public interface TaskScheduler
 {
   /**
    * Returns the list of task descriptors for all known tasks in system.
@@ -45,7 +45,7 @@ public interface NexusTaskScheduler
       throws IllegalArgumentException;
 
   /**
-   * A factory for tasks (by actual type). Delegates to {@link NexusTaskFactory}. This method should be rarely used, as
+   * A factory for tasks (by actual type). Delegates to {@link TaskFactory}. This method should be rarely used, as
    * it will return a "live" configured task instance that is not scheduled! To be used in cases when task as-is
    * should be executed synchronously, in caller thread using {@link Task#call()} method directly.
    */

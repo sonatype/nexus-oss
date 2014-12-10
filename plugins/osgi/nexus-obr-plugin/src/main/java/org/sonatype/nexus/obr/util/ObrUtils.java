@@ -264,7 +264,7 @@ public final class ObrUtils
         }
       };
 
-      final ResourceStoreRequest request = new ResourceStoreRequest("/");
+      final ResourceStoreRequest request = new ResourceStoreRequest("/", true, false);
       final DefaultWalkerContext ctx = new DefaultWalkerContext(target, request, new ObrWalkerFilter());
       ctx.getProcessors().add(obrProcessor);
       walker.walk(ctx);

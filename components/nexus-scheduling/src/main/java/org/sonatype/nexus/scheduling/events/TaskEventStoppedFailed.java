@@ -15,14 +15,29 @@ package org.sonatype.nexus.scheduling.events;
 import org.sonatype.nexus.scheduling.TaskInfo;
 
 /**
- * Event fired when a task is was running and been canceled.
+ * Event fired when a task failed with some error.
  *
  * @since 2.0
  */
-public class NexusTaskEventCanceled<T>
-    extends NexusTaskEvent<T>
+public class TaskEventStoppedFailed<T>
+    extends TaskEventStopped<T>
 {
-  public NexusTaskEventCanceled(final TaskInfo<T> taskInfo) {
+  /**
+   * Failure cause.
+   */
+  private final Throwable throwable;
+
+  public TaskEventStoppedFailed(final TaskInfo<T> taskInfo,
+                                final Throwable throwable)
+  {
     super(taskInfo);
+    this.throwable = throwable;
+  }
+
+  /**
+   * Returns the failure cause.
+   */
+  public Throwable getFailureCause() {
+    return throwable;
   }
 }

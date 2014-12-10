@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
@@ -34,23 +34,23 @@ import org.eclipse.sisu.BeanEntry;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default {@link NexusTaskFactory} that hooks into SISU.
+ * Default {@link TaskFactory} that hooks into SISU.
  *
  * @since 3.0
  */
 @Singleton
 @Named
-public class DefaultNexusTaskFactory
+public class DefaultTaskFactory
     extends ComponentSupport
-    implements NexusTaskFactory
+    implements TaskFactory
 {
   private final Iterable<BeanEntry<Named, Task>> tasks;
 
   private final List<TaskDescriptor<?>> taskDescriptors;
 
   @Inject
-  public DefaultNexusTaskFactory(final Iterable<BeanEntry<Named, Task>> tasks,
-                                 final List<TaskDescriptor<?>> taskDescriptors)
+  public DefaultTaskFactory(final Iterable<BeanEntry<Named, Task>> tasks,
+                            final List<TaskDescriptor<?>> taskDescriptors)
   {
     this.tasks = checkNotNull(tasks);
     this.taskDescriptors = checkNotNull(taskDescriptors);

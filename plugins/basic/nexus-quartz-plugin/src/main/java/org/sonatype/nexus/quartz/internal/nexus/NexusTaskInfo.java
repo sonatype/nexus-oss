@@ -48,7 +48,7 @@ public class NexusTaskInfo<T>
    */
   static final String TASK_INFO_KEY = NexusTaskInfo.class.getName();
 
-  private final QuartzNexusSchedulerSPI quartzSupport;
+  private final QuartzTaskExecutorSPI quartzSupport;
 
   private final JobKey jobKey;
 
@@ -60,7 +60,7 @@ public class NexusTaskInfo<T>
 
   private volatile boolean removed;
 
-  public NexusTaskInfo(final QuartzNexusSchedulerSPI quartzSupport,
+  public NexusTaskInfo(final QuartzTaskExecutorSPI quartzSupport,
                        final JobKey jobKey,
                        final NexusTaskState nexusTaskState,
                        final @Nullable NexusTaskFuture<T> nexusTaskFuture)
@@ -255,6 +255,15 @@ public class NexusTaskInfo<T>
     @Override
     public NexusTaskFuture<T> getFuture() {
       return future;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "state=" + state +
+          ", nextRun=" + nextRun +
+          ", future=" + future +
+          '}';
     }
   }
 }

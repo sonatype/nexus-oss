@@ -14,7 +14,7 @@ package org.sonatype.nexus.yum.internal.support;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 
 import com.google.code.tempusfugit.temporal.Condition;
 import org.junit.After;
@@ -24,7 +24,7 @@ public abstract class SchedulerYumNexusTestSupport
 {
 
   @Inject
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   @After
   public void waitForThreadPool()

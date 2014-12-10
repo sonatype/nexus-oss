@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -53,10 +53,10 @@ public class WastebasketPlexusResource
 
   private final Wastebasket wastebasket;
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   @Inject
-  public WastebasketPlexusResource(final Wastebasket wastebasket, final NexusTaskScheduler nexusScheduler)
+  public WastebasketPlexusResource(final Wastebasket wastebasket, final TaskScheduler nexusScheduler)
   {
     this.wastebasket = wastebasket;
     this.nexusScheduler = nexusScheduler;

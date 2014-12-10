@@ -24,7 +24,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.task.MergeMetadataTask;
@@ -45,7 +45,7 @@ public class YumGroupImpl
 
   private final static Logger log = LoggerFactory.getLogger(YumGroupImpl.class);
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   private final GroupRepository repository;
 
@@ -56,7 +56,7 @@ public class YumGroupImpl
   private YumRepository yumRepository;
 
   @Inject
-  public YumGroupImpl(final NexusTaskScheduler nexusScheduler,
+  public YumGroupImpl(final TaskScheduler nexusScheduler,
                       final MergeMetadataRequestStrategy mergeMetadataRequestStrategy,
                       final @Assisted GroupRepository repository)
       throws MalformedURLException, URISyntaxException

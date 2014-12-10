@@ -25,13 +25,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -50,20 +50,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 // TODO: I want this implementation to be last, see DefaultNexusTaskScheduler#getScheduler method
 @Priority(1000) // be last, sorta fallback? (and used in tests)
-public class ThreadPoolNexusSchedulerSPI
+public class ThreadPoolTaskExecutorSPI
     extends ComponentSupport
-    implements NexusTaskExecutorSPI
+    implements TaskExecutorSPI
 {
-  private final NexusTaskFactory nexusTaskFactory;
+  private final TaskFactory taskFactory;
 
   private final ThreadPoolExecutor executorService;
 
   private final ConcurrentMap<String, TaskInfo<?>> tasks;
 
   @Inject
-  public ThreadPoolNexusSchedulerSPI(final NexusTaskFactory nexusTaskFactory)
+  public ThreadPoolTaskExecutorSPI(final TaskFactory taskFactory)
   {
-    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.taskFactory = checkNotNull(taskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);
     this.tasks = Maps.newConcurrentMap();
   }
@@ -242,7 +242,7 @@ public class ThreadPoolNexusSchedulerSPI
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
-    final Task<T> task = nexusTaskFactory.createTaskInstance(taskConfiguration);
+    final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
     final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
     taskInfo.setFuture(future);
