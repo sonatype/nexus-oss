@@ -152,7 +152,7 @@ public class EventsRouter
         log.debug("Removing obsolete metadata files... ({}:{} cached)", repository.getId(), item.getPath());
         RepoMD repoMD = new RepoMD(((StorageFileItem) item).getInputStream());
         final Collection<String> locations = repoMD.getLocations();
-        ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA);
+        ResourceStoreRequest request = new ResourceStoreRequest("/" + Yum.PATH_OF_REPODATA, true, false);
         request.getRequestContext().put(AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE);
         DefaultWalkerContext context = new DefaultWalkerContext(repository, request);
         context.getProcessors().add(new AbstractFileWalkerProcessor()
