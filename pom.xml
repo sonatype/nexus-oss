@@ -438,9 +438,9 @@
             <source>${maven.compiler.source}</source>
             <target>${maven.compiler.target}</target>
             <!--
-            Configure support for Groovy compilation, but leave it off by default.  Modules which need this should configure the compilerId.
+            Configure support for Groovy compilation.
             -->
-            <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
+            <compilerId>groovy-eclipse-compiler</compilerId>
           </configuration>
         </plugin>
 
