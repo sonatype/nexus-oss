@@ -18,7 +18,10 @@
     <File>${nexus-work}/logs/request.log</File>
     <Append>true</Append>
     <encoder>
-      <!-- Common Log Format: http://en.wikipedia.org/wiki/Common_Log_Format -->
+      <!--
+      Common Log Format: http://en.wikipedia.org/wiki/Common_Log_Format
+      Can not use 'common' as we must replace %user with %requestAttribute{nexus.user.id}
+      -->
       <pattern>%clientHost %l %requestAttribute{nexus.user.id} [%date] "%requestURL" %statusCode %bytesSent</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
