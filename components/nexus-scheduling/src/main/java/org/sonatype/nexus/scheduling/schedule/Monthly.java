@@ -15,6 +15,9 @@ package org.sonatype.nexus.scheduling.schedule;
 import java.util.Date;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Sets;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,26 +27,103 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Monthly
     extends Schedule
 {
-  public static final Integer LAST_DAY_OF_MONTH = 999;
+  public static final class CalendarDay
+  {
+    private static final int LAST_DAY_OF_MONTH = 999;
 
-  public Monthly(final Date startAt, final Set<Integer> daysToRun) {
+    private static final CalendarDay LAST_DAY = new CalendarDay(LAST_DAY_OF_MONTH);
+
+    public static final CalendarDay day(final int day) {
+      return new CalendarDay(day);
+    }
+
+    public static final Set<CalendarDay> days(final int... days) {
+      final Set<CalendarDay> result = Sets.newHashSet();
+      for (int day : days) {
+        result.add(day(day));
+      }
+      return result;
+    }
+
+    public static final CalendarDay lastDay() {
+      return LAST_DAY;
+    }
+
+    private final int day;
+
+    private CalendarDay(final int day) {
+      checkArgument((day >= 1 && day <= 31) || day == LAST_DAY_OF_MONTH, "Invalid calendar day %s", day);
+      this.day = day;
+    }
+
+    public int getDay() {
+      return day;
+    }
+
+    public boolean isLastDayOfMonth() {
+      return day == LAST_DAY_OF_MONTH;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "day=" + (day == LAST_DAY_OF_MONTH ? "last" : day) +
+          '}';
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      CalendarDay that = (CalendarDay) o;
+      if (day != that.day) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return day;
+    }
+
+    // ==
+
+    public static final Function<CalendarDay, String> toString = new Function<CalendarDay, String>()
+    {
+      @Override
+      public String apply(final CalendarDay input) {
+        return Integer.toString(input.getDay());
+      }
+    };
+
+    public static final Function<String, CalendarDay> toCalendarDay = new Function<String, CalendarDay>()
+    {
+      @Override
+      public CalendarDay apply(final String input) {
+        return new CalendarDay(Integer.parseInt(input));
+      }
+    };
+  }
+
+  public Monthly(final Date startAt, final Set<CalendarDay> daysToRun) {
     super("monthly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
     checkArgument(!daysToRun.isEmpty(), "No days of month set to run");
-    for (Integer integer : daysToRun) {
-      checkArgument((integer >= 1 && integer <= 31) || LAST_DAY_OF_MONTH.equals(integer), "Invalid monthly argument: %s",
-          daysToRun);
-    }
     properties.put("schedule.startAt", dateToString(startAt));
-    properties.put("schedule.daysToRun", setToCsv(daysToRun));
+    properties.put("schedule.daysToRun", setToCsv(daysToRun, CalendarDay.toString));
   }
 
   public Date getStartAt() {
     return stringToDate(properties.get("schedule.startAt"));
   }
 
-  public Set<Integer> getDaysToRun() {
-    return csvToSet(properties.get("schedule.daysToRun"));
+  public Set<CalendarDay> getDaysToRun() {
+    return csvToSet(properties.get("schedule.daysToRun"), CalendarDay.toCalendarDay);
   }
 }

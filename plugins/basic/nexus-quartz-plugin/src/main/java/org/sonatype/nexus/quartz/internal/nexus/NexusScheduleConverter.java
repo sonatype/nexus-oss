@@ -25,14 +25,15 @@ import org.sonatype.nexus.scheduling.schedule.Daily;
 import org.sonatype.nexus.scheduling.schedule.Hourly;
 import org.sonatype.nexus.scheduling.schedule.Manual;
 import org.sonatype.nexus.scheduling.schedule.Monthly;
+import org.sonatype.nexus.scheduling.schedule.Monthly.CalendarDay;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Once;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import org.quartz.CronScheduleBuilder;
@@ -86,46 +87,17 @@ public class NexusScheduleConverter
     }
     else if (schedule instanceof Weekly) {
       final Weekly s = (Weekly) schedule;
-      final String daysToRun = Joiner.on(",").join(Iterables.transform(s.getDaysToRun(), new Function<Integer, String>()
-      {
-        @Override
-        public String apply(final Integer integer) {
-          switch (integer) {
-            case 1:
-              return "SUN";
-            case 2:
-              return "MON";
-            case 3:
-              return "TUE";
-            case 4:
-              return "WED";
-            case 5:
-              return "THU";
-            case 6:
-              return "FRI";
-            case 7:
-              return "SAT";
-            default:
-              throw new IllegalArgumentException("Unknown day of week: " + integer);
-          }
-        }
-      }));
+      final String daysToRun = Joiner.on(",").join(Iterables.transform(s.getDaysToRun(), Weekday.toString));
       triggerBuilder = newTrigger().startAt(s.getStartAt())
           .withSchedule(CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " ? * " + daysToRun));
     }
     else if (schedule instanceof Monthly) {
       final Monthly s = (Monthly) schedule;
-      final Set<Integer> daysToRun = s.getDaysToRun();
-      final boolean lastDayOfMonth = daysToRun.remove(Monthly.LAST_DAY_OF_MONTH);
-      // TODO: quartz does not support use of "L" along with days!
+      final Set<CalendarDay> daysToRun = s.getDaysToRun();
+      final boolean lastDayOfMonth = daysToRun.remove(CalendarDay.lastDay());
+      // quartz does not support use of "L" along with days!
       if (!lastDayOfMonth) {
-        final String daysToRunStr = Joiner.on(",").join(Iterables.transform(daysToRun, new Function<Integer, String>()
-        {
-          @Override
-          public String apply(final Integer integer) {
-            return Integer.toString(integer);
-          }
-        }));
+        final String daysToRunStr = Joiner.on(",").join(Iterables.transform(daysToRun, CalendarDay.toString));
         triggerBuilder = newTrigger().startAt(s.getStartAt())
             .withSchedule(
                 CronScheduleBuilder.cronSchedule(cronTimeParts(s.getStartAt()) + " " + daysToRunStr + " * ?"));
@@ -137,8 +109,7 @@ public class NexusScheduleConverter
     }
     else if (schedule instanceof Manual) {
       final Manual s = (Manual) schedule;
-      // TODO: this looks awkward, but is needed to maintain job:trigger 1:1 ratio
-      // TODO: Investigate other solutions? (ie. durable job w/o trigger?)
+      // this looks awkward, but is needed to maintain job:trigger 1:1 ratio
       // that would introduce lot of exceptional branches handling trigger==null in code
       triggerBuilder = newTrigger().startAt(FAR_FUTURE);
     }
@@ -185,12 +156,14 @@ public class NexusScheduleConverter
     }
     else if ("weekly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<Weekday> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"),
+          Weekday.toWeekday);
       return new Weekly(startAt, daysToRun);
     }
     else if ("monthly".equals(type)) {
       final Date startAt = stringToDate(trigger.getJobDataMap().getString("schedule.startAt"));
-      final Set<Integer> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"));
+      final Set<CalendarDay> daysToRun = csvToSet(trigger.getJobDataMap().getString("schedule.daysToRun"),
+          CalendarDay.toCalendarDay);
       return new Monthly(startAt, daysToRun);
     }
     else if ("manual".equals(type)) {

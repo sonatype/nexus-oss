@@ -51,12 +51,16 @@ import org.sonatype.nexus.scheduling.schedule.Daily;
 import org.sonatype.nexus.scheduling.schedule.Hourly;
 import org.sonatype.nexus.scheduling.schedule.Manual;
 import org.sonatype.nexus.scheduling.schedule.Monthly;
+import org.sonatype.nexus.scheduling.schedule.Monthly.CalendarDay;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Once;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -134,102 +138,94 @@ public abstract class AbstractScheduledServicePlexusResource
     return list;
   }
 
-  protected List<String> formatRecurringDayOfWeek(Set<Integer> days) {
-    List<String> list = new ArrayList<String>();
-
-    for (Integer day : days) {
-      switch (day.intValue()) {
-        case 1: {
+  protected List<String> formatRecurringDayOfWeek(Set<Weekday> days) {
+    final List<String> list = Lists.newArrayList();
+    for (Weekday day : days) {
+      switch (day) {
+        case SUN: {
           list.add("sunday");
           break;
         }
-        case 2: {
+        case MON: {
           list.add("monday");
           break;
         }
-        case 3: {
+        case TUE: {
           list.add("tuesday");
           break;
         }
-        case 4: {
+        case WED: {
           list.add("wednesday");
           break;
         }
-        case 5: {
+        case THU: {
           list.add("thursday");
           break;
         }
-        case 6: {
+        case FRI: {
           list.add("friday");
           break;
         }
-        case 7: {
+        case SAT: {
           list.add("saturday");
           break;
         }
       }
     }
-
     return list;
   }
 
-  protected Set<Integer> formatRecurringDayOfWeek(List<String> days) {
-    Set<Integer> set = new HashSet<Integer>();
-
+  protected Set<Weekday> formatRecurringDayOfWeek(List<String> days) {
+    final Set<Weekday> set = Sets.newHashSet();
     for (String day : days) {
       if ("sunday".equals(day)) {
-        set.add(new Integer(1));
+        set.add(Weekday.SUN);
       }
       else if ("monday".equals(day)) {
-        set.add(new Integer(2));
+        set.add(Weekday.MON);
       }
       else if ("tuesday".equals(day)) {
-        set.add(new Integer(3));
+        set.add(Weekday.TUE);
       }
       else if ("wednesday".equals(day)) {
-        set.add(new Integer(4));
+        set.add(Weekday.WED);
       }
       else if ("thursday".equals(day)) {
-        set.add(new Integer(5));
+        set.add(Weekday.THU);
       }
       else if ("friday".equals(day)) {
-        set.add(new Integer(6));
+        set.add(Weekday.FRI);
       }
       else if ("saturday".equals(day)) {
-        set.add(new Integer(7));
+        set.add(Weekday.SAT);
       }
     }
-
     return set;
   }
 
-  protected List<String> formatRecurringDayOfMonth(Set<Integer> days) {
-    List<String> list = new ArrayList<String>();
-
-    for (Integer day : days) {
-      if (Monthly.LAST_DAY_OF_MONTH.equals(day)) {
+  protected List<String> formatRecurringDayOfMonth(Set<CalendarDay> days) {
+    final List<String> list = Lists.newArrayList();
+    for (CalendarDay day : days) {
+      if (day.isLastDayOfMonth()) {
         list.add("last");
       }
       else {
-        list.add(String.valueOf(day));
+        list.add(String.valueOf(day.getDay()));
       }
     }
-
     return list;
   }
 
-  protected Set<Integer> formatRecurringDayOfMonth(List<String> days) {
-    Set<Integer> set = new HashSet<Integer>();
-
+  protected Set<CalendarDay> formatRecurringDayOfMonth(List<String> days) {
+    final Set<CalendarDay> set = Sets.newHashSet();
     for (String day : days) {
       if ("last".equals(day)) {
-        set.add(Monthly.LAST_DAY_OF_MONTH);
+        set.add(CalendarDay.lastDay());
       }
       else {
-        set.add(Integer.valueOf(day));
+        set.add(CalendarDay.day(Integer.valueOf(day)));
       }
     }
-
     return set;
   }
 

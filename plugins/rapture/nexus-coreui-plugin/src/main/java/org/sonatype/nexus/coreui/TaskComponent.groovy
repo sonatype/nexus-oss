@@ -37,10 +37,12 @@ import org.sonatype.nexus.scheduling.schedule.Daily
 import org.sonatype.nexus.scheduling.schedule.Hourly
 import org.sonatype.nexus.scheduling.schedule.Manual
 import org.sonatype.nexus.scheduling.schedule.Monthly
+import org.sonatype.nexus.scheduling.schedule.Monthly.CalendarDay
 import org.sonatype.nexus.scheduling.schedule.Now
 import org.sonatype.nexus.scheduling.schedule.Once
 import org.sonatype.nexus.scheduling.schedule.Schedule
 import org.sonatype.nexus.scheduling.schedule.Weekly
+import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
@@ -336,11 +338,13 @@ class TaskComponent
     }
     if (schedule instanceof Weekly) {
       result.startDate = schedule.startAt
-      result.recurringDays = schedule.daysToRun
+      // expects integers with 1=SUN, 2=MON, etc...
+      result.recurringDays = schedule.daysToRun.collect { it.ordinal() + 1 }
     }
     if (schedule instanceof Monthly) {
       result.startDate = schedule.startAt
-      result.recurringDays = schedule.daysToRun
+      // expects ints, with 999 being the "lastDayOfMonth"
+      result.recurringDays = schedule.daysToRun.collect { it.isLastDayOfMonth() ? 999 : it.day }
     }
     if (schedule instanceof Cron) {
       result.startDate = schedule.startAt
@@ -391,9 +395,9 @@ class TaskComponent
         case 'daily':
           return new Daily(date.time)
         case 'weekly':
-          return new Weekly(date.time, taskXO.recurringDays as Set<Integer>)
+          return new Weekly(date.time, taskXO.recurringDays.collect { Weekday.values()[it-1] } as Set<Weekday>)
         case 'monthly':
-          return new Monthly(date.time, taskXO.recurringDays as Set<Integer>)
+          return new Monthly(date.time, taskXO.recurringDays.collect { it == 999 ? CalendarDay.lastDay() : CalendarDay.day(it) } as Set<CalendarDay>)
       }
     }
     return new Manual()

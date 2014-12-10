@@ -21,6 +21,7 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.schedule.Manual;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 
 import com.google.common.collect.ImmutableSet;
@@ -64,7 +65,7 @@ public class NexusTaskSchedulerIT
       assertThat(taskInfo.getCurrentState().getNextRun(), nullValue());
       // reschedule it (but in future)
       taskScheduler.rescheduleTask(id,
-          new Weekly(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1L)), ImmutableSet.of(Weekly.FRI)));
+          new Weekly(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1L)), ImmutableSet.of(Weekday.FRI)));
     }
 
     {

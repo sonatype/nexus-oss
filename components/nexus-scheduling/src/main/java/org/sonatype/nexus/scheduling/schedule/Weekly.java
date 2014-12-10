@@ -15,6 +15,8 @@ package org.sonatype.nexus.scheduling.schedule;
 import java.util.Date;
 import java.util.Set;
 
+import com.google.common.base.Function;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,38 +26,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Weekly
     extends Schedule
 {
-  // TODO: make this type safe by using enum?
-  public static final Integer SUN = Integer.valueOf(1);
+  public static enum Weekday
+  {
+    SUN, MON, TUE, WED, THU, FRI, SAT;
 
-  public static final Integer MON = Integer.valueOf(2);
+    public static final Function<Weekday, String> toString = new Function<Weekday, String>()
+    {
+      @Override
+      public String apply(final Weekday input) {
+        return input.name();
+      }
+    };
 
-  public static final Integer TUE = Integer.valueOf(3);
+    public static final Function<String, Weekday> toWeekday = new Function<String, Weekday>()
+    {
+      @Override
+      public Weekday apply(final String input) {
+        return Weekday.valueOf(input);
+      }
+    };
+  }
 
-  public static final Integer WED = Integer.valueOf(4);
-
-  public static final Integer THU = Integer.valueOf(5);
-
-  public static final Integer FRI = Integer.valueOf(6);
-
-  public static final Integer SAT = Integer.valueOf(7);
-
-  public Weekly(final Date startAt, final Set<Integer> daysToRun) {
+  public Weekly(final Date startAt, final Set<Weekday> daysToRun) {
     super("weekly");
     checkNotNull(startAt);
     checkNotNull(daysToRun);
     checkArgument(!daysToRun.isEmpty(), "No days of week set to run");
-    for (Integer integer : daysToRun) {
-      checkArgument(integer >= SUN && integer <= SAT, "Invalid weekly argument: %s", daysToRun);
-    }
     properties.put("schedule.startAt", dateToString(startAt));
-    properties.put("schedule.daysToRun", setToCsv(daysToRun));
+    properties.put("schedule.daysToRun", setToCsv(daysToRun, Weekday.toString));
   }
 
   public Date getStartAt() {
     return stringToDate(properties.get("schedule.startAt"));
   }
 
-  public Set<Integer> getDaysToRun() {
-    return csvToSet(properties.get("schedule.daysToRun"));
+  public Set<Weekday> getDaysToRun() {
+    return csvToSet(properties.get("schedule.daysToRun"), Weekday.toWeekday);
   }
 }
