@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 
 import org.apache.commons.lang.StringUtils;
@@ -65,7 +65,7 @@ public abstract class AbstractIndexPlexusResource
 
   public static final String TARGET_ID = "target";
 
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   private List<Searcher> searchers;
 
@@ -74,7 +74,7 @@ public abstract class AbstractIndexPlexusResource
   }
 
   @Inject
-  public void setNexusScheduler(final NexusTaskScheduler nexusScheduler) {
+  public void setNexusScheduler(final TaskScheduler nexusScheduler) {
     this.nexusScheduler = nexusScheduler;
   }
 
@@ -291,7 +291,7 @@ public abstract class AbstractIndexPlexusResource
 
   protected abstract boolean getIsFullReindex();
 
-  protected NexusTaskScheduler getNexusScheduler() {
+  protected TaskScheduler getNexusScheduler() {
     return nexusScheduler;
   }
 

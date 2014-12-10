@@ -20,7 +20,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
@@ -58,7 +58,7 @@ public class YumHostedImplDeletionsTest
 
   private HostedRepository repository;
 
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   @Before
   public void prepareService()
@@ -68,7 +68,7 @@ public class YumHostedImplDeletionsTest
     when(repository.getId()).thenReturn(REPO_ID);
     when(repository.getLocalUrl()).thenReturn("/target");
 
-    nexusScheduler = mock(NexusTaskScheduler.class);
+    nexusScheduler = mock(TaskScheduler.class);
     when(nexusScheduler.createTaskConfigurationInstance(GenerateMetadataTask.class)).thenReturn(
         new TaskConfiguration()
     );

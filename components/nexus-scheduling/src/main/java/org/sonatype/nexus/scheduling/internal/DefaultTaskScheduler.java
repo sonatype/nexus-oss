@@ -15,22 +15,22 @@ package org.sonatype.nexus.scheduling.internal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskFactory;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
-import org.sonatype.nexus.util.DigesterUtils;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -43,19 +43,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 @Named
-public class DefaultNexusTaskScheduler
+public class DefaultTaskScheduler
     extends ComponentSupport
-    implements NexusTaskScheduler
+    implements TaskScheduler
 {
-  private final NexusTaskFactory nexusTaskFactory;
+  private final TaskFactory taskFactory;
 
-  private final Provider<NexusTaskExecutorSPI> schedulerProvider;
+  private final Provider<TaskExecutorSPI> schedulerProvider;
 
   @Inject
-  public DefaultNexusTaskScheduler(final NexusTaskFactory nexusTaskFactory,
-                                   final Provider<NexusTaskExecutorSPI> schedulerProvider)
+  public DefaultTaskScheduler(final TaskFactory taskFactory,
+                              final Provider<TaskExecutorSPI> schedulerProvider)
   {
-    this.nexusTaskFactory = checkNotNull(nexusTaskFactory);
+    this.taskFactory = checkNotNull(taskFactory);
     this.schedulerProvider = checkNotNull(schedulerProvider);
   }
 
@@ -64,8 +64,8 @@ public class DefaultNexusTaskScheduler
   /**
    * Returns the actual SPI present in system.
    */
-  private NexusTaskExecutorSPI getScheduler() {
-    final NexusTaskExecutorSPI provider = schedulerProvider.get();
+  private TaskExecutorSPI getScheduler() {
+    final TaskExecutorSPI provider = schedulerProvider.get();
     if (provider == null) {
       throw new IllegalStateException("No scheduler present in system!");
     }
@@ -76,7 +76,7 @@ public class DefaultNexusTaskScheduler
 
   @Override
   public List<TaskDescriptor<?>> listTaskDescriptors() {
-    return nexusTaskFactory.listTaskDescriptors();
+    return taskFactory.listTaskDescriptors();
   }
 
   @Override
@@ -90,7 +90,7 @@ public class DefaultNexusTaskScheduler
   @Override
   public TaskConfiguration createTaskConfigurationInstance(final String taskType) throws IllegalArgumentException {
     checkNotNull(taskType);
-    final TaskDescriptor<?> taskDescriptor = nexusTaskFactory.resolveTaskDescriptorByTypeId(taskType);
+    final TaskDescriptor<?> taskDescriptor = taskFactory.resolveTaskDescriptorByTypeId(taskType);
     checkArgument(taskDescriptor != null, "Unknown taskType: '%s'", taskType);
     return createTaskConfigurationInstanceFromDescriptor(taskDescriptor);
   }
@@ -100,7 +100,7 @@ public class DefaultNexusTaskScheduler
       throws IllegalArgumentException
   {
     checkNotNull(taskConfiguration);
-    return nexusTaskFactory.createTaskInstance(taskConfiguration);
+    return taskFactory.createTaskInstance(taskConfiguration);
   }
 
   @Override
@@ -162,11 +162,7 @@ public class DefaultNexusTaskScheduler
                             final TaskConfiguration taskConfiguration)
   {
     // TODO: call into quartz for this? Must not clash with existing persisted job IDs!
-    return DigesterUtils.getSha1Digest(
-        taskFQCName
-            + System.identityHashCode(taskConfiguration)
-            + System.nanoTime()
-    );
+    return UUID.randomUUID().toString();
   }
 
   // ==

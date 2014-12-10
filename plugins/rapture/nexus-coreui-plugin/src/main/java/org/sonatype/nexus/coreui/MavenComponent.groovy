@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
@@ -49,7 +49,7 @@ extends DirectComponentSupport
   @Named("protected") RepositoryRegistry protectedRepositoryRegistry
 
   @Inject
-  NexusTaskScheduler nexusScheduler
+  TaskScheduler nexusScheduler
 
   /**
    * Retrieves Maven related information.

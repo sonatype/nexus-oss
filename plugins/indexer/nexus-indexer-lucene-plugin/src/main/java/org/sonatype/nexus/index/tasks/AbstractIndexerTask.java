@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.scheduling.Cancelable;
-import org.sonatype.nexus.scheduling.RepositoryTaskSupport;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 
 /**
  * Base class for indexer related tasks.

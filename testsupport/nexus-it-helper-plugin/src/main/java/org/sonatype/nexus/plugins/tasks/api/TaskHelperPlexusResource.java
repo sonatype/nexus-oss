@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -39,10 +39,10 @@ public class TaskHelperPlexusResource
     extends AbstractPlexusResource
 {
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   @Inject
-  public TaskHelperPlexusResource(final NexusTaskScheduler nexusScheduler)
+  public TaskHelperPlexusResource(final TaskScheduler nexusScheduler)
   {
     this.nexusScheduler = nexusScheduler;
   }

@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
@@ -45,10 +45,10 @@ public class TasksRunPlexusResource
 
   private static final String RESOURCE_URI = "/tasks/run/{taskType}";
 
-  private final NexusTaskScheduler nexusScheduler;
+  private final TaskScheduler nexusScheduler;
 
   @Inject
-  public TasksRunPlexusResource(final NexusTaskScheduler nexusScheduler)
+  public TasksRunPlexusResource(final TaskScheduler nexusScheduler)
   {
     this.nexusScheduler = checkNotNull(nexusScheduler);
   }

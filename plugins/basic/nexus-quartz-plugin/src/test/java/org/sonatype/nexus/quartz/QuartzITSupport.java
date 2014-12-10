@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.quartz.internal.QuartzSupportImpl;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
@@ -57,7 +57,7 @@ public abstract class QuartzITSupport
   static protected MutableBeanLocator locator;
 
   @Inject
-  static protected NexusTaskScheduler nexusTaskScheduler;
+  static protected TaskScheduler taskScheduler;
 
   @Inject
   static protected QuartzSupportImpl quartzSupport;

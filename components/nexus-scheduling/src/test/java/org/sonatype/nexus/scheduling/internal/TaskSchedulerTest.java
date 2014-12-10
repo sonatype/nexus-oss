@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 
 import javax.inject.Named;
 
+import org.sonatype.nexus.scheduling.internal.Tasks.SleeperTask;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskDescriptor;
@@ -24,8 +25,7 @@ import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.TaskInfo.State;
-import org.sonatype.nexus.scheduling.internal.Tasks.SleeperTask;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableList;
@@ -39,20 +39,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
-import static org.sonatype.nexus.scheduling.internal.Tasks.beanEntry;
 
-public class NexusTaskSchedulerTest
+public class TaskSchedulerTest
     extends TestSupport
 {
-  private DefaultNexusTaskScheduler nexusTaskScheduler;
+  private DefaultTaskScheduler nexusTaskScheduler;
 
   @Before
   public void prepare() {
-    final BeanEntry<Named, Task> task = beanEntry(SleeperTask.class);
-    final DefaultNexusTaskFactory nexusTaskFactory = new DefaultNexusTaskFactory(
+    final BeanEntry<Named, Task> task = Tasks.beanEntry(SleeperTask.class);
+    final DefaultTaskFactory nexusTaskFactory = new DefaultTaskFactory(
         ImmutableList.of(task), Lists.<TaskDescriptor<?>>newArrayList());
-    nexusTaskScheduler = new DefaultNexusTaskScheduler(nexusTaskFactory,
-        Providers.<NexusTaskExecutorSPI>of(new ThreadPoolNexusSchedulerSPI(nexusTaskFactory)));
+    nexusTaskScheduler = new DefaultTaskScheduler(nexusTaskFactory,
+        Providers.<TaskExecutorSPI>of(new ThreadPoolTaskExecutorSPI(nexusTaskFactory)));
   }
 
   @Test

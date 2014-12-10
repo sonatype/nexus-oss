@@ -44,7 +44,7 @@ public class NexusTaskFuture<T>
    */
   static final String FUTURE_KEY = NexusTaskFuture.class.getName();
 
-  private final QuartzNexusSchedulerSPI quartzSupport;
+  private final QuartzTaskExecutorSPI quartzSupport;
 
   private final JobKey jobKey;
 
@@ -60,7 +60,7 @@ public class NexusTaskFuture<T>
 
   private T result;
 
-  public NexusTaskFuture(final QuartzNexusSchedulerSPI quartzSupport,
+  public NexusTaskFuture(final QuartzTaskExecutorSPI quartzSupport,
                          final JobKey jobKey,
                          final Date startedAt,
                          final Schedule startedBy)

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.scheduling.NexusTaskScheduler;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.internal.EventsRouter;
 import org.sonatype.nexus.yum.internal.support.SchedulerYumNexusTestSupport;
@@ -57,7 +57,7 @@ public class GenerateMetadataTaskConcurrencyLimitIT
   public RepeatingRule repeatedly = new RepeatingRule();
 
   @Inject
-  private NexusTaskScheduler nexusScheduler;
+  private TaskScheduler nexusScheduler;
 
   @Inject
   private EventsRouter handler;

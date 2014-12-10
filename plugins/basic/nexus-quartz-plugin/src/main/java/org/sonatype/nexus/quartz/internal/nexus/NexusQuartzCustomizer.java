@@ -46,10 +46,10 @@ public class NexusQuartzCustomizer
     extends QuartzCustomizer
 {
   // TODO: this is due cycle
-  private final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider;
+  private final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider;
 
   @Inject
-  public NexusQuartzCustomizer(final Provider<QuartzNexusSchedulerSPI> quartzNexusSchedulerSPIProvider)
+  public NexusQuartzCustomizer(final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider)
   {
     this.quartzNexusSchedulerSPIProvider = checkNotNull(quartzNexusSchedulerSPIProvider);
   }
@@ -58,7 +58,7 @@ public class NexusQuartzCustomizer
   public void onCreated(final QuartzSupport quartzSupport, final Scheduler scheduler) {
     try {
       // Install job supporting listeners for each NX task being scheduled
-      final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(QuartzNexusSchedulerSPI.QZ_NEXUS_GROUP));
+      final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(QuartzTaskExecutorSPI.QZ_NEXUS_GROUP));
       for (JobKey jobKey : jobKeys) {
         final JobDetail jobDetail = quartzSupport.getScheduler().getJobDetail(jobKey);
         checkState(jobDetail != null);

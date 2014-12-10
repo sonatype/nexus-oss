@@ -26,7 +26,7 @@ import org.sonatype.nexus.scheduling.schedule.Schedule;
  *
  * @since 3.0
  */
-public interface NexusTaskExecutorSPI
+public interface TaskExecutorSPI
 {
   /**
    * Returns the info of a NX task by it's ID, if present. If no task present with ID then {@code null}.

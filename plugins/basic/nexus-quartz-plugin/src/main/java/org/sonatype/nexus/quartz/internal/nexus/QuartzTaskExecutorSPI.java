@@ -28,7 +28,7 @@ import org.sonatype.nexus.scheduling.TaskInfo.State;
 import org.sonatype.nexus.scheduling.TaskRemovedException;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
-import org.sonatype.nexus.scheduling.spi.NexusTaskExecutorSPI;
+import org.sonatype.nexus.scheduling.spi.TaskExecutorSPI;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -52,7 +52,7 @@ import static org.quartz.impl.matchers.KeyMatcher.keyEquals;
 import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTaskConfiguration;
 
 /**
- * Quartz backed implementation of {@link NexusTaskExecutorSPI}. It uses distinct group for NX tasks and relies on
+ * Quartz backed implementation of {@link TaskExecutorSPI}. It uses distinct group for NX tasks and relies on
  * {@link QuartzSupport}.
  *
  * @since 3.0
@@ -60,9 +60,9 @@ import static org.sonatype.nexus.quartz.internal.nexus.NexusTaskJobSupport.toTas
 @Singleton
 @Named
 @Priority(2000)
-public class QuartzNexusSchedulerSPI
+public class QuartzTaskExecutorSPI
     extends ComponentSupport
-    implements NexusTaskExecutorSPI
+    implements TaskExecutorSPI
 {
   /**
    * Group for job and trigger keys.
@@ -76,9 +76,9 @@ public class QuartzNexusSchedulerSPI
   private final NexusScheduleConverter nexusScheduleConverter;
 
   @Inject
-  public QuartzNexusSchedulerSPI(final EventBus eventBus,
-                                 final QuartzSupport quartzSupport,
-                                 final NexusScheduleConverter nexusScheduleConverter)
+  public QuartzTaskExecutorSPI(final EventBus eventBus,
+                               final QuartzSupport quartzSupport,
+                               final NexusScheduleConverter nexusScheduleConverter)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
