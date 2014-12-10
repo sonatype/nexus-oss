@@ -242,8 +242,9 @@ public class ThreadPoolTaskExecutorSPI
   public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
+    checkArgument(!tasks.containsKey(taskConfiguration.getId()), "Task %s already running!", taskConfiguration);
     final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
-    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
+    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo<>(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
     taskInfo.setFuture(future);
     tasks.put(task.getId(), taskInfo);
@@ -257,6 +258,6 @@ public class ThreadPoolTaskExecutorSPI
 
   @Override
   public int getRunningTaskCount() {
-    return executorService.getActiveCount();
+    return tasks.size();
   }
 }
