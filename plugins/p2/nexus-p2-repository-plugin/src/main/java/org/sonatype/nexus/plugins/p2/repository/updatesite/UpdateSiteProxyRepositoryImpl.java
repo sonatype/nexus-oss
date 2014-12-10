@@ -203,7 +203,7 @@ public class UpdateSiteProxyRepositoryImpl
       mirrorFeature(site, feature, mirrored);
     }
 
-    final ResourceStoreRequest root = new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT);
+    final ResourceStoreRequest root = new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT, true, false);
 
     final DefaultWalkerContext ctx = new DefaultWalkerContext(this, root, filter);
     ctx.getContext().put("mirrored", mirrored);

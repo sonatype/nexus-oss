@@ -77,7 +77,7 @@ public class LocalContentDiscovererImpl
         new DiscoveryResult<MavenRepository>(mavenRepository);
     // NEXUS-6485: Since this fix, prefixes will do include empty directories due to "depth" optimization
     final WalkerContext context =
-        new DefaultWalkerContext(mavenRepository, new ResourceStoreRequest("/"),
+        new DefaultWalkerContext(mavenRepository, new ResourceStoreRequest("/", true, false),
             new DepthLimitedStoreWalkerFilter(config.getLocalScrapeDepth()),
             true);
     final PrefixCollectorProcessor prefixCollectorProcessor = new PrefixCollectorProcessor();
