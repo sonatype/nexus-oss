@@ -68,6 +68,21 @@ extends DirectComponentSupport
   }
 
   /**
+   * Retrieves role references form all available {@link AuthorizationManager}s.
+   * @return a list of role references
+   */
+  @DirectMethod
+  @RequiresPermissions('security:roles:read')
+  List<ReferenceXO> readReferences() {
+    return securitySystem.listRoles(DEFAULT_SOURCE).collect { input ->
+      return new ReferenceXO(
+          id: input.roleId,
+          name: input.name
+      )
+    }
+  }
+
+  /**
    * Retrieves available role sources.
    * @return list of sources
    */

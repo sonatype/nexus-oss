@@ -10,11 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai.config;
+package org.sonatype.security.realms.kenai.internal.capability;
 
+import java.util.Map;
+
+import javax.inject.Named;
+
+import org.sonatype.nexus.capability.support.CapabilitySupport;
 import org.sonatype.security.realms.kenai.config.model.Configuration;
 
-public interface KenaiRealmConfiguration
+/**
+ * Kenai capability.
+ *
+ * @since 3.0
+ */
+@Named(KenaiCapabilityDescriptor.TYPE_ID)
+public class KenaiCapability
+    extends CapabilitySupport<Configuration>
 {
-  Configuration getConfiguration();
+
+  @Override
+  protected Configuration createConfig(final Map<String, String> properties) {
+    return new Configuration(properties);
+  }
+
 }
+

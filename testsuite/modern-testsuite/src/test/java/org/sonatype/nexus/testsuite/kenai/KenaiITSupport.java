@@ -15,15 +15,15 @@ package org.sonatype.nexus.testsuite.kenai;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.inject.Inject;
-
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.capabilities.client.Capabilities;
+import org.sonatype.nexus.capabilities.client.Filter;
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
 import org.sonatype.nexus.client.core.subsystem.config.Security;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
-import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.tests.http.server.fluent.Server;
 
 import org.junit.AfterClass;
@@ -33,8 +33,6 @@ import org.junit.rules.ExpectedException;
 
 import static java.util.Arrays.asList;
 import static org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy.Strategy.EACH_TEST;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 
 /**
  * Support for Kenai integration tests.
@@ -45,9 +43,6 @@ import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 public class KenaiITSupport
     extends NexusRunningParametrizedITSupport
 {
-
-  @Inject
-  private FileTaskBuilder fileTaskBuilder;
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -60,13 +55,7 @@ public class KenaiITSupport
   protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
     return super.configureNexus(configuration)
         .setLogLevel("org.sonatype.security.realms.kenai", "DEBUG")
-        .addFeatures("nexus-kenai-plugin")
-        .addOverlays(
-            fileTaskBuilder.copy()
-                .directory(file(testData().resolveFile("preset-nexus")))
-                .filterUsing("mock-kenai-port", String.valueOf(server.getPort()))
-                .to().directory(path("sonatype-work/nexus/etc"))
-        );
+        .addFeatures("nexus-kenai-plugin");
   }
 
   private static Server server;
@@ -96,6 +85,17 @@ public class KenaiITSupport
   }
 
   void configureKenaiRealm() {
+    Capabilities capabilities = client().getSubsystem(Capabilities.class);
+    try {
+      capabilities.getUnique(Filter.capabilitiesThat().haveType("kenai"));
+    }
+    catch (NexusClientNotFoundException e) {
+      capabilities.create("kenai")
+          .withProperty("baseUrl", "http://localhost:" + server.getPort())
+          .withProperty("defaultRole", "kenai-base-role")
+          .enable();
+    }
+
     Security security = client().getSubsystem(ServerConfiguration.class).security();
     security.settings().setRealms(asList("NexusAuthenticatingRealm", "NexusAuthorizingRealm", "kenai"));
     security.save();

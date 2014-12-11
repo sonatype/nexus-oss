@@ -12,13 +12,20 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import com.sonatype.security.realms.kenai.config.model.Configuration;
+import java.net.MalformedURLException;
+import java.util.List;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
+import org.sonatype.security.realms.kenai.config.model.Configuration;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 
+import com.google.common.base.Throwables;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.junit.Rule;
 
 /**
@@ -37,18 +44,42 @@ public abstract class AbstractKenaiRealmTest
   protected static final String AUTH_APP_NAME = "auth_app";
 
   @Rule
-  public ServerResource server = new ServerResource(Server.server().serve("/api/login/*").withServlet(new KenaiMockAuthcServlet()).getServerProvider());
+  public ServerResource server = new ServerResource(
+      Server.server().serve("/api/login/*").withServlet(new KenaiMockAuthcServlet()).getServerProvider());
 
-  protected KenaiRealmConfiguration getKenaiRealmConfiguration()
-      throws Exception
-  {
-    // configure Kenai Realm
-    KenaiRealmConfiguration kenaiRealmConfiguration = lookup(KenaiRealmConfiguration.class);
-    Configuration configuration = kenaiRealmConfiguration.getConfiguration();
-    configuration.setDefaultRole(DEFAULT_ROLE);
-    configuration.setEmailDomain("sonatype.org");
-    configuration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/"); // add the '/' to the end
-    // kenaiRealmConfiguration.updateConfiguration( configuration );
-    return kenaiRealmConfiguration;
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(KenaiRealmConfiguration.class).toInstance(getKenaiRealmConfiguration());
+      }
+    });
+  }
+
+  @Override
+  protected void customizeContainerConfiguration(final ContainerConfiguration configuration) {
+    super.customizeContainerConfiguration(configuration);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+  }
+
+  protected KenaiRealmConfiguration getKenaiRealmConfiguration() {
+    return new KenaiRealmConfiguration()
+    {
+      @Override
+      public Configuration getConfiguration() {
+        Configuration configuration = new Configuration();
+        try {
+          configuration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
+        }
+        catch (MalformedURLException e) {
+          throw Throwables.propagate(e);
+        }
+        configuration.setDefaultRole(DEFAULT_ROLE);
+        return configuration;
+      }
+    };
   }
 }
