@@ -56,7 +56,7 @@ public class KenaiImpl
   public KenaiImpl(final SecuritySystem securitySystem,
                    final CapabilityRegistry capabilityRegistry)
   {
-    this.securitySystem = securitySystem;
+    this.securitySystem = checkNotNull(securitySystem);
     this.capabilityRegistry = checkNotNull(capabilityRegistry);
   }
 
