@@ -14,10 +14,11 @@
 
 -->
 <configuration>
+
   <appender name="request.logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${nexus-work}/logs/request.log</File>
     <Append>true</Append>
-    <encoder>
+    <encoder class="org.sonatype.nexus.bootstrap.log.AccessPatternLayoutEncoder">
       <pattern>common</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
