@@ -62,15 +62,12 @@ public class KenaiImpl
 
   @Override
   public Kenai configure(final KenaiConfiguration config) throws InvalidConfigurationException, IOException {
-    Collection<? extends CapabilityReference> refs = capabilityRegistry.get(
-        CapabilityReferenceFilterBuilder.capabilities().withType(KenaiCapabilityDescriptor.TYPE)
-    );
-    if (refs.size() > 0) {
-      CapabilityReference reference = refs.iterator().next();
+    CapabilityReference ref = capabilityReference();
+    if (ref != null) {
       capabilityRegistry.update(
-          reference.context().id(),
-          reference.context().isEnabled(),
-          reference.context().notes(),
+          ref.context().id(),
+          ref.context().isEnabled(),
+          ref.context().notes(),
           config.asMap()
       );
     }
@@ -87,11 +84,9 @@ public class KenaiImpl
 
   @Override
   public KenaiConfiguration getConfiguration() throws IOException {
-    Collection<? extends CapabilityReference> refs = capabilityRegistry.get(
-        CapabilityReferenceFilterBuilder.capabilities().withType(KenaiCapabilityDescriptor.TYPE)
-    );
-    if (refs.size() > 0) {
-      return refs.iterator().next().capabilityAs(KenaiCapability.class).getConfig();
+    CapabilityReference ref = capabilityReference();
+    if (ref != null) {
+      return ref.capabilityAs(KenaiCapability.class).getConfig();
     }
     return null;
   }
