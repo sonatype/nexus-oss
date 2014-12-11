@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A Realm that connects to a java.net kenai API.
@@ -154,12 +153,19 @@ public class KenaiRealm
 
   private KenaiConfiguration configuration() {
     try {
-      checkState(kenai.isEnabled(), "Kenai is not enabled");
       KenaiConfiguration config = kenai.getConfiguration();
-      checkState(config != null, "Kenai is not configured");
+      if (config == null) {
+        logger.warn("Kenai is not configured");
+        throw new IllegalStateException("Kenai is not configured");
+      }
+      if (!kenai.isEnabled()) {
+        logger.warn("Kenai is not enabled");
+        throw new IllegalStateException("Kenai is not enabled");
+      }
       return config;
     }
     catch (IOException e) {
+      logger.warn("Could not retrieve Kenai configuration");
       throw new IllegalStateException("Could not retrieve Kenai configuration", e);
     }
   }
