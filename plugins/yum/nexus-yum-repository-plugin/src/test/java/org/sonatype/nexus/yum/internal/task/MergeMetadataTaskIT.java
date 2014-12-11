@@ -14,6 +14,10 @@ package org.sonatype.nexus.yum.internal.task;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
@@ -26,6 +30,8 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +55,7 @@ public class MergeMetadataTaskIT
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
     taskConfiguration.setRepositoryId(GROUP_ID_1);
     task.configure(taskConfiguration);
+    task.setRepositoryRegistry(repoRegistry());
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_1)).isEmpty(), is(false));
   }
 
@@ -64,7 +71,17 @@ public class MergeMetadataTaskIT
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
     taskConfiguration.setRepositoryId(GROUP_ID_1);
     task.configure(taskConfiguration);
+    task.setRepositoryRegistry(repoRegistry());
     assertThat(task.isBlockedBy(createRunningTaskForGroups(GROUP_ID_2)).isEmpty(), is(true));
+  }
+
+  private RepositoryRegistry repoRegistry()
+      throws Exception
+  {
+    final RepositoryRegistry repoRegistry = mock(RepositoryRegistry.class);
+    when(repoRegistry.getRepositoryWithFacet(anyString(), eq(GroupRepository.class))).thenThrow(
+        new NoSuchRepositoryException("foo"));
+    return repoRegistry;
   }
 
   private List<TaskInfo<?>> createRunningTaskForGroups(final String... groupIds) {

@@ -25,9 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskFactory;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
@@ -58,7 +58,7 @@ public class ThreadPoolTaskExecutorSPI
 
   private final ThreadPoolExecutor executorService;
 
-  private final ConcurrentMap<String, TaskInfo<?>> tasks;
+  private final ConcurrentMap<String, ThreadPoolTaskInfo<?>> tasks;
 
   @Inject
   public ThreadPoolTaskExecutorSPI(final TaskFactory taskFactory)
@@ -71,27 +71,25 @@ public class ThreadPoolTaskExecutorSPI
   private class ThreadPoolTaskInfo<T>
       implements TaskInfo<T>, Callable<T>
   {
-    private final Task<T> task;
+    private Task<T> task;
 
-    private final Schedule schedule;
-
-    private final Date runStarted;
-
-    private volatile EndState endState;
-
-    private long runDuration;
+    private Schedule schedule;
 
     private Future<T> future;
 
-    public ThreadPoolTaskInfo(final Task<T> task, final Schedule schedule)
-    {
+    private Date runStarted;
+
+    private long runDuration;
+
+    private volatile EndState endState;
+
+    public void itRuns(final Task<T> task, final Schedule schedule, final Future<T> future) {
       this.task = task;
       this.schedule = schedule;
-      this.runStarted = new Date();
-    }
-
-    public void setFuture(final Future<T> future) {
       this.future = future;
+      this.runStarted = new Date();
+      this.runDuration = 0;
+      this.endState = null;
     }
 
     @Override
@@ -235,17 +233,24 @@ public class ThreadPoolTaskExecutorSPI
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
-    return Lists.newArrayList(tasks.values());
+    return Lists.<TaskInfo<?>>newArrayList(tasks.values());
   }
 
   @Override
-  public <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
+  public synchronized <T> TaskInfo<T> scheduleTask(final TaskConfiguration taskConfiguration, final Schedule schedule) {
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
     final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
-    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo(task, schedule);
+    final ThreadPoolTaskInfo<T> taskInfo;
+    if (tasks.containsKey(taskConfiguration.getId())) {
+      taskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
+      taskInfo.getCurrentState().getFuture().cancel(true);
+    }
+    else {
+      taskInfo = new ThreadPoolTaskInfo<>();
+    }
     final Future<T> future = executorService.submit(taskInfo);
-    taskInfo.setFuture(future);
+    taskInfo.itRuns(task, schedule, future);
     tasks.put(task.getId(), taskInfo);
     return taskInfo;
   }
@@ -257,6 +262,6 @@ public class ThreadPoolTaskExecutorSPI
 
   @Override
   public int getRunningTaskCount() {
-    return executorService.getActiveCount();
+    return tasks.size();
   }
 }

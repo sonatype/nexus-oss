@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.scheduling.Task;
 import org.sonatype.nexus.scheduling.TaskInfo;
@@ -22,6 +25,7 @@ import org.sonatype.nexus.scheduling.TaskSupport;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 /**
@@ -62,15 +66,35 @@ public abstract class RepositoryTaskSupport<T>
       return blockedBy;
     }
     else {
-      // am gonna work on X, am blocked if any other running task works on X or all repositories
+      // am gonna work on X, so am blocked if any other running task works on all or X repositories
       return Lists.newArrayList(Iterables.filter(blockedBy, new Predicate<TaskInfo<?>>()
       {
         @Override
         public boolean apply(final TaskInfo<?> taskInfo) {
-          return taskInfo.getConfiguration().getRepositoryId() == null
-              || getConfiguration().getRepositoryId().equals(taskInfo.getConfiguration().getRepositoryId());
+          return taskInfo.getConfiguration().getRepositoryId() == null ||
+              !Collections.disjoint(
+                  transitiveHull(getConfiguration().getRepositoryId()),
+                  transitiveHull(taskInfo.getConfiguration().getRepositoryId()));
         }
       }));
     }
+  }
+
+  /**
+   * Returns the repository's "transitive hull", all (directly or indirectly) affected repositories calculated from
+   * task's repository.If tasks' repository is group, it's transitive members are pulled in recursively.
+   */
+  private Set<String> transitiveHull(final String repositoryId) {
+    final Set<String> transitiveHull = Sets.newHashSet();
+    try {
+      final GroupRepository thisGroup = repositoryRegistry
+          .getRepositoryWithFacet(repositoryId, GroupRepository.class);
+      transitiveHull.addAll(thisGroup.getTransitiveMemberRepositoryIds());
+    }
+    catch (NoSuchRepositoryException e) {
+      // repositoryId is not a group, so just add it alone
+      transitiveHull.add(repositoryId);
+    }
+    return transitiveHull;
   }
 }
