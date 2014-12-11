@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai;
+package org.sonatype.security.realms.kenai.internal;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
 import org.sonatype.nexus.NexusAppTestSupport;
-import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
-import org.sonatype.security.realms.kenai.config.model.Configuration;
+import org.sonatype.security.realms.kenai.Kenai;
+import org.sonatype.security.realms.kenai.KenaiConfiguration;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 
@@ -27,6 +28,9 @@ import com.google.inject.Module;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.junit.Rule;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Kenai test super class. Note: NexusAppTestSupport needed as these tests boot whole security up.
@@ -54,7 +58,7 @@ public abstract class AbstractKenaiRealmTest
     {
       @Override
       public void configure(final Binder binder) {
-        binder.bind(KenaiRealmConfiguration.class).toInstance(getKenaiRealmConfiguration());
+        binder.bind(Kenai.class).toInstance(mockKenai());
       }
     });
   }
@@ -65,21 +69,24 @@ public abstract class AbstractKenaiRealmTest
     configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
-  protected KenaiRealmConfiguration getKenaiRealmConfiguration() {
-    return new KenaiRealmConfiguration()
-    {
-      @Override
-      public Configuration getConfiguration() {
-        Configuration configuration = new Configuration();
-        try {
-          configuration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
-        }
-        catch (MalformedURLException e) {
-          throw Throwables.propagate(e);
-        }
-        configuration.setDefaultRole(DEFAULT_ROLE);
-        return configuration;
-      }
-    };
+  protected Kenai mockKenai() {
+    KenaiConfiguration kenaiConfiguration = new KenaiConfiguration();
+    try {
+      kenaiConfiguration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
+    }
+    catch (MalformedURLException e) {
+      throw Throwables.propagate(e);
+    }
+    kenaiConfiguration.setDefaultRole(DEFAULT_ROLE);
+
+    Kenai kenai = mock(Kenai.class);
+    when(kenai.isEnabled()).thenReturn(true);
+    try {
+      when(kenai.getConfiguration()).thenReturn(kenaiConfiguration);
+    }
+    catch (IOException e) {
+      // not way, we are mocking
+    }
+    return kenai;
   }
 }

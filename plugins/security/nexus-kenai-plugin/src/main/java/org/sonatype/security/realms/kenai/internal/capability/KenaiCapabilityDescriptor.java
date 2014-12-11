@@ -28,8 +28,8 @@ import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.formfields.ComboboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.security.realms.kenai.KenaiConfiguration;
 import org.sonatype.security.realms.kenai.KenaiPlugin;
-import org.sonatype.security.realms.kenai.config.model.Configuration;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -90,13 +90,13 @@ public class KenaiCapabilityDescriptor
   public KenaiCapabilityDescriptor() {
     this.formFields = Lists.<FormField>newArrayList(
         new StringTextFormField(
-            Configuration.BASE_URL,
+            KenaiConfiguration.BASE_URL,
             messages.baseUrlLabel(),
             messages.baseUrlHelp(),
             MANDATORY
         ).withInitialValue("https://java.net/"),
         new ComboboxFormField(
-            Configuration.DEFAULT_ROLE,
+            KenaiConfiguration.DEFAULT_ROLE,
             messages.defaultRoleLabel(),
             messages.defaultRoleHelp(),
             MANDATORY
@@ -123,7 +123,7 @@ public class KenaiCapabilityDescriptor
   public Validator validator() {
     return validators().logical().and(
         validators().capability().uniquePer(TYPE),
-        validators().value().validUrl(TYPE, Configuration.BASE_URL)
+        validators().value().validUrl(TYPE, KenaiConfiguration.BASE_URL)
     );
   }
 
@@ -131,7 +131,7 @@ public class KenaiCapabilityDescriptor
   public Validator validator(final CapabilityIdentity id) {
     return validators().logical().and(
         validators().capability().uniquePerExcluding(id, TYPE),
-        validators().value().validUrl(TYPE, Configuration.BASE_URL)
+        validators().value().validUrl(TYPE, KenaiConfiguration.BASE_URL)
     );
   }
 

@@ -10,10 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai.config.model;
+package org.sonatype.security.realms.kenai;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.jetbrains.annotations.NonNls;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -23,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class Configuration
+public class KenaiConfiguration
 {
 
   @NonNls
@@ -42,12 +43,19 @@ public class Configuration
    */
   private String defaultRole;
 
-  public Configuration() {}
+  public KenaiConfiguration() {}
 
-  public Configuration(final Map<String, String> properties) {
+  public KenaiConfiguration(final Map<String, String> properties) {
     checkNotNull(properties);
     this.baseUrl = properties.get(BASE_URL);
     this.defaultRole = properties.get(DEFAULT_ROLE);
+  }
+
+  public Map<String, String> asMap() {
+    Map<String, String> map = Maps.newHashMap();
+    map.put(BASE_URL, baseUrl);
+    map.put(DEFAULT_ROLE, defaultRole);
+    return map;
   }
 
   /**

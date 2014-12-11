@@ -10,11 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai.config;
+package org.sonatype.security.realms.kenai.internal;
 
-import org.sonatype.security.realms.kenai.config.model.Configuration;
+import java.io.IOException;
 
-public interface KenaiRealmConfiguration
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class KenaiMockAuthcServlet
+    extends HttpServlet
 {
-  Configuration getConfiguration();
+
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException
+  {
+    final String username = req.getParameter("username");
+    final String password = req.getParameter("password");
+
+    if (username != null && password != null && (username + "123").equals(password)) {
+      // we are fine
+      resp.setStatus(200);
+      return;
+    }
+    else {
+      resp.sendError(401);
+    }
+  }
+
 }

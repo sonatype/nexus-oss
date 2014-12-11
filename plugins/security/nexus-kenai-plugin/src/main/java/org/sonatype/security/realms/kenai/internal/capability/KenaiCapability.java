@@ -17,7 +17,7 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.sonatype.nexus.capability.support.CapabilitySupport;
-import org.sonatype.security.realms.kenai.config.model.Configuration;
+import org.sonatype.security.realms.kenai.KenaiConfiguration;
 
 /**
  * Kenai capability.
@@ -26,12 +26,12 @@ import org.sonatype.security.realms.kenai.config.model.Configuration;
  */
 @Named(KenaiCapabilityDescriptor.TYPE_ID)
 public class KenaiCapability
-    extends CapabilitySupport<Configuration>
+    extends CapabilitySupport<KenaiConfiguration>
 {
 
   @Override
-  protected Configuration createConfig(final Map<String, String> properties) {
-    return new Configuration(properties);
+  protected KenaiConfiguration createConfig(final Map<String, String> properties) {
+    return new KenaiConfiguration(properties);
   }
 
 }

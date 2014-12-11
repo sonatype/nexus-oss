@@ -14,30 +14,49 @@ package org.sonatype.security.realms.kenai;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.annotation.Nullable;
 
-public class KenaiMockAuthcServlet
-    extends HttpServlet
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+
+/**
+ * Kenai facade.
+ *
+ * @since 3.0
+ */
+public interface Kenai
 {
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException
-  {
-    final String username = req.getParameter("username");
-    final String password = req.getParameter("password");
+  /**
+   * Configure Kenai.
+   *
+   * @throws InvalidConfigurationException If configuration is invalid
+   */
+  Kenai configure(KenaiConfiguration config) throws InvalidConfigurationException, IOException;
 
-    if (username != null && password != null && (username + "123").equals(password)) {
-      // we are fine
-      resp.setStatus(200);
-      return;
-    }
-    else {
-      resp.sendError(401);
-    }
-  }
+  /**
+   * Returns current Kenai configuration (null if not yet configured)
+   */
+  @Nullable
+  KenaiConfiguration getConfiguration() throws IOException;
+
+  /**
+   * Check if the capability is enabled.
+   */
+  boolean isEnabled();
+
+  /**
+   * Toggle capability enabled.
+   */
+  void setEnabled(boolean enable);
+
+  /**
+   * Check if the realm is active.
+   */
+  boolean isRealmActive();
+
+  /**
+   * Toggle realm active.
+   */
+  void setRealmActive(boolean realmActive);
 
 }
