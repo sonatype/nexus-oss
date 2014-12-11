@@ -18,7 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.sonatype.nexus.scheduling.schedule.Hourly;
 import org.sonatype.nexus.scheduling.schedule.Monthly;
+import org.sonatype.nexus.scheduling.schedule.Monthly.CalendarDay;
 import org.sonatype.nexus.scheduling.schedule.Weekly;
+import org.sonatype.nexus.scheduling.schedule.Weekly.Weekday;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.joda.time.DateTime;
@@ -68,7 +70,7 @@ public class NexusScheduleConverterTest
 
   @Test
   public void weekly1() {
-    final Weekly weekly = new Weekly(new Date(), Sets.newSet(Weekly.SAT));
+    final Weekly weekly = new Weekly(new Date(), Sets.newSet(Weekday.SAT));
     final TriggerBuilder triggerBuilder = converter.toTrigger(weekly);
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
@@ -78,7 +80,7 @@ public class NexusScheduleConverterTest
 
   @Test
   public void weekly2() {
-    final Weekly weekly = new Weekly(new Date(), Sets.newSet(Weekly.SAT, Weekly.FRI));
+    final Weekly weekly = new Weekly(new Date(), Sets.newSet(Weekday.SAT, Weekday.FRI));
     final TriggerBuilder triggerBuilder = converter.toTrigger(weekly);
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
@@ -88,7 +90,7 @@ public class NexusScheduleConverterTest
 
   @Test
   public void montlhy1() {
-    final Monthly monthly = new Monthly(new Date(), Sets.newSet(2));
+    final Monthly monthly = new Monthly(new Date(), CalendarDay.days(2));
     final TriggerBuilder triggerBuilder = converter.toTrigger(monthly);
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
@@ -98,7 +100,7 @@ public class NexusScheduleConverterTest
 
   @Test
   public void montlhy2() {
-    final Monthly monthly = new Monthly(new Date(), Sets.newSet(1, 2, 3, 10, 11, 12));
+    final Monthly monthly = new Monthly(new Date(), CalendarDay.days(1, 2, 3, 10, 11, 12));
     final TriggerBuilder triggerBuilder = converter.toTrigger(monthly);
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));
@@ -108,7 +110,7 @@ public class NexusScheduleConverterTest
 
   @Test
   public void montlhy3() {
-    final Monthly monthly = new Monthly(new Date(), Sets.newSet(Monthly.LAST_DAY_OF_MONTH));
+    final Monthly monthly = new Monthly(new Date(), Sets.newSet(CalendarDay.lastDay()));
     final TriggerBuilder triggerBuilder = converter.toTrigger(monthly);
     final Trigger trigger = triggerBuilder.build();
     assertThat(trigger, instanceOf(CronTrigger.class));

@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.scheduling.schedule;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -58,33 +57,31 @@ public abstract class Schedule
 
   // ==
 
+  /**
+   * Helper method to set {@link Date} types, handles conversion to string automatically.
+   */
   public static String dateToString(final Date date) {
     return new DateTime(date).toString();
   }
 
+  /**
+   * Helper method to get {@link Date} types, handles conversion from string automatically.
+   */
   public static Date stringToDate(final String string) {
     return DateTime.parse(string).toDate();
   }
 
-  public static String setToCsv(Set<Integer> set) {
-    return Joiner.on(',').join(Collections2.transform(set, new Function<Integer, String>()
-    {
-      @Override
-      public String apply(final Integer input) {
-        return input.toString();
-      }
-    }));
+  /**
+   * Helper method to set {@link Set} types, handles conversion to CSV with provided function.
+   */
+  public static <T> String setToCsv(final Set<T> set, final Function<T, String> func) {
+    return Joiner.on(',').join(Collections2.transform(set, func));
   }
 
-  public static Set<Integer> csvToSet(String value) {
-    final Collection<Integer> enums = Collections2.transform(Splitter.on(',').splitToList(value),
-        new Function<String, Integer>()
-        {
-          @Override
-          public Integer apply(final String input) {
-            return Integer.parseInt(input);
-          }
-        });
-    return Sets.newHashSet(enums);
+  /**
+   * Helper method to get {@link Set} types, handles conversion from CSV with provided function.
+   */
+  public static <T> Set<T> csvToSet(String value, final Function<String, T> func) {
+    return Sets.newHashSet(Collections2.transform(Splitter.on(',').splitToList(value), func));
   }
 }
