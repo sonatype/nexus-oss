@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -71,40 +72,29 @@ public abstract class RepositoryTaskSupport<T>
         @Override
         public boolean apply(final TaskInfo<?> taskInfo) {
           return taskInfo.getConfiguration().getRepositoryId() == null ||
-              !intersect(getConfiguration().getRepositoryId(), taskInfo.getConfiguration().getRepositoryId()).isEmpty();
+              !Collections.disjoint(
+                  transitiveHull(getConfiguration().getRepositoryId()),
+                  transitiveHull(taskInfo.getConfiguration().getRepositoryId()));
         }
       }));
     }
   }
 
   /**
-   * Returns the intersection of all (directly or indirectly) affected repositories calculated from "this task"'s
-   * repository and "other task"'s repository. If any of those two are group, their transitive members are pulled in
-   * too.
+   * Returns the repository's "transitive hull", all (directly or indirectly) affected repositories calculated from
+   * task's repository.If tasks' repository is group, it's transitive members are pulled in recursively.
    */
-  private Set<String> intersect(final String thisRepositoryId, final String thatRepositoryId) {
-    // this transitive hull
-    final Set<String> thisRepositoryIds = Sets.newHashSet();
+  private Set<String> transitiveHull(final String repositoryId) {
+    final Set<String> transitiveHull = Sets.newHashSet();
     try {
       final GroupRepository thisGroup = repositoryRegistry
-          .getRepositoryWithFacet(thisRepositoryId, GroupRepository.class);
-      thisRepositoryIds.addAll(thisGroup.getTransitiveMemberRepositoryIds());
+          .getRepositoryWithFacet(repositoryId, GroupRepository.class);
+      transitiveHull.addAll(thisGroup.getTransitiveMemberRepositoryIds());
     }
     catch (NoSuchRepositoryException e) {
-      // thisRepositoryId is not a group, we are done with "this"
-      thisRepositoryIds.add(thisRepositoryId);
+      // repositoryId is not a group, so just add it alone
+      transitiveHull.add(repositoryId);
     }
-    // that transitive hull
-    final Set<String> thatRepositoryIds = Sets.newHashSet();
-    try {
-      final GroupRepository thatGroup = repositoryRegistry
-          .getRepositoryWithFacet(thatRepositoryId, GroupRepository.class);
-      thatRepositoryIds.addAll(thatGroup.getTransitiveMemberRepositoryIds());
-    }
-    catch (NoSuchRepositoryException e) {
-      // thatRepositoryId is not a group, we are done with "that"
-      thatRepositoryIds.add(thatRepositoryId);
-    }
-    return Sets.intersection(thisRepositoryIds, thatRepositoryIds);
+    return transitiveHull;
   }
 }
