@@ -39,9 +39,11 @@ public class NexusDefaultWebSessionManager
 
   @Inject
   public void configureProperties(
-      final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout)
+      final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout,
+      final @Named("${shiro.secureSessionCookies:-false}") boolean secureSessionCookies)
   {
     setGlobalSessionTimeout(globalSessionTimeout);
+    getSessionIdCookie().setSecure(secureSessionCookies);
   }
 
   @Override
