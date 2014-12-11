@@ -14,8 +14,10 @@ package org.sonatype.nexus.yum.internal.task;
 
 import java.util.List;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.routing.Manager;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
@@ -39,6 +41,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -189,6 +192,8 @@ public class GenerateMetadataTaskSettingsIT
     when(repo.getLocalUrl()).thenReturn(osIndependentUri(rpmsDir()));
     final RepositoryRegistry repoRegistry = mock(RepositoryRegistry.class);
     when(repoRegistry.getRepository(anyString())).thenReturn(repo);
+    when(repoRegistry.getRepositoryWithFacet(anyString(), eq(GroupRepository.class))).thenThrow(
+        new NoSuchRepositoryException(REPO));
     return repoRegistry;
   }
 

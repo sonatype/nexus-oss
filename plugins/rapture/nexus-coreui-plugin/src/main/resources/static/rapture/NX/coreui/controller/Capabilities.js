@@ -474,40 +474,44 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    * Enables selected capability.
    */
-  enableCapability: function(button) {
+  enableCapability: function() {
     var me = this,
-        list = button.up('grid'),
-        model = list.getSelectionModel().getSelection()[0],
-        description = me.getDescription(model);
+        model = me.selectedModel(),
+        description;
 
-    NX.direct.capability_Capability.enable(model.getId(), function(response) {
-      me.loadStore();
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: 'Capability enabled: ' + description, type: 'success'
-        });
-      }
-    });
+    if (model) {
+      description = me.getDescription(model);
+      NX.direct.capability_Capability.enable(model.getId(), function(response) {
+        me.loadStore();
+        if (Ext.isObject(response) && response.success) {
+          NX.Messages.add({
+            text: 'Capability enabled: ' + description, type: 'success'
+          });
+        }
+      });
+    }
   },
 
   /**
    * @private
    * Disables selected capability.
    */
-  disableCapability: function(button) {
+  disableCapability: function() {
     var me = this,
-        list = button.up('grid'),
-        model = list.getSelectionModel().getSelection()[0],
-        description = me.getDescription(model);
+        model = me.selectedModel(),
+        description;
 
-    NX.direct.capability_Capability.disable(model.getId(), function(response) {
-      me.loadStore();
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({
-          text: 'Capability disabled: ' + description, type: 'success'
-        });
-      }
-    });
+    if (model) {
+      description = me.getDescription(model);
+      NX.direct.capability_Capability.disable(model.getId(), function(response) {
+        me.loadStore();
+        if (Ext.isObject(response) && response.success) {
+          NX.Messages.add({
+            text: 'Capability disabled: ' + description, type: 'success'
+          });
+        }
+      });
+    }
   }
 
 });
