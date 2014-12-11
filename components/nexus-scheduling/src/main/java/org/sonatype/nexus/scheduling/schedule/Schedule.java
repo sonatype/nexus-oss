@@ -72,16 +72,18 @@ public abstract class Schedule
   }
 
   /**
-   * Helper method to set {@link Set} types, handles conversion to CSV with provided function.
+   * Helper method to set {@link Set} types, handles conversion to CSV with provided function. Ordering of set
+   * elements in produced CSV string is enforced to their natural ordering.
    */
-  public static <T> String setToCsv(final Set<T> set, final Function<T, String> func) {
-    return Joiner.on(',').join(Collections2.transform(set, func));
+  public static <T extends Comparable<T>> String setToCsv(final Set<T> set, final Function<T, String> func) {
+    return Joiner.on(',').join(Collections2.transform(Sets.newTreeSet(set), func));
   }
 
   /**
-   * Helper method to get {@link Set} types, handles conversion from CSV with provided function.
+   * Helper method to get {@link Set} types, handles conversion from CSV with provided function. Ordering of
+   * returned set element does not reflect CSV ordering, elements are (re)sorted by their natural ordering.
    */
-  public static <T> Set<T> csvToSet(String value, final Function<String, T> func) {
-    return Sets.newHashSet(Collections2.transform(Splitter.on(',').splitToList(value), func));
+  public static <T extends Comparable<T>> Set<T> csvToSet(String value, final Function<String, T> func) {
+    return Sets.newTreeSet(Collections2.transform(Splitter.on(',').splitToList(value), func));
   }
 }
