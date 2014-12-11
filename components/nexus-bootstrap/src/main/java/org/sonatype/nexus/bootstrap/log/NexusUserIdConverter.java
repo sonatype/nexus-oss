@@ -20,7 +20,7 @@ import ch.qos.logback.access.spi.IAccessEvent;
  *
  * @since 2.11.1
  */
-public class NexusUserConverter
+public class NexusUserIdConverter
     extends AccessConverter
 {
 

@@ -19,7 +19,7 @@ import ch.qos.logback.core.pattern.PatternLayoutEncoderBase;
 
 /**
  * Encoder that configures {@code %u} and {@code %user} converter
- * patterns to be converted by {@link NexusUserConverter} instead of {@link RemoteUserConverter}.
+ * patterns to be converted by {@link NexusUserIdConverter} instead of {@link RemoteUserConverter}.
  *
  * @since 2.11.1
  */
@@ -30,9 +30,9 @@ public class AccessPatternLayoutEncoder
   @Override
   public void start() {
     PatternLayout patternLayout = new PatternLayout();
-    patternLayout.getDefaultConverterMap().put("u", NexusUserConverter.class
+    patternLayout.getDefaultConverterMap().put("u", NexusUserIdConverter.class
         .getName());
-    patternLayout.getDefaultConverterMap().put("user", NexusUserConverter.class
+    patternLayout.getDefaultConverterMap().put("user", NexusUserIdConverter.class
         .getName());
     patternLayout.setContext(context);
     patternLayout.setPattern(getPattern());
