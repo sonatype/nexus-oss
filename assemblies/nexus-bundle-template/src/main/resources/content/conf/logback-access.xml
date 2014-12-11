@@ -14,15 +14,12 @@
 
 -->
 <configuration>
+
   <appender name="request.logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${nexus-work}/logs/request.log</File>
     <Append>true</Append>
-    <encoder>
-      <!--
-      Common Log Format: http://en.wikipedia.org/wiki/Common_Log_Format
-      Can not use 'common' as we must replace %user with %requestAttribute{nexus.user.id}
-      -->
-      <pattern>%clientHost %l %requestAttribute{nexus.user.id} [%date] "%requestURL" %statusCode %bytesSent</pattern>
+    <encoder class="org.sonatype.nexus.bootstrap.log.AccessPatternLayoutEncoder">
+      <pattern>common</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${nexus-work}/logs/request.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
