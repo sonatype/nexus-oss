@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap.log;
+package org.sonatype.nexus.pax.logging;
 
 import ch.qos.logback.access.pattern.AccessConverter;
 import ch.qos.logback.access.spi.IAccessEvent;
@@ -18,7 +18,7 @@ import ch.qos.logback.access.spi.IAccessEvent;
 /**
  * Converter for the request attribute named by {@link #ATTR_USER_ID}
  *
- * @since 2.11.1
+ * @since 3.0
  */
 public class NexusUserIdConverter
     extends AccessConverter

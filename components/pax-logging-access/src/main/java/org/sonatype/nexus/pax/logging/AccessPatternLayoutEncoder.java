@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bootstrap.log;
+package org.sonatype.nexus.pax.logging;
 
 import ch.qos.logback.access.PatternLayout;
 import ch.qos.logback.access.pattern.RemoteUserConverter;
@@ -21,7 +21,7 @@ import ch.qos.logback.core.pattern.PatternLayoutEncoderBase;
  * Encoder that configures {@code %u} and {@code %user} converter
  * patterns to be converted by {@link NexusUserIdConverter} instead of {@link RemoteUserConverter}.
  *
- * @since 2.11.1
+ * @since 3.0
  */
 public class AccessPatternLayoutEncoder
     extends PatternLayoutEncoderBase<IAccessEvent>
