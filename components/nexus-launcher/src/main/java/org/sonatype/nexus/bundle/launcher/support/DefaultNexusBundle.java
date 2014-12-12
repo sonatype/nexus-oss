@@ -47,6 +47,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bundle.launcher.support.DefaultNexusBundleConfiguration.DEFAULT_START_TIMEOUT;
+import static org.sonatype.sisu.bl.BundleConfiguration.RANDOM_PORT;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 import static org.sonatype.sisu.goodies.common.SimpleFormat.format;
@@ -83,6 +84,11 @@ public class DefaultNexusBundle
   private CommandMonitorThread keepAliveThread;
 
   private ConfigurationStrategy strategy;
+
+  /**
+   * SSL port if HTTPS support is enabled, otherwise -1.
+   */
+  private int sslPort;
 
   @Inject
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
@@ -205,6 +211,13 @@ public class DefaultNexusBundle
 
     strategy = determineConfigurationStrategy();
 
+    if (getConfiguration().getSslPort() == RANDOM_PORT) {
+      sslPort = portReservationService.reservePort();
+    }
+    else {
+      sslPort = getConfiguration().getSslPort();
+    }
+
     configureNexusProperties(strategy);
   }
 
@@ -226,6 +239,11 @@ public class DefaultNexusBundle
       keepAlivePort = 0;
     }
     strategy = null;
+
+    if (getConfiguration().getSslPort() == RANDOM_PORT && sslPort > 0) {
+      getPortReservationService().cancelPort(sslPort);
+    }
+    sslPort = 0;
   }
 
   /**
@@ -442,6 +460,11 @@ public class DefaultNexusBundle
   }
 
   @Override
+  public int getSslPort() {
+    return sslPort;
+  }
+
+  @Override
   protected String generateId() {
     return "nx"; // TODO? use a system property if we should or not add: + "-" + System.currentTimeMillis();
   }
@@ -485,6 +508,7 @@ public class DefaultNexusBundle
       final Properties nexusProperties = new Properties();
 
       nexusProperties.setProperty("application-port", String.valueOf(getPort()));
+      nexusProperties.setProperty("application-port-ssl", String.valueOf(getSslPort()));
 
       final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
       if (!systemProperties.isEmpty()) {

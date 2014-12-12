@@ -13,6 +13,7 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -100,6 +101,21 @@ public class DefaultNexusBundleConfiguration
    * Logging pattern. When null, default one should be used.
    */
   private String logPattern;
+
+  /**
+   * Optional SSL port.
+   */
+  private int sslPort = -1;
+
+  /**
+   * Optional keystore location.
+   */
+  private File keystoreLocation;
+
+  /**
+   * Optional keystore password.
+   */
+  private String keystorePassword;
 
   @Inject
   public DefaultNexusBundleConfiguration(final FileTaskBuilder fileTaskBuilder,
@@ -328,7 +344,54 @@ public class DefaultNexusBundleConfiguration
       }
     }
 
+    if (keystoreLocation != null) {
+      overlays.add(
+          fileTaskBuilder.replace()
+              .inFile(path("nexus/etc/custom.properties"))
+              .replace(
+                  "nexus-args=${karaf.base}/etc/jetty.xml",
+                  "nexus-args=${karaf.base}/etc/jetty.xml,${karaf.base}/etc/jetty-https.xml"
+              )
+              .failIfFileDoesNotExist()
+      );
+      overlays.add(
+          fileTaskBuilder.replace()
+              .inFile(path("nexus/etc/jetty-https.xml"))
+              .replace(
+                  "<Property name=\"nexus-base\"/>/etc/ssl/keystore.jks",
+                  keystoreLocation.getAbsolutePath()
+              )
+              .replace(
+                  "OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v",
+                  keystorePassword
+              )
+              .failIfFileDoesNotExist()
+      );
+    }
+
     return overlays;
   }
 
+  @Override
+  public NexusBundleConfiguration enableHttps(final int port, final File keystore, final String password) {
+    sslPort = port;
+    keystoreLocation = keystore;
+    keystorePassword = password;
+    return this;
+  }
+
+  @Override
+  public int getSslPort() {
+    return sslPort;
+  }
+
+  @Override
+  public File getKeystoreLocation() {
+    return keystoreLocation;
+  }
+
+  @Override
+  public String getKeystorePassword() {
+    return keystorePassword;
+  }
 }
