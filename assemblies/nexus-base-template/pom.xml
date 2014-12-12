@@ -388,9 +388,9 @@
                 </replace>
 
                 <replace file="${project.build.directory}/assembly/etc/startup.properties">
-                  <!-- pax-logging-service (log4j) with pax-logging-logback plus our metrics support -->
+                  <!-- swap pax-logging-service (log4j) with pax-logging-logback plus our metrics+access support -->
                   <replacefilter token="${mvn:pax-logging-service}"
-                                 value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-logback}"/>
+                                 value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-access} = 8${line.separator}${mvn:pax-logging-logback}"/>
                 </replace>
               </target>
             </configuration>

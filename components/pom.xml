@@ -59,6 +59,7 @@
     <module>nexus-supportzip-api</module>
     <module>nexus-webresources-api</module>
     <module>pax-logging-metrics</module>
+    <module>pax-logging-access</module>
   </modules>
 
   <dependencyManagement>

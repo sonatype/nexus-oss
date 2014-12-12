@@ -28,6 +28,7 @@ public class Monthly
     extends Schedule
 {
   public static final class CalendarDay
+      implements Comparable<CalendarDay>
   {
     /**
      * A special "sentinel" value for a CalendarDay that marks the "last day in the month", as the normal days
@@ -73,6 +74,11 @@ public class Monthly
       return getClass().getSimpleName() + "{" +
           "day=" + (day == LAST_DAY_OF_MONTH ? "last" : day) +
           '}';
+    }
+
+    @Override
+    public int compareTo(final CalendarDay other) {
+      return this.day - other.day;
     }
 
     @Override

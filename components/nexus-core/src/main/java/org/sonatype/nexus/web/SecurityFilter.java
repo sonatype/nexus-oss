@@ -13,6 +13,7 @@
 package org.sonatype.nexus.web;
 
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,6 +21,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.UserIdMdcHelper;
@@ -42,6 +44,10 @@ public class SecurityFilter
     extends AbstractShiroFilter
 {
   private static final Logger log = LoggerFactory.getLogger(SecurityFilter.class);
+
+  public static final String ATTR_USER_PRINCIPAL = "nexus.user.principal";
+
+  public static final String ATTR_USER_ID = "nexus.user.id";
 
   @Inject
   public SecurityFilter(final SecuritySystem securitySystem,
@@ -66,6 +72,16 @@ public class SecurityFilter
                               final FilterChain origChain)
       throws IOException, ServletException
   {
+    // HACK: Attach principal to underlying request so we can use that in the request-log
+    if (request instanceof HttpServletRequest) {
+      HttpServletRequest httpRequest = (HttpServletRequest)request;
+      Principal p = httpRequest.getUserPrincipal();
+      if (p != null) {
+        httpRequest.setAttribute(ATTR_USER_PRINCIPAL, p);
+        httpRequest.setAttribute(ATTR_USER_ID, p.getName());
+      }
+    }
+
     UserIdMdcHelper.set();
     try {
       super.executeChain(request, response, origChain);
