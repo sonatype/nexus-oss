@@ -210,21 +210,35 @@ Ext.define('NX.controller.User', {
         win = button.up('window'),
         form = button.up('form'),
         values = form.getValues(),
-        userName = NX.util.Base64.encode(values.username),
-        userPass = NX.util.Base64.encode(values.password);
+        basicAuth = 'Basic: ' + NX.util.Base64.encode(values['username'] + ':' + values['password']);
 
-    me.logDebug('Sign-in user: ' + values.username); // do not log password
+    me.logDebug('Sign-in user: ' + values['username']);
 
     win.getEl().mask('Signing in...');
 
-    NX.direct.rapture_Security.signIn(userName, userPass, values.remember === 'on', function (response) {
-      win.getEl().unmask();
-      if (Ext.isObject(response) && response.success) {
-        NX.State.setUser(response.data);
+    Ext.Ajax.request({
+      url: NX.util.Url.urlOf('service/local/authentication/login'),
+      method: 'GET',
+      headers: {
+        'Authorization': basicAuth,
+        'X-Nexus-RememberMe': values['remember'] === 'on'
+      },
+      scope: me,
+      suppressStatus: true,
+      success: function() {
+        win.getEl().unmask();
+        NX.State.setUser({ id: values.username });
         win.close();
         if (win.options && Ext.isFunction(win.options.success)) {
           win.options.success.call(win.options.scope, win.options);
         }
+      },
+      failure: function() {
+        win.getEl().unmask();
+        NX.Messages.add({
+          text: 'Incorrect username and/or password or no permission to use the Nexus User Interface.',
+          type: 'warning'
+        });
       }
     });
   },
