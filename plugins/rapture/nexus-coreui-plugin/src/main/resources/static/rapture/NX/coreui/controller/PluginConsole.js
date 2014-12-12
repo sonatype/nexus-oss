@@ -18,13 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.PluginConsole', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.util.Url',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-system-pluginlist',
+  masters: 'nx-coreui-system-pluginlist',
 
   stores: [
     'PluginInfo'
@@ -34,14 +34,9 @@ Ext.define('NX.coreui.controller.PluginConsole', {
     'system.PluginList'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-system-pluginlist'
-    },
-    {
-      ref: 'info',
-      selector: 'nx-coreui-system-plugins nx-info-panel'
-    }
+    { ref: 'feature', selector: 'nx-coreui-system-plugins' },
+    { ref: 'list', selector: 'nx-coreui-system-pluginlist' },
+    { ref: 'info', selector: 'nx-coreui-system-plugins nx-info-panel' }
   ],
 
   features: {

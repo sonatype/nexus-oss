@@ -85,6 +85,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         groupId = undefined, artifactId = undefined, versions = [];
 
     if (me.getSearchResultVersion()) {
+
       me.getSearchResultVersionStore().each(function(searchResultVersionModel) {
         groupId = searchResultVersionModel.get('groupId');
         artifactId = searchResultVersionModel.get('artifactId');
@@ -127,7 +128,9 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
           else {
             searchResultModel.set('healthCheckError', true);
           }
-          me.getSearchResultVersion().getView().refresh();
+          if (me.getSearchResultVersion()) {
+            me.getSearchResultVersion().getView().refresh();
+          }
         });
       }
     }

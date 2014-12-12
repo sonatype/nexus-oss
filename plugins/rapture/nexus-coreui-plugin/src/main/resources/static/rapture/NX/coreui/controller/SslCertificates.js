@@ -18,13 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SslCertificates', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-sslcertificate-list',
+  masters: 'nx-coreui-sslcertificate-list',
 
   models: [
     'SslCertificate'
@@ -41,14 +41,9 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     'ssl.SslCertificateList'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-sslcertificate-list'
-    },
-    {
-      ref: 'details',
-      selector: 'nx-coreui-sslcertificate-feature nx-coreui-sslcertificate-details'
-    }
+    { ref: 'feature', selector: 'nx-coreui-sslcertificate-feature' },
+    { ref: 'list', selector: 'nx-coreui-sslcertificate-list' },
+    { ref: 'details', selector: 'nx-coreui-sslcertificate-feature nx-coreui-sslcertificate-details' }
   ],
   icons: {
     'sslcertificate-default': {

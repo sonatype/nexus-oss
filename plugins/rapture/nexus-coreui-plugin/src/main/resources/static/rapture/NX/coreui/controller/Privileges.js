@@ -18,14 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Privileges', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-privilege-list',
+  masters: 'nx-coreui-privilege-list',
 
   stores: [
     'Privilege'
@@ -37,18 +37,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     'privilege.PrivilegeTrace'
   ],
   refs: [
-    {
-      ref: 'feature',
-      selector: 'nx-coreui-privilege-feature'
-    },
-    {
-      ref: 'list',
-      selector: 'nx-coreui-privilege-list'
-    },
-    {
-      ref: 'info',
-      selector: 'nx-coreui-privilege-feature nx-info-panel'
-    }
+    { ref: 'feature', selector: 'nx-coreui-privilege-feature' },
+    { ref: 'list', selector: 'nx-coreui-privilege-list' },
+    { ref: 'info', selector: 'nx-coreui-privilege-feature nx-info-panel' }
   ],
   icons: {
     'privilege-default': {
@@ -116,7 +107,7 @@ Ext.define('NX.coreui.controller.Privileges', {
         info;
 
     if (Ext.isDefined(model)) {
-      me.getFeature().setDescriptionIconName('privilege-' + model.get('type'));
+      me.getFeature().setItemClass(1, NX.Icons.cls('privilege-' + model.get('type'), 'x16'));
       info = {
         'Id': model.getId(),
         'Name': model.get('name'),
@@ -168,10 +159,11 @@ Ext.define('NX.coreui.controller.Privileges', {
    */
   bindDeleteButton: function (button) {
     var me = this;
+
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list, function (model) {
+            NX.Conditions.gridHasSelection(me.masters[0], function (model) {
               return !model.get('readOnly');
             })
         ),

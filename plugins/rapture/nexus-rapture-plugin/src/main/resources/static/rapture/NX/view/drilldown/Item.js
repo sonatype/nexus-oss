@@ -13,14 +13,42 @@
 /*global Ext*/
 
 /**
- * A single link in the drilldown breadcrumb
+ * A single panel in a drilldown series
  *
  * @since 3.0
  */
 
-Ext.define('NX.view.drilldown.DrilldownLink', {
-  extend: 'Ext.button.Button',
-  alias: 'widget.nx-drilldown-link',
-  ui: 'drilldown',
-  scale: 'medium'
+Ext.define('NX.view.drilldown.Item', {
+  extend: 'Ext.panel.Panel',
+  alias: 'widget.nx-drilldown-item',
+
+  itemName: 'item',
+  itemClass: null,
+  itemBookmark: null,
+
+  layout: 'fit',
+
+  /**
+   * Set the name of this drilldown item (appears in the breadcrumb)
+   */
+  setItemName: function(text) {
+    this.itemName = text;
+  },
+
+  /**
+   * Set the icon class of this drilldown item (appears in the breadcrumb)
+   */
+  setItemClass: function(cls) {
+    this.itemClass = cls;
+  },
+
+  /**
+   * Set the page to load when the breadcrumb segment associated with this drilldown item is clicked
+   */
+  setItemBookmark: function(bookmark, scope) {
+    this.itemBookmark = {
+      obj: bookmark,
+      scope: scope
+    };
+  }
 });

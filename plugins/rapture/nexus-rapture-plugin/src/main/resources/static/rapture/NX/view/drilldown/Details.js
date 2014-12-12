@@ -17,9 +17,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.masterdetail.Tabs', {
+Ext.define('NX.view.drilldown.Details', {
   extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-masterdetail-tabs',
+  alias: 'widget.nx-drilldown-details',
   requires: [
     'NX.Icons',
     'NX.Bookmarks',
@@ -36,13 +36,13 @@ Ext.define('NX.view.masterdetail.Tabs', {
       {
         xtype: 'panel',
         itemId: 'info',
-        iconCls: NX.Icons.cls('masterdetail-info', 'x16'),
+        iconCls: NX.Icons.cls('drilldown-info', 'x16'),
         hidden: true
       },
       {
         xtype: 'panel',
         itemId: 'warning',
-        iconCls: NX.Icons.cls('masterdetail-warning', 'x16'),
+        iconCls: NX.Icons.cls('drilldown-warning', 'x16'),
         hidden: true
       },
       {

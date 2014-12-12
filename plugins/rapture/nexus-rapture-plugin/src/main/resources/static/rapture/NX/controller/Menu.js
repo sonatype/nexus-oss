@@ -240,10 +240,18 @@ Ext.define('NX.controller.Menu', {
    */
   navigateTo: function (bookmark) {
     var me = this,
-        node, mode, feature, menuBookmark;
+        node, mode, feature, menuBookmark, queryIndex;
 
     if (bookmark) {
-      menuBookmark = bookmark.getSegment(0);
+      // Get the path (minus an optional filter string)
+      if (bookmark.getSegments().length) {
+        queryIndex = bookmark.getSegment(0).indexOf('=');
+        if (queryIndex != -1) {
+          menuBookmark = bookmark.getSegment(0).slice(0, bookmark.getSegment(0).indexOf('='));
+        } else {
+          menuBookmark = bookmark.getSegment(0);
+        }
+      }
 
       //<if debug>
       me.logDebug('Navigate to: ' + menuBookmark);

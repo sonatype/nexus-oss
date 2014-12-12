@@ -18,12 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
-  extend: 'NX.view.masterdetail.Panel',
+  extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-privilege-feature',
 
-  list: 'nx-coreui-privilege-list',
-
   iconName: 'privilege-default',
+
+  masters: { xtype: 'nx-coreui-privilege-list' },
 
   actions: [
     { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }

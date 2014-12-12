@@ -18,24 +18,33 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.feed.FeedList', {
-  extend: 'Ext.grid.Panel',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-feed-list',
 
   store: 'Feed',
-  allowDeselect: true,
 
-  columns: [
-    {
-      xtype: 'nx-iconcolumn',
-      width: 36,
-      iconVariant: 'x16',
-      iconName: function () {
-        return 'feed-default';
-      }
-    },
-    { header: 'Feed', dataIndex: 'name', flex: 1 },
-    { header: 'URL', dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
-  ],
+  /*
+   * @override
+   */
+
+  initComponent: function() {
+    var me = this;
+
+    me.columns = [
+      {
+        xtype: 'nx-iconcolumn',
+        width: 36,
+        iconVariant: 'x16',
+        iconName: function () {
+          return 'feed-default';
+        }
+      },
+      { header: 'Feed', dataIndex: 'name', flex: 1 },
+      { header: 'URL', dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
+    ];
+
+    me.callParent(arguments);
+  },
 
   viewConfig: {
     emptyText: 'No feeds defined',

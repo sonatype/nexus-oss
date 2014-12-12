@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Capabilities', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.Dialogs',
@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-capability-list',
+  masters: 'nx-coreui-capability-list',
 
   stores: [
     'Capability',
@@ -169,7 +169,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      me.getFeature().setDescriptionIconName('capability-' + model.get('state'));
+      me.getFeature().setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
 
       capabilityTypeModel = me.getCapabilityTypeStore().getById(model.get('typeId'));
 
@@ -187,13 +187,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   eventuallyShowWarning: function(model) {
-    var masterdetail = this.getList().up('nx-masterdetail-panel');
+    var drilldown = this.getList().up('nx-drilldown');
 
     if (model.get('enabled') && !model.get('active')) {
-      masterdetail.showWarning(model.get('stateDescription'));
+      drilldown.showWarning(model.get('stateDescription'));
     }
     else {
-      masterdetail.clearWarning();
+      drilldown.clearWarning();
     }
   },
 
@@ -476,20 +476,21 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   enableCapability: function() {
     var me = this,
-        model = me.selectedModel(),
-        description;
+      bookmark = NX.Bookmarks.getBookmark(),
+      model, modelId, description;
 
-    if (model) {
-      description = me.getDescription(model);
-      NX.direct.capability_Capability.enable(model.getId(), function(response) {
-        me.loadStore();
-        if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({
-            text: 'Capability enabled: ' + description, type: 'success'
-          });
-        }
-      });
-    }
+    modelId = decodeURIComponent(bookmark.getSegment(1));
+    model = me.getList().getStore().getById(modelId);
+    description = me.getDescription(model);
+
+    NX.direct.capability_Capability.enable(model.getId(), function(response) {
+      me.loadStore();
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Capability enabled: ' + description, type: 'success'
+        });
+      }
+    });
   },
 
   /**
@@ -498,20 +499,21 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   disableCapability: function() {
     var me = this,
-        model = me.selectedModel(),
-        description;
+      bookmark = NX.Bookmarks.getBookmark(),
+      model, modelId, description;
 
-    if (model) {
-      description = me.getDescription(model);
-      NX.direct.capability_Capability.disable(model.getId(), function(response) {
-        me.loadStore();
-        if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({
-            text: 'Capability disabled: ' + description, type: 'success'
-          });
-        }
-      });
-    }
+    modelId = decodeURIComponent(bookmark.getSegment(1));
+    model = me.getList().getStore().getById(modelId);
+    description = me.getDescription(model);
+
+    NX.direct.capability_Capability.disable(model.getId(), function(response) {
+      me.loadStore();
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({
+          text: 'Capability disabled: ' + description, type: 'success'
+        });
+      }
+    });
   }
 
 });

@@ -18,13 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Roles', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-role-list',
+  masters: 'nx-coreui-role-list',
 
   models: [
     'Role'
@@ -44,22 +44,11 @@ Ext.define('NX.coreui.controller.Roles', {
     'role.RoleTree'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-role-list'
-    },
-    {
-      ref: 'settings',
-      selector: 'nx-coreui-role-feature nx-coreui-role-settings'
-    },
-    {
-      ref: 'privilegeTrace',
-      selector: 'nx-coreui-role-feature nx-coreui-privilege-trace'
-    },
-    {
-      ref: 'roleTree',
-      selector: 'nx-coreui-role-feature nx-coreui-role-tree'
-    }
+    { ref: 'feature', selector: 'nx-coreui-role-feature' },
+    { ref: 'list', selector: 'nx-coreui-role-list' },
+    { ref: 'settings', selector: 'nx-coreui-role-feature nx-coreui-role-settings' },
+    { ref: 'privilegeTrace', selector: 'nx-coreui-role-feature nx-coreui-privilege-trace' },
+    { ref: 'roleTree', selector: 'nx-coreui-role-feature nx-coreui-role-tree' }
   ],
   icons: {
     'role-default': {
@@ -217,7 +206,7 @@ Ext.define('NX.coreui.controller.Roles', {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list, function(model) {
+            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('readOnly');
             })
         ),

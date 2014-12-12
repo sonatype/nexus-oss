@@ -75,6 +75,16 @@ Ext.define('NX.Bookmark', {
   },
 
   /**
+   * @public
+   * @returns {Array} list of all segments in this bookmarks
+   */
+  getSegments: function() {
+    var me = this;
+
+    return me.segments;
+  },
+
+  /**
    * Appends a segment to current segment.
    * @param {String/String[]} segments to append
    * @returns {NX.Bookmark} itself
