@@ -191,7 +191,8 @@ public class GenerateMetadataTask
         // at the end check for cancellation
         CancelableSupport.checkCancellation();
         // got here, not canceled, move results to proper place
-        moveDirectoryToDirectory(repoTmpDir, repoBaseDir, false);
+        DirSupport.delete(repoRepodataDir.toPath());
+        DirSupport.move(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       catch (IOException e) {
         LOG.warn("Yum metadata generation failed", e);

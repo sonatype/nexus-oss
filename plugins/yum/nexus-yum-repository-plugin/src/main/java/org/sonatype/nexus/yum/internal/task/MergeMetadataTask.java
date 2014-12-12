@@ -34,12 +34,12 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.CancelableSupport;
-import org.sonatype.nexus.scheduling.TaskScheduler;
-import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
@@ -85,13 +85,16 @@ public class MergeMetadataTask
   protected YumRepository execute()
       throws Exception
   {
-    groupRepository = getRepositoryRegistry().getRepositoryWithFacet(getConfiguration().getRepositoryId(), GroupRepository.class);
+    groupRepository = getRepositoryRegistry()
+        .getRepositoryWithFacet(getConfiguration().getRepositoryId(), GroupRepository.class);
     if (isValidRepository()) {
       deleteYumTempDirs();
 
       final File repoBaseDir = RepositoryUtils.getBaseDir(groupRepository);
+      final File repoRepodataDir = new File(repoBaseDir, PATH_OF_REPODATA);
       final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
       DirSupport.mkdir(repoTmpDir);
+      final File repoTmpRepodataDir = new File(repoTmpDir, PATH_OF_REPODATA);
 
       RepositoryItemUid groupRepoMdUid = groupRepository.createUid("/" + PATH_OF_REPOMD_XML);
       try {
@@ -105,22 +108,21 @@ public class MergeMetadataTask
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {
-          // delete without using group repository API as group repositories does not allow delete (read only)
-          File groupRepodata = new File(repoTmpDir, PATH_OF_REPODATA);
-          // deleteQuietly(groupRepodata);
+          // just copy into newly created tmpDir
           if (memberReposBaseDirs.size() == 1) {
             log.debug(
                 "Copying Yum metadata from {} to group repository {}",
                 memberReposBaseDirs.get(0), groupRepository.getId()
             );
-            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), groupRepodata);
+            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), repoTmpRepodataDir);
           }
         }
 
         // at the end check for cancellation
         CancelableSupport.checkCancellation();
         // got here, not canceled, move results to proper place
-        moveDirectoryToDirectory(repoTmpDir, repoBaseDir, false);
+        DirSupport.delete(repoRepodataDir.toPath());
+        DirSupport.move(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       finally {
         groupRepoMdUid.getLock().unlock();
