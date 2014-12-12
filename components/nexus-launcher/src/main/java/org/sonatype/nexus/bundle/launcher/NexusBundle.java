@@ -56,4 +56,9 @@ public interface NexusBundle
    */
   File getLauncherLog();
 
+  /**
+   * Returns the SSL port if HTTPS support is enabled, otherwise -1.
+   */
+  int getSslPort();
+
 }

@@ -119,4 +119,27 @@ public interface NexusBundleConfiguration
    */
   String getLogPattern();
 
+  /**
+   * Enables support for HTTPS with the given port, keystore, and password.
+   * 
+   * @param port SSL port
+   * @param keystore Keystore location
+   * @param password Keystore password
+   */
+  NexusBundleConfiguration enableHttps(int port, File keystore, String password);
+
+  /**
+   * Gets the SSL port, if configured.
+   */
+  int getSslPort();
+
+  /**
+   * Gets the keystore location, if configured.
+   */
+  File getKeystoreLocation();
+
+  /**
+   * Gets the keystore password, if configured.
+   */
+  String getKeystorePassword();
 }

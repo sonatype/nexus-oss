@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
+import static org.sonatype.sisu.bl.BundleConfiguration.RANDOM_PORT;
 import static org.sonatype.sisu.bl.jsw.JSWConfig.WRAPPER_JAVA_MAINCLASS;
 import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
 import static org.sonatype.sisu.filetasks.builder.FileRef.file;
@@ -108,6 +109,11 @@ public class DefaultNexusBundle
   private CommandMonitorThread keepAliveThread;
 
   private ConfigurationStrategy strategy;
+
+  /**
+   * SSL port if HTTPS support is enabled, otherwise -1.
+   */
+  private int sslPort;
 
   @Inject
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
@@ -233,6 +239,13 @@ public class DefaultNexusBundle
 
     strategy = determineConfigurationStrategy();
 
+    if (getConfiguration().getSslPort() == RANDOM_PORT) {
+      sslPort = portReservationService.reservePort();
+    }
+    else {
+      sslPort = getConfiguration().getSslPort();
+    }
+
     configureJSW(strategy);
     configureNexusProperties(strategy);
   }
@@ -255,6 +268,11 @@ public class DefaultNexusBundle
       keepAlivePort = 0;
     }
     strategy = null;
+
+    if (getConfiguration().getSslPort() == RANDOM_PORT && sslPort > 0) {
+      getPortReservationService().cancelPort(sslPort);
+    }
+    sslPort = 0;
   }
 
   /**
@@ -578,6 +596,11 @@ public class DefaultNexusBundle
   }
 
   @Override
+  public int getSslPort() {
+    return sslPort;
+  }
+
+  @Override
   protected String generateId() {
     return "nx"; // TODO? use a system property if we should or not add: + "-" + System.currentTimeMillis();
   }
@@ -629,6 +652,9 @@ public class DefaultNexusBundle
         jswConfig.addJavaSystemProperties(jmxProps);
       }
 
+      if (getSslPort() > 0) {
+        jswConfig.addIndexedProperty("wrapper.app.parameter", "./conf/jetty-https.xml");
+      }
     }
   }
 
@@ -652,6 +678,7 @@ public class DefaultNexusBundle
       final Properties nexusProperties = new Properties();
 
       nexusProperties.setProperty("application-port", String.valueOf(getPort()));
+      nexusProperties.setProperty("application-port-ssl", String.valueOf(getSslPort()));
 
       final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
       if (!systemProperties.isEmpty()) {

@@ -99,6 +99,21 @@ public class DefaultNexusBundleConfiguration
    */
   private String logPattern;
 
+  /**
+   * Optional SSL port.
+   */
+  private int sslPort = -1;
+
+  /**
+   * Optional keystore location.
+   */
+  private File keystoreLocation;
+
+  /**
+   * Optional keystore password.
+   */
+  private String keystorePassword;
+
   @Inject
   public DefaultNexusBundleConfiguration(final FileTaskBuilder fileTaskBuilder,
                                          final Provider<JMXConfiguration> jmxConfigurationProvider)
@@ -296,7 +311,45 @@ public class DefaultNexusBundleConfiguration
       }
     }
 
+    if (keystoreLocation != null) {
+      overlays.add(
+          fileTaskBuilder.replace()
+              .inFile(path("nexus/conf/jetty-https.xml"))
+              .replace(
+                  "./conf/ssl/keystore.jks",
+                  keystoreLocation.getAbsolutePath()
+              )
+              .replace(
+                  "OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v",
+                  keystorePassword
+              )
+              .failIfFileDoesNotExist()
+      );
+    }
+
     return overlays;
   }
 
+  @Override
+  public NexusBundleConfiguration enableHttps(final int port, final File keystore, final String password) {
+    sslPort = port;
+    keystoreLocation = keystore;
+    keystorePassword = password;
+    return this;
+  }
+
+  @Override
+  public int getSslPort() {
+    return sslPort;
+  }
+
+  @Override
+  public File getKeystoreLocation() {
+    return keystoreLocation;
+  }
+
+  @Override
+  public String getKeystorePassword() {
+    return keystorePassword;
+  }
 }
