@@ -191,7 +191,7 @@ public class GenerateMetadataTask
         // at the end check for cancellation
         CancelableSupport.checkCancellation();
         // got here, not canceled, move results to proper place
-        DirSupport.delete(repoRepodataDir.toPath());
+        DirSupport.deleteIfExists(repoRepodataDir.toPath());
         DirSupport.move(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       catch (IOException e) {
