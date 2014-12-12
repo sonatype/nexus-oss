@@ -156,7 +156,8 @@ define('Sonatype/repoServer/RepositoryIndexBrowserContainer', function() {
                             extension : options.cbPassThru.node.attributes.extension,
                             artifactLink : options.cbPassThru.node.attributes.artifactUri,
                             pomLink : options.cbPassThru.node.attributes.pomUri,
-                            nodeName : options.cbPassThru.node.attributes.nodeName
+                            nodeName : options.cbPassThru.node.attributes.nodeName,
+                            format : options.cbPassThru.container.payload.data.format
                           });
                     }
                   },
