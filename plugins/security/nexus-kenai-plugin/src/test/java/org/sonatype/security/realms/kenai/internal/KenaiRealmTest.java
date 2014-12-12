@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai;
+package org.sonatype.security.realms.kenai.internal;
 
 import org.sonatype.nexus.httpclient.HttpClientFactory;
 
@@ -36,7 +36,7 @@ public class KenaiRealmTest
   {
     final HttpClientFactory mockHttpClientFactory = Mockito.mock(HttpClientFactory.class);
     Mockito.when(mockHttpClientFactory.create()).thenReturn(new DefaultHttpClient());
-    return new KenaiRealm(getKenaiRealmConfiguration(), mockHttpClientFactory);
+    return new KenaiRealm(mockKenai(), mockHttpClientFactory);
   }
 
   @Test
