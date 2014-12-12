@@ -24,6 +24,13 @@
   }
 }
 
+@include extjs-panel-ui(
+  $ui: 'nx-drilldown-message',
+
+  $ui-header-background-color: $color-white,
+  $ui-header-color: $color-night-rider
+);
+
 /**
  * ui: 'settings-panel'
  */
