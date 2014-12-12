@@ -41,6 +41,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
 /**
@@ -174,13 +175,99 @@ public class ScheduledTaskEventsIT
   }
 
   @Test
-  public void canceledRun() throws Exception {
+  public void canceledRunWithNonCancelableTaskWithoutInterruption() throws Exception {
     // reset the latch
     SleeperTask.reset();
 
     // create the task
     final TaskConfiguration taskConfiguration = taskScheduler
         .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+
+    // give it some time to start
+    SleeperTask.youWait.await();
+
+    // attempt to cancel it 3 times
+    taskInfo.getCurrentState().getFuture().cancel(false);
+    taskInfo.getCurrentState().getFuture().cancel(false);
+    taskInfo.getCurrentState().getFuture().cancel(false);
+
+    // make it be done
+    SleeperTask.meWait.countDown();
+    Thread.yield();
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+    // done
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
+    assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.OK));
+
+    // started, canceled x3, stoppedCanceled
+    assertThat(listener.arrivedEvents, hasSize(5));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(3), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(4), instanceOf(TaskEventStoppedDone.class));
+  }
+
+  @Test
+  public void canceledRunWithNonCancelableTaskWithInterruption() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+
+    // create the task
+    final TaskConfiguration taskConfiguration = taskScheduler
+        .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+
+    // give it some time to start
+    SleeperTask.youWait.await();
+
+    // attempt to cancel it 3 times
+    taskInfo.getCurrentState().getFuture().cancel(true);
+    taskInfo.getCurrentState().getFuture().cancel(true);
+    taskInfo.getCurrentState().getFuture().cancel(true);
+
+    // make it be done
+    SleeperTask.meWait.countDown();
+    Thread.yield();
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+    // done
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
+    assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
+
+    // started, canceled, stoppedCanceled, but we don't know exact size!
+    // assertThat(listener.arrivedEvents, hasSize(3));
+    // first is started
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    // it contains several (at least one) canceled after started, but we don't know how many
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    // last if stoppedCanceled
+    assertThat(listener.arrivedEvents.get(listener.arrivedEvents.size() - 1),
+        instanceOf(TaskEventStoppedCanceled.class));
+  }
+
+  @Test
+  public void canceledRunWithCancelableTask() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+
+    // create the task
+    final TaskConfiguration taskConfiguration = taskScheduler
+        .createTaskConfigurationInstance(SleeperCancelableTask.class);
     final String RESULT = "This is the expected result";
     taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
     final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
@@ -215,6 +302,42 @@ public class ScheduledTaskEventsIT
     // reset the latch
     SleeperTask.reset();
     SleeperTask.exception = new TaskInterruptedException("foo", true);
+
+    // create the task
+    final TaskConfiguration taskConfiguration = taskScheduler
+        .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Hourly(new Date()));
+
+    // give it some time to start
+    SleeperTask.youWait.await();
+
+    // make it be done
+    SleeperTask.meWait.countDown();
+    Thread.yield();
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+    // done
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
+    assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
+
+    // started, canceled, stoppedCanceled
+    assertThat(listener.arrivedEvents, hasSize(3));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventStoppedCanceled.class));
+  }
+
+  @Test
+  public void canceledRunByThrowingInterruptedEx() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+    SleeperTask.exception = new InterruptedException("foo");
 
     // create the task
     final TaskConfiguration taskConfiguration = taskScheduler

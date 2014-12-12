@@ -54,6 +54,8 @@ public class NexusTaskFuture<T>
 
   private final CountDownLatch countDownLatch;
 
+  private volatile Thread jobExecutingThread;
+
   private volatile RunState runState;
 
   private Exception exception;
@@ -91,15 +93,17 @@ public class NexusTaskFuture<T>
     return runState;
   }
 
-  public void setRunState(final RunState runState) {
+  public void setRunState(final Thread jobExecutingThread, final RunState runState) {
+    checkNotNull(jobExecutingThread);
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
     log.debug("NX Task {} runState transition {} -> {}", jobKey, this.runState, runState);
+    this.jobExecutingThread = jobExecutingThread;
     this.runState = runState;
   }
 
   public void doCancel() {
-    setRunState(RunState.CANCELED);
+    setRunState(jobExecutingThread, RunState.CANCELED);
     setResult(null, new CancellationException("Task canceled"));
   }
 
@@ -107,11 +111,15 @@ public class NexusTaskFuture<T>
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (isCancelled()) {
-      return true;
+    boolean result = quartzSupport.cancelJob(jobKey);
+    if (!result && mayInterruptIfRunning) {
+      jobExecutingThread.interrupt();
+      result = true;
     }
-    doCancel();
-    return quartzSupport.cancelJob(jobKey);
+    if (result) {
+      doCancel();
+    }
+    return result;
   }
 
   @Override

@@ -91,22 +91,28 @@ public class NexusTaskJobListener<T>
   /**
    * Returns the trigger associated with NX Task wrapping job. The trigger executing this Job does NOT have to be
    * THAT trigger, think about "runNow"! So, this method returns the associated trigger, while the trigger in
-   * context might be something completely different. If not found, returns {@code null}.
+   * context might be something completely different. If not found, depending on {@code failIfNotFound} parameter
+   * returns {@code null} or propagates the exception.
    */
-  private Trigger getJobTrigger(final JobExecutionContext context) {
+  private Trigger getJobTrigger(final JobExecutionContext context, final boolean failIfNotFound) {
     try {
       return context.getScheduler().getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
     }
     catch (SchedulerException e) {
-      throw Throwables.propagate(e);
+      if (failIfNotFound) {
+        throw Throwables.propagate(e);
+      }
+      else {
+        return null;
+      }
     }
   }
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
     log.trace("Job {} jobToBeExecuted", jobKey);
-    // might be null: job Removed
-    final Trigger jobTrigger = getJobTrigger(context);
+    // might not be null: job Removed?
+    final Trigger jobTrigger = getJobTrigger(context, true);
     // must never be null, so use this or that
     final Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
 
@@ -155,7 +161,7 @@ public class NexusTaskJobListener<T>
     log.trace("Job {} lastRunState={}", jobKey, endState);
 
     // might be null: job Removed
-    Trigger jobTrigger = getJobTrigger(context);
+    Trigger jobTrigger = getJobTrigger(context, false);
     // must never be null, so use this or that
     Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
 

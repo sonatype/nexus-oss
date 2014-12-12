@@ -167,8 +167,9 @@ public class NexusTaskInfo<T>
       // already removed
       return false;
     }
-    if (nexusTaskFuture != null) {
-      nexusTaskFuture.cancel(true);
+    if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
+      // running and not cancelable
+      return false;
     }
     if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration())) {
       // if no last state (removed even before 1st run), add one noting it got removed/canceled
@@ -177,13 +178,7 @@ public class NexusTaskInfo<T>
     }
     removed = true;
     log.debug("NX Task {} remove; state={}", jobKey, state);
-    if (state == State.WAITING) {
-      return quartzSupport.removeTask(jobKey);
-    }
-    else {
-      // removed when finished, see setNexusTaskState
-      return true;
-    }
+    return quartzSupport.removeTask(jobKey);
   }
 
   @Override

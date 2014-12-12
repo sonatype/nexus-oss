@@ -209,7 +209,7 @@ class TaskComponent
   @RequiresPermissions('nexus:tasksrun:delete')
   @Validate
   void stop(final @NotEmpty(message = '[id] may not be empty') String id) {
-    nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(true)
+    nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(false)
   }
 
   static String getStatusDescription(final CurrentState<?> currentState) {

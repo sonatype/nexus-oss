@@ -17,17 +17,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskSupport;
 
 /**
- * Simple sleeper task.
+ * Simple sleeper task that is not cancelable.
  */
 @Named
 public class SleeperTask
     extends TaskSupport<String>
-    implements Cancelable
 {
   static final String RESULT_KEY = "result";
 
@@ -48,7 +46,7 @@ public class SleeperTask
     youWait.countDown(); // task signals "started" to test
 
     while (!meWait.await(1L, TimeUnit.SECONDS)) { // test signals "finish" to this task
-      CancelableSupport.checkCancellation();
+      doTheWork();
     }
 
     if (exception != null) {
@@ -61,5 +59,9 @@ public class SleeperTask
   @Override
   public String getMessage() {
     return "Message is:" + getConfiguration().getString(RESULT_KEY);
+  }
+
+  protected void doTheWork() throws Exception {
+    Thread.sleep(10L); // kinda working
   }
 }

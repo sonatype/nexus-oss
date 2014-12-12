@@ -45,6 +45,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
@@ -145,14 +146,12 @@ public class QuartzTaskExecutorSPI
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
-      log.debug("NX Task {} scheduled", jobKey);
-      if (quartzSupport.getScheduler().checkExists(jobKey)) {
-        // this is update
-        final TaskInfo<T> old = taskByKey(jobKey);
-        if (old != null) {
-          old.remove();
-        }
+      final NexusTaskInfo<T> old = taskByKey(jobKey);
+      if (old != null && !old.remove()) {
+        // this is update but old task could not be removed: ie. running a non-cancelable task
+        throw new IllegalArgumentException("Task could not be updated: running and not cancelable?");
       }
+      log.debug("NX Task {} scheduled", jobKey);
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
