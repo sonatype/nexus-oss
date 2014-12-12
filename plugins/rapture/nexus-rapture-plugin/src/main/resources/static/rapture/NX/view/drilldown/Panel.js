@@ -127,13 +127,6 @@ Ext.define('NX.view.drilldown.Panel', {
 
       // Make a breadcrumb (including icon and 'home' link)
       breadcrumb.add(
-        '',
-        {
-          xtype: 'image',
-          height: 32,
-          width: 32,
-          cls: content.currentIconCls
-        },
         {
           xtype: 'button',
           scale: 'large',
@@ -153,10 +146,10 @@ Ext.define('NX.view.drilldown.Panel', {
 
       // Create the rest of the links
       for (var i = 1; i <= me.currentIndex && i < me.items.items.length; ++i) {
-        breadcrumb.add(
+        breadcrumb.add([
           // Separator
           {
-            xtype: 'tbtext',
+            xtype: 'label',
             cls: 'breadcrumb-separator',
             text: '/'
           },
@@ -186,7 +179,7 @@ Ext.define('NX.view.drilldown.Panel', {
               }
             }
           })(i)
-        );
+        ]);
       }
 
       root.hide();
