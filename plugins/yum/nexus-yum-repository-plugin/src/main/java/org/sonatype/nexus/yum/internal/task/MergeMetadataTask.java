@@ -52,7 +52,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
-import static org.apache.commons.io.FileUtils.moveDirectoryToDirectory;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 
@@ -122,7 +121,7 @@ public class MergeMetadataTask
         CancelableSupport.checkCancellation();
         // got here, not canceled, move results to proper place
         DirSupport.deleteIfExists(repoRepodataDir.toPath());
-        DirSupport.move(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
+        DirSupport.moveIfExists(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       finally {
         groupRepoMdUid.getLock().unlock();
