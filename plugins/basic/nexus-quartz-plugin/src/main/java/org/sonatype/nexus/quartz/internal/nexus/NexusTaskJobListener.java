@@ -141,6 +141,9 @@ public class NexusTaskJobListener<T>
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
     log.trace("Job {} jobWasExecuted", jobKey);
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
+    // on Executed, the taskInfo might be removed or even replaced, so use the one we started with
+    // DO NOT TOUCH the listener's instance
+    final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) context.get(NexusTaskInfo.TASK_INFO_KEY);
     final EndState endState;
     if (future.isCancelled()) {
       endState = EndState.CANCELED;
