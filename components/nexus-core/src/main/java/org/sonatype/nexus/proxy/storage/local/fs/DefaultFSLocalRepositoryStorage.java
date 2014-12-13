@@ -58,6 +58,7 @@ import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import org.apache.commons.io.IOUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -132,38 +133,44 @@ public class DefaultFSLocalRepositoryStorage
   }
 
   /**
-   * Gets the file from base.
-   *
-   * @return the file from base
+   * Resolve repository file from given request and ensure the file is a child of the repository base directory.
    */
-  public File getFileFromBase(final Repository repository, final ResourceStoreRequest request, final File repoBase)
-      throws LocalStorageException
-  {
-    File result = null;
+  private File resolveFile(final Repository repository, final ResourceStoreRequest request) throws IOException {
+    // lookup repository base directory and canonicalize
+    File baseDir = getBaseDir(repository, request).getCanonicalFile();
 
-    if (request.getRequestPath() == null || RepositoryItemUid.PATH_ROOT.equals(request.getRequestPath())) {
-      result = repoBase;
+    // resolve file relative to base directory
+    File file;
+    String path = request.getRequestPath();
+    if (path == null || RepositoryItemUid.PATH_ROOT.equals(path)) {
+      file = baseDir;
     }
-    else if (request.getRequestPath().startsWith("/")) {
-      result = new File(repoBase, request.getRequestPath().substring(1));
+    else if (path.startsWith("/")) {
+      file = new File(baseDir, path.substring(1));
     }
     else {
-      result = new File(repoBase, request.getRequestPath());
+      file = new File(baseDir, path);
     }
 
-    if (log.isTraceEnabled()) {
-      log.trace("{} --> {}", request.getRequestPath(), result.getAbsoluteFile());
+    // canonicalize repository file
+    file = file.getCanonicalFile();
+
+    log.trace("Resolve request path '{}' to file: '{}'", path, file);
+
+    // FIXME: This check would be more appropriate as impl in FSPeer ipml
+
+    // ensure file is a child of repository base directory
+    if (!file.getPath().startsWith(baseDir.getPath())) {
+      throw new LocalStorageException(
+          String.format("Attempt to resolve repository '%s' (id='%s') file '%s' which exists outside of repository base directory '%s' is forbidden!",
+              repository.getName(),
+              repository.getId(),
+              file,
+              baseDir
+          ));
     }
 
-    // to be foolproof, chrooting it
-    if (!result.getAbsolutePath().startsWith(getBaseDir(repository, request).getAbsolutePath())) {
-      throw new LocalStorageException("getFileFromBase() method evaluated directory wrongly in repository \""
-          + repository.getName() + "\" (id=\"" + repository.getId() + "\")! baseDir="
-          + getBaseDir(repository, request).getAbsolutePath() + ", target=" + result.getAbsolutePath());
-    }
-    else {
-      return result;
-    }
+    return file;
   }
 
   /**
@@ -171,10 +178,16 @@ public class DefaultFSLocalRepositoryStorage
    *
    * @return the file from base
    */
-  public File getFileFromBase(Repository repository, ResourceStoreRequest request)
+  public File getFileFromBase(final Repository repository, final ResourceStoreRequest request)
       throws LocalStorageException
   {
-    return getFileFromBase(repository, request, getBaseDir(repository, request));
+    try {
+      return resolveFile(repository, request);
+    }
+    catch (IOException e) {
+      Throwables.propagateIfPossible(e, LocalStorageException.class);
+      throw new LocalStorageException(e);
+    }
   }
 
   /**
