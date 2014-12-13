@@ -97,7 +97,7 @@ public class NexusTaskFuture<T>
     checkNotNull(jobExecutingThread);
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
-    log.debug("NX Task {} runState transition {} -> {}", jobKey, this.runState, runState);
+    log.debug("NX Task {} runState transition {} -> {}", jobKey.getName(), this.runState, runState);
     this.jobExecutingThread = jobExecutingThread;
     this.runState = runState;
   }
@@ -105,6 +105,7 @@ public class NexusTaskFuture<T>
   public void doCancel() {
     setRunState(jobExecutingThread, RunState.CANCELED);
     setResult(null, new CancellationException("Task canceled"));
+    log.info("NX Task canceled {}", jobKey.getName());
   }
 
   // == TaskFuture

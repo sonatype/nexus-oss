@@ -118,7 +118,7 @@ public class NexusTaskJobSupport<T>
         }
       }
       catch (TaskInterruptedException | InterruptedException e) {
-        log.info("Task canceled: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId());
+        log.debug("NX Task {}:{} canceled: {}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e.toString());
         if (!nexusTaskInfo.getNexusTaskFuture().isCancelled()) {
           nexusTaskInfo.getNexusTaskFuture().doCancel();
           eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));

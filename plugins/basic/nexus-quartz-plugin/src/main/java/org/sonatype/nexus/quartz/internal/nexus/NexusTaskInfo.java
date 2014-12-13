@@ -67,10 +67,8 @@ public class NexusTaskInfo<T>
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
-    this.state = nexusTaskFuture != null ? State.RUNNING : State.WAITING;
-    this.nexusTaskState = nexusTaskState;
-    this.nexusTaskFuture = nexusTaskFuture;
     this.removed = false;
+    setNexusTaskState(nexusTaskFuture != null ? State.RUNNING : State.WAITING, nexusTaskState, nexusTaskFuture);
   }
 
   public synchronized boolean isRemovedOrDone() {
@@ -84,12 +82,17 @@ public class NexusTaskInfo<T>
     checkNotNull(state);
     checkNotNull(nexusTaskState);
     checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
-    if (this.state != state) {
-      log.debug("NX Task {} state transition {} -> {}, nextRun={}", jobKey, this.state, state,
-          nexusTaskState.getNextExecutionTime());
+    if (this.state == null) {
+      log.info("NX Task {} : {} : {} ", jobKey.getName(), state, nexusTaskState.getConfiguration().getName());
     }
     else {
-      log.debug("NX Task {} state update {}, nextRun={}", jobKey, state, nexusTaskState.getNextExecutionTime());
+      if (this.state != state) {
+        log.info("NX Task {} : {} -> {} : {} ", jobKey.getName(), this.state, state,
+            nexusTaskState.getConfiguration().getName());
+      }
+      else {
+        log.debug("NX Task {} state update {}, nextRun={}", jobKey, state, nexusTaskState.getNextExecutionTime());
+      }
     }
     this.state = state;
     this.nexusTaskState = nexusTaskState;
