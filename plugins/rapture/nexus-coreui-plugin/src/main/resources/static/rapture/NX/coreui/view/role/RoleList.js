@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleList', {
-  extend: 'NX.view.masterdetail.Master',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-role-list',
   requires: [
     'NX.Icons'

@@ -18,14 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.RepositoryTargets', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Dialogs',
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-repositorytarget-list',
+  masters: 'nx-coreui-repositorytarget-list',
 
   models: [
     'RepositoryTarget'
@@ -42,14 +42,9 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     'repositorytarget.RepositoryTargetSettingsForm',
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-repositorytarget-list'
-    },
-    {
-      ref: 'settings',
-      selector: 'nx-coreui-repositorytarget-feature nx-coreui-repositorytarget-settings'
-    }
+    { ref: 'feature', selector: 'nx-coreui-repositorytarget-feature' },
+    { ref: 'list', selector: 'nx-coreui-repositorytarget-list' },
+    { ref: 'settings', selector: 'nx-coreui-repositorytarget-feature nx-coreui-repositorytarget-settings' }
   ],
   icons: {
     'target-default': {

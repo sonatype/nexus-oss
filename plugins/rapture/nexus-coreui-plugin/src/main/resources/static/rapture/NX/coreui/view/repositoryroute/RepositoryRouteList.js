@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
-  extend: 'NX.view.masterdetail.Master',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repositoryroute-list',
 
   store: 'RepositoryRoute',

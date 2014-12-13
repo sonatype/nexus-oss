@@ -18,11 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repository.RepositoryList', {
-  extend: 'NX.view.masterdetail.Master',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repository-list',
 
   store: 'Repository',
 
+  /*
+   * @override
+   */
   initComponent: function() {
     var me = this;
 

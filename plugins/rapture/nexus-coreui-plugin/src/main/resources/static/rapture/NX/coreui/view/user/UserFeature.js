@@ -18,13 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.user.UserFeature', {
-  extend: 'NX.view.masterdetail.Panel',
+  extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-user-feature',
 
-  list: 'nx-coreui-user-list',
-
-  // FIXME: This seems strange to configure icon name here for the detail panel
   iconName: 'user-default',
+
+  masters: { xtype: 'nx-coreui-user-list' },
 
   tabs: [
     { xtype: 'nx-coreui-user-settings', title: 'Settings', weight: 10 },

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Tasks', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.Dialogs',
@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-task-list',
+  masters: 'nx-coreui-task-list',
 
   stores: [
     'Task',
@@ -361,8 +361,12 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   runTask: function() {
     var me = this,
-        model = me.selectedModel(),
-        description;
+        bookmark = NX.Bookmarks.getBookmark(),
+        model, modelId, description;
+
+    modelId = decodeURIComponent(bookmark.getSegment(1));
+    model = me.getList().getStore().getById(modelId);
+    description = me.getDescription(model);
 
     if (model) {
       description = me.getDescription(model);
@@ -385,8 +389,12 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   stopTask: function() {
     var me = this,
-        model = me.selectedModel(),
-        description;
+      bookmark = NX.Bookmarks.getBookmark(),
+      model, modelId, description;
+
+    modelId = decodeURIComponent(bookmark.getSegment(1));
+    model = me.getList().getStore().getById(modelId);
+    description = me.getDescription(model);
 
     if (model) {
       description = me.getDescription(model);

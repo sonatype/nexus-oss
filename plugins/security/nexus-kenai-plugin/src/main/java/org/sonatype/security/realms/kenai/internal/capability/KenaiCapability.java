@@ -10,43 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext*/
+package org.sonatype.security.realms.kenai.internal.capability;
+
+import java.util.Map;
+
+import javax.inject.Named;
+
+import org.sonatype.nexus.capability.support.CapabilitySupport;
+import org.sonatype.security.realms.kenai.KenaiConfiguration;
 
 /**
- * A single panel in a drilldown series
+ * Kenai capability.
  *
  * @since 3.0
  */
+@Named(KenaiCapabilityDescriptor.TYPE_ID)
+public class KenaiCapability
+    extends CapabilitySupport<KenaiConfiguration>
+{
 
-Ext.define('NX.view.drilldown.DrilldownItem', {
-  extend: 'Ext.panel.Panel',
-  alias: 'widget.nx-drilldown-item',
-
-  itemName: 'item',
-  itemClass: null,
-  itemBookmark: null,
-
-  /**
-   * @override
-   */
-  initComponent: function () {
-    var me = this;
-
-    me.setItemName = function(text) {
-      this.itemName = text;
-    }
-
-    me.setItemClass = function(cls) {
-      this.itemClass = cls;
-    }
-
-    me.setItemBookmark = function(bookmark, scope) {
-      this.itemBookmark = {
-        obj: bookmark,
-        scope: scope
-      };
-    }
-
-    me.callParent(arguments);
+  @Override
+  protected KenaiConfiguration createConfig(final Map<String, String> properties) {
+    return new KenaiConfiguration(properties);
   }
-});
+
+}
+

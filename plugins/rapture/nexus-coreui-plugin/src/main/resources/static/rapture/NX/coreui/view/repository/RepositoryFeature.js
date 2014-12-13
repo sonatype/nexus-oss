@@ -18,12 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repository.RepositoryFeature', {
-  extend: 'NX.view.masterdetail.Panel',
+  extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-repository-feature',
 
-  list: 'nx-coreui-repository-list',
-
   iconName: 'repository-default',
+
+  masters: { xtype: 'nx-coreui-repository-list' },
 
   tabs: [
     { xtype: 'nx-coreui-repository-settings', title: 'Settings', weight: 10 }

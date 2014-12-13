@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Repositories', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'Ext.direct.Manager',
     'NX.util.Url',
@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-repository-list',
+  masters: 'nx-coreui-repository-list',
 
   models: [
     'Repository'
@@ -59,8 +59,8 @@ Ext.define('NX.coreui.controller.Repositories', {
     'repository.RepositorySettingsVirtualForm'
   ],
   refs: [
-    { ref: 'list', selector: 'nx-coreui-repository-list' },
     { ref: 'feature', selector: 'nx-coreui-repository-feature' },
+    { ref: 'list', selector: 'nx-coreui-repository-list' },
     { ref: 'settings', selector: 'nx-coreui-repository-settings' },
     { ref: 'selectTemplate', selector: 'nx-coreui-repository-selecttemplate' }
   ],

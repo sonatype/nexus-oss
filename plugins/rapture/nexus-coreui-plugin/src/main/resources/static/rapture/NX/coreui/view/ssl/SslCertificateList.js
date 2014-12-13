@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.ssl.SslCertificateList', {
-  extend: 'NX.view.masterdetail.Master',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-sslcertificate-list',
   requires: [
     'NX.Icons'

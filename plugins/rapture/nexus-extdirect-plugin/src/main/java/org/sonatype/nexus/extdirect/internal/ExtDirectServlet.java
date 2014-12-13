@@ -93,19 +93,15 @@ public class ExtDirectServlet
 
   private final BeanLocator beanLocator;
 
-  private final SecuritySystem securitySystem;
-
   private final EventRecorder eventRecorder;
 
   @Inject
   public ExtDirectServlet(final ApplicationDirectories directories,
                           final BeanLocator beanLocator,
-                          final SecuritySystem securitySystem,
                           final @Nullable EventRecorder eventRecorder)
   {
     this.directories = checkNotNull(directories);
     this.beanLocator = checkNotNull(beanLocator);
-    this.securitySystem = checkNotNull(securitySystem);
     this.eventRecorder = eventRecorder; // null okay
   }
 
@@ -194,18 +190,6 @@ public class ExtDirectServlet
         if (log.isDebugEnabled()) {
           log.debug("Invoking action method: {}, java-method: {}", method.getFullName(),
               method.getFullJavaMethodName());
-        }
-
-        Subject subject = securitySystem.getSubject();
-        if ((subject == null || !subject.isAuthenticated()) && securitySystem.isAnonymousAccessEnabled()) {
-          try {
-            securitySystem.login(new UsernamePasswordToken(
-                securitySystem.getAnonymousUsername(), securitySystem.getAnonymousPassword()
-            ));
-          }
-          catch (Exception e) {
-            log.error("Could not log in anonymous user");
-          }
         }
 
         Response response = null;

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Users', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.State',
@@ -29,7 +29,7 @@ Ext.define('NX.coreui.controller.Users', {
     'NX.Dialogs'
   ],
 
-  list: 'nx-coreui-user-list',
+  masters: 'nx-coreui-user-list',
 
   models: [
     'User'
@@ -465,7 +465,7 @@ Ext.define('NX.coreui.controller.Users', {
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted(me.permission, 'delete'),
-            NX.Conditions.gridHasSelection(me.list, function(model) {
+            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external')
                   && (model.getId() !== NX.State.getUser().id)
                   && (model.getId() !== NX.State.getValue('anonymousUsername'));
@@ -515,7 +515,7 @@ Ext.define('NX.coreui.controller.Users', {
                 NX.Conditions.isPermitted('security:userschangepw', 'create'),
                 NX.Conditions.isPermitted('security:usersreset', 'delete')
             ),
-            NX.Conditions.gridHasSelection(me.list, function(model) {
+            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),

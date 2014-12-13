@@ -222,19 +222,14 @@ public class NexusHttpAuthenticationFilter
     }
   }
 
+  /**
+   * RememberMe if not anonymous logged in and header 'X-Nexus-RememberMe' is TRUE.
+   */
   @Override
   protected boolean isRememberMe(ServletRequest request) {
-    if (request.getAttribute(ANONYMOUS_LOGIN) == null) {
-      // it is not an anonymous login
-      // return true;
-      // NEXUS-607: fix for cookies, when sent from client. They will expire once
-      // and we are not sending them anymore.
-      return false;
-    }
-    else {
-      // it is anon login. no rembemberMe
-      return false;
-    }
+    return request.getAttribute(ANONYMOUS_LOGIN) == null
+        && request instanceof HttpServletRequest
+        && Boolean.valueOf(((HttpServletRequest) request).getHeader("X-Nexus-RememberMe"));
   }
 
   /**

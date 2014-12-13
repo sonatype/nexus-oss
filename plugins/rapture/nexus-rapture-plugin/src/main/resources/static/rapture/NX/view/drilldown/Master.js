@@ -17,9 +17,9 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.masterdetail.Master', {
+Ext.define('NX.view.drilldown.Master', {
   extend: 'Ext.grid.Panel',
-  alias: 'widget.nx-masterdetail-master',
+  alias: 'widget.nx-drilldown-master',
 
   listeners: {
     columnschanged: 'refreshDrilldown',
@@ -27,7 +27,7 @@ Ext.define('NX.view.masterdetail.Master', {
   },
 
   /**
-   * Put a drilldown affordance at the end of each item in the list
+   * Put a drilldown affordance ‘>’ at the end of each item in the list
    *
    * @param ct The content header for the grid
    */

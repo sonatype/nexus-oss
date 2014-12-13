@@ -18,14 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.RepositoryRoutes', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Dialogs',
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-repositoryroute-list',
+  masters: 'nx-coreui-repositoryroute-list',
 
   models: [
     'RepositoryRoute'
@@ -39,17 +39,12 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     'repositoryroute.RepositoryRouteFeature',
     'repositoryroute.RepositoryRouteList',
     'repositoryroute.RepositoryRouteSettings',
-    'repositoryroute.RepositoryRouteSettingsForm',
+    'repositoryroute.RepositoryRouteSettingsForm'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-repositoryroute-list'
-    },
-    {
-      ref: 'settings',
-      selector: 'nx-coreui-repositoryroute-feature nx-coreui-repositoryroute-settings'
-    }
+    { ref: 'feature', selector: 'nx-coreui-repositoryroute-feature' },
+    { ref: 'list', selector: 'nx-coreui-repositoryroute-list' },
+    { ref: 'settings', selector: 'nx-coreui-repositoryroute-feature nx-coreui-repositoryroute-settings' }
   ],
   icons: {
     'repositoryroute-default': {

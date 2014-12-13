@@ -18,13 +18,16 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Feeds', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Permissions',
     'NX.Bookmarks',
     'NX.Conditions',
     'NX.Windows'
   ],
+
+  masters: 'nx-coreui-feed-list',
+
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -33,20 +36,17 @@ Ext.define('NX.coreui.controller.Feeds', {
     'Feed',
     'FeedEntry'
   ],
+
   views: [
     'feed.FeedFeature',
     'feed.FeedEntryList',
     'feed.FeedList'
   ],
+
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-feed-list'
-    },
-    {
-      ref: 'entryList',
-      selector: 'nx-coreui-feedentry-list'
-    }
+    { ref: 'feature', selector: 'nx-coreui-feed-feature' },
+    { ref: 'list', selector: 'nx-coreui-feed-list' },
+    { ref: 'entryList', selector: 'nx-coreui-feedentry-list' }
   ],
 
   /**
@@ -76,24 +76,17 @@ Ext.define('NX.coreui.controller.Feeds', {
       }
     }, me);
 
+    me.callParent();
+
     me.listen({
       controller: {
-        '#Bookmarking': {
-          navigate: me.navigateTo
-        },
         '#Refresh': {
           refresh: me.loadFeeds
         }
       },
-      store: {
-        '#Feed': {
-          load: me.onFeedLoad
-        }
-      },
       component: {
         'nx-coreui-feed-list': {
-          beforerender: me.loadFeeds,
-          selectionchange: me.onSelectionChange
+          beforerender: me.loadFeeds
         },
         'nx-coreui-feed-list button[action=subscribe]': {
           click: me.subscribe,
@@ -101,6 +94,10 @@ Ext.define('NX.coreui.controller.Feeds', {
         }
       }
     });
+  },
+
+  getDescription: function(model) {
+    return model.get('name');
   },
 
   /**
@@ -118,74 +115,12 @@ Ext.define('NX.coreui.controller.Feeds', {
 
   /**
    * @private
-   * (Re)select bookmarked feed.
    */
-  onFeedLoad: function () {
-    var me = this,
-        list = me.getList();
+  onSelection: function (list, model) {
+    var me = this;
 
-    if (list) {
-      me.navigateTo(NX.Bookmarks.getBookmark());
-    }
-  },
-
-  /**
-   * @private
-   */
-  onSelectionChange: function (selectionModel, selected) {
-    this.onFeedChanged(selected[0]);
-  },
-
-  /**
-   * @private
-   * Show/Hide, reload feed entries.
-   * Bookmark selected entry.
-   *
-   * @param {NX.coreui.model.Feed} feedModel selected model
-   */
-  onFeedChanged: function (feedModel) {
-    var me = this,
-        entryList = me.getEntryList(),
-        bookmark = NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0));
-
-    if (feedModel) {
-      entryList.setTitle(feedModel.get('name'));
-      me.getFeedEntryStore().filter({ id: 'key', property: 'key', value: feedModel.get('key') });
-      entryList.show();
-      me.getList().getView().focusRow(feedModel);
-      bookmark.appendSegments(encodeURIComponent(feedModel.getId()));
-    }
-    else {
-      entryList.hide();
-    }
-    NX.Bookmarks.bookmark(bookmark, me);
-  },
-
-  /**
-   * @private
-   * @param {NX.Bookmark} bookmark to navigate to
-   */
-  navigateTo: function (bookmark) {
-    var me = this,
-        list = me.getList(),
-        store, modelId, model;
-
-    if (list && bookmark) {
-      modelId = bookmark.getSegment(1);
-      if (modelId) {
-        modelId = decodeURIComponent(modelId);
-        me.logDebug('Navigate to: ' + modelId);
-        store = list.getStore();
-        model = store.getById(modelId);
-        if (model) {
-          list.getSelectionModel().select(model, false, true);
-          list.getView().focusRow(model);
-          me.onFeedChanged(model);
-        }
-      }
-      else {
-        list.getSelectionModel().deselectAll();
-      }
+    if (model) {
+      me.getFeedEntryStore().filter({ id: 'key', property: 'key', value: model.get('key') });
     }
   },
 

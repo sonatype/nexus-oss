@@ -18,24 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.feed.FeedFeature', {
-  extend: 'Ext.panel.Panel',
+  extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-feed-feature',
 
-  layout: 'border',
+  iconName: 'feed-default',
 
-  items: [
-    {
-      xtype: 'nx-coreui-feed-list',
-      region: 'center'
-    },
-    {
-      xtype: 'nx-coreui-feedentry-list',
-      region: 'south',
-      title: 'test',
-      split: true,
-      height: '70%',
-      hidden: true
-    }
+  masters: { xtype: 'nx-coreui-feed-list' },
+
+  tabs: [
+    { xtype: 'nx-coreui-feedentry-list', title: 'Events', weight: 10 }
   ]
-
 });

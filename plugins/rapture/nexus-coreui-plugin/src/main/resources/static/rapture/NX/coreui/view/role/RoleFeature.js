@@ -18,12 +18,12 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.role.RoleFeature', {
-  extend: 'NX.view.masterdetail.Panel',
+  extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-role-feature',
 
-  list: 'nx-coreui-role-list',
-
   iconName: 'role-default',
+
+  masters: { xtype: 'nx-coreui-role-list' },
 
   tabs: [
     { xtype: 'nx-coreui-role-settings', title: 'Settings', weight: 10 },

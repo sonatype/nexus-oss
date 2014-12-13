@@ -38,10 +38,7 @@ Ext.define('NX.util.condition.GridHasSelection', {
 
     if (!me.bounded) {
       components[me.grid] = {
-        afterrender: me.evaluate,
-        selectionchange: function (cmp, selection) {
-          me.evaluate(cmp, selection);
-        },
+        selection: me.evaluate,
         destroy: me.evaluate
       };
       Ext.app.EventBus.listen({ component: components }, me);
@@ -56,10 +53,10 @@ Ext.define('NX.util.condition.GridHasSelection', {
         satisfied = false;
 
     if (me.bounded) {
-      if (selection && selection.length) {
+      if (selection) {
         satisfied = true;
         if (Ext.isFunction(me.fn)) {
-          satisfied = me.fn(selection.length === 1 ? selection[0] : selection) === true;
+          satisfied = me.fn(selection) === true;
         }
       }
       me.setSatisfied(satisfied);

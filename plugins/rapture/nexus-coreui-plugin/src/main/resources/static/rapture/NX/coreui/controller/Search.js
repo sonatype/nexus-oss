@@ -18,15 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Search', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Permissions',
-    'NX.view.drilldown.Drilldown',
-    'NX.view.drilldown.DrilldownItem',
-    'NX.view.drilldown.DrilldownLink'
+    'NX.Permissions'
   ],
+
+  masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-version-list'],
 
   stores: [
     'SearchFilter',
@@ -48,7 +47,7 @@ Ext.define('NX.coreui.controller.Search', {
   ],
 
   refs: [
-    { ref: 'searchFeature', selector: 'nx-searchfeature' },
+    { ref: 'feature', selector: 'nx-searchfeature' },
     { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
     { ref: 'searchResultDetails', selector: 'nx-searchfeature #searchResultDetails' },
     { ref: 'searchResultVersion', selector: 'nx-coreui-search-result-version-list' },
@@ -61,6 +60,8 @@ Ext.define('NX.coreui.controller.Search', {
    */
   init: function() {
     var me = this;
+
+    me.callParent();
 
     me.getApplication().getIconController().addIcons({
       'search-default': {
@@ -131,9 +132,6 @@ Ext.define('NX.coreui.controller.Search', {
       controller: {
         '#Refresh': {
           refresh: me.onRefresh
-        },
-        '#Bookmarking': {
-          navigate: me.navigateTo
         }
       },
       component: {
@@ -147,12 +145,6 @@ Ext.define('NX.coreui.controller.Search', {
           search: me.onSearchCriteriaChange,
           searchcleared: me.onSearchCriteriaChange,
           criteriaremoved: me.removeCriteria
-        },
-        'nx-coreui-search-result-list': {
-          cellclick: me.onSearchResultCellClick
-        },
-        'nx-coreui-search-result-version-list': {
-          cellclick: me.onSearchResultVersionCellClick
         },
         'nx-searchfeature button[action=save]': {
           click: me.showSaveSearchFilterWindow
@@ -186,40 +178,31 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
-   * Initialize search criterias (filters) on navigation.
-   */
-  navigateTo: function() {
-    var me = this;
-
-    if (me.getSearchFeature()) {
-      me.initCriterias();
-    }
-  },
-
-  /**
-   * @private
-   * Initialize search criterias (filters) based on filter definition and (eventual) bookmarked criterias.
+   * Initialize search criterias (filters) based on filter definition and bookmarked criterias.
    */
   initCriterias: function() {
     var me = this,
-        searchPanel = me.getSearchFeature(),
+        searchPanel = me.getFeature(),
         searchFilter = searchPanel.searchFilter,
         searchCriteriaPanel = searchPanel.down('#criteria'),
         searchCriteriaStore = me.getSearchCriteriaStore(),
         addCriteriaMenu = [],
-        bookmarkSegments = NX.Bookmarks.getBookmark().segments,
+        bookmarkSegments = NX.Bookmarks.getBookmark().getSegments(),
         bookmarkValues = {},
+        filterSegments,
         criterias = {},
-        searchCriteria;
+        searchCriteria, queryIndex, pair;
 
-    if (bookmarkSegments && (bookmarkSegments.length > 1)
-        && Ext.String.endsWith(NX.Bookmarks.getBookmark().segments[0], 'search' + searchPanel.bookmarkEnding)) {
-      Ext.Array.each(Ext.Array.slice(bookmarkSegments, 1), function(segment) {
-        var split = segment.split('=');
-        if (split.length === 2) {
-          bookmarkValues[split[0]] = decodeURIComponent(split[1]);
+    // Extract the filter object from the URI
+    if (bookmarkSegments && bookmarkSegments.length) {
+      queryIndex = bookmarkSegments[0].indexOf('=');
+      if (queryIndex != -1) {
+        filterSegments = decodeURIComponent(bookmarkSegments[0].slice(queryIndex + 1)).split(' AND ');
+        for (var i = 0; i < filterSegments.length; ++i) {
+          pair = filterSegments[i].split('=');
+          bookmarkValues[pair[0]] = pair[1];
         }
-      });
+      }
     }
 
     searchCriteriaPanel.removeAll();
@@ -284,6 +267,10 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchResultStore().filter();
   },
 
+  getDescription: function(model) {
+    return model.getId();
+  },
+
   /**
    * @private
    * Add a criteria.
@@ -291,7 +278,7 @@ Ext.define('NX.coreui.controller.Search', {
    */
   addCriteria: function(menuitem) {
     var me = this,
-        searchPanel = me.getSearchFeature(),
+        searchPanel = me.getFeature(),
         searchCriteriaPanel = searchPanel.down('#criteria'),
         addButton = searchCriteriaPanel.down('#addButton'),
         criteria = menuitem.criteria,
@@ -318,7 +305,7 @@ Ext.define('NX.coreui.controller.Search', {
    */
   removeCriteria: function(searchCriteria) {
     var me = this,
-        searchPanel = me.getSearchFeature(),
+        searchPanel = me.getFeature(),
         searchCriteriaPanel = searchPanel.down('#criteria');
 
     searchCriteriaPanel.remove(searchCriteria);
@@ -343,7 +330,7 @@ Ext.define('NX.coreui.controller.Search', {
   onRefresh: function() {
     var me = this;
 
-    if (me.getSearchFeature()) {
+    if (me.getFeature()) {
       me.getSearchResultStore().filter();
     }
   },
@@ -381,35 +368,51 @@ Ext.define('NX.coreui.controller.Search', {
     }
 
     if (apply) {
-      me.onSearchResultCellClick(me.getSearchResult().getSelectionModel(), null, null, null);
+      me.onSearchResultSelection(null);
       me.bookmarkFilters();
+    }
+  },
+
+  /**
+   * When a list managed by this controller is clicked, route the event to the proper handler
+   *
+   * @override
+   */
+  onSelection: function(list, model) {
+    var me = this,
+      listType;
+
+    // Figure out what kind of list we’re dealing with
+    listType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
+
+    if (listType == "SearchResult") {
+      me.onSearchResultSelection(model);
+    } else if (listType == "SearchResultVersion") {
+      me.onSearchResultVersionSelection(model);
     }
   },
 
   /**
    * @private
    * Show details and load version of selected search result.
-   * @param selectionModel search result grid selection model
-   * @param record selected search result
+   * @param list search result grid selection model
+   * @param model selected search result
    */
-  onSearchResultCellClick: function(selectionModel, td, cellIndex, record) {
+  onSearchResultSelection: function(model) {
     var me = this,
-        searchResultModel = record,
+        searchResultModel = model,
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
         searchResultVersionStore = me.getSearchResultVersionStore();
 
-    me.onSearchResultVersionCellClick(me.getSearchResultVersion().getSelectionModel(), null, null, null);
+    me.onSearchResultVersionSelection(null);
 
     if (searchResultModel) {
-      searchResultDetails.items.get(0).hide();
-      searchResultDetails.items.get(1).show();
-      searchResultDetails.items.get(1).items.get(0).showInfo({
+      searchResultDetails.items.get(0).showInfo({
         'Group': searchResultModel.get('groupId'),
         'Name': searchResultModel.get('artifactId'),
         'Format': searchResultModel.get('format')
       });
-      searchResultVersion.show();
       searchResultVersionStore.clearFilter(true);
       searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
       searchResultVersionStore.addFilter([
@@ -422,27 +425,18 @@ Ext.define('NX.coreui.controller.Search', {
           value: searchResultModel.get('artifactId')
         }
       ]);
-
-      // Show the component version panel
-      searchResultDetails.up('#nx-drilldown').setItemName(1, record.internalId);
-      searchResultDetails.up('#nx-drilldown').showChild(1, true);
-    }
-    else {
-      searchResultDetails.items.get(0).show();
-      searchResultDetails.items.get(1).hide();
-      searchResultVersion.hide();
     }
   },
 
   /**
    * @private
    * Show storage file of selected version of search result.
-   * @param selectionModel search result grid selection model
-   * @param record selected search result
+   * @param list search result grid selection model
+   * @param model selected search result
    */
-  onSearchResultVersionCellClick: function(selectionModel, td, cellIndex, record) {
+  onSearchResultVersionSelection: function(model) {
     var me = this,
-        searchResultVersionModel = record,
+        searchResultVersionModel = model,
         storageFileContainer = me.getStorageFileContainer();
 
     if (searchResultVersionModel) {
@@ -453,7 +447,7 @@ Ext.define('NX.coreui.controller.Search', {
       );
       storageFileContainer.expand();
 
-      // Show the version detail panel
+      // Set the appropriate breadcrumb icon
       var icon;
       var type = searchResultVersionModel.get('type');
       if (NX.getApplication().getIconController().findIcon('repository-item-type-' + type, 'x16')) {
@@ -461,9 +455,7 @@ Ext.define('NX.coreui.controller.Search', {
       } else {
         icon = 'default';
       }
-      storageFileContainer.up('#nx-drilldown').setItemClass(2, NX.Icons.cls('repository-item-type-' + icon, 'x16'));
-      storageFileContainer.up('#nx-drilldown').setItemName(2, record.internalId);
-      storageFileContainer.up('#nx-drilldown').showChild(2, true);
+      storageFileContainer.up('nx-drilldown-item').setItemClass(NX.Icons.cls('repository-item-type-' + icon, 'x16'));
     }
     else {
       storageFileContainer.showStorageFile();
@@ -527,14 +519,24 @@ Ext.define('NX.coreui.controller.Search', {
    */
   bookmarkFilters: function() {
     var me = this,
-        segments = [NX.Bookmarks.getBookmark().getSegment(0)];
+        filterArray = [],
+        firstSegment, segments;
 
+    // Remove any pre-existing query string
+    firstSegment = NX.Bookmarks.getBookmark().getSegment(0);
+    if (firstSegment.indexOf('=') != -1) {
+      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='))
+    }
+
+    // Add each criteria to the filter object
     Ext.Array.each(Ext.ComponentQuery.query('nx-searchfeature component[searchCriteria=true]'), function(cmp) {
       if (cmp.getValue() && !cmp.isHidden()) {
-        segments.push(cmp.criteriaId + '=' + encodeURIComponent(cmp.getValue()));
+        filterArray.push(cmp.criteriaId + '=' + cmp.getValue());
       }
     });
 
+    // Stringify and url encode the filter object, then bookmark it
+    segments = [firstSegment + "=" + encodeURIComponent(filterArray.join(' AND '))];
     NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
   },
 
@@ -545,12 +547,12 @@ Ext.define('NX.coreui.controller.Search', {
    */
   onQuickSearch: function(quickSearch, searchValue) {
     var me = this,
-        searchFeature = me.getSearchFeature();
+        searchFeature = me.getFeature();
 
     if (!searchFeature || (searchFeature.searchFilter.getId() !== 'keyword')) {
       if (searchValue) {
         NX.Bookmarks.navigateTo(
-            NX.Bookmarks.fromSegments(['browse/search', 'keyword=' + encodeURIComponent(searchValue)]),
+            NX.Bookmarks.fromToken('browse/search=' + encodeURIComponent('keyword=' + searchValue)),
             me
         );
       }

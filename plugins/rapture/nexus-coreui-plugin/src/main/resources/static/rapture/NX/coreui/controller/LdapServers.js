@@ -18,14 +18,14 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.LdapServers', {
-  extend: 'NX.controller.MasterDetail',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.Messages',
     'NX.Permissions'
   ],
 
-  list: 'nx-coreui-ldapserver-list',
+  masters: 'nx-coreui-ldapserver-list',
 
   models: [
     'LdapServer'
@@ -52,6 +52,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
     'ldap.LdapServerUserAndGroupMappingTestResults'
   ],
   refs: [
+    { ref: 'feature', selector: 'nx-coreui-ldapserver-feature' },
     { ref: 'list', selector: 'nx-coreui-ldapserver-list' },
     { ref: 'connection', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-connection' },
     { ref: 'backup', selector: 'nx-coreui-ldapserver-feature nx-coreui-ldapserver-backup' },

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.kenai;
+package org.sonatype.security.realms.kenai.internal;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +21,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.httpclient.HttpClientFactory;
-import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
+import org.sonatype.security.realms.kenai.Kenai;
+import org.sonatype.security.realms.kenai.KenaiConfiguration;
 
 import com.google.common.collect.Lists;
 import org.apache.http.Consts;
@@ -65,15 +66,15 @@ public class KenaiRealm
 
   private static final Logger logger = LoggerFactory.getLogger(KenaiRealm.class);
 
-  private final KenaiRealmConfiguration kenaiRealmConfiguration;
+  private final Kenai kenai;
 
   private final HttpClientFactory httpClientFactory;
 
   @Inject
-  public KenaiRealm(final KenaiRealmConfiguration kenaiRealmConfiguration,
+  public KenaiRealm(final Kenai kenai,
                     final HttpClientFactory httpClientFactory)
   {
-    this.kenaiRealmConfiguration = checkNotNull(kenaiRealmConfiguration);
+    this.kenai = checkNotNull(kenai);
     this.httpClientFactory = checkNotNull(httpClientFactory);
     setName(ROLE);
     setAuthenticationCachingEnabled(true);
@@ -111,7 +112,7 @@ public class KenaiRealm
     final HttpClient client = httpClientFactory.create();
 
     try {
-      final String url = kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/login/authenticate.json";
+      final String url = configuration().getBaseUrl() + "api/login/authenticate.json";
       final List<NameValuePair> nameValuePairs = Lists.newArrayListWithCapacity(2);
       nameValuePairs.add(new BasicNameValuePair("username", usernamePasswordToken.getUsername()));
       nameValuePairs.add(new BasicNameValuePair("password", new String(usernamePasswordToken.getPassword())));
@@ -146,7 +147,27 @@ public class KenaiRealm
     }
     // add the default role
     final SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-    authorizationInfo.addRole(kenaiRealmConfiguration.getConfiguration().getDefaultRole());
+    authorizationInfo.addRole(configuration().getDefaultRole());
     return authorizationInfo;
   }
+
+  private KenaiConfiguration configuration() {
+    try {
+      KenaiConfiguration config = kenai.getConfiguration();
+      if (config == null) {
+        logger.warn("Kenai is not configured");
+        throw new IllegalStateException("Kenai is not configured");
+      }
+      if (!kenai.isEnabled()) {
+        logger.warn("Kenai is not enabled");
+        throw new IllegalStateException("Kenai is not enabled");
+      }
+      return config;
+    }
+    catch (IOException e) {
+      logger.warn("Could not retrieve Kenai configuration");
+      throw new IllegalStateException("Could not retrieve Kenai configuration", e);
+    }
+  }
+
 }
