@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -73,6 +74,9 @@ public class DefaultRepositoryItemUidFactory
       if (!path.startsWith(RepositoryItemUid.PATH_ROOT)) {
         path = RepositoryItemUid.PATH_ROOT + path;
       }
+
+      // ban relative paths
+      checkArgument(!path.contains("/.."), "Path may not contain relative tokens: %s", path);
     }
     else {
       path = RepositoryItemUid.PATH_ROOT;
