@@ -24,12 +24,45 @@
   }
 }
 
-@include extjs-panel-ui(
-  $ui: 'nx-drilldown-message',
+/**
+ * ui: 'nx-drilldown-message'
+ */
 
-  $ui-header-background-color: $color-white,
+@include extjs-panel-ui(
+  $ui: 'drilldown-message',
+
   $ui-header-color: $color-night-rider
 );
+
+.x-panel-drilldown-message {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+
+  .x-panel-header {
+    padding: 8px;
+    border: 1px solid !important;
+    height: 32px;
+    border-radius: 8px;
+
+    img {
+      margin-right: 5px !important;
+    }
+  }
+}
+
+.x-panel-drilldown-message.nx-drilldown-warning {
+  .x-panel-header {
+    border-color: rgb(242, 168, 34) !important;
+    background-color: rgb(255, 251, 244);
+  }
+}
+
+.x-panel-drilldown-message.nx-drilldown-info {
+  .x-panel-header {
+    border-color: #6FA0CF !important;
+    background-color: #EEF7FF;
+  }
+}
 
 /**
  * ui: 'settings-panel'

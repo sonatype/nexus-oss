@@ -78,7 +78,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
               pack: 'start'
             },
             tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
-            tbar: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : Ext.apply({}, me.actions)
+            actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : Ext.apply({}, me.actions)
           }
         }
       );
