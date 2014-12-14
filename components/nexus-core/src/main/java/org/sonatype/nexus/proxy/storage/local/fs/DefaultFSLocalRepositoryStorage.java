@@ -157,7 +157,7 @@ public class DefaultFSLocalRepositoryStorage
 
     log.trace("Resolve request path '{}' to file: '{}'", path, file);
 
-    // FIXME: This check would be more appropriate as impl in FSPeer ipml
+    // FIXME: This check would be more appropriate as impl in FSPeer impl?
 
     // ensure file is a child of repository base directory
     if (!file.getPath().startsWith(baseDir.getPath())) {
