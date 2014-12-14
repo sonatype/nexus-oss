@@ -149,7 +149,8 @@ public class NexusTaskInfo<T>
 
   @Override
   public synchronized CurrentState<T> getCurrentState() {
-    checkState(state == State.DONE || !removed, "Task already removed/updated");
+    // TODO: why was this check here?
+    // checkState(state == State.DONE || !removed, "Task already removed/updated");
     if (nexusTaskState.getSchedule() instanceof Manual) {
       return new CS<>(state, null, nexusTaskFuture);
     }
