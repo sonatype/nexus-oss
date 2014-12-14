@@ -76,7 +76,7 @@ public class DefaultRepositoryItemUidFactory
       }
 
       // ban relative paths
-      checkArgument(!path.contains("/.."), "Path may not contain relative tokens: %s", path);
+      checkArgument(!path.contains("/.."), "Repository UID path may NOT contain relative tokens: %s", path);
     }
     else {
       path = RepositoryItemUid.PATH_ROOT;
