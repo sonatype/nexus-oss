@@ -174,7 +174,7 @@ public class NexusTaskJobListener<T>
     // actual schedule
     final Schedule jobSchedule = nexusScheduleConverter.toSchedule(currentTrigger);
     // state: if not removed and will fire again: WAITING, otherwise DONE
-    final State state = nextFireTime != null ? State.WAITING : State.DONE;
+    final State state = !nexusTaskInfo.isRemovedOrDone() && nextFireTime != null ? State.WAITING : State.DONE;
     // update task state, w/ respect to future: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
         state,
