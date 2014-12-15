@@ -185,8 +185,7 @@ public class QuartzTaskExecutorSPI
         return null;
       }
       checkState(!task.isRemovedOrDone(), "Done task cannot be rescheduled");
-      log.info("NX Task {} : rescheduled : {} : {} -> {} ", jobKey.getName(), task.getConfiguration().getName(),
-          task.getSchedule(), schedule);
+      log.info("NX Task {} : rescheduled : {} : {} -> {} ", jobKey.getName(), task.getConfiguration().getName(), task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
       quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
@@ -345,11 +344,8 @@ public class QuartzTaskExecutorSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      boolean result = quartzSupport.getScheduler().unscheduleJob(new TriggerKey(jobKey.getName(), jobKey.getGroup()));
-      if (result) {
-        quartzSupport.getScheduler().getListenerManager().removeJobListener(NexusTaskJobListener.listenerName(jobKey));
-      }
-      return result;
+      quartzSupport.getScheduler().getListenerManager().removeJobListener(NexusTaskJobListener.listenerName(jobKey));
+      return quartzSupport.getScheduler().unscheduleJob(new TriggerKey(jobKey.getName(), jobKey.getGroup()));
     }
     catch (SchedulerException e) {
       throw Throwables.propagate(e);

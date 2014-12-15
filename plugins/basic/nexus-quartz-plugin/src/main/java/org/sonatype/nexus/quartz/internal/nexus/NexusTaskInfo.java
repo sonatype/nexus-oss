@@ -98,10 +98,11 @@ public class NexusTaskInfo<T>
     this.nexusTaskState = nexusTaskState;
     this.nexusTaskFuture = nexusTaskFuture;
 
-    // DONE tasks or those already removed should be cleaned up, as they might reschedule themselves
-    if (isRemovedOrDone()) {
+    // DONE tasks should be removed, if not removed already by #remove() method
+    if (!removed && state == State.DONE) {
       removed = true;
       quartzSupport.removeTask(jobKey);
+      log.debug("NX Task {} is done and removed", jobKey);
     }
   }
 
@@ -182,7 +183,6 @@ public class NexusTaskInfo<T>
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
-    log.debug("NX Task {} remove; state={}", jobKey, state);
     return quartzSupport.removeTask(jobKey);
   }
 
