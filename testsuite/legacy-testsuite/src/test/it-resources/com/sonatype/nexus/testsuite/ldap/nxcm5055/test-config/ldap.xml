@@ -9,29 +9,35 @@
 
 -->
 <ldapConfiguration>
-  <connectionInfo>
-    <searchBase>o=sonatype</searchBase>
-    <systemUsername>uid=admin,ou=system</systemUsername>
-    <systemPassword>CMw7ArkDsKp4yvV0M1yl</systemPassword>
-    <authScheme>simple</authScheme>
-    <protocol>ldaps</protocol>
-    <host>localhost</host>
-    <port>${port}</port>
-  </connectionInfo>
-  <userAndGroupConfig>
-    <emailAddressAttribute>mail</emailAddressAttribute>
-    <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
-    <groupBaseDn>ou=groups</groupBaseDn>
-    <groupIdAttribute>cn</groupIdAttribute>
-    <userMemberOfAttribute>businesscategory</userMemberOfAttribute>
-    <groupMemberFormat>cn=${username},ou=groups,o=sonatype</groupMemberFormat>
-    <groupObjectClass>organizationalRole</groupObjectClass>
-    <userPasswordAttribute>userPassword</userPasswordAttribute>
-    <preferredPasswordEncoding>clear</preferredPasswordEncoding>
-    <userIdAttribute>uid</userIdAttribute>
-    <userObjectClass>inetOrgPerson</userObjectClass>
-    <userBaseDn>ou=people</userBaseDn>
-    <userRealNameAttribute>sn</userRealNameAttribute>
-  </userAndGroupConfig>
-
+  <version>2.8.0</version>
+  <servers>
+    <server>
+      <id>default</id>
+      <name>ldap://localhost:12345</name>
+      <connectionInfo>
+        <searchBase>o=sonatype</searchBase>
+        <systemUsername>uid=admin,ou=system</systemUsername>
+        <systemPassword>CMw7ArkDsKp4yvV0M1yl</systemPassword>
+        <authScheme>simple</authScheme>
+        <protocol>ldaps</protocol>
+        <host>localhost</host>
+        <port>${port}</port>
+      </connectionInfo>
+      <userAndGroupConfig>
+        <emailAddressAttribute>mail</emailAddressAttribute>
+        <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+        <groupBaseDn>ou=groups</groupBaseDn>
+        <groupIdAttribute>cn</groupIdAttribute>
+        <userMemberOfAttribute>businesscategory</userMemberOfAttribute>
+        <groupMemberFormat>cn=${username},ou=groups,o=sonatype</groupMemberFormat>
+        <groupObjectClass>organizationalRole</groupObjectClass>
+        <userPasswordAttribute>userPassword</userPasswordAttribute>
+        <preferredPasswordEncoding>clear</preferredPasswordEncoding>
+        <userIdAttribute>uid</userIdAttribute>
+        <userObjectClass>inetOrgPerson</userObjectClass>
+        <userBaseDn>ou=people</userBaseDn>
+        <userRealNameAttribute>sn</userRealNameAttribute>
+      </userAndGroupConfig>
+    </server>
+  </servers>
 </ldapConfiguration>
