@@ -86,6 +86,10 @@
 
 .x-btn-drilldown-medium {
   padding: 0 2px 0 6px;
+
+  .x-btn-inner {
+    text-overflow: ellipsis;
+  }
 }
 
 .feature-content .x-panel-header .x-btn-drilldown-medium {

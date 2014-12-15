@@ -111,8 +111,6 @@ Ext.define('NX.view.feature.Content', {
     var me = this,
         label = me.down('#description');
 
-    console.log(label);
-
     label.setText(text);
   },
 
