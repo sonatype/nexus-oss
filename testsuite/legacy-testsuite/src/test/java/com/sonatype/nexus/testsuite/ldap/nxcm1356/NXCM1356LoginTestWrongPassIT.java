@@ -12,11 +12,11 @@
  */
 package com.sonatype.nexus.testsuite.ldap.nxcm1356;
 
-import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerLoginTestDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerLoginTestRequest;
-import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;

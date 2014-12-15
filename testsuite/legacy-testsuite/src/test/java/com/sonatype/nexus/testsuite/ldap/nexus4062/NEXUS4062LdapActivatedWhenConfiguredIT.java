@@ -15,12 +15,12 @@ package com.sonatype.nexus.testsuite.ldap.nexus4062;
 import java.util.List;
 
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
-import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerListEntryDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerListResponse;
-import com.sonatype.security.ldap.api.dto.LdapServerRequest;
-import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerListEntryDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerListResponse;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;

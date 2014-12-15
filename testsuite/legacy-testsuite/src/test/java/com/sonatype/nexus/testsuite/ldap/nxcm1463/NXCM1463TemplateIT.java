@@ -13,7 +13,7 @@
 package com.sonatype.nexus.testsuite.ldap.nxcm1463;
 
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
-import com.sonatype.security.ldap.api.dto.LdapSchemaTemplateListResponse;
+import org.sonatype.security.realms.ldap.api.dto.LdapSchemaTemplateListResponse;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
