@@ -171,6 +171,7 @@ public class NexusTaskInfo<T>
       // already removed
       return false;
     }
+    log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
       // running and not cancelable
       return false;
@@ -191,7 +192,7 @@ public class NexusTaskInfo<T>
     if (isRemovedOrDone()) {
       throw new TaskRemovedException("Task removed: " + jobKey);
     }
-    log.debug("NX Task {} runNow; state={}", jobKey, state);
+    log.info("NX Task {} : runNow : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,

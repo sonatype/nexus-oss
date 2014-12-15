@@ -151,7 +151,7 @@ public class QuartzTaskExecutorSPI
         // this is update but old task could not be removed: ie. running a non-cancelable task
         throw new IllegalArgumentException("Task could not be updated: running and not cancelable?");
       }
-      log.debug("NX Task {} scheduled", jobKey);
+      log.info("NX Task {} : scheduled : {} ", jobKey.getName(), taskConfiguration.getName());
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
@@ -185,7 +185,8 @@ public class QuartzTaskExecutorSPI
         return null;
       }
       checkState(!task.isRemovedOrDone(), "Done task cannot be rescheduled");
-      log.debug("NX Task rescheduleTask: {}: {} -> {}", jobKey, task.getSchedule(), schedule);
+      log.info("NX Task {} : rescheduled : {} : {} -> {} ", jobKey.getName(), task.getConfiguration().getName(),
+          task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
       quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
