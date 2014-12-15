@@ -231,10 +231,13 @@ public class ScheduledTaskEventsIT
     // give it some time to start
     SleeperTask.youWait.await();
 
-    // attempt to cancel it 3 times
+    // attempt to cancel it 1 times
     taskInfo.getCurrentState().getFuture().cancel(true);
-    taskInfo.getCurrentState().getFuture().cancel(true);
-    taskInfo.getCurrentState().getFuture().cancel(true);
+    // Note: the original test tried it 3 times, but as cancellation is now implemented,
+    // the task would interrupt on latch await, and would go back into WAITING as schedule is hourly,
+    // hence, would "loose" the future causing NPE here
+    // taskInfo.getCurrentState().getFuture().cancel(true);
+    // taskInfo.getCurrentState().getFuture().cancel(true);
 
     // make it be done
     SleeperTask.meWait.countDown();
