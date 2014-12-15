@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -136,37 +137,37 @@ public class DefaultFSLocalRepositoryStorage
    * Resolve repository file from given request and ensure the file is a child of the repository base directory.
    */
   private File resolveFile(final Repository repository, final ResourceStoreRequest request) throws IOException {
-    // lookup repository base directory and canonicalize
-    File baseDir = getBaseDir(repository, request).getCanonicalFile();
+    // lookup repository base directory
+    File baseDir = getBaseDir(repository, request);
 
     // resolve file relative to base directory
     File file;
-    String path = request.getRequestPath();
-    if (path == null || RepositoryItemUid.PATH_ROOT.equals(path)) {
+    String requestPath = request.getRequestPath();
+    if (requestPath == null || RepositoryItemUid.PATH_ROOT.equals(requestPath)) {
       file = baseDir;
     }
-    else if (path.startsWith("/")) {
-      file = new File(baseDir, path.substring(1));
+    else if (requestPath.startsWith("/")) {
+      file = new File(baseDir, requestPath.substring(1));
     }
     else {
-      file = new File(baseDir, path);
+      file = new File(baseDir, requestPath);
     }
 
-    // canonicalize repository file
-    file = file.getCanonicalFile();
+    // FIXME: This check would be more appropriate in FSPeer impl?
 
-    log.trace("Resolve request path '{}' to file: '{}'", path, file);
-
-    // FIXME: This check would be more appropriate as impl in FSPeer impl?
+    // normalize file path references to remove any relative tokens
+    Path basePath = baseDir.toPath().toAbsolutePath().normalize();
+    Path filePath = file.toPath().toAbsolutePath().normalize();
+    log.trace("Resolve request path '{}' to file: '{}'", requestPath, filePath);
 
     // ensure file is a child of repository base directory
-    if (!file.getPath().startsWith(baseDir.getPath())) {
+    if (!filePath.startsWith(basePath)) {
       throw new LocalStorageException(
           String.format("Attempt to resolve repository '%s' (id='%s') file '%s' which exists outside of repository base directory '%s' is forbidden!",
               repository.getName(),
               repository.getId(),
-              file,
-              baseDir
+              filePath,
+              basePath
           ));
     }
 
