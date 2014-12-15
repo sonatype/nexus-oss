@@ -69,9 +69,9 @@ public class NEXUS4062LdapActivatedWhenConfiguredIT
     final List<String> activeRealmsAfterConf = SettingsMessageUtil.getCurrentSettings().getSecurityRealms();
 
     // at starting point LDAP Realm was not active
-    assertThat(activeRealmsBeforeConf, not(hasItem("LdapAuthenticatingRealm")));
+    assertThat(activeRealmsBeforeConf, not(hasItem("LdapRealm")));
     // when configured, LDAP Realm was automatically added to active Realms
-    assertThat(activeRealmsAfterConf, hasItem("LdapAuthenticatingRealm"));
+    assertThat(activeRealmsAfterConf, hasItem("LdapRealm"));
   }
 
   private void removeServers() throws Exception {

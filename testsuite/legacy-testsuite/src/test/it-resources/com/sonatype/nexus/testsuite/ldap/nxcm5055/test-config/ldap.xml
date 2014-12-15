@@ -17,7 +17,7 @@
       <connectionInfo>
         <searchBase>o=sonatype</searchBase>
         <systemUsername>uid=admin,ou=system</systemUsername>
-        <systemPassword>CMw7ArkDsKp4yvV0M1yl</systemPassword>
+        <systemPassword>secret</systemPassword>
         <authScheme>simple</authScheme>
         <protocol>ldaps</protocol>
         <host>localhost</host>
