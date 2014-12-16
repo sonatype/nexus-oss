@@ -23,6 +23,7 @@ import java.util.List;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -34,15 +35,19 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -57,14 +62,56 @@ import static org.mockito.Mockito.when;
 public class DefaultFSLocalRepositoryStorageTest
     extends TestSupport
 {
+  @Mock
+  private Wastebasket wastebasket;
+
+  @Mock
+  private MimeSupport mimeSupport;
+
+  @Mock
+  private FSPeer fsPeer;
+
+  @Mock
+  private LinkPersister linkPersister;
+
+  @Mock
+  private Repository repository;
+
+  @Mock
+  private RepositoryItemUid repositoryItemUid;
+
+  @Mock
+  private AttributesHandler attributesHandler;
+
+  private File baseDir;
+
+  private DefaultFSLocalRepositoryStorage subject;
+
+  @Before
+  public void prepare() {
+    when(mimeSupport.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString())).thenReturn(
+        "text/plain");
+
+    baseDir = util.createTempDir();
+    final LocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
+    localStorageContext.putContextObject(DefaultFSLocalRepositoryStorage.BASEDIR_FILE, baseDir);
+
+    // repository
+    when(repository.getId()).thenReturn("test");
+    when(repository.createUid(anyString())).thenReturn(repositoryItemUid);
+    when(repository.getAttributesHandler()).thenReturn(attributesHandler);
+    when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
+    when(repository.getRepositoryKind()).thenReturn(new DefaultRepositoryKind(HostedRepository.class, null));
+    when(repository.getLocalUrl()).thenReturn(baseDir.toURI().toString());
+
+    subject = new DefaultFSLocalRepositoryStorage(wastebasket, linkPersister, mimeSupport, fsPeer);
+  }
 
   /**
    * Tests listing a directory, when a contained file does NOT exists.
    */
-  @SuppressWarnings({"unchecked"})
   @Test
   public void testListFilesThrowsItemNotFoundException() throws Exception {
-
     File repoLocation = new File(util.getBaseDir(), "target/" + getClass().getSimpleName() + "/repo/");
 
     // the contents of the "valid" directory, only contains a "valid.txt" file
@@ -81,14 +128,8 @@ public class DefaultFSLocalRepositoryStorageTest
     invalidFileCollection.add(new File(invalidDir, "missing.txt"));
 
     // Mocks
-    Wastebasket wastebasket = mock(Wastebasket.class);
-    LinkPersister linkPersister = mock(LinkPersister.class);
-    MimeSupport mimeUtil = mock(MimeSupport.class);
-    when(mimeUtil.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString())).thenReturn(
-        "text/plain");
 
     // Mock FSPeer to return the results created above
-    FSPeer fsPeer = mock(FSPeer.class);
     when(fsPeer
         .listItems(Mockito.any(Repository.class), Mockito.any(File.class), Mockito.any(ResourceStoreRequest.class),
             eq(validDir))).thenReturn(validFileCollection);
@@ -97,31 +138,19 @@ public class DefaultFSLocalRepositoryStorageTest
             eq(new File(repoLocation, "invalid/")))).thenReturn(invalidFileCollection);
 
     // create Repository Mock
-    Repository repository = mock(Repository.class);
-    when(repository.getId()).thenReturn("mock");
-    when(repository.getRepositoryKind()).thenReturn(new DefaultRepositoryKind(HostedRepository.class, null));
     when(repository.getLocalUrl()).thenReturn(repoLocation.toURI().toURL().toString());
-    AttributesHandler attributesHandler = mock(AttributesHandler.class);
-    when(repository.getAttributesHandler()).thenReturn(attributesHandler);
-    when(repository.getLocalStorageContext()).thenReturn(new DefaultLocalStorageContext(null));
-    RepositoryItemUid uid = mock(RepositoryItemUid.class);
-    when(repository.createUid(anyString())).thenReturn(uid);
-
-
-    DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
-        linkPersister, mimeUtil, fsPeer);
 
     ResourceStoreRequest validRequest = new ResourceStoreRequest("valid");
 
     // positive test, valid.txt should be found
-    Collection<StorageItem> items = localRepositoryStorageUnderTest.listItems(repository, validRequest);
+    Collection<StorageItem> items = subject.listItems(repository, validRequest);
     assertThat(items.iterator().next().getName(), equalTo("valid.txt"));
     assertThat(items, hasSize(1));
 
 
     // missing.txt was listed in this directory, but it does NOT exist, only invalid.txt should be found
     ResourceStoreRequest invalidRequest = new ResourceStoreRequest("invalid");
-    items = localRepositoryStorageUnderTest.listItems(repository, invalidRequest);
+    items = subject.listItems(repository, invalidRequest);
     assertThat(items.iterator().next().getName(), equalTo("invalid.txt"));
     assertThat(items, hasSize(1));
   }
@@ -134,18 +163,6 @@ public class DefaultFSLocalRepositoryStorageTest
   public void testRetrieveItemFromFileThrowsItemNotFoundExceptionForDeletedFile()
       throws Exception
   {
-    // Mocks
-    Wastebasket wastebasket = mock(Wastebasket.class);
-    Repository repository = mock(Repository.class);
-    RepositoryItemUid uid = mock(RepositoryItemUid.class);
-    when(repository.createUid(anyString())).thenReturn(uid);
-    final DefaultLocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
-    when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
-    FSPeer fsPeer = mock(FSPeer.class);
-    MimeSupport mimeSupport = mock(MimeSupport.class);
-    when(mimeSupport.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString()))
-        .thenReturn("text/plain");
-
     // mock file
     File mockFile = mock(File.class);
     when(mockFile.isDirectory()).thenReturn(false);
@@ -154,16 +171,11 @@ public class DefaultFSLocalRepositoryStorageTest
 
 
     // needs to throw a FileNotFound when _opening_ the file
-    LinkPersister linkPersister = mock(LinkPersister.class);
     when(linkPersister.isLinkContent(Mockito.any(ContentLocator.class)))
         .thenThrow(new FileNotFoundException("Expected to be thrown from mock."));
 
-    // object to test
-    DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
-        linkPersister, mimeSupport, fsPeer);
-
     // expected to throw a ItemNotFoundException
-    localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+    subject.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
   }
 
   /**
@@ -174,44 +186,51 @@ public class DefaultFSLocalRepositoryStorageTest
   public void attributeFileIsNotCheckedForBeingLink()
       throws Exception
   {
-    // Mocks
-    Wastebasket wastebasket = mock(Wastebasket.class);
-    Repository repository = mock(Repository.class);
-    RepositoryItemUid uid = mock(RepositoryItemUid.class);
-    when(repository.getId()).thenReturn("test");
-    when(repository.createUid(anyString())).thenReturn(uid);
-    when(repository.getAttributesHandler()).thenReturn(mock(AttributesHandler.class));
-    final DefaultLocalStorageContext localStorageContext = new DefaultLocalStorageContext(null);
-    when(repository.getLocalStorageContext()).thenReturn(localStorageContext);
-    FSPeer fsPeer = mock(FSPeer.class);
-    MimeSupport mimeSupport = mock(MimeSupport.class);
-    when(mimeSupport.guessMimeTypeFromPath(Mockito.any(MimeRulesSource.class), Mockito.anyString()))
-        .thenReturn("text/plain");
-
     // mock file
     File mockFile = mock(File.class);
     when(mockFile.isDirectory()).thenReturn(false);
     when(mockFile.isFile()).thenReturn(true);
     when(mockFile.exists()).thenReturn(true);
 
-    // link persister
-    LinkPersister linkPersister = mock(LinkPersister.class);
-
-    // test subject
-    DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage(wastebasket,
-        linkPersister, mimeSupport, fsPeer);
-
     // plain file, it result in 1 method call on link persister to check is content a link or not
-    when(uid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(false);
-    localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+    when(repositoryItemUid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(false);
+    subject.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
     Mockito.verify(linkPersister, times(1)).isLinkContent(Mockito.any(ContentLocator.class));
 
     // reset the mock
     Mockito.reset(linkPersister);
 
     // attribute file, it result in 0 method call on link persister as is redundtant
-    when(uid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(true);
-    localRepositoryStorageUnderTest.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
+    when(repositoryItemUid.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class)).thenReturn(true);
+    subject.retrieveItemFromFile(repository, new ResourceStoreRequest("not-used"), mockFile);
     Mockito.verify(linkPersister, times(0)).isLinkContent(Mockito.any(ContentLocator.class));
+  }
+
+  @Test
+  public void getFileFromBaseOk() throws Exception {
+    final File fileFromBase = subject.getFileFromBase(repository, new ResourceStoreRequest("/foo/bar"));
+    assertThat(fileFromBase.getCanonicalFile(), equalTo(new File(baseDir, "foo/bar")));
+  }
+
+  @Test
+  public void getFileFromBaseRelative() throws Exception {
+    {
+      final File fileFromBase = subject.getFileFromBase(repository, new ResourceStoreRequest("/foo/bar/../baz"));
+      assertThat(fileFromBase.getCanonicalFile(), equalTo(new File(baseDir, "foo/baz")));
+    }
+    {
+      final File fileFromBase = subject.getFileFromBase(repository, new ResourceStoreRequest("/foo/bar/../bar/../../baz"));
+      assertThat(fileFromBase.getCanonicalFile(), equalTo(new File(baseDir, "baz")));
+    }
+  }
+
+  @Test(expected = LocalStorageException.class)
+  public void getFileFromBaseRelativeOut1() throws Exception {
+    subject.getFileFromBase(repository, new ResourceStoreRequest("/foo/bar/../bar/../../../baz"));
+  }
+
+  @Test(expected = LocalStorageException.class)
+  public void getFileFromBaseRelativeOut2() throws Exception {
+    subject.getFileFromBase(repository, new ResourceStoreRequest(".."));
   }
 }
