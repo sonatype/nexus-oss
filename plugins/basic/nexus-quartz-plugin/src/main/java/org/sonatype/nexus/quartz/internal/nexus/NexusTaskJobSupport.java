@@ -82,8 +82,6 @@ public class NexusTaskJobSupport<T>
 
   private NexusTaskInfo<T> nexusTaskInfo;
 
-  private Thread nexusTaskExecutingThread;
-
   @Inject
   public NexusTaskJobSupport(final EventBus eventBus,
                              final Provider<QuartzTaskExecutorSPI> quartzNexusSchedulerSPIProvider,
@@ -100,13 +98,13 @@ public class NexusTaskJobSupport<T>
     try {
       final TaskConfiguration taskConfiguration = toTaskConfiguration(context.getJobDetail().getJobDataMap());
       final NexusTaskFuture<T> future = (NexusTaskFuture) context.get(NexusTaskFuture.FUTURE_KEY);
+      future.setJobExecutingThread(Thread.currentThread());
       nexusTask = taskFactory.createTaskInstance(taskConfiguration);
       nexusTaskInfo = getTaskInfo();
-      nexusTaskExecutingThread = Thread.currentThread();
       try {
         mayBlock(nexusTask, future);
         if (!future.isCancelled()) {
-          future.setRunState(nexusTaskExecutingThread, RunState.RUNNING);
+          future.setRunState(RunState.RUNNING);
           try {
             final T result = nexusTask.call();
             context.setResult(result);
@@ -149,7 +147,7 @@ public class NexusTaskJobSupport<T>
       if (blockedBy != null && !blockedBy.isEmpty()) {
         try {
           // will ISEx if canceled!
-          future.setRunState(nexusTaskExecutingThread, RunState.BLOCKED);
+          future.setRunState(RunState.BLOCKED);
           for (TaskInfo<?> taskInfo : blockedBy) {
             try {
               taskInfo.getCurrentState().getFuture().get();
