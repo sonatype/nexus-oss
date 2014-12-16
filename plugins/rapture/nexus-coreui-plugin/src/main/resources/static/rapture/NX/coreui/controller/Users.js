@@ -260,6 +260,32 @@ Ext.define('NX.coreui.controller.Users', {
 
   /**
    * @private
+   * Load store for selected source.
+   */
+  loadStore: function() {
+    var me = this,
+        list = me.getList(),
+        userSourceButton;
+
+    if (list) {
+      userSourceButton = list.down('button[action=filter]');
+      if (!userSourceButton.sourceId) {
+        userSourceButton.sourceId = 'default';
+      }
+      me.updateEmptyText();
+      me.getUserStore().load({
+        params: {
+          filter: [
+            { property: 'source', value: userSourceButton.sourceId },
+            { property: 'userId', value: me.getUserSearchBox().getValue() }
+          ]
+        }
+      });
+    }
+  },
+
+  /**
+   * @private
    * (Re)load related stores.
    */
   loadRelatedStores: function() {
