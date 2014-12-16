@@ -58,6 +58,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.PathUtils;
 import org.sonatype.nexus.util.file.DirSupport;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import org.apache.commons.io.IOUtils;
@@ -80,7 +81,8 @@ public class DefaultFSLocalRepositoryStorage
   /**
    * Key of the {@link File} denoting repository root directory in repository's context.
    */
-  private static final String BASEDIR_FILE = DefaultFSLocalRepositoryStorage.class.getName() + ".baseDir";
+  @VisibleForTesting
+  static final String BASEDIR_FILE = DefaultFSLocalRepositoryStorage.class.getName() + ".baseDir";
 
   private FSPeer fsPeer;
 
