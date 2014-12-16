@@ -6,10 +6,9 @@
  * ui: 'drilldown'
  */
 
-@include extjs-button-toolbar-large-ui(
+@include extjs-button-large-ui(
   $ui: 'drilldown',
 
-  $padding: 3px 3px 3px 4px,
   $text-padding: 0,
 
   $color: $color-navy-blue,
@@ -44,7 +43,11 @@
   $inner-opacity-disabled: 1
 );
 
-@include extjs-button-toolbar-medium-ui(
+.x-btn-drilldown-large {
+  padding: 0 !important;
+}
+
+@include extjs-button-medium-ui(
   $ui: 'drilldown',
 
   $text-padding: 0,
@@ -81,7 +84,15 @@
   $inner-opacity-disabled: 1
 );
 
-.feature-content .x-panel-header .x-btn-drilldown-toolbar-medium {
+.x-btn-drilldown-medium {
+  padding: 0 2px 0 6px;
+
+  .x-btn-inner {
+    text-overflow: ellipsis;
+  }
+}
+
+.feature-content .x-panel-header .x-btn-drilldown-medium {
   top: 7px !important;
 }
 

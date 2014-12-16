@@ -35,7 +35,8 @@
 .feature-description {
   font-size: $font-size-body;
   font-weight: $font-weight-body;
-  top: 15px !important;
+  top: 12px !important;
+  padding-left: 7px;
 }
 
 /**
@@ -43,13 +44,14 @@
  */
 .breadcrumb-separator {
   font-size: $font-size-h4;
-  top: 15px !important;
+  top: 7px !important;
+  padding-left: 8px;
 }
 
 /**
  * cls: 'breadcrumb-icon'
  */
 .breadcrumb-icon {
-  top: 13px !important;
+  top: 9px !important;
   margin-left: 11px;
 }
