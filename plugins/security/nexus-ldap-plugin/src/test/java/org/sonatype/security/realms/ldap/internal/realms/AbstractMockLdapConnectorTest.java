@@ -25,10 +25,8 @@ import java.util.TreeSet;
 
 import org.sonatype.security.realms.ldap.AbstractLdapConfigurationTest;
 import org.sonatype.security.realms.ldap.MockLdapConnector;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
-import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;

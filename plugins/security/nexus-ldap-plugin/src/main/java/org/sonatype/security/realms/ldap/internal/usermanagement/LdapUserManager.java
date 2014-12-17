@@ -22,10 +22,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.realms.ldap.LdapPlugin;
 
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.RoleIdentifier;

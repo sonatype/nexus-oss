@@ -23,8 +23,8 @@ import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManag
 import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration
 import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplate
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplateManager
+import org.sonatype.security.realms.ldap.internal.templates.LdapSchemaTemplate
+import org.sonatype.security.realms.ldap.internal.templates.LdapSchemaTemplateManager
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.realm.ldap.LdapContextFactory
@@ -37,8 +37,8 @@ import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.validation.Create
 import org.sonatype.nexus.validation.Update
 import org.sonatype.nexus.validation.Validate
-import org.sonatype.security.realms.ldap.connector.dao.LdapConnectionTester
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser
 import org.sonatype.security.realms.ldap.internal.realms.DefaultLdapContextFactory
 import org.sonatype.security.realms.ldap.LdapURL
 

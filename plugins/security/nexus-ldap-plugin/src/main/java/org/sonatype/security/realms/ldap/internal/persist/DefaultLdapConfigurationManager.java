@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.persist.validation.LdapConfigurationValidator;
-import org.sonatype.security.realms.ldap.realms.LdapRealm;
+import org.sonatype.security.realms.ldap.internal.realms.LdapRealm;
 import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 

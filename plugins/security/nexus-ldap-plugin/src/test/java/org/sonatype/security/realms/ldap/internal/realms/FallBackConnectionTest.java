@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.security.realms.ldap.MockLdapConnector;
-import org.sonatype.security.realms.ldap.connector.FailoverLdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
 
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.ldap.connector.dao.NoLdapUserRolesFoundException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapGroupException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 
 import org.junit.Assert;
 import org.junit.Ignore;

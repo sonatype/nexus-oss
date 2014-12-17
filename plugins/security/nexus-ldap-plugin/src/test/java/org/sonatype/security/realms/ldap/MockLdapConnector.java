@@ -16,12 +16,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.dao.NoLdapUserRolesFoundException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapGroupException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 

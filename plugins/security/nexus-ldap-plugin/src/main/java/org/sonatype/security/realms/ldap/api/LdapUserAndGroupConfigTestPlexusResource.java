@@ -37,9 +37,9 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapConnectionTester;
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 
 import org.restlet.Context;
 import org.restlet.data.Request;

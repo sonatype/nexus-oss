@@ -20,11 +20,11 @@ import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 
-import org.sonatype.security.realms.ldap.connector.dao.LdapAuthConfiguration;
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapGroupDAO;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUserDAO;
-import org.sonatype.security.realms.ldap.connector.DefaultLdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapAuthConfiguration;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapGroupDAO;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUserDAO;
+import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.security.realms.ldap.LdapURL;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;

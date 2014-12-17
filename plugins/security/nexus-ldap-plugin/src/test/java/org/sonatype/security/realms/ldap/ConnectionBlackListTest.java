@@ -17,11 +17,11 @@ import java.util.TreeSet;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.dao.NoLdapUserRolesFoundException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapGroupException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.junit.Assert;
 import org.junit.Ignore;

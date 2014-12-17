@@ -22,7 +22,7 @@ import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 
 import com.thoughtworks.xstream.XStream;
 import org.junit.Assert;

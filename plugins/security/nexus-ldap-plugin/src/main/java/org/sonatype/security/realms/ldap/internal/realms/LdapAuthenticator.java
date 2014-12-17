@@ -19,8 +19,8 @@ import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.dao.password.PasswordEncoderManager;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.password.PasswordEncoderManager;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;

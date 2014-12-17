@@ -17,10 +17,9 @@ import java.util.List;
 
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.MockLdapConnector;
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 import org.sonatype.security.realms.ldap.events.LdapClearCacheEvent;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
 
 import org.junit.Assert;
 import org.junit.Ignore;

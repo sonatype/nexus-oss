@@ -31,7 +31,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapConnectionTester;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.restlet.Context;

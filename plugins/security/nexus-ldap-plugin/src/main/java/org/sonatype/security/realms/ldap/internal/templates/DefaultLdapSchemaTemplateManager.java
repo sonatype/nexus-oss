@@ -21,9 +21,6 @@ import javax.inject.Singleton;
 
 import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplate;
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplateManager;
-
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.IOUtils;
 

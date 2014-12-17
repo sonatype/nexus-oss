@@ -21,12 +21,12 @@ import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManag
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.ldap.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.connector.dao.NoLdapUserRolesFoundException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapGroupException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import com.thoughtworks.xstream.XStream;
 import org.junit.Assert;

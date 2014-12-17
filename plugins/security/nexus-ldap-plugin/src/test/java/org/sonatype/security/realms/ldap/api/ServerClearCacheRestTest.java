@@ -18,9 +18,9 @@ import java.util.List;
 import org.sonatype.security.realms.ldap.MockLdapConnector;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
-import org.sonatype.security.realms.ldap.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -26,9 +26,9 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.ldap.connector.dao.LdapDAOException;
-import org.sonatype.security.realms.ldap.connector.dao.NoSuchLdapGroupException;
-import org.sonatype.security.realms.ldap.realms.LdapManager;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

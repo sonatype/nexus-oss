@@ -25,8 +25,8 @@ import javax.ws.rs.Produces;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 import org.sonatype.security.realms.ldap.api.dto.LdapSchemaTemplateDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapSchemaTemplateListResponse;
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplate;
-import org.sonatype.security.realms.ldap.templates.LdapSchemaTemplateManager;
+import org.sonatype.security.realms.ldap.internal.templates.LdapSchemaTemplate;
+import org.sonatype.security.realms.ldap.internal.templates.LdapSchemaTemplateManager;
 
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
