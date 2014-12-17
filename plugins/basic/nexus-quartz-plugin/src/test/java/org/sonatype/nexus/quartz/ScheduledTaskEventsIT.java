@@ -189,7 +189,7 @@ public class ScheduledTaskEventsIT
     // give it some time to start
     SleeperTask.youWait.await();
 
-    // attempt to cancel it 3 times
+    // attempt to cancel it 3 times (w/o interruption)
     taskInfo.getCurrentState().getFuture().cancel(false);
     taskInfo.getCurrentState().getFuture().cancel(false);
     taskInfo.getCurrentState().getFuture().cancel(false);
@@ -207,13 +207,11 @@ public class ScheduledTaskEventsIT
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.OK));
 
-    // started, canceled x3, stoppedCanceled
-    assertThat(listener.arrivedEvents, hasSize(5));
+    // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
+    // attempted to be canceled at all
+    assertThat(listener.arrivedEvents, hasSize(2));
     assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
-    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventCanceled.class));
-    assertThat(listener.arrivedEvents.get(3), instanceOf(TaskEventCanceled.class));
-    assertThat(listener.arrivedEvents.get(4), instanceOf(TaskEventStoppedDone.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedDone.class));
   }
 
   @Test
@@ -231,13 +229,8 @@ public class ScheduledTaskEventsIT
     // give it some time to start
     SleeperTask.youWait.await();
 
-    // attempt to cancel it 1 times
+    // cancel it w/ interruption
     taskInfo.getCurrentState().getFuture().cancel(true);
-    // Note: the original test tried it 3 times, but as cancellation is now implemented,
-    // the task would interrupt on latch await, and would go back into WAITING as schedule is hourly,
-    // hence, would "loose" the future causing NPE here
-    // taskInfo.getCurrentState().getFuture().cancel(true);
-    // taskInfo.getCurrentState().getFuture().cancel(true);
 
     // make it be done
     SleeperTask.meWait.countDown();
@@ -252,15 +245,12 @@ public class ScheduledTaskEventsIT
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.WAITING));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
 
-    // started, canceled, stoppedCanceled, but we don't know exact size!
-    // assertThat(listener.arrivedEvents, hasSize(3));
-    // first is started
+    // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
+    // attempted to be canceled at all (no canceled events), still, end state is canceled
+    // as thread was interrupted
+    assertThat(listener.arrivedEvents, hasSize(2));
     assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
-    // it contains several (at least one) canceled after started, but we don't know how many
-    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
-    // last if stoppedCanceled
-    assertThat(listener.arrivedEvents.get(listener.arrivedEvents.size() - 1),
-        instanceOf(TaskEventStoppedCanceled.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedCanceled.class));
   }
 
   @Test

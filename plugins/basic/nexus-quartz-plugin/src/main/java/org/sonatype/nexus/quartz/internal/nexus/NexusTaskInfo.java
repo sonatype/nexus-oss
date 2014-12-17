@@ -91,7 +91,8 @@ public class NexusTaskInfo<T>
             nexusTaskState.getConfiguration().getName());
       }
       else {
-        log.debug("NX Task {} state update {}, nextRun={}", jobKey, state, nexusTaskState.getNextExecutionTime());
+        log.debug("NX Task {} : {} : nextRun={} : {} ", jobKey.getName(), state, nexusTaskState.getNextExecutionTime(),
+            nexusTaskState.getConfiguration().getName());
       }
     }
     this.state = state;
@@ -100,9 +101,9 @@ public class NexusTaskInfo<T>
 
     // DONE tasks should be removed, if not removed already by #remove() method
     if (!removed && state == State.DONE) {
-      removed = true;
       quartzSupport.removeTask(jobKey);
-      log.debug("NX Task {} is done and removed", jobKey);
+      removed = true;
+      log.debug("NX Task {} is done and removed", jobKey.getName());
     }
   }
 

@@ -116,7 +116,10 @@ public class NexusTaskFuture<T>
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
     boolean result = quartzSupport.cancelJob(jobKey);
+    Thread jobExecutingThread = this.jobExecutingThread;
     if (!result && jobExecutingThread != null && mayInterruptIfRunning) {
+      // Yell about this, as this is dangerous
+      log.info("Cancelling with interruption NX Task {}", jobKey.getName());
       jobExecutingThread.interrupt();
       result = true;
     }
