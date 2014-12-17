@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.security.realms.ldap.MockLdapConnector;
+import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 

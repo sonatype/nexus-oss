@@ -10,24 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.ldap.internal.persist;
+package org.sonatype.security.realms.ldap.internal
 
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
+import org.sonatype.security.configuration.model.SecurityConfiguration
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
-
-import org.junit.Test;
-
-public class PasswordHelperTest
-    extends AbstractLdapConfigurationTest
+/**
+ * @since 3.0
+ */
+class SecurityTestSupportSecurity
 {
 
-  @Test
-  public void testGetConfig()
-      throws Exception
-  {
-    PasswordHelper passwordHelper = lookup(PasswordHelper.class);
-    System.out.println(passwordHelper.encrypt("secret"));
+  static SecurityConfiguration securityWithLdapRealm() {
+    return new SecurityConfiguration(
+        anonymousAccessEnabled: false,
+        anonymousUsername: 'anonymous',
+        realms: [
+            'NexusAuthenticatingRealm',
+            'NexusAuthorizingRealm'
+        ]
+    )
   }
+
 }
+

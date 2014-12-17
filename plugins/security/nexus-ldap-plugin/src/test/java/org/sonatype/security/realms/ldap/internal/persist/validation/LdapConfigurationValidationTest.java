@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.sonatype.security.realms.ldap.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationSource;
 import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
 

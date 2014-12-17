@@ -36,7 +36,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.sonatype.security.realms.ldap.LdapURL;
+import org.sonatype.security.realms.ldap.internal.LdapURL;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;

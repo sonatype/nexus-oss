@@ -10,24 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.ldap.internal.persist;
+package org.sonatype.security.realms.ldap.internal.events;
 
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
+import org.sonatype.nexus.events.AbstractEvent;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
-
-import org.junit.Test;
-
-public class PasswordHelperTest
-    extends AbstractLdapConfigurationTest
+public class LdapClearCacheEvent
+    extends AbstractEvent<Object>
 {
 
-  @Test
-  public void testGetConfig()
-      throws Exception
-  {
-    PasswordHelper passwordHelper = lookup(PasswordHelper.class);
-    System.out.println(passwordHelper.encrypt("secret"));
+  public LdapClearCacheEvent(Object component) {
+    super(component);
   }
+
 }

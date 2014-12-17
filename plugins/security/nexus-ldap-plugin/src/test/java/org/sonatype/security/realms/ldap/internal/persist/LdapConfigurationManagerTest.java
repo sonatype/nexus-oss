@@ -15,7 +15,7 @@ package org.sonatype.security.realms.ldap.internal.persist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.security.realms.ldap.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
 import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 

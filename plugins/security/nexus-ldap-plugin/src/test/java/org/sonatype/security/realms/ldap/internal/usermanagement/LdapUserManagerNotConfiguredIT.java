@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.ldap.internal.usermanagement;
 
-import org.sonatype.security.realms.ldap.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 

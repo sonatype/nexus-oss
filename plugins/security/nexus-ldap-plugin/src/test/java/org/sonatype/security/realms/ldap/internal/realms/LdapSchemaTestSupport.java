@@ -18,12 +18,11 @@ import java.util.SortedSet;
 
 import org.sonatype.security.realms.ldap.LdapPlugin;
 
-import org.sonatype.security.realms.ldap.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;

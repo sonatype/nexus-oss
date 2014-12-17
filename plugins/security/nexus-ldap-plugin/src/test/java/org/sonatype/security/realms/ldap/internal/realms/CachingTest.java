@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.security.authentication.AuthenticationException;
-import org.sonatype.security.realms.ldap.MockLdapConnector;
+import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
-import org.sonatype.security.realms.ldap.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
 
 import org.junit.Assert;
 import org.junit.Ignore;

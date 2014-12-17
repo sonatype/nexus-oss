@@ -33,7 +33,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.realms.ldap.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

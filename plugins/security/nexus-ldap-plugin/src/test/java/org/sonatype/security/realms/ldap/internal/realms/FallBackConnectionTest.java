@@ -15,7 +15,7 @@ package org.sonatype.security.realms.ldap.internal.realms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.security.realms.ldap.MockLdapConnector;
+import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
 
 import org.sonatype.security.authentication.AuthenticationException;

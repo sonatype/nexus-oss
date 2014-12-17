@@ -44,7 +44,7 @@ import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupE
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
-import org.sonatype.security.realms.ldap.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

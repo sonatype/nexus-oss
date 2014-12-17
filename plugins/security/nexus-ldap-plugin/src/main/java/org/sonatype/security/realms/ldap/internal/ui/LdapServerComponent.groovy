@@ -40,7 +40,7 @@ import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser
 import org.sonatype.security.realms.ldap.internal.realms.DefaultLdapContextFactory
-import org.sonatype.security.realms.ldap.LdapURL
+import org.sonatype.security.realms.ldap.internal.LdapURL
 
 import javax.annotation.Nullable
 import javax.inject.Inject

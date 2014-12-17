@@ -24,7 +24,7 @@ import javax.naming.NamingException;
 import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
-import org.sonatype.security.realms.ldap.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

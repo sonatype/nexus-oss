@@ -25,7 +25,7 @@ import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapGroupDAO;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUserDAO;
 import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
-import org.sonatype.security.realms.ldap.LdapURL;
+import org.sonatype.security.realms.ldap.internal.LdapURL;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;

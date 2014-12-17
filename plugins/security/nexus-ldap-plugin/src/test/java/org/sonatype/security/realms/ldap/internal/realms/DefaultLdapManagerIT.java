@@ -15,9 +15,8 @@ package org.sonatype.security.realms.ldap.internal.realms;
 import java.util.Collection;
 import java.util.Set;
 
-import org.sonatype.security.realms.ldap.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
-import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import junit.framework.Assert;
 import org.junit.Test;

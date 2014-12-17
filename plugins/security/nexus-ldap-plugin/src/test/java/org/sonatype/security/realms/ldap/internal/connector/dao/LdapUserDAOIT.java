@@ -19,7 +19,7 @@ import java.util.Map;
 import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
-import org.sonatype.security.realms.ldap.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
 import org.junit.Test;
 
