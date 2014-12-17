@@ -30,6 +30,7 @@ import org.sonatype.nexus.scheduling.events.TaskEventStoppedCanceled;
 import org.sonatype.nexus.scheduling.events.TaskEventStoppedDone;
 import org.sonatype.nexus.scheduling.events.TaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Hourly;
+import org.sonatype.nexus.scheduling.schedule.Now;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Lists;
@@ -41,7 +42,6 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
 /**
@@ -248,6 +248,37 @@ public class ScheduledTaskEventsIT
     // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
     // attempted to be canceled at all (no canceled events), still, end state is canceled
     // as thread was interrupted
+    assertThat(listener.arrivedEvents, hasSize(2));
+    assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedCanceled.class));
+  }
+
+  @Test
+  public void prematureCanceledRunWithNonCancelableTask() throws Exception {
+    // reset the latch
+    SleeperTask.reset();
+
+    // create the task
+    final TaskConfiguration taskConfiguration = taskScheduler
+        .createTaskConfigurationInstance(SleeperTask.class);
+    final String RESULT = "This is the expected result";
+    taskConfiguration.setString(SleeperTask.RESULT_KEY, RESULT);
+    final TaskInfo<String> taskInfo = taskScheduler.scheduleTask(taskConfiguration, new Now());
+    taskInfo.getCurrentState().getFuture().cancel(false);
+
+    // do not use latches, as this task will not even start!
+
+    // the fact that future.get returned still does not mean that the pool is done
+    // pool maintenance might not be done yet
+    // so let's sleep for some
+    Thread.sleep(500);
+    // done
+    assertThat(taskScheduler.getRunningTaskCount(), equalTo(0));
+    assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
+    assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
+
+    // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
+    // attempted to be canceled at all
     assertThat(listener.arrivedEvents, hasSize(2));
     assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
     assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedCanceled.class));
