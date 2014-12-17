@@ -33,6 +33,12 @@ Ext.define('NX.view.drilldown.Drilldown', {
     xtype: 'nx-info-panel'
   },
 
+  // List of masters to use (xtype objects)
+  masters: null,
+
+  // List of actions to use in the detail view
+  actions: null,
+
   /**
    * @override
    */
@@ -78,7 +84,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
               pack: 'start'
             },
             tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
-            actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : Ext.apply({}, me.actions)
+            actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
           }
         }
       );
