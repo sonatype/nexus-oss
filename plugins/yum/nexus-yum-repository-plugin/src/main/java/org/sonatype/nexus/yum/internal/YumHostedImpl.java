@@ -231,7 +231,7 @@ public class YumHostedImpl
       if (Objects.equals(taskInfo.getConfiguration().getRepositoryId(), task.getRepositoryId()) &&
           Objects.equals(taskInfo.getConfiguration().getString(GenerateMetadataTask.PARAM_VERSION), task.getString(
               GenerateMetadataTask.PARAM_VERSION))) {
-        final TaskConfiguration taskConfiguration =  mergeAddedFiles((TaskInfo<YumRepository>) taskInfo, task);
+        final TaskConfiguration taskConfiguration =  mergeAddedFiles(taskInfo.getConfiguration(), task);
         return nexusScheduler.scheduleTask(taskConfiguration, taskInfo.getSchedule());
       }
     }
@@ -266,10 +266,9 @@ public class YumHostedImpl
   }
 
   @SuppressWarnings("unchecked")
-  private TaskConfiguration mergeAddedFiles(final TaskInfo<YumRepository> existingScheduledTask,
-                                                  final TaskConfiguration taskToMerge)
+  private TaskConfiguration mergeAddedFiles(final TaskConfiguration existingTaskConfiguration,
+                                            final TaskConfiguration taskToMerge)
   {
-    final TaskConfiguration existingTaskConfiguration = existingScheduledTask.getConfiguration();
     if (isNotBlank(taskToMerge.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
       if (isBlank(existingTaskConfiguration.getString(GenerateMetadataTask.PARAM_ADDED_FILES))) {
         existingTaskConfiguration.setString(GenerateMetadataTask.PARAM_ADDED_FILES,
