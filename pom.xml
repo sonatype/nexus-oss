@@ -733,7 +733,7 @@
               Excludes for specific classes which have compatible, yet different licences.
               -->
               <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
-              <exclude>**/nexus-ldap-plugin/**/org/sonatype/security/ldap/LdapEncoder.java</exclude>
+              <exclude>**/nexus-ldap-plugin/**/org/sonatype/security/realms/ldap/internal/connector/dao/LdapEncoder.java</exclude>
             </excludes>
           </configuration>
         </plugin>

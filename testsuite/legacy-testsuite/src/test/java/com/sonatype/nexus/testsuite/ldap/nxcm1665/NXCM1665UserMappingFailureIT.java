@@ -15,7 +15,7 @@ package com.sonatype.nexus.testsuite.ldap.nxcm1665;
 import java.util.Locale;
 
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
-import com.sonatype.security.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;

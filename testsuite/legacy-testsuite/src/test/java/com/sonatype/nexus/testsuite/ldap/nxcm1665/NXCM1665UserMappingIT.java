@@ -13,9 +13,9 @@
 package com.sonatype.nexus.testsuite.ldap.nxcm1665;
 
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
-import com.sonatype.security.ldap.api.dto.LdapServerRequest;
-import com.sonatype.security.ldap.api.dto.LdapUserDTO;
-import com.sonatype.security.ldap.api.dto.LdapUserListResponse;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserListResponse;
 
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;

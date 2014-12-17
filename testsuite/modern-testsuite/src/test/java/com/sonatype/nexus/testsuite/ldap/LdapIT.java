@@ -16,7 +16,7 @@ import org.sonatype.sisu.siesta.common.validation.ValidationErrorsException;
 
 import org.junit.Test;
 
-import static com.sonatype.nexus.ldap.model.LdapTrustStoreKey.ldapTrustStoreKey;
+import static org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey.ldapTrustStoreKey;
 
 /**
  * ITs related to trust store keys.

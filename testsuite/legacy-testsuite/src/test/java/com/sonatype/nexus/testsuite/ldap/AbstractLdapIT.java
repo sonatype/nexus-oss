@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import com.sonatype.security.ldap.api.dto.LdapConnectionInfoDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerConfigurationDTO;
-import com.sonatype.security.ldap.api.dto.LdapServerRequest;
-import com.sonatype.security.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
-import com.sonatype.security.ldap.api.dto.XStreamInitalizer;
+import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import org.sonatype.security.realms.ldap.api.dto.XStreamInitalizer;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
