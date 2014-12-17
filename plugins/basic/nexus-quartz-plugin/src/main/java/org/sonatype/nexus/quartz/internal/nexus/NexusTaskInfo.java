@@ -179,7 +179,7 @@ public class NexusTaskInfo<T>
     if (isRemovedOrDone()) {
       // already removed
       log.debug("NX Task {} : already removed", jobKey.getName());
-      return false;
+      return true;
     }
     if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
       // running and not cancelable
@@ -197,6 +197,7 @@ public class NexusTaskInfo<T>
       log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     }
     else {
+      // TODO: WTF?
       log.info("NX Task {} : not found in QZ", jobKey.getName());
     }
     return result;

@@ -168,8 +168,9 @@ public interface TaskInfo<T>
   // ==
 
   /**
-   * Removes (with canceling if runs) the task. Returns {@code true} if removal succeeded (task was found and was
-   * removed), otherwise {@code false}.
+   * Removes (with canceling if runs) the task. Returns {@code true} if it's guaranteed that the task is removed from
+   * scheduler, and no future executions of this task will happen. Still, task might be executing in this very moment,
+   * until detects cancellation. Returns {@code false} if task executes and is not cancelable.
    */
   boolean remove();
 
