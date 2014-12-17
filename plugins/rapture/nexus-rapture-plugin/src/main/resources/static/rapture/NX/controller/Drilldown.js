@@ -149,18 +149,20 @@ Ext.define('NX.controller.Drilldown', {
     // Trigger navigation when the first list loads
     lists[0].mon(lists[0].getStore(), 'load', me.onStoreLoad, me);
 
-    me.loadStore();
+    me.loadStore(Ext.emptyFn);
   },
 
   /**
    * Prompts a reset/reload of the first list in the drilldown
+   *
+   * @param cb Call this once the store has loaded
    */
-  loadStore: function () {
+  loadStore: function (cb) {
     var me = this,
         lists = me.getLists();
 
     lists[0].getStore().clearFilter();
-    lists[0].getStore().load();
+    lists[0].getStore().load(cb);
   },
 
   loadStoreAndSelect: function (modelId) {
@@ -168,16 +170,17 @@ Ext.define('NX.controller.Drilldown', {
       lists = me.getLists(),
       model;
 
-    me.loadStore();
-
-    // Find the model belonging to this id, and bookmark it
-    for (var i = 0; i < lists.length; ++i) {
-      model = lists[i].getStore().getById(modelId);
-      if (model) {
-        me.bookmark(model);
-        break;
+    me.loadStore(function(records, operations, success) {
+      // Find the model belonging to this id, and bookmark it
+      for (var i = 0; i < lists.length; ++i) {
+        model = lists[i].getStore().getById(modelId);
+        if (model) {
+          me.bookmark(model);
+          me.navigateTo(NX.Bookmarks.getBookmark());
+          break;
+        }
       }
-    }
+    });
   },
 
   /**
@@ -216,7 +219,7 @@ Ext.define('NX.controller.Drilldown', {
         lists = me.getLists();
 
     if (lists.length) {
-      me.loadStore();
+      me.loadStore(Ext.emptyFn);
     }
   },
 
@@ -242,7 +245,7 @@ Ext.define('NX.controller.Drilldown', {
       // Find the list to which this model belongs, and focus on it
       for (var i = 0; i < lists.length; ++i) {
         if (lists[i].getView().getNode(model)) {
-          lists[i].getView().focusRow(model);
+          lists[i].getSelectionModel().select([model], false, true);
           feature.setItemName(i + 1, me.getDescription(model));
           break;
         }

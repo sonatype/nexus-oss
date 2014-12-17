@@ -262,7 +262,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    * Load store for selected source.
    */
-  loadStore: function() {
+  loadStore: function(cb) {
     var me = this,
         list = me.getList(),
         userSourceButton;
@@ -279,7 +279,8 @@ Ext.define('NX.coreui.controller.Users', {
             { property: 'source', value: userSourceButton.sourceId },
             { property: 'userId', value: me.getUserSearchBox().getValue() }
           ]
-        }
+        },
+        callback: cb
       });
     }
   },
