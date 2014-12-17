@@ -277,8 +277,8 @@ public class ScheduledTaskEventsIT
     assertThat(taskInfo.getCurrentState().getState(), equalTo(State.DONE));
     assertThat(taskInfo.getLastRunState().getEndState(), equalTo(EndState.CANCELED));
 
-    // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
-    // attempted to be canceled at all
+    // started, stoppedDone: task is not cancelable, but it was canceled by framework
+    // even before it was started
     assertThat(listener.arrivedEvents, hasSize(2));
     assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
     assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedCanceled.class));
