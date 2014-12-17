@@ -126,6 +126,10 @@ public class NexusTaskInfo<T>
     }
   }
 
+  public JobKey getJobKey() {
+    return jobKey;
+  }
+
   @Nullable
   public NexusTaskFuture<T> getNexusTaskFuture() {
     return nexusTaskFuture;

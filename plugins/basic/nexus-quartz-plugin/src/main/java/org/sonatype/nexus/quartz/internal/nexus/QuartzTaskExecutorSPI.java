@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,7 +46,6 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
@@ -88,13 +88,10 @@ public class QuartzTaskExecutorSPI
 
   @Override
   public <T> TaskInfo<T> getTaskById(final String id) {
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
-      final NexusTaskInfo<T> taskInfo = taskByKey(jobKey);
-      if (taskInfo != null && !taskInfo.isRemovedOrDone()) {
-        return taskInfo;
+      final NexusTaskInfo<T> task = taskByNxTaskId(id);
+      if (task != null && !task.isRemovedOrDone()) {
+        return task;
       }
     }
     catch (IllegalStateException e) {
@@ -103,16 +100,11 @@ public class QuartzTaskExecutorSPI
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
-    finally {
-      Thread.currentThread().setContextClassLoader(classLoader);
-    }
     return null;
   }
 
   @Override
   public List<TaskInfo<?>> listsTasks() {
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
       final List<TaskInfo<?>> result = Lists.newArrayList();
       final Map<JobKey, NexusTaskInfo<?>> allTasks = allTasks();
@@ -126,9 +118,6 @@ public class QuartzTaskExecutorSPI
     catch (SchedulerException e) {
       throw Throwables.propagate(e);
     }
-    finally {
-      Thread.currentThread().setContextClassLoader(classLoader);
-    }
   }
 
 
@@ -139,19 +128,19 @@ public class QuartzTaskExecutorSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final JobKey jobKey = JobKey.jobKey(taskConfiguration.getId(), QZ_NEXUS_GROUP);
+      final JobKey jobKey = JobKey.jobKey(UUID.randomUUID().toString(), QZ_NEXUS_GROUP);
       // get trigger, but use identity of jobKey
       // This is only for simplicity, as is not a requirement: NX job:triggers are 1:1 so tying them as this is ok
       // ! create the trigger before eventual TaskInfo remove bellow to avoid task removal in case of an invalid trigger
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(jobKey.getName(), jobKey.getGroup()).build();
 
-      final NexusTaskInfo<T> old = taskByKey(jobKey);
+      final NexusTaskInfo<T> old = taskByNxTaskId(taskConfiguration.getId());
       if (old != null && !old.remove()) {
         // this is update but old task could not be removed: ie. running a non-cancelable task
         throw new IllegalArgumentException("Task could not be updated: running and not cancelable?");
       }
-      log.info("NX Task {} : scheduled : {} ", jobKey.getName(), taskConfiguration.getName());
+      log.info("NX Task {} : {} scheduled with key: {} ", taskConfiguration.getId(), taskConfiguration.getName(), jobKey.getName());
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
@@ -179,15 +168,16 @@ public class QuartzTaskExecutorSPI
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
     try {
-      final JobKey jobKey = JobKey.jobKey(id, QZ_NEXUS_GROUP);
-      final NexusTaskInfo<T> task = taskByKey(jobKey);
+      final NexusTaskInfo<T> task = taskByNxTaskId(id);
       if (task == null) {
         return null;
       }
       checkState(!task.isRemovedOrDone(), "Done task cannot be rescheduled");
-      log.info("NX Task {} : rescheduled : {} : {} -> {} ", jobKey.getName(), task.getConfiguration().getName(), task.getSchedule(), schedule);
+      log.info("NX Task {} : rescheduled : {} : {} -> {} ", task.getJobKey().getName(),
+          task.getConfiguration().getName(),
+          task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
-          .withIdentity(jobKey.getName(), jobKey.getGroup()).forJob(jobKey).build();
+          .withIdentity(task.getJobKey().getName(), task.getJobKey().getGroup()).forJob(task.getJobKey()).build();
       quartzSupport.getScheduler().rescheduleJob(trigger.getKey(), trigger);
       // update TaskInfo, but only if it's WAITING, as running one will pick up the change by job listener when done
       task.setNexusTaskStateIfInState(
@@ -225,7 +215,6 @@ public class QuartzTaskExecutorSPI
   }
 
   // ==
-
 
   /**
    * Creates and registers a {@link NexusTaskJobListener} for given task with initial state and returns it's {@link
@@ -287,6 +276,23 @@ public class QuartzTaskExecutorSPI
     finally {
       Thread.currentThread().setContextClassLoader(classLoader);
     }
+  }
+
+  <T> NexusTaskInfo<T> taskByNxTaskId(final String id) throws SchedulerException {
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
+    try {
+      final Map<JobKey, NexusTaskInfo<?>> allTasks = allTasks();
+      for (NexusTaskInfo<?> task : allTasks.values()) {
+        if (task.getId().equals(id)) {
+          return (NexusTaskInfo<T>) task;
+        }
+      }
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(classLoader);
+    }
+    return null;
   }
 
   <T> NexusTaskInfo<T> taskByKey(final JobKey jobKey) throws SchedulerException {
