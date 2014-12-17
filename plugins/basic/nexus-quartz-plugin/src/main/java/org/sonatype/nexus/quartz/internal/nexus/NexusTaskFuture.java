@@ -123,7 +123,8 @@ public class NexusTaskFuture<T>
       jobExecutingThread.interrupt();
       result = true;
     }
-    if (result) {
+    if (result || runState == RunState.STARTING) {
+      // if canceled, or task not even started yet
       doCancel();
     }
     return result;

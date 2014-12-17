@@ -111,16 +111,18 @@ public class NexusTaskJobSupport<T>
       // after this point, cancellation will be handled okay too
 
       try {
-        mayBlock();
         if (!future.isCancelled()) {
-          future.setRunState(RunState.RUNNING);
-          try {
-            final T result = nexusTask.call();
-            context.setResult(result);
-          }
-          finally {
-            // put back any state task modified to have it persisted
-            context.getJobDetail().getJobDataMap().putAll(nexusTask.taskConfiguration().asMap());
+          mayBlock();
+          if (!future.isCancelled()) {
+            future.setRunState(RunState.RUNNING);
+            try {
+              final T result = nexusTask.call();
+              context.setResult(result);
+            }
+            finally {
+              // put back any state task modified to have it persisted
+              context.getJobDetail().getJobDataMap().putAll(nexusTask.taskConfiguration().asMap());
+            }
           }
         }
       }
@@ -185,8 +187,13 @@ public class NexusTaskJobSupport<T>
       eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
     }
     else {
-      // note: nexusTask might be null, if this method invoked outside of execute() method!
-      throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
+      if (nexusTask == null) {
+        // premature or too late cancellation attempt, just do nothing
+        return;
+      }
+      else {
+        throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
+      }
     }
   }
 
