@@ -178,11 +178,12 @@ public class NexusTaskInfo<T>
   public synchronized boolean remove() {
     if (isRemovedOrDone()) {
       // already removed
+      log.debug("NX Task {} : already removed", jobKey.getName());
       return false;
     }
-    log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
       // running and not cancelable
+      log.debug("NX Task {} : is running as is not cancelable", jobKey.getName());
       return false;
     }
     if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration())) {
@@ -191,7 +192,14 @@ public class NexusTaskInfo<T>
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
-    return quartzSupport.removeTask(jobKey);
+    boolean result = quartzSupport.removeTask(jobKey);
+    if (result) {
+      log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
+    }
+    else {
+      log.info("NX Task {} : not found in QZ", jobKey.getName());
+    }
+    return result;
   }
 
   @Override
