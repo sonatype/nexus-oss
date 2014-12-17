@@ -245,7 +245,7 @@ Ext.define('NX.controller.Drilldown', {
       // Find the list to which this model belongs, and focus on it
       for (var i = 0; i < lists.length; ++i) {
         if (lists[i].getView().getNode(model)) {
-          lists[i].getSelectionModel().select([model]);
+          lists[i].getSelectionModel().select([model], false, true);
           feature.setItemName(i + 1, me.getDescription(model));
           break;
         }
