@@ -27,33 +27,27 @@ Ext.define('NX.view.feature.Content', {
   layout: 'fit',
 
   header: {
-    xtype: 'panel',
+    height: 50,
+
     items: [
       {
-        xtype: 'toolbar',
+        xtype: 'panel',
+        layout: { type: 'hbox' },
         itemId: 'breadcrumb',
-        height: 50,
         hidden: true
       },
       {
-        xtype: 'toolbar',
+        xtype: 'panel',
+        layout: { type: 'hbox' },
         itemId: 'feature-root',
-        height: 50,
         items: [
-          '',
           {
-            xtype: 'image',
-            itemId: 'icon',
-            height: 32,
-            width: 32
-          },
-          {
-            xtype: 'tbtext',
+            xtype: 'label',
             cls: 'feature-name',
             itemId: 'title'
           },
           {
-            xtype: 'tbtext',
+            xtype: 'label',
             cls: 'feature-description',
             itemId: 'description'
           }
@@ -125,24 +119,5 @@ Ext.define('NX.view.feature.Content', {
    *
    * @private
    */
-  currentIconCls: undefined,
-
-  /**
-   * Custom handling for iconCls since we are using custom header component.
-   *
-   * @override
-   * @param cls
-   */
-  setIconCls: function(cls) {
-    var me = this,
-        icon = me.down('image[itemId=icon]');
-
-    me.callParent(arguments);
-
-    if (me.currentIconCls) {
-      icon.removeCls(me.currentIconCls);
-    }
-    icon.addCls(cls);
-    me.currentIconCls = cls;
-  }
+  currentIconCls: undefined
 });

@@ -106,6 +106,7 @@ Ext.define('NX.view.drilldown.Panel', {
       me.currentIndex = index;
 
       me.refreshBreadcrumb();
+      me.resizeBreadcrumb();
     }
   },
 
@@ -127,13 +128,6 @@ Ext.define('NX.view.drilldown.Panel', {
 
       // Make a breadcrumb (including icon and 'home' link)
       breadcrumb.add(
-        '',
-        {
-          xtype: 'image',
-          height: 32,
-          width: 32,
-          cls: content.currentIconCls
-        },
         {
           xtype: 'button',
           scale: 'large',
@@ -153,10 +147,10 @@ Ext.define('NX.view.drilldown.Panel', {
 
       // Create the rest of the links
       for (var i = 1; i <= me.currentIndex && i < me.items.items.length; ++i) {
-        breadcrumb.add(
+        breadcrumb.add([
           // Separator
           {
-            xtype: 'tbtext',
+            xtype: 'label',
             cls: 'breadcrumb-separator',
             text: '/'
           },
@@ -186,11 +180,96 @@ Ext.define('NX.view.drilldown.Panel', {
               }
             }
           })(i)
-        );
+        ]);
       }
 
       root.hide();
       breadcrumb.show();
+    }
+  },
+
+  /*
+   * Resize the breadcrumb, truncate individual elements with ellipses as needed
+   */
+  resizeBreadcrumb: function() {
+    var me = this,
+      padding = 60, // Prevent truncation from happening too late
+      parent = me.ownerCt,
+      breadcrumb = me.up('#feature-content').down('#breadcrumb'),
+      buttons, availableWidth, minimumWidth;
+
+    // Is the breadcrumb clipped?
+    if (parent && breadcrumb.getWidth() + padding > parent.getWidth()) {
+
+      // Yes. Take measurements and get a list of buttons sorted by length (longest first)
+      buttons = breadcrumb.query('button').splice(1).sort(function(a,b) { return a.getWidth() < b.getWidth(); });
+      availableWidth = parent.getWidth();
+
+      // What is the width of the breadcrumb, sans buttons?
+      minimumWidth = breadcrumb.getWidth() + padding;
+      for (var i = 0; i < buttons.length; ++i) {
+        minimumWidth -= buttons[i].getWidth();
+      }
+
+      // Reduce the size of the longest button, until all buttons fit in the specified width
+      me.reduceButtonWidth(buttons, availableWidth - minimumWidth);
+    }
+  },
+
+  /*
+   * Reduce the width of a set of buttons, longest first, to a specified width
+   *
+   * @param buttons The list of buttons to resize (sorted descending by width)
+   * @param width The desired resize width (sum of all buttons)
+   * @param minPerButton The minimum to resize each button (until all buttons are at this minimum)
+   */
+  reduceButtonWidth: function(buttons, width, minPerButton) {
+    var me = this,
+      currentWidth = 0,
+      currentButtonWidth,
+      nextButtonWidth,
+      setToWidth;
+
+    // Calculate the current width of the buttons
+    for (var i = 0; i < buttons.length; ++i) {
+      currentWidth += buttons[i].getWidth();
+    }
+
+    // Find the next button to resize
+    for (var i = 0; i < buttons.length; ++i) {
+      // Shorten the longest button
+      if (i < buttons.length - 1 && buttons[i].getWidth() > buttons[i+1].getWidth()) {
+
+        // Will resizing this button make it fit?
+        if (currentWidth - (buttons[i].getWidth() - buttons[i+1].getWidth()) <= width) {
+
+          // Yes.
+          setToWidth = width;
+          for (var j = i + 1; j < buttons.length; ++j) {
+            setToWidth -= buttons[j].getWidth();
+          }
+          buttons[i].setWidth(setToWidth);
+
+          // Exit the algorithm
+          break;
+
+        } else {
+
+          // No. Set the width of this button to that of the next button, and re-run the algorithm.
+          buttons[i].setWidth(buttons[i+1].getWidth());
+          me.reduceButtonWidth(buttons, width, minPerButton);
+        }
+      } else {
+
+        // All buttons are the same length, shorten all by the same length
+        setToWidth = Math.floor(width / buttons.length);
+        for (var j = 0; j < buttons.length; ++j) {
+          buttons[j].setWidth(setToWidth);
+        }
+
+        // Exit the algorithm
+        break;
+      }
     }
   }
 });
