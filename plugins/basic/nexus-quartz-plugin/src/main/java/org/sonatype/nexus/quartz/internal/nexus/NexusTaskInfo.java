@@ -87,10 +87,17 @@ public class NexusTaskInfo<T>
     }
     else {
       if (this.state != state) {
-        log.info("NX Task {} : {} -> {} : {} ", jobKey.getName(), this.state, state,
+        // we have a transition
+        String newState = state.name();
+        if (state != State.RUNNING && nexusTaskState.getLastRunState() != null) {
+          // we ended running and have lastRunState available, enhance log with it
+          newState = newState + " (" + nexusTaskState.getLastRunState().getEndState().name() + ")";
+        }
+        log.info("NX Task {} : {} -> {} : {} ", jobKey.getName(), this.state, newState,
             nexusTaskState.getConfiguration().getName());
       }
       else {
+        // this is usually config change of waiting task
         log.debug("NX Task {} : {} : nextRun={} : {} ", jobKey.getName(), state, nexusTaskState.getNextExecutionTime(),
             nexusTaskState.getConfiguration().getName());
       }
