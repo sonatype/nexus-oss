@@ -160,8 +160,6 @@ public class GenerateMetadataTask
 
     setDefaults();
 
-    LOG.debug("Configuration: {}", getConfiguration());
-
     final Repository repository = findRepository();
     final RepositoryItemUid mdUid = repository.createUid("/" + PATH_OF_REPOMD_XML);
     try {
