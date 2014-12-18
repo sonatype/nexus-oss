@@ -248,9 +248,10 @@ public class ScheduledTaskEventsIT
     // started, stoppedDone: task is not cancelable, hence, is "unaware" it was
     // attempted to be canceled at all (no canceled events), still, end state is canceled
     // as thread was interrupted
-    assertThat(listener.arrivedEvents, hasSize(2));
+    assertThat(listener.arrivedEvents, hasSize(3));
     assertThat(listener.arrivedEvents.get(0), instanceOf(TaskEventStarted.class));
-    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventStoppedCanceled.class));
+    assertThat(listener.arrivedEvents.get(1), instanceOf(TaskEventCanceled.class));
+    assertThat(listener.arrivedEvents.get(2), instanceOf(TaskEventStoppedCanceled.class));
   }
 
   @Test
