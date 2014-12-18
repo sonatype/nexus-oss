@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,10 +34,13 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
+import org.sonatype.nexus.scheduling.Cancelable;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.MetadataProcessor;
@@ -57,7 +61,11 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 @Named
 public class MergeMetadataTask
     extends RepositoryTaskSupport<YumRepository>
+    implements Cancelable
 {
+  // TODO: is defined in DefaultFSPeer. Do we want to expose it over there?
+  private static final String REPO_TMP_FOLDER = ".nexus/tmp";
+
   private final YumRegistry yumRegistry;
 
   private final CommandLineExecutor commandLineExecutor;
@@ -76,11 +84,17 @@ public class MergeMetadataTask
   protected YumRepository execute()
       throws Exception
   {
-    groupRepository = getRepositoryRegistry().getRepositoryWithFacet(getConfiguration().getRepositoryId(), GroupRepository.class);
+    groupRepository = getRepositoryRegistry()
+        .getRepositoryWithFacet(getConfiguration().getRepositoryId(), GroupRepository.class);
     if (isValidRepository()) {
       deleteYumTempDirs();
 
       final File repoBaseDir = RepositoryUtils.getBaseDir(groupRepository);
+      final File repoRepodataDir = new File(repoBaseDir, PATH_OF_REPODATA);
+      final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
+      DirSupport.mkdir(repoTmpDir);
+      final File repoTmpRepodataDir = new File(repoTmpDir, PATH_OF_REPODATA);
+
       RepositoryItemUid groupRepoMdUid = groupRepository.createUid("/" + PATH_OF_REPOMD_XML);
       try {
         groupRepoMdUid.getLock().lock(Action.update);
@@ -88,25 +102,30 @@ public class MergeMetadataTask
         final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
         if (memberReposBaseDirs.size() > 1) {
           log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-          commandLineExecutor.exec(buildCommand(repoBaseDir, memberReposBaseDirs));
+          commandLineExecutor.exec(buildCommand(repoTmpDir, memberReposBaseDirs));
           MetadataProcessor.processMergedMetadata(groupRepository, memberReposBaseDirs);
           log.debug("Group repository '{}' merged", groupRepository.getId());
         }
         else {
-          // delete without using group repository API as group repositories does not allow delete (read only)
-          File groupRepodata = new File(repoBaseDir, PATH_OF_REPODATA);
-          deleteQuietly(groupRepodata);
+          // just copy into newly created tmpDir
           if (memberReposBaseDirs.size() == 1) {
             log.debug(
                 "Copying Yum metadata from {} to group repository {}",
                 memberReposBaseDirs.get(0), groupRepository.getId()
             );
-            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), groupRepodata);
+            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), repoTmpRepodataDir);
           }
         }
+
+        // at the end check for cancellation
+        CancelableSupport.checkCancellation();
+        // got here, not canceled, move results to proper place
+        DirSupport.deleteIfExists(repoRepodataDir.toPath());
+        DirSupport.moveIfExists(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       finally {
         groupRepoMdUid.getLock().unlock();
+        deleteQuietly(repoTmpDir);
       }
 
       deleteYumTempDirs();

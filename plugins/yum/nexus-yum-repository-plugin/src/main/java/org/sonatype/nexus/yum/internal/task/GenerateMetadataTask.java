@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +32,8 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
+import org.sonatype.nexus.scheduling.Cancelable;
+import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
@@ -54,8 +57,10 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 
 /**
@@ -66,8 +71,11 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 @Named
 public class GenerateMetadataTask
     extends RepositoryTaskSupport<YumRepository>
-    implements ListFileFactory
+    implements ListFileFactory, Cancelable
 {
+  // TODO: is defined in DefaultFSPeer. Do we want to expose it over there?
+  private static final String REPO_TMP_FOLDER = ".nexus/tmp";
+
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
 
   private static final String CACHE_DIR_PREFIX = ".cache-";
@@ -158,20 +166,41 @@ public class GenerateMetadataTask
       mdUid.getLock().lock(Action.update);
 
       LOG.debug("Generating Yum-Repository for '{}' ...", getRpmDir());
+
+      final File repoBaseDir = getRepoDir();
+      final File repoRepodataDir = new File(repoBaseDir, PATH_OF_REPODATA);
+      final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
+      DirSupport.mkdir(repoTmpDir);
+      final File repoTmpRepodataDir = new File(repoTmpDir, PATH_OF_REPODATA);
+
       try {
         // NEXUS-6680: Nuke cache dir if force rebuild in effect
         if (shouldForceFullScan()) {
           DirSupport.deleteIfExists(getCacheDir().toPath());
         }
-        DirSupport.mkdir(getRepoDir().toPath());
+
+        // copy existing metadata to perform update
+        if (repoRepodataDir.isDirectory()) {
+          DirSupport.copy(repoRepodataDir.toPath(), repoTmpRepodataDir.toPath());
+        }
 
         File rpmListFile = createRpmListFile();
-        commandLineExecutor.exec(buildCreateRepositoryCommand(rpmListFile));
+        commandLineExecutor.exec(buildCreateRepositoryCommand(repoTmpDir, rpmListFile));
+
+        // at the end check for cancellation
+        CancelableSupport.checkCancellation();
+        // got here, not canceled, move results to proper place
+        DirSupport.deleteIfExists(repoRepodataDir.toPath());
+        DirSupport.moveIfExists(repoTmpRepodataDir.toPath(), repoRepodataDir.toPath());
       }
       catch (IOException e) {
         LOG.warn("Yum metadata generation failed", e);
         throw new IOException("Yum metadata generation failed", e);
       }
+      finally {
+        deleteQuietly(repoTmpDir);
+      }
+
       // TODO dubious
       Thread.sleep(100);
 
@@ -188,7 +217,7 @@ public class GenerateMetadataTask
       }
 
       regenerateMetadataForGroups();
-      return new YumRepositoryImpl(getRepoDir(), repositoryId, getVersion());
+      return new YumRepositoryImpl(repoBaseDir, repositoryId, getVersion());
     }
     finally {
       mdUid.getLock().unlock();
@@ -259,14 +288,14 @@ public class GenerateMetadataTask
     return getRepositoryId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
   }
 
-  private String buildCreateRepositoryCommand(File packageList) {
+  private String buildCreateRepositoryCommand(File tmpDir, File packageList) {
     StringBuilder commandLine = new StringBuilder();
     commandLine.append(yumRegistry.getCreaterepoPath());
     if (!shouldForceFullScan()) {
       commandLine.append(" --update");
     }
     commandLine.append(" --verbose --no-database");
-    commandLine.append(" --outputdir ").append(getRepoDir().getAbsolutePath());
+    commandLine.append(" --outputdir ").append(tmpDir.getAbsolutePath());
     commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
     commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
     final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();

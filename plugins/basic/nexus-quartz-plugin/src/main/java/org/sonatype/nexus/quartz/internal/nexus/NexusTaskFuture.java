@@ -54,6 +54,8 @@ public class NexusTaskFuture<T>
 
   private final CountDownLatch countDownLatch;
 
+  private volatile Thread jobExecutingThread;
+
   private volatile RunState runState;
 
   private Exception exception;
@@ -73,9 +75,14 @@ public class NexusTaskFuture<T>
     this.runState = RunState.STARTING;
   }
 
+  public void setJobExecutingThread(final Thread jobExecutingThread) {
+    this.jobExecutingThread = checkNotNull(jobExecutingThread);
+  }
+
   public void setResult(final T result, final Exception exception) {
     this.result = result;
     this.exception = exception;
+    this.jobExecutingThread = null;
     countDownLatch.countDown();
   }
 
@@ -94,24 +101,33 @@ public class NexusTaskFuture<T>
   public void setRunState(final RunState runState) {
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
-    log.debug("NX Task {} runState transition {} -> {}", jobKey, this.runState, runState);
+    log.debug("NX Task {} runState transition {} -> {}", jobKey.getName(), this.runState, runState);
     this.runState = runState;
   }
 
   public void doCancel() {
     setRunState(RunState.CANCELED);
     setResult(null, new CancellationException("Task canceled"));
+    log.info("NX Task canceled {}", jobKey.getName());
   }
 
   // == TaskFuture
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (isCancelled()) {
-      return true;
+    boolean result = quartzSupport.cancelJob(jobKey);
+    Thread jobExecutingThread = this.jobExecutingThread;
+    if (!result && jobExecutingThread != null && mayInterruptIfRunning) {
+      // Yell about this, as this is dangerous
+      log.info("Cancelling with interruption NX Task {}", jobKey.getName());
+      jobExecutingThread.interrupt();
+      result = true;
     }
-    doCancel();
-    return quartzSupport.cancelJob(jobKey);
+    if (result || runState == RunState.STARTING) {
+      // if canceled, or task not even started yet
+      doCancel();
+    }
+    return result;
   }
 
   @Override

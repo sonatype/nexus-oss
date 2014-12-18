@@ -26,7 +26,6 @@ import org.sonatype.nexus.scheduling.events.TaskEventStoppedFailed;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Throwables;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -68,7 +67,7 @@ public class NexusTaskJobListener<T>
                               final JobKey jobKey,
                               final NexusScheduleConverter nexusScheduleConverter,
                               final NexusTaskState initialState,
-                              final @Nullable NexusTaskFuture nexusTaskFuture)
+                              final @Nullable NexusTaskFuture<T> nexusTaskFuture)
   {
     this.eventBus = checkNotNull(eventBus);
     this.quartzSupport = checkNotNull(quartzSupport);
@@ -93,26 +92,41 @@ public class NexusTaskJobListener<T>
    * THAT trigger, think about "runNow"! So, this method returns the associated trigger, while the trigger in
    * context might be something completely different. If not found, returns {@code null}.
    */
+  @Nullable
   private Trigger getJobTrigger(final JobExecutionContext context) {
     try {
       return context.getScheduler().getTrigger(triggerKey(jobKey.getName(), jobKey.getGroup()));
     }
     catch (SchedulerException e) {
-      throw Throwables.propagate(e);
+      return null;
     }
+  }
+
+  /**
+   * Returns the current trigger for currently executing NX Task. That is either its associated trigger loaded
+   * up by key using {@link #getJobTrigger(JobExecutionContext)}, or if not found (can happen when invoked from
+   * {@link #jobWasExecuted(JobExecutionContext, JobExecutionException)} method for a canceled/removed job, the
+   * "current" trigger from context is returned. Never returns {@code null}, as QZ context always contains a
+   * trigger.
+   */
+  private Trigger getCurrentTrigger(final JobExecutionContext context) {
+    final Trigger jobTrigger = getJobTrigger(context);
+    return jobTrigger != null ? jobTrigger : context.getTrigger();
   }
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
-    log.trace("Job {} jobToBeExecuted", jobKey);
-    // might be null: job Removed
-    final Trigger jobTrigger = getJobTrigger(context);
-    // must never be null, so use this or that
-    final Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
+    log.trace("Job {} jobToBeExecuted", jobKey.getName());
+    // get current trigger, which in this method SHOULD be job's trigger.
+    // Still, in some circumstances (that I cannot imagine right now, except to have concurrency bug)
+    // the NX Task's Trigger might be missing. Still, we don't want to throw in this listener
+    // as that would make whole QZ instance inconsistent. Also, even if job removed (coz bug exists)
+    // we do want to "follow" it's lifecycle here.
+    final Trigger currentTrigger = getCurrentTrigger(context);
 
     NexusTaskFuture<T> future = nexusTaskInfo.getNexusTaskFuture();
     if (future == null) {
-      log.trace("Job {} has no future, creating it", jobKey);
+      log.trace("Job {} has no future, creating it", jobKey.getName());
       future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
           nexusScheduleConverter.toSchedule(context.getTrigger()));
       // set the future on taskinfo
@@ -133,8 +147,11 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
-    log.trace("Job {} jobWasExecuted", jobKey);
+    log.trace("Job {} jobWasExecuted", jobKey.getName());
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
+    // on Executed, the taskInfo might be removed or even replaced, so use the one we started with
+    // DO NOT TOUCH the listener's instance
+    final NexusTaskInfo<T> nexusTaskInfo = (NexusTaskInfo<T>) context.get(NexusTaskInfo.TASK_INFO_KEY);
     final EndState endState;
     if (future.isCancelled()) {
       endState = EndState.CANCELED;
@@ -152,20 +169,18 @@ public class NexusTaskJobListener<T>
         endState,
         future.getStartedAt(),
         System.currentTimeMillis() - future.getStartedAt().getTime());
-    log.trace("Job {} lastRunState={}", jobKey, endState);
+    log.trace("Job {} lastRunState={}", jobKey.getName(), endState);
 
-    // might be null: job Removed
-    Trigger jobTrigger = getJobTrigger(context);
-    // must never be null, so use this or that
-    Trigger currentTrigger = jobTrigger != null ? jobTrigger : context.getTrigger();
+    Trigger currentTrigger = getCurrentTrigger(context);
 
-    // the job trigger's next fire time
-    final Date nextFireTime = jobTrigger != null ? jobTrigger.getNextFireTime() : null;
+    // the job trigger's next fire time (this is ok, as "now" trigger will return null too,
+    // as this is the end of it's single one execution)
+    final Date nextFireTime = currentTrigger != null ? currentTrigger.getNextFireTime() : null;
 
     // actual schedule
     final Schedule jobSchedule = nexusScheduleConverter.toSchedule(currentTrigger);
     // state: if not removed and will fire again: WAITING, otherwise DONE
-    final State state = nextFireTime != null ? State.WAITING : State.DONE;
+    final State state = !nexusTaskInfo.isRemovedOrDone() && nextFireTime != null ? State.WAITING : State.DONE;
     // update task state, w/ respect to future: if DONE keep future, if WAITING drop it
     nexusTaskInfo.setNexusTaskState(
         state,

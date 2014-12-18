@@ -67,10 +67,8 @@ public class NexusTaskInfo<T>
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
-    this.state = nexusTaskFuture != null ? State.RUNNING : State.WAITING;
-    this.nexusTaskState = nexusTaskState;
-    this.nexusTaskFuture = nexusTaskFuture;
     this.removed = false;
+    setNexusTaskState(nexusTaskFuture != null ? State.RUNNING : State.WAITING, nexusTaskState, nexusTaskFuture);
   }
 
   public synchronized boolean isRemovedOrDone() {
@@ -84,21 +82,35 @@ public class NexusTaskInfo<T>
     checkNotNull(state);
     checkNotNull(nexusTaskState);
     checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
-    if (this.state != state) {
-      log.debug("NX Task {} state transition {} -> {}, nextRun={}", jobKey, this.state, state,
-          nexusTaskState.getNextExecutionTime());
+    if (this.state == null) {
+      log.info("NX Task {} : {} : {} ", jobKey.getName(), state, nexusTaskState.getConfiguration().getName());
     }
     else {
-      log.debug("NX Task {} state update {}, nextRun={}", jobKey, state, nexusTaskState.getNextExecutionTime());
+      if (this.state != state) {
+        // we have a transition
+        String newState = state.name();
+        if (state != State.RUNNING && nexusTaskState.getLastRunState() != null) {
+          // we ended running and have lastRunState available, enhance log with it
+          newState = newState + " (" + nexusTaskState.getLastRunState().getEndState().name() + ")";
+        }
+        log.info("NX Task {} : {} -> {} : {} ", jobKey.getName(), this.state, newState,
+            nexusTaskState.getConfiguration().getName());
+      }
+      else {
+        // this is usually config change of waiting task
+        log.debug("NX Task {} : {} : nextRun={} : {} ", jobKey.getName(), state, nexusTaskState.getNextExecutionTime(),
+            nexusTaskState.getConfiguration().getName());
+      }
     }
     this.state = state;
     this.nexusTaskState = nexusTaskState;
     this.nexusTaskFuture = nexusTaskFuture;
 
-    // DONE tasks or those already removed should be cleaned up, as they might reschedule themselves
-    if (isRemovedOrDone()) {
-      removed = true;
+    // DONE tasks should be removed, if not removed already by #remove() method
+    if (!removed && state == State.DONE) {
       quartzSupport.removeTask(jobKey);
+      removed = true;
+      log.debug("NX Task {} is done and removed", jobKey.getName());
     }
   }
 
@@ -112,6 +124,10 @@ public class NexusTaskInfo<T>
     if (this.state == state) {
       setNexusTaskState(state, nexusTaskState, nexusTaskFuture);
     }
+  }
+
+  public JobKey getJobKey() {
+    return jobKey;
   }
 
   @Nullable
@@ -146,7 +162,8 @@ public class NexusTaskInfo<T>
 
   @Override
   public synchronized CurrentState<T> getCurrentState() {
-    checkState(state == State.DONE || !removed, "Task already removed/updated");
+    // TODO: why was this check here?
+    // checkState(state == State.DONE || !removed, "Task already removed/updated");
     if (nexusTaskState.getSchedule() instanceof Manual) {
       return new CS<>(state, null, nexusTaskFuture);
     }
@@ -165,10 +182,13 @@ public class NexusTaskInfo<T>
   public synchronized boolean remove() {
     if (isRemovedOrDone()) {
       // already removed
-      return false;
+      log.debug("NX Task {} : already removed", jobKey.getName());
+      return true;
     }
-    if (nexusTaskFuture != null) {
-      nexusTaskFuture.cancel(true);
+    if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
+      // running and not cancelable
+      log.debug("NX Task {} : is running as is not cancelable", jobKey.getName());
+      return false;
     }
     if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration())) {
       // if no last state (removed even before 1st run), add one noting it got removed/canceled
@@ -176,14 +196,15 @@ public class NexusTaskInfo<T>
       NexusTaskState.setLastRunState(nexusTaskState.getConfiguration(), EndState.CANCELED, new Date(), 0L);
     }
     removed = true;
-    log.debug("NX Task {} remove; state={}", jobKey, state);
-    if (state == State.WAITING) {
-      return quartzSupport.removeTask(jobKey);
+    boolean result = quartzSupport.removeTask(jobKey);
+    if (result) {
+      log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     }
     else {
-      // removed when finished, see setNexusTaskState
-      return true;
+      // TODO: WTF?
+      log.info("NX Task {} : not found in QZ", jobKey.getName());
     }
+    return result;
   }
 
   @Override
@@ -192,7 +213,7 @@ public class NexusTaskInfo<T>
     if (isRemovedOrDone()) {
       throw new TaskRemovedException("Task removed: " + jobKey);
     }
-    log.debug("NX Task {} runNow; state={}", jobKey, state);
+    log.info("NX Task {} : runNow : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,
