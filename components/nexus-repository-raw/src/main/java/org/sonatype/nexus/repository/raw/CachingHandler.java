@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.raw;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.raw.cache.RawCacheFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.PayloadResponse;
