@@ -540,6 +540,11 @@
           <configuration>
             <excludes combine.children="append">
               <!--
+              Exclude enunciate docs
+              -->
+              <exclude>**/plugins/**/src/main/resources/docs/**</exclude>
+
+              <!--
               Exclude test resource files, many of these need specific content w/o headers.
               -->
               <exclude>**/src/test/*resources/**</exclude>
