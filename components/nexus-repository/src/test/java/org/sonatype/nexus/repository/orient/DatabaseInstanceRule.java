@@ -19,8 +19,12 @@ import org.slf4j.LoggerFactory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+// TODO: Find a better home for this so it can be re-used
+
 /**
  * JUnit rule to provide {@link DatabaseInstance} and related components.
+ *
+ * @since 3.0
  */
 public class DatabaseInstanceRule
   extends ExternalResource
