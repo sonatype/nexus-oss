@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-class FacetLookup
+public class FacetLookup
   implements Iterable<Facet>
 {
   private final Map<Class, Facet> backing = Maps.newHashMap();
