@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.repository
 
-import com.google.common.reflect.TypeToken
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import static org.junit.Assert.fail
 
 /**
  * Tests for {@link FacetLookup}.
@@ -43,16 +45,38 @@ class FacetLookupTest
     // empty
   }
 
-  /**
-   * How can we make repo.facet(ExampleFacet.class) and repo.facet(MyExampleFacet.class) work
-   * after repo.attach(new MyExampleFacet()) ?
-   */
   @Test
-  void 'experiment with facet attach type handling'() {
-    def typeToken = TypeToken.of(MyExampleFacet.class)
-    def types = typeToken.types
-    types.each { type ->
-      println type
+  void 'add and get facet'() {
+    def facet1 = new MyExampleFacet()
+    underTest.add(facet1)
+
+    def facet2 = underTest.get(MyExampleFacet.class)
+    assert facet1 == facet2
+  }
+
+  // FIXME: These tests should pass, but need to update the impl to cope first
+
+  @Test
+  @Ignore('FIXME: impl does not yet support this')
+  void 'add and get facet subtype'() {
+    def facet1 = new MyExampleFacet()
+    underTest.add(facet1)
+
+    def facet2 = underTest.get(ExampleFacet.class)
+    assert facet1 == facet2
+  }
+
+  @Test
+  @Ignore('FIXME: impl does not yet support this')
+  void 'add duplicate facet disallowed'() {
+    underTest.add(new MyExampleFacet())
+
+    try {
+      underTest.add(new MyExampleFacet())
+      fail()
+    }
+    catch (Exception e) {
+      // expected
     }
   }
 }
