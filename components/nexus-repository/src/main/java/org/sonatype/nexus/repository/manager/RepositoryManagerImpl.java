@@ -23,13 +23,16 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Default {@link RepositoryManager} implementation.
@@ -42,6 +45,8 @@ public class RepositoryManagerImpl
     extends LifecycleSupport
     implements RepositoryManager
 {
+  private final EventBus eventBus;
+
   private final ConfigurationStore store;
 
   private final Map<String,Recipe> recipes;
@@ -49,35 +54,70 @@ public class RepositoryManagerImpl
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
-  public RepositoryManagerImpl(final ConfigurationStore store,
+  public RepositoryManagerImpl(final EventBus eventBus,
+                               final ConfigurationStore store,
                                final Map<String,Recipe> recipes)
   {
+    this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
     this.recipes = checkNotNull(recipes);
+  }
 
-    log.debug("Recipes:");
-    for (Map.Entry<String,Recipe> entry : recipes.entrySet()) {
-      log.debug("Recipe '{}': {}", entry.getKey(), entry.getValue());
+  private Recipe recipe(final String name) {
+    Recipe recipe = recipes.get(name);
+    checkState(recipe != null, "Missing recipe: %s", name);
+    return recipe;
+  }
+
+  private Repository repository(final String name) {
+    Repository repository = repositories.get(name);
+    checkState(repository != null, "Missing repository: %s", name);
+    return repository;
+  }
+
+  private void track(final Repository repository) {
+    repositories.put(repository.getName(), repository);
+  }
+
+  // TODO: Generally need to consider exception handling to ensure proper state is maintained always
+
+  @Override
+  protected void doStart() throws Exception {
+    log.debug("Restoring repositories");
+    for (Configuration configuration : store.browse()) {
+      log.debug("Restoring repository: {}", configuration);
+      Recipe recipe = recipe(configuration.getRecipeName());
+      Repository repository = recipe.create(configuration);
+      track(repository);
+    }
+
+    log.debug("Starting repositories");
+    for (Repository repository : repositories.values()) {
+      repository.start();
+
+      eventBus.post(new RepositoryRestoredEvent(repository));
     }
   }
 
   @Override
-  protected void doStart() throws Exception {
-    // TODO: load all repository configs
-    // TODO: re-create repository from recipe
-    // TODO: start all repositories
-    // TODO: fire restored event ... maybe rename to started
-  }
-
-  @Override
   protected void doStop() throws Exception {
-    // TODO: stop all repositories
-    // TODO: fire stopped event?
+    log.debug("Stopping repositories");
+    for (Repository repository : repositories.values()) {
+      repository.stop();
+    }
+
+    log.debug("Disposing repositories");
+    for (Repository repository : repositories.values()) {
+      repository.dispose();
+    }
+
     repositories.clear();
   }
 
   @Override
   public Iterable<Repository> browse() {
+    ensureStarted();
+
     return ImmutableList.copyOf(repositories.values());
   }
 
@@ -85,35 +125,55 @@ public class RepositoryManagerImpl
   @Override
   public Repository read(final String name) {
     checkNotNull(name);
+    ensureStarted();
+
     return repositories.get(name);
   }
 
   @Override
   public Repository create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    // TODO: create repository from recipe
-    // TODO: store configuration
-    // TODO: add to repositories collection
-    // TODO: fire created event
-    return null;
+    ensureStarted();
+
+    log.debug("Creating repository: {}", configuration);
+    Recipe recipe = recipe(configuration.getRecipeName());
+    Repository repository = recipe.create(configuration);
+
+    store.create(configuration);
+    track(repository);
+    repository.start();
+
+    eventBus.post(new RepositoryCreatedEvent(repository));
+
+    return repository;
   }
 
   @Override
-  public Repository edit(final Configuration configuration) throws Exception {
+  public Repository update(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    // TODO: stop repository
-    // TODO: reconfigure repository (via ConfigurationFacet)
-    // TODO: start repository
-    // TODO: fire updated event?
-    return null;
+    ensureStarted();
+
+    log.debug("Updating repository: {}", configuration);
+    Repository repository = repository(configuration.getRepositoryName());
+    repository.stop();
+    repository.facet(ConfigurationFacet.class).update(configuration);
+    repository.start();
+
+    return repository;
   }
 
   @Override
   public void delete(final String name) throws Exception {
     checkNotNull(name);
-    // TODO: stop repository
-    // TODO: remove from store
-    // TODO: remove from collection
-    // TODO: fire deleted event
+    ensureStarted();
+
+    log.debug("Deleting repository: {}", name);
+    Repository repository = repository(name);
+    repository.stop();
+    repository.dispose();
+    store.delete(name);
+    repositories.remove(name);
+
+    eventBus.post(new RepositoryDeletedEvent(name));
   }
 }

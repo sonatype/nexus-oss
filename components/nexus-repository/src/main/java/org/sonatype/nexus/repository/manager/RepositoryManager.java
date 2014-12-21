@@ -33,7 +33,7 @@ public interface RepositoryManager
 
   Repository create(Configuration configuration) throws Exception;
 
-  Repository edit(Configuration configuration) throws Exception;
+  Repository update(Configuration configuration) throws Exception;
 
   void delete(String name) throws Exception;
 }

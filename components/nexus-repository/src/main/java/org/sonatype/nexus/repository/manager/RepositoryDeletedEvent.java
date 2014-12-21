@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.manager;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * ???
  *
@@ -19,5 +21,20 @@ package org.sonatype.nexus.repository.manager;
  */
 public class RepositoryDeletedEvent
 {
+  private String repositoryName;
 
+  public RepositoryDeletedEvent(final String repositoryName) {
+    this.repositoryName = checkNotNull(repositoryName);
+  }
+
+  public String getRepositoryName() {
+    return repositoryName;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repositoryName='" + repositoryName + '\'' +
+        '}';
+  }
 }

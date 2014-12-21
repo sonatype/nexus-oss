@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.repository.manager;
 
+import org.sonatype.nexus.repository.Repository;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * ???
  *
@@ -19,5 +23,20 @@ package org.sonatype.nexus.repository.manager;
  */
 public class RepositoryCreatedEvent
 {
+  private Repository repository;
 
+  public RepositoryCreatedEvent(final Repository repository) {
+    this.repository = checkNotNull(repository);
+  }
+
+  public Repository getRepository() {
+    return repository;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repository=" + repository +
+        '}';
+  }
 }
