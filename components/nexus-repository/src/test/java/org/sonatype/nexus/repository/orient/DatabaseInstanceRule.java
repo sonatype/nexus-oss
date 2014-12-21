@@ -16,6 +16,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -35,7 +36,7 @@ public class DatabaseInstanceRule
   private DatabaseInstance instance;
 
   public DatabaseInstanceRule(final String name) {
-    this.name = name;
+    this.name = checkNotNull(name);
   }
 
   public MinimalDatabaseServer getServer() {
