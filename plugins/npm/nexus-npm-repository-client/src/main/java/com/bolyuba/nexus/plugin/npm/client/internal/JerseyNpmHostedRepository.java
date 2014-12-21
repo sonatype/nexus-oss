@@ -47,4 +47,23 @@ public class JerseyNpmHostedRepository
 
     return settings;
   }
+
+  /**
+   * Returns the content URI either as null ( in the case it is not published ) or as a value
+   * always ending in forward slash.
+   *
+   * The slash is appended to ensure npm cli 2.1.7+ compatibility, yet
+   * this behaviour is also backwards compatible.
+   *
+   * @see <a href="https://github.com/npm/npm/issues/6982">NPM Issue 6982</a>
+   * @return null or the content uri always ending with forward slash
+   */
+  @Override
+  public String contentUri() {
+    final String uri = super.contentUri();
+    if(uri != null && !uri.endsWith("/")){
+      return uri + "/";
+    }
+    return uri;
+  }
 }
