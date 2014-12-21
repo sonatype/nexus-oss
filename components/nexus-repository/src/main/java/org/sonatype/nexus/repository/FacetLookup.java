@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,6 +53,6 @@ public class FacetLookup
 
   @Override
   public Iterator<Facet> iterator() {
-    return backing.values().iterator();
+    return Iterators.unmodifiableIterator(backing.values().iterator());
   }
 }

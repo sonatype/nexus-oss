@@ -102,7 +102,7 @@ public class RepositoryManagerImpl
   public Repository edit(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
     // TODO: stop repository
-    // TODO: reconfigure repository
+    // TODO: reconfigure repository (via ConfigurationFacet)
     // TODO: start repository
     // TODO: fire updated event?
     return null;
