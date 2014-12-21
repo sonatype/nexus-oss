@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
- * ???
+ * Repository manager.
  *
  * @since 3.0
  */
@@ -29,7 +29,7 @@ public interface RepositoryManager
   Iterable<Repository> browse();
 
   @Nullable
-  Repository read(String name);
+  Repository get(String name);
 
   Repository create(Configuration configuration) throws Exception;
 

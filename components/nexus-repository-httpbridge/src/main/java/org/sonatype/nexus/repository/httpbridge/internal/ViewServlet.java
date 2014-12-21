@@ -85,7 +85,7 @@ public class ViewServlet
   @Nonnull
   private Repository repository(final HttpServletRequest request) {
     String key = "TODO"; // decode from request
-    Repository repo = repositoryManager.read(key);
+    Repository repo = repositoryManager.get(key);
     checkState(repo != null, "No repository with key: %s", key);
     //noinspection ConstantConditions
     return repo;

@@ -89,6 +89,8 @@ public class RepositoryManagerImpl
       Recipe recipe = recipe(configuration.getRecipeName());
       Repository repository = recipe.create(configuration);
       track(repository);
+
+      eventBus.post(new RepositoryLoadedEvent(repository));
     }
 
     log.debug("Starting repositories");
@@ -123,7 +125,7 @@ public class RepositoryManagerImpl
 
   @Nullable
   @Override
-  public Repository read(final String name) {
+  public Repository get(final String name) {
     checkNotNull(name);
     ensureStarted();
 
@@ -159,6 +161,8 @@ public class RepositoryManagerImpl
     repository.facet(ConfigurationFacet.class).update(configuration);
     repository.start();
 
+    eventBus.post(new RepositoryUpdatedEvent(repository));
+
     return repository;
   }
 
@@ -174,6 +178,6 @@ public class RepositoryManagerImpl
     store.delete(name);
     repositories.remove(name);
 
-    eventBus.post(new RepositoryDeletedEvent(name));
+    eventBus.post(new RepositoryDeletedEvent(repository));
   }
 }

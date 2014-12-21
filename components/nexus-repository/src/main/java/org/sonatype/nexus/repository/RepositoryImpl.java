@@ -60,6 +60,7 @@ public class RepositoryImpl
 
   @Override
   public Configuration getConfiguration() {
+    checkState(configuration != null);
     return configuration;
   }
 
