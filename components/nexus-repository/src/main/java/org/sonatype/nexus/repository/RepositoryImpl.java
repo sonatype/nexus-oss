@@ -59,6 +59,15 @@ public class RepositoryImpl
   }
 
   @Override
+  public Configuration getConfiguration() {
+    return configuration;
+  }
+
+  //
+  // Lifecycle
+  //
+
+  @Override
   public void init(final Configuration configuration) throws Exception {
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
@@ -105,10 +114,9 @@ public class RepositoryImpl
     // TODO: fire disposed event
   }
 
-  @Override
-  public Configuration getConfiguration() {
-    return configuration;
-  }
+  //
+  // Facets
+  //
 
   @Override
   public void attach(final Facet facet) throws Exception {
@@ -127,5 +135,12 @@ public class RepositoryImpl
           String.format("No facet of type %s in repository %s", type.getSimpleName(), getName()));
     }
     return facet;
+  }
+
+  /**
+   * Allow set of facets to be exposed for special purposes by framework.
+   */
+  public Iterable<Facet> facets() {
+    return facets;
   }
 }
