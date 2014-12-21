@@ -13,15 +13,13 @@
 
 package org.sonatype.nexus.repository.config
 
-import com.google.inject.util.Providers
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer
-import org.sonatype.nexus.orient.DatabaseInstance
+import org.sonatype.nexus.repository.orient.DatabaseInstanceRule
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
@@ -32,26 +30,15 @@ import static org.junit.Assert.fail
 class ConfigurationStoreImplTest
     extends TestSupport
 {
-  private MinimalDatabaseServer databaseServer
-
-  private MemoryDatabaseManager databaseManager
-
-  private DatabaseInstance databaseInstance
+  @Rule
+  public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
   private ConfigurationStoreImpl underTest
 
   @Before
   void setUp() {
-    databaseServer = new MinimalDatabaseServer()
-    databaseServer.start()
-
-    databaseManager = new MemoryDatabaseManager()
-    databaseManager.start()
-
-    databaseInstance = databaseManager.instance('test')
-
     underTest = new ConfigurationStoreImpl(
-        Providers.of(databaseInstance),
+        database.instanceProvider,
         new HexRecordIdObfuscator(),
         new ConfigurationEntityAdapter()
     )
@@ -59,17 +46,7 @@ class ConfigurationStoreImplTest
 
   @After
   void tearDown() {
-    databaseInstance = null
-
-    if (databaseManager != null) {
-      databaseManager.stop()
-      databaseManager = null
-    }
-
-    if (databaseServer != null) {
-      databaseServer.stop()
-      databaseServer = null
-    }
+    underTest = null
   }
 
   @Test

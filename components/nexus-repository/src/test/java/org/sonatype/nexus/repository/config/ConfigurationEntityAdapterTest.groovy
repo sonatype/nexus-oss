@@ -14,10 +14,9 @@ package org.sonatype.nexus.repository.config
 
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer
-import org.sonatype.nexus.orient.DatabaseInstance
+import org.sonatype.nexus.repository.orient.DatabaseInstanceRule
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
@@ -26,45 +25,25 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 class ConfigurationEntityAdapterTest
   extends TestSupport
 {
-  private MinimalDatabaseServer databaseServer
-
-  private MemoryDatabaseManager databaseManager
-
-  private DatabaseInstance databaseInstance
+  @Rule
+  public DatabaseInstanceRule database = new DatabaseInstanceRule('test')
 
   private ConfigurationEntityAdapter underTest
 
   @Before
   void setUp() {
-    databaseServer = new MinimalDatabaseServer()
-    databaseServer.start()
-
-    databaseManager = new MemoryDatabaseManager()
-    databaseManager.start()
-
-    databaseInstance = databaseManager.instance('test')
-
     underTest = new ConfigurationEntityAdapter()
+
   }
 
   @After
   void tearDown() {
-    databaseInstance = null
-
-    if (databaseManager != null) {
-      databaseManager.stop()
-      databaseManager = null
-    }
-
-    if (databaseServer != null) {
-      databaseServer.stop()
-      databaseServer = null
-    }
+    underTest = null
   }
 
   @Test
   void 'register schema'() {
-    def db = databaseInstance.connect()
+    def db = database.instance.connect()
     try {
       underTest.register(db)
     }
@@ -75,7 +54,7 @@ class ConfigurationEntityAdapterTest
 
   @Test
   void 'add simple entity'() {
-    def db = databaseInstance.connect()
+    def db = database.instance.connect()
     try {
       underTest.register(db)
 
@@ -95,7 +74,7 @@ class ConfigurationEntityAdapterTest
 
   @Test
   void 'read simple entity'() {
-    def db = databaseInstance.connect()
+    def db = database.instance.connect()
     try {
       underTest.register(db)
 
