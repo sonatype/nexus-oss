@@ -114,6 +114,8 @@ public class RepositoryImpl
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
 
+    facet.init(this);
+
     facets.add(facet);
   }
 

@@ -66,7 +66,6 @@ public abstract class RecipeSupport
 
     for (Provider<? extends Facet> facetPrototype : facetPrototypes) {
       final Facet facet = facetPrototype.get();
-      facet.init(repo);
       repo.attach(facet);
     }
 
