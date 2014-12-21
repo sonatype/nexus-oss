@@ -137,9 +137,7 @@ public class RepositoryImpl
     return facet;
   }
 
-  /**
-   * Allow set of facets to be exposed for special purposes by framework.
-   */
+  @Override
   public Iterable<Facet> facets() {
     return facets;
   }

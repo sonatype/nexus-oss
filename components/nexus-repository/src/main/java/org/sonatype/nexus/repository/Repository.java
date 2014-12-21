@@ -40,4 +40,6 @@ public interface Repository
   void attach(Facet facet) throws Exception;
 
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
+
+  Iterable<Facet> facets();
 }
