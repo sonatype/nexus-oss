@@ -13,6 +13,10 @@
 package org.sonatype.nexus.repository;
 
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+
+import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -23,8 +27,19 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class RepositoryImpl
+    extends ComponentSupport
     implements Repository
 {
+  /**
+   * Assisted injection factory.
+   */
+  public static interface Factory
+  {
+    RepositoryImpl create(Type type, Format format);
+  }
+
+  private final EventBus eventBus;
+
   private final Type type;
 
   private final Format format;
@@ -38,7 +53,11 @@ public class RepositoryImpl
   // TODO: Sort out synchronization needed to ensure state sanity
   private volatile boolean started;
 
-  public RepositoryImpl(final Type type, final Format format) {
+  public RepositoryImpl(final EventBus eventBus,
+                        final @Assisted Type type,
+                        final @Assisted Format format)
+  {
+    this.eventBus = checkNotNull(eventBus);
     this.type = checkNotNull(type);
     this.format = checkNotNull(format);
   }
@@ -64,6 +83,15 @@ public class RepositoryImpl
     return configuration;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "type=" + type +
+        ", format=" + format +
+        ", name='" + name + '\'' +
+        '}';
+  }
+
   //
   // Lifecycle
   //
@@ -72,17 +100,22 @@ public class RepositoryImpl
   public void init(final Configuration configuration) throws Exception {
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
+
+    log.debug("Initialized");
   }
 
   @Override
   public void start() throws Exception {
     checkState(!started, "Already started");
 
+    log.debug("Starting");
+
     for (Facet facet : facets) {
+      log.debug("Starting facet: {}", facet);
       facet.start();
     }
 
-    // TODO: fire started event
+    eventBus.post(new RepositoryStartedEvent(this));
 
     started = true;
   }
@@ -91,28 +124,34 @@ public class RepositoryImpl
   public void stop() throws Exception {
     checkState(started, "Not started");
 
+    log.debug("Stopping");
+
     for (Facet facet : facets) {
+      log.debug("Stopping facet: {}", facet);
       facet.stop();
     }
 
-    // TODO: fire stopped event
+    eventBus.post(new RepositoryStoppedEvent(this));
 
     started = false;
   }
 
   @Override
   public void dispose() throws Exception {
+    log.debug("Disposing");
+
     if (started) {
       stop();
     }
 
     for (Facet facet : facets) {
+      log.debug("Disposing facet: {}", facet);
       facet.dispose();
     }
 
     facets.clear();
 
-    // TODO: fire disposed event
+    eventBus.post(new RepositoryDisposedEvent(this));
   }
 
   //
@@ -123,18 +162,20 @@ public class RepositoryImpl
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
 
+    log.debug("Attaching facet: {}", facet);
     facet.init(this);
-
     facets.add(facet);
   }
 
   @Override
   public <T extends Facet> T facet(final Class<T> type) throws MissingFacetException {
-    final T facet = facets.get(type);
+    T facet = facets.get(type);
+
     if (facet == null) {
       throw new MissingFacetException(
           String.format("No facet of type %s in repository %s", type.getSimpleName(), getName()));
     }
+
     return facet;
   }
 

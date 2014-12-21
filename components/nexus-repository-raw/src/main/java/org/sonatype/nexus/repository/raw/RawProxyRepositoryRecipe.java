@@ -20,8 +20,6 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Type;
 
-import com.google.inject.Injector;
-
 /**
  * A recipe for creating 'proxy' repositories for the 'raw' format.
  *
@@ -34,10 +32,13 @@ public class RawProxyRepositoryRecipe
 {
   @Inject
   public RawProxyRepositoryRecipe(final @Named("proxy") Type type,
-                                  final @Named("raw") Format format,
-                                  final Injector injector)
+                                  final @Named("raw") Format format)
   {
-    super(type, format, injector);
-    addFacetProvider(RawProxyViewFacet.class);
+    super(type, format);
+  }
+
+  @Override
+  protected void init() throws Exception {
+    addFacet(RawProxyViewFacet.class);
   }
 }

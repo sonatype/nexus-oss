@@ -13,17 +13,24 @@
 
 package org.sonatype.nexus.repository;
 
+import java.lang.annotation.Annotation;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
-import com.google.inject.Injector;
+import com.google.inject.Key;
+import org.eclipse.sisu.BeanEntry;
+import org.eclipse.sisu.inject.BeanLocator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A base class for implementing {@link Recipe}s.
@@ -38,38 +45,15 @@ public abstract class RecipeSupport
 
   private final Type type;
 
-  private final Injector injector;
+  private BeanLocator beanLocator;
 
-  protected final List<Provider<? extends Facet>> facetPrototypes;
+  private RepositoryImpl.Factory repositoryFactory;
 
-  public RecipeSupport(final Type type, final Format format, final Injector injector) {
+  protected final List<Provider<? extends Facet>> facetPrototypes = Lists.newArrayList();
+
+  protected RecipeSupport(final Type type, final Format format) {
     this.type = checkNotNull(type);
     this.format = checkNotNull(format);
-    this.injector = checkNotNull(injector);
-    facetPrototypes = Lists.newArrayList();
-  }
-
-  protected <T extends Facet> Provider<T> lookupProvider(Class<T> type) {
-    return injector.getProvider(type);
-  }
-
-  protected <T extends Facet> void addFacetProvider(Class<T> type) {
-    facetPrototypes.add(lookupProvider(type));
-  }
-
-  @Override
-  public Repository create(final Configuration config) throws Exception {
-    checkNotNull(config);
-
-    Repository repo = new RepositoryImpl(type, format);
-    repo.init(config);
-
-    for (Provider<? extends Facet> facetPrototype : facetPrototypes) {
-      final Facet facet = facetPrototype.get();
-      repo.attach(facet);
-    }
-
-    return repo;
   }
 
   @Override
@@ -80,5 +64,53 @@ public abstract class RecipeSupport
   @Override
   public Type getType() {
     return type;
+  }
+
+  @Inject
+  public void setBeanLocator(final BeanLocator beanLocator) {
+    this.beanLocator = checkNotNull(beanLocator);
+  }
+
+  @Inject
+  public void setRepositoryFactory(final RepositoryImpl.Factory factory) {
+    this.repositoryFactory = checkNotNull(factory);
+  }
+
+  @PostConstruct
+  protected abstract void init() throws Exception;
+
+  protected <T extends Facet> void addFacet(final Class<T> type) {
+    checkNotNull(type);
+
+    checkState(beanLocator != null);
+    Iterator<? extends BeanEntry<Annotation, T>> iter = beanLocator.locate(Key.get(type)).iterator();
+    if (iter.hasNext()) {
+      BeanEntry<Annotation, T> entry = iter.next();
+      log.debug("Adding facet provider: {} -> {}", type, entry);
+      facetPrototypes.add(entry.getProvider());
+    }
+    else {
+      // TODO: Should this be fatal?
+      log.error("Missing facet provider for type: {}", type);
+    }
+  }
+
+  @Override
+  public Repository create(final Configuration config) throws Exception {
+    checkNotNull(config);
+
+    log.debug("Creating repository: {}", config);
+
+    checkState(repositoryFactory != null);
+    Repository repo = repositoryFactory.create(type, format);
+    repo.init(config);
+
+    for (Provider<? extends Facet> facetPrototype : facetPrototypes) {
+      final Facet facet = facetPrototype.get();
+      log.debug("Attaching facet: {}", facet);
+      repo.attach(facet);
+    }
+
+    return repo;
   }
 }
