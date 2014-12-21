@@ -33,7 +33,6 @@ class ConfigurationEntityAdapterTest
   @Before
   void setUp() {
     underTest = new ConfigurationEntityAdapter()
-
   }
 
   @After
