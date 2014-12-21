@@ -29,19 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Configuration
     extends EntitySupport
 {
-  private String recipeName;
-
   private String repositoryName;
 
+  private String recipeName;
+
   private Map<String, Map<String, Object>> attributes = Maps.newHashMap();
-
-  public String getRecipeName() {
-    return recipeName;
-  }
-
-  public void setRecipeName(final String recipeName) {
-    this.recipeName = checkNotNull(recipeName);
-  }
 
   public String getRepositoryName() {
     return repositoryName;
@@ -49,6 +41,14 @@ public class Configuration
 
   public void setRepositoryName(final String repositoryName) {
     this.repositoryName = checkNotNull(repositoryName);
+  }
+
+  public String getRecipeName() {
+    return recipeName;
+  }
+
+  public void setRecipeName(final String recipeName) {
+    this.recipeName = checkNotNull(recipeName);
   }
 
   public Map<String, Map<String, Object>> getAttributes() {
@@ -74,8 +74,8 @@ public class Configuration
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "recipeName='" + recipeName + '\'' +
-        ", repositoryName='" + repositoryName + '\'' +
+        "repositoryName='" + repositoryName + '\'' +
+        ", recipeName='" + recipeName + '\'' +
         ", attributes=" + attributes +
         '}';
   }
