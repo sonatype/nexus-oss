@@ -12,11 +12,7 @@
  */
 package org.sonatype.nexus.repository;
 
-import java.util.Map;
-
 import org.sonatype.nexus.repository.config.Configuration;
-
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -33,14 +29,14 @@ public class RepositoryImpl
 
   private final Format format;
 
+  private final FacetLookup facets = new FacetLookup();
+
   private String name;
 
   private Configuration configuration;
 
   // TODO: Sort out synchronization needed to ensure state sanity
   private volatile boolean started;
-
-  private final Map<Class, Facet> facets = Maps.newHashMap();
 
   public RepositoryImpl(final Type type, final Format format) {
     this.type = checkNotNull(type);
@@ -71,14 +67,26 @@ public class RepositoryImpl
   @Override
   public void start() throws Exception {
     checkState(!started, "Already started");
-    // TODO
+
+    for (Facet facet : facets) {
+      facet.start();
+    }
+
+    // TODO: fire started event
+
     started = true;
   }
 
   @Override
   public void stop() throws Exception {
     checkState(started, "Not started");
-    // TODO
+
+    for (Facet facet : facets) {
+      facet.stop();
+    }
+
+    // TODO: fire stopped event
+
     started = false;
   }
 
@@ -87,7 +95,14 @@ public class RepositoryImpl
     if (started) {
       stop();
     }
-    // TODO:
+
+    for (Facet facet : facets) {
+      facet.dispose();
+    }
+
+    facets.clear();
+
+    // TODO: fire disposed event
   }
 
   @Override
@@ -98,12 +113,13 @@ public class RepositoryImpl
   @Override
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
-    facets.put(facet.getClass(), facet);
+
+    facets.add(facet);
   }
 
   @Override
   public <T extends Facet> T facet(final Class<T> type) throws MissingFacetException {
-    final T facet = (T) facets.get(checkNotNull(type));
+    final T facet = facets.get(type);
     if (facet == null) {
       throw new MissingFacetException(
           String.format("No facet of type %s in repository %s", type.getSimpleName(), getName()));
