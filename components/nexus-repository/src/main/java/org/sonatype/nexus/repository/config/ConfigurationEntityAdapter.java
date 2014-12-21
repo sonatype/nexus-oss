@@ -18,10 +18,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
+import org.sonatype.nexus.repository.entity.EntityAdapter;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -37,17 +39,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class ConfigurationEntityAdapter
   extends ComponentSupport
+  implements EntityAdapter
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
       .type(Configuration.class)
       .build();
 
-  private static final String P_RECIPE_NAME = "recipe_name";
-
   private static final String P_REPOSITORY_NAME = "repository_name";
 
+  private static final String P_RECIPE_NAME = "recipe_name";
+
   private static final String P_ATTRIBUTES = "attributes";
+
+  private static final String I_REPOSITORY_NAME = "repository_name_idx";
 
   public OClass register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
@@ -57,11 +62,14 @@ public class ConfigurationEntityAdapter
     if (type == null) {
       type = schema.createClass(DB_CLASS);
 
-      type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
       type.createProperty(P_REPOSITORY_NAME, OType.STRING).setNotNull(true);
+      type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
       type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
 
-      log.info("Created schema: {}, properties: {}", type, type.properties());
+      type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
+
+      log.info("Created schema class '{}': properties={}, indexes={}",
+          type, type.properties(), type.getIndexes());
     }
 
     return type;
@@ -90,12 +98,8 @@ public class ConfigurationEntityAdapter
     entity.setRepositoryName(repositoryName);
     entity.setAttributes(attributes);
 
-    // TODO: Where is metadata installed?
-
     return entity;
   }
-
-  // TODO: Where does MVCC fit in here?
 
   public ODocument edit(final ODocument document, final Configuration entity) {
     checkNotNull(document);
