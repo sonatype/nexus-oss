@@ -69,8 +69,6 @@ public abstract class RecipeSupport
       repo.attach(facet);
     }
 
-    repo.start();
-
     return repo;
   }
 
