@@ -133,23 +133,23 @@ public class RepositoryImpl
   }
 
   @Override
-  public void dispose() throws Exception {
-    log.debug("Disposing");
+  public void destroy() throws Exception {
+    log.debug("Destroying");
 
     if (started) {
       stop();
     }
 
     for (Facet facet : facets) {
-      log.debug("Disposing facet: {}", facet);
-      facet.dispose();
+      log.debug("Destroying facet: {}", facet);
+      facet.destroy();
     }
 
     facets.clear();
 
-    eventBus.post(new RepositoryDisposedEvent(this));
+    eventBus.post(new RepositoryDestroyedEvent(this));
 
-    log.debug("Disposed");
+    log.debug("Destroyed");
   }
 
   //

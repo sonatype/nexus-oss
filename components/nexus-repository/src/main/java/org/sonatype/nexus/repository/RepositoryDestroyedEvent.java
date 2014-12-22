@@ -13,14 +13,14 @@
 package org.sonatype.nexus.repository;
 
 /**
- * Emitted when a repository has been disposed.
+ * Emitted when a repository has been destroyed.
  *
  * @since 3.0
  */
-public class RepositoryDisposedEvent
+public class RepositoryDestroyedEvent
   extends RepositoryEvent
 {
-  public RepositoryDisposedEvent(final Repository repository) {
+  public RepositoryDestroyedEvent(final Repository repository) {
     super(repository);
   }
 }

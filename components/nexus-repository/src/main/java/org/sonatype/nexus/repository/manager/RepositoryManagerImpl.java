@@ -110,7 +110,7 @@ public class RepositoryManagerImpl
 
     log.debug("Disposing repositories");
     for (Repository repository : repositories.values()) {
-      repository.dispose();
+      repository.destroy();
     }
 
     repositories.clear();
@@ -174,7 +174,7 @@ public class RepositoryManagerImpl
     log.debug("Deleting repository: {}", name);
     Repository repository = repository(name);
     repository.stop();
-    repository.dispose();
+    repository.destroy();
     store.delete(name);
     repositories.remove(name);
 
