@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Sonatype Nexus (TM) Open Source Version
@@ -18,48 +19,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-components</artifactId>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-plugins</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-repository-raw</artifactId>
+  <artifactId>nexus-plugins-formats</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>bundle</packaging>
+  <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-repository</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-repository-httpbridge</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.goodies</groupId>
-      <artifactId>goodies-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>nexus-repository-raw</module>
+  </modules>
 
 </project>
