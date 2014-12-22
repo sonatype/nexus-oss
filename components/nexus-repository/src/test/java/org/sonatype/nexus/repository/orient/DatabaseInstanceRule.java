@@ -27,6 +27,7 @@ import org.junit.rules.ExternalResource;
 import org.junit.runners.model.MultipleFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -41,6 +42,11 @@ import static com.google.common.base.Preconditions.checkState;
 public class DatabaseInstanceRule
   extends ExternalResource
 {
+  static {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+
   private static final Logger log = LoggerFactory.getLogger(DatabaseInstanceRule.class);
 
   private final String name;
