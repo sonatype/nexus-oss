@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.internal;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.RepositoryFactory;
 import org.sonatype.nexus.repository.RepositoryImpl;
 
 import com.google.inject.AbstractModule;
@@ -31,7 +32,7 @@ public class RepositoryModule
   protected void configure() {
     install(new FactoryModuleBuilder()
             .implement(Repository.class, RepositoryImpl.class)
-            .build(RepositoryImpl.Factory.class)
+            .build(RepositoryFactory.class)
     );
   }
 }

@@ -30,14 +30,6 @@ public class RepositoryImpl
     extends ComponentSupport
     implements Repository
 {
-  /**
-   * Assisted injection factory.
-   */
-  public static interface Factory
-  {
-    RepositoryImpl create(Type type, Format format);
-  }
-
   private final EventBus eventBus;
 
   private final Type type;

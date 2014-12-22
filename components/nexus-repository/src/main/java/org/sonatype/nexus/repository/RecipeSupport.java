@@ -47,7 +47,7 @@ public abstract class RecipeSupport
 
   private BeanLocator beanLocator;
 
-  private RepositoryImpl.Factory repositoryFactory;
+  private RepositoryFactory repositoryFactory;
 
   protected final List<Provider<? extends Facet>> facetPrototypes = Lists.newArrayList();
 
@@ -67,16 +67,14 @@ public abstract class RecipeSupport
   }
 
   @Inject
-  public void setBeanLocator(final BeanLocator beanLocator) {
+  public void installDependencies(final BeanLocator beanLocator,
+                                  final RepositoryFactory repositoryFactory)
+  {
     this.beanLocator = checkNotNull(beanLocator);
+    this.repositoryFactory = checkNotNull(repositoryFactory);
   }
 
-  @Inject
-  public void setRepositoryFactory(final RepositoryImpl.Factory factory) {
-    this.repositoryFactory = checkNotNull(factory);
-  }
-
-  // TODO: Test if this will work to get sisu to invoke concreate class impl
+  // TODO: Test if this will work to get sisu to invoke concrete class impl
   @PostConstruct
   protected abstract void init() throws Exception;
 
