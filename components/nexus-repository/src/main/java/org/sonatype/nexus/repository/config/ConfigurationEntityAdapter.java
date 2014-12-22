@@ -18,13 +18,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.repository.entity.EntityAdapter;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.repository.entity.EntityAdapterSupport;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -38,8 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ConfigurationEntityAdapter
-  extends ComponentSupport
-  implements EntityAdapter
+  extends EntityAdapterSupport<Configuration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
@@ -54,35 +50,16 @@ public class ConfigurationEntityAdapter
 
   private static final String I_REPOSITORY_NAME = "repository_name_idx";
 
-  public OClass register(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-
-    OSchema schema = db.getMetadata().getSchema();
-    OClass type = schema.getClass(DB_CLASS);
-    if (type == null) {
-      type = schema.createClass(DB_CLASS);
-
-      type.createProperty(P_REPOSITORY_NAME, OType.STRING).setNotNull(true);
-      type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
-      type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
-
-      type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
-
-      log.info("Created schema class '{}': properties={}, indexes={}",
-          type, type.properties(), type.getIndexes());
-    }
-
-    return type;
+  public ConfigurationEntityAdapter() {
+    super(DB_CLASS);
   }
 
-  //
-  // BREAD operations
-  //
-
-  public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
-    checkNotNull(db);
-
-    return db.browseClass(DB_CLASS);
+  @Override
+  protected void defineSchema(final OClass type) {
+    type.createProperty(P_REPOSITORY_NAME, OType.STRING).setNotNull(true);
+    type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
+    type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
+    type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
   }
 
   public Configuration read(final ODocument document) {
@@ -110,14 +87,6 @@ public class ConfigurationEntityAdapter
     document.field(P_ATTRIBUTES, entity.getAttributes());
 
     return document.save();
-  }
-
-  public ODocument add(final ODatabaseDocumentTx db, final Configuration entity) {
-    checkNotNull(db);
-
-    ODocument doc = db.newInstance(DB_CLASS);
-
-    return edit(doc, entity);
   }
 
   // TODO: delete()

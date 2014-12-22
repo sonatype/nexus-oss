@@ -12,12 +12,26 @@
  */
 package org.sonatype.nexus.repository.entity;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+
 /**
  * Entity adapter.
  *
  * @since 3.0
  */
-public interface EntityAdapter
+public interface EntityAdapter<T>
 {
-  // marker
+  OClass register(ODatabaseDocumentTx db);
+
+  Iterable<ODocument> browse(ODatabaseDocumentTx db);
+
+  T read(ODocument document);
+
+  ODocument edit(ODocument document, T entity);
+
+  ODocument add(ODatabaseDocumentTx db, T entity);
+
+  // delete?
 }
