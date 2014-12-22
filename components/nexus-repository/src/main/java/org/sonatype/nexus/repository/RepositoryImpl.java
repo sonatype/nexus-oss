@@ -110,6 +110,8 @@ public class RepositoryImpl
     eventBus.post(new RepositoryStartedEvent(this));
 
     started = true;
+
+    log.debug("Started");
   }
 
   @Override
@@ -126,6 +128,8 @@ public class RepositoryImpl
     eventBus.post(new RepositoryStoppedEvent(this));
 
     started = false;
+
+    log.debug("Stopped");
   }
 
   @Override
@@ -144,6 +148,8 @@ public class RepositoryImpl
     facets.clear();
 
     eventBus.post(new RepositoryDisposedEvent(this));
+
+    log.debug("Disposed");
   }
 
   //
