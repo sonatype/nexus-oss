@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * A base class for implementing {@link Recipe}s.
+ * Support for {@link Recipe} implementations.
  *
  * @since 3.0
  */
@@ -76,9 +76,22 @@ public abstract class RecipeSupport
     this.repositoryFactory = checkNotNull(factory);
   }
 
+  // TODO: Test if this will work to get sisu to invoke concreate class impl
   @PostConstruct
   protected abstract void init() throws Exception;
 
+  /**
+   * Add a facet provider.
+   */
+  protected <T extends Facet> void addFacet(final Provider<T> provider) {
+    checkNotNull(provider);
+    log.debug("Adding facet provider: {}", provider);
+    facetPrototypes.add(provider);
+  }
+
+  /**
+   * Add a facet provider for the given type.
+   */
   protected <T extends Facet> void addFacet(final Class<T> type) {
     checkNotNull(type);
 
