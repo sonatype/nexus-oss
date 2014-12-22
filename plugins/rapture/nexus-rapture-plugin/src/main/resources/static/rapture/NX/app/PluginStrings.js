@@ -62,7 +62,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_SIGN_IN_CANCEL: 'Cancel>',
 
     // Filter box
-    GLOBAL_FILTER_PLACEHOLDER: 'filter',
+    GLOBAL_FILTER_PLACEHOLDER: 'filter>',
 
     // Pagination
     //GLOBAL_PAGINATION_CONTROL: 'Page [X] of [Y]',
@@ -105,7 +105,6 @@ Ext.define('NX.app.PluginStrings', {
     BROWSE_SEARCH_VERSIONS_LICENSE_COLUMN: 'License>',
     BROWSE_SEARCH_DETAILS_INFO_TAB: 'Info>',
     BROWSE_SEARCH_DETAILS_MAVEN_TAB: 'Maven>',
-    BROWSE_SEARCH_INFO_PATH: 'Path>',
     BROWSE_SEARCH_MAVEN_GROUP: 'Group>',
     BROWSE_SEARCH_MAVEN_ARTIFACT: 'Artifact>',
     BROWSE_SEARCH_MAVEN_VERSION: 'Version>',
@@ -151,11 +150,22 @@ Ext.define('NX.app.PluginStrings', {
     BROWSE_REPOSITORY_TITLE: 'Repository>',
     BROWSE_REPOSITORY_SUBTITLE: 'Browse repositories>',
     BROWSE_REPOSITORY_MORE_BUTTON: 'More…>',
-    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
     // Browse -> Repository -> Standard
     BROWSE_STANDARD_TITLE: 'Standard>',
     BROWSE_STANDARD_SUBTITLE: 'Browse standard repositories>',
+    BROWSE_STANDARD_LIST_FILE_COLUMN: 'Storage File>',
+    BROWSE_STANDARD_LIST_STORAGE_COLUMN: 'Storage>',
+    BROWSE_STANDARD_LIST_INDEX_COLUMN: 'Index>',
+    BROWSE_STANDARD_INFO_PATH: 'Path>',
+    BROWSE_STANDARD_INFO_SIZE: 'Size>',
+    BROWSE_STANDARD_INFO_UPLOADED_BY: 'Uploaded by',
+    BROWSE_STANDARD_INFO_UPLOADED_DATE: 'Uploaded Date>',
+    BROWSE_STANDARD_INFO_MODIFIED: 'Last Modified>',
+    BROWSE_STANDARD_INFO_SHA1: 'SHA1>',
+    BROWSE_STANDARD_INFO_MD5: 'MD5>',
+    BROWSE_STANDARD_INFO_CONTAINED: 'Contained in>',
+    //BROWSE_STANDARD_COMPONENT_INFO_EMPTY_STATE: 'CLM data is not available for this artifact. Unable to properly identify the groupId, artifactId or version.>',
 
     // Browse -> Repository -> Managed
     BROWSE_MANAGED_TITLE: 'Managed>',
@@ -168,10 +178,23 @@ Ext.define('NX.app.PluginStrings', {
     // Browse -> Upload -> Maven
     BROWSE_MAVEN_TITLE: 'Maven>',
     BROWSE_MAVEN_SUBTITLE: 'Upload artifacts to Maven Hosted Repositories>',
+    BROWSE_MAVEN_REPOSITORY: 'Repository>',
+    BROWSE_MAVEN_REPOSITORY_HELP: 'Select the repository where artifacts will be uploaded.>',
+    BROWSE_MAVEN_REPOSITORY_PLACEHOLDER: 'select repository>',
+    BROWSE_MAVEN_ARTIFACT_HELP: 'Select the artifacts you wish to upload>',
+    BROWSE_MAVEN_ARTIFACT_BUTTON: 'Add an artifact>',
+    BROWSE_MAVEN_ARTIFACTS_BUTTON: 'Add another artifact>',
+    BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON: 'Upload>',
+    BROWSE_MAVEN_ARTIFACT_DISCARD_BUTTON: 'Discard>',
 
     // Browse -> Upload -> Staging
     BROWSE_STAGING_TITLE: 'Staging>',
     BROWSE_STAGING_SUBTITLE: 'Upload artifacts via Staging>',
+    BROWSE_STAGING_PROFILE: 'Staging profile>',
+    BROWSE_STAGING_PROFILE_HELP: 'Select a staging profile to be used or leave it empty in order to be automatically selected.>',
+    BROWSE_STAGING_PROFILE_PLACEHOLDER: 'select a profile>',
+    BROWSE_STAGING_DESCRIPTION: 'Description>',
+    BROWSE_STAGING_DESCRIPTION_HELP: 'A detailed description of the staged repository>',
 
     // Browse -> Upload -> Staging Bundle
     BROWSE_STAGING_BUNDLE_TITLE: 'Staging Bundle>',
