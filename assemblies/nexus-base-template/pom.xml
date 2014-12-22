@@ -455,6 +455,8 @@
             <feature>nexus-coreui-plugin</feature>
             <feature>nexus-componentviews-plugin</feature>
             <feature>nexus-rawcontent-plugin</feature>
+            <feature>nexus-repository-httpbridge</feature>
+            <feature>nexus-repository-raw</feature>
           </installedFeatures>
         </configuration>
       </plugin>
