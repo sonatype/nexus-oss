@@ -19,8 +19,16 @@ import javax.annotation.Nullable;
  *
  * @since 3.0
  */
-public interface Entity
+public abstract class Entity
 {
+  private EntityMetadata metadata;
+
   @Nullable
-  EntityMetadata getEntityMetadata();
+  public EntityMetadata getEntityMetadata() {
+    return metadata;
+  }
+
+  public void setEntityMetadata(final @Nullable EntityMetadata metadata) {
+    this.metadata = metadata;
+  }
 }

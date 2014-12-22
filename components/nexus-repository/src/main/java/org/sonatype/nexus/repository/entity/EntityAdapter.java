@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public abstract class EntityAdapter<T extends EntitySupport>
+public abstract class EntityAdapter<T extends Entity>
   extends ComponentSupport
 {
   private final String typeName;

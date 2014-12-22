@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.config;
 
 import java.util.Map;
 
-import org.sonatype.nexus.repository.entity.EntitySupport;
+import org.sonatype.nexus.repository.entity.Entity;
 
 import com.google.common.collect.Maps;
 
@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class Configuration
-    extends EntitySupport
+    extends Entity
 {
   private String repositoryName;
 
