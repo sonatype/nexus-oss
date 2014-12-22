@@ -36,14 +36,14 @@ import static com.google.common.base.Preconditions.checkState;
 public abstract class EntityAdapter<T extends EntitySupport>
   extends ComponentSupport
 {
-  private final String className;
+  private final String typeName;
 
   private RecordIdObfuscator recordIdObfuscator;
 
   private OClass type;
 
-  public EntityAdapter(final String className) {
-    this.className = checkNotNull(className);
+  public EntityAdapter(final String typeName) {
+    this.typeName = checkNotNull(typeName);
   }
 
   @Inject
@@ -56,15 +56,10 @@ public abstract class EntityAdapter<T extends EntitySupport>
     return recordIdObfuscator;
   }
 
-  public OClass getType() {
-    checkState(type != null, "No registered");
-    return type;
-  }
-
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "className='" + className + '\'' +
+        "typeName='" + typeName + '\'' +
         '}';
   }
 
@@ -76,12 +71,12 @@ public abstract class EntityAdapter<T extends EntitySupport>
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
-    type = schema.getClass(className);
+    type = schema.getClass(typeName);
     if (type == null) {
-      type = schema.createClass(className);
-      defineSchema(type);
+      type = schema.createClass(typeName);
+      defineType(type);
 
-      log.debug("Created schema class '{}': properties={}, indexes={}",
+      log.debug("Created schema type '{}': properties={}, indexes={}",
           type,
           type.properties(),
           type.getIndexes()
@@ -89,7 +84,12 @@ public abstract class EntityAdapter<T extends EntitySupport>
     }
   }
 
-  protected abstract void defineSchema(final OClass type);
+  protected abstract void defineType(final OClass type);
+
+  public OClass getType() {
+    checkState(type != null, "Not registered");
+    return type;
+  }
 
   //
   // BREAD operations
@@ -103,7 +103,7 @@ public abstract class EntityAdapter<T extends EntitySupport>
 
   public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
-    return db.browseClass(className);
+    return db.browseClass(typeName);
   }
 
   public T read(final ODocument document) {
@@ -130,7 +130,7 @@ public abstract class EntityAdapter<T extends EntitySupport>
     checkNotNull(db);
     checkNotNull(entity);
 
-    ODocument doc = db.newInstance(className);
+    ODocument doc = db.newInstance(typeName);
     return edit(doc, entity);
   }
 

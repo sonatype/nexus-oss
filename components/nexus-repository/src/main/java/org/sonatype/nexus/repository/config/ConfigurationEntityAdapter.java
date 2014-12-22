@@ -53,7 +53,7 @@ public class ConfigurationEntityAdapter
   }
 
   @Override
-  protected void defineSchema(final OClass type) {
+  protected void defineType(final OClass type) {
     type.createProperty(P_REPOSITORY_NAME, OType.STRING).setNotNull(true);
     type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
