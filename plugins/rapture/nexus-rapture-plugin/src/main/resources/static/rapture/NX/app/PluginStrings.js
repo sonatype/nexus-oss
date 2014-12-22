@@ -187,19 +187,6 @@ Ext.define('NX.app.PluginStrings', {
     BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON: 'Upload>',
     BROWSE_MAVEN_ARTIFACT_DISCARD_BUTTON: 'Discard>',
 
-    // Browse -> Upload -> Staging
-    BROWSE_STAGING_TITLE: 'Staging>',
-    BROWSE_STAGING_SUBTITLE: 'Upload artifacts via Staging>',
-    BROWSE_STAGING_PROFILE: 'Staging profile>',
-    BROWSE_STAGING_PROFILE_HELP: 'Select a staging profile to be used or leave it empty in order to be automatically selected.>',
-    BROWSE_STAGING_PROFILE_PLACEHOLDER: 'select a profile>',
-    BROWSE_STAGING_DESCRIPTION: 'Description>',
-    BROWSE_STAGING_DESCRIPTION_HELP: 'A detailed description of the staged repository>',
-
-    // Browse -> Upload -> Staging Bundle
-    BROWSE_STAGING_BUNDLE_TITLE: 'Staging Bundle>',
-    BROWSE_STAGING_BUNDLE_SUBTITLE: 'Upload bundle via Staging>',
-
     // Admin -> Repository
     ADMIN_REPOSITORY_TITLE: 'Repository>',
     ADMIN_REPOSITORY_SUBTITLE: 'Repository administration>',
