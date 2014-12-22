@@ -94,7 +94,7 @@ public class ConfigurationStoreImpl
     checkState(configuration.getEntityMetadata() == null);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = entityAdapter.add(db, configuration);
+      entityAdapter.add(db, configuration);
     }
 
     return configuration;
@@ -112,7 +112,7 @@ public class ConfigurationStoreImpl
 
       // TODO: Verify record version
 
-      doc = entityAdapter.edit(doc, configuration);
+      entityAdapter.edit(doc, configuration);
     }
 
     return configuration;
