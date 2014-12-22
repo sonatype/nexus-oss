@@ -81,7 +81,7 @@ public abstract class RecipeSupport
   /**
    * Add a facet provider.
    */
-  protected <T extends Facet> void addFacet(final Provider<T> provider) {
+  protected void addFacet(final Provider<? extends Facet> provider) {
     checkNotNull(provider);
     log.debug("Adding facet provider: {}", provider);
     facetPrototypes.add(provider);
