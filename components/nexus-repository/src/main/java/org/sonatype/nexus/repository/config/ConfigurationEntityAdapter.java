@@ -88,6 +88,4 @@ public class ConfigurationEntityAdapter
 
     return document.save();
   }
-
-  // TODO: delete()
 }

@@ -20,19 +20,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.RecordIdObfuscator;
-import org.sonatype.nexus.repository.entity.EntityId;
-import org.sonatype.nexus.repository.entity.EntityMetadata;
-import org.sonatype.nexus.repository.entity.EntityVersion;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.version.ORecordVersion;
-import com.orientechnologies.orient.core.version.OSimpleVersion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -48,56 +41,26 @@ public class ConfigurationStoreImpl
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final RecordIdObfuscator recordIdObfuscator;
-
   private final ConfigurationEntityAdapter entityAdapter;
-
-  private OClass entityType;
 
   @Inject
   public ConfigurationStoreImpl(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                                final RecordIdObfuscator recordIdObfuscator,
                                 final ConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
-    this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
     this.entityAdapter = checkNotNull(entityAdapter);
   }
 
   @Override
   protected void doStart() throws Exception {
     try (ODatabaseDocumentTx db = databaseInstance.get().connect()) {
-      // register schema
-      entityType = entityAdapter.register(db);
+      entityAdapter.register(db);
     }
   }
-
-  @Override
-  protected void doStop() throws Exception {
-    entityType = null;
-  }
-
-  // TODO: Hookup to NX lifecycle
 
   private ODatabaseDocumentTx openDb() {
     ensureStarted();
     return databaseInstance.get().acquire();
-  }
-
-  private void attachEntityMetadata(final Configuration entity, final ODocument doc) {
-    EntityId id = new EntityId(recordIdObfuscator.encode(entityType, doc.getIdentity()));
-    EntityVersion version = new EntityVersion(doc.getRecordVersion().toString());
-    entity.setEntityMetadata(new EntityMetadata(id, version));
-  }
-
-  private ORID decodeRecordIdentity(final EntityMetadata metadata) {
-    return recordIdObfuscator.decode(entityType, metadata.getId().getValue());
-  }
-
-  private ORecordVersion decodeRecordVersion(final EntityMetadata metadata) {
-    ORecordVersion version = new OSimpleVersion();
-    version.getSerializer().fromString(metadata.getVersion().getValue(), version);
-    return version;
   }
 
   @Override
@@ -107,7 +70,7 @@ public class ConfigurationStoreImpl
     try (ODatabaseDocumentTx db = openDb()) {
       for (ODocument doc : entityAdapter.browse(db)) {
         Configuration entity = entityAdapter.read(doc);
-        attachEntityMetadata(entity, doc);
+        entityAdapter.setMetadata(entity, doc);
         entities.add(entity);
       }
     }
@@ -130,12 +93,11 @@ public class ConfigurationStoreImpl
   @Override
   public Configuration create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-
     checkState(configuration.getEntityMetadata() == null);
 
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = entityAdapter.add(db, configuration);
-      attachEntityMetadata(configuration, doc);
+      entityAdapter.setMetadata(configuration, doc);
     }
 
     return configuration;
@@ -145,9 +107,7 @@ public class ConfigurationStoreImpl
   public Configuration edit(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
 
-    EntityMetadata metadata = configuration.getEntityMetadata();
-    checkState(metadata != null);
-    ORID rid = decodeRecordIdentity(metadata);
+    ORID rid = entityAdapter.recordIdentity(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = db.getRecord(rid);
@@ -156,7 +116,7 @@ public class ConfigurationStoreImpl
       // TODO: Verify record version
 
       doc = entityAdapter.edit(doc, configuration);
-      attachEntityMetadata(configuration, doc);
+      entityAdapter.setMetadata(configuration, doc);
     }
 
     return configuration;

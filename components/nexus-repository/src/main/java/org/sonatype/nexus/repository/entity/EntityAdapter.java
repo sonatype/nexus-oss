@@ -23,7 +23,11 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  */
 public interface EntityAdapter<T>
 {
-  OClass register(ODatabaseDocumentTx db);
+  OClass getType();
+
+  void register(ODatabaseDocumentTx db);
+
+  // BREAD operations
 
   Iterable<ODocument> browse(ODatabaseDocumentTx db);
 

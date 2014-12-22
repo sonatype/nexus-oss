@@ -12,28 +12,54 @@
  */
 package org.sonatype.nexus.repository.entity;
 
+import javax.inject.Inject;
+
+import org.sonatype.nexus.orient.RecordIdObfuscator;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.version.ORecordVersion;
+import com.orientechnologies.orient.core.version.OSimpleVersion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Support for {@link EntityAdapter} implementations.
  *
  * @since 3.0
  */
-public abstract class EntityAdapterSupport<T>
+public abstract class EntityAdapterSupport<T extends EntitySupport>
   extends ComponentSupport
   implements EntityAdapter<T>
 {
   private final String className;
 
+  private RecordIdObfuscator recordIdObfuscator;
+
+  private OClass type;
+
   public EntityAdapterSupport(final String className) {
     this.className = checkNotNull(className);
+  }
+
+  @Inject
+  public void installDependencies(final RecordIdObfuscator recordIdObfuscator) {
+    this.recordIdObfuscator = checkNotNull(recordIdObfuscator);
+  }
+
+  protected RecordIdObfuscator getRecordIdObfuscator() {
+    checkState(recordIdObfuscator != null);
+    return recordIdObfuscator;
+  }
+
+  public OClass getType() {
+    checkState(type != null, "No registered");
+    return type;
   }
 
   @Override
@@ -44,30 +70,33 @@ public abstract class EntityAdapterSupport<T>
   }
 
   @Override
-  public OClass register(final ODatabaseDocumentTx db) {
+  public void register(final ODatabaseDocumentTx db) {
     checkNotNull(db);
 
     OSchema schema = db.getMetadata().getSchema();
-    OClass type = schema.getClass(className);
+    type = schema.getClass(className);
     if (type == null) {
       type = schema.createClass(className);
       defineSchema(type);
 
-      log.info("Created schema class '{}': properties={}, indexes={}",
+      log.debug("Created schema class '{}': properties={}, indexes={}",
           type,
           type.properties(),
           type.getIndexes()
       );
     }
-
-    return type;
   }
 
   protected abstract void defineSchema(final OClass type);
 
+  //
+  // BREAD operations
+  //
+
   @Override
   public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
+
     return db.browseClass(className);
   }
 
@@ -75,7 +104,51 @@ public abstract class EntityAdapterSupport<T>
   public ODocument add(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
+
     ODocument doc = db.newInstance(className);
     return edit(doc, entity);
+  }
+
+  //
+  // Metadata support
+  //
+
+  /**
+   * Set metadata on entity.
+   */
+  public void setMetadata(final T entity, final ODocument doc) {
+    checkNotNull(entity != null);
+    checkNotNull(doc != null);
+    EntityId id = new EntityId(getRecordIdObfuscator().encode(getType(), doc.getIdentity()));
+    EntityVersion version = new EntityVersion(doc.getRecordVersion().toString());
+    entity.setEntityMetadata(new EntityMetadata(id, version));
+  }
+
+  /**
+   * Get metadata from entity.
+   */
+  public EntityMetadata getMetadata(final T entity) {
+    checkNotNull(entity != null);
+    EntityMetadata metadata = entity.getEntityMetadata();
+    checkState(metadata != null);
+    return metadata;
+  }
+
+  /**
+   * Return record identity of entity.
+   */
+  public ORID recordIdentity(final T entity) {
+    EntityMetadata metadata = getMetadata(entity);
+    return getRecordIdObfuscator().decode(getType(), metadata.getId().getValue());
+  }
+
+  /**
+   * Return record version of entity.
+   */
+  public ORecordVersion recordVersion(final T entity) {
+    EntityMetadata metadata = getMetadata(entity);
+    ORecordVersion version = new OSimpleVersion();
+    version.getSerializer().fromString(metadata.getVersion().getValue(), version);
+    return version;
   }
 }

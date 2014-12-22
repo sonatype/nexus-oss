@@ -37,10 +37,12 @@ class ConfigurationStoreImplTest
 
   @Before
   void setUp() {
+    def entityAdapter = new ConfigurationEntityAdapter()
+    entityAdapter.installDependencies(new HexRecordIdObfuscator())
+
     underTest = new ConfigurationStoreImpl(
         database.instanceProvider,
-        new HexRecordIdObfuscator(),
-        new ConfigurationEntityAdapter()
+        entityAdapter
     )
   }
 
