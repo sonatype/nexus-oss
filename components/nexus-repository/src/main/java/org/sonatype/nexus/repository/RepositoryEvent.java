@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * ???
+ * Repository event.
  *
  * @since 3.0
  */

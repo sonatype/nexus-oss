@@ -162,10 +162,8 @@ public class RepositoryImpl
   @Override
   public <T extends Facet> T facet(final Class<T> type) throws MissingFacetException {
     T facet = facets.get(type);
-
     if (facet == null) {
-      throw new MissingFacetException(
-          String.format("No facet of type %s in repository %s", type.getSimpleName(), getName()));
+      throw new MissingFacetException(this, type);
     }
 
     return facet;

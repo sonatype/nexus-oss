@@ -20,18 +20,7 @@ package org.sonatype.nexus.repository;
 public class MissingFacetException
     extends RuntimeException
 {
-  public MissingFacetException() {
-  }
-
-  public MissingFacetException(final String message) {
-    super(message);
-  }
-
-  public MissingFacetException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
-
-  public MissingFacetException(final Throwable cause) {
-    super(cause);
+  public MissingFacetException(final Repository repository, final Class<? extends Facet> type) {
+    super(String.format("No facet of type %s in repository %s", type.getSimpleName(), repository.getName()));
   }
 }
