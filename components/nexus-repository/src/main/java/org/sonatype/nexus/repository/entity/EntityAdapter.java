@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.entity;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 
 import org.sonatype.nexus.orient.RecordIdObfuscator;
@@ -101,11 +103,28 @@ public abstract class EntityAdapter<T extends Entity>
 
   protected abstract void writeFields(final ODocument document, final T entity);
 
+  /**
+   * Browse all documents.
+   */
   public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
     return db.browseClass(typeName);
   }
 
+  /**
+   * Browse all entities, appending to given collection.
+   */
+  public Iterable<T> browse(final ODatabaseDocumentTx db, final Collection<T> entities) {
+    checkNotNull(entities);
+    for (ODocument document : browse(db)) {
+      entities.add(read(document));
+    }
+    return entities;
+  }
+
+  /**
+   * Read entity from document.
+   */
   public T read(final ODocument document) {
     checkNotNull(document);
 
@@ -116,6 +135,9 @@ public abstract class EntityAdapter<T extends Entity>
     return entity;
   }
 
+  /**
+   * Edit document from entity.
+   */
   public ODocument edit(final ODocument document, final T entity) {
     checkNotNull(document);
     checkNotNull(entity);
@@ -126,6 +148,9 @@ public abstract class EntityAdapter<T extends Entity>
     return document.save();
   }
 
+  /**
+   * Add new entity.
+   */
   public ODocument add(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);

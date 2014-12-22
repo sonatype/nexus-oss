@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.config;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,24 +63,15 @@ public class ConfigurationStoreImpl
 
   @Override
   public Iterable<Configuration> browse() {
-    ensureStarted();
-    List<Configuration> entities = Lists.newArrayList();
-
     try (ODatabaseDocumentTx db = openDb()) {
-      // FIXME: Should hide this detail in EA
-      for (ODocument doc : entityAdapter.browse(db)) {
-        entities.add(entityAdapter.read(doc));
-      }
+      return entityAdapter.browse(db, Lists.<Configuration>newArrayList());
     }
-
-    return entities;
   }
 
   @Nullable
   @Override
   public Configuration read(final String identifier) {
     checkNotNull(identifier);
-    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       // TODO:
@@ -95,7 +84,6 @@ public class ConfigurationStoreImpl
   public Configuration create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
     checkState(configuration.getEntityMetadata() == null);
-    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       entityAdapter.add(db, configuration);
@@ -107,7 +95,6 @@ public class ConfigurationStoreImpl
   @Override
   public Configuration edit(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    ensureStarted();
 
     // FIXME: Should hide this detail in EA
     ORID rid = entityAdapter.recordIdentity(configuration);
@@ -127,7 +114,6 @@ public class ConfigurationStoreImpl
   @Override
   public void delete(final String identifier) throws Exception {
     checkNotNull(identifier);
-    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       // TODO:
