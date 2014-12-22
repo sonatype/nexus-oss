@@ -25,8 +25,6 @@ import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * {@link Configuration} entity adapter.
  *
@@ -62,11 +60,13 @@ public class ConfigurationEntityAdapter
     type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
   }
 
-  public Configuration read(final ODocument document) {
-    checkNotNull(document);
+  @Override
+  protected Configuration newEntity() {
+    return new Configuration();
+  }
 
-    Configuration entity = new Configuration();
-
+  @Override
+  protected void readFields(final ODocument document, final Configuration entity) {
     String recipeName = document.field(P_RECIPE_NAME, OType.STRING);
     String repositoryName = document.field(P_REPOSITORY_NAME, OType.STRING);
     Map<String,Map<String,Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
@@ -74,18 +74,12 @@ public class ConfigurationEntityAdapter
     entity.setRecipeName(recipeName);
     entity.setRepositoryName(repositoryName);
     entity.setAttributes(attributes);
-
-    return entity;
   }
 
-  public ODocument edit(final ODocument document, final Configuration entity) {
-    checkNotNull(document);
-    checkNotNull(entity);
-
+  @Override
+  protected void writeFields(final ODocument document, final Configuration entity) {
     document.field(P_RECIPE_NAME, entity.getRecipeName());
     document.field(P_REPOSITORY_NAME, entity.getRepositoryName());
     document.field(P_ATTRIBUTES, entity.getAttributes());
-
-    return document.save();
   }
 }

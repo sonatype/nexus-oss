@@ -69,9 +69,7 @@ public class ConfigurationStoreImpl
 
     try (ODatabaseDocumentTx db = openDb()) {
       for (ODocument doc : entityAdapter.browse(db)) {
-        Configuration entity = entityAdapter.read(doc);
-        entityAdapter.setMetadata(entity, doc);
-        entities.add(entity);
+        entities.add(entityAdapter.read(doc));
       }
     }
 
@@ -97,7 +95,6 @@ public class ConfigurationStoreImpl
 
     try (ODatabaseDocumentTx db = openDb()) {
       ODocument doc = entityAdapter.add(db, configuration);
-      entityAdapter.setMetadata(configuration, doc);
     }
 
     return configuration;
@@ -116,7 +113,6 @@ public class ConfigurationStoreImpl
       // TODO: Verify record version
 
       doc = entityAdapter.edit(doc, configuration);
-      entityAdapter.setMetadata(configuration, doc);
     }
 
     return configuration;

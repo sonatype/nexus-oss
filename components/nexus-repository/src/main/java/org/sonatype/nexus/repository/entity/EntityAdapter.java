@@ -37,5 +37,5 @@ public interface EntityAdapter<T>
 
   ODocument add(ODatabaseDocumentTx db, T entity);
 
-  // delete?
+  // TODO: delete
 }

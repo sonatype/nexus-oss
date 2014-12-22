@@ -93,11 +93,38 @@ public abstract class EntityAdapterSupport<T extends EntitySupport>
   // BREAD operations
   //
 
+  protected abstract T newEntity();
+
+  protected abstract void readFields(final ODocument document, final T entity);
+
+  protected abstract void writeFields(final ODocument document, final T entity);
+
   @Override
   public Iterable<ODocument> browse(final ODatabaseDocumentTx db) {
     checkNotNull(db);
-
     return db.browseClass(className);
+  }
+
+  @Override
+  public T read(final ODocument document) {
+    checkNotNull(document);
+
+    T entity = newEntity();
+    readFields(document, entity);
+    setMetadata(entity, document);
+
+    return entity;
+  }
+
+  @Override
+  public ODocument edit(final ODocument document, final T entity) {
+    checkNotNull(document);
+    checkNotNull(entity);
+
+    writeFields(document, entity);
+    setMetadata(entity, document);
+
+    return document.save();
   }
 
   @Override
@@ -108,6 +135,8 @@ public abstract class EntityAdapterSupport<T extends EntitySupport>
     ODocument doc = db.newInstance(className);
     return edit(doc, entity);
   }
+
+  // TODO: delete
 
   //
   // Metadata support
