@@ -18,7 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.OClassNameBuilder;
-import org.sonatype.nexus.repository.entity.EntityAdapterSupport;
+import org.sonatype.nexus.repository.entity.EntityAdapter;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
@@ -33,7 +33,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 @Named
 @Singleton
 public class ConfigurationEntityAdapter
-  extends EntityAdapterSupport<Configuration>
+  extends EntityAdapter<Configuration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
