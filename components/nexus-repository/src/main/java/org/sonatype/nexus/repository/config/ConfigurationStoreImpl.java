@@ -65,6 +65,7 @@ public class ConfigurationStoreImpl
 
   @Override
   public Iterable<Configuration> browse() {
+    ensureStarted();
     List<Configuration> entities = Lists.newArrayList();
 
     try (ODatabaseDocumentTx db = openDb()) {
@@ -80,6 +81,7 @@ public class ConfigurationStoreImpl
   @Override
   public Configuration read(final String identifier) {
     checkNotNull(identifier);
+    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       // TODO:
@@ -92,6 +94,7 @@ public class ConfigurationStoreImpl
   public Configuration create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
     checkState(configuration.getEntityMetadata() == null);
+    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       entityAdapter.add(db, configuration);
@@ -103,6 +106,7 @@ public class ConfigurationStoreImpl
   @Override
   public Configuration edit(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
+    ensureStarted();
 
     ORID rid = entityAdapter.recordIdentity(configuration);
 
@@ -121,6 +125,7 @@ public class ConfigurationStoreImpl
   @Override
   public void delete(final String identifier) throws Exception {
     checkNotNull(identifier);
+    ensureStarted();
 
     try (ODatabaseDocumentTx db = openDb()) {
       // TODO:
