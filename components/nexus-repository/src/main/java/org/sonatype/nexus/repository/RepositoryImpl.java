@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.inject.Inject;
+
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -45,6 +47,7 @@ public class RepositoryImpl
   // TODO: Sort out synchronization needed to ensure state sanity
   private volatile boolean started;
 
+  @Inject
   public RepositoryImpl(final EventBus eventBus,
                         final @Assisted Type type,
                         final @Assisted Format format)
