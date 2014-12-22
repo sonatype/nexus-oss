@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
@@ -33,6 +34,8 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
+@Named
+@Singleton
 public class ConfigurationStoreImpl
   extends LifecycleSupport
   implements ConfigurationStore

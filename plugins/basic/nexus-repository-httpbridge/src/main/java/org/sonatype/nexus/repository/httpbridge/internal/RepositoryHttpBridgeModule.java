@@ -12,20 +12,24 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
+import javax.inject.Named;
+
+import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.web.SecurityFilter;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
+ * Repository HTTP bridge module.
+ *
  * @since 3.0
  */
+@Named
 public class RepositoryHttpBridgeModule
     extends AbstractModule
 {
-  private static final Logger log = LoggerFactory.getLogger(RepositoryHttpBridgeModule.class);
-
-  public static final String MOUNT_POINT = "/repository/*";
+  public static final String MOUNT_POINT = "/repository";
 
   @Override
   protected void configure() {
@@ -34,9 +38,18 @@ public class RepositoryHttpBridgeModule
       @Override
       protected void configureServlets() {
         bind(ViewServlet.class);
-        serve(MOUNT_POINT).with(ViewServlet.class);
+        serve(MOUNT_POINT + "/*").with(ViewServlet.class);
+        filter(MOUNT_POINT + "/*").through(SecurityFilter.class);
       }
     });
-    log.info("Nexus repository HTTP bridge configured");
+
+    install(new FilterChainModule()
+    {
+      @Override
+      protected void configure() {
+        // FIXME: Update filters here
+        //addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
+      }
+    });
   }
 }
