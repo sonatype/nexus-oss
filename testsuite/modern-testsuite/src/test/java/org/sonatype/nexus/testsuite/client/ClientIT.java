@@ -505,7 +505,7 @@ public class ClientIT
     assertThat(target.id(), is(id));
     assertThat(target.name(), is(id + "name"));
     assertThat(target.contentClass(), is("maven2"));
-    assertThat(target.patterns(), contains("test1", "test2"));
+    assertThat(target.patterns(), containsInAnyOrder("test1", "test2"));
   }
 
   private RepositoryTarget createTarget(final String id, final String... patterns) {
