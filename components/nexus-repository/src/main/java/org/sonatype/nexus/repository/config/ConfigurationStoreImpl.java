@@ -69,6 +69,7 @@ public class ConfigurationStoreImpl
     List<Configuration> entities = Lists.newArrayList();
 
     try (ODatabaseDocumentTx db = openDb()) {
+      // FIXME: Should hide this detail in EA
       for (ODocument doc : entityAdapter.browse(db)) {
         entities.add(entityAdapter.read(doc));
       }
@@ -108,6 +109,7 @@ public class ConfigurationStoreImpl
     checkNotNull(configuration);
     ensureStarted();
 
+    // FIXME: Should hide this detail in EA
     ORID rid = entityAdapter.recordIdentity(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
