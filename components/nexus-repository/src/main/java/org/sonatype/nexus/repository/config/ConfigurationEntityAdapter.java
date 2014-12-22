@@ -54,8 +54,12 @@ public class ConfigurationEntityAdapter
 
   @Override
   protected void defineType(final OClass type) {
-    type.createProperty(P_REPOSITORY_NAME, OType.STRING).setNotNull(true);
-    type.createProperty(P_RECIPE_NAME, OType.STRING).setNotNull(true);
+    type.createProperty(P_REPOSITORY_NAME, OType.STRING)
+        .setMandatory(true)
+        .setNotNull(true);
+    type.createProperty(P_RECIPE_NAME, OType.STRING)
+        .setMandatory(true)
+        .setNotNull(true);
     type.createProperty(P_ATTRIBUTES, OType.EMBEDDEDMAP);
     type.createIndex(I_REPOSITORY_NAME, INDEX_TYPE.UNIQUE, P_REPOSITORY_NAME);
   }

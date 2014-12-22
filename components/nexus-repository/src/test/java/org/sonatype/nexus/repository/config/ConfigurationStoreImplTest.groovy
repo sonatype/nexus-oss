@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.config
 
+import com.orientechnologies.orient.core.exception.OValidationException
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
 import org.junit.After
 import org.junit.Before
@@ -79,7 +80,7 @@ class ConfigurationStoreImplTest
   }
 
   @Test
-  void 'create entity with duplicate name disallowed'() {
+  void 'create entity with unique repositoryName'() {
     underTest.start()
 
     try {
@@ -92,11 +93,46 @@ class ConfigurationStoreImplTest
 
       create 'foo'
 
+      // attempting to create with same repositoryName should fail
       try {
         create 'foo'
         fail()
       }
       catch (ORecordDuplicatedException e) {
+        // expected
+        log e.toString()
+      }
+    }
+    finally {
+      underTest.stop()
+    }
+  }
+
+  @Test
+  void 'create entity with mandatory fields'() {
+    underTest.start()
+
+    try {
+      try {
+        underTest.create(new Configuration(
+            // omit repositoryName
+            recipeName: 'test'
+        ))
+        fail()
+      }
+      catch (OValidationException e) {
+        // expected
+        log e.toString()
+      }
+
+      try {
+        underTest.create(new Configuration(
+            repositoryName: 'test'
+            // omit recipeName
+        ))
+        fail()
+      }
+      catch (OValidationException e) {
         // expected
         log e.toString()
       }
