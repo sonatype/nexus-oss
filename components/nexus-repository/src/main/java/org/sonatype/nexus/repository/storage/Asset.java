@@ -19,7 +19,7 @@ import org.sonatype.nexus.repository.entity.Entity;
  *
  * @since 3.0
  */
-public interface Asset
+public class Asset
   extends Entity
 {
 }
