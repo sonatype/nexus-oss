@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository
 
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
@@ -32,15 +31,23 @@ class FacetLookupTest
     underTest = new FacetLookup()
   }
 
+  @Facet.Exposed
   static interface ExampleFacet
     extends Facet
   {
     // empty
   }
 
+  static class ExampleFacetSupport
+      extends FacetSupport
+      implements ExampleFacet
+  {
+    // empty
+  }
+
+  @Facet.Exposed
   static class MyExampleFacet
-    extends FacetSupport
-    implements ExampleFacet
+    extends ExampleFacetSupport
   {
     // empty
   }
@@ -54,21 +61,26 @@ class FacetLookupTest
     assert facet1 == facet2
   }
 
-  // FIXME: These tests should pass, but need to update the impl to cope first
-
   @Test
-  @Ignore('FIXME: impl does not yet support this')
-  void 'add and get facet subtype'() {
+  void 'add and get facet exposure'() {
     def facet1 = new MyExampleFacet()
     underTest.add(facet1)
 
+    // lookup by exposed intf should return same instance
     def facet2 = underTest.get(ExampleFacet.class)
-    assert facet1 == facet2
+    assert facet2 == facet1
+
+    // lookup by exposed concrete should return same instance
+    def facet3 = underTest.get(MyExampleFacet.class)
+    assert facet3 == facet1
+
+    // look up of non-exposed facet type returns null
+    def facet4 = underTest.get(ExampleFacetSupport.class)
+    assert facet4 == null
   }
 
   @Test
-  @Ignore('FIXME: impl does not yet support this')
-  void 'add duplicate facet disallowed'() {
+  void 'add duplicate facet exposure disallowed'() {
     underTest.add(new MyExampleFacet())
 
     try {

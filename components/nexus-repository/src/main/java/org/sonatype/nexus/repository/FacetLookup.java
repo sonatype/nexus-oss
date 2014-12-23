@@ -12,15 +12,19 @@
  */
 package org.sonatype.nexus.repository;
 
+import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -31,22 +35,29 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class FacetLookup
+  extends ComponentSupport
   implements Iterable<Facet>
 {
   private final Map<Class<? extends Facet>, Facet> backing = Maps.newHashMap();
 
   // TODO: sort out synchronization requirement for usage
 
+  /**
+   * Add a facet and bind exposed types.
+   */
   public void add(final Facet facet) {
     checkNotNull(facet);
 
     // discover all types to expose facet
     Class<? extends Facet> root = facet.getClass();
     List<Class<? extends Facet>> types = exposedTypes(root);
+    checkState(!types.isEmpty(), "No exposed facets: %s", root);
+
+    log.debug("Adding facet: {}, exposed as: {}", facet, types);
 
     // verify we are not clobbering existing facet types
     for (Class<? extends Facet> type : types) {
-      checkState(!backing.containsKey(type), "Duplicate exposed facet type: %s, root: %s", type, root);
+      checkState(!backing.containsKey(type), "Duplicate exposed facet type: %s, root type: %s", type, root);
     }
 
     // map all exposed types to given facet
@@ -55,15 +66,30 @@ public class FacetLookup
     }
   }
 
+  /**
+   * Returns list of all types of given root type which implement {@link Facet}
+   * and are marked with {@link Facet.Exposed}.
+   */
+  @SuppressWarnings("unchecked")
   private List<Class<? extends Facet>> exposedTypes(final Class<? extends Facet> root) {
     List<Class<? extends Facet>> exposed = Lists.newArrayList();
-    // TODO: Provide smarter mapping so that ViewFacet and [Specific]ViewFacet would return the same instance
-    // TODO: And verify that facets do not provide more of the same type of interfaces?
-    // HACK: For now just add the root type to move forward
-    exposed.add(root);
+
+    for (Class<?> type : TypeToken.of(root).getTypes().rawTypes()) {
+      if (Facet.class.isAssignableFrom(type)) {
+        for (Annotation annotation : type.getDeclaredAnnotations()) {
+          if (annotation.annotationType() == Facet.Exposed.class) {
+            exposed.add((Class<? extends Facet>) type);
+          }
+        }
+      }
+    }
+
     return exposed;
   }
 
+  /**
+   * Get a facet instance by exposed type.
+   */
   @SuppressWarnings("unchecked")
   @Nullable
   public <T extends Facet> T get(final Class<T> type) {
@@ -71,10 +97,16 @@ public class FacetLookup
     return (T) backing.get(type);
   }
 
+  /**
+   * Clear all facet bindings.
+   */
   public void clear() {
     backing.clear();
   }
 
+  /**
+   * List all facet instances.
+   */
   @Override
   public Iterator<Facet> iterator() {
     return Iterators.unmodifiableIterator(backing.values().iterator());

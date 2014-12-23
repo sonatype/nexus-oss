@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.repository;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
  * Repository facet.
  *
@@ -26,4 +31,14 @@ public interface Facet
   void stop() throws Exception;
 
   void destroy() throws Exception;
+
+  /**
+   * Marks {@link Facet} interface and/or implementation as exposed.
+   */
+  @Documented
+  @Retention(RUNTIME)
+  @interface Exposed
+  {
+    // marker
+  }
 }

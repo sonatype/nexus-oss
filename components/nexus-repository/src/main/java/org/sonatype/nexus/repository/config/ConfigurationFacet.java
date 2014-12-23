@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.Facet;
  *
  * @since 3.0
  */
+@Facet.Exposed
 public interface ConfigurationFacet
   extends Facet
 {
