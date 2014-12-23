@@ -65,20 +65,20 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             xtype: 'combo',
             name: 'discoveryInterval',
             itemId: 'discoveryInterval',
-            fieldLabel: NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_UPDATE'),
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE'),
             helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_HELP'),
             emptyText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_PLACEHOLDER'),
             editable: false,
             value: 24,
             store: [
-              [1, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_1_HOUR_ITEM')],
-              [2, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_2_HOUR_ITEM')],
-              [3, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_3_HOUR_ITEM')],
-              [6, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_6_HOUR_ITEM')],
-              [9, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_9_HOUR_ITEM')],
-              [12, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_12_HOUR_ITEM')],
-              [24, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_DAILY_ITEM')],
-              [168, NX.I18n.get('ADMIN_REPOSTIORIES_ROUTING_WEEKLY_ITEM')]
+              [1, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_1_HOUR_ITEM')],
+              [2, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_2_HOUR_ITEM')],
+              [3, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_3_HOUR_ITEM')],
+              [6, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_6_HOUR_ITEM')],
+              [9, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_9_HOUR_ITEM')],
+              [12, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_12_HOUR_ITEM')],
+              [24, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DAILY_ITEM')],
+              [168, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_WEEKLY_ITEM')]
             ],
             queryMode: 'local'
           }
