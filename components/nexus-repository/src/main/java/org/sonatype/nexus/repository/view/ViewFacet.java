@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -19,10 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A facet that provides the repository view framework.
  *
- * TODO: Put this into a Facet Support, or the Facet class
- *
  * @since 3.0
  */
+@Facet.Exposed
 public class ViewFacet
     extends FacetSupport
 {
