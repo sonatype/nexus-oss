@@ -45,124 +45,101 @@ class ConfigurationStoreImplTest
         database.instanceProvider,
         entityAdapter
     )
+
+    underTest.start()
   }
 
   @After
   void tearDown() {
-    underTest = null
-  }
-
-  @Test
-  void 'create entity'() {
-    underTest.start()
-
-    try {
-      def entity = new Configuration(
-          repositoryName: 'foo',
-          recipeName: 'bar',
-          attributes: [
-              'baz': [
-                  'a': false
-              ]
-          ]
-      )
-      log entity
-      assert entity.entityMetadata == null
-
-      entity = underTest.create(entity)
-      log entity
-      assert entity.entityMetadata != null
-      log entity.entityMetadata
-    }
-    finally {
+    if (underTest) {
       underTest.stop()
+      underTest = null
     }
   }
 
   @Test
-  void 'create entity with unique repositoryName'() {
-    underTest.start()
+  void 'create configuration'() {
+    def entity = new Configuration(
+        repositoryName: 'foo',
+        recipeName: 'bar',
+        attributes: [
+            'baz': [
+                'a': false
+            ]
+        ]
+    )
+    log entity
+    assert entity.entityMetadata == null
 
+    entity = underTest.create(entity)
+    log entity
+    assert entity.entityMetadata != null
+    log entity.entityMetadata
+  }
+
+  @Test
+  void 'create configuration with unique repositoryName'() {
+    def create = { name ->
+      underTest.create(new Configuration(
+          repositoryName: name,
+          recipeName: 'test'
+      ))
+    }
+
+    create 'foo'
+
+    // attempting to create with same repositoryName should fail
     try {
-      def create = { name ->
-        underTest.create(new Configuration(
-            repositoryName: name,
-            recipeName: 'test'
-        ))
-      }
-
       create 'foo'
-
-      // attempting to create with same repositoryName should fail
-      try {
-        create 'foo'
-        fail()
-      }
-      catch (ORecordDuplicatedException e) {
-        // expected
-        log e.toString()
-      }
+      fail()
     }
-    finally {
-      underTest.stop()
+    catch (ORecordDuplicatedException e) {
+      // expected
+      log e.toString()
     }
   }
 
   @Test
-  void 'create entity with mandatory fields'() {
-    underTest.start()
+  void 'create configuration with mandatory fields'() {
+    try {
+      underTest.create(new Configuration(
+          // omit repositoryName
+          recipeName: 'test'
+      ))
+      fail()
+    }
+    catch (OValidationException e) {
+      // expected
+      log e.toString()
+    }
 
     try {
-      try {
-        underTest.create(new Configuration(
-            // omit repositoryName
-            recipeName: 'test'
-        ))
-        fail()
-      }
-      catch (OValidationException e) {
-        // expected
-        log e.toString()
-      }
-
-      try {
-        underTest.create(new Configuration(
-            repositoryName: 'test'
-            // omit recipeName
-        ))
-        fail()
-      }
-      catch (OValidationException e) {
-        // expected
-        log e.toString()
-      }
+      underTest.create(new Configuration(
+          repositoryName: 'test'
+          // omit recipeName
+      ))
+      fail()
     }
-    finally {
-      underTest.stop()
+    catch (OValidationException e) {
+      // expected
+      log e.toString()
     }
   }
 
   @Test
-  void 'browse entities'() {
-    underTest.start()
-
-    try {
-      def create = { name ->
-        underTest.create(new Configuration(
-            repositoryName: name,
-            recipeName: 'test'
-        ))
-      }
-
-      create 'foo'
-      create 'bar'
-
-      underTest.browse().each { entity ->
-        log entity
-      }
+  void 'list configurations'() {
+    def create = { name ->
+      underTest.create(new Configuration(
+          repositoryName: name,
+          recipeName: 'test'
+      ))
     }
-    finally {
-      underTest.stop()
+
+    create 'foo'
+    create 'bar'
+
+    underTest.list().each { entity ->
+      log entity
     }
   }
 }

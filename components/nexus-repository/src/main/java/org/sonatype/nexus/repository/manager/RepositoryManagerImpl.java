@@ -84,7 +84,7 @@ public class RepositoryManagerImpl
   @Override
   protected void doStart() throws Exception {
     log.debug("Restoring repositories");
-    for (Configuration configuration : store.browse()) {
+    for (Configuration configuration : store.list()) {
       log.debug("Restoring repository: {}", configuration);
       Recipe recipe = recipe(configuration.getRecipeName());
       Repository repository = recipe.create(configuration);

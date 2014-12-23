@@ -22,11 +22,11 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface ConfigurationStore
   extends Lifecycle
 {
-  Iterable<Configuration> browse();
+  Iterable<Configuration> list();
 
   Configuration create(Configuration configuration) throws Exception;
 
-  Configuration edit(Configuration configuration) throws Exception;
+  Configuration update(Configuration configuration) throws Exception;
 
   void delete(Configuration configuration) throws Exception;
 }

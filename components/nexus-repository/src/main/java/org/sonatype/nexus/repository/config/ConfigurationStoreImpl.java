@@ -61,7 +61,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Iterable<Configuration> browse() {
+  public Iterable<Configuration> list() {
     try (ODatabaseDocumentTx db = openDb()) {
       return entityAdapter.browse(db, Lists.<Configuration>newArrayList());
     }
@@ -79,7 +79,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Configuration edit(final Configuration configuration) throws Exception {
+  public Configuration update(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
