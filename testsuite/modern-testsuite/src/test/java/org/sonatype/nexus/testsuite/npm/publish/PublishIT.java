@@ -66,9 +66,12 @@ public class PublishIT
     final File projectDir = util.createTempDir();
     copyPackageJson(packageName, "0.0.1", privateRegistry.contentUri(), projectDir);
     final File npmrc = testData().resolveFile(".npmrc");
+
     final String cmd = String
         .format("npm --registry %s --cache %s --userconfig %s publish %s",
-            privateRegistry.contentUri(),
+            // appending slash to workaround bug in npm cli versions 2.1.7 to 2.1.16
+            // https://github.com/npm/npm/issues/6982
+            privateRegistry.contentUri() + "/",
             localDirectory.getAbsolutePath(),
             npmrc.getAbsolutePath(),
             projectDir.getAbsolutePath());
