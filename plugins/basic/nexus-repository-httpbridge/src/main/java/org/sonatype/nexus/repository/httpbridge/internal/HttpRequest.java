@@ -39,10 +39,21 @@ public class HttpRequest
 
   private final String path;
 
+  private final Headers headers;
+
   public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest, final String path) {
     this.repository = checkNotNull(repository);
     this.httpServletRequest = checkNotNull(httpServletRequest);
     this.path = checkNotNull(path);
+    this.headers = createHeaders(httpServletRequest);
+  }
+
+  private static Headers createHeaders(final HttpServletRequest request) {
+    Headers headers = new Headers();
+    for (Map.Entry<String,String[]> entry : request.getParameterMap().entrySet()) {
+      headers.set(entry.getKey(), entry.getValue());
+    }
+    return headers;
   }
 
   @Override
@@ -52,8 +63,7 @@ public class HttpRequest
 
   @Override
   public String getAction() {
-    // TODO:
-    return null;
+    return httpServletRequest.getMethod();
   }
 
   @Override
@@ -75,8 +85,7 @@ public class HttpRequest
 
   @Override
   public Headers getHeaders() {
-    // TODO:
-    return null;
+    return headers;
   }
 
   @Nullable

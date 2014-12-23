@@ -26,7 +26,7 @@ public class Response
 {
   private final Status status;
 
-  private final Headers headers = new Headers() {}; // TODO obviously
+  private final Headers headers = new Headers();
 
   private final Map<String, Object> attributes = Maps.newHashMap();
 

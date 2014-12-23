@@ -12,11 +12,16 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,6 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class Headers
+  implements Iterable<Map.Entry<String,String>>
 {
   private final ListMultimap<String,String> backing;
 
@@ -34,10 +40,27 @@ public class Headers
     this.backing = checkNotNull(headers);
   }
 
+  public Headers() {
+    this(ArrayListMultimap.<String, String>create());
+  }
+
+  /**
+   * Check if a named header exists.
+   */
+  public boolean contains(final String name) {
+    return backing.containsKey(name);
+  }
+
+  /**
+   * Returns all values for named header.
+   */
   public List<String> getAll(final String name) {
     return backing.get(name);
   }
 
+  /**
+   * Returns first value of named header.
+   */
   @Nullable
   public String get(final String name) {
     List<String> values = backing.get(name);
@@ -47,18 +70,56 @@ public class Headers
     return null;
   }
 
-  // TODO: type coercion helpers
+  /**
+   * Set on or more named header values.
+   */
+  public void set(final String name, final String... values) {
+    for (String value : values) {
+      backing.put(name, value);
+    }
+  }
 
+  /**
+   * Set on or more named header values.
+   */
+  public void set(final String name, final Iterable<String> values) {
+    backing.putAll(name, values);
+  }
+
+  /**
+   * Remove named header values.
+   */
+  public void remove(final String name) {
+    backing.removeAll(name);
+  }
+
+  /**
+   * Returns all header names.
+   */
   public Set<String> names() {
     return backing.keySet();
   }
 
+  /**
+   * Returns number of headers (size of keys not values).
+   */
   public int size() {
     return backing.size();
+  }
+
+  public Collection<Entry<String,String>> entries() {
+    return backing.entries();
+  }
+
+  @Override
+  public Iterator<Entry<String, String>> iterator() {
+    return backing.entries().iterator();
   }
 
   @Override
   public String toString() {
     return backing.toString();
   }
+
+  // TODO: type coercion helpers
 }
