@@ -52,11 +52,17 @@ public class ConfigurationFacetImpl
 
   @Override
   public void update(final Configuration configuration) throws Exception {
-    // TODO
+    checkNotNull(configuration);
+
+    // TODO: reconfigure facets
+
+    save(configuration);
   }
 
   @Override
   public void save(final Configuration configuration) throws Exception {
-    // TODO
+    checkNotNull(configuration);
+
+    store.update(configuration);
   }
 }
