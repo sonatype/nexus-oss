@@ -26,7 +26,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Orient {@link ConfigurationStore}.
+ * Orient {@link ConfigurationStore} implementation.
  *
  * @since 3.0
  */
