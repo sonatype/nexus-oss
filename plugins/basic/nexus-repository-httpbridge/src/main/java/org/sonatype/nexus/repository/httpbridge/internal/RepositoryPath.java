@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Strings.nullToEmpty;
-
 /**
  * A utility class for parsing the repository name and remaining path out of a request URI.
  *
@@ -26,8 +24,6 @@ import static com.google.common.base.Strings.nullToEmpty;
  */
 public class RepositoryPath
 {
-  private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");
-
   private final String repositoryName;
 
   private final String remainingPath;
@@ -37,25 +33,31 @@ public class RepositoryPath
     this.remainingPath = remainingPath;
   }
 
-  /**
-   * @return The parsed path or {@code null}
-   */
-  @Nullable
-  public static RepositoryPath parse(String path) {
-    final Matcher matcher = PATTERN.matcher(nullToEmpty(path));
-
-    if (!matcher.matches()) {
-      return null;
-    }
-
-    return new RepositoryPath(matcher.group(1), matcher.group(2));
-  }
-
   public String getRepositoryName() {
     return repositoryName;
   }
 
   public String getRemainingPath() {
     return remainingPath;
+  }
+
+  //
+  // Parser
+  //
+
+  private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");
+
+  /**
+   * @return The parsed path or {@code null}
+   */
+  @Nullable
+  public static RepositoryPath parse(final @Nullable String path) {
+    if (path != null) {
+      Matcher matcher = PATTERN.matcher(path);
+      if (matcher.matches()) {
+        return new RepositoryPath(matcher.group(1), matcher.group(2));
+      }
+    }
+    return null;
   }
 }
