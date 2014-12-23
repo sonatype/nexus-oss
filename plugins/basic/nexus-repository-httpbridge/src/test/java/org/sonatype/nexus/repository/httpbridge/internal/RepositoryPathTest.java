@@ -17,8 +17,8 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Tests for {@link RepositoryPath}.
@@ -61,10 +61,10 @@ public class RepositoryPathTest
     checkPaths("//path", "", "/path");
   }
 
-  private void checkPaths(final String path, final String expectedRepoKey, final String expectedRemainingPath) {
-    final RepositoryPath repoKeyParser = RepositoryPath.parse(path);
-
-    assertThat(repoKeyParser.getRepositoryNAme(), is(equalTo(expectedRepoKey)));
-    assertThat(repoKeyParser.getRemainingPath(), is(equalTo(expectedRemainingPath)));
+  private void checkPaths(final String path, final String expectedRepoName, final String expectedRemainingPath) {
+    final RepositoryPath parsedPath = RepositoryPath.parse(path);
+    assertThat(parsedPath, notNullValue());
+    assertThat(parsedPath.getRepositoryName(), is(expectedRepoName));
+    assertThat(parsedPath.getRemainingPath(), is(expectedRemainingPath));
   }
 }
