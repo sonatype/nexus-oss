@@ -35,6 +35,7 @@ import com.google.common.base.Throwables;
  *
  * @since 3.0
  */
+@Deprecated
 @Named
 @Singleton
 public class ComponentViewServlet

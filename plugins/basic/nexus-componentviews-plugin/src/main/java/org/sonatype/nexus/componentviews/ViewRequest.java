@@ -24,6 +24,7 @@ import org.sonatype.nexus.componentviews.config.ViewConfig;
  *
  * @since 3.0
  */
+@Deprecated
 public interface ViewRequest
 {
   enum HttpMethod

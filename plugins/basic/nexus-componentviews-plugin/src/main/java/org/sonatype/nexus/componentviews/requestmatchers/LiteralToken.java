@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  *
  * @since 3.0
  */
+@Deprecated
 public class LiteralToken
     extends Token
 {

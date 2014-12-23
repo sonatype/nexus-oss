@@ -23,6 +23,7 @@ import static com.google.common.base.Strings.nullToEmpty;
  *
  * @since 3.0
  */
+@Deprecated
 public class ViewNameParser
 {
   private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");

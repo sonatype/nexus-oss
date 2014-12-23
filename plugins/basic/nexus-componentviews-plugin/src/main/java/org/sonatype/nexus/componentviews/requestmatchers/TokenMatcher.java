@@ -43,6 +43,7 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
+@Deprecated
 public class TokenMatcher
 {
   private final List<VariableToken> variables;

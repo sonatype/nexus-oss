@@ -19,6 +19,7 @@ import org.sonatype.nexus.component.model.ComponentOriginId;
  *
  * @since 3.0
  */
+@Deprecated
 public class ViewId
     extends ComponentOriginId
 {

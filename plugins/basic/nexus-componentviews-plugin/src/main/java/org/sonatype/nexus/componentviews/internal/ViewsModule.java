@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.0
  */
+@Deprecated
 @Named
 public class ViewsModule
     extends AbstractModule

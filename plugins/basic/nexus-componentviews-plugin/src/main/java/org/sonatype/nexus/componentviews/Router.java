@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Deprecated
 public class Router
 {
   private final List<Route> routes = new ArrayList<>();

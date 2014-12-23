@@ -28,6 +28,7 @@ import static java.util.Arrays.asList;
  *
  * @since 3.0
  */
+@Deprecated
 public class PatternParser
 {
   public static final String DEFAULT_VARIABLE_REGEXP = "[^/]+";

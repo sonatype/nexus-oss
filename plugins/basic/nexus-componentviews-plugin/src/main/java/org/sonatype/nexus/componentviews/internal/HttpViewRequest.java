@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Deprecated
 public class HttpViewRequest
     implements ViewRequest
 {

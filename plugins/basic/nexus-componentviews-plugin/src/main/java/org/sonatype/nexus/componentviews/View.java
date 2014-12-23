@@ -27,6 +27,7 @@ import static java.util.Arrays.asList;
  *
  * @since 3.0
  */
+@Deprecated
 public class View
     extends ComponentSupport
 {

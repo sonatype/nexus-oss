@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @since 3.0
  */
+@Deprecated
 public interface ViewResponse
 {
   /**

@@ -22,6 +22,7 @@ import org.sonatype.nexus.componentviews.responses.Responses;
  *
  * @since 3.0
  */
+@Deprecated
 @Named
 @Singleton
 public class NotFoundHandler

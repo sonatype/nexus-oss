@@ -19,6 +19,7 @@ import com.google.common.base.Objects;
  *
  * @since 3.0
  */
+@Deprecated
 public class VariableToken
     extends Token
 {

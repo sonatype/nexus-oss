@@ -19,6 +19,7 @@ import org.sonatype.nexus.events.AbstractEvent;
  *
  * @since 3.0
  */
+@Deprecated
 public abstract class ViewRegistryEvent
     extends AbstractEvent<ViewRegistry>
 {

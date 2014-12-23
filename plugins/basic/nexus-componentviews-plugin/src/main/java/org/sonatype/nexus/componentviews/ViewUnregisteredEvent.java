@@ -19,6 +19,7 @@ package org.sonatype.nexus.componentviews;
  *
  * @since 3.0
  */
+@Deprecated
 public class ViewUnregisteredEvent
     extends ViewRegistryEvent
 {

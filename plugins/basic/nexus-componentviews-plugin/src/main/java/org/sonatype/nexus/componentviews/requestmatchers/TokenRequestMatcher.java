@@ -25,6 +25,7 @@ import org.sonatype.nexus.componentviews.ViewRequest;
  *
  * @since 3.0
  */
+@Deprecated
 public class TokenRequestMatcher
     implements RequestMatcher
 {
