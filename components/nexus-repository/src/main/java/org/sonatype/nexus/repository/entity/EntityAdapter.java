@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.entity;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public abstract class EntityAdapter<T extends Entity>
-  extends ComponentSupport
+    extends ComponentSupport
 {
   private final String typeName;
 
@@ -196,19 +197,46 @@ public abstract class EntityAdapter<T extends Entity>
   // Metadata support
   //
 
-  // TODO: Consider simplifying by making EntityMetadata an interface with attached/detached variants
-
-  static class AttachedEntityMetadata
-    extends EntityMetadata
+  class AttachedEntityMetadata<T>
+      implements EntityMetadata
   {
     private final ORID rid;
 
     private final ORecordVersion rversion;
 
-    public AttachedEntityMetadata(final EntityId id, final EntityVersion version, final ODocument document) {
-      super(id, version);
+    private EntityId id;
+
+    private EntityVersion version;
+
+    public AttachedEntityMetadata(final ODocument document) {
       this.rid = document.getIdentity();
       this.rversion = document.getRecordVersion();
+    }
+
+    @Override
+    public EntityId getId() {
+      if (id == null) {
+        id = new EntityId(getRecordIdObfuscator().encode(getType(), rid));
+      }
+      return id;
+    }
+
+    @Override
+    public EntityVersion getVersion() {
+      if (version == null) {
+        version = new EntityVersion(rversion.toString());
+      }
+      return version;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "rid=" + rid +
+          ", rversion=" + rversion +
+          ", id=" + id +
+          ", version=" + version +
+          '}';
     }
   }
 
@@ -218,9 +246,7 @@ public abstract class EntityAdapter<T extends Entity>
   public void setMetadata(final T entity, final ODocument doc) {
     checkNotNull(entity != null);
     checkNotNull(doc != null);
-    EntityId id = new EntityId(getRecordIdObfuscator().encode(getType(), doc.getIdentity()));
-    EntityVersion version = new EntityVersion(doc.getRecordVersion().toString());
-    entity.setEntityMetadata(new AttachedEntityMetadata(id, version, doc));
+    entity.setEntityMetadata(new AttachedEntityMetadata(doc));
   }
 
   /**
@@ -239,7 +265,7 @@ public abstract class EntityAdapter<T extends Entity>
   public ORID recordIdentity(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
-      return ((AttachedEntityMetadata)metadata).rid;
+      return ((AttachedEntityMetadata) metadata).rid;
     }
     return getRecordIdObfuscator().decode(getType(), metadata.getId().getValue());
   }
@@ -250,7 +276,7 @@ public abstract class EntityAdapter<T extends Entity>
   public ORecordVersion recordVersion(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
-      return ((AttachedEntityMetadata)metadata).rversion;
+      return ((AttachedEntityMetadata) metadata).rversion;
     }
     ORecordVersion version = new OSimpleVersion();
     version.getSerializer().fromString(metadata.getVersion().getValue(), version);

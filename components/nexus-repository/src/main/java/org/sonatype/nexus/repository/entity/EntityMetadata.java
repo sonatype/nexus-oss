@@ -12,37 +12,14 @@
  */
 package org.sonatype.nexus.repository.entity;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Entity metadata.
  *
  * @since 3.0
  */
-public class EntityMetadata
+public interface EntityMetadata
 {
-  private final EntityId id;
+  EntityId getId();
 
-  private final EntityVersion version;
-
-  public EntityMetadata(final EntityId id, final EntityVersion version) {
-    this.id = checkNotNull(id);
-    this.version = checkNotNull(version);
-  }
-
-  public EntityId getId() {
-    return id;
-  }
-
-  public EntityVersion getVersion() {
-    return version;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "id=" + id +
-        ", version=" + version +
-        '}';
-  }
+  EntityVersion getVersion();
 }
