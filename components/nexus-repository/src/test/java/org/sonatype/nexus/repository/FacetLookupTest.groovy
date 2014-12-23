@@ -52,6 +52,12 @@ class FacetLookupTest
     // empty
   }
 
+  static class FacetNoExposure
+    extends FacetSupport
+  {
+    // empty
+  }
+
   @Test
   void 'add and get facet'() {
     def facet1 = new MyExampleFacet()
@@ -77,6 +83,18 @@ class FacetLookupTest
     // look up of non-exposed facet type returns null
     def facet4 = underTest.get(ExampleFacetSupport.class)
     assert facet4 == null
+  }
+
+  @Test
+  void 'add facet with nothing exposed'() {
+    def facet1 = new FacetNoExposure()
+    try {
+      underTest.add(facet1)
+      fail();
+    }
+    catch (Exception e) {
+      // expected
+    }
   }
 
   @Test
