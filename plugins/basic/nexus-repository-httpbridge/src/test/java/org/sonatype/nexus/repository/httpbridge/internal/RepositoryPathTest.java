@@ -19,6 +19,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * Tests for {@link RepositoryPath}.
@@ -28,7 +29,8 @@ public class RepositoryPathTest
 {
   @Test
   public void nullPath() {
-    checkPaths(null, "", "");
+    RepositoryPath parsedPath = RepositoryPath.parse(null);
+    assertThat(parsedPath, nullValue());
   }
 
   @Test
