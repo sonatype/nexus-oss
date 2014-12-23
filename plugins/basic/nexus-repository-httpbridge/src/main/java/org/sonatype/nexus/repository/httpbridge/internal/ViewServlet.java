@@ -43,15 +43,15 @@ import static com.google.common.base.Preconditions.checkState;
 @Named
 @Singleton
 public class ViewServlet
-  extends HttpServlet
+    extends HttpServlet
 {
   private final RepositoryManager repositoryManager;
 
-  private final Map<String,HttpResponseSender> responseSenders;
+  private final Map<String, HttpResponseSender> responseSenders;
 
   @Inject
   public ViewServlet(final RepositoryManager repositoryManager,
-                     final Map<String,HttpResponseSender> responseSenders)
+                     final Map<String, HttpResponseSender> responseSenders)
   {
     this.repositoryManager = checkNotNull(repositoryManager);
     this.responseSenders = checkNotNull(responseSenders);
@@ -61,14 +61,18 @@ public class ViewServlet
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
+    final RepositoryPath repoPath = RepositoryPath.parse(req.getPathInfo());
+    checkState(repoPath != null, "Cannot parse repository path");
+
     // resolve repository for request
-    Repository repo = repository(req);
+    Repository repo = repository(repoPath.getRepositoryKey());
 
     // dispatch request
     ViewFacet facet = repo.facet(ViewFacet.class);
+
     Response response;
     try {
-      response = facet.getRouter().dispatch(new HttpRequest(repo, req));
+      response = facet.getRouter().dispatch(new HttpRequest(repo, req, repoPath.getRemainingPath()));
     }
     catch (Exception e) {
       Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
@@ -83,8 +87,7 @@ public class ViewServlet
    * Find repository for given request.
    */
   @Nonnull
-  private Repository repository(final HttpServletRequest request) {
-    String key = "TODO"; // decode from request
+  private Repository repository(final String key) {
     Repository repo = repositoryManager.get(key);
     checkState(repo != null, "No repository with key: %s", key);
     //noinspection ConstantConditions

@@ -37,9 +37,12 @@ public class HttpRequest
 
   private final HttpServletRequest httpServletRequest;
 
-  public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest) {
+  private final String path;
+
+  public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest, final String path) {
     this.repository = checkNotNull(repository);
     this.httpServletRequest = checkNotNull(httpServletRequest);
+    this.path = checkNotNull(path);
   }
 
   @Override
@@ -55,8 +58,7 @@ public class HttpRequest
 
   @Override
   public String getPath() {
-    // TODO:
-    return null;
+    return path;
   }
 
   @Override
