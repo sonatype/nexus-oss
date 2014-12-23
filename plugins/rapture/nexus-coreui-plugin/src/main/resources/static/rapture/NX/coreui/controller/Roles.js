@@ -191,7 +191,7 @@ Ext.define('NX.coreui.controller.Roles', {
         });
       });
       newButton.menu.add({
-        text: 'External Role Mapping',
+        text: NX.I18n.get('ADMIN_ROLES_LIST_EXTERNAL_ROLE_ITEM'),
         menu: menuItems,
         iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });

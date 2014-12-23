@@ -35,13 +35,13 @@ Ext.define('NX.coreui.view.role.RoleList', {
         return 'role-default';
       }
     },
-    {header: 'Name', dataIndex: 'name', flex: 1},
-    {header: 'Source', dataIndex: 'source'},
-    {header: 'Description', dataIndex: 'description', flex: 1}
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_SOURCE_COLUMN'), dataIndex: 'source'},
+    {header: NX.I18n.get('ADMIN_ROLES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1}
   ],
 
   viewConfig: {
-    emptyText: 'No roles defined',
+    emptyText: NX.I18n.get('ADMIN_ROLES_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 
@@ -56,9 +56,9 @@ Ext.define('NX.coreui.view.role.RoleList', {
     var me = this;
 
     me.tbar = [
-      { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+      { xtype: 'button', text: NX.I18n.get('ADMIN_ROLES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
         menu: [
-          { text: 'Nexus Role', action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
+          { text: NX.I18n.get('ADMIN_ROLES_LIST_NEXUS_ROLE_ITEM'), action: 'newrole', iconCls: NX.Icons.cls('role-default', 'x16') }
         ]
       }
     ];
