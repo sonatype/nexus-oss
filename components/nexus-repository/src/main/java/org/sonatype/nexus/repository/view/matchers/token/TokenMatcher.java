@@ -19,17 +19,16 @@ import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.nexus.repository.view.Request;
 
 /**
- * A RequestMatcher that examines the {@link Request#getPath() request path} and attempts to parse it using the
+ * A {@link Matcher} that examines the {@link Request#getPath() request path} and attempts to parse it using the
  * {@link TokenMatcher}. If there is a match, the tokens are stored in the {@link Context#get(String)}
  * request attribute} {@link #PATH_TOKENS} so that handlers can access them.
  *
  * @since 3.0
- * TODO: Rename this to TokenMatcher
  */
 public class TokenMatcher
     implements Matcher
 {
-  public static final String PATH_TOKENS = "TokenRequestMatcher.pathTokens";
+  public static final String PATH_TOKENS = TokenMatcher.class.getName() + ".pathTokens";
 
   private final TokenMatcherInternal tokenMatcher;
 
@@ -50,9 +49,7 @@ public class TokenMatcher
     return true;
   }
 
-  private Map<String, String> findTokens(
-      final Request request)
-  {
+  private Map<String, String> findTokens(final Request request) {
     return tokenMatcher.matchTokens(request.getPath());
   }
 }
