@@ -102,10 +102,10 @@ public class StringMultimap
   }
 
   /**
-   * Returns number of entries (size of keys not values).
+   * Returns number of named entries.
    */
   public int size() {
-    return backing.size();
+    return backing.keySet().size();
   }
 
   public Collection<Entry<String,String>> entries() {
