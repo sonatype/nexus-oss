@@ -12,14 +12,51 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import com.google.common.collect.ListMultimap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * ???
+ * Headers container.
  *
  * @since 3.0
  */
-public interface Headers
+public class Headers
 {
-  // intended to be a generic (javax.servlet) free wrapper around HTTP headers
+  private final ListMultimap<String,String> backing;
 
-  // helper around Multimap<String,String>
+  public Headers(final ListMultimap<String, String> headers) {
+    this.backing = checkNotNull(headers);
+  }
+
+  public List<String> getAll(final String name) {
+    return backing.get(name);
+  }
+
+  @Nullable
+  public String get(final String name) {
+    List<String> values = backing.get(name);
+    if (!values.isEmpty()) {
+      return values.get(0);
+    }
+    return null;
+  }
+
+  public Set<String> names() {
+    return backing.keySet();
+  }
+
+  public int size() {
+    return backing.size();
+  }
+
+  @Override
+  public String toString() {
+    return backing.toString();
+  }
 }
