@@ -47,6 +47,8 @@ public class Headers
     return null;
   }
 
+  // TODO: type coercion helpers
+
   public Set<String> names() {
     return backing.keySet();
   }
