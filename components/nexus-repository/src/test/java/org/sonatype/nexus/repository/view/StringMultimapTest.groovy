@@ -31,15 +31,19 @@ class StringMultimapTest
 
   @Test
   void 'size validation'() {
+    log underTest
     assert underTest.size() == 0
 
     underTest.set('foo', 'bar')
+    log underTest
     assert underTest.size() == 1
 
     underTest.set('foo', 'baz')
+    log underTest
     assert underTest.size() == 1
 
     underTest.set('ick', 'poo')
+    log underTest
     assert underTest.size() == 2
   }
 }
