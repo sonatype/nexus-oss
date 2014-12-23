@@ -197,9 +197,11 @@ public abstract class EntityAdapter<T extends Entity>
   // Metadata support
   //
 
-  class AttachedEntityMetadata<T>
+  private static class AttachedEntityMetadata
       implements EntityMetadata
   {
+    private final EntityAdapter owner;
+
     private final ORID rid;
 
     private final ORecordVersion rversion;
@@ -208,7 +210,9 @@ public abstract class EntityAdapter<T extends Entity>
 
     private EntityVersion version;
 
-    public AttachedEntityMetadata(final ODocument document) {
+    public AttachedEntityMetadata(final EntityAdapter owner, final ODocument document) {
+      this.owner = checkNotNull(owner);
+      checkNotNull(document);
       this.rid = document.getIdentity();
       this.rversion = document.getRecordVersion();
     }
@@ -216,7 +220,7 @@ public abstract class EntityAdapter<T extends Entity>
     @Override
     public EntityId getId() {
       if (id == null) {
-        id = new EntityId(getRecordIdObfuscator().encode(getType(), rid));
+        id = new EntityId(owner.getRecordIdObfuscator().encode(owner.getType(), rid));
       }
       return id;
     }
@@ -245,8 +249,8 @@ public abstract class EntityAdapter<T extends Entity>
    */
   public void setMetadata(final T entity, final ODocument doc) {
     checkNotNull(entity != null);
-    checkNotNull(doc != null);
-    entity.setEntityMetadata(new AttachedEntityMetadata(doc));
+    assert entity != null;
+    entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
   }
 
   /**
@@ -254,6 +258,7 @@ public abstract class EntityAdapter<T extends Entity>
    */
   public EntityMetadata getMetadata(final T entity) {
     checkNotNull(entity != null);
+    assert entity != null;
     EntityMetadata metadata = entity.getEntityMetadata();
     checkState(metadata != null);
     return metadata;
