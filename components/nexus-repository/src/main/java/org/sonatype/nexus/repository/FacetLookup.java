@@ -13,14 +13,17 @@
 package org.sonatype.nexus.repository;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Helper to provide {@link Facet} lookup.
@@ -30,14 +33,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FacetLookup
   implements Iterable<Facet>
 {
-  private final Map<Class, Facet> backing = Maps.newHashMap();
+  private final Map<Class<? extends Facet>, Facet> backing = Maps.newHashMap();
 
-  // TODO: Provide smarter mapping so that ViewFacet and [Specific]ViewFacet would return the same instance
-  // TODO: And verify that facets do not provide more of the same type of interfaces?
+  // TODO: sort out synchronization requirement for usage
 
   public void add(final Facet facet) {
     checkNotNull(facet);
-    backing.put(facet.getClass(), facet);
+
+    // discover all types to expose facet
+    Class<? extends Facet> root = facet.getClass();
+    List<Class<? extends Facet>> types = exposedTypes(root);
+
+    // verify we are not clobbering existing facet types
+    for (Class<? extends Facet> type : types) {
+      checkState(!backing.containsKey(type), "Duplicate exposed facet type: %s, root: %s", type, root);
+    }
+
+    // map all exposed types to given facet
+    for (Class<? extends Facet> type : types) {
+      backing.put(type, facet);
+    }
+  }
+
+  private List<Class<? extends Facet>> exposedTypes(final Class<? extends Facet> root) {
+    List<Class<? extends Facet>> exposed = Lists.newArrayList();
+    // TODO: Provide smarter mapping so that ViewFacet and [Specific]ViewFacet would return the same instance
+    // TODO: And verify that facets do not provide more of the same type of interfaces?
+    // HACK: For now just add the root type to move forward
+    exposed.add(root);
+    return exposed;
   }
 
   @SuppressWarnings("unchecked")
