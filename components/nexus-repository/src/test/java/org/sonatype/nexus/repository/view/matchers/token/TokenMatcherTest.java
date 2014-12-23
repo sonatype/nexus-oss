@@ -22,6 +22,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Test for {@link TokenMatcher}.
+ */
 public class TokenMatcherTest
 {
   @Test

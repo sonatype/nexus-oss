@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * @since 3.0
+ * Tests for {@link Token}.
  */
 public class TokenTest
 {
