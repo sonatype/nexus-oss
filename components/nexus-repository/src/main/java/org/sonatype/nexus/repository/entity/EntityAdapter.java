@@ -181,6 +181,9 @@ public abstract class EntityAdapter<T extends Entity>
     return edit(doc, entity);
   }
 
+  /**
+   * Delete an entity.
+   */
   public void delete(final ODatabaseDocumentTx db, final T entity) {
     checkNotNull(db);
     checkNotNull(entity);
@@ -197,6 +200,9 @@ public abstract class EntityAdapter<T extends Entity>
   // Metadata support
   //
 
+  /**
+   * Attached {@link EntityMetadata} captures native details to simplify resolution w/o encoding.
+   */
   private static class AttachedEntityMetadata
       implements EntityMetadata
   {
@@ -247,7 +253,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Set metadata on entity.
    */
-  public void setMetadata(final T entity, final ODocument doc) {
+  private void setMetadata(final T entity, final ODocument doc) {
     checkNotNull(entity != null);
     assert entity != null;
     entity.setEntityMetadata(new AttachedEntityMetadata(this, doc));
@@ -256,7 +262,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Get metadata from entity.
    */
-  public EntityMetadata getMetadata(final T entity) {
+  private EntityMetadata getMetadata(final T entity) {
     checkNotNull(entity != null);
     assert entity != null;
     EntityMetadata metadata = entity.getEntityMetadata();
@@ -267,7 +273,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record identity of entity.
    */
-  public ORID recordIdentity(final T entity) {
+  private ORID recordIdentity(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rid;
@@ -278,7 +284,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Return record version of entity.
    */
-  public ORecordVersion recordVersion(final T entity) {
+  private ORecordVersion recordVersion(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
     if (metadata instanceof AttachedEntityMetadata) {
       return ((AttachedEntityMetadata) metadata).rversion;
