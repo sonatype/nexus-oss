@@ -12,14 +12,21 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import com.google.common.collect.ListMultimap;
+
 /**
- * ???
+ * Parameters container.
  *
  * @since 3.0
  */
-public interface Parameters
+public class Parameters
+  extends StringMultimap
 {
-  // intended to be a generic (javax.servlet) free wrapper around HTTP request query parameters
+  public Parameters(final ListMultimap<String, String> entries) {
+    super(entries);
+  }
 
-  // helper around Multimap<String,String>
+  public Parameters() {
+    super();
+  }
 }

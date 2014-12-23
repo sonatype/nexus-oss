@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
-import java.util.Map;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,8 +30,13 @@ public class HttpHeaders
 {
   public HttpHeaders(final HttpServletRequest request) {
     checkNotNull(request);
-    for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-      set(entry.getKey(), entry.getValue());
+    Enumeration<String> names = request.getHeaderNames();
+    while (names.hasMoreElements()) {
+      String name = names.nextElement();
+      Enumeration<String> values = request.getHeaders(name);
+      while (values.hasMoreElements()) {
+        set(name, values.nextElement());
+      }
     }
   }
 }

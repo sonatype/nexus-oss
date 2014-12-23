@@ -39,12 +39,15 @@ public class HttpRequest
 
   private final String path;
 
+  private final Parameters parameters;
+
   private final Headers headers;
 
   public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest, final String path) {
     this.repository = checkNotNull(repository);
     this.httpServletRequest = checkNotNull(httpServletRequest);
     this.path = checkNotNull(path);
+    this.parameters = new HttpParameters(httpServletRequest);
     this.headers = new HttpHeaders(httpServletRequest);
   }
 
@@ -71,8 +74,7 @@ public class HttpRequest
 
   @Override
   public Parameters getParameters() {
-    // TODO:
-    return null;
+    return parameters;
   }
 
   @Override
