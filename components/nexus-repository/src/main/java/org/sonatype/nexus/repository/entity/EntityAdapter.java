@@ -196,6 +196,22 @@ public abstract class EntityAdapter<T extends Entity>
   // Metadata support
   //
 
+  // TODO: Consider simplifying by making EntityMetadata an interface with attached/detached variants
+
+  static class AttachedEntityMetadata
+    extends EntityMetadata
+  {
+    private final ORID rid;
+
+    private final ORecordVersion rversion;
+
+    public AttachedEntityMetadata(final EntityId id, final EntityVersion version, final ODocument document) {
+      super(id, version);
+      this.rid = document.getIdentity();
+      this.rversion = document.getRecordVersion();
+    }
+  }
+
   /**
    * Set metadata on entity.
    */
@@ -204,7 +220,7 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(doc != null);
     EntityId id = new EntityId(getRecordIdObfuscator().encode(getType(), doc.getIdentity()));
     EntityVersion version = new EntityVersion(doc.getRecordVersion().toString());
-    entity.setEntityMetadata(new EntityMetadata(id, version));
+    entity.setEntityMetadata(new AttachedEntityMetadata(id, version, doc));
   }
 
   /**
@@ -222,6 +238,9 @@ public abstract class EntityAdapter<T extends Entity>
    */
   public ORID recordIdentity(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
+    if (metadata instanceof AttachedEntityMetadata) {
+      return ((AttachedEntityMetadata)metadata).rid;
+    }
     return getRecordIdObfuscator().decode(getType(), metadata.getId().getValue());
   }
 
@@ -230,6 +249,9 @@ public abstract class EntityAdapter<T extends Entity>
    */
   public ORecordVersion recordVersion(final T entity) {
     EntityMetadata metadata = getMetadata(entity);
+    if (metadata instanceof AttachedEntityMetadata) {
+      return ((AttachedEntityMetadata)metadata).rversion;
+    }
     ORecordVersion version = new OSimpleVersion();
     version.getSerializer().fromString(metadata.getVersion().getValue(), version);
     return version;
