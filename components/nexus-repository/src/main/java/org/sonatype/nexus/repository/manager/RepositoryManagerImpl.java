@@ -63,18 +63,27 @@ public class RepositoryManagerImpl
     this.recipes = checkNotNull(recipes);
   }
 
+  /**
+   * Lookup a recipe by name.
+   */
   private Recipe recipe(final String name) {
     Recipe recipe = recipes.get(name);
     checkState(recipe != null, "Missing recipe: %s", name);
     return recipe;
   }
 
+  /**
+   * Lookup a repository by name.
+   */
   private Repository repository(final String name) {
     Repository repository = repositories.get(name);
     checkState(repository != null, "Missing repository: %s", name);
     return repository;
   }
 
+  /**
+   * Mark repository as tracked.
+   */
   private void track(final Repository repository) {
     repositories.put(repository.getName(), repository);
   }
