@@ -38,6 +38,7 @@ Ext.define('NX.coreui.controller.SupportRequest', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support Request',
+      text: NX.I18n.get('ADMIN_SUPPORT_REQUEST_TITLE'),
       description: NX.I18n.get('ADMIN_SUPPORT_REQUEST_SUBTITLE'),
       view: { xtype: 'nx-coreui-support-supportrequest' },
       iconConfig: {

@@ -203,18 +203,6 @@ Ext.define('NX.app.PluginStrings', {
     ADMIN_TARGETS_TITLE: 'Targets>',
     ADMIN_TARGETS_SUBTITLE: 'Manage repository targets>',
 
-    // Admin -> Staging
-    ADMIN_STAGING_TITLE: 'Staging>',
-    ADMIN_STAGING_SUBTITLE: 'Staging administration>',
-
-    // Admin -> Staging -> Profiles
-    ADMIN_PROFILES_TITLE: 'Profiles>',
-    ADMIN_PROFILES_SUBTITLE: 'Manage staging profiles>',
-
-    // Admin -> Staging -> Rules
-    ADMIN_RULES_TITLE: 'Rules>',
-    ADMIN_RULES_SUBTITLE: 'Manage staging rules>',
-
     // Admin -> Security
     ADMIN_SECURITY_TITLE: 'Security>',
     ADMIN_SECURITY_SUBTITLE: 'Security administration>',
@@ -235,17 +223,9 @@ Ext.define('NX.app.PluginStrings', {
     ADMIN_ANONYMOUS_TITLE: 'Anonymous>',
     ADMIN_ANONYMOUS_SUBTITLE: 'Manage anonymous user configuration>',
 
-    // Admin -> Security -> Atlassian Crowd
-    ADMIN_CROWD_TITLE: 'Atlassian Crowd>',
-    ADMIN_CROWD_SUBTITLE: 'Manage Atlassian Crowd configuration>',
-
     // Admin -> Security -> LDAP
     ADMIN_LDAP_SUBTITLE: 'LDAP>',
     ADMIN_LDAP_SUBTITLE: 'Manage LDAP servers configuration>',
-
-    // Admin -> Security -> PGP
-    ADMIN_PGP_TITLE: 'PGP>',
-    ADMIN_PGP_SUBTITLE: 'Manage PGP key servers used to look up public PGP keys>',
 
     // Admin -> Security -> Realms
     ADMIN_REALMS_TITLE: 'Realms>',
@@ -254,10 +234,6 @@ Ext.define('NX.app.PluginStrings', {
     // Admin -> Security -> SSL Certificates
     ADMIN_SSL_TITLE: 'SSL Certificates>',
     ADMIN_SSL_SUBTITLE: 'Manage trusted SSL certificates for use with the Nexus Trust Store>',
-
-    // Admin -> Security -> User Token
-    ADMIN_TOKEN_TITLE: 'User Token>',
-    ADMIN_TOKEN_SUBTITLE: 'Manage user-token configuration>',
 
     // Admin -> Support
     ADMIN_SUPPORT_TITLE: 'Support>',
@@ -311,41 +287,17 @@ Ext.define('NX.app.PluginStrings', {
     ADMIN_HTTP_TITLE: 'HTTP>',
     ADMIN_HTTP_SUBTITLE: 'Manage outbound HTTP/HTTPS configuration>',
 
-    // Admin -> System -> Licensing
-    ADMIN_LICENSING_TITLE: 'Licensing>',
-    ADMIN_LICENSING_SUBTITLE: 'Manage Nexus product license>',
-
-    // Admin -> System -> Licensing -> License Users
-    ADMIN_LICENSE_USERS_TITLE: 'License Users>',
-    ADMIN_LICENSE_USERS_SUBTITLE: 'Reports active license users in the last 7 days>',
-
     // Admin -> System -> Plugins
     ADMIN_PLUGINS_TITLE: 'Plugins>',
     ADMIN_PLUGINS_SUBTITLE: 'View installed plugins>',
-
-    // Admin -> System -> Smart Proxy
-    ADMIN_SMART_PROXY_TITLE: 'Smart Proxy>',
-    ADMIN_SMART_PROXY_SUBTITLE: 'Manage Smart Proxy server configuration>',
-
-    // Admin -> System -> Smart Proxy -> Trusted Keys
-    ADMIN_TRUSTED_KEYS_TITLE: 'Trusted Keys>',
-    ADMIN_TRUSTED_KEYS_SUBTITLE: 'Manage Smart Proxy trusted server key certificates>',
 
     // Admin -> System -> Tasks
     ADMIN_TASKS_TITLE: 'Tasks>',
     ADMIN_TASKS_SUBTITLE: 'Manage scheduled tasks>',
 
-    // Admin -> System -> Templates
-    ADMIN_TEMPLATES_PROXY_TITLE: 'Templates>',
-    ADMIN_TEMPLATES_PROXY_SUBTITLE: 'Manage templates (Maven settings, etc)>',
-
     // User -> Account
     USER_ACCOUNT_TITLE: 'Account>',
-    USER_ACCOUNT_SUBTITLE: 'Manage your account>',
-
-    // User -> User Token
-    USER_TOKEN_TITLE: 'User Token>',
-    USER_TOKEN_SUBTITLE: 'Access Nexus without the use of passwords>'
+    USER_ACCOUNT_SUBTITLE: 'Manage your account>'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);

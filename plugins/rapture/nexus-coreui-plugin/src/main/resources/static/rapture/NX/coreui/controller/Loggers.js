@@ -56,6 +56,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging',
+      text: NX.I18n.get('ADMIN_LOGGING_TITLE'),
       description: NX.I18n.get('ADMIN_LOGGING_SUBTITLE'),
       view: { xtype: 'nx-coreui-logger-list' },
       iconConfig: {

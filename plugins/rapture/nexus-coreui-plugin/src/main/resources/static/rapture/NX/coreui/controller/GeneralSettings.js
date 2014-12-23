@@ -36,6 +36,7 @@ Ext.define('NX.coreui.controller.GeneralSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/General',
+      text: NX.I18n.get('ADMIN_GENERAL_TITLE'),
       description: NX.I18n.get('ADMIN_GENERAL_SUBTITLE'),
       view: { xtype: 'nx-coreui-system-general-settings' },
       iconConfig: {

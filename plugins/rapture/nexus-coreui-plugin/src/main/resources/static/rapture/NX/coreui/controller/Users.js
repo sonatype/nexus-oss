@@ -79,6 +79,7 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'admin',
       path: '/Security/Users',
+      text: NX.I18n.get('ADMIN_USERS_TITLE'),
       description: NX.I18n.get('ADMIN_USERS_SUBTITLE'),
       view: { xtype: 'nx-coreui-user-feature' },
       iconConfig: {

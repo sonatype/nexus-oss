@@ -66,6 +66,7 @@ Ext.define('NX.coreui.controller.Tasks', {
   features: {
     mode: 'admin',
     path: '/System/Tasks',
+    text: NX.I18n.get('ADMIN_TASKS_TITLE'),
     description: NX.I18n.get('ADMIN_TASKS_SUBTITLE'),
     view: { xtype: 'nx-coreui-task-feature' },
     iconConfig: {

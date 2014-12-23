@@ -79,6 +79,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
   features: {
     mode: 'admin',
     path: '/System/Capabilities',
+    text: NX.I18n.get('ADMIN_CAPABILITIES_TITLE'),
     description: NX.I18n.get('ADMIN_CAPABILITIES_SUBTITLE'),
     view: { xtype: 'nx-coreui-capability-feature' },
     iconConfig: {
