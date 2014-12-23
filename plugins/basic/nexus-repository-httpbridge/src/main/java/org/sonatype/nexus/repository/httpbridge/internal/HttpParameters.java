@@ -10,9 +10,10 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.httpbridge.internal;
 
-import java.util.Map;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,8 +31,10 @@ public class HttpParameters
 {
   public HttpParameters(final HttpServletRequest request) {
     checkNotNull(request);
-    for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-      set(entry.getKey(), entry.getValue());
+    Enumeration<String> names = request.getParameterNames();
+    while (names.hasMoreElements()) {
+      String name = names.nextElement();
+      set(name, request.getParameterValues(name));
     }
   }
 }
