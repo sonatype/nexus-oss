@@ -94,6 +94,10 @@ public class StringMultimap
     backing.removeAll(name);
   }
 
+  public void clear() {
+    backing.clear();
+  }
+
   /**
    * Returns all entry names.
    */
@@ -106,6 +110,10 @@ public class StringMultimap
    */
   public int size() {
     return backing.keySet().size();
+  }
+
+  public boolean isEmpty() {
+    return backing.isEmpty();
   }
 
   public Collection<Entry<String,String>> entries() {
