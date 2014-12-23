@@ -45,15 +45,7 @@ public class HttpRequest
     this.repository = checkNotNull(repository);
     this.httpServletRequest = checkNotNull(httpServletRequest);
     this.path = checkNotNull(path);
-    this.headers = createHeaders(httpServletRequest);
-  }
-
-  private static Headers createHeaders(final HttpServletRequest request) {
-    Headers headers = new Headers();
-    for (Map.Entry<String,String[]> entry : request.getParameterMap().entrySet()) {
-      headers.set(entry.getKey(), entry.getValue());
-    }
-    return headers;
+    this.headers = new HttpHeaders(httpServletRequest);
   }
 
   @Override
