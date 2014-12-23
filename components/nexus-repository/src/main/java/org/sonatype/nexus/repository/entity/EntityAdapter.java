@@ -103,6 +103,8 @@ public abstract class EntityAdapter<T extends Entity>
 
   protected abstract void writeFields(final ODocument document, final T entity);
 
+  // TODO: Clean up api and return types
+
   /**
    * Browse all documents.
    */
