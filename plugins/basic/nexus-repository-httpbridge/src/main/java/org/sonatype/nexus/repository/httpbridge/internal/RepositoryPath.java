@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
- * A utility class for parsing the repository key out of a request URI.
+ * A utility class for parsing the repository name and remaining path out of a request URI.
  *
  * @since 3.0
  */
@@ -28,12 +28,12 @@ public class RepositoryPath
 {
   private static final Pattern PATTERN = Pattern.compile("/?([^/]*)(.*)");
 
-  private final String viewName;
+  private final String repositoryName;
 
   private final String remainingPath;
 
-  private RepositoryPath(final String viewName, final String remainingPath) {
-    this.viewName = viewName;
+  private RepositoryPath(final String repositoryName, final String remainingPath) {
+    this.repositoryName = repositoryName;
     this.remainingPath = remainingPath;
   }
 
@@ -51,8 +51,8 @@ public class RepositoryPath
     return new RepositoryPath(matcher.group(1), matcher.group(2));
   }
 
-  public String getRepositoryKey() {
-    return viewName;
+  public String getRepositoryName() {
+    return repositoryName;
   }
 
   public String getRemainingPath() {

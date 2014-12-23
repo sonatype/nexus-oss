@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
-import org.sonatype.nexus.repository.httpbridge.internal.RepositoryPath;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Test;
@@ -65,7 +64,7 @@ public class RepositoryPathTest
   private void checkPaths(final String path, final String expectedRepoKey, final String expectedRemainingPath) {
     final RepositoryPath repoKeyParser = RepositoryPath.parse(path);
 
-    assertThat(repoKeyParser.getRepositoryKey(), is(equalTo(expectedRepoKey)));
+    assertThat(repoKeyParser.getRepositoryNAme(), is(equalTo(expectedRepoKey)));
     assertThat(repoKeyParser.getRemainingPath(), is(equalTo(expectedRemainingPath)));
   }
 }

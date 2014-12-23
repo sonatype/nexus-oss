@@ -65,7 +65,7 @@ public class ViewServlet
     checkState(repoPath != null, "Cannot parse repository path");
 
     // resolve repository for request
-    Repository repo = repository(repoPath.getRepositoryKey());
+    Repository repo = repository(repoPath.getRepositoryName());
 
     // dispatch request
     ViewFacet facet = repo.facet(ViewFacet.class);
@@ -87,9 +87,9 @@ public class ViewServlet
    * Find repository for given request.
    */
   @Nonnull
-  private Repository repository(final String key) {
-    Repository repo = repositoryManager.get(key);
-    checkState(repo != null, "No repository with key: %s", key);
+  private Repository repository(final String name) {
+    Repository repo = repositoryManager.get(name);
+    checkState(repo != null, "No repository with name: %s", name);
     //noinspection ConstantConditions
     return repo;
   }
