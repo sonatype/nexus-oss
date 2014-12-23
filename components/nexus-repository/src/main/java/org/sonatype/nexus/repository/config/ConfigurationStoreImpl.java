@@ -68,7 +68,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Configuration create(final Configuration configuration) throws Exception {
+  public Configuration create(final Configuration configuration) {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
@@ -79,7 +79,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Configuration update(final Configuration configuration) throws Exception {
+  public Configuration update(final Configuration configuration) {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
@@ -90,7 +90,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public void delete(final Configuration configuration) throws Exception {
+  public void delete(final Configuration configuration) {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {

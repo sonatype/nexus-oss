@@ -24,9 +24,9 @@ public interface ConfigurationStore
 {
   Iterable<Configuration> list();
 
-  Configuration create(Configuration configuration) throws Exception;
+  Configuration create(Configuration configuration);
 
-  Configuration update(Configuration configuration) throws Exception;
+  Configuration update(Configuration configuration);
 
-  void delete(Configuration configuration) throws Exception;
+  void delete(Configuration configuration);
 }
