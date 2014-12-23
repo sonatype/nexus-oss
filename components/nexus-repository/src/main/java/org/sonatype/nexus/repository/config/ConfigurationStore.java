@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.config;
 
-import javax.annotation.Nullable;
-
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -26,12 +24,9 @@ public interface ConfigurationStore
 {
   Iterable<Configuration> browse();
 
-  @Nullable
-  Configuration read(String identifier);
-
   Configuration create(Configuration configuration) throws Exception;
 
   Configuration edit(Configuration configuration) throws Exception;
 
-  void delete(String identifier) throws Exception;
+  void delete(Configuration configuration) throws Exception;
 }

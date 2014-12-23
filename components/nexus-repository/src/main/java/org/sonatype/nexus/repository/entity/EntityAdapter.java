@@ -136,11 +136,27 @@ public abstract class EntityAdapter<T extends Entity>
   }
 
   /**
+   * Edit entity.
+   */
+  public ODocument edit(final ODatabaseDocumentTx db, final T entity) {
+    checkNotNull(db);
+    checkNotNull(entity);
+
+    ORID rid = recordIdentity(entity);
+    ODocument document = db.getRecord(rid);
+    checkState(document != null);
+
+    return edit(document, entity);
+  }
+
+  /**
    * Edit document from entity.
    */
   public ODocument edit(final ODocument document, final T entity) {
     checkNotNull(document);
     checkNotNull(entity);
+
+    // TODO: MVCC
 
     writeFields(document, entity);
     setMetadata(entity, document);
@@ -155,11 +171,24 @@ public abstract class EntityAdapter<T extends Entity>
     checkNotNull(db);
     checkNotNull(entity);
 
+    // new entity must not already have metadata
+    checkState(entity.getEntityMetadata() == null);
+
     ODocument doc = db.newInstance(typeName);
     return edit(doc, entity);
   }
 
-  // TODO: delete
+  public void delete(final ODatabaseDocumentTx db, final T entity) {
+    checkNotNull(db);
+    checkNotNull(entity);
+
+    // TODO: MVCC
+
+    ORID rid = recordIdentity(entity);
+    db.delete(rid);
+
+    entity.setEntityMetadata(null);
+  }
 
   //
   // Metadata support

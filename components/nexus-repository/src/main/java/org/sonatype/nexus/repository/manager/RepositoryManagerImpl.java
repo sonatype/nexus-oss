@@ -173,9 +173,10 @@ public class RepositoryManagerImpl
 
     log.debug("Deleting repository: {}", name);
     Repository repository = repository(name);
+    Configuration configuration = repository.getConfiguration();
     repository.stop();
     repository.destroy();
-    store.delete(name);
+    store.delete(configuration);
     repositories.remove(name);
 
     eventBus.post(new RepositoryDeletedEvent(repository));

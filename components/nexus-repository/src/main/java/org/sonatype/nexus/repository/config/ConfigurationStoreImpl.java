@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.config;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -23,11 +22,8 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Orient {@link ConfigurationStore}.
@@ -71,22 +67,9 @@ public class ConfigurationStoreImpl
     }
   }
 
-  @Nullable
-  @Override
-  public Configuration read(final String identifier) {
-    checkNotNull(identifier);
-
-    try (ODatabaseDocumentTx db = openDb()) {
-      // TODO:
-    }
-
-    return null;
-  }
-
   @Override
   public Configuration create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    checkState(configuration.getEntityMetadata() == null);
 
     try (ODatabaseDocumentTx db = openDb()) {
       entityAdapter.add(db, configuration);
@@ -99,27 +82,19 @@ public class ConfigurationStoreImpl
   public Configuration edit(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
 
-    // FIXME: Should hide this detail in EA
-    ORID rid = entityAdapter.recordIdentity(configuration);
-
     try (ODatabaseDocumentTx db = openDb()) {
-      ODocument doc = db.getRecord(rid);
-      checkState(doc != null);
-
-      // TODO: Verify record version
-
-      entityAdapter.edit(doc, configuration);
+      entityAdapter.edit(db, configuration);
     }
 
     return configuration;
   }
 
   @Override
-  public void delete(final String identifier) throws Exception {
-    checkNotNull(identifier);
+  public void delete(final Configuration configuration) throws Exception {
+    checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      // TODO:
+      entityAdapter.delete(db, configuration);
     }
   }
 }
