@@ -66,20 +66,17 @@
 
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-eventbus</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-lifecycle</artifactId>
     </dependency>
 
-    <!--
-    HACK: ATM the app lifecycle events are also in core.
-    -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <artifactId>nexus-httpclient-api</artifactId>
     </dependency>
 
     <dependency>
