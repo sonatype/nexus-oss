@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Blob created event.
  *
  * @since 3.0
  */
 public class BlobCreatedEvent
+  extends BlobEvent
 {
-
+  public BlobCreatedEvent(final Blob blob) {
+    super(blob);
+  }
 }

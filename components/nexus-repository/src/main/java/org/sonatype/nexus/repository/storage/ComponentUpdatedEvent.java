@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Component updated event.
  *
  * @since 3.0
  */
 public class ComponentUpdatedEvent
+  extends ComponentEvent
 {
-
+  public ComponentUpdatedEvent(final Component component) {
+    super(component);
+  }
 }

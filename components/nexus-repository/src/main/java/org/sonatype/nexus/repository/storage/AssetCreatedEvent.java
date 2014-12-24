@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Asset created event.
  *
  * @since 3.0
  */
 public class AssetCreatedEvent
+  extends AssetEvent
 {
-
+  public AssetCreatedEvent(final Asset asset) {
+    super(asset);
+  }
 }

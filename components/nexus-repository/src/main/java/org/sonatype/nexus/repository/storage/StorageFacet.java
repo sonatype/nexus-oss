@@ -15,10 +15,11 @@ package org.sonatype.nexus.repository.storage;
 import org.sonatype.nexus.repository.Facet;
 
 /**
- * ???
+ * Storage {@link Facet}.
  *
  * @since 3.0
  */
+@Facet.Exposed
 public interface StorageFacet
   extends Facet
 {

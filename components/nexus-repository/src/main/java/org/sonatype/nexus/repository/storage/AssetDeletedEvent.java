@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Asset deleted event.
  *
  * @since 3.0
  */
 public class AssetDeletedEvent
+  extends AssetEvent
 {
-
+  public AssetDeletedEvent(final Asset asset) {
+    super(asset);
+  }
 }

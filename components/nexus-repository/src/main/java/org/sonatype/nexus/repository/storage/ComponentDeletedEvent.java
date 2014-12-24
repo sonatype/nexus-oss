@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Component deleted event.
  *
  * @since 3.0
  */
 public class ComponentDeletedEvent
+  extends ComponentEvent
 {
-
+  public ComponentDeletedEvent(final Component component) {
+    super(component);
+  }
 }

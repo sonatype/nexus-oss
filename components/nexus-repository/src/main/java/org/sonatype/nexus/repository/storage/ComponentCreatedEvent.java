@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Component created event.
  *
  * @since 3.0
  */
 public class ComponentCreatedEvent
+  extends ComponentEvent
 {
-
+  public ComponentCreatedEvent(final Component component) {
+    super(component);
+  }
 }

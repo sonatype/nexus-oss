@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
+
 /**
- * ???
+ * Storage service.
  *
  * @since 3.0
  */
 public interface StorageService
+  extends Lifecycle
 {
+  // TODO:
 }

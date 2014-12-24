@@ -13,11 +13,14 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Blob deleted event.
  *
  * @since 3.0
  */
 public class BlobDeletedEvent
+  extends BlobEvent
 {
-
+  public BlobDeletedEvent(final Blob blob) {
+    super(blob);
+  }
 }
