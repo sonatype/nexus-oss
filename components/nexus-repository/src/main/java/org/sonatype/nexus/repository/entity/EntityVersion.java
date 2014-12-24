@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.entity;
 
+import java.io.Serializable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -20,7 +22,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class EntityVersion
+  implements Serializable
 {
+  private static final long serialVersionUID = 1L;
+
   private final String value;
 
   public EntityVersion(final String value) {
