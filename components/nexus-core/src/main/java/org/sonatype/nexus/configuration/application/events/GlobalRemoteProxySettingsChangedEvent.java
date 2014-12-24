@@ -25,8 +25,14 @@ import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 public class GlobalRemoteProxySettingsChangedEvent
 {
 
-  public GlobalRemoteProxySettingsChangedEvent(final GlobalRemoteProxySettings remoteProxySettingsConfiguration)
+  private GlobalRemoteProxySettings settings;
+
+  public GlobalRemoteProxySettingsChangedEvent(final GlobalRemoteProxySettings settings)
   {
+    this.settings = settings;
   }
 
+  public GlobalRemoteProxySettings getSettings() {
+    return settings;
+  }
 }

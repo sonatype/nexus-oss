@@ -29,7 +29,7 @@ public class GlobalRemoteConnectionSettingsChangedEvent
     this.settings = settings;
   }
 
-  public GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings() {
+  public GlobalRemoteConnectionSettings getSettings() {
     return settings;
   }
 
