@@ -70,7 +70,6 @@
     </dependency>
 
     <!--
-    HACK: ATM the basic impls of orient support (for testing) still exist in nexus-core.
     HACK: ATM the app lifecycle events are also in core.
     -->
     <dependency>

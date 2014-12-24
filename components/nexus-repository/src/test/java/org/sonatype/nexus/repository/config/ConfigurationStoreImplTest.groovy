@@ -13,14 +13,15 @@
 
 package org.sonatype.nexus.repository.config
 
+import com.google.inject.util.Providers
 import com.orientechnologies.orient.core.exception.OValidationException
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator
-import org.sonatype.nexus.repository.orient.DatabaseInstanceRule
+import org.sonatype.nexus.orient.DatabaseInstanceRule
+import org.sonatype.nexus.orient.HexRecordIdObfuscator
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
@@ -42,7 +43,7 @@ class ConfigurationStoreImplTest
     entityAdapter.installDependencies(new HexRecordIdObfuscator())
 
     underTest = new ConfigurationStoreImpl(
-        database.instanceProvider,
+        Providers.of(database.instance),
         entityAdapter
     )
 

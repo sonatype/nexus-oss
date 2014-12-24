@@ -10,19 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.orient;
+package org.sonatype.nexus.orient;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
-import org.sonatype.nexus.orient.DatabaseInstance;
-
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.inject.util.Providers;
 import org.junit.rules.ExternalResource;
 import org.junit.runners.model.MultipleFailureException;
 import org.slf4j.Logger;
@@ -31,8 +24,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-
-// TODO: Find a better home for this so it can be re-used
 
 /**
  * JUnit rule to provide {@link DatabaseInstance} and related components.
@@ -74,10 +65,6 @@ public class DatabaseInstanceRule
   public DatabaseInstance getInstance() {
     checkState(instance != null);
     return instance;
-  }
-
-  public Provider<DatabaseInstance> getInstanceProvider() {
-    return Providers.of(getInstance());
   }
 
   @Override
