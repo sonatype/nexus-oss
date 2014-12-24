@@ -121,6 +121,7 @@ public class ViewServlet
    * Find repository for given request.
    */
   private Repository repository(final String name) {
+    log.debug("Looking for repository: {}", name);
     Repository repo = repositoryManager.get(name);
     checkState(repo != null, "No repository with name: %s", name);
     return repo;
@@ -131,6 +132,7 @@ public class ViewServlet
    */
   private HttpResponseSender sender(final Repository repository) {
     String format = repository.getFormat().getValue();
+    log.debug("Looking for HTTP response sender: {}", format);
     HttpResponseSender sender = responseSenders.get(format);
     checkState(sender != null, "No HTTP response sender for format: %s", format);
     return sender;

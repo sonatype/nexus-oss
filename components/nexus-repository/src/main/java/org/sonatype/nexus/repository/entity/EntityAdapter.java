@@ -79,7 +79,7 @@ public abstract class EntityAdapter<T extends Entity>
       type = schema.createClass(typeName);
       defineType(type);
 
-      log.debug("Created schema type '{}': properties={}, indexes={}",
+      log.info("Created schema type '{}': properties={}, indexes={}",
           type,
           type.properties(),
           type.getIndexes()
