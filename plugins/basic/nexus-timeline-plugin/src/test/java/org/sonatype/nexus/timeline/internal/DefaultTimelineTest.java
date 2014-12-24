@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
+import org.sonatype.nexus.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.EntryListCallback;
 import org.sonatype.nexus.timeline.TimelineCallback;
