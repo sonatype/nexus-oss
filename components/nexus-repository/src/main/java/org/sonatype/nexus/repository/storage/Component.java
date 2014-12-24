@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.storage;
 import org.sonatype.nexus.repository.entity.Entity;
 
 /**
- * ???
+ * Component entity.
  *
  * @since 3.0
  */

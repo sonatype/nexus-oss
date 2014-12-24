@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.storage;
 
 /**
- * ???
+ * Blob entity.
  *
  * @since 3.0
  */

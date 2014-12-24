@@ -12,17 +12,33 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default {@link StorageService} implementation.
  *
  * @since 3.0
  */
+@Named
+@Singleton
 public class StorageServiceImpl
   extends LifecycleSupport
   implements StorageService
 {
+  private final EventBus eventBus;
+
+  @Inject
+  public StorageServiceImpl(final EventBus eventBus) {
+    this.eventBus = checkNotNull(eventBus);
+  }
+
   @Override
   protected void doStart() throws Exception {
     // TODO
