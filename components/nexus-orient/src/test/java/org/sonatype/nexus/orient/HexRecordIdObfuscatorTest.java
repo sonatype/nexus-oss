@@ -10,19 +10,13 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.orient;
-
-import org.sonatype.nexus.orient.RecordIdObfuscator;
-import org.sonatype.sisu.litmus.testsupport.group.Perf;
-
-import org.junit.experimental.categories.Category;
+package org.sonatype.nexus.orient;
 
 /**
- * Performance tests for {@link HexRecordIdObfuscator}.
+ * Tests for {@link HexRecordIdObfuscator}.
  */
-@Category(Perf.class)
-public class HexRecordIdObfuscatorPerf
-  extends RecordIdObfuscatorPerfSupport
+public class HexRecordIdObfuscatorTest
+  extends RecordIdObfuscatorTestSupport
 {
   @Override
   protected RecordIdObfuscator createTestSubject() throws Exception {
