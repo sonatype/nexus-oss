@@ -18,8 +18,8 @@ import org.junit.Before
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer
+import org.sonatype.nexus.orient.MemoryDatabaseManager
+import org.sonatype.nexus.orient.MinimalDatabaseServer
 import org.sonatype.security.model.CPrivilege
 import org.sonatype.security.model.CRole
 import org.sonatype.security.model.CUserRoleMapping

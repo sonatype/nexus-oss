@@ -44,8 +44,8 @@ import org.sonatype.nexus.component.services.internal.adapter.TestComponentAdapt
 import org.sonatype.nexus.component.services.internal.id.DefaultEntityIdFactory;
 import org.sonatype.nexus.component.services.storage.ComponentStore;
 import org.sonatype.nexus.internal.orient.DatabaseManagerImpl;
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.MinimalDatabaseServer;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.base.Supplier;
