@@ -15,10 +15,10 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +31,9 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
 
 import com.google.common.base.Throwables;
+import org.jboss.logging.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -45,6 +48,8 @@ import static com.google.common.base.Preconditions.checkState;
 public class ViewServlet
     extends HttpServlet
 {
+  private static final Logger log = LoggerFactory.getLogger(ViewServlet.class);
+
   private final RepositoryManager repositoryManager;
 
   private final Map<String, HttpResponseSender> responseSenders;
@@ -58,26 +63,55 @@ public class ViewServlet
   }
 
   @Override
-  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+  public void init(final ServletConfig config) throws ServletException {
+    super.init(config);
+    log.info("Initialized");
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    log.info("Destroyed");
+  }
+
+  @Override
+  protected void service(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
   {
+    String uri = request.getRequestURI();
+    if (request.getQueryString() != null) {
+      uri = String.format("%s?%s", uri, request.getQueryString());
+    }
+
+    if (log.isDebugEnabled()) {
+      log.debug("Servicing: {} {} ({})", request.getMethod(), uri, request.getRequestURL());
+    }
+
+    MDC.put(getClass().getName(), uri);
+    try {
+      doService(request, response);
+    }
+    catch (Exception e) {
+      log.warn("Service failure", e);
+      Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
+      throw new ServletException(e);
+    }
+    finally {
+      MDC.remove(getClass().getName());
+    }
+  }
+
+  protected void doService(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
     final RepositoryPath repoPath = RepositoryPath.parse(req.getPathInfo());
     checkState(repoPath != null, "Cannot parse repository path");
+    assert repoPath != null;
 
     // resolve repository for request
     Repository repo = repository(repoPath.getRepositoryName());
 
     // dispatch request
     ViewFacet facet = repo.facet(ViewFacet.class);
-
-    Response response;
-    try {
-      response = facet.getRouter().dispatch(new HttpRequest(repo, req, repoPath.getRemainingPath()));
-    }
-    catch (Exception e) {
-      Throwables.propagateIfPossible(e, ServletException.class, IOException.class);
-      throw new ServletException(e);
-    }
+    Response response = facet.getRouter().dispatch(new HttpRequest(repo, req, repoPath.getRemainingPath()));
 
     // send response
     sender(repo).send(response, resp);
@@ -86,23 +120,19 @@ public class ViewServlet
   /**
    * Find repository for given request.
    */
-  @Nonnull
   private Repository repository(final String name) {
     Repository repo = repositoryManager.get(name);
     checkState(repo != null, "No repository with name: %s", name);
-    //noinspection ConstantConditions
     return repo;
   }
 
   /**
    * Find sender for repository format.
    */
-  @Nonnull
   private HttpResponseSender sender(final Repository repository) {
     String format = repository.getFormat().getValue();
     HttpResponseSender sender = responseSenders.get(format);
     checkState(sender != null, "No HTTP response sender for format: %s", format);
-    //noinspection ConstantConditions
     return sender;
   }
 }
