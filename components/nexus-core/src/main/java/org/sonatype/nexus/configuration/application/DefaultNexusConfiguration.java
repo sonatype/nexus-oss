@@ -52,8 +52,8 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
+import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 import org.sonatype.nexus.proxy.events.Veto;
-import org.sonatype.nexus.proxy.events.Vetoable;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -204,16 +204,16 @@ public class DefaultNexusConfiguration
 
   private static class VetoFormatterRequest
   {
-    private Vetoable event;
+    private AbstractVetoableEvent<?> event;
 
     private boolean detailed;
 
-    public VetoFormatterRequest(Vetoable event, boolean detailed) {
+    public VetoFormatterRequest(AbstractVetoableEvent<?> event, boolean detailed) {
       this.event = event;
       this.detailed = detailed;
     }
 
-    public Vetoable getEvent() {
+    public AbstractVetoableEvent<?> getEvent() {
       return event;
     }
 

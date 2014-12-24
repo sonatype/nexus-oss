@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class AbstractVetoableEvent<T>
-    implements Vetoable
 {
   private final ArrayList<Veto> vetos = new ArrayList<Veto>();
 
