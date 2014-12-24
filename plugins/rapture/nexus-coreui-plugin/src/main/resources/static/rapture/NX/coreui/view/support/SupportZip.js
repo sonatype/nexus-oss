@@ -32,79 +32,78 @@ Ext.define('NX.coreui.view.support.SupportZip', {
 
     me.items = {
       xtype: 'nx-settingsform',
-      settingsFormSubmitMessage: 'Creating support ZIP...',
-      settingsFormSuccessMessage: 'Support ZIP created',
+      settingsFormSubmitMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATING'),
+      settingsFormSuccessMessage: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED'),
       api: {
         submit: 'NX.direct.atlas_SupportZip.create'
       },
       editableCondition: NX.Conditions.isPermitted('nexus:atlas', 'create'),
-      editableMarker: 'You do not have permission to create a support ZIP',
+      editableMarker: NX.I18n.get('ADMIN_SUPPORT_ZIP_PERMISSION_ERROR'),
       items: [
         {
           xtype: 'label',
-          html: '<div>No information will be sent to Sonatype when creating the support ZIP file.' +
-              '<br/><br/>Select the contents and options for support ZIP creation:<br/><br/></div>'
+          html: NX.I18n.get('ADMIN_SUPPORT_ZIP_HELP')
         },
         {
           xtype: 'checkboxgroup',
-          fieldLabel: 'Contents',
+          fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CONTENTS'),
           columns: 1,
           allowBlank: false,
           items: [
             {
               xtype: 'checkbox',
               name: 'systemInformation',
-              boxLabel: 'Includes system information report',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_REPORT'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'threadDump',
-              boxLabel: 'Include a JVM thread-dump',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_DUMP'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'configuration',
-              boxLabel: 'Include configuration files',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CONFIGURATION'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'security',
-              boxLabel: 'Include security configuration files',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_SECURITY'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'log',
-              boxLabel: 'Include log files',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_LOGS'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'metrics',
-              boxLabel: 'Includes system and component metrics',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_METRICS'),
               checked: true
             }
           ]
         },
         {
           xtype: 'checkboxgroup',
-          fieldLabel: 'Options',
+          fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_OPTIONS'),
           allowBlank: true,
           columns: 1,
           items: [
             {
               xtype: 'checkbox',
               name: 'limitFileSizes',
-              boxLabel: 'Limit the size of files included in the support ZIP to no more than 30 MB each.',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_INCLUDED'),
               checked: true
             },
             {
               xtype: 'checkbox',
               name: 'limitZipSize',
-              boxLabel: 'Limit the maximum size of the support ZIP file to no more than 20 MB.',
+              boxLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_MAX'),
               checked: true
             }
           ]
@@ -115,7 +114,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
 
       buttons: [
         {
-          text: 'Create',
+          text: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATE_BUTTON'),
           formBind: true,
           glyph: 'xf019@FontAwesome' /* fa-download */,
           action: 'save',
