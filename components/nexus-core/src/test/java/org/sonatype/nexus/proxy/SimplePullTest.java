@@ -225,7 +225,7 @@ public class SimplePullTest
     getRemoteFile(getRepositoryRegistry().getRepository("repo3"), "/repo3.txt").setLastModified(now);
 
     // and here we go again
-    //testItemEventListener.reset();
+    testItemEventListener.reset();
 
     item =
         getRootRouter().retrieveItem(
