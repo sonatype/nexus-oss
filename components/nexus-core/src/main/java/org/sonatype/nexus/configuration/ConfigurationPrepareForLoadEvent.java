@@ -25,11 +25,14 @@ import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
 public class ConfigurationPrepareForLoadEvent
     extends AbstractVetoableEvent<ApplicationConfiguration>
 {
+  private final ApplicationConfiguration configuration;
+
   public ConfigurationPrepareForLoadEvent(ApplicationConfiguration configuration) {
     super(configuration);
+    this.configuration = configuration;
   }
 
   public ApplicationConfiguration getConfiguration() {
-    return getEventSender();
+    return configuration;
   }
 }

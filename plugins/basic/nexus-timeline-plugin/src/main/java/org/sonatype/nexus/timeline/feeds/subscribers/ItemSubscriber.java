@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -20,7 +21,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -109,7 +109,7 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          ievt.getEventDate(),
+          new Date(), // HACK: could restore by having item events have date
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data
@@ -118,7 +118,7 @@ public class ItemSubscriber
     }
   }
 
-  private void inspectForNexus(Event<?> evt) {
+  private void inspectForNexus(Object evt) {
     RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
     // filter out links and dirs/collections and hidden files
@@ -165,7 +165,7 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          evt.getEventDate(),
+          new Date(), // HACK: could restore by having item events have date
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data

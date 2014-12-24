@@ -12,23 +12,22 @@
  */
 package org.sonatype.nexus.capability;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 /**
  * {@link Condition} related events.
  *
  * @since capabilities 2.0
  */
 public class ConditionEvent
-    extends AbstractEvent<Condition>
 {
 
+  private final Condition condition;
+
   public ConditionEvent(final Condition condition) {
-    super(condition);
+    this.condition = condition;
   }
 
   public Condition getCondition() {
-    return getEventSender();
+    return condition;
   }
 
   @Override

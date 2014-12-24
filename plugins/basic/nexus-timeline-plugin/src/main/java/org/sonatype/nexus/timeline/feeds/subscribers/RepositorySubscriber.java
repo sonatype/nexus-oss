@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -22,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -92,7 +92,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_LSTATUS,
-        revt.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         null, // TODO: who changed it?
         "/", // link to UI
         data
@@ -118,7 +118,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_PSTATUS,
-        revt.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         null, // TODO: who changed it?
         "/", // link to UI
         data
@@ -126,7 +126,7 @@ public class RepositorySubscriber
     getFeedRecorder().addEvent(fe);
   }
 
-  private void inspect(Event<?> evt) {
+  private void inspect(Object evt) {
     if (!isNexusStarted()) {
       return;
     }
@@ -165,7 +165,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         action,
-        evt.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         null, // TODO: who changed it?
         "/", // link to UI
         data

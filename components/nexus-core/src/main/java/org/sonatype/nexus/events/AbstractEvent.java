@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.events;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * The superclass for all events.
  *
@@ -23,56 +19,5 @@ import java.util.Map;
  * @since 2.7.0
  */
 public abstract class AbstractEvent<T>
-    implements Event<T>
 {
-  /**
-   * The event date.
-   */
-  private final Date eventDate;
-
-  /**
-   * The event context
-   */
-  private final HashMap<Object, Object> eventContext;
-
-  /**
-   * The sender
-   */
-  private final T eventSender;
-
-  /**
-   * Instantiates a new abstract event.
-   */
-  public AbstractEvent(T component) {
-    this.eventDate = new Date();
-    this.eventContext = new HashMap<Object, Object>();
-    this.eventSender = component;
-  }
-
-  /**
-   * Gets the event date.
-   *
-   * @return the event date
-   */
-  public Date getEventDate() {
-    return eventDate;
-  }
-
-  /**
-   * Gets the modifiable event context.
-   *
-   * @return the event context
-   */
-  public Map<Object, Object> getEventContext() {
-    return eventContext;
-  }
-
-  /**
-   * Gets the sender
-   *
-   * @return the event sender
-   */
-  public T getEventSender() {
-    return eventSender;
-  }
 }

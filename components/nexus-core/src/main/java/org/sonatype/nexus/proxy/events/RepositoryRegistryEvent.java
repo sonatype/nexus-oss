@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
@@ -21,14 +20,15 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
  * @author cstamas
  */
 public abstract class RepositoryRegistryEvent
-    extends AbstractEvent<RepositoryRegistry>
 {
+  private final RepositoryRegistry repositoryRegistry;
+
   public RepositoryRegistryEvent(final RepositoryRegistry repositoryRegistry) {
-    super(repositoryRegistry);
+    this.repositoryRegistry = repositoryRegistry;
   }
 
   public RepositoryRegistry getRepositoryRegistry() {
-    return getEventSender();
+    return repositoryRegistry;
   }
 
 }

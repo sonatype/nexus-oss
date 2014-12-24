@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -74,7 +73,7 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
     inspect(evt);
   }
 
-  protected void inspect(final Event<?> evt) {
+  private void inspect(final Object evt) {
     Repository repository = null;
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
       repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
@@ -94,7 +93,7 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
     }
   }
 
-  private void inspectForIndexerManager(Event<?> evt, Repository repository) {
+  private void inspectForIndexerManager(Object evt, Repository repository) {
     try {
       // we are handling repo events, like addition and removal
       if (evt instanceof RepositoryRegistryEventAdd) {

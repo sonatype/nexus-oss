@@ -19,15 +19,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -36,7 +32,6 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.sisu.goodies.common.Loggers;
 
-import com.google.common.eventbus.Subscribe;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -75,11 +70,6 @@ public abstract class AbstractProxyTestEnvironment
    */
   private RepositoryRouter rootRouter;
 
-  /**
-   * The test listener
-   */
-  private TestItemEventListener testEventListener;
-
   public ApplicationConfiguration getApplicationConfiguration() {
     return applicationConfiguration;
   }
@@ -113,12 +103,6 @@ public abstract class AbstractProxyTestEnvironment
     return rootRouter;
   }
 
-  /**
-   * Gets the test event listener.
-   */
-  public TestItemEventListener getTestEventListener() {
-    return testEventListener;
-  }
 
   /*
    * (non-Javadoc)
@@ -133,10 +117,6 @@ public abstract class AbstractProxyTestEnvironment
     applicationConfiguration = lookup(ApplicationConfiguration.class);
 
     repositoryRegistry = lookup(RepositoryRegistry.class);
-
-    testEventListener = new TestItemEventListener();
-
-    eventBus().register(testEventListener);
 
     // "ping" it
     lookup(AttributesHandler.class);
@@ -286,42 +266,6 @@ public abstract class AbstractProxyTestEnvironment
          FileOutputStream fos = new FileOutputStream(file)) {
       IOUtils.copy(is, fos);
       fos.flush();
-    }
-  }
-
-  protected class TestItemEventListener
-  {
-    private List<Event> events = new ArrayList<Event>();
-
-    public List<Event> getEvents() {
-      return events;
-    }
-
-    public Event getFirstEvent() {
-      if (events.size() > 0) {
-        return events.get(0);
-      }
-      else {
-        return null;
-      }
-    }
-
-    public Event getLastEvent() {
-      if (events.size() > 0) {
-        return events.get(events.size() - 1);
-      }
-      else {
-        return null;
-      }
-    }
-
-    public void reset() {
-      events.clear();
-    }
-
-    @Subscribe
-    public void onEvent(RepositoryItemEvent evt) {
-      events.add(evt);
     }
   }
 

@@ -13,7 +13,6 @@
 package org.sonatype.nexus.component.source.config;
 
 import org.sonatype.nexus.component.source.ComponentSourceRegistry;
-import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Fired when the {@link ComponentSourceRegistry} has been populated as Nexus starts.
@@ -21,11 +20,8 @@ import org.sonatype.nexus.events.AbstractEvent;
  * @since 3.0
  */
 public class ComponentSourceRegistryInitializedEvent
-    extends AbstractEvent<ComponentSourceRegistry>
 {
-  public ComponentSourceRegistryInitializedEvent(
-      final ComponentSourceRegistry component)
+  public ComponentSourceRegistryInitializedEvent(final ComponentSourceRegistry component)
   {
-    super(component);
   }
 }

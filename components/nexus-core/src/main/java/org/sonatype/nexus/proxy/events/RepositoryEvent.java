@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The event that is occurred within a Repository, such as content changes or other maintenance stuff.
@@ -23,10 +20,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author cstamas
  */
 public abstract class RepositoryEvent
-    extends AbstractEvent<Repository>
 {
+  private final Repository repository;
+
   public RepositoryEvent(final Repository repository) {
-    super(checkNotNull(repository));
+    this.repository = repository;
   }
 
   /**
@@ -35,7 +33,7 @@ public abstract class RepositoryEvent
    * @return the repository
    */
   public Repository getRepository() {
-    return getEventSender();
+    return repository;
   }
 
   @Override

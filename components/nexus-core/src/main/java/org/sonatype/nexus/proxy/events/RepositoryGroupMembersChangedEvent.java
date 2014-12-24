@@ -135,7 +135,7 @@ public class RepositoryGroupMembersChangedEvent
    * Returns the group repository instance being reconfigured.
    */
   public GroupRepository getGroupRepository() {
-    return (GroupRepository) getEventSender();
+    return (GroupRepository) getRepository();
   }
 
   /**

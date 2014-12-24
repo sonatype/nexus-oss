@@ -23,7 +23,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -81,42 +80,26 @@ public class NexusRepositoryMetadataEventInspector
   }
 
   @Subscribe
-  public void on(final NexusStartedEvent evt) {
-    inspect(evt);
+  public void on(final NexusStartedEvent event) {
+    // on start, we batch process all of those
+    for (Repository repository : repositoryRegistry.getRepositories()) {
+      processRepository(repository);
+    }
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventAdd evt) {
-    inspect(evt);
+  public void on(final RepositoryRegistryEventAdd event) {
+    if (systemStatusProvider.get().isNexusStarted()) {
+      processRepository(event.getRepository());
+    }
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryConfigurationUpdatedEvent evt) {
-    inspect(evt);
-  }
-
-  protected void inspect(Event<?> evt) {
-    if (evt instanceof NexusStartedEvent) {
-      // on start, we batch process all of those
-      for (Repository repository : repositoryRegistry.getRepositories()) {
-        processRepository(repository);
-      }
-
-      return;
-    }
-
-    // stuff below should happen only if this is a RUNNING instance!
-    if (!systemStatusProvider.get().isNexusStarted()) {
-      return;
-    }
-
-    if (evt instanceof RepositoryRegistryEventAdd) {
-      processRepository(((RepositoryRegistryEventAdd) evt).getRepository());
-    }
-    else if (evt instanceof RepositoryConfigurationUpdatedEvent) {
-      processRepository(((RepositoryConfigurationUpdatedEvent) evt).getRepository());
+  public void on(final RepositoryConfigurationUpdatedEvent event) {
+    if (systemStatusProvider.get().isNexusStarted()) {
+      processRepository(event.getRepository());
     }
   }
 

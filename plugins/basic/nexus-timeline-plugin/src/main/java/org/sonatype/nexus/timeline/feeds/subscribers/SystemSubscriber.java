@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
-        e.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         null, // "system" is booting
         "/", // link to UI
         data
@@ -82,7 +83,7 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_BOOT,
-        e.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         null, // "system" is booting
         "/", // link to UI
         data
@@ -107,7 +108,7 @@ public class SystemSubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_SYSTEM,
         FeedRecorder.SYSTEM_CONFIG,
-        event.getEventDate(),
+        new Date(), // HACK: could restore by having event have date
         event.getUserId(),
         "/", // link to UI
         data

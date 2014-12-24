@@ -17,7 +17,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -82,7 +81,7 @@ public class IndexerManagerEventInspector
     }
   }
 
-  private void inspectForIndexerManager(final Event<?> evt) {
+  private void inspectForIndexerManager(final Object evt) {
     RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
     Repository repository = ievt.getRepository();
