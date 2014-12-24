@@ -72,7 +72,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
         if (factory) {
           item = Ext.apply(factory.create(formField), {
             requiresPermission: true,
-            name: 'property.' + formField.id,
+            name: 'property_' + formField.id,
             factory: factory
           });
           me.add(item);
@@ -93,10 +93,10 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
 
     if (me.formFields) {
       Ext.Array.each(me.formFields, function (formField) {
-        value = values['property.' + formField.id];
+        value = values['property_' + formField.id];
         if (Ext.isDefined(value) && value !== null) {
           properties[formField.id] = String(value);
-          delete values['property.' + formField.id];
+          delete values['property_' + formField.id];
         }
       });
     }
@@ -118,13 +118,13 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
 
     if (me.formFields) {
       Ext.Array.each(me.formFields, function (formField) {
-        data['property.' + formField.id] = '';
+        data['property_' + formField.id] = '';
       });
     }
 
     if (properties) {
       Ext.Object.each(properties, function (key, value) {
-        data['property.' + key] = value;
+        data['property_' + key] = value;
       });
     }
 
@@ -148,7 +148,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
         if (errors.hasOwnProperty(key)) {
           marked = false;
           if (form) {
-            field = form.findField('property.' + key);
+            field = form.findField('property_' + key);
             if (!field) {
               field = form.findField(key);
             }
