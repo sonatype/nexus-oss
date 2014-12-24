@@ -232,13 +232,13 @@ public class DefaultNexusConfiguration
       if (request != null
           && request.getEvent() != null
           && request.getEvent().isVetoed()) {
-        sb.append("Event " + request.getEvent().toString() + " has been vetoed by one or more components.");
+        sb.append("Event ").append(request.getEvent().toString()).append(" has been vetoed by one or more components.");
 
         if (request.isDetailed()) {
           sb.append(LINE_SEPERATOR);
 
           for (Veto veto : request.getEvent().getVetos()) {
-            sb.append("vetoer: " + veto.getVetoer().toString());
+            sb.append("vetoer: ").append(veto.getVetoer().toString());
             sb.append("cause:");
             sb.append(LINE_SEPERATOR);
             sb.append(ExceptionUtils.getFullStackTrace(veto.getReason()));
