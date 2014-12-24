@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.storage.StorageService;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleManagerImpl;
 
@@ -42,15 +43,19 @@ public class RepositoryLifecycle
 
   private final Provider<ConfigurationStore> configurationStore;
 
+  private final Provider<StorageService> storageService;
+
   private final Provider<RepositoryManager> repositoryManager;
 
   @Inject
   public RepositoryLifecycle(final EventBus eventBus,
                              final Provider<ConfigurationStore> configurationStore,
+                             final Provider<StorageService> storageService,
                              final Provider<RepositoryManager> repositoryManager)
   {
     this.eventBus = checkNotNull(eventBus);
     this.configurationStore = checkNotNull(configurationStore);
+    this.storageService = checkNotNull(storageService);
     this.repositoryManager = checkNotNull(repositoryManager);
 
     eventBus.register(this);
@@ -59,8 +64,8 @@ public class RepositoryLifecycle
   @Subscribe
   public void on(final NexusStartedEvent event) throws Exception {
     add(configurationStore.get());
+    add(storageService.get());
     add(repositoryManager.get());
-
     start();
   }
 
