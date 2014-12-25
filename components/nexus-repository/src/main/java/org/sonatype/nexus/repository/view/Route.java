@@ -14,13 +14,13 @@ package org.sonatype.nexus.repository.view;
 
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A view route, an ordered list of handlers guarded by a {@link Matcher}.
+ * View route.
  *
  * @since 3.0
  */
@@ -31,11 +31,10 @@ public class Route
   private final List<Handler> handlers;
 
   public Route(final Matcher matcher, final List<Handler> handlers) {
-    checkNotNull(handlers);
-    checkArgument(!handlers.isEmpty(), "handler list must not be empty");
-
-    this.matcher = checkNotNull(matcher);
-    this.handlers = ImmutableList.copyOf(checkNotNull(handlers));
+    this.matcher = checkNotNull(matcher, "Missing matcher");
+    checkNotNull(handlers, "Missing handlers");
+    checkArgument(!handlers.isEmpty(), "At least one handler is required");
+    this.handlers = handlers;
   }
 
   public Matcher getMatcher() {
@@ -44,5 +43,34 @@ public class Route
 
   public List<Handler> getHandlers() {
     return handlers;
+  }
+
+  //
+  // Builder
+  //
+
+  /**
+   * View {@link Route} builder.
+   */
+  public static class Builder
+  {
+    private Matcher matcher;
+
+    private List<Handler> handlers = Lists.newArrayList();
+
+    public Builder matcher(final Matcher matcher) {
+      this.matcher = checkNotNull(matcher);
+      return this;
+    }
+
+    public Builder handler(final Handler handler) {
+      checkNotNull(handler);
+      handlers.add(handler);
+      return this;
+    }
+
+    public Route create() {
+      return new Route(matcher, handlers);
+    }
   }
 }

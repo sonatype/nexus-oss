@@ -14,15 +14,17 @@ package org.sonatype.nexus.repository.view.matchers;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * ???
+ * Literal string matcher.
  *
  * @since 3.0
  */
 public class LiteralMatcher
+  extends ComponentSupport
   implements Matcher
 {
   private final String literal;
@@ -37,11 +39,13 @@ public class LiteralMatcher
   @Override
   public boolean matches(final Context context) {
     checkNotNull(context);
+    String path = context.getRequest().getPath();
+    log.debug("Literal match: {}={} ignore-case: {}", path, literal, ignoreCase);
     if (ignoreCase) {
-      return context.getRequest().getPath().equalsIgnoreCase(literal);
+      return path.equalsIgnoreCase(literal);
     }
     else {
-      return context.getRequest().getPath().equals(literal);
+      return path.equals(literal);
     }
   }
 

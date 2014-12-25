@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.view;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A response that also carries a {@link Payload}.
+ * Payload response.
  *
  * @since 3.0
  */

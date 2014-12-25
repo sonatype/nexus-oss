@@ -38,7 +38,7 @@ public class RawProxyRepositoryRecipe
   }
 
   @Override
-  protected void init() throws Exception {
+  protected void doInit() {
     addFacet(RawProxyViewFacet.class);
   }
 }

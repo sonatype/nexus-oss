@@ -10,62 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.raw;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.inject.Named;
 
+import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.view.DefaultRoute;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.NotFoundHandler;
-import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
-import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
-
-import com.google.common.collect.Lists;
 
 /**
  * A proxy for the remote content.
  *
  * @since 3.0
  */
+@Named
 public class RawProxyViewFacet
-    extends ViewFacet
+    extends FacetSupport
+    implements ViewFacet
 {
-  public static final String CONFIG_KEY = "raw_proxy_view_facet" ;
-
-
-  public RawProxyViewFacet(final Router router) {
-    super(router);
-  }
+  public static final String CONFIG_KEY = "raw_proxy_view_facet";
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    final Configuration configuration = repository.getConfiguration();
+    //final Configuration configuration = repository.getConfiguration();
+    //
+    //final Router router = getRouter();
+    //
+    //// Do we have the content cached already? Is the cache up to date?
+    //
+    //// Can we find the content remotely?
+    //
+    //
+    //// Build the primary route of the raw proxy view
+    //
+    //final List<Handler> handlers = Lists.newArrayList();
+    //
+    //// Check the cache to see if we
+    ////handlers.add(new CacheCheckHandler(repository));
+    //handlers.add(new RemoteFetchHandler(repository));
+    //
+    //final Route route = new Route(new AlwaysMatcher(), handlers);
+    //
+    //router.route(route);
+    //
+    //// By default, return a 404
+    //router.defaultHandlers(new DefaultRoute(Arrays.asList((Handler) new NotFoundHandler())));
+  }
 
-    final Router router = getRouter();
-
-    // Do we have the content cached already? Is the cache up to date?
-
-    // Can we find the content remotely?
-
-
-    // Build the primary route of the raw proxy view
-
-    final List<Handler> handlers = Lists.newArrayList();
-
-    // Check the cache to see if we
-    //handlers.add(new CacheCheckHandler(repository));
-    handlers.add(new RemoteFetchHandler(repository));
-
-    final Route route = new Route(new AlwaysMatcher(), handlers);
-
-    router.addRoute(route);
-
-    // By default, return a 404
-    router.setDefaultRoute(new DefaultRoute(Arrays.asList((Handler) new NotFoundHandler())));
+  @Override
+  public Router getRouter() {
+    return null;
   }
 }

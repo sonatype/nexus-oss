@@ -13,26 +13,15 @@
 package org.sonatype.nexus.repository.view;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.FacetSupport;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A facet that provides the repository view framework.
+ * View facet.
  *
  * @since 3.0
  */
 @Facet.Exposed
-public class ViewFacet
-    extends FacetSupport
+public interface ViewFacet
+    extends Facet
 {
-  private final Router router;
-
-  public ViewFacet(final Router router) {
-    this.router = checkNotNull(router);
-  }
-
-  public Router getRouter() {
-    return router;
-  }
+  Router getRouter();
 }

@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * ???
+ * Payload.
  *
  * @since 3.0
  */

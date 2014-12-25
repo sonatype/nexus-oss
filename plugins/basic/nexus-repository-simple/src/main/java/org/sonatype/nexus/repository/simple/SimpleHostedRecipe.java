@@ -21,7 +21,6 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.types.HostedType;
-import org.sonatype.nexus.repository.view.ViewFacet;
 
 /**
  * Simple hosted repository recipe.
@@ -43,8 +42,8 @@ public class SimpleHostedRecipe
   }
 
   @Override
-  protected void init() throws Exception {
+  protected void doInit() {
     addFacet(ConfigurationFacet.class);
-    addFacet(ViewFacet.class);
+    addFacet(SimpleViewFacet.class);
   }
 }

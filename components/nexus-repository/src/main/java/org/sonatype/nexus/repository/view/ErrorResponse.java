@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.view;
 
 /**
- * ???
+ * Error response.
  *
  * @since 3.0
  */

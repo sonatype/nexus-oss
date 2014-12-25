@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Repository;
 
 /**
- * ???
+ * View request.
  *
  * @since 3.0
  */

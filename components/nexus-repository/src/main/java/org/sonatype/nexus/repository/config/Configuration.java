@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.config;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.entity.Entity;
 
 import com.google.common.collect.Maps;
@@ -33,7 +35,7 @@ public class Configuration
 
   private String recipeName;
 
-  private Map<String, Map<String, Object>> attributes = Maps.newHashMap();
+  private Map<String, Map<String, Object>> attributes;
 
   public String getRepositoryName() {
     return repositoryName;
@@ -51,16 +53,21 @@ public class Configuration
     this.recipeName = checkNotNull(recipeName);
   }
 
+  @Nullable
   public Map<String, Map<String, Object>> getAttributes() {
     return attributes;
   }
 
-  public void setAttributes(final Map<String, Map<String, Object>> attributes) {
-    this.attributes = checkNotNull(attributes);
+  public void setAttributes(final @Nullable Map<String, Map<String, Object>> attributes) {
+    this.attributes = attributes;
   }
 
   public Attributes attributes(final String key) {
     checkNotNull(key);
+
+    if (attributes == null) {
+      attributes = Maps.newHashMap();
+    }
 
     Map<String,Object> map = attributes.get(key);
     if (map == null) {

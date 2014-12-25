@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * The processing context for a given {@link ViewFacet} handling a {@link Request}.
+ * View context.
  *
  * @since 3.0
  */

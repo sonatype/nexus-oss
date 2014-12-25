@@ -12,48 +12,83 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.collect.Lists;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Dispatches {@link Request}s to the first matching {@link Route}, otherwise the request is handled by a {@link
- * Router#setDefaultRoute(DefaultRoute)} default route}.
+ * View router.
  *
  * @since 3.0
  */
 public class Router
+  extends ComponentSupport
 {
-  private final List<Route> routes = new ArrayList<>();
+  private final List<Route> routes;
 
-  private Route defaultRoute;
+  private final DefaultRoute defaultRoute;
 
-  public Response dispatch(Request request) throws Exception {
+  public Router(final List<Route> routes, final DefaultRoute defaultRoute) {
+    this.routes = checkNotNull(routes, "Missing routes");
+    this.defaultRoute = checkNotNull(defaultRoute, "Missing default route");
+  }
+
+  public Response dispatch(final Request request) throws Exception {
+    checkNotNull(request);
+
+    log.debug("Dispatching: {}", request);
+
     Context context = new Context(request);
+    Route route = findRoute(context);
+    log.debug("Selected route: {}", route);
 
-    context.setHandlers(findRoute(context).getHandlers());
+    context.setHandlers(route.getHandlers());
 
     return context.proceed();
   }
 
-  public void addRoute(Route route) {
-    routes.add(route);
-  }
-
-  /**
-   * If none of the Routes match, the {@link Request} will be {@link Router#dispatch}ed to the default route.
-   */
-  public void setDefaultRoute(final DefaultRoute defaultRoute) {
-    this.defaultRoute = checkNotNull(defaultRoute);
-  }
-
-  private Route findRoute(Context context) {
+  private Route findRoute(final Context context) {
     for (Route route : routes) {
       if (route.getMatcher().matches(context)) {
         return route;
       }
     }
     return defaultRoute;
+  }
+
+  //
+  // Builder
+  //
+
+  /**
+   * View {@link Router} builder.
+   */
+  public static class Builder
+  {
+    private List<Route> routes = Lists.newArrayList();
+
+    private DefaultRoute defaultRoute;
+
+    public Builder route(final Route route) {
+      checkNotNull(route);
+      routes.add(route);
+      return this;
+    }
+
+    public Builder defaultHandlers(final Handler... handlers) {
+      checkArgument(handlers != null);
+      checkArgument(handlers.length != 0);
+      this.defaultRoute = new DefaultRoute(handlers);
+      return this;
+    }
+
+    public Router create() {
+      return new Router(routes, defaultRoute);
+    }
   }
 }

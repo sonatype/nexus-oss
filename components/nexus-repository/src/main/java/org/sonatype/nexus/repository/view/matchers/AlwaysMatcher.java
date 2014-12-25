@@ -14,17 +14,20 @@ package org.sonatype.nexus.repository.view.matchers;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
- * ???
+ * Always matcher.
  *
  * @since 3.0
  */
 public class AlwaysMatcher
+  extends ComponentSupport
   implements Matcher
 {
   @Override
   public boolean matches(final Context context) {
+    log.debug("Always match");
     return true;
   }
 }

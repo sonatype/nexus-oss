@@ -16,15 +16,17 @@ import java.util.regex.Pattern;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * ???
+ * Regular expression string matcher.
  *
  * @since 3.0
  */
 public class RegexMatcher
+  extends ComponentSupport
   implements Matcher
 {
   public static interface Result
@@ -42,7 +44,9 @@ public class RegexMatcher
   public boolean matches(final Context context) {
     checkNotNull(context);
 
-    final java.util.regex.Matcher m = pattern.matcher(context.getRequest().getPath());
+    String path = context.getRequest().getPath();
+    log.debug("Regex matcher: {}~={}", path, pattern);
+    final java.util.regex.Matcher m = pattern.matcher(path);
 
     if (m.matches()) {
       // expose match result in context

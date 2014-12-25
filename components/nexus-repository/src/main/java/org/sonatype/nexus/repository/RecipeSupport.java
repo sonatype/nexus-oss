@@ -74,9 +74,15 @@ public abstract class RecipeSupport
     this.repositoryFactory = checkNotNull(repositoryFactory);
   }
 
-  // TODO: Test if this will work to get sisu to invoke concrete class impl
+  // FIXME: Consider alternatives to initialize support bits that do not rely on JSR-250?
+
   @PostConstruct
-  protected abstract void init() throws Exception;
+  protected final void init() throws Exception {
+    log.debug("Initializing");
+    doInit();
+  }
+
+  protected abstract void doInit();
 
   /**
    * Add a facet provider.
@@ -101,8 +107,7 @@ public abstract class RecipeSupport
       facetPrototypes.add(entry.getProvider());
     }
     else {
-      // TODO: Should this be fatal?
-      log.error("Missing facet provider for type: {}", type);
+      throw new RuntimeException("Missing facet provider for type: " + type);
     }
   }
 
@@ -117,9 +122,7 @@ public abstract class RecipeSupport
     repo.init(config);
 
     for (Provider<? extends Facet> facetPrototype : facetPrototypes) {
-      final Facet facet = facetPrototype.get();
-      log.debug("Attaching facet: {}", facet);
-      repo.attach(facet);
+      repo.attach(facetPrototype.get());
     }
 
     return repo;

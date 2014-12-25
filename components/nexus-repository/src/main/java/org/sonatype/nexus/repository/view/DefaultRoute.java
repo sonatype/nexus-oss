@@ -12,12 +12,13 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
 
 /**
- * A route of last resort, guarded by an {@link AlwaysMatcher}.
+ * View default route.
  *
  * @since 3.0
  */
@@ -26,5 +27,9 @@ public class DefaultRoute
 {
   public DefaultRoute(final List<Handler> handlers) {
     super(new AlwaysMatcher(), handlers);
+  }
+
+  public DefaultRoute(final Handler[] handlers) {
+    this(Arrays.asList(handlers));
   }
 }

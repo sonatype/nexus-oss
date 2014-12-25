@@ -18,7 +18,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * ???
+ * View response.
  *
  * @since 3.0
  */
