@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleForm', {
     return 'Task rescheduled: ' + data['name'] + ' (' + data['typeName'] + ')';
   },
 
-  editableMarker: 'You do not have permission to update tasks',
+  editableMarker: NX.I18n.get('ADMIN_TASKS_PERMISSION_ERROR'),
 
   items: [
     {
