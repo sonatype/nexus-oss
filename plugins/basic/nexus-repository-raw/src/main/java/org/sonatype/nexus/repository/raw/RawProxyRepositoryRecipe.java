@@ -18,6 +18,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 
 /**
@@ -38,7 +39,7 @@ public class RawProxyRepositoryRecipe
   }
 
   @Override
-  protected void doInit() {
-    addFacet(RawProxyViewFacet.class);
+  public void apply(final Repository repository) throws Exception {
+    // TODO: attach
   }
 }
