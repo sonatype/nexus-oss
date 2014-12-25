@@ -94,10 +94,13 @@ public class RepositoryManagerImpl
     String recipeName = configuration.getRecipeName();
     Recipe recipe = recipe(recipeName);
     log.debug("Using recipe: [{}] {}", recipeName, recipe);
+
     Repository repository = factory.create(recipe.getType(), recipe.getFormat());
     repository.init(configuration);
+
     // TODO: mandatory facets/recipe?
     recipe.apply(repository);
+
     return repository;
   }
 
