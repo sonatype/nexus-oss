@@ -70,25 +70,21 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Configuration create(final Configuration configuration) {
+  public void create(final Configuration configuration) {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
       entityAdapter.add(db, configuration);
     }
-
-    return configuration;
   }
 
   @Override
-  public Configuration update(final Configuration configuration) {
+  public void update(final Configuration configuration) {
     checkNotNull(configuration);
 
     try (ODatabaseDocumentTx db = openDb()) {
       entityAdapter.edit(db, configuration);
     }
-
-    return configuration;
   }
 
   @Override

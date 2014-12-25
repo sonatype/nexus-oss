@@ -122,10 +122,17 @@ public class RepositoryManagerImpl
   }
 
   /**
-   * Mark repository as tracked.
+   * Track repository.
    */
   private void track(final Repository repository) {
     repositories.put(repository.getName(), repository);
+  }
+
+  /**
+   * Untrack repository.
+   */
+  private void untrack(final Repository repository) {
+    repositories.remove(repository.getName());
   }
 
   // TODO: Generally need to consider exception handling to ensure proper state is maintained always
@@ -197,10 +204,10 @@ public class RepositoryManagerImpl
     ensureStarted();
 
     log.debug("Creating repository: {}", configuration);
-    Repository repository = newRepository(configuration);
-
     store.create(configuration);
+    Repository repository = newRepository(configuration);
     track(repository);
+
     repository.start();
 
     eventBus.post(new RepositoryCreatedEvent(repository));
@@ -237,7 +244,7 @@ public class RepositoryManagerImpl
     repository.stop();
     repository.destroy();
     store.delete(configuration);
-    repositories.remove(name);
+    untrack(repository);
 
     eventBus.post(new RepositoryDeletedEvent(repository));
   }

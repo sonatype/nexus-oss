@@ -26,9 +26,9 @@ public interface ConfigurationStore
 {
   List<Configuration> list();
 
-  Configuration create(Configuration configuration);
+  void create(Configuration configuration);
 
-  Configuration update(Configuration configuration);
+  void update(Configuration configuration);
 
   void delete(Configuration configuration);
 }

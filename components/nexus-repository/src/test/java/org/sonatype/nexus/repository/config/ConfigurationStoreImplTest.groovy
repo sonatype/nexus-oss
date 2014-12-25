@@ -72,7 +72,7 @@ class ConfigurationStoreImplTest
     log entity
     assert entity.entityMetadata == null
 
-    entity = underTest.create(entity)
+    underTest.create(entity)
     log entity
     assert entity.entityMetadata != null
     log entity.entityMetadata
