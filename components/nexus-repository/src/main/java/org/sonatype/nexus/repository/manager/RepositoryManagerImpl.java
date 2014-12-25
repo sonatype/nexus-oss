@@ -215,6 +215,8 @@ public class RepositoryManagerImpl
 
     log.debug("Updating repository: {}", configuration);
     Repository repository = repository(configuration.getRepositoryName());
+
+    // TODO: Ensure configuration sanity, before we apply to repository
     repository.stop();
     // TODO: figure out how to reconfigure, save and config-facet usage
     repository.start();
