@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     return 'LDAP server updated: ' + data['name'];
   },
 
-  editableMarker: 'You do not have permission to update LDAP servers',
+  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
 
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     });
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: 'Verify connection', formBind: true, action: 'verifyconnection' }
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), formBind: true, action: 'verifyconnection' }
     );
   }
 

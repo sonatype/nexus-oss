@@ -28,8 +28,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
       {
         xtype: 'textfield',
         name: 'cronExpression',
-        fieldLabel: 'CRON expression',
-        helpText: 'A cron expression that will control the running of the task.',
+        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON'),
+        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_CRON_HELP'),
         allowBlank: false
       }
     ];

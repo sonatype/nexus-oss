@@ -48,41 +48,41 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         name: 'userId',
         itemId: 'userId',
         readOnly: true,
-        fieldLabel: 'ID',
-        helpText: 'The ID assigned to this user, will be used as the username.',
-        emptyText: 'enter a user id'
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ID'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP'),
+        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_PLACEHOLDER')
       },
       { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
-        fieldLabel: 'First Name',
-        helpText: 'The first name of the user.',
-        emptyText: 'enter first name'
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_HELP'),
+        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_PLACEHOLDER')
       },
       {
         name: 'lastName',
-        fieldLabel: 'Last Name',
-        helpText: 'The last name of the user.',
-        emptyText: 'enter last name'
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_HELP'),
+        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_PLACEHOLDER')
       },
       {
         xtype: 'nx-email',
         name: 'email',
-        fieldLabel: 'Email',
-        helpText: 'Email address, to notify user when necessary.',
-        emptyText: 'enter an email address'
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
+        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_PLACEHOLDER')
       },
       {
         xtype: 'combo',
         name: 'status',
-        fieldLabel: 'Status',
-        helpText: 'The current status of the user.',
-        emptyText: 'select status',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_HELP'),
+        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_PLACEHOLDER'),
         allowBlank: false,
         editable: false,
         store: [
-          ['active', 'Active'],
-          ['disabled', 'Disabled']
+          ['active', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_ACTIVE')],
+          ['disabled', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_DISABLED')]
         ],
         queryMode: 'local'
       },
@@ -90,11 +90,11 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: 'Roles',
-        helpText: 'The roles assigned to this user.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_HELP'),
         buttons: ['add', 'remove'],
-        fromTitle: 'Roles',
-        toTitle: 'Given',
+        fromTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_PICKER'),
+        toTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_GIVEN_PICKER'),
         store: 'Role',
         valueField: 'id',
         displayField: 'name',

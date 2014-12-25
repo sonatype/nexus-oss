@@ -63,7 +63,8 @@ Ext.define('NX.coreui.controller.Roles', {
   features: {
     mode: 'admin',
     path: '/Security/Roles',
-    description: 'Manage roles',
+    text: NX.I18n.get('ADMIN_ROLES_TITLE'),
+    description: NX.I18n.get('ADMIN_ROLES_SUBTITLE'),
     view: { xtype: 'nx-coreui-role-feature' },
     iconConfig: {
       file: 'user_policeman.png',
@@ -190,7 +191,7 @@ Ext.define('NX.coreui.controller.Roles', {
         });
       });
       newButton.menu.add({
-        text: 'External Role Mapping',
+        text: NX.I18n.get('ADMIN_ROLES_LIST_EXTERNAL_ROLE_ITEM'),
         menu: menuItems,
         iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });

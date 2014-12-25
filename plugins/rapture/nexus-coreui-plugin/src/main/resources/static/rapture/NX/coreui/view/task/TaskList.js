@@ -32,22 +32,22 @@ Ext.define('NX.coreui.view.task.TaskList', {
         return 'task-default';
       }
     },
-    { header: 'Name', dataIndex: 'name', flex: 1 },
-    { header: 'Type', dataIndex: 'typeName', flex: 1 },
-    { header: 'Status', dataIndex: 'statusDescription' },
-    { header: 'Schedule', dataIndex: 'schedule' },
-    { header: 'Next Run', dataIndex: 'nextRun', flex: 1 },
-    { header: 'Last Run', dataIndex: 'lastRun', flex: 1 },
-    { header: 'Last Result', dataIndex: 'lastRunResult' }
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_STATUS_COLUMN'), dataIndex: 'statusDescription' },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_SCHEDULE_COLUMN'), dataIndex: 'schedule' },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_NEXT_RUN_COLUMN'), dataIndex: 'nextRun', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RUN_COLUMN'), dataIndex: 'lastRun', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TASKS_LIST_LAST_RESULT_COLUMN'), dataIndex: 'lastRunResult' }
   ],
 
   viewConfig: {
-    emptyText: 'No scheduled tasks defined',
+    emptyText: NX.I18n.get('ADMIN_TASKS_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('ADMIN_TASKS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [

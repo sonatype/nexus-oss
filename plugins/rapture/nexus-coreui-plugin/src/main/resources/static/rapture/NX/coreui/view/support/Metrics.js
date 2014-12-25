@@ -36,16 +36,16 @@ Ext.define('NX.coreui.view.support.Metrics', {
   tbar: [
     {
       xtype: 'button',
-      text: 'Download',
-      tooltip: 'Download metrics data',
+      text: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_BUTTON'),
+      tooltip: NX.I18n.get('ADMIN_METRICS_DOWNLOAD_TOOLTIP'),
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'download'
     },
     '-',
     {
       xtype: 'button',
-      text: 'Thread Dump',
-      tooltip: 'Download thread dump',
+      text: NX.I18n.get('ADMIN_METRICS_DUMP_BUTTON'),
+      tooltip: NX.I18n.get('ADMIN_METRICS_DUMP_TOOLTIP'),
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'threads'
     }
@@ -71,7 +71,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       items: [
         {
           xtype: 'panel',
-          title: 'Memory Usage',
+          title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
           frame: true,
           ui: 'subsection',
           height: 240,
@@ -120,7 +120,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
         },
         {
           xtype: 'panel',
-          title: 'Memory Distribution',
+          title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
           frame: true,
           ui: 'subsection',
           height: 240,
@@ -165,7 +165,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
     },
     {
       xtype: 'panel',
-      title: 'Thread States',
+      title: NX.I18n.get('ADMIN_METRICS_STATES_SECTION'),
       frame: true,
       ui: 'subsection',
       height: 240,

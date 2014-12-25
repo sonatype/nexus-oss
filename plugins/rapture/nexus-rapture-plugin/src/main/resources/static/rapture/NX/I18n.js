@@ -13,14 +13,32 @@
 /*global Ext, NX*/
 
 /**
- * Storage file info panel.
+ * I18n helper.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repositorybrowse.StorageFileInfo', {
-  extend: 'NX.view.info.Panel',
-  alias: 'widget.nx-coreui-repositorybrowse-storagefileinfo',
+Ext.define('NX.I18n', {
+  singleton: true,
+  mixins: {
+    logAware: 'NX.LogAware'
+  },
 
-  title: NX.I18n.get('BROWSE_SEARCH_DETAILS_INFO_TAB')
+  /**
+   * @private
+   */
+  keys: {},
 
+  /**
+   * @public
+   */
+  register: function(keys) {
+    Ext.apply(this.keys, keys);
+  },
+
+  /**
+   * @public
+   */
+  get: function(key) {
+    return this.keys[key];
+  }
 });

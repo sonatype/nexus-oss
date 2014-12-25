@@ -55,7 +55,8 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
   features: {
     mode: 'admin',
     path: '/Repository/Routing',
-    description: 'Manage repository routes',
+    text: NX.I18n.get('ADMIN_ROUTING_TITLE'),
+    description: NX.I18n.get('ADMIN_ROUTING_SUBTITLE'),
     view: { xtype: 'nx-coreui-repositoryroute-feature' },
     iconConfig: {
       file: 'arrow_branch.png',

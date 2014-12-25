@@ -36,8 +36,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: 'Enabled',
-      helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+      fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SETTINGS_ENABLED'),
+      helpText: NX.I18n.get('ADMIN_CAPABILITIES_SETTINGS_ENABLED_HELP'),
       name: 'enabled',
       allowBlank: false,
       checked: true,
