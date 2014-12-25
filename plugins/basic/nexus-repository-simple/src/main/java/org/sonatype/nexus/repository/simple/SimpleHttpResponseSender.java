@@ -26,6 +26,8 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+// TODO: Extract into default impl, as many formats may only need the same bits, but model to lookup still needs format-specific instance
+
 /**
  * Simple {@link HttpResponseSender}.
  *
