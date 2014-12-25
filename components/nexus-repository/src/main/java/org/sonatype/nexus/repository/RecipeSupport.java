@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -47,8 +46,6 @@ public abstract class RecipeSupport
 
   private BeanLocator beanLocator;
 
-  private RepositoryFactory repositoryFactory;
-
   protected final List<Provider<? extends Facet>> facetPrototypes = Lists.newArrayList();
 
   protected RecipeSupport(final Type type, final Format format) {
@@ -67,11 +64,8 @@ public abstract class RecipeSupport
   }
 
   @Inject
-  public void installDependencies(final BeanLocator beanLocator,
-                                  final RepositoryFactory repositoryFactory)
-  {
+  public void installDependencies(final BeanLocator beanLocator) {
     this.beanLocator = checkNotNull(beanLocator);
-    this.repositoryFactory = checkNotNull(repositoryFactory);
   }
 
   // FIXME: Consider alternatives to initialize support bits that do not rely on JSR-250?
@@ -112,19 +106,10 @@ public abstract class RecipeSupport
   }
 
   @Override
-  public Repository create(final Configuration config) throws Exception {
-    checkNotNull(config);
-
-    log.debug("Creating repository: {}", config);
-
-    checkState(repositoryFactory != null);
-    Repository repo = repositoryFactory.create(type, format);
-    repo.init(config);
-
+  public void apply(final Repository repository) throws Exception {
+    checkNotNull(repository);
     for (Provider<? extends Facet> facetPrototype : facetPrototypes) {
-      repo.attach(facetPrototype.get());
+      repository.attach(facetPrototype.get());
     }
-
-    return repo;
   }
 }

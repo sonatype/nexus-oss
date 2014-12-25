@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.RepositoryFactory;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
@@ -52,15 +53,19 @@ public class RepositoryManagerImpl
 
   private final Map<String,Recipe> recipes;
 
+  private final RepositoryFactory factory;
+
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
   public RepositoryManagerImpl(final EventBus eventBus,
                                final ConfigurationStore store,
+                               final RepositoryFactory factory,
                                final Map<String,Recipe> recipes)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
+    this.factory = checkNotNull(factory);
     this.recipes = checkNotNull(recipes);
   }
 
@@ -79,6 +84,17 @@ public class RepositoryManagerImpl
   private Repository repository(final String name) {
     Repository repository = repositories.get(name);
     checkState(repository != null, "Missing repository: %s", name);
+    return repository;
+  }
+
+  /**
+   * Construct a new repository from configuration.
+   */
+  private Repository newRepository(final Configuration configuration) throws Exception {
+    Recipe recipe = recipe(configuration.getRecipeName());
+    Repository repository = factory.create(recipe.getType(), recipe.getFormat());
+    repository.init(configuration);
+    recipe.apply(repository);
     return repository;
   }
 
@@ -102,8 +118,7 @@ public class RepositoryManagerImpl
     log.debug("Restoring repositories");
     for (Configuration configuration : configurations) {
       log.debug("Restoring repository: {}", configuration);
-      Recipe recipe = recipe(configuration.getRecipeName());
-      Repository repository = recipe.create(configuration);
+      Repository repository = newRepository(configuration);
       track(repository);
 
       eventBus.post(new RepositoryLoadedEvent(repository));
@@ -159,8 +174,7 @@ public class RepositoryManagerImpl
     ensureStarted();
 
     log.debug("Creating repository: {}", configuration);
-    Recipe recipe = recipe(configuration.getRecipeName());
-    Repository repository = recipe.create(configuration);
+    Repository repository = newRepository(configuration);
 
     store.create(configuration);
     track(repository);

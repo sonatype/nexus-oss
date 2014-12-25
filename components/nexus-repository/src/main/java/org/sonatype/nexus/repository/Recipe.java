@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository;
 
-import org.sonatype.nexus.repository.config.Configuration;
-
 /**
  * Repository recipe.
  *
@@ -25,5 +23,5 @@ public interface Recipe
 
   Format getFormat();
 
-  Repository create(Configuration config) throws Exception;
+  void apply(Repository repository) throws Exception;
 }
