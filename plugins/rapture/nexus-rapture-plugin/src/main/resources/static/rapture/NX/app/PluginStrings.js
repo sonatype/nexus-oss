@@ -843,7 +843,21 @@ Ext.define('NX.app.PluginStrings', {
 
     // User -> Account
     USER_ACCOUNT_TITLE: 'Account>',
-    USER_ACCOUNT_SUBTITLE: 'Manage your account>'
+    USER_ACCOUNT_SUBTITLE: 'Manage your account>',
+    USER_ACCOUNT_HELP: '<p>Manage your account settings.</p>>',
+    USER_ACCOUNT_ID: 'ID>',
+    USER_ACCOUNT_ID_HELP: 'The ID assigned to you, used as the username.>',
+    USER_ACCOUNT_ID_PLACEHOLDER: 'enter a user id>',
+    USER_ACCOUNT_FIRST: 'First Name>',
+    USER_ACCOUNT_FIRST_HELP: 'Your first name.>',
+    USER_ACCOUNT_FIRST_PLACEHOLDER: 'enter first name>',
+    USER_ACCOUNT_LAST: 'Last Name>',
+    USER_ACCOUNT_LAST_HELP: 'Your last name.>',
+    USER_ACCOUNT_LAST_PLACEHOLDER: 'enter last name>',
+    USER_ACCOUNT_EMAIL: 'Email>',
+    USER_ACCOUNT_EMAIL_HELP: 'Your email address, to notify you when necessary.>',
+    USER_ACCOUNT_EMAIL_PLACEHOLDER: 'enter an email address>',
+    USER_ACCOUNT_PASSWORD_BUTTON: 'Change Password>'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
