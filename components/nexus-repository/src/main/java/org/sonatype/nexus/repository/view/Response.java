@@ -45,4 +45,11 @@ public class Response
   public Map<String, Object> getAttributes() {
     return attributes;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "status=" + status +
+        '}';
+  }
 }
