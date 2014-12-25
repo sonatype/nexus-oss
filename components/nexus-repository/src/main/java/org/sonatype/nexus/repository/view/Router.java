@@ -18,7 +18,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -81,8 +80,6 @@ public class Router
     }
 
     public Builder defaultHandlers(final Handler... handlers) {
-      checkArgument(handlers != null);
-      checkArgument(handlers.length != 0);
       this.defaultRoute = new DefaultRoute(handlers);
       return this;
     }
