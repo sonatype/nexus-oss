@@ -22,12 +22,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.RepositoryFactory;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
+import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -109,7 +111,14 @@ public class RepositoryManagerImpl
     // apply recipe to repository
     recipe.apply(repository);
 
+    // ensure required facets present
+    requireFacet(repository, ViewFacet.class);
+
     return repository;
+  }
+
+  private void requireFacet(final Repository repository, final Class<? extends Facet> type) {
+    checkState(repository.facet(type) != null, "Missing required facet: %s", type);
   }
 
   /**
