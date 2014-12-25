@@ -11,25 +11,50 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.internal.orient;
+package org.sonatype.nexus.orient;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.annotation.Nullable;
 
-import org.sonatype.nexus.orient.DatabaseManager;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * In-memory {@link DatabaseManager} implementation.
+ * Remote {@link DatabaseManager} implementation.
  *
  * @since 3.0
  */
-@Named("memory")
-@Singleton
-public class MemoryDatabaseManager
+//@Named("remote")
+//@Singleton
+public class RemoteDatabaseManager
     extends DatabaseManagerSupport
 {
+  private final String hostname;
+
+  private final Integer port;
+
+  public RemoteDatabaseManager(final String hostname, final @Nullable Integer port) {
+    this.hostname = checkNotNull(hostname);
+    this.port = port;
+    log.debug("Hostname: {}", hostname);
+    log.debug("Port: {}", port);
+  }
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  @Nullable
+  public Integer getPort() {
+    return port;
+  }
+
   @Override
   protected String connectionUri(final String name) {
-    return "memory:" + name;
+    StringBuilder buff = new StringBuilder();
+    buff.append("remote:").append(hostname);
+    if (port != null) {
+      buff.append(":").append(port);
+    }
+    buff.append("/").append(name);
+    return buff.toString();
   }
 }

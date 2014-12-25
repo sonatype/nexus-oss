@@ -22,7 +22,9 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.orient.DatabaseExternalizer;
+import org.sonatype.nexus.orient.DatabaseExternalizerImpl;
 import org.sonatype.nexus.orient.DatabaseManager;
+import org.sonatype.nexus.orient.DatabaseManagerSupport;
 import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.annotations.VisibleForTesting;

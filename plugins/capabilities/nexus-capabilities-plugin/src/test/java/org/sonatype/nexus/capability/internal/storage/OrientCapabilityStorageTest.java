@@ -15,10 +15,10 @@ package org.sonatype.nexus.capability.internal.storage;
 import java.util.Map;
 
 import org.sonatype.nexus.capability.CapabilityIdentity;
-import org.sonatype.nexus.internal.orient.HexRecordIdObfuscator;
-import org.sonatype.nexus.internal.orient.MemoryDatabaseManager;
-import org.sonatype.nexus.internal.orient.MinimalDatabaseServer;
 import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.HexRecordIdObfuscator;
+import org.sonatype.nexus.orient.MemoryDatabaseManager;
+import org.sonatype.nexus.orient.MinimalDatabaseServer;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;

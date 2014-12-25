@@ -14,6 +14,7 @@ package org.sonatype.nexus.internal.orient;
 
 import org.sonatype.nexus.orient.DatabaseManager;
 import org.sonatype.nexus.orient.DatabaseServer;
+import org.sonatype.nexus.orient.EncryptedRecordIdObfuscator;
 import org.sonatype.nexus.orient.RecordIdObfuscator;
 
 import com.google.inject.AbstractModule;
