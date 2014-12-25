@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.annotation.Nonnull;
+
 /**
  * Repository recipe.
  *
@@ -23,5 +25,5 @@ public interface Recipe
 
   Format getFormat();
 
-  void apply(Repository repository) throws Exception;
+  void apply(@Nonnull Repository repository) throws Exception;
 }

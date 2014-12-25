@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -21,7 +22,6 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
-import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.types.HostedType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,25 +38,19 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
-  private final Provider<ConfigurationFacet> configFacet;
-
   private final Provider<SimpleViewFacet> viewFacet;
 
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
-                            final Provider<ConfigurationFacet> configFacet,
                             final Provider<SimpleViewFacet> viewFacet)
   {
     super(type, format);
-    this.configFacet = checkNotNull(configFacet);
     this.viewFacet = checkNotNull(viewFacet);
   }
 
   @Override
-  public void apply(final Repository repository) throws Exception {
-    checkNotNull(repository);
-    repository.attach(configFacet.get());
+  public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(viewFacet.get());
   }
 }

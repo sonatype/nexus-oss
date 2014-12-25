@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Recipe;
@@ -55,17 +56,21 @@ public class RepositoryManagerImpl
 
   private final RepositoryFactory factory;
 
+  private final Provider<ConfigurationFacet> configFacet;
+
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
   public RepositoryManagerImpl(final EventBus eventBus,
                                final ConfigurationStore store,
                                final RepositoryFactory factory,
+                               final Provider<ConfigurationFacet> configFacet,
                                final Map<String,Recipe> recipes)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
     this.factory = checkNotNull(factory);
+    this.configFacet = checkNotNull(configFacet);
     this.recipes = checkNotNull(recipes);
   }
 
@@ -98,7 +103,10 @@ public class RepositoryManagerImpl
     Repository repository = factory.create(recipe.getType(), recipe.getFormat());
     repository.init(configuration);
 
-    // TODO: mandatory facets/recipe?
+    // attach mandatory facets
+    repository.attach(configFacet.get());
+
+    // apply recipe to repository
     recipe.apply(repository);
 
     return repository;

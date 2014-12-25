@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.raw;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,7 +40,7 @@ public class RawProxyRepositoryRecipe
   }
 
   @Override
-  public void apply(final Repository repository) throws Exception {
+  public void apply(final @Nonnull Repository repository) throws Exception {
     // TODO: attach
   }
 }
