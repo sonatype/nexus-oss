@@ -92,8 +92,10 @@ public class RepositoryManagerImpl
    */
   private Repository newRepository(final Configuration configuration) throws Exception {
     Recipe recipe = recipe(configuration.getRecipeName());
+    log.debug("Using recipe: {}", recipe);
     Repository repository = factory.create(recipe.getType(), recipe.getFormat());
     repository.init(configuration);
+    // TODO: mandatory facets/recipe?
     recipe.apply(repository);
     return repository;
   }
@@ -115,7 +117,7 @@ public class RepositoryManagerImpl
       return;
     }
 
-    log.debug("Restoring repositories");
+    log.debug("Restoring {} repositories", configurations.size());
     for (Configuration configuration : configurations) {
       log.debug("Restoring repository: {}", configuration);
       Repository repository = newRepository(configuration);
@@ -124,7 +126,7 @@ public class RepositoryManagerImpl
       eventBus.post(new RepositoryLoadedEvent(repository));
     }
 
-    log.debug("Starting repositories");
+    log.debug("Starting {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
       repository.start();
 
@@ -139,12 +141,12 @@ public class RepositoryManagerImpl
       return;
     }
 
-    log.debug("Stopping repositories");
+    log.debug("Stopping {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
       repository.stop();
     }
 
-    log.debug("Disposing repositories");
+    log.debug("Disposing {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
       repository.destroy();
     }
