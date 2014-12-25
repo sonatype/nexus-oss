@@ -38,6 +38,7 @@
     <module>nexus-rawcontent-plugin</module>
     <module>nexus-repository-httpbridge</module>
     <module>nexus-repository-raw</module>
+    <module>nexus-repository-simple</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-siesta-plugin</module>
     <module>nexus-site-repository-client</module>
