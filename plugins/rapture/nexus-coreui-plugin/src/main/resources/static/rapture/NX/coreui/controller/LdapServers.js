@@ -71,7 +71,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
   features: {
     mode: 'admin',
     path: '/Security/LDAP',
-    description: 'Manage LDAP servers configuration',
+    text: NX.I18n.get('ADMIN_LDAP_TITLE'),
+    description: NX.I18n.get('ADMIN_LDAP_SUBTITLE'),
     view: { xtype: 'nx-coreui-ldapserver-feature' },
     iconConfig: {
       file: 'book_addresses.png',

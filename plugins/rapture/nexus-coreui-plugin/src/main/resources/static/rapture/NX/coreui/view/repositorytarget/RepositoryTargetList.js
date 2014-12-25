@@ -32,18 +32,18 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
         return 'target-default';
       }
     },
-    { header: 'Name', dataIndex: 'name', flex: 1 },
-    { header: 'Repository Type', dataIndex: 'format' },
-    { header: 'Patterns', dataIndex: 'patterns', flex: 1 }
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_REPOSITORY_COLUMN'), dataIndex: 'format' },
+    { header: NX.I18n.get('ADMIN_TARGETS_LIST_PATTERNS_COLUMN'), dataIndex: 'patterns', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: 'No repository targets defined',
+    emptyText: NX.I18n.get('ADMIN_TARGETS_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('ADMIN_TARGETS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [

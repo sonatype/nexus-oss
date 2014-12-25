@@ -46,37 +46,37 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
           // request settings
           {
             xtype: 'label',
-            html: '<p>Nexus uses HTTP to fetch content from remote servers.  In some cases customization of HTTP request configuration may be required.</p>'
+            html: NX.I18n.get('ADMIN_HTTP_HELP')
           },
           {
             xtype: 'nx-coreui-httprequestsettings'
           },
           {
             xtype: 'label',
-            html: '<p>When Nexus is behind a firewall or otherwise needs to have a proxy server configured to access remote servers via HTTP proxy server configuration may be required.</p>'
+            html: NX.I18n.get('ADMIN_HTTP_PROXY_HELP')
           },
           {
             xtype: 'nx-optionalfieldset',
-            title: 'HTTP Proxy',
+            title: NX.I18n.get('ADMIN_HTTP_PROXY'),
             checkboxToggle: true,
             checkboxName: 'httpEnabled',
             items: [
               {
                 xtype: 'label',
-                html: '<p>HTTP proxy settings.</p>'
+                html: NX.I18n.get('ADMIN_HTTP_PROXY_SETTINGS')
               },
               {
                 xtype: 'textfield',
                 name: 'httpHost',
-                fieldLabel: 'Host',
-                helpText: 'This is the host name of the HTTP proxy used for remote connections. (no HTTP required...just the host or ip)',
+                fieldLabel: NX.I18n.get('ADMIN_HTTP_PROXY_HOST'),
+                helpText: NX.I18n.get('ADMIN_HTTP_PROXY_HOST_HELP'),
                 allowBlank: false
               },
               {
                 xtype: 'numberfield',
                 name: 'httpPort',
-                fieldLabel: 'Port',
-                helpText: 'This is the port number of the HTTP proxy used for remote connections.',
+                fieldLabel: NX.I18n.get('ADMIN_HTTP_PROXY_PORT'),
+                helpText: NX.I18n.get('ADMIN_HTTP_PROXY_PORT_HELP'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -85,7 +85,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               },
               {
                 xtype: 'nx-optionalfieldset',
-                title: 'Authentication',
+                title: NX.I18n.get('ADMIN_HTTP_PROXY_AUTHENTICATION'),
                 checkboxToggle: true,
                 checkboxName: 'httpAuthEnabled',
                 collapsed: true,
@@ -97,9 +97,9 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               {
                 xtype: 'nx-valueset',
                 name: 'nonProxyHosts',
-                fieldLabel: 'Non Proxy Hosts',
-                helpText: "List of host names to exclude from http proxy. Regular expressions are supported, e.g. '.*\\.somecompany\\.com'.",
-                emptyText: 'enter a hostname',
+                fieldLabel: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY'),
+                helpText: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY_HELP'),
+                emptyText: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY_PLACEHOLDER'),
                 sorted: true
               }
             ]
@@ -107,7 +107,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
 
           {
             xtype: 'nx-optionalfieldset',
-            title: 'HTTPS Proxy',
+            title: NX.I18n.get('ADMIN_HTTPS_PROXY'),
             itemId: 'httpsProxy',
             checkboxToggle: true,
             checkboxName: 'httpsEnabled',
@@ -115,20 +115,20 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
             items: [
               {
                 xtype: 'label',
-                html: '<p>HTTPS proxy settings.</p>'
+                html: NX.I18n.get('ADMIN_HTTPS_PROXY_SETTINGS')
               },
               {
                 xtype: 'textfield',
                 name: 'httpsHost',
-                fieldLabel: 'Host',
-                helpText: 'This is the host name of the HTTPS proxy used for remote connections. (no HTTPS required...just the host or ip)',
+                fieldLabel: NX.I18n.get('ADMIN_HTTPS_PROXY_HOST'),
+                helpText: NX.I18n.get('ADMIN_HTTPS_PROXY_HOST_HELP'),
                 allowBlank: false
               },
               {
                 xtype: 'numberfield',
                 name: 'httpsPort',
-                fieldLabel: 'Port',
-                helpText: 'This is the port number of the HTTPS proxy used for remote connections.',
+                fieldLabel: NX.I18n.get('ADMIN_HTTPS_PROXY_PORT'),
+                helpText: NX.I18n.get('ADMIN_HTTPS_PROXY_PORT_HELP'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -137,7 +137,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               },
               {
                 xtype: 'nx-optionalfieldset',
-                title: 'Authentication',
+                title: NX.I18n.get('ADMIN_HTTP_PROXY_AUTHENTICATION'),
                 checkboxToggle: true,
                 checkboxName: 'httpsAuthEnabled',
                 collapsed: true,

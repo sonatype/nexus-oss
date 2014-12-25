@@ -19,6 +19,10 @@
  */
 Ext.define('NX.app.PluginConfig', {
 
+  requires: [
+    'NX.app.PluginStrings'
+  ],
+
   controllers: [
     'Content',
     'Dashboard',

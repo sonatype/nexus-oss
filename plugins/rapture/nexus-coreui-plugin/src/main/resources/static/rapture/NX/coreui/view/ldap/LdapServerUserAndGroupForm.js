@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
     return 'LDAP server updated: ' + data['name'];
   },
 
-  editableMarker: 'You do not have permission to update LDAP servers',
+  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 
@@ -63,8 +63,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
     });
 
     me.getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: 'Verify user mapping', formBind: true, action: 'verifyusermapping' },
-        { xtype: 'button', text: 'Verify login', formBind: true, action: 'verifylogin' }
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }
     );
   }
 

@@ -95,7 +95,10 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
     if (model &&
         (model.get('format') === 'maven2' && (model.get('type') === 'hosted') || model.get('type') === 'group')) {
       if (!hostedPanel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-routing-hosted-repository-settings', title: 'Routing' });
+        me.getFeature().addTab({
+          xtype: 'nx-coreui-routing-hosted-repository-settings',
+          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+        });
         hostedPanel = me.getHostedPanel();
       }
       hostedPanel.setRepository(model);
@@ -109,7 +112,10 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
 
     if (model && (model.get('format') === 'maven2' && model.get('type') === 'proxy')) {
       if (!proxyPanel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-routing-proxy-repository-settings', title: 'Routing' });
+        me.getFeature().addTab({
+          xtype: 'nx-coreui-routing-proxy-repository-settings',
+          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+        });
         proxyPanel = me.getProxyPanel();
       }
       proxyPanel.setRepository(model);

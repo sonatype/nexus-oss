@@ -44,25 +44,25 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsGroupForm', {
       {
         xtype: 'checkbox',
         name: 'browseable',
-        fieldLabel: 'Allow file browsing',
-        helpText: 'Allow users to browse the contents of the repository.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
-        fieldLabel: 'Publish URL',
-        helpText: 'Expose the URL of the repository to users.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {
         xtype: 'nx-itemselector',
         name: 'memberRepositoryIds',
-        fieldLabel: 'Member Repositories',
-        helpText: 'Select the repositories that are member of the group.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_HELP'),
         buttons: ['up', 'add', 'remove', 'down'],
-        fromTitle: 'Available Repositories',
-        toTitle: 'Ordered Member Repositories',
+        fromTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_FROM'),
+        toTitle: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_MEMBERS_TO'),
         store: me.repositoryStore,
         valueField: 'id',
         displayField: 'name',

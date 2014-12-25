@@ -23,7 +23,7 @@ Ext.define('NX.view.header.AdminMode', {
 
   mode: 'admin',
   title: 'Administration',
-  tooltip: 'Server administration and configuration',
+  tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),
   glyph: 'xf013@FontAwesome', /* fa-gear */
 
   collapseMenu: false

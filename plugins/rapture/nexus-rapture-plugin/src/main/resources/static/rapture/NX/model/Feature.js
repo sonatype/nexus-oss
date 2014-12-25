@@ -23,13 +23,7 @@ Ext.define('NX.model.Feature', {
   idProperty: 'path',
   fields: [
     { name: 'path' },
-    {
-      name: 'text',
-      convert: function (val, row) {
-        var segments = row.data.path.split('/');
-        return segments[segments.length - 1];
-      }
-    },
+    { name: 'text' },
     { name: 'mode', defaultValue: 'admin' },
     { name: 'weight', defaultValue: 100 },
     { name: 'group', defaultValue: false },
