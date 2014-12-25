@@ -29,6 +29,8 @@ public interface Repository
 
   void init(Configuration configuration) throws Exception;
 
+  //void update(Configuration configuration) throws Exception;
+
   void start() throws Exception;
 
   void stop() throws Exception;

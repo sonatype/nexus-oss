@@ -216,7 +216,7 @@ public class RepositoryManagerImpl
     log.debug("Updating repository: {}", configuration);
     Repository repository = repository(configuration.getRepositoryName());
     repository.stop();
-    repository.facet(ConfigurationFacet.class).update(configuration);
+    // TODO: figure out how to reconfigure, save and config-facet usage
     repository.start();
 
     eventBus.post(new RepositoryUpdatedEvent(repository));

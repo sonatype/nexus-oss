@@ -23,15 +23,8 @@ import org.sonatype.nexus.repository.Facet;
 public interface ConfigurationFacet
   extends Facet
 {
-  Configuration get();
-
-  /**
-   * Update the configuration of a repository, informing all facets of the change, and save the configuration.
-   */
-  void update(Configuration configuration) throws Exception;
-
   /**
    * Persist configuration.
    */
-  void save(Configuration configuration) throws Exception;
+  void save() throws Exception;
 }

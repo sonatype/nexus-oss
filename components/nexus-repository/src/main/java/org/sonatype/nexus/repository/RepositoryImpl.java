@@ -15,11 +15,13 @@ package org.sonatype.nexus.repository;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacetImpl;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.inject.assistedinject.Assisted;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -76,6 +78,14 @@ public class RepositoryImpl
   public Configuration getConfiguration() {
     checkState(configuration != null);
     return configuration;
+  }
+
+  /**
+   * Exposed for {@link ConfigurationFacetImpl#save}.
+   */
+  public void setConfiguration(final Configuration configuration) {
+    checkArgument(configuration != null);
+    this.configuration = configuration;
   }
 
   @Override

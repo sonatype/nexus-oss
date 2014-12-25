@@ -28,6 +28,8 @@ public interface Facet
 {
   void init(Repository repository) throws Exception;
 
+  //void update() throws Exception;
+
   void start() throws Exception;
 
   void stop() throws Exception;

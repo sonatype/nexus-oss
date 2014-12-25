@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.RepositoryImpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,37 +32,16 @@ public class ConfigurationFacetImpl
 {
   private final ConfigurationStore store;
 
-  private Configuration configuration;
-
   @Inject
   public ConfigurationFacetImpl(final ConfigurationStore store) {
     this.store = checkNotNull(store);
   }
 
   @Override
-  protected void doInit(final Repository repository) throws Exception {
-    configuration = repository.getConfiguration();
-    assert configuration != null;
-  }
-
-  @Override
-  public Configuration get() {
-    return configuration;
-  }
-
-  @Override
-  public void update(final Configuration configuration) throws Exception {
-    checkNotNull(configuration);
-
-    // TODO: reconfigure facets
-
-    save(configuration);
-  }
-
-  @Override
-  public void save(final Configuration configuration) throws Exception {
-    checkNotNull(configuration);
-
-    store.update(configuration);
+  public void save() throws Exception {
+    RepositoryImpl repository = ((RepositoryImpl)getRepository());
+    Configuration configuration = repository.getConfiguration();
+    configuration = store.update(configuration);
+    repository.setConfiguration(configuration);
   }
 }
