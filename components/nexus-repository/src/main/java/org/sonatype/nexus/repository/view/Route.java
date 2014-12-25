@@ -45,6 +45,14 @@ public class Route
     return handlers;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "matcher=" + matcher +
+        ", handlers=" + handlers +
+        '}';
+  }
+
   //
   // Builder
   //

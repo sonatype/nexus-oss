@@ -45,7 +45,7 @@ public class SimpleViewFacet
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
-            .matcher(new LiteralMatcher("foo", true))
+            .matcher(new LiteralMatcher("/foo", true))
             .handler(new Handler()
             {
               @Override
