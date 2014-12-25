@@ -23,6 +23,10 @@ Ext.define('NX.coreui.app.PluginConfig', {
     'NX.coreui'
   ],
 
+  requires: [
+    'NX.coreui.app.PluginStrings'
+  ],
+
   controllers: [
     {
       id: 'NX.coreui.controller.AnalyticsSettings',

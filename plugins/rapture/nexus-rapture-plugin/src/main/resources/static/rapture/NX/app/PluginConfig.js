@@ -20,7 +20,7 @@
 Ext.define('NX.app.PluginConfig', {
 
   requires: [
-    'NX.app.PluginStrings' // String abstraction
+    'NX.app.PluginStrings'
   ],
 
   controllers: [
