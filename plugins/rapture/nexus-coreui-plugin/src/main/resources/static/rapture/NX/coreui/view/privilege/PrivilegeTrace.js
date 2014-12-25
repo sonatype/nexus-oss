@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'privilegeTree',
-        title: 'Privileges',
+        title: NX.I18n.get('ADMIN_ROLES_TRACE_PRIVILEGES'),
         ui: 'treepanel',
         rootVisible: false,
         lines: false,
@@ -77,7 +77,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'roleTree',
-        title: 'Role Containment',
+        title: NX.I18n.get('ADMIN_ROLES_TRACE_CONTAINMENT'),
         ui: 'treepanel',
         tools: [
           { type: 'collapse', tooltip: 'Collapse all', callback: function(panel) {

@@ -44,29 +44,17 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
         items: [
           {
             xtype: 'container',
-            html: '<p>The analytics feature collects non-sensitive information about how your organization is using Nexus. ' +
-                'It is useful to you from a compatibility perspective, since it gathers answers to questions such as what features are most important, ' +
-                'where are users having difficulty and what integrations/APIs are actively in use. This data is available to you and allows you to understand your usage of Nexus better. ' +
-                'Provided to Sonatype it enables us to tailor the ongoing development of the product.</p>' +
-                '<b>Event Collection</b>' +
-                '<p>The collected information is limited to the use of the Nexus user interface and the Nexus REST API -- i.e. the primary interaction points between your environment and Nexus. ' +
-                'Only the user interface navigation flows and REST endpoints being called are recorded. None of the request specific data ' +
-                '(e.g. credentials or otherwise sensitive information) is ever captured.</p>' +
-                '<p>Event collection and submission are controlled separately.  When collection is enabled, a summary of the data collected is shown on the <code>Events</code> tab.</p>' +
-                '<b>Event Submission</b>' +
-                '<p>Analytics event data can be submitted either automatically or manually.' +
-                '<br/><code>Export</code> generates a ZIP file that can be inspected prior to any information being sent to the Nexus analytics service. ' +
-                '<br/><code>Submit</code> generates a ZIP file and then immediately uploads it to the Nexus analytics service.</p>'
+            html: NX.I18n.get('ADMIN_ANALYTICS_HELP')
           },
           {
             xtype: 'checkbox',
             name: 'collection',
-            boxLabel: 'Enable analytics event collection'
+            boxLabel: NX.I18n.get('ADMIN_ANALYTICS_COLLECTION')
           },
           {
             xtype: 'checkbox',
             name: 'autosubmit',
-            boxLabel: 'Enable automatic analytics event submission'
+            boxLabel: NX.I18n.get('ADMIN_ANALYTICS_SUBMISSION')
           }
         ]
       }

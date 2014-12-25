@@ -42,7 +42,8 @@ Ext.define('NX.coreui.controller.PluginConsole', {
   features: {
     mode: 'admin',
     path: '/System/Plugins',
-    description: 'View installed plugins',
+    text: NX.I18n.get('ADMIN_PLUGINS_TITLE'),
+    description: NX.I18n.get('ADMIN_PLUGINS_SUBTITLE'),
     view: 'NX.coreui.view.system.Plugins',
     iconConfig: {
       file: 'plugin.png',
@@ -69,19 +70,18 @@ Ext.define('NX.coreui.controller.PluginConsole', {
         info;
 
     if (Ext.isDefined(model)) {
-      info = {
-        'Name': model.get('name'),
-        'Version': model.get('version'),
-        'Status': model.get('status')
-        //'Description': model.get('description'),
-        //'SCM Version': model.get('scmVersion'),
-        //'SCM Timestamp': model.get('scmTimestamp'),
-        //'Site': NX.util.Url.asLink(model.get('site'))
-      };
+      info = {};
+      info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_NAME')] = model.get('name');
+      info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_VERSION')] = model.get('version');
+      info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_STATUS')] = model.get('status');
+      //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_DESCRIPTION') = model.get('description');
+      //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SCM_VERSION') = model.get('scmVersion');
+      //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SCM_TIMESTAMP') = model.get('scmTimestamp');
+      //info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_SITE') = NX.util.Url.asLink(model.get('site'));
       if (Ext.isDefined(model.get('documentation'))) {
         Ext.each(model.get('documentation'), function (doc) {
           if (!Ext.isEmpty(doc.url)) {
-            info['Documentation'] = NX.util.Url.asLink(doc.url, doc.label);
+            info[NX.I18n.get('ADMIN_PLUGINS_SUMMARY_DOCUMENTATION')] = NX.util.Url.asLink(doc.url, doc.label);
           }
         });
       }

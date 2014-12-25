@@ -35,34 +35,34 @@ Ext.define('NX.coreui.view.user.UserAccount', {
         items: [
           {
             xtype: 'label',
-            html: '<p>Manage your account settings.</p>'
+            html: NX.I18n.get('USER_ACCOUNT_HELP')
           },
           {
             name: 'userId',
             itemId: 'userId',
             readOnly: true,
-            fieldLabel: 'ID',
-            helpText: 'The ID assigned to you, used as the username.',
-            emptyText: 'enter a user id'
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
+            helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP'),
+            emptyText: NX.I18n.get('USER_ACCOUNT_ID_PLACEHOLDER')
           },
           {
             name: 'firstName',
-            fieldLabel: 'First Name',
-            helpText: 'Your first name.',
-            emptyText: 'enter first name'
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST'),
+            helpText: NX.I18n.get('USER_ACCOUNT_FIRST_HELP'),
+            emptyText: NX.I18n.get('USER_ACCOUNT_FIRST_PLACEHOLDER')
           },
           {
             name: 'lastName',
-            fieldLabel: 'Last Name',
-            helpText: 'Your last name.',
-            emptyText: 'enter last name'
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST'),
+            helpText: NX.I18n.get('USER_ACCOUNT_LAST_HELP'),
+            emptyText: NX.I18n.get('USER_ACCOUNT_LAST_PLACEHOLDER')
           },
           {
             xtype: 'nx-email',
             name: 'email',
-            fieldLabel: 'Email',
-            helpText: 'Your email address, to notify you when necessary.',
-            emptyText: 'enter an email address'
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL'),
+            helpText: NX.I18n.get('USER_ACCOUNT_EMAIL_HELP'),
+            emptyText: NX.I18n.get('USER_ACCOUNT_EMAIL_PLACEHOLDER')
           }
         ]
       }
@@ -71,7 +71,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.callParent(arguments);
 
     me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: 'Change Password', action: 'changepassword', ui: 'danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
+      xtype: 'button', text: NX.I18n.get('USER_ACCOUNT_PASSWORD_BUTTON'), action: 'changepassword', ui: 'danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true
     });
   }
 

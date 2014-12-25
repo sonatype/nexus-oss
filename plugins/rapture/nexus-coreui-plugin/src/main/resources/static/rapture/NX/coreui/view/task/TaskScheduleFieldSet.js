@@ -32,18 +32,18 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       xtype: 'combo',
       name: 'schedule',
       itemId: 'schedule',
-      fieldLabel: 'Recurrence',
-      helpText: 'The frequency this task will run.  Manual - this task can only be run manually. Once - run the task once at the specified date/time. Daily - run the task every day at the specified time. Weekly - run the task every week on the specified day at the specified time. Monthly - run the task every month on the specified day(s) and time. Advanced - run the task using the supplied cron string.',
-      emptyText: 'Select...',
+      fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE'),
+      helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_HELP'),
+      emptyText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_PLACEHOLDER'),
       editable: false,
       store: [
-        ['manual', 'Manual'],
-        ['once', 'Once'],
-        ['hourly', 'Hourly'],
-        ['daily', 'Daily'],
-        ['weekly', 'Weekly'],
-        ['monthly', 'Monthly'],
-        ['advanced', 'Advanced']
+        ['manual', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_MANUAL')],
+        ['once', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_ONCE')],
+        ['hourly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_HOURLY')],
+        ['daily', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_DAILY')],
+        ['weekly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_WEEKLY')],
+        ['monthly', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_MONTHLY')],
+        ['advanced', NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_ADVANCED')]
       ],
       queryMode: 'local',
       listeners: {

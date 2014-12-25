@@ -26,11 +26,7 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
     items: [
       {
         xtype: 'label',
-        html: '<div>' +
-            '<p>Submit a support request to Sonatype.</p>' +
-            '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p>' +
-            '<p>Attaching a <strong>Support ZIP</strong> to your request will help our engineers give you a faster response.</p>' +
-            '</div>'
+        html: NX.I18n.get('ADMIN_SUPPORT_REQUEST_HELP')
       }
     ],
 
@@ -38,11 +34,11 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
 
     buttons: [
       {
-        text: 'Submit Request',
+        text: NX.I18n.get('ADMIN_SUPPORT_REQUEST_BUTTON'),
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
         ui: 'primary',
-        tooltip: 'Submit a support request in the Sonatype support portal'
+        tooltip: NX.I18n.get('ADMIN_SUPPORT_REQUEST_TOOLTIP')
       }
     ]
   }

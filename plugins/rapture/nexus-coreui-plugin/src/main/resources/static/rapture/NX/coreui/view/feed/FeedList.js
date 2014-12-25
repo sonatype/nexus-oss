@@ -39,8 +39,8 @@ Ext.define('NX.coreui.view.feed.FeedList', {
           return 'feed-default';
         }
       },
-      { header: 'Feed', dataIndex: 'name', flex: 1 },
-      { header: 'URL', dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
+      { header: NX.I18n.get('BROWSE_FEEDS_LIST_FEED_COLUMN'), dataIndex: 'name', flex: 1 },
+      { header: NX.I18n.get('BROWSE_FEEDS_LIST_URL_COLUMN'), dataIndex: 'url', flex: 2, xtype: 'nx-linkcolumn' }
     ];
 
     me.callParent(arguments);
@@ -54,7 +54,7 @@ Ext.define('NX.coreui.view.feed.FeedList', {
   tbar: [
     {
       xtype: 'button',
-      text: 'Subscribe',
+      text: NX.I18n.get('BROWSE_FEEDS_LIST_SUBSCRIBE_BUTTON'),
       glyph: 'xf09e@FontAwesome' /* fa-rss */,
       action: 'subscribe',
       disabled: true

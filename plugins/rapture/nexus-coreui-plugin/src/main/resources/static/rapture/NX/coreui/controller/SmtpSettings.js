@@ -52,7 +52,8 @@ Ext.define('NX.coreui.controller.SmtpSettings', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/System/Email Server',
-      description: 'Manage email server SMTP configuration',
+      text: NX.I18n.get('ADMIN_SMTP_TITLE'),
+      description: NX.I18n.get('ADMIN_SMTP_SUBTITLE'),
       view: { xtype: 'nx-coreui-system-smtp-settings' },
       iconConfig: {
         file: 'email.png',

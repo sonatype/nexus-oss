@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
     'Ext.util.KeyNav'
   ],
 
-  emptyText: 'enter a username or leave blank to display all',
+  emptyText: NX.I18n.get('ADMIN_USERS_LIST_FILTER_PLACEHOLDER'),
   width: 320,
   submitValue: false,
 

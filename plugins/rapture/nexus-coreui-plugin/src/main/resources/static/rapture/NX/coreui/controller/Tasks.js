@@ -66,7 +66,8 @@ Ext.define('NX.coreui.controller.Tasks', {
   features: {
     mode: 'admin',
     path: '/System/Tasks',
-    description: 'Manage scheduled tasks',
+    text: NX.I18n.get('ADMIN_TASKS_TITLE'),
+    description: NX.I18n.get('ADMIN_TASKS_SUBTITLE'),
     view: { xtype: 'nx-coreui-task-feature' },
     iconConfig: {
       file: 'time.png',
@@ -155,7 +156,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       taskTypeModel = me.getTaskTypeStore().getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: 'Settings', weight: 20 });
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('ADMIN_TASKS_DETAILS_SETTINGS_TAB'), weight: 20 });
         }
         me.showSettings(model);
       }
@@ -166,7 +167,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       }
       if (taskTypeModel && model.get('schedule') !== 'internal') {
         if (!schedule) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: 'Schedule', weight: 30 });
+          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: NX.I18n.get('ADMIN_TASKS_DETAILS_SCHEDULE_TAB'), weight: 30 });
         }
         me.showSchedule(model);
       }
@@ -184,17 +185,18 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @param {NX.coreui.model.Task} model task model
    */
   showSummary: function(model) {
-    var me = this;
+    var me = this,
+      info = {};
 
-    me.getInfo().showInfo({
-      'Id': model.getId(),
-      'Name': model.get('name'),
-      'Type': model.get('typeName'),
-      'Status': model.get('statusDescription'),
-      'Next Run': model.get('nextRun'),
-      'Last Run': model.get('lastRun'),
-      'Last Result': model.get('lastRunResult')
-    });
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_ID')] = model.getId();
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_NAME')] = model.get('name');
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_TYPE')] = model.get('typeName');
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_STATUS')] = model.get('statusDescription');
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_NEXT_RUN')] = model.get('nextRun');
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_LAST_RUN')] = model.get('lastRun');
+    info[NX.I18n.get('ADMIN_TASKS_SUMMARY_LAST_RESULT')] = model.get('lastRunResult');
+
+    me.getInfo().showInfo(info);
   },
 
   /**

@@ -57,28 +57,28 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             xtype: 'checkbox',
             name: 'discoveryEnabled',
             itemId: 'discoveryEnabled',
-            fieldLabel: 'Enable discovery',
-            helpText: 'Enable routing discovery.',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_HELP'),
             value: true
           },
           {
             xtype: 'combo',
             name: 'discoveryInterval',
             itemId: 'discoveryInterval',
-            fieldLabel: 'Update interval',
-            helpText: 'Interval between routing discovery runs.',
-            emptyText: 'Select...',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_HELP'),
+            emptyText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_PLACEHOLDER'),
             editable: false,
             value: 24,
             store: [
-              [1, '1 hr'],
-              [2, '2 hr'],
-              [3, '3 hr'],
-              [6, '6 hr'],
-              [9, '9 hr'],
-              [12, '12 hr'],
-              [24, 'Daily'],
-              [168, 'Weekly']
+              [1, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_1_HOUR_ITEM')],
+              [2, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_2_HOUR_ITEM')],
+              [3, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_3_HOUR_ITEM')],
+              [6, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_6_HOUR_ITEM')],
+              [9, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_9_HOUR_ITEM')],
+              [12, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_12_HOUR_ITEM')],
+              [24, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DAILY_ITEM')],
+              [168, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_WEEKLY_ITEM')]
             ],
             queryMode: 'local'
           }
@@ -87,7 +87,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
       {
         xtype: 'form',
         itemId: 'publishStatusForm',
-        title: 'Publish Status',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISH_SECTION'),
         hidden: true,
         ui: 'subsection',
 
@@ -109,8 +109,8 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
           {
             xtype: 'nx-datedisplayfield',
             name: 'publishTimestamp',
-            fieldLabel: 'Published On',
-            helpText: 'Time when routing data was published.',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED_HELP'),
             hideIfUndefined: true,
             hidden: true
           },
@@ -125,7 +125,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
       {
         xtype: 'form',
         itemId: 'discoveryStatusForm',
-        title: 'Discovery Status',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SECTION'),
         hidden: true,
         ui: 'subsection',
 
@@ -147,8 +147,8 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
           {
             xtype: 'nx-datedisplayfield',
             name: 'discoveryTimestamp',
-            fieldLabel: 'Last Run',
-            helpText: 'Time when discovery process was last run.',
+            fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_RUN'),
+            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_RUN_HELP'),
             hideIfUndefined: true,
             hidden: true
           }
@@ -185,7 +185,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
 
         if (values && values.publishStatus) {
           if (values.publishUrl) {
-            values.publishUrl = NX.util.Url.asLink(values.publishUrl, 'View prefix file');
+            values.publishUrl = NX.util.Url.asLink(values.publishUrl, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PREFIX_LINK'));
           }
           publishStatusForm.getForm().setValues(values);
           publishStatusForm.show();
@@ -212,7 +212,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
     });
 
     me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: 'Update now', formBind: true, action: 'update', hidden: true
+      xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_BUTTON'), formBind: true, action: 'update', hidden: true
     });
   },
 

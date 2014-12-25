@@ -65,7 +65,8 @@ Ext.define('NX.coreui.controller.Feeds', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'browse',
       path: '/Feeds',
-      description: 'System event feeds',
+      text: NX.I18n.get('BROWSE_FEEDS_TITLE'),
+      description: NX.I18n.get('BROWSE_FEEDS_SUBTITLE'),
       view: { xtype: 'nx-coreui-feed-feature' },
       iconConfig: {
         file: 'feed.png',

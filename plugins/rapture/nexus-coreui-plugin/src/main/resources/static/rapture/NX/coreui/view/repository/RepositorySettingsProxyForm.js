@@ -40,55 +40,54 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
       {
         xtype: 'nx-url',
         name: 'remoteStorageUrl',
-        fieldLabel: 'Remote Storage Location',
-        helpText: 'Location of the remote repository being proxied.',
-        emptyText: 'enter an URL'
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_HELP'),
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_REMOTE_PLACEHOLDER')
       },
       {
         xtype: 'checkbox',
         name: 'autoBlockActive',
-        fieldLabel: 'Auto Blocking Enabled',
-        helpText: 'Auto-block outbound connections on the repository if remote peer is detected as unreachable/unresponsive.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKING'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BLOCKING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
-        fieldLabel: 'File Content Validation',
-        helpText: 'Enable content validation for remote contents.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'browseable',
-        fieldLabel: 'Allow file browsing',
-        helpText: 'Allow users to browse the contents of the repository.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
-        fieldLabel: 'Publish URL',
-        helpText: 'Expose the URL of the repository to users.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {
         xtype: 'numberfield',
         name: 'notFoundCacheTTL',
-        fieldLabel: 'Not Found Cache TTL',
-        helpText: 'How long to cache the fact that a file was not found in the repository.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TTL'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TTL_HELP'),
         minValue: -1,
         maxValue: 511000,
         allowDecimals: false,
         allowExponential: false,
         allowBlank: true
-      }
-      ,
+      },
       {
         xtype: 'numberfield',
         name: 'itemMaxAge',
-        fieldLabel: 'Item Max Age',
-        helpText: 'How long to cache non-artifact and metadata items in the repository before rechecking the remote repository.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ITEM_AGE'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ITEM_AGE_HELP'),
         minValue: -1,
         maxValue: 511000,
         allowDecimals: false,
@@ -97,7 +96,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
       },
       {
         xtype: 'nx-optionalfieldset',
-        title: 'Authentication',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_AUTHENTICATION'),
         checkboxToggle: true,
         checkboxName: 'authEnabled',
         collapsed: true,
@@ -107,7 +106,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
       },
       {
         xtype: 'nx-optionalfieldset',
-        title: 'HTTP Request Settings',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_HTTP'),
         checkboxToggle: true,
         checkboxName: 'httpRequestSettings',
         collapsed: true,

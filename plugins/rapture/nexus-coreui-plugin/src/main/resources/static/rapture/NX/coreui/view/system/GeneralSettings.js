@@ -45,14 +45,14 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
         items: [
           {
             xtype: 'label',
-            html: '<p>Set the base URL for the server.  This is primarily used when generating email notifications.</p>'
+            html: NX.I18n.get('ADMIN_GENERAL_HELP')
           },
           {
             xtype: 'textfield',
             name: 'baseUrl',
             itemId: 'baseUrl',
-            fieldLabel: 'Base URL',
-            helpText: 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/',
+            fieldLabel: NX.I18n.get('ADMIN_GENERAL_URL'),
+            helpText: NX.I18n.get('ADMIN_GENERAL_URL_HELP'),
             allowBlank: true,
             vtype: 'url',
             emptyText: NX.util.Url.baseUrl
