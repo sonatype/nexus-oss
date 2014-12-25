@@ -27,7 +27,6 @@ public class AlwaysMatcher
 {
   @Override
   public boolean matches(final Context context) {
-    log.debug("Always match");
     return true;
   }
 }

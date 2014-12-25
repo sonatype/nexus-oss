@@ -45,7 +45,7 @@ public class RegexMatcher
     checkNotNull(context);
 
     String path = context.getRequest().getPath();
-    log.debug("Regex matcher: {}~={}", path, pattern);
+    log.debug("Matching: {}~={}", path, pattern);
     final java.util.regex.Matcher m = pattern.matcher(path);
 
     if (m.matches()) {

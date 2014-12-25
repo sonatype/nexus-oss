@@ -40,7 +40,7 @@ public class LiteralMatcher
   public boolean matches(final Context context) {
     checkNotNull(context);
     String path = context.getRequest().getPath();
-    log.debug("Literal match: {}={} ignore-case: {}", path, literal, ignoreCase);
+    log.debug("Matching: {}={} ignore-case: {}", path, literal, ignoreCase);
     if (ignoreCase) {
       return path.equalsIgnoreCase(literal);
     }
