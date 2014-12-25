@@ -32,9 +32,9 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1, groupable: false },
-    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'), dataIndex: 'notes', flex: 1 }
+    { text: 'Type', dataIndex: 'typeName', flex: 1 },
+    { text: 'Description', dataIndex: 'description', flex: 1, groupable: false },
+    { text: 'Notes', dataIndex: 'notes', flex: 1 }
   ],
 
   viewConfig: {
@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   tbar: [
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
+      text: 'New',
       action: 'new',
       disabled: true,
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */

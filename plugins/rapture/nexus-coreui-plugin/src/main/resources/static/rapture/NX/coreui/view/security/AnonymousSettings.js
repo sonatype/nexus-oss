@@ -40,13 +40,14 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
         items: [
           {
             xtype: 'label',
-            html: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW_HELP')
+            html: '<p>Nexus can be configured to allow or disallow anonymous users from accessing the system.</p>' +
+                '<p>If only authenticated users should be allowed to use this server, disable anonymous access.</p>'
           },
           {
             xtype: 'checkbox',
             name: 'enabled',
             value: true,
-            boxLabel: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW'),
+            boxLabel: 'Allow anonymous users to access the server',
             listeners: {
               change: me.handleUseCustomUser,
               afterrender: me.handleUseCustomUser
@@ -54,7 +55,7 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
           },
           {
             xtype: 'nx-optionalfieldset',
-            title: NX.I18n.get('ADMIN_ANONYMOUS_CUSTOMIZE'),
+            title: 'Customize anonymous user credentials',
             itemId: 'useCustomUser',
             checkboxToggle: true,
             checkboxName: 'useCustomUser',
@@ -62,22 +63,22 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
             items: [
               {
                 xtype: 'label',
-                html: NX.I18n.get('ADMIN_ANONYMOUS_CUSTOMIZE_HELP')
+                html: '<p>In rare cases the <em>anonymous</em> username and password may be overridden; this is normally not needed.</p>'
               },
               {
                 xtype: 'textfield',
                 name: 'username',
-                fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_PLACEHOLDER'),
+                fieldLabel: 'Username',
+                helpText: 'The username that will be used to authenticate anonymous users against the security realm.',
+                emptyText: 'anonymous',
                 allowBlank: false
               },
               {
                 xtype: 'nx-password',
                 name: 'password',
-                fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_PLACEHOLDER'),
+                fieldLabel: 'Password',
+                helpText: 'The password that will be used to authenticate anonymous users against the security realm.',
+                emptyText: 'password',
                 allowBlank: false
               }
             ]

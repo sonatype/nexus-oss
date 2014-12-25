@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
   store: 'SearchResult',
 
   viewConfig: {
-    emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_EMPTY_STATE'),
+    emptyText: 'No results',
     deferEmptyText: false
   },
 
@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       }
     },
     {
-      header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_COMPONENT_COLUMN'),
+      header: 'Component',
       dataIndex: 'id',
       menuDisabled: true,
       resizable: false,

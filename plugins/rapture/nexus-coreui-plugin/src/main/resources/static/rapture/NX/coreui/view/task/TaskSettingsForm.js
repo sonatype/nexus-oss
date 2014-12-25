@@ -40,8 +40,8 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     },
     {
       xtype: 'checkbox',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_ENABLED'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_ENABLED_HELP'),
+      fieldLabel: 'Enabled',
+      helpText: 'This flag determines if the task is currently active. To disable this task for a period of time, de-select this checkbox.',
       name: 'enabled',
       allowBlank: false,
       checked: true,
@@ -49,15 +49,15 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     },
     {
       name: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME_HELP'),
-      emptyText: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME_PLACEHOLDER')
+      fieldLabel: 'Name',
+      helpText: 'A name for the scheduled task.',
+      emptyText: 'enter a name'
     },
     {
       xtype: 'nx-email',
       name: 'alertEmail',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL_HELP'),
+      fieldLabel: 'Alert Email',
+      helpText: 'The email address where an email will be sent in case that task execution will fail.',
       allowBlank: true
     },
     { xtype: 'nx-coreui-formfield-settingsfieldset' }

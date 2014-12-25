@@ -42,9 +42,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
         xtype: 'combo',
         name: 'repositoryPolicy',
         itemId: 'repositoryPolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_PLACEHOLDER'),
+        fieldLabel: 'Repository Policy',
+        helpText: 'Maven repositories can store either release or snapshot artifacts.',
+        emptyText: 'select a policy',
         editable: false,
         store: [
           ['RELEASE', 'Release'],
@@ -59,9 +59,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
       {
         xtype: 'combo',
         name: 'writePolicy',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
-        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
+        fieldLabel: 'Deployment Policy',
+        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
+        emptyText: 'select a policy',
         editable: false,
         store: [
           ['ALLOW_WRITE', 'Allow Redeploy'],
@@ -73,22 +73,22 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
       {
         xtype: 'checkbox',
         name: 'browseable',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
+        fieldLabel: 'Allow file browsing',
+        helpText: 'Allow users to browse the contents of the repository.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'indexable',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SEARCH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SEARCH_HELP'),
+        fieldLabel: 'Include in Search',
+        helpText: 'Include repository in search results.',
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
+        fieldLabel: 'Publish URL',
+        helpText: 'Expose the URL of the repository to users.',
         value: true
       }
     ];

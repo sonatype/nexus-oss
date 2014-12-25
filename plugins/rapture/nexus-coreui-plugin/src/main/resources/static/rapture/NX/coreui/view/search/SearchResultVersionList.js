@@ -45,15 +45,15 @@ Ext.define('NX.coreui.view.search.SearchResultVersionList', {
       }
     },
     {
-      header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_VERSION_COLUMN'),
+      header: 'Version',
       dataIndex: 'versionOrder',
       flex: 1,
       renderer: function (value, metadata, model) {
         return model.get('version');
       }
     },
-    { header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_FILE_COLUMN'), dataIndex: 'name', flex: 2.5 },
-    { header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_REPOSITORY_COLUMN'), dataIndex: 'repositoryName', flex: 1 }
+    { header: 'File', dataIndex: 'name', flex: 2.5 },
+    { header: 'Repository', dataIndex: 'repositoryName', flex: 1 }
   ],
 
   features: [

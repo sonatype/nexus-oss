@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-repositoryroute-settings',
 
-  title: NX.I18n.get('ADMIN_ROUTING_DETAILS_SETTINGS_TAB'),
+  title: 'Settings',
   items: { xtype: 'nx-coreui-repositoryroute-settings-form' }
 
 });

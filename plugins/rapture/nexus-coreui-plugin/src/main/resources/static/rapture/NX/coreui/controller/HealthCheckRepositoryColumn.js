@@ -114,7 +114,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     if (!column) {
       column = grid.healthCheckColumn = Ext.create('Ext.grid.column.Column', {
         id: 'healthCheckColumn',
-        header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_COLUMN'),
+        header: 'Health Check',
         width: 120,
         renderer: Ext.bind(me.renderHealthCheckColumn, me),
         listeners: {

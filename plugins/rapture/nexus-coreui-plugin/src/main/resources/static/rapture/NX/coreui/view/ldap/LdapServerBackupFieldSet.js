@@ -30,8 +30,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
     {
       xtype: 'checkbox',
       name: 'backupMirrorEnabled',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_BACKUP_USE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_BACKUP_USE_HELP'),
+      fieldLabel: 'Use Backup Mirror',
+      helpText: 'Check this box if a backup mirror should be used.',
       listeners: {
         change: function (checkbox, newValue) {
           checkbox.up('panel').showOrHide('backupMirror', newValue);
@@ -41,13 +41,13 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
     {
       xtype: 'combo',
       name: 'backupMirrorProtocol',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_HELP'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
+      fieldLabel: 'Protocol',
+      helpText: 'Use plain text (ldap://) or secure (ldaps://) connection.',
+      emptyText: 'select a connection type',
       editable: false,
       store: [
-        ['ldap', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLAIN_ITEM')],
-        ['ldaps', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_SECURE_ITEM')]
+        ['ldap', 'Plain connection (ldap)'],
+        ['ldaps', 'Secure Connection (ldaps)']
       ],
       queryMode: 'local',
       backupMirror: [true]
@@ -55,16 +55,16 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
     {
       name: 'backupMirrorHost',
       itemId: 'backupMirrorHost',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_HELP'),
+      fieldLabel: 'Host',
+      helpText: 'The host name of the backup LDAP server.',
       backupMirror: [true]
     },
     {
       xtype: 'numberfield',
       name: 'backupMirrorPort',
       itemId: 'backupMirrorPort',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT_HELP'),
+      fieldLabel: 'Port',
+      helpText: 'The port the backup LDAP server is listening on (ldap - 389, ldaps - 636).',
       minValue: 1,
       maxValue: 65535,
       allowDecimals: false,

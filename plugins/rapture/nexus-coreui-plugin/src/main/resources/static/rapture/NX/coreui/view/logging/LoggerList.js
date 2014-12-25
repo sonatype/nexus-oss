@@ -32,21 +32,21 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
         return 'logger-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LOGGING_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: 'Name', dataIndex: 'name', flex: 1 },
     {
-      header: NX.I18n.get('ADMIN_LOGGING_LEVEL_COLUMN'),
+      header: 'Level',
       dataIndex: 'level',
       editor: {
         xtype: 'combo',
         editable: false,
         store: [
-          ['TRACE', NX.I18n.get('ADMIN_LOGGING_TRACE_ITEM')],
-          ['DEBUG', NX.I18n.get('ADMIN_LOGGING_DEBUG_ITEM')],
-          ['INFO', NX.I18n.get('ADMIN_LOGGING_INFO_ITEM')],
-          ['WARN', NX.I18n.get('ADMIN_LOGGING_WARN_ITEM')],
-          ['ERROR', NX.I18n.get('ADMIN_LOGGING_ERROR_ITEM')],
-          ['OFF', NX.I18n.get('ADMIN_LOGGING_OFF_ITEM')],
-          ['DEFAULT', NX.I18n.get('ADMIN_LOGGING_DEFAULT_ITEM')]
+          ['TRACE', 'TRACE'],
+          ['DEBUG', 'DEBUG'],
+          ['INFO', 'INFO'],
+          ['WARN', 'WARN'],
+          ['ERROR', 'ERROR'],
+          ['OFF', 'OFF'],
+          ['DEFAULT', 'DEFAULT']
         ],
         queryMode: 'local'
       }
@@ -54,23 +54,23 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_LOGGING_EMPTY_STATE'),
+    emptyText: 'No loggers defined',
     deferEmptyText: false
   },
 
   tbar: [
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_NEW_TOOLTIP'),
+      text: 'New',
+      tooltip: 'Add new logger',
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       action: 'new',
       disabled: true
     },
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_DELETE_TOOLTIP'),
+      text: 'Delete',
+      tooltip: 'Remove selected logger',
       glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
       action: 'delete',
       disabled: true
@@ -78,8 +78,8 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     '-',
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_RESET_TOOLTIP'),
+      text: 'Reset',
+      tooltip: 'Reset loggers to their default levels',
       glyph: 'xf0e2@FontAwesome' /* fa-undo */,
       action: 'reset',
       disabled: true

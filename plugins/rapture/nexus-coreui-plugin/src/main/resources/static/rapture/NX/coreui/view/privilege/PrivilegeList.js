@@ -34,16 +34,16 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
       iconVariant: 'x16',
       iconNamePrefix: 'privilege-'
     },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_COLUMN'), dataIndex: 'repositoryTargetName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_REPOSITORY_COLUMN'), dataIndex: 'repositoryName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_METHOD_COLUMN'), dataIndex: 'method', flex: 1 }
+    { header: 'Name', dataIndex: 'name', flex: 1 },
+    { header: 'Description', dataIndex: 'description', flex: 1 },
+    { header: 'Type', dataIndex: 'typeName', flex: 1 },
+    { header: 'Target', dataIndex: 'repositoryTargetName', flex: 1 },
+    { header: 'Repository', dataIndex: 'repositoryName', flex: 1 },
+    { header: 'Method', dataIndex: 'method', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_PRIVILEGES_LIST_EMPTY_STATE'),
+    emptyText: 'No privileges defined',
     deferEmptyText: false
   },
 
@@ -58,9 +58,9 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     var me = this;
 
     me.tbar = [
-      { xtype: 'button', text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+      { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
         menu: [
-          { text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_ITEM'), action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target',
+          { text: 'Repository Target Privilege', action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target',
               'x16') }
         ]
       }

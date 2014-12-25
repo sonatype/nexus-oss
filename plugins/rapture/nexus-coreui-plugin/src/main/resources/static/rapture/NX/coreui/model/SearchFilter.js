@@ -22,7 +22,6 @@ Ext.define('NX.coreui.model.SearchFilter', {
   fields: [
     'id',
     'name',
-    'text',
     'description',
     'criterias',
     'readOnly'

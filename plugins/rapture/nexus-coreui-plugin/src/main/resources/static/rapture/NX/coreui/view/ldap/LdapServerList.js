@@ -32,20 +32,20 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
         return 'ldapserver-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_COLUMN'), dataIndex: 'order', width: 80 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_LDAP_LIST_URL_COLUMN'), dataIndex: 'url', flex: 1 }
+    { header: 'Order', dataIndex: 'order', width: 80 },
+    { header: 'Name', dataIndex: 'name', flex: 1 },
+    { header: 'Url', dataIndex: 'url', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: NX.I18n.get('ADMIN_LDAP_LIST_EMPTY_STATE'),
+    emptyText: 'No LDAP servers defined',
     deferEmptyText: false
   },
 
   tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_ORDER_BUTTON'), glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */, action: 'changeorder', disabled: true },
-    { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_LIST_CACHE_BUTTON'), glyph: 'xf014@FontAwesome' /* fa-trash-o */, action: 'clearcache', disabled: true }
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
+    { xtype: 'button', text: 'Change Order', glyph: 'xf162@FontAwesome' /* fa-sort-numeric-asc */, action: 'changeorder', disabled: true },
+    { xtype: 'button', text: 'Clear Cache', glyph: 'xf014@FontAwesome' /* fa-trash-o */, action: 'clearcache', disabled: true }
   ],
 
   plugins: [

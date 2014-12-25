@@ -32,16 +32,16 @@ Ext.define('NX.coreui.view.support.SysInfo', {
   tbar: [
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_TOOLTIP'),
+      text: 'Download',
+      tooltip: 'Download system information',
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'download'
     },
     '-',
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_TOOLTIP'),
+      text: 'Print',
+      tooltip: 'Print system information',
       glyph: 'xf02f@FontAwesome' /* fa-print */,
       action: 'print'
     }

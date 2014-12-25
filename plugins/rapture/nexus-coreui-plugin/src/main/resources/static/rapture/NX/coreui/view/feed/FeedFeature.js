@@ -26,6 +26,6 @@ Ext.define('NX.coreui.view.feed.FeedFeature', {
   masters: { xtype: 'nx-coreui-feed-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-feedentry-list', title: NX.I18n.get('BROWSE_FEEDS_DETAILS_EVENTS_TAB'), weight: 10 }
+    { xtype: 'nx-coreui-feedentry-list', title: 'Events', weight: 10 }
   ]
 });

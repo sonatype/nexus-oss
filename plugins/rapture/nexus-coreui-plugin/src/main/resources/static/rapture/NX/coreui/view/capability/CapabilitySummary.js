@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
     'NX.Conditions'
   ],
 
-  title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),
+  title: 'Summary',
   autoScroll: true,
 
   /**
@@ -64,8 +64,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           },
           {
             xtype: 'textarea',
-            fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES'),
-            helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
+            fieldLabel: 'Notes',
+            helpText: "Optional notes about configured capability.",
             name: 'notes',
             allowBlank: true,
             anchor: '100%'

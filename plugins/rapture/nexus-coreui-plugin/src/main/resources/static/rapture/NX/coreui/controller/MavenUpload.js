@@ -42,8 +42,7 @@ Ext.define('NX.coreui.controller.MavenUpload', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'browse',
       path: '/Upload/Maven',
-      text: NX.I18n.get('BROWSE_MAVEN_TITLE'),
-      description: NX.I18n.get('BROWSE_MAVEN_SUBTITLE'),
+      description: 'Upload artifacts to Maven Hosted Repositories',
       view: { xtype: 'nx-coreui-maven-upload' },
       iconConfig: {
         file: 'upload.png',

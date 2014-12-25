@@ -73,8 +73,7 @@ Ext.define('NX.coreui.controller.Repositories', {
   features: {
     mode: 'admin',
     path: '/Repository/Repositories',
-    text: NX.I18n.get('ADMIN_REPOSITORIES_TITLE'),
-    description: NX.I18n.get('ADMIN_REPOSITORIES_SUBTITLE'),
+    description: 'Manage repositories',
     view: { xtype: 'nx-coreui-repository-feature' },
     iconConfig: {
       file: 'database.png',
@@ -179,7 +178,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (NX.Conditions.isPermitted("nexus:cache", "delete")
         && type !== 'virtual' && localStatus === 'IN_SERVICE' && userManaged) {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_EXPIRE_ITEM'), action: 'expirecache', handler: Ext.bind(me.expireCache, me, [model])
+        text: 'Expire Cache', action: 'expirecache', handler: Ext.bind(me.expireCache, me, [model])
       });
     }
 
@@ -188,7 +187,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         && (provider === 'maven2' || provider === 'maven1')
         && (type === 'hosted' || type === 'group') && localStatus === 'IN_SERVICE' && userManaged) {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_REBUILD_ITEM'), action: 'rebuildmetadata', handler: Ext.bind(me.rebuildMavenMetadata, me, [model])
+        text: 'Rebuild Metadata', action: 'rebuildmetadata', handler: Ext.bind(me.rebuildMavenMetadata, me, [model])
       });
     }
 
@@ -196,7 +195,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (NX.Conditions.isPermitted("nexus:repostatus", "update")
         && type === 'proxy' && proxyMode === 'ALLOW') {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_BLOCK_ITEM'), action: 'blockproxy', handler: Ext.bind(me.blockProxy, me, [model])
+        text: 'Block Proxy', action: 'blockproxy', handler: Ext.bind(me.blockProxy, me, [model])
       });
     }
 
@@ -204,7 +203,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (NX.Conditions.isPermitted("nexus:repostatus", "update")
         && type === 'proxy' && proxyMode !== 'ALLOW') {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ALLOW_ITEM'), action: 'allowproxy', handler: Ext.bind(me.allowProxy, me, [model])
+        text: 'Allow Proxy', action: 'allowproxy', handler: Ext.bind(me.allowProxy, me, [model])
       });
     }
 
@@ -212,7 +211,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (NX.Conditions.isPermitted("nexus:repostatus", "update")
         && type !== 'group' && localStatus === 'IN_SERVICE') {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_POOS_ITEM'), action: 'putoutofservice', handler: Ext.bind(me.putOutOfService, me, [model])
+        text: 'Put Out of Service', action: 'putoutofservice', handler: Ext.bind(me.putOutOfService, me, [model])
       });
     }
 
@@ -220,7 +219,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     if (NX.Conditions.isPermitted("nexus:repostatus", "update")
         && type !== 'group' && localStatus !== 'IN_SERVICE') {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_PRIS_ITEM'), action: 'putinservice', handler: Ext.bind(me.putInService, me, [model])
+        text: 'Put in Service', action: 'putinservice', handler: Ext.bind(me.putInService, me, [model])
       });
     }
 
@@ -230,10 +229,10 @@ Ext.define('NX.coreui.controller.Repositories', {
         && (provider === 'maven2' || provider === 'maven1')
         && type !== 'virtual') {
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_REPAIR_ITEM'), action: 'repairindex', handler: Ext.bind(me.repairIndex, me, [model])
+        text: 'Repair Index', action: 'repairindex', handler: Ext.bind(me.repairIndex, me, [model])
       });
       button.menu.add({
-        text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_UPDATE_ITEM'), action: 'updateindex', handler: Ext.bind(me.updateIndex, me, [model])
+        text: 'Update Index', action: 'updateindex', handler: Ext.bind(me.updateIndex, me, [model])
       });
     }
   },

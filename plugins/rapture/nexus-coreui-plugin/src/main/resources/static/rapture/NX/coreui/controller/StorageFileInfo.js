@@ -59,10 +59,12 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
           repositories = [];
 
       if (Ext.isObject(response) && response.success && response.data) {
-        info[NX.I18n.get('BROWSE_STANDARD_INFO_PATH')] = NX.util.Url.asLink(
+        info = {
+          'Path': NX.util.Url.asLink(
               NX.util.Url.urlOf('content/repositories/' + repositoryId + response.data['path']),
               response.data['path'] + (response.data['inLocalStorage'] ? '' : ' (Not Locally Cached)')
-        );
+          )
+        };
         if (response.data['inLocalStorage']) {
           Ext.Array.each(response.data['repositories'], function(repository) {
             repositories.push(NX.util.Url.asLink(
@@ -71,13 +73,16 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
                 '_self'
             ));
           });
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_SIZE')] = me.toSizeString(response.data['size']);
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_UPLOADED_BY')] = response.data['createdBy'];
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_UPLOADED_DATE')] = Ext.Date.parse(response.data['created'], 'c');
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_MODIFIED')] = Ext.Date.parse(response.data['modified'], 'c');
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_SHA1')] = response.data['sha1'];
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_MD5')] = response.data['md5'];
-          info[NX.I18n.get('BROWSE_STANDARD_INFO_CONTAINED')] = repositories;
+          Ext.apply(info, {
+            'Size': me.toSizeString(response.data['size']),
+            'Uploaded by': response.data['createdBy'],
+            'Uploaded Date': Ext.Date.parse(response.data['created'], 'c'),
+            'Last Modified': Ext.Date.parse(response.data['modified'], 'c'),
+            'SHA1': response.data['sha1'],
+            'MD5': response.data['md5'],
+            'Contained in': repositories
+          });
+
         }
       }
       panel.showInfo(info);

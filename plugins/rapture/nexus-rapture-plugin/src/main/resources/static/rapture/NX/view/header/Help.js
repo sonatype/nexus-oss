@@ -21,7 +21,7 @@ Ext.define('NX.view.header.Help', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-help',
 
-  tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_TOOLTIP'),
+  tooltip: 'Help',
   glyph: 'xf059@FontAwesome', // fa-question-circle
 
   // hide the menu button arrow
@@ -41,38 +41,38 @@ Ext.define('NX.view.header.Help', {
       },
       '-',
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_ABOUT'),
+        text: 'About',
         iconCls: 'nx-icon-nexus-x16',
         tooltip: 'About Sonatype Nexus',
         action: 'about'
       },
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_DOCUMENTATION'),
+        text: 'Documentation',
         iconCls: 'nx-icon-help-manual-x16',
         tooltip: 'Sonatype Nexus product documentation',
         action: 'docs'
       },
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_KB'),
+        text: 'Knowledge Base',
         iconCls: 'nx-icon-help-kb-x16',
         tooltip: 'Sonatype Nexus knowledge base',
         action: 'kb'
       },
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_COMMUNITY'),
+        text: 'Community',
         iconCls: 'nx-icon-help-community-x16',
         tooltip: 'Sonatype Nexus community information',
         action: 'community'
       },
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_ISSUES'),
+        text: 'Issue Tracker',
         iconCls: 'nx-icon-help-issues-x16',
         tooltip: 'Sonatype Nexus issue and bug tracker',
         action: 'issues'
       },
       '-',
       {
-        text: NX.I18n.get('GLOBAL_HEADER_HELP_SUPPORT'),
+        text: 'Support',
         iconCls: 'nx-icon-help-support-x16',
         tooltip: 'Sonatype Nexus product support',
         action: 'support'

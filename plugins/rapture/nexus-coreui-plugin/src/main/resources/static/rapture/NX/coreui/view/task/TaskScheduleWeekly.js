@@ -48,8 +48,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
         xtype: 'datefield',
         name: 'startDate',
         itemId: 'startDate',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE_HELP'),
+        fieldLabel: 'Start Date',
+        helpText: 'The date this task should start running.',
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -59,7 +59,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
         xtype: 'timefield',
         name: 'startTime',
         itemId: 'startTime',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRING'),
+        fieldLabel: 'Recurring Time',
         helpText: 'The time this task should start on days it will run in your time zone ' +
             NX.util.DateFormat.getTimeZone() + '.',
         allowBlank: false,
@@ -68,10 +68,10 @@ Ext.define('NX.coreui.view.task.TaskScheduleWeekly', {
       },
       {
         xtype: 'checkboxgroup',
-        fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_HELP'),
+        fieldLabel: 'Days',
+        helpText: 'Days of week when this task should run.',
         allowBlank: false,
-        blankText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_PLACEHOLDER'),
+        blankText: 'At least one day should be selected',
         vertical: true,
         columns: 1,
         items: days

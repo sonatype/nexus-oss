@@ -31,15 +31,15 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
   items: [
     {
       xtype: 'label',
-      html: '<p>' + NX.I18n.get('BROWSE_MAVEN_ARTIFACT_HELP') + '</p>'
+      html: '<p>Select the artifacts you wish to upload.</p>'
     },
     { xtype: 'nx-coreui-upload-artifact-coordinates', hidden: true, disabled: true }
   ],
 
   buttonAlign: 'left',
   buttons: [
-    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON'), action: 'upload', ui: 'primary', formBind: true },
-    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_DISCARD_BUTTON'), action: 'discard' }
+    { text: 'Upload', action: 'upload', ui: 'primary', formBind: true },
+    { text: 'Discard', action: 'discard' }
   ]
 
 });

@@ -82,7 +82,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     var me = this,
         searchResultDetails = me.getSearchResultDetails().down('#secondaryInfo'),
         searchResultModel,
-        groupId = undefined, artifactId = undefined, versions = [], info = {};
+        groupId = undefined, artifactId = undefined, versions = [];
 
     if (me.getSearchResultVersion()) {
 
@@ -97,8 +97,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
         searchResultModel = me.getSearchResultStore().getById(groupId + ':' + artifactId);
         searchResultModel.set('healthCheckLoading', true);
         searchResultModel.commit();
-        info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(searchResultModel);
-        searchResultDetails.showInfo(info);
+        searchResultDetails.showInfo({ 'Most popular version': me.renderMostPopularVersion(searchResultModel) });
         me.getSearchResultVersion().getView().refresh();
         NX.direct.healthcheck_Search.read(groupId, artifactId, versions, function(response) {
           searchResultModel.set('healthCheckLoading', false);
@@ -109,8 +108,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
             searchResultModel.set('healthCheckError', response.data['error']);
             searchResultModel.set('healthCheckMostPopularVersion', response.data['mostPopularVersion']);
             searchResultModel.endEdit();
-            info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULAR')] = me.renderMostPopularVersion(searchResultModel);
-            searchResultDetails.showInfo(info);
+            searchResultDetails.showInfo({ 'Most popular version': me.renderMostPopularVersion(searchResultModel) });
             Ext.Object.each(response.data.versions, function(key, value) {
               var searchResultVersionModel = me.getSearchResultVersionStore().getById(key);
               if (searchResultVersionModel) {
@@ -169,14 +167,14 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
     if (!grid.healthCheckColumns) {
       grid.healthCheckColumns = [
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_AGE_COLUMN'),
+          header: 'Age',
           dataIndex: 'healthCheckAge',
           groupable: false,
           width: 60,
           renderer: Ext.bind(me.renderAgeColumn, me)
         }),
         Ext.create('Ext.grid.column.Column', {
-          header: NX.I18n.get('BROWSE_SEARCH_VERSIONS_POPULARITY_COLUMN'),
+          header: 'Popularity',
           dataIndex: 'healthCheckPopularity',
           groupable: false,
           width: 90,

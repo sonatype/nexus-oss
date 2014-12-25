@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
     return 'Role updated: ' + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_ROLES_SETTINGS_ERROR'),
+  editableMarker: 'You do not have permission to update roles or role is readonly',
 
   initComponent: function() {
     var me = this,
@@ -53,9 +53,9 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         xtype: 'combo',
         name: 'id',
         itemId: 'id',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED_PLACEHOLDER'),
+        fieldLabel: 'Mapped Role',
+        helpText: 'The mapped role.',
+        emptyText: 'select a role',
         editable: false,
         store: 'RoleBySource',
         queryMode: 'local',
@@ -68,9 +68,9 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         name: 'id',
         itemId: 'id',
         readOnly: true,
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_PLACEHOLDER')
+        fieldLabel: 'ID',
+        helpText: 'The id of this role.',
+        emptyText: 'enter a role id'
       };
     }
 
@@ -87,27 +87,27 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
       idField,
       {
         name: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME_PLACEHOLDER')
+        fieldLabel: 'Name',
+        helpText: 'The name of this role.',
+        emptyText: 'enter a name'
       },
       {
         name: 'description',
         allowBlank: true,
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION_PLACEHOLDER')
+        fieldLabel: 'Description',
+        helpText: 'The description of this role.',
+        emptyText: 'enter a description'
       },
       {
         xtype: 'nx-itemselector',
         name: 'privileges',
         itemId: 'privileges',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES_HELP'),
+        fieldLabel: 'Privileges',
+        helpText: 'Privileges contained in this Role.',
         allowBlank: true,
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES_PICKER'),
-        toTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_GIVEN_PICKER'),
+        fromTitle: 'Privileges',
+        toTitle: 'Given',
         store: 'Privilege',
         valueField: 'id',
         displayField: 'name',
@@ -117,12 +117,12 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES_HELP'),
+        fieldLabel: 'Roles',
+        helpText: 'Roles contained in this Role.',
         allowBlank: true,
         buttons: ['add', 'remove'],
-        fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES_PICKER'),
-        toTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_CONTAINED_PICKER'),
+        fromTitle: 'Roles',
+        toTitle: 'Contained',
         store: roleStore,
         valueField: 'id',
         displayField: 'name',

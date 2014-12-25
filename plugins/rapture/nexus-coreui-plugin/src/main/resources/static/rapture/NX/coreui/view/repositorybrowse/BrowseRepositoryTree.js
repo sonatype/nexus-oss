@@ -34,7 +34,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   columns: [
     {
       xtype: 'treecolumn',
-      text: NX.I18n.get('BROWSE_STANDARD_LIST_FILE_COLUMN'),
+      text: 'Storage File',
       flex: 2,
       sortable: true,
       dataIndex: 'text'
@@ -42,7 +42,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     {
       xtype: 'nx-iconcolumn',
       dataIndex: 'inStorage',
-      text: NX.I18n.get('BROWSE_STANDARD_LIST_STORAGE_COLUMN'),
+      text: 'Storage',
       hideable: true,
       sortable: false,
       width: 80,
@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
     {
       xtype: 'nx-iconcolumn',
       dataIndex: 'inIndex',
-      text: NX.I18n.get('BROWSE_STANDARD_LIST_INDEX_COLUMN'),
+      text: 'Index',
       hideable: true,
       sortable: false,
       width: 80,
@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.repositorybrowse.BrowseRepositoryTree', {
   ],
 
   tbar: [
-    { xtype: 'button', text: NX.I18n.get('BROWSE_REPOSITORY_MORE_BUTTON'), glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
+    { xtype: 'button', text: 'More...', glyph: 'xf0ae@FontAwesome' /* fa-tasks */, action: 'more', disabled: true,
       menu: []
     }
   ],

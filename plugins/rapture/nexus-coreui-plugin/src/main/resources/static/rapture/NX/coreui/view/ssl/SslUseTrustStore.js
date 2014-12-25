@@ -25,13 +25,13 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
     var me = this;
 
     if (!me.fieldLabel && !me.boxLabel) {
-      me.fieldLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
+      me.fieldLabel = 'Use Nexus TrustStore';
     }
     if (me.fieldLabel === true) {
-      me.fieldLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
+      me.fieldLabel = 'Use Nexus TrustStore';
     }
     if (me.boxLabel === true) {
-      me.boxLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
+      me.boxLabel = 'Use Nexus TrustStore';
     }
 
     me.items = {
@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
         },
         {
           xtype: 'button',
-          text: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CERTIFICATE_BUTTON'),
+          text: 'View Certificate',
           ui: 'plain',
           action: 'showcertificate',
           glyph: 'xf0a3@FontAwesome' /* fa-certificate */,

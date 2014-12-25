@@ -56,8 +56,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support ZIP',
-      text: NX.I18n.get('ADMIN_SUPPORT_ZIP_TITLE'),
-      description: NX.I18n.get('ADMIN_SUPPORT_ZIP_SUBTITLE'),
+      description: 'Creates a ZIP file containing useful support information about your server',
       view: { xtype: 'nx-coreui-support-supportzip' },
       iconConfig: {
         file: 'file_extension_zip.png',

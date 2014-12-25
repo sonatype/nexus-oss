@@ -487,7 +487,7 @@ Ext.define('NX.controller.Menu', {
         segments = feature.path.split('/');
         parent = me.getFeatureMenuStore().getRootNode();
         for (var i = 2; i < segments.length; i++) {
-          child = parent.findChild('path', segments.slice(0, i + 1).join('/'), false);
+          child = parent.findChild('text', segments[i], false);
           if (child) {
             if (i < segments.length - 1) {
               child.data = Ext.apply(child.data, {

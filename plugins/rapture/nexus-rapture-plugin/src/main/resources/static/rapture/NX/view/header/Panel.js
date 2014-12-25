@@ -61,7 +61,7 @@ Ext.define('NX.view.header.Panel', {
             items: [
               {
                 xtype: 'label',
-                text: NX.I18n.get('GLOBAL_HEADER_TITLE'),
+                text: 'Sonatype Nexus',
                 cls: 'nx-header-productname'
               },
               {

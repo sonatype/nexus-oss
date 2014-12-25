@@ -46,14 +46,15 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
         items: [
           {
             xtype: 'label',
-            html: NX.I18n.get('ADMIN_REALMS_HELP')
+            html: '<p>Configure the active security realms and realm order.</p>' +
+                '<p>At least one security realm must be active.</p>'
           },
           {
             xtype: 'nx-itemselector',
             name: 'realms',
             buttons: ['up', 'add', 'remove', 'down'],
-            fromTitle: NX.I18n.get('ADMIN_REALMS_AVAILABLE'),
-            toTitle: NX.I18n.get('ADMIN_REALMS_ACTIVE'),
+            fromTitle: 'Available',
+            toTitle: 'Active',
             store: 'RealmType',
             valueField: 'id',
             displayField: 'name',

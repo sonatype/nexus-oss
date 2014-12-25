@@ -32,16 +32,16 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
         return 'repositoryroute-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_ROUTE_COLUMN'), dataIndex: 'pattern', flex: 1 },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_RULE_COLUMN'), dataIndex: 'mappingType', renderer: function (val) {
+    { header: 'Route', dataIndex: 'pattern', flex: 1 },
+    { header: 'Rule Type', dataIndex: 'mappingType', renderer: function (val) {
       return {
         BLOCKING: 'Blocking',
         INCLUSION: 'Inclusive',
         EXCLUSION: 'Exclusive'
       }[val];
     }},
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_GROUP_COLUMN'), dataIndex: 'groupName' },
-    { header: NX.I18n.get('ADMIN_ROUTING_LIST_REPOSITORIES_COLUMN'), dataIndex: 'mappedRepositoriesNames', flex: 1 }
+    { header: 'Group', dataIndex: 'groupName' },
+    { header: 'Repositories', dataIndex: 'mappedRepositoriesNames', flex: 1 }
   ],
 
   viewConfig: {
@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
   },
 
   tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_ROUTING_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [{ ptype: 'gridfilterbox', emptyText: 'No repository route matched criteria "$filter"' }]

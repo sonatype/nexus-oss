@@ -30,22 +30,22 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
   items: [
     {
       name: 'name',
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME_HELP'),
+      helpText: 'The name of the LDAP Server.',
       itemId: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME_PLACEHOLDER')
+      fieldLabel: 'Name',
+      emptyText: 'enter a name'
     },
     {
       xtype: 'combo',
       name: 'protocol',
       itemId: 'protocol',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_HELP'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
+      fieldLabel: 'Protocol',
+      helpText: 'Use plain text (ldap://) or secure (ldaps://) connection.',
+      emptyText: 'select a connection type',
       editable: false,
       store: [
-        ['ldap', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLAIN_ITEM')],
-        ['ldaps', NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_SECURE_ITEM')]
+        ['ldap', 'Plain connection (ldap)'],
+        ['ldaps', 'Secure Connection (ldaps)']
       ],
       queryMode: 'local',
       useTrustStore: function (combo) {
@@ -63,8 +63,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       name: 'host',
       itemId: 'host',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_HELP'),
+      fieldLabel: 'Host',
+      helpText: 'The host name of the LDAP server.',
       listeners: {
         change: function(){
           var protocol = this.up('form').down('#protocol');
@@ -76,8 +76,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       xtype: 'numberfield',
       name: 'port',
       itemId: 'port',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PORT_HELP'),
+      fieldLabel: 'Port',
+      helpText: 'The port the LDAP server is listening on (ldap - 389, ldaps - 636).',
       minValue: 1,
       maxValue: 65535,
       allowDecimals: false,
@@ -91,20 +91,20 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     },
     {
       name: 'searchBase',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_BASE_HELP')
+      fieldLabel: 'Search Base',
+      helpText: 'LDAP location to be added to the connection URL, e.g. "dc=sonatype,dc=com".'
     },
     {
       xtype: 'combo',
       name: 'authScheme',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_PLACEHOLDER'),
+      fieldLabel: 'Authentication Method',
+      emptyText: 'select an authentication method',
       editable: false,
       store: [
-        ['simple', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_SIMPLE_ITEM')],
-        ['none', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_ANONYMOUS_ITEM')],
-        ['DIGEST-MD5', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_DIGEST_ITEM')],
-        ['CRAM-MD5', NX.I18n.get('ADMIN_LDAP_CONNECTION_AUTH_CRAM_ITEM')]
+        ['simple', 'Simple Authentication'],
+        ['none', 'Anonymous Authentication'],
+        ['DIGEST-MD5', 'DIGEST-MD5'],
+        ['CRAM-MD5', 'CRAM-MD5']
       ],
       queryMode: 'local',
       listeners: {
@@ -116,46 +116,46 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     {
       name: 'authRealm',
       itemId: 'authRealm',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_SASL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_SASL_HELP'),
+      fieldLabel: 'SASL Realm',
+      helpText: 'The SASL realm to bind to, e.g. "mydomain.com".',
       allowBlank: true,
       authScheme: ['DIGEST-MD5', 'CRAM-MD5']
     },
     {
       name: 'authUsername',
       itemId: 'authUsername',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_USERNAME'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_USERNAME_HELP'),
+      fieldLabel: 'Username',
+      helpText: 'The username or DN to bind with. If simple authentication is used, this has to be a fully qualified user name.',
       authScheme: ['simple', 'DIGEST-MD5', 'CRAM-MD5']
     },
     {
       xtype: 'nx-password',
       name: 'authPassword',
       itemId: 'authPassword',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PASSWORD'),
+      fieldLabel: 'Password',
       inputType: 'password',
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PASSWORD_HELP'),
+      helpText: 'The password to bind with.',
       authScheme: ['simple', 'DIGEST-MD5', 'CRAM-MD5']
     },
     {
       xtype: 'numberfield',
       name: 'connectionTimeout',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_TIMEOUT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_TIMEOUT_HELP'),
+      fieldLabel: 'Connection Timeout',
+      helpText: 'The number of seconds to wait before timeout on connection to LDAP Server.',
       value: 30
     },
     {
       xtype: 'numberfield',
       name: 'connectionRetryDelay',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_RETRY'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_RETRY_HELP'),
+      fieldLabel: 'Retry Delay',
+      helpText: 'The number of seconds to wait before retrying a request to the LDAP Server.',
       value: 300
     },
     {
       xtype: 'numberfield',
       name: 'cacheTimeout',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_CACHE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_CACHE_HELP'),
+      fieldLabel: 'Cache Duration',
+      helpText: 'The number of seconds to keep items in the cache.',
       value: 600
     }
   ],

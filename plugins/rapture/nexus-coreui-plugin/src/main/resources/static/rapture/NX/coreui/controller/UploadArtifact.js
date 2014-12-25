@@ -169,7 +169,7 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
     form.add({
       xtype: 'button',
       action: 'add',
-      text: form.down(me.artifactPanelXType) ? NX.I18n.get('BROWSE_MAVEN_ARTIFACTS_BUTTON') : NX.I18n.get('BROWSE_MAVEN_ARTIFACT_BUTTON'),
+      text: form.down(me.artifactPanelXType) ? 'Add another artifact' : 'Add an artifact',
       margin: '5 0 10 0',
       glyph: 'xf016@FontAwesome' /* fa-file-o */
     });

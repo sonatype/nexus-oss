@@ -52,8 +52,7 @@ Ext.define('NX.coreui.controller.RealmSettings', {
       mode: 'admin',
       path: '/Security/Realms',
       view: { xtype: 'nx-coreui-security-realm-settings' },
-      text: NX.I18n.get('ADMIN_REALMS_TITLE'),
-      description: NX.I18n.get('ADMIN_REALMS_SUBTITLE'),
+      description: 'Manage security realm configuration',
       iconConfig: {
         file: 'shield.png',
         variants: ['x16', 'x32']

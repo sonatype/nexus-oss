@@ -44,26 +44,27 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
         items: [
           {
             xtype: 'label',
-            html: NX.I18n.get('ADMIN_SMTP_HELP')
+            html: '<p>Nexus can send email notifications for various events.</p>' +
+                '<p>To enable sending email please configure a SMTP server.</p>'
           },
           {
             xtype: 'nx-email',
             name: 'systemEmail',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_EMAIL'),
-            helpText: NX.I18n.get('ADMIN_SMTP_EMAIL_HELP')
+            fieldLabel: 'System email address',
+            helpText: 'Email address used as the FROM address for all email notifications.'
           },
           {
             xtype: 'combo',
             name: 'connectionType',
             itemId: 'connectionType',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_TYPE'),
-            helpText: NX.I18n.get('ADMIN_SMTP_TYPE_HELP'),
-            emptyText: NX.I18n.get('ADMIN_SMTP_TYPE_PLACEHOLDER'),
+            fieldLabel: 'SMTP server type',
+            helpText: 'Connection level security to be used with SMTP server. Use any of the SSL/TLS provided solutions for greater security.',
+            emptyText: 'select a connection type',
             editable: false,
             store: [
-              ['PLAIN', NX.I18n.get('ADMIN_SMTP_TYPE_PLAIN_ITEM')],
-              ['SSL', NX.I18n.get('ADMIN_SMTP_TYPE_SSL_ITEM')],
-              ['TLS', NX.I18n.get('ADMIN_SMTP_TYPE_TLS_ITEM')]
+              ['PLAIN', 'Plain SMTP'],
+              ['SSL', 'Secure SMTP via SSL'],
+              ['TLS', 'Secure SMTP via TLS']
             ],
             queryMode: 'local',
             useTrustStore: function (combo) {
@@ -81,8 +82,8 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
           {
             name: 'host',
             itemId: 'host',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_HOSTNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_HOSTNAME_HELP'),
+            fieldLabel: 'Hostname',
+            helpText: 'The host name of an SMTP server.',
             listeners: {
               change: function(){
                 var cType = this.up('form').down('#connectionType');
@@ -94,8 +95,8 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             xtype: 'numberfield',
             name: 'port',
             itemId: 'port',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_PORT'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PORT_HELP'),
+            fieldLabel: 'SMTP server port',
+            helpText: 'The port the SMTP server is listening on.',
             minValue: 1,
             maxValue: 65536,
             allowDecimals: false,
@@ -104,14 +105,14 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
           {
             name: 'username',
             allowBlank: true,
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_USERNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_USERNAME_HELP')
+            fieldLabel: 'Username',
+            helpText: 'The username used to access the SMTP server.'
           },
           {
             xtype: 'nx-password',
             name: 'password',
-            fieldLabel: NX.I18n.get('ADMIN_SMTP_PASSWORD'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PASSWORD_HELP'),
+            fieldLabel: 'SMTP password',
+            helpText: 'The password used to access the SMTP server.',
             allowBlank: true
           }
         ]
@@ -121,7 +122,7 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
     me.callParent(arguments);
 
     me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add({
-      xtype: 'button', text: NX.I18n.get('ADMIN_SMTP_VERIFY_BUTTON'), formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
+      xtype: 'button', text: 'Verify SMTP connection', formBind: true, action: 'verify', glyph: 'xf003@FontAwesome' /* fa-envelope-o */
     });
   }
 });

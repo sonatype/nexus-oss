@@ -29,9 +29,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
   items: [
     {
       xtype: 'combo',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE_PLACEHOLDER'),
-      helpText : NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE_HELP'),
+      fieldLabel: 'Template',
+      emptyText: 'select a template to apply',
+      helpText : 'Select a template to apply some default values to the configuration.',
       editable: false,
       store: 'LdapSchemaTemplate',
       displayField: 'name',
@@ -49,54 +49,54 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     //user
     {
       name: 'userBaseDn',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_DN'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_DN_HELP'),
+      fieldLabel: 'Base DN',
+      helpText: 'Base location in the LDAP that the users are found, relative to the search base ("ou=people").',
       allowBlank: true
     },
     {
       xtype: 'checkbox',
       name: 'userSubtree',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_SUBTREE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_SUBTREE_HELP')
+      fieldLabel: 'User Subtree',
+      helpText: 'Check this box if users are located in structures below the user Base DN.'
     },
     {
       name: 'userObjectClass',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_CLASS'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_CLASS_HELP')
+      fieldLabel: 'Object Class',
+      helpText: 'LDAP class for user objects ("inetOrgPerson").'
     },
     {
       name: 'userLdapFilter',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_FILTER'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_FILTER_HELP'),
+      fieldLabel: 'User Filter',
+      helpText: 'LDAP search filter to additionally limit user search (for example "attribute=foo" or "(|(mail=*@domain.com)(uid=dom*))".',
       allowBlank: true
     },
     {
       name: 'userIdAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_ID'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_ID_HELP')
+      fieldLabel: 'User ID Attribute',
+      helpText: 'LDAP attribute containing user id ("userIdAttribute").'
     },
     {
       name: 'userRealNameAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_REAL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_REAL_HELP')
+      fieldLabel: 'Real Name Attribute',
+      helpText: 'LDAP attribute containing the real name of the user ("cn").'
     },
     {
       name: 'userEmailAddressAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_EMAIL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_EMAIL_HELP')
+      fieldLabel: 'E-Mail Attribute',
+      helpText: 'LDAP attribute containing e-mail address ("emailAddressAttribute").'
     },
     {
       name: 'userPasswordAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_PASSWORD'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_PASSWORD_HELP'),
+      fieldLabel: 'Password Attribute',
+      helpText: 'LDAP attribute containing the password ("userPassword").  If this field is blank the user will be authenticated against a bind with the LDAP server.',
       allowBlank: true
     },
     // group
     {
       xtype: 'checkbox',
       name: 'ldapGroupsAsRoles',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_MAP'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_MAP_HELP'),
+      fieldLabel: 'Map LDAP groups as Roles',
+      helpText: 'Check this box if LDAP groups should be mapped as roles.',
       value: true,
       listeners: {
         change: function (checkbox, newValue) {
@@ -111,12 +111,12 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
       xtype: 'combo',
       name: 'groupType',
       itemId: 'groupType',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_TYPE'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_GROUP_TYPE_PLACEHOLDER'),
+      fieldLabel: 'Group Type',
+      emptyText: 'select a group type',
       editable: false,
       store: [
-        ['dynamic', NX.I18n.get('ADMIN_LDAP_GROUP_TYPE_DYNAMIC_ITEM')],
-        ['static', NX.I18n.get('ADMIN_LDAP_GROUP_TYPE_STATIC_ITEM')]
+        ['dynamic', 'Dynamic Groups'],
+        ['static', 'Static Groups']
       ],
       queryMode: 'local',
       listeners: {
@@ -128,46 +128,50 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     },
     {
       name: 'groupBaseDn',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_DN'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_DN_HELP'),
+      fieldLabel: 'Group Base DN',
+      helpText: 'Base location in the LDAP that the groups are found, relative to the search base ("ou=Group").',
       allowBlank: true,
       groupType: ['static']
     },
     {
       xtype: 'checkbox',
       name: 'groupSubtree',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_SUBTREE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_SUBTREE_HELP'),
+      fieldLabel: 'Group Subtree',
+      helpText: 'Check this box if groups are located in structures below the group Base DN.',
       groupType: ['static']
     },
     {
       name: 'groupObjectClass',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_CLASS'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_CLASS_HELP'),
+      fieldLabel: 'Group Object Class',
+      helpText: 'LDAP class for group objects ("posixGroup").',
       groupType: ['static']
     },
     {
       name: 'groupIdAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_ID'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_ID_HELP'),
+      fieldLabel: 'Group ID Attribute',
+      helpText: 'LDAP attribute containing group id ("cn").',
       groupType: ['static']
     },
     {
       name: 'groupMemberAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_ATTRIBUTE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_ATTRIBUTE_HELP'),
+      fieldLabel: 'Group Member Attribute',
+      helpText: 'LDAP attribute containing the usernames for the group.',
       groupType: ['static']
     },
     {
       name: 'groupMemberFormat',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_FORMAT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_FORMAT_HELP'),
+      fieldLabel: 'Group Member Format',
+      helpText: 'The format of User ID stored in the Group Member Attribute. A token "${dn}" can be used to lookup the FQDN of the user or use something like "uid=${username},ou=people,o=sonatype" where "${username}" is replaced with the Username value.',
       groupType: ['static']
     },
     {
       name: 'userMemberOfAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_MEMBER'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_MEMBER_HELP'),
+      fieldLabel: 'Group Member of Attribute',
+      helpText: 'Groups are generally one of two types in LDAP systems -'
+          + ' static or dynamic. A static group maintains its own'
+          + ' membership list. A dynamic group records its membership on a'
+          + ' user entry. If dynamic groups this should be set to the'
+          + ' attribute used to store the attribute that holds groups DN in the user object.',
       groupType: ['dynamic']
     }
   ],

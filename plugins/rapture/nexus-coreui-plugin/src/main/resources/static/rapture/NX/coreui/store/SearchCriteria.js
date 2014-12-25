@@ -34,58 +34,58 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     {
       id: 'format',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_FORMAT')
+        fieldLabel: 'Format'
       }
     },
     {
       id: 'keyword',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_KEYWORD'),
+        fieldLabel: 'Keyword',
         width: 250
       }
     },
     {
       id: 'version',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_VERSION')
+        fieldLabel: 'Version'
       }
     },
     {
       id: 'groupid',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_ID'),
+        fieldLabel: 'Group ID',
         width: 250
       }
     },
     {
       id: 'artifactid',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_ARTIFACT_ID')
+        fieldLabel: 'Artifact ID'
       }
     },
     {
       id: 'classifier',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASSIFIER')
+        fieldLabel: 'Classifier'
       }
     },
     {
       id: 'packaging',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING')
+        fieldLabel: 'Packaging'
       }
     },
     {
       id: 'sha-1',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
+        fieldLabel: 'SHA-1',
         width: 250
       }
     },
     {
       id: 'classname',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASS_NAME'),
+        fieldLabel: 'Class name',
         width: 250
       }
     }

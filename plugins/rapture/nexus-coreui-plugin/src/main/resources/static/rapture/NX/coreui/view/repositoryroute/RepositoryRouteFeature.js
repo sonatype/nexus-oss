@@ -28,6 +28,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteFeature', {
   tabs: { xtype: 'nx-coreui-repositoryroute-settings' },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_ROUTING_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: 'Delete', glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
   ]
 });

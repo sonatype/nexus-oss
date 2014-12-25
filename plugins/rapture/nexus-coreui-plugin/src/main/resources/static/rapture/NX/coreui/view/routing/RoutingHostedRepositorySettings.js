@@ -43,7 +43,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
     {
       xtype: 'form',
       itemId: 'publishStatusForm',
-      title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISH_SECTION'),
+      title: 'Publish Status',
       hidden: true,
       ui: 'subsection',
       cls: 'no-border',
@@ -66,8 +66,8 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
         {
           xtype: 'nx-datedisplayfield',
           name: 'publishTimestamp',
-          fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED'),
-          helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED_HELP'),
+          fieldLabel: 'Published On',
+          helpText: 'Time when routing data was published.',
           hideIfUndefined: true,
           hidden: true
         },
@@ -114,7 +114,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
 
         if (values && values.publishStatus) {
           if (values.publishUrl) {
-            values.publishUrl = NX.util.Url.asLink(values.publishUrl, NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PREFIX_LINK'));
+            values.publishUrl = NX.util.Url.asLink(values.publishUrl, 'View prefix file');
           }
           publishStatusForm.getForm().setValues(values);
           publishStatusForm.show();

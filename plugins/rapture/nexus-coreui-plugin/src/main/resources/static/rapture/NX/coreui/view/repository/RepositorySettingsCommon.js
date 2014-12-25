@@ -30,28 +30,28 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'id',
       itemId: 'id',
-      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID_HELP'),
-      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER'),
+      fieldLabel: 'ID',
+      helpText: 'Unique identifier for the repository.',
+      emptyText: 'enter a repository id',
       readOnly: true,
       validator: function(value) {
         if (/^[a-zA-Z0-9_\-\.]+$/.test(value)) {
           return true;
         }
-        return NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_ERROR');
+        return 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in ID';
       }
     },
     {
       name: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_HELP'),
-      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER')
+      fieldLabel: 'Name',
+      helpText: 'Repository display name',
+      emptyText: 'enter a repository name'
     },
     {
       name: 'providerName',
       itemId: 'providerName',
-      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER_HELP'),
+      fieldLabel: 'Provider',
+      helpText: 'Repository content provider.',
       readOnly: true,
       submitValue: false,
       allowBlank: true
@@ -59,8 +59,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'formatName',
       itemId: 'formatName',
-      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT_HELP'),
+      fieldLabel: 'Format',
+      helpText: 'Repository content format.',
       readOnly: true,
       submitValue: false,
       allowBlank: true

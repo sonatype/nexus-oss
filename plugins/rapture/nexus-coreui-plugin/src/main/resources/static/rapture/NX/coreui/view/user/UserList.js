@@ -32,12 +32,12 @@ Ext.define('NX.coreui.view.user.UserList', {
         return 'user-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_ID_COLUMN'), dataIndex: 'userId', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_REALM_COLUMN'), dataIndex: 'realm' },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_FIRST_COLUMN'), dataIndex: 'firstName', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_LAST_COLUMN'), dataIndex: 'lastName', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_EMAIL_COLUMN'), dataIndex: 'email', flex: 2 },
-    { header: NX.I18n.get('ADMIN_USERS_LIST_STATUS_COLUMN'), dataIndex: 'status' }
+    { header: 'User Id', dataIndex: 'userId', flex: 2 },
+    { header: 'Realm', dataIndex: 'realm' },
+    { header: 'First name', dataIndex: 'firstName', flex: 2 },
+    { header: 'Last name', dataIndex: 'lastName', flex: 2 },
+    { header: 'Email', dataIndex: 'email', flex: 2 },
+    { header: 'Status', dataIndex: 'status' }
   ],
 
   viewConfig: {
@@ -46,10 +46,10 @@ Ext.define('NX.coreui.view.user.UserList', {
   },
 
   tbar: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
+    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     '-',
-    '<b>' + NX.I18n.get('ADMIN_USERS_LIST_SOURCE') + '</b>',
-    { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_DEFAULT_BUTTON'), action: 'filter', menu: [] },
+    '<b>Source:</b>',
+    { xtype: 'button', text: 'Default', action: 'filter', menu: [] },
     { xtype: 'nx-coreui-user-searchbox' }
   ]
 

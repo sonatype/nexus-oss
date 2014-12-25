@@ -37,9 +37,9 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
       {
         xtype: 'combo',
         name: 'repositoryId',
-        fieldLabel: NX.I18n.get('BROWSE_MAVEN_REPOSITORY'),
-        helpText: NX.I18n.get('BROWSE_MAVEN_REPOSITORY_HELP'),
-        emptyText: NX.I18n.get('BROWSE_MAVEN_REPOSITORY_PLACEHOLDER'),
+        fieldLabel: 'Repository',
+        helpText: 'Select the repository where artifacts will be uploaded.',
+        emptyText: 'select repository',
         queryMode: 'local',
         displayField: 'name',
         valueField: 'id',

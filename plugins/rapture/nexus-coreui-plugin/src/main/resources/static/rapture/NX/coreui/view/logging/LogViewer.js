@@ -28,23 +28,23 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     cls: 'log-viewer-field',
     readOnly: true,
     hideLabel: true,
-    emptyText: NX.I18n.get('ADMIN_LOG_VIEWER_EMPTY_STATE'),
+    emptyText: 'Refresh to display log',
     inputAttrTpl: 'wrap="off"'
   },
 
   tbar: [
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_TOOLTIP'),
+      text: 'Download',
+      tooltip: 'Download log file',
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'download'
     },
     '-',
     {
       xtype: 'button',
-      text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TOOLTIP'),
+      text: 'Mark',
+      tooltip: 'Add a mark in Nexus log file',
       glyph: 'xf11e@FontAwesome' /* fa-flag-checkered */,
       action: 'mark',
       disabled: true
@@ -57,11 +57,11 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
       editable: false,
       value: 0,
       store: [
-        [0, NX.I18n.get('ADMIN_LOG_VIEWER_MANUAL_ITEM')],
-        [20, NX.I18n.get('ADMIN_LOG_VIEWER_20_SECONDS_ITEM')],
-        [60, NX.I18n.get('ADMIN_LOG_VIEWER_MINUTE_ITEM')],
-        [120, NX.I18n.get('ADMIN_LOG_VIEWER_2_MINUTES_ITEM')],
-        [300, NX.I18n.get('ADMIN_LOG_VIEWER_5_MINUTES_ITEM')]
+        [0, 'Refresh manually'],
+        [20, 'Refresh every 20 seconds'],
+        [60, 'Refresh every minute'],
+        [120, 'Refresh every 2 minutes'],
+        [300, 'Refresh every 5 minutes']
       ],
       queryMode: 'local'
     },
@@ -72,9 +72,9 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
       editable: false,
       value: 25,
       store: [
-        [25, NX.I18n.get('ADMIN_LOG_VIEWER_25KB_ITEM')],
-        [50, NX.I18n.get('ADMIN_LOG_VIEWER_50KB_ITEM')],
-        [100, NX.I18n.get('ADMIN_LOG_VIEWER_100KB_ITEM')]
+        [25, 'Last 25KB'],
+        [50, 'Last 50KB'],
+        [100, 'Last 100KB']
       ],
       queryMode: 'local'
     }

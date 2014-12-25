@@ -37,29 +37,29 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
     me.items = [
       {
         xtype: 'fieldset',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_SECTION'),
+        title: 'Subject',
         items: [
-          { xtype: 'displayfield', name: 'subjectCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_NAME') },
-          { xtype: 'displayfield', name: 'subjectOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_ORGANIZATION') },
-          { xtype: 'displayfield', name: 'subjectOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_UNIT') }
+          { xtype: 'displayfield', name: 'subjectCommonName', fieldLabel: 'Common Name' },
+          { xtype: 'displayfield', name: 'subjectOrganization', fieldLabel: 'Organisation' },
+          { xtype: 'displayfield', name: 'subjectOrganizationalUnit', fieldLabel: 'Unit' }
         ]
       },
       {
         xtype: 'fieldset',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_SECTION'),
+        title: 'Issuer',
         items: [
-          { xtype: 'displayfield', name: 'issuerCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_NAME') },
-          { xtype: 'displayfield', name: 'issuerOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_ORGANIZATION') },
-          { xtype: 'displayfield', name: 'issuerOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_UNIT') }
+          { xtype: 'displayfield', name: 'issuerCommonName', fieldLabel: 'Common Name' },
+          { xtype: 'displayfield', name: 'issuerOrganization', fieldLabel: 'Organisation' },
+          { xtype: 'displayfield', name: 'issuerOrganizationalUnit', fieldLabel: 'Unit' }
         ]
       },
       {
         xtype: 'fieldset',
-        title: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_SECTION'),
+        title: 'Certificate',
         items: [
-          { xtype: 'displayfield', name: 'issuedOn', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_ISSUED'), renderer: NX.util.DateFormat.timestampRenderer() },
-          { xtype: 'displayfield', name: 'expiresOn', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_VALID'), renderer: NX.util.DateFormat.timestampRenderer() },
-          { xtype: 'displayfield', name: 'fingerprint', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_FINGERPRINT') }
+          { xtype: 'displayfield', name: 'issuedOn', fieldLabel: 'Issued On', renderer: NX.util.DateFormat.timestampRenderer() },
+          { xtype: 'displayfield', name: 'expiresOn', fieldLabel: 'Valid Until', renderer: NX.util.DateFormat.timestampRenderer() },
+          { xtype: 'displayfield', name: 'fingerprint', fieldLabel: 'Fingerprint' }
         ]
       }
     ];
