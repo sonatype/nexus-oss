@@ -29,10 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HttpRequest
   extends Request
 {
-  private final HttpServletRequest httpServletRequest;
-
   public HttpRequest(final HttpServletRequest httpServletRequest, final Repository repository, final String path) {
-    this.httpServletRequest = checkNotNull(httpServletRequest);
+    checkNotNull(httpServletRequest);
+
+    // decode http-servlet-request into normalized request bits
     this.repository = checkNotNull(repository);
     this.action = httpServletRequest.getMethod();
     this.path = checkNotNull(path);
@@ -42,10 +42,6 @@ public class HttpRequest
 
     // TODO: wrap payload if there is one
     this.payload = null;
-  }
-
-  public HttpServletRequest getHttpServletRequest() {
-    return httpServletRequest;
   }
 
   @Override
