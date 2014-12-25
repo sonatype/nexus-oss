@@ -39,6 +39,6 @@ public class SimpleHttpResponseSender
   public void send(final Response response, final HttpServletResponse httpServletResponse)
       throws ServletException, IOException
   {
-    // TODO:
+    httpServletResponse.sendError(404, "TEST");
   }
 }

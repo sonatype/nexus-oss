@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.manager;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -92,8 +93,14 @@ public class RepositoryManagerImpl
 
   @Override
   protected void doStart() throws Exception {
+    List<Configuration> configurations = store.list();
+    if (configurations.isEmpty()) {
+      log.debug("No repositories configured");
+      return;
+    }
+
     log.debug("Restoring repositories");
-    for (Configuration configuration : store.list()) {
+    for (Configuration configuration : configurations) {
       log.debug("Restoring repository: {}", configuration);
       Recipe recipe = recipe(configuration.getRecipeName());
       Repository repository = recipe.create(configuration);
@@ -112,6 +119,11 @@ public class RepositoryManagerImpl
 
   @Override
   protected void doStop() throws Exception {
+    if (repositories.isEmpty()) {
+      log.debug("No repositories defined");
+      return;
+    }
+
     log.debug("Stopping repositories");
     for (Repository repository : repositories.values()) {
       repository.stop();

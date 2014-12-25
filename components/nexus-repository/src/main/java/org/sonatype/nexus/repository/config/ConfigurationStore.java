@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import java.util.List;
+
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**
@@ -22,7 +24,7 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 public interface ConfigurationStore
   extends Lifecycle
 {
-  Iterable<Configuration> list();
+  List<Configuration> list();
 
   Configuration create(Configuration configuration);
 

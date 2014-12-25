@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.config;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -61,7 +63,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
-  public Iterable<Configuration> list() {
+  public List<Configuration> list() {
     try (ODatabaseDocumentTx db = openDb()) {
       return entityAdapter.browse(db, Lists.<Configuration>newArrayList());
     }

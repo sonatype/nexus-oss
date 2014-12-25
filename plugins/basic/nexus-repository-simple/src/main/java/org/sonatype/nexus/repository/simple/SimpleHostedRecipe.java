@@ -19,7 +19,9 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Type;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.view.ViewFacet;
 
 /**
  * Simple hosted repository recipe.
@@ -42,6 +44,7 @@ public class SimpleHostedRecipe
 
   @Override
   protected void init() throws Exception {
-    // TODO:
+    addFacet(ConfigurationFacet.class);
+    addFacet(ViewFacet.class);
   }
 }

@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.repository.entity;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -117,7 +117,7 @@ public abstract class EntityAdapter<T extends Entity>
   /**
    * Browse all entities, appending to given collection.
    */
-  public Iterable<T> browse(final ODatabaseDocumentTx db, final Collection<T> entities) {
+  public List<T> browse(final ODatabaseDocumentTx db, final List<T> entities) {
     checkNotNull(entities);
     for (ODocument document : browse(db)) {
       entities.add(read(document));
