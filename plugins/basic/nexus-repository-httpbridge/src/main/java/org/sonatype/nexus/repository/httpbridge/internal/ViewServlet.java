@@ -105,22 +105,31 @@ public class ViewServlet
   protected void doService(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws Exception
   {
-    final RepositoryPath repoPath = RepositoryPath.parse(httpRequest.getPathInfo());
-    checkState(repoPath != null, "Cannot parse repository path");
-    assert repoPath != null;
-
     // resolve repository for request
-    Repository repo = repository(repoPath.getRepositoryName());
+    RepositoryPath path = path(httpRequest);
+    log.debug("Parsed path: {}", path);
+
+    Repository repo = repository(path.getRepositoryName());
     log.debug("Repository: {}", repo);
 
     // dispatch request
     ViewFacet facet = repo.facet(ViewFacet.class);
     log.debug("View facet: {}", facet);
-    Response response = facet.dispatch(new HttpRequest(repo, httpRequest, repoPath.getRemainingPath()));
+    Response response = facet.dispatch(new HttpRequest(httpRequest, repo, path.getRemainingPath()));
 
     // send response
     log.debug("Sending response: {}", response);
     sender(repo).send(response, httpResponse);
+  }
+
+  /**
+   * Parse repository path.
+   */
+  private RepositoryPath path(final HttpServletRequest httpRequest) {
+    String pathInfo = httpRequest.getPathInfo();
+    RepositoryPath path = RepositoryPath.parse(httpRequest.getPathInfo());
+    checkState(path != null, "Unable parse repository path from: %s", pathInfo);
+    return path;
   }
 
   /**

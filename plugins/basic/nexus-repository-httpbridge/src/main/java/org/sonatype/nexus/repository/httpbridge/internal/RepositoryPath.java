@@ -41,6 +41,14 @@ public class RepositoryPath
     return remainingPath;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "repositoryName='" + repositoryName + '\'' +
+        ", remainingPath='" + remainingPath + '\'' +
+        '}';
+  }
+
   //
   // Parser
   //

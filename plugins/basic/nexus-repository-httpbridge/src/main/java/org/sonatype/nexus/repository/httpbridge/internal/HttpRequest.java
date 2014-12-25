@@ -12,15 +12,9 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
-import java.util.Map;
-
-import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.view.Headers;
-import org.sonatype.nexus.repository.view.Parameters;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Request;
 
 import com.google.common.collect.Maps;
@@ -33,69 +27,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class HttpRequest
-  implements Request
+  extends Request
 {
-  private final Repository repository;
-
   private final HttpServletRequest httpServletRequest;
 
-  private final String action;
-
-  private final String path;
-
-  private final Parameters parameters;
-
-  private final Headers headers;
-
-  private final Map<String, Object> attributes = Maps.newHashMap();
-
-  private Payload payload;
-
-  public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest, final String path) {
-    this.repository = checkNotNull(repository);
+  public HttpRequest(final HttpServletRequest httpServletRequest, final Repository repository, final String path) {
     this.httpServletRequest = checkNotNull(httpServletRequest);
+    this.repository = checkNotNull(repository);
     this.action = httpServletRequest.getMethod();
     this.path = checkNotNull(path);
     this.parameters = new HttpParameters(httpServletRequest);
     this.headers = new HttpHeaders(httpServletRequest);
+    this.attributes = Maps.newHashMap();
 
     // TODO: wrap payload if there is one
+    this.payload = null;
   }
 
-  @Override
-  public Repository getRepository() {
-    return repository;
-  }
-
-  @Override
-  public String getAction() {
-    return action;
-  }
-
-  @Override
-  public String getPath() {
-    return path;
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return attributes;
-  }
-
-  @Override
-  public Parameters getParameters() {
-    return parameters;
-  }
-
-  @Override
-  public Headers getHeaders() {
-    return headers;
-  }
-
-  @Nullable
-  @Override
-  public Payload getPayload() {
-    return payload;
+  public HttpServletRequest getHttpServletRequest() {
+    return httpServletRequest;
   }
 
   @Override

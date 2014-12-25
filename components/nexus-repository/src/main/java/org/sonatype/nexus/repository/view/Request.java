@@ -23,20 +23,61 @@ import org.sonatype.nexus.repository.Repository;
  *
  * @since 3.0
  */
-public interface Request
+public class Request
 {
-  Repository getRepository();
+  protected Repository repository;
 
-  String getAction();
+  protected String action;
 
-  String getPath();
+  protected String path;
 
-  Parameters getParameters();
+  protected Parameters parameters;
 
-  Headers getHeaders();
+  protected Headers headers;
 
-  Map<String, Object> getAttributes();
+  protected Map<String, Object> attributes;
+
+  protected Payload payload;
+
+  // TODO: Add setters and sanity conditions, and/or introduce a builder to be used for direct api usage?
+
+  public Repository getRepository() {
+    return repository;
+  }
+
+  public String getAction() {
+    return action;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  public Parameters getParameters() {
+    return parameters;
+  }
+
+  public Headers getHeaders() {
+    return headers;
+  }
+
+  public Map<String, Object> getAttributes() {
+    return attributes;
+  }
 
   @Nullable
-  Payload getPayload();
+  public Payload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String toString() {
+    // Excluding some members which could lead to very verbose logging
+    return getClass().getSimpleName() + "{" +
+        "action='" + action + '\'' +
+        ", path='" + path + '\'' +
+        ", parameters=" + parameters +
+        ", payload=" + payload +
+        '}';
+  }
 }
