@@ -12,15 +12,38 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.Repository;
+
+import static com.google.common.base.Preconditions.checkState;
+
 /**
- * Error response.
+ * Support for {@link ViewFacet} implementations.
  *
  * @since 3.0
  */
-public class ErrorResponse
-  extends Response
+public abstract class ViewFacetSupport
+  extends FacetSupport
+  implements ViewFacet
 {
-  public ErrorResponse(final Status status) {
-    super(status);
+  private Router router;
+
+  @Override
+  protected void doInit(final Repository repository) throws Exception {
+    router = createRouter();
+    log.debug("Created router: {}", router);
+  }
+
+  protected abstract Router createRouter() throws Exception;
+
+  @Override
+  public Router getRouter() {
+    checkState(router != null);
+    return router;
+  }
+
+  @Override
+  public Response dispatch(final Request request) throws Exception {
+    return getRouter().dispatch(request);
   }
 }

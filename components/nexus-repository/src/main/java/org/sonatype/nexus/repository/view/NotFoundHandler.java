@@ -17,7 +17,8 @@ package org.sonatype.nexus.repository.view;
  *
  * @since 3.0
  */
-public class NotFoundHandler implements Handler
+public class NotFoundHandler
+    implements Handler
 {
   @Override
   public Response handle(final Context context) throws Exception {

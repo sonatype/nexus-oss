@@ -75,21 +75,22 @@ public class ViewServlet
   }
 
   @Override
-  protected void service(final HttpServletRequest request, final HttpServletResponse response)
+  protected void service(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    String uri = request.getRequestURI();
-    if (request.getQueryString() != null) {
-      uri = String.format("%s?%s", uri, request.getQueryString());
+    String uri = httpRequest.getRequestURI();
+    if (httpRequest.getQueryString() != null) {
+      uri = String.format("%s?%s", uri, httpRequest.getQueryString());
     }
 
     if (log.isDebugEnabled()) {
-      log.debug("Servicing: {} {} ({})", request.getMethod(), uri, request.getRequestURL());
+      log.debug("Servicing: {} {} ({})", httpRequest.getMethod(), uri, httpRequest.getRequestURL());
     }
 
     MDC.put(getClass().getName(), uri);
     try {
-      doService(request, response);
+      doService(httpRequest, httpResponse);
+      log.debug("Service completed");
     }
     catch (Exception e) {
       log.warn("Service failure", e);
@@ -101,8 +102,10 @@ public class ViewServlet
     }
   }
 
-  protected void doService(final HttpServletRequest req, final HttpServletResponse resp) throws Exception {
-    final RepositoryPath repoPath = RepositoryPath.parse(req.getPathInfo());
+  protected void doService(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
+      throws Exception
+  {
+    final RepositoryPath repoPath = RepositoryPath.parse(httpRequest.getPathInfo());
     checkState(repoPath != null, "Cannot parse repository path");
     assert repoPath != null;
 
@@ -113,12 +116,11 @@ public class ViewServlet
     // dispatch request
     ViewFacet facet = repo.facet(ViewFacet.class);
     log.debug("View facet: {}", facet);
-
-    Response response = facet.getRouter().dispatch(new HttpRequest(repo, req, repoPath.getRemainingPath()));
-    log.debug("Response: {}", response);
+    Response response = facet.dispatch(new HttpRequest(repo, httpRequest, repoPath.getRemainingPath()));
 
     // send response
-    sender(repo).send(response, resp);
+    log.debug("Sending response: {}", response);
+    sender(repo).send(response, httpResponse);
   }
 
   /**

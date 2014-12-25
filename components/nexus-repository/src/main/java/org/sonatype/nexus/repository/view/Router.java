@@ -42,6 +42,12 @@ public class Router
 
     log.debug("Dispatching: {}", request);
 
+    // include more details about the request as trace logging
+    if (log.isTraceEnabled()) {
+      log.trace("Headers: {}", request.getHeaders());
+      log.trace("Attributes: {}", request.getAttributes());
+    }
+
     Context context = new Context(request);
     Route route = findRoute(context);
     log.debug("Selected route: {}", route);

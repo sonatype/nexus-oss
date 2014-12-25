@@ -14,6 +14,7 @@
 package org.sonatype.nexus.repository.simple;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
@@ -36,9 +38,26 @@ public class SimpleHttpResponseSender
   implements HttpResponseSender
 {
   @Override
-  public void send(final Response response, final HttpServletResponse httpServletResponse)
+  public void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    httpServletResponse.sendError(404, "TEST");
+    // TODO: attributes?
+
+    for (Map.Entry<String,String> header : response.getHeaders()) {
+      httpResponse.addHeader(header.getKey(), header.getValue());
+    }
+    // TODO: standard headers
+
+    // TODO: content-type
+    // TODO: content-length
+    // TODO: write payload
+
+    Status status = response.getStatus();
+    if (status.isSuccessful()) {
+      httpResponse.setStatus(status.getCode(), status.getMessage());
+    }
+    else {
+      httpResponse.sendError(status.getCode(), status.getMessage());
+    }
   }
 }

@@ -15,10 +15,8 @@ package org.sonatype.nexus.repository.raw;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.view.Router;
-import org.sonatype.nexus.repository.view.ViewFacet;
+import org.sonatype.nexus.repository.view.ViewFacetSupport;
 
 /**
  * A proxy for the remote content.
@@ -27,13 +25,12 @@ import org.sonatype.nexus.repository.view.ViewFacet;
  */
 @Named
 public class RawProxyViewFacet
-    extends FacetSupport
-    implements ViewFacet
+    extends ViewFacetSupport
 {
   public static final String CONFIG_KEY = "raw_proxy_view_facet";
 
   @Override
-  protected void doInit(final Repository repository) throws Exception {
+  protected Router createRouter() throws Exception {
     //final Configuration configuration = repository.getConfiguration();
     //
     //final Router router = getRouter();
@@ -57,10 +54,7 @@ public class RawProxyViewFacet
     //
     //// By default, return a 404
     //router.defaultHandlers(new DefaultRoute(Arrays.asList((Handler) new NotFoundHandler())));
-  }
 
-  @Override
-  public Router getRouter() {
     return null;
   }
 }

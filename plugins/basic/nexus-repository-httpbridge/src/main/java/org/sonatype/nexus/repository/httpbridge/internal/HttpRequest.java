@@ -23,6 +23,8 @@ import org.sonatype.nexus.repository.view.Parameters;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Request;
 
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -37,18 +39,27 @@ public class HttpRequest
 
   private final HttpServletRequest httpServletRequest;
 
+  private final String action;
+
   private final String path;
 
   private final Parameters parameters;
 
   private final Headers headers;
 
+  private final Map<String, Object> attributes = Maps.newHashMap();
+
+  private Payload payload;
+
   public HttpRequest(final Repository repository, final HttpServletRequest httpServletRequest, final String path) {
     this.repository = checkNotNull(repository);
     this.httpServletRequest = checkNotNull(httpServletRequest);
+    this.action = httpServletRequest.getMethod();
     this.path = checkNotNull(path);
     this.parameters = new HttpParameters(httpServletRequest);
     this.headers = new HttpHeaders(httpServletRequest);
+
+    // TODO: wrap payload if there is one
   }
 
   @Override
@@ -58,7 +69,7 @@ public class HttpRequest
 
   @Override
   public String getAction() {
-    return httpServletRequest.getMethod();
+    return action;
   }
 
   @Override
@@ -68,8 +79,7 @@ public class HttpRequest
 
   @Override
   public Map<String, Object> getAttributes() {
-    // TODO:
-    return null;
+    return attributes;
   }
 
   @Override
@@ -85,7 +95,16 @@ public class HttpRequest
   @Nullable
   @Override
   public Payload getPayload() {
-    // TODO:
-    return null;
+    return payload;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "action='" + action + '\'' +
+        ", path='" + path + '\'' +
+        ", parameters=" + parameters +
+        ", payload=" + payload +
+        '}';
   }
 }

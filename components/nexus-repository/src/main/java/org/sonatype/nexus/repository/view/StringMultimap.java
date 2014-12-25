@@ -105,6 +105,8 @@ public class StringMultimap
     return backing.keySet();
   }
 
+  // FIXME: Sort out size() and entries() mismatch?
+
   /**
    * Returns number of named entries.
    */

@@ -87,12 +87,13 @@ public class Context
 
     if (handlers.hasNext()) {
       Handler handler = handlers.next();
-      log.debug("Handler: {}", handler);
+      log.debug("Invoking handler: {}", handler);
 
       try {
         return handler.handle(this);
       }
       finally {
+        // retain handler position in-case of re-proceed
         if (handlers.hasPrevious()) {
           handlers.previous();
         }

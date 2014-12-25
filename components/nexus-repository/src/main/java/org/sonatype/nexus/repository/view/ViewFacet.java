@@ -24,4 +24,6 @@ public interface ViewFacet
     extends Facet
 {
   Router getRouter();
+
+  Response dispatch(Request request) throws Exception;
 }

@@ -32,4 +32,12 @@ public class PayloadResponse
   public Payload getPayload() {
     return payload;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "status=" + getStatus() +
+        ", payload=" + payload +
+        '}';
+  }
 }

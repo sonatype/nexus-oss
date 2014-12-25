@@ -26,7 +26,7 @@ import com.google.inject.servlet.ServletModule;
  * @since 3.0
  */
 @Named
-public class RepositoryHttpBridgeModule
+public class HttpBridgeModule
     extends AbstractModule
 {
   public static final String MOUNT_POINT = "/repository";

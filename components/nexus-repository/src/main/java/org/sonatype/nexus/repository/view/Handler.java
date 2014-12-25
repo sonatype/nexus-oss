@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.view;
 
 /**
- * ???
+ * View handler.
  *
  * @since 3.0
  */
