@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.view.payloads;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.view.Payload;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,8 +35,8 @@ public class StreamPayload
 
   private final InputStream stream;
 
-  public StreamPayload(final String contentType, final long size, final InputStream stream) {
-    this.contentType = checkNotNull(contentType);
+  public StreamPayload(final @Nullable String contentType, final long size, final InputStream stream) {
+    this.contentType = contentType;
     this.size = size;
     this.stream = checkNotNull(stream);
   }

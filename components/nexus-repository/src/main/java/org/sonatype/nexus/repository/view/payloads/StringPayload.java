@@ -16,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.view.Payload;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,8 +34,8 @@ public class StringPayload
 
   private final String content;
 
-  public StringPayload(final String contentType, final String content) {
-    this.contentType = checkNotNull(contentType);
+  public StringPayload(final @Nullable String contentType, final String content) {
+    this.contentType = contentType;
     this.content = checkNotNull(content);
   }
 

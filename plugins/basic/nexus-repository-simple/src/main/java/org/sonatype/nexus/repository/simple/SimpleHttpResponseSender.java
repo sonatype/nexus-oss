@@ -69,7 +69,9 @@ public class SimpleHttpResponseSender
     // write payload details if we have one
     if (response instanceof PayloadResponse) {
       Payload payload = ((PayloadResponse)response).getPayload();
-      httpResponse.setContentType(payload.getContentType());
+      if (payload.getContentType() != null) {
+        httpResponse.setContentType(payload.getContentType());
+      }
       httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
 
       webUtils.sendContent(payload.openInputStream(), httpResponse);
