@@ -13,24 +13,21 @@
 
 package org.sonatype.nexus.repository.simple;
 
-import java.io.ByteArrayInputStream;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.NotFoundHandler;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
-import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.repository.view.StreamPayload;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
-import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Simple {@link ViewFacet}.
@@ -41,6 +38,13 @@ import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 public class SimpleViewFacet
     extends ViewFacetSupport
 {
+  private final ContentHandler contentHandler;
+
+  @Inject
+  public SimpleViewFacet(final ContentHandler contentHandler) {
+    this.contentHandler = checkNotNull(contentHandler);
+  }
+
   @Override
   protected Router createRouter() throws Exception {
     Router.Builder builder = new Router.Builder();
@@ -57,26 +61,9 @@ public class SimpleViewFacet
         .create());
 
     builder.route(new Route.Builder()
-        .matcher(new RegexMatcher("/content/(.*)"))
-        .handler(new Handler() {
-          @Override
-          public Response handle(final Context context) throws Exception {
-            RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
-            String name = mr.getMatchResult().group(1);
-
-            byte[] content = String.format("Content name: %s", name).getBytes();
-            Response response = new PayloadResponse(
-                Status.success(200),
-                new StreamPayload("text/plain", content.length, new ByteArrayInputStream(content))
-            );
-
-            response.getHeaders().set("X-Simple-Content-Name", name);
-
-            return response;
-          }
-        })
+        .matcher(ContentHandler.MATCHER)
+        .handler(contentHandler)
         .create());
-
 
     builder.defaultHandlers(new NotFoundHandler());
 
