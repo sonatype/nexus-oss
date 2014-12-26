@@ -70,8 +70,8 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_FILTER_PLACEHOLDER: 'filter',
 
     // Pagination
-    //GLOBAL_PAGINATION_CONTROL: 'Page [X] of [Y]',
-    //GLOBAL_PAGINATION_DISPLAYED: 'Displaying [X] of [Y]',
+    //GLOBAL_PAGINATION_CONTROL: 'Page {0} of {1}',
+    //GLOBAL_PAGINATION_DISPLAYED: 'Displaying {0} of {1}',
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',
