@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import javax.annotation.Nonnull;
+
 /**
  * View handler.
  *
@@ -19,5 +21,6 @@ package org.sonatype.nexus.repository.view;
  */
 public interface Handler
 {
-  Response handle(Context context) throws Exception;
+  @Nonnull
+  Response handle(@Nonnull Context context) throws Exception;
 }
