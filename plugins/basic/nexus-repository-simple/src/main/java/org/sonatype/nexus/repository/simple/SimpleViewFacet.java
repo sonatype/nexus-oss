@@ -70,7 +70,7 @@ public class SimpleViewFacet
                 new StreamPayload("text/plain", content.length, new ByteArrayInputStream(content))
             );
 
-            response.getHeaders().set("X-Content-Name", name);
+            response.getHeaders().set("X-Simple-Content-Name", name);
 
             return response;
           }
