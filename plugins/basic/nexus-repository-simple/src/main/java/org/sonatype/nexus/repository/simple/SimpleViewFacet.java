@@ -62,11 +62,17 @@ public class SimpleViewFacet
           @Override
           public Response handle(final Context context) throws Exception {
             RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
-            byte[] content = ("Content name: " + mr.getMatchResult().group(1)).getBytes();
-            return new PayloadResponse(
+            String name = mr.getMatchResult().group(1);
+
+            byte[] content = String.format("Content name: %s", name).getBytes();
+            Response response = new PayloadResponse(
                 Status.success(200),
                 new StreamPayload("text/plain", content.length, new ByteArrayInputStream(content))
             );
+
+            response.getHeaders().set("X-Content-Name", name);
+
+            return response;
           }
         })
         .create());
