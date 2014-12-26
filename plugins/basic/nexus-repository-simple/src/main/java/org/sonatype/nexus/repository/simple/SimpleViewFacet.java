@@ -58,6 +58,7 @@ public class SimpleViewFacet
 
     builder.route(new Route.Builder()
         .matcher(new LiteralMatcher("/foo", true))
+        .handler(timingHandler)
         .handler(new Handler()
         {
           @Nonnull
