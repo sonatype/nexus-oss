@@ -59,7 +59,7 @@ public class SimpleViewFacet
           @NotNull
           @Override
           public Response handle(final @NotNull Context context) throws Exception {
-            return Responses.notFound("Xenu says no foo for you");
+            return Responses.notFound("Xenu says no /foo for you");
           }
         })
         .create());
