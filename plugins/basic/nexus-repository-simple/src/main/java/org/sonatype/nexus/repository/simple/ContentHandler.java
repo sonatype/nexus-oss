@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Payload;
@@ -39,6 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Simple content handler.
+ *
+ * Allows GET, PUT, DELETE to manage repository-specific named content in-memory.
  *
  * @since 3.0
  */
@@ -66,7 +69,22 @@ public class ContentHandler
     }
   }
 
-  private final Map<String, Content> contents = Maps.newConcurrentMap();
+  /**
+   * Map of repository-name -> [Map of content-name -> content]
+   */
+  private final Map<String,Map<String, Content>> allContents = Maps.newConcurrentMap();
+
+  /**
+   * Return collection of repository specific contents.
+   */
+  private Map<String, Content> repositoryContents(final Repository repository) {
+    Map<String,Content> contents = allContents.get(repository.getName());
+    if (contents == null) {
+      contents = Maps.newConcurrentMap();
+      allContents.put(repository.getName(), contents);
+    }
+    return contents;
+  }
 
   @Nonnull
   @Override
@@ -75,6 +93,8 @@ public class ContentHandler
     String method = context.getRequest().getAction();
 
     log.debug("{} content: {}", method, name);
+
+    Map<String, Content> contents = repositoryContents(context.getRequest().getRepository());
 
     switch (method) {
       case "GET": {
