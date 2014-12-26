@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.simple;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -28,6 +29,7 @@ import com.google.common.base.Stopwatch;
  * @since 3.0
  */
 @Named
+@Singleton
 public class TimingHandler
   extends ComponentSupport
   implements Handler

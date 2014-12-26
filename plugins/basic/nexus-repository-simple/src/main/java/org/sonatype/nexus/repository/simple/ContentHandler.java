@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -32,6 +33,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
  * @since 3.0
  */
 @Named
+@Singleton
 public class ContentHandler
   extends ComponentSupport
   implements Handler
