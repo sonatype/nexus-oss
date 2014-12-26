@@ -48,11 +48,18 @@ Ext.define('NX.I18n', {
 
   /**
    * @public
+   * @param key
+   * @param values
+   * @returns {String}
    */
-  format: function(key, params) {
+  format: function(key) {
     var text = this.get(key);
     if (text) {
-      text = Ext.String.format(text, params);
+      var params = Array.prototype.slice.call(arguments);
+      // replace first element with text
+      params.shift();
+      params.unshift(text);
+      text = Ext.String.format.apply(this, params);
     }
     return text;
   }
