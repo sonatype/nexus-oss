@@ -59,6 +59,10 @@ public class Status
         '}';
   }
 
+  //
+  // Helpers
+  //
+
   public static Status success(final int code, final String message) {
     return new Status(true, code, message);
   }
