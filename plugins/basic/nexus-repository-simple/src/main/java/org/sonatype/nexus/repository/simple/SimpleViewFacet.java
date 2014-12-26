@@ -40,10 +40,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleViewFacet
     extends ViewFacetSupport
 {
+  private final TimingHandler timingHandler;
+
   private final ContentHandler contentHandler;
 
   @Inject
-  public SimpleViewFacet(final ContentHandler contentHandler) {
+  public SimpleViewFacet(final TimingHandler timingHandler,
+                         final ContentHandler contentHandler)
+  {
+    this.timingHandler = checkNotNull(timingHandler);
     this.contentHandler = checkNotNull(contentHandler);
   }
 
@@ -65,6 +70,7 @@ public class SimpleViewFacet
 
     builder.route(new Route.Builder()
         .matcher(new RegexMatcher("/content/(.*)"))
+        .handler(timingHandler)
         .handler(contentHandler)
         .create());
 

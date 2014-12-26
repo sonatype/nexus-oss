@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -106,6 +107,7 @@ public class Context
    * Invokes the next handler in the handler chain. Interceptor-style handlers should invoke this from their {@link
    * Handler#handle(Context)} method and return the result.
    */
+  @Nonnull
   public Response proceed() throws Exception {
     log.debug("Proceed");
 
