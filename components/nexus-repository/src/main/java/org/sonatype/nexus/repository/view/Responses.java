@@ -15,6 +15,11 @@ package org.sonatype.nexus.repository.view;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Joiner;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Convenience methods for constructing various commonly used responses.
  *
@@ -38,5 +43,15 @@ public class Responses
    */
   public static Response methodNotAllowed() {
     return new Response(new Status(false, 405, null));
+  }
+
+  public static Response methodNotAllowed(final String methodName, final String... allowedMethods) {
+    checkNotNull(methodName);
+    checkNotNull(allowedMethods);
+    checkArgument(allowedMethods.length != 0);
+    Response response = new Response(Status.failure(405, methodName));
+    String allow = Joiner.on(',').join(allowedMethods);
+    response.getHeaders().set("Allow", allow);
+    return response;
   }
 }
