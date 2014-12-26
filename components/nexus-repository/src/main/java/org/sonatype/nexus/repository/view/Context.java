@@ -109,7 +109,7 @@ public class Context
    */
   @Nonnull
   public Response proceed() throws Exception {
-    log.debug("Proceed");
+    log.trace("Proceed");
 
     if (handlers.hasNext()) {
       Handler handler = handlers.next();
