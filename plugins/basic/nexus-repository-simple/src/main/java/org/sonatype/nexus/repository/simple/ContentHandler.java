@@ -60,8 +60,9 @@ public class ContentHandler
     public Content(final Payload payload) throws IOException {
       checkNotNull(payload);
       this.type = payload.getContentType();
-      InputStream input = checkNotNull(payload.openInputStream());
-      this.bytes = ByteStreams.toByteArray(input);
+      try (InputStream input = checkNotNull(payload.openInputStream())) {
+        this.bytes = ByteStreams.toByteArray(input);
+      }
     }
 
     public Payload toPayload() {
