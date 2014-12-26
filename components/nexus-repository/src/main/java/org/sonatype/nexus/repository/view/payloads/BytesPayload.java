@@ -58,7 +58,7 @@ public class BytesPayload
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "contentType='" + contentType + '\'' +
-        ", size='" + getSize() + '\'' +
+        ", size=" + getSize() +
         '}';
   }
 }
