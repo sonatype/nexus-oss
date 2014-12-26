@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.view;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class Router
-  extends ComponentSupport
+    extends ComponentSupport
 {
   private final List<Route> routes;
 
@@ -42,8 +43,12 @@ public class Router
   public Response dispatch(final Request request) throws Exception {
     checkNotNull(request);
 
+    boolean trace = log.isTraceEnabled();
+
     log.debug("Dispatching: {}", request);
-    logRequest(request);
+    if (trace) {
+      logRequest(request);
+    }
 
     Context context = new Context(request);
     Route route = findRoute(context);
@@ -52,55 +57,53 @@ public class Router
     context.setHandlers(route.getHandlers());
 
     Response response = context.proceed();
-    logResponse(response);
+    if (trace) {
+      logResponse(response);
+    }
 
     return response;
   }
 
   private void logRequest(final Request request) {
-    if (log.isTraceEnabled()) {
-      if (request.getHeaders().isEmpty()) {
-        log.trace("No request headers");
+    if (request.getHeaders().isEmpty()) {
+      log.trace("No request headers");
+    }
+    else {
+      log.trace("Request headers:");
+      for (Map.Entry<String, String> header : request.getHeaders()) {
+        log.trace("  {}: {}", header.getKey(), header.getValue());
       }
-      else {
-        log.trace("Request headers:");
-        for (Map.Entry<String,String> header : request.getHeaders()) {
-          log.trace("  {}: {}", header.getKey(), header.getValue());
-        }
-      }
+    }
 
-      if (request.getAttributes().isEmpty()) {
-        log.trace("No request attributes");
-      }
-      else {
-        log.trace("Request attributes:");
-        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
-          log.trace("  {}={}", entry.getKey(), entry.getValue());
-        }
+    if (request.getAttributes().isEmpty()) {
+      log.trace("No request attributes");
+    }
+    else {
+      log.trace("Request attributes:");
+      for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+        log.trace("  {}={}", entry.getKey(), entry.getValue());
       }
     }
   }
 
   private void logResponse(final Response response) {
-    if (log.isTraceEnabled()) {
-      if (response.getHeaders().isEmpty()) {
-        log.trace("No response headers");
+    if (response.getHeaders().isEmpty()) {
+      log.trace("No response headers");
+    }
+    else {
+      log.trace("Response headers:");
+      for (Map.Entry<String, String> header : response.getHeaders()) {
+        log.trace("  {}: {}", header.getKey(), header.getValue());
       }
-      else {
-        log.trace("Response headers:");
-        for (Map.Entry<String,String> header : response.getHeaders()) {
-          log.trace("  {}: {}", header.getKey(), header.getValue());
-        }
-      }
+    }
 
-      if (response.getAttributes().isEmpty()) {
-        log.trace("No response attributes");
-      }
-      else {
-        log.trace("Response attributes:");
-        for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
-          log.trace("  {}={}", entry.getKey(), entry.getValue());
-        }
+    if (response.getAttributes().isEmpty()) {
+      log.trace("No response attributes");
+    }
+    else {
+      log.trace("Response attributes:");
+      for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
+        log.trace("  {}={}", entry.getKey(), entry.getValue());
       }
     }
   }
