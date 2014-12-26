@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import javax.annotation.Nonnull;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -29,6 +31,7 @@ public class PayloadResponse
     this.payload = checkNotNull(payload);
   }
 
+  @Nonnull
   public Payload getPayload() {
     return payload;
   }

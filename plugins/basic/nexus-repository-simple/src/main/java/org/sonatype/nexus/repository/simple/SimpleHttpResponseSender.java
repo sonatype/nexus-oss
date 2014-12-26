@@ -32,7 +32,6 @@ import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 // TODO: Extract into default impl, as many formats may only need the same bits, but model to lookup still needs format-specific instance
 
@@ -71,8 +70,6 @@ public class SimpleHttpResponseSender
     // write payload details if we have one
     if (response instanceof PayloadResponse) {
       Payload payload = ((PayloadResponse)response).getPayload();
-      checkState(payload != null);
-
       if (payload.getContentType() != null) {
         httpResponse.setContentType(payload.getContentType());
       }
