@@ -44,7 +44,7 @@ public class BytesPayload
 
   @Override
   public long getSize() {
-    return content.length
+    return content.length;
   }
 
   @Override

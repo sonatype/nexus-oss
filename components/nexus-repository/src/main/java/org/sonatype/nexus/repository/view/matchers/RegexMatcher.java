@@ -30,7 +30,7 @@ public class RegexMatcher
   extends ComponentSupport
   implements Matcher
 {
-  public static interface Result
+  public static interface State
   {
     MatchResult getMatchResult();
   }
@@ -61,7 +61,7 @@ public class RegexMatcher
 
     if (m.matches()) {
       // expose match result in context
-      context.set(Result.class, new Result()
+      context.set(State.class, new State()
       {
         @Override
         public MatchResult getMatchResult() {
