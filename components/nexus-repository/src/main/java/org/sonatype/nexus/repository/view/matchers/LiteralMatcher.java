@@ -36,6 +36,10 @@ public class LiteralMatcher
     this.ignoreCase = ignoreCase;
   }
 
+  public LiteralMatcher(final String literal) {
+    this(literal, true);
+  }
+
   @Override
   public boolean matches(final Context context) {
     checkNotNull(context);

@@ -57,7 +57,7 @@ public class SimpleViewFacet
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
-        .matcher(new LiteralMatcher("/foo", true))
+        .matcher(new LiteralMatcher("/foo"))
         .handler(timingHandler)
         .handler(new Handler()
         {
@@ -72,10 +72,31 @@ public class SimpleViewFacet
     builder.route(new Route.Builder()
         .matcher(new RegexMatcher("/content/(.*)"))
         .handler(timingHandler)
+        .handler(new Handler()
+        {
+          @Nonnull
+          @Override
+          public Response handle(@Nonnull final Context context) throws Exception {
+            log.debug("Xenu approves");
+            return context.proceed();
+          }
+        })
         .handler(contentHandler)
         .create());
 
-    builder.defaultHandlers(new NotFoundHandler());
+    builder.defaultHandlers(
+        timingHandler,
+        new Handler()
+        {
+          @Nonnull
+          @Override
+          public Response handle(@Nonnull final Context context) throws Exception {
+            log.debug("Xenu may not be happy if you keep this up");
+            return context.proceed();
+          }
+        },
+        new NotFoundHandler()
+    );
 
     return builder.create();
   }

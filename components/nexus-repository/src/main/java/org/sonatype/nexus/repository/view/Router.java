@@ -20,6 +20,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * View router.
@@ -133,6 +134,7 @@ public class Router
     }
 
     public Builder defaultHandlers(final Handler... handlers) {
+      checkState(this.defaultRoute == null, "Default handlers already configured");
       this.defaultRoute = new DefaultRoute(handlers);
       return this;
     }

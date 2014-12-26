@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * View route.
@@ -67,6 +68,7 @@ public class Route
     private List<Handler> handlers = Lists.newArrayList();
 
     public Builder matcher(final Matcher matcher) {
+      checkState(this.matcher == null, "Matcher already configured");
       this.matcher = checkNotNull(matcher);
       return this;
     }
