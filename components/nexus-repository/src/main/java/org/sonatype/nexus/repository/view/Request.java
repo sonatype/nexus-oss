@@ -45,6 +45,8 @@ public class Request
     return repository;
   }
 
+  // FIXME: Sort out 'action' or 'method'
+
   public String getAction() {
     return action;
   }
