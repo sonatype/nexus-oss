@@ -13,18 +13,29 @@
 
 package org.sonatype.nexus.repository.simple;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
-import org.sonatype.nexus.repository.view.payloads.StringPayload;
+import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Simple content handler.
@@ -37,20 +48,71 @@ public class ContentHandler
     extends ComponentSupport
     implements Handler
 {
+  private static class Content
+  {
+    private final String type;
+
+    private final byte[] bytes;
+
+    public Content(final Payload payload) throws IOException {
+      checkNotNull(payload);
+      this.type = payload.getContentType();
+      InputStream input = checkNotNull(payload.openInputStream());
+      this.bytes = ByteStreams.toByteArray(input);
+    }
+
+    public Payload toPayload() {
+      return new BytesPayload(type, bytes);
+    }
+  }
+
+  private final Map<String, Content> contents = Maps.newConcurrentMap();
+
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
+    String name = contentName(context);
+    String method = context.getRequest().getAction();
+
+    log.debug("{} content: {}", method, name);
+
+    switch (method) {
+      case "GET": {
+        Content content = contents.get(name);
+        if (content == null) {
+          return Responses.notFound(name);
+        }
+        return new PayloadResponse(Status.success(200), content.toPayload());
+      }
+
+      case "PUT": {
+        Payload payload = context.getRequest().getPayload();
+        Content content = new Content(payload);
+        Content prev = contents.put(name, content);
+        if (prev == null) {
+          return new Response(Status.success(201));
+        }
+        return new Response(Status.success(204));
+      }
+
+      case "DELETE": {
+        Content prev = contents.remove(name);
+        if (prev == null) {
+          return Responses.notFound(name);
+        }
+        return new Response(Status.success(204));
+      }
+
+      default:
+        return Responses.methodNotAllowed(method, "GET", "PUT", "DELETE");
+    }
+  }
+
+  /**
+   * Find content name from request context matcher state.
+   */
+  private String contentName(final Context context) {
     RegexMatcher.State matchState = context.require(RegexMatcher.State.class);
-    String name = matchState.getMatchResult().group(1);
-
-    String content = String.format("Content name: %s", name);
-    Response response = new PayloadResponse(
-        Status.success(200),
-        new StringPayload("text/plain", content)
-    );
-
-    response.getHeaders().set("X-Simple-Content-Name", name);
-
-    return response;
+    return matchState.getMatchResult().group(1);
   }
 }
