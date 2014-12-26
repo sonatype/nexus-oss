@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.simple;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -27,8 +28,6 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
-
-import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -56,9 +55,9 @@ public class SimpleViewFacet
         .matcher(new LiteralMatcher("/foo", true))
         .handler(new Handler()
         {
-          @NotNull
+          @Nonnull
           @Override
-          public Response handle(final @NotNull Context context) throws Exception {
+          public Response handle(final @Nonnull Context context) throws Exception {
             return Responses.notFound("Xenu says no /foo for you");
           }
         })

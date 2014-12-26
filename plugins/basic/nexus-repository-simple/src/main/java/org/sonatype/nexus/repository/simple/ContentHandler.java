@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.simple;
 
 import java.io.ByteArrayInputStream;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.view.Context;
@@ -25,8 +26,6 @@ import org.sonatype.nexus.repository.view.StreamPayload;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Simple content handler.
  *
@@ -37,9 +36,9 @@ public class ContentHandler
   extends ComponentSupport
   implements Handler
 {
-  @NotNull
+  @Nonnull
   @Override
-  public Response handle(final @NotNull Context context) throws Exception {
+  public Response handle(final @Nonnull Context context) throws Exception {
     RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
     String name = mr.getMatchResult().group(1);
 
