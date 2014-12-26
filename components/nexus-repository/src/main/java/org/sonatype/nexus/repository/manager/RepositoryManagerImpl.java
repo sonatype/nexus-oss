@@ -171,7 +171,7 @@ public class RepositoryManagerImpl
       repository.stop();
     }
 
-    log.debug("Disposing {} repositories", repositories.size());
+    log.debug("Destroying {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
       repository.destroy();
     }
