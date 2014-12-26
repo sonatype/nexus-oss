@@ -39,6 +39,21 @@ Ext.define('NX.I18n', {
    * @public
    */
   get: function(key) {
-    return this.keys[key];
+    var text = this.keys[key];
+    if (!text) {
+      this.logWarn('Missing I18n key: ' + key);
+    }
+    return text;
+  },
+
+  /**
+   * @public
+   */
+  format: function(key, params) {
+    var text = this.get(key);
+    if (text) {
+      text = Ext.String.format(text, params);
+    }
+    return text;
   }
 });
