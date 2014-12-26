@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
+import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 
 /**
  * Simple {@link ViewFacet}.
@@ -40,16 +41,27 @@ public class SimpleViewFacet
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
-            .matcher(new LiteralMatcher("/foo", true))
-            .handler(new Handler()
-            {
-              @Override
-              public Response handle(final Context context) throws Exception {
-                return Responses.notFound("Xenu says no foo for you");
-              }
-            })
-            .create()
-    );
+        .matcher(new LiteralMatcher("/foo", true))
+        .handler(new Handler()
+        {
+          @Override
+          public Response handle(final Context context) throws Exception {
+            return Responses.notFound("Xenu says no foo for you");
+          }
+        })
+        .create());
+
+    builder.route(new Route.Builder()
+        .matcher(new RegexMatcher("/content/(.*)"))
+        .handler(new Handler() {
+          @Override
+          public Response handle(final Context context) throws Exception {
+            RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
+            return Responses.notFound("Content name: " + mr.getMatcher().group(1));
+          }
+        })
+        .create());
+
 
     builder.defaultHandlers(new NotFoundHandler());
 

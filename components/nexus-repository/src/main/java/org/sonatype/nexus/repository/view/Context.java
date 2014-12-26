@@ -48,34 +48,57 @@ public class Context
   }
 
   @Nullable
-  public Object get(String key) {
+  public Object get(final String key) {
+    checkNotNull(key);
     return attributes.get(key);
   }
 
   @Nullable
-  public <T> T get(Class<T> type) {
-    return (T) attributes.get(checkNotNull(type).getName());
+  @SuppressWarnings("unchecked")
+  public <T> T get(final Class<T> type) {
+    checkNotNull(type);
+    return (T) get(type.getName());
   }
 
-  public Object set(String key, Object value) {
+  public Object require(final String key) {
+    Object value = get(key);
+    checkState(value != null, "Missing context attribute: %s", key);
+    return value;
+  }
+
+  public <T> T require(final Class<T> type) {
+    T value = get(type);
+    checkState(value != null, "Missing context attribute: %s", type.getName());
+    return value;
+  }
+
+  public Object set(final String key, final Object value) {
+    checkNotNull(key);
+    log.trace("Set: {}={}", key, value);
     return attributes.put(key, value);
   }
 
-  public <T> T set(Class<T> type, T value) {
-    return (T) attributes.put(checkNotNull(type).getName(), value);
+  @SuppressWarnings("unchecked")
+  public <T> T set(final Class<T> type, final T value) {
+    checkNotNull(type);
+    return (T) set(type.getName(), value);
   }
 
-  public void remove(String key) {
+  public void remove(final String key) {
+    checkNotNull(key);
+    log.trace("Remove: {}", key);
     attributes.remove(key);
   }
 
-  public void remove(Class type) {
-    attributes.remove(checkNotNull(type).getName());
+  public void remove(final Class type) {
+    checkNotNull(type);
+    remove(type.getName());
   }
 
   public void setHandlers(final List<Handler> handlers) {
+    checkNotNull(handlers);
     checkState(this.handlers == null, "Handlers can only be set once.");
-    this.handlers = checkNotNull(handlers).listIterator();
+    this.handlers = handlers.listIterator();
   }
 
   /**

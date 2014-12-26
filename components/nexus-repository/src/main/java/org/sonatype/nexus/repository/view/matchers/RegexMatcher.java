@@ -40,6 +40,16 @@ public class RegexMatcher
     this.pattern = checkNotNull(pattern);
   }
 
+  public RegexMatcher(final String regex, final int flags) {
+    checkNotNull(regex);
+    this.pattern = Pattern.compile(regex, flags);
+  }
+
+  public RegexMatcher(final String regex) {
+    checkNotNull(regex);
+    this.pattern = Pattern.compile(regex);
+  }
+
   @Override
   public boolean matches(final Context context) {
     checkNotNull(context);
