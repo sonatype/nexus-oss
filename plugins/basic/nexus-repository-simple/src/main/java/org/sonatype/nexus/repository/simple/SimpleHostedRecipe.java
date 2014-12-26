@@ -51,6 +51,7 @@ public class SimpleHostedRecipe
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    // attach custom view facet
     repository.attach(viewFacet.get());
   }
 }

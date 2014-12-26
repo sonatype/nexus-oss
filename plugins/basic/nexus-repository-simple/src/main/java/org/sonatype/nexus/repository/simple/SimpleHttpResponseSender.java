@@ -58,12 +58,15 @@ public class SimpleHttpResponseSender
   {
     // TODO: attributes?
 
+    // add request headers
     for (Map.Entry<String,String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
 
+    // add standard headers
     webUtils.equipResponseWithStandardHeaders(httpResponse);
 
+    // write payload details if we have one
     if (response instanceof PayloadResponse) {
       Payload payload = ((PayloadResponse)response).getPayload();
       httpResponse.setContentType(payload.getContentType());
@@ -72,6 +75,7 @@ public class SimpleHttpResponseSender
       webUtils.sendContent(payload.openInputStream(), httpResponse);
     }
 
+    // Set or send status
     Status status = response.getStatus();
     if (status.isSuccessful()) {
       httpResponse.setStatus(status.getCode(), status.getMessage());
