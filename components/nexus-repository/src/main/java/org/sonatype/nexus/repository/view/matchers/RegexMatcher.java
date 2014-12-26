@@ -64,7 +64,7 @@ public class RegexMatcher
       context.set(Result.class, new Result()
       {
         @Override
-        public java.util.regex.Matcher getMatcher() {
+        public MatchResult getMatchResult() {
           return m;
         }
       });
