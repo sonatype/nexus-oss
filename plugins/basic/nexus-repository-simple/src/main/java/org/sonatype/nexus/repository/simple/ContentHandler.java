@@ -18,7 +18,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
@@ -36,8 +35,6 @@ public class ContentHandler
   extends ComponentSupport
   implements Handler
 {
-  public static final Matcher MATCHER = new RegexMatcher("/content/(.*)");
-
   @Override
   public Response handle(final Context context) throws Exception {
     RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);

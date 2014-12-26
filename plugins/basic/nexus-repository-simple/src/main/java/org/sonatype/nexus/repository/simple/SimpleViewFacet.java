@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
+import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -61,7 +62,7 @@ public class SimpleViewFacet
         .create());
 
     builder.route(new Route.Builder()
-        .matcher(ContentHandler.MATCHER)
+        .matcher(new RegexMatcher("/content/(.*)"))
         .handler(contentHandler)
         .create());
 
