@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.repository.simple;
 
-import java.io.ByteArrayInputStream;
-
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,8 +21,8 @@ import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.repository.view.StreamPayload;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
+import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
@@ -44,10 +42,10 @@ public class ContentHandler
     RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
     String name = mr.getMatchResult().group(1);
 
-    byte[] content = String.format("Content name: %s", name).getBytes();
+    String content = String.format("Content name: %s", name);
     Response response = new PayloadResponse(
         Status.success(200),
-        new StreamPayload("text/plain", content.length, new ByteArrayInputStream(content))
+        new StringPayload("text/plain", content)
     );
 
     response.getHeaders().set("X-Simple-Content-Name", name);

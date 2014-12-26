@@ -10,15 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view;
+package org.sonatype.nexus.repository.view.payloads;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.annotation.Nullable;
+import org.sonatype.nexus.repository.view.Payload;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * ???
+ * Stream payload.
  *
  * @since 3.0
  */
@@ -32,12 +34,11 @@ public class StreamPayload
   private final InputStream stream;
 
   public StreamPayload(final String contentType, final long size, final InputStream stream) {
-    this.contentType = contentType;
+    this.contentType = checkNotNull(contentType);
     this.size = size;
-    this.stream = stream;
+    this.stream = checkNotNull(stream);
   }
 
-  @Nullable
   @Override
   public String getContentType() {
     return contentType;
