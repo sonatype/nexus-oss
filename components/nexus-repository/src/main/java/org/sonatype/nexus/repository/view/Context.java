@@ -74,6 +74,7 @@ public class Context
 
   public Object set(final String key, final Object value) {
     checkNotNull(key);
+    checkNotNull(value);
     log.trace("Set: {}={}", key, value);
     return attributes.put(key, value);
   }
