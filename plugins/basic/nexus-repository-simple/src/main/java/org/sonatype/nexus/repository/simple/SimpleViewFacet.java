@@ -13,15 +13,20 @@
 
 package org.sonatype.nexus.repository.simple;
 
+import java.io.ByteArrayInputStream;
+
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.NotFoundHandler;
+import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
+import org.sonatype.nexus.repository.view.Status;
+import org.sonatype.nexus.repository.view.StreamPayload;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
@@ -57,7 +62,11 @@ public class SimpleViewFacet
           @Override
           public Response handle(final Context context) throws Exception {
             RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
-            return Responses.notFound("Content name: " + mr.getMatchResult().group(1));
+            byte[] content = ("Content name: " + mr.getMatchResult().group(1)).getBytes();
+            return new PayloadResponse(
+                Status.success(200),
+                new StreamPayload("text/plain", content.length, new ByteArrayInputStream(content))
+            );
           }
         })
         .create());

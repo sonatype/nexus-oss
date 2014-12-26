@@ -12,8 +12,10 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import javax.annotation.Nullable;
+
 /**
- * A representation of HTTP response status with an optional message.
+ * A representation of response status with an optional message.
  *
  * @since 3.0
  */
@@ -25,14 +27,14 @@ public class Status
 
   private final String message;
 
-  public Status(final boolean successful, final int code) {
-    this(successful, code, null);
-  }
-
-  public Status(final boolean successful, final int code, final String message) {
+  public Status(final boolean successful, final int code, final @Nullable String message) {
     this.successful = successful;
     this.code = code;
     this.message = message;
+  }
+
+  public Status(final boolean successful, final int code) {
+    this(successful, code, null);
   }
 
   public boolean isSuccessful() {
@@ -43,6 +45,7 @@ public class Status
     return code;
   }
 
+  @Nullable
   public String getMessage() {
     return message;
   }
@@ -54,5 +57,21 @@ public class Status
         ", code=" + code +
         ", message='" + message + '\'' +
         '}';
+  }
+
+  public static Status success(final int code, final String message) {
+    return new Status(true, code, message);
+  }
+
+  public static Status success(final int code) {
+    return new Status(true, code);
+  }
+
+  public static Status failure(final int code, final String message) {
+    return new Status(false, code, message);
+  }
+
+  public static Status failure(final int code) {
+    return new Status(false, code);
   }
 }

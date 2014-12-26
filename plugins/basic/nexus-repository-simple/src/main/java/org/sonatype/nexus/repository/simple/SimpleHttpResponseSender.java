@@ -16,15 +16,21 @@ package org.sonatype.nexus.repository.simple;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
+import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
+import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 // TODO: Extract into default impl, as many formats may only need the same bits, but model to lookup still needs format-specific instance
 
@@ -39,6 +45,13 @@ public class SimpleHttpResponseSender
   extends ComponentSupport
   implements HttpResponseSender
 {
+  private final WebUtils webUtils;
+
+  @Inject
+  public SimpleHttpResponseSender(final WebUtils webUtils) {
+    this.webUtils = checkNotNull(webUtils);
+  }
+
   @Override
   public void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
@@ -48,11 +61,16 @@ public class SimpleHttpResponseSender
     for (Map.Entry<String,String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
-    // TODO: standard headers
 
-    // TODO: content-type
-    // TODO: content-length
-    // TODO: write payload
+    webUtils.equipResponseWithStandardHeaders(httpResponse);
+
+    if (response instanceof PayloadResponse) {
+      Payload payload = ((PayloadResponse)response).getPayload();
+      httpResponse.setContentType(payload.getContentType());
+      httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
+
+      webUtils.sendContent(payload.openInputStream(), httpResponse);
+    }
 
     Status status = response.getStatus();
     if (status.isSuccessful()) {

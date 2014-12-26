@@ -42,29 +42,7 @@ public class Router
     checkNotNull(request);
 
     log.debug("Dispatching: {}", request);
-
-    // include more details about the request as trace logging
-    if (log.isTraceEnabled()) {
-      if (request.getHeaders().isEmpty()) {
-        log.trace("No headers");
-      }
-      else {
-        log.trace("Headers:");
-        for (Map.Entry<String,String> header : request.getHeaders()) {
-          log.trace("  {}: {}", header.getKey(), header.getValue());
-        }
-      }
-
-      if (request.getAttributes().isEmpty()) {
-        log.trace("No attributes");
-      }
-      else {
-        log.trace("Attributes:");
-        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
-          log.trace("  {}={}", entry.getKey(), entry.getValue());
-        }
-      }
-    }
+    logRequest(request);
 
     Context context = new Context(request);
     Route route = findRoute(context);
@@ -72,7 +50,58 @@ public class Router
 
     context.setHandlers(route.getHandlers());
 
-    return context.proceed();
+    Response response = context.proceed();
+    logResponse(response);
+
+    return response;
+  }
+
+  private void logRequest(final Request request) {
+    if (log.isTraceEnabled()) {
+      if (request.getHeaders().isEmpty()) {
+        log.trace("No request headers");
+      }
+      else {
+        log.trace("Request headers:");
+        for (Map.Entry<String,String> header : request.getHeaders()) {
+          log.trace("  {}: {}", header.getKey(), header.getValue());
+        }
+      }
+
+      if (request.getAttributes().isEmpty()) {
+        log.trace("No request attributes");
+      }
+      else {
+        log.trace("Request attributes:");
+        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+          log.trace("  {}={}", entry.getKey(), entry.getValue());
+        }
+      }
+    }
+  }
+
+  private void logResponse(final Response response) {
+    if (log.isTraceEnabled()) {
+      if (response.getHeaders().isEmpty()) {
+        log.trace("No response headers");
+      }
+      else {
+        log.trace("Response headers:");
+        for (Map.Entry<String,String> header : response.getHeaders()) {
+          log.trace("  {}: {}", header.getKey(), header.getValue());
+        }
+      }
+
+      if (response.getAttributes().isEmpty()) {
+        log.trace("No response attributes");
+      }
+      else {
+        log.trace("Response attributes:");
+        for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
+          log.trace("  {}={}", entry.getKey(), entry.getValue());
+        }
+      }
+    }
   }
 
   private Route findRoute(final Context context) {
