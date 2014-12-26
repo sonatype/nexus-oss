@@ -14,6 +14,7 @@
 package org.sonatype.nexus.repository.simple;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -74,7 +75,9 @@ public class SimpleHttpResponseSender
       }
       httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
 
-      webUtils.sendContent(payload.openInputStream(), httpResponse);
+      try (InputStream input = payload.openInputStream()) {
+        webUtils.sendContent(input, httpResponse);
+      }
     }
 
     // Set or send status
