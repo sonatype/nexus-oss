@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.view.matchers;
 
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 import org.sonatype.nexus.repository.view.Context;
@@ -31,7 +32,7 @@ public class RegexMatcher
 {
   public static interface Result
   {
-    java.util.regex.Matcher getMatcher();
+    MatchResult getMatchResult();
   }
 
   private final Pattern pattern;

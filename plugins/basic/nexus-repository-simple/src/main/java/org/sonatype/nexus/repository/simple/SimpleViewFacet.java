@@ -57,7 +57,7 @@ public class SimpleViewFacet
           @Override
           public Response handle(final Context context) throws Exception {
             RegexMatcher.Result mr = context.require(RegexMatcher.Result.class);
-            return Responses.notFound("Content name: " + mr.getMatcher().group(1));
+            return Responses.notFound("Content name: " + mr.getMatchResult().group(1));
           }
         })
         .create());
