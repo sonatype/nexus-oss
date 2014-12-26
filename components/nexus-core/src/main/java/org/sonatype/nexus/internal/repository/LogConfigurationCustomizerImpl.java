@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
 
-import static org.sonatype.nexus.log.LoggerLevel.DEBUG;
+import static org.sonatype.nexus.log.LoggerLevel.TRACE;
 
 /**
  * Repository {@link LogConfigurationCustomizer}.
@@ -31,7 +31,7 @@ public class LogConfigurationCustomizerImpl
 {
   @Override
   public void customize(final Configuration config) {
-    // HACK: DEBUG for testing, change to DEFAULT later
-    config.setLoggerLevel("org.sonatype.nexus.repository", DEBUG);
+    // HACK: TRACE for testing, change to DEFAULT later
+    config.setLoggerLevel("org.sonatype.nexus.repository", TRACE);
   }
 }

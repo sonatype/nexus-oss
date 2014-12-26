@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.view;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 /**
  * Payload.
  *
@@ -22,6 +24,9 @@ import java.io.InputStream;
  */
 public interface Payload
 {
+  long UNKNOWN_SIZE = -1;
+
+  @Nullable
   String getContentType();
 
   long getSize();

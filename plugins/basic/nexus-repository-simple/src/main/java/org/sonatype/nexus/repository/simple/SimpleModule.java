@@ -3,7 +3,6 @@ package org.sonatype.nexus.repository.simple;
 import javax.inject.Named;
 
 import com.google.inject.AbstractModule;
-import org.eclipse.sisu.bean.LifecycleModule;
 
 /**
  * Simple repository module.
@@ -16,6 +15,6 @@ public class SimpleModule
 {
   @Override
   protected void configure() {
-    install(new LifecycleModule());
+    // TODO:
   }
 }

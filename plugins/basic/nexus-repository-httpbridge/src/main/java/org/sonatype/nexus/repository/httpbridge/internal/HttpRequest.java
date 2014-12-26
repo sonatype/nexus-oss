@@ -12,9 +12,14 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Request;
 
 import com.google.common.collect.Maps;
@@ -40,8 +45,8 @@ public class HttpRequest
     this.headers = new HttpHeaders(httpServletRequest);
     this.attributes = Maps.newHashMap();
 
-    // TODO: wrap payload if there is one
-    this.payload = null;
+    // TODO: Can we tell if there is a payload or not from HttpServletRequest api?
+    this.payload = new PayloadImpl(httpServletRequest);
   }
 
   @Override
@@ -52,5 +57,45 @@ public class HttpRequest
         ", parameters=" + parameters +
         ", payload=" + payload +
         '}';
+  }
+
+  private static class PayloadImpl
+    implements Payload
+  {
+    private final HttpServletRequest request;
+
+    private final String contentType;
+
+    private final long size;
+
+    public PayloadImpl(final HttpServletRequest request) {
+      this.request = request;
+      this.contentType = request.getContentType();
+      this.size = request.getContentLength();
+    }
+
+    @Nullable
+    @Override
+    public String getContentType() {
+      return contentType;
+    }
+
+    @Override
+    public long getSize() {
+      return size;
+    }
+
+    @Override
+    public InputStream openInputStream() throws IOException {
+      return request.getInputStream();
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "contentType='" + contentType + '\'' +
+          ", size=" + size +
+          '}';
+    }
   }
 }

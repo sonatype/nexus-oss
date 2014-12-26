@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.view;
 
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -44,8 +45,25 @@ public class Router
 
     // include more details about the request as trace logging
     if (log.isTraceEnabled()) {
-      log.trace("Headers: {}", request.getHeaders());
-      log.trace("Attributes: {}", request.getAttributes());
+      if (request.getHeaders().isEmpty()) {
+        log.trace("No headers");
+      }
+      else {
+        log.trace("Headers:");
+        for (Map.Entry<String,String> header : request.getHeaders()) {
+          log.trace("  {}: {}", header.getKey(), header.getValue());
+        }
+      }
+
+      if (request.getAttributes().isEmpty()) {
+        log.trace("No attributes");
+      }
+      else {
+        log.trace("Attributes:");
+        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+          log.trace("  {}={}", entry.getKey(), entry.getValue());
+        }
+      }
     }
 
     Context context = new Context(request);
