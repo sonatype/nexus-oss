@@ -804,7 +804,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     USER_ACCOUNT_EMAIL: 'Email',
     USER_ACCOUNT_EMAIL_HELP: 'Your email address, to notify you when necessary.',
     USER_ACCOUNT_EMAIL_PLACEHOLDER: 'enter an email address',
-    USER_ACCOUNT_PASSWORD_BUTTON: 'Change Password>'
+    USER_ACCOUNT_PASSWORD_BUTTON: 'Change Password'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
