@@ -369,9 +369,6 @@ Ext.define('NX.controller.State', {
                   // retry after the dialog is dismissed
                   me.statusProvider.connect();
                 }
-
-                // FIXME: Show "Retry" as button text
-                // FIXME: Get icon to show up ... stupid icons
               }
           );
         }
