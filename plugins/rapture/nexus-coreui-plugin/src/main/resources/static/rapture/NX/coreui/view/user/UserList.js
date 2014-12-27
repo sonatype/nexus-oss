@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.user.UserList', {
   ],
 
   viewConfig: {
-    emptyText: 'No users defined',
+    emptyText: NX.I18n.get('ADMIN_USERS_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 

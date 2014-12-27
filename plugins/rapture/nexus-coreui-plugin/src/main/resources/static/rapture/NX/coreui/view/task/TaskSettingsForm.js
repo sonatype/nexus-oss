@@ -28,10 +28,10 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     submit: 'NX.direct.coreui_Task.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Task updated: ' + data['name'] + ' (' + data['typeName'] + ')';
+    return NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS') + data['name'] + ' (' + data['typeName'] + ')';
   },
 
-  editableMarker: 'You do not have permission to update tasks or task is not user manageable',
+  editableMarker: NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_ERROR'),
 
   items: [
     {

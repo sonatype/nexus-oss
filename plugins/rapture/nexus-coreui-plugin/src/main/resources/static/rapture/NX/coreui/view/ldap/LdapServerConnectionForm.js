@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
     return 'LDAP server updated: ' + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
+  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-connection-fieldset' },
 

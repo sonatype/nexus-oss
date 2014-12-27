@@ -47,8 +47,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_PLACEHOLDER'),
         editable: false,
         store: [
-          ['RELEASE', 'Release'],
-          ['SNAPSHOT', 'Snapshots']
+          ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_RELEASE_ITEM')],
+          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_SNAPSHOTS_ITEM')]
         ],
         queryMode: 'local',
         readOnly: true,
@@ -64,9 +64,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
         editable: false,
         store: [
-          ['ALLOW_WRITE', 'Allow Redeploy'],
-          ['ALLOW_WRITE_ONCE', 'Disable Redeploy'],
-          ['READ_ONLY', 'Read Only']
+          ['ALLOW_WRITE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
+          ['ALLOW_WRITE_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
+          ['READ_ONLY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
         ],
         queryMode: 'local'
       },

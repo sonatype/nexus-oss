@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
     'NX.Conditions'
   ],
 
-  title: 'Create new route',
+  title: NX.I18n.get('ADMIN_ROUTING_CREATE_TITLE'),
   defaultFocus: 'pattern',
 
   /**
@@ -39,10 +39,10 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
         submit: 'NX.direct.coreui_RepositoryRoute.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Repository route created: ' + data['pattern'];
+        return NX.I18n.get('ADMIN_ROUTING_CREATE_SUCCESS') + data['pattern'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
-      editableMarker: 'You do not have permission to create routes'
+      editableMarker: NX.I18n.get('ADMIN_ROUTING_CREATE_ERROR')
     };
 
     me.callParent();

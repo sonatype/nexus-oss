@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
     'NX.Icons'
   ],
 
-  title: 'Load certificate from server',
+  title: NX.I18n.get('ADMIN_SSL_LOAD_TITLE'),
   defaultFocus: 'server',
 
   /**
@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
           },
           items: [
             { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-server', 'x32') },
-            { xtype: 'container', html: 'Please enter a hostname, hostname:port or a URL to fetch a SSL certificate from.' }
+            { xtype: 'container', html: NX.I18n.get('ADMIN_SSL_LOAD_HELP') }
           ]
         },
         {
@@ -58,8 +58,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
       ],
 
       buttons: [
-        { text: 'Load Certificate', action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('ADMIN_SSL_LOAD_SUBMIT_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_LOAD_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

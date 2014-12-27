@@ -48,12 +48,12 @@ Ext.define('NX.view.SettingsForm', {
   /**
    * @cfg {string/function} [settingsFormLoadMessage: 'Loading...'] Text to be used as mask while loading data.
    */
-  settingsFormLoadMessage: 'Loading...',
+  settingsFormLoadMessage: NX.I18n.get('GLOBAL_SETTINGS_LOADING'),
 
   /**
    * @cfg {string/function} [settingsFormSubmitMessage: 'Saving...'] Text to be used as mask while submitting data.
    */
-  settingsFormSubmitMessage: 'Saving...',
+  settingsFormSubmitMessage: NX.I18n.get('GLOBAL_SETTINGS_SAVING'),
 
   /**
    * @cfg {NX.util.condition.Condition} The condition to be satisfied in order for this form to be editable.
@@ -76,8 +76,8 @@ Ext.define('NX.view.SettingsForm', {
   buttonAlign: 'left',
 
   buttons: [
-    { text: 'Save', formBind: true, action: 'save', ui: 'primary', bindToEnter: false },
-    { text: 'Discard',
+    { text: NX.I18n.get('GLOBAL_BUTTON_SAVE'), formBind: true, action: 'save', ui: 'primary', bindToEnter: false },
+    { text: NX.I18n.get('GLOBAL_BUTTON_DISCARD'),
       handler: function () {
         var form = this.up('form'),
             record = form.getRecord();

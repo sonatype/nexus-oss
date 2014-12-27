@@ -30,31 +30,31 @@ Ext.define('NX.coreui.view.upload.UploadArtifactCoordinates', {
     {
       name: 'groupId',
       itemId: 'groupId',
-      fieldLabel: 'Group',
-      helpText: 'Maven group id of uploaded artifacts.',
-      emptyText: 'enter a group name'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP'),
+      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP_HELP'),
+      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP_PLACEHOLDER')
     },
     {
       name: 'artifactId',
       itemId: 'artifactId',
-      fieldLabel: 'Artifact',
-      helpText: 'Maven artifact id of uploaded artifacts.',
-      emptyText: 'enter an artifact name'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID'),
+      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID_HELP'),
+      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID_PLACEHOLDER')
     },
     {
       name: 'version',
       itemId: 'version',
-      fieldLabel: 'Version',
-      helpText: 'Maven version of uploaded artifacts.',
-      emptyText: 'enter a version'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION'),
+      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION_HELP'),
+      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION_PLACEHOLDER')
     },
     {
       xtype: 'combo',
       name: 'packaging',
       itemId: 'packaging',
-      fieldLabel: 'Packaging',
-      helpText: 'Maven packaging.',
-      emptyText: 'select or enter packaging',
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING'),
+      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING_HELP'),
+      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING_PLACEHOLDER'),
       queryMode: 'local',
       displayField: 'name',
       valueField: 'id',

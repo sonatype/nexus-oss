@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
     submit: 'NX.direct.coreui_User.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'User updated: ' + data['userId'];
+    return NX.I18n.get('ADMIN_USERS_UPDATE_SUCCESS') + data['userId'];
   },
 
   editableMarker: 'You do not have permission to update users or is an external user',

@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
           submit: 'NX.direct.coreui_RealmSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure realms',
+        editableMarker: NX.I18n.get('ADMIN_REALMS_UPDATE_ERROR'),
 
         items: [
           {

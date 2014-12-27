@@ -37,27 +37,27 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
     me.items = [
       {
         name: namePrefix + 'uthUsername',
-        fieldLabel: 'Username',
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
-        fieldLabel: 'Password'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
       },
       {
         xtype: 'label',
-        html: 'Windows NT Lan Manager options:'
+        html: NX.I18n.get('ADMIN_AUTHENTICATION_NT')
       },
       {
         name: namePrefix + 'uthNtlmHost',
-        fieldLabel: 'NT LAN Host',
-        helpText: 'Lan Manager host-name.'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST'),
+        helpText: NX.I18n.get('ADMIN_AUTHENTICATION_HOST_HELP')
       },
       {
         name: namePrefix + 'uthNtlmDomain',
-        fieldLabel: 'NT LAN Manager Domain',
-        helpText: 'Lan Manager domain-name.'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN'),
+        helpText: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN_HELP')
       }
     ];
 

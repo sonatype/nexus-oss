@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
     'NX.Conditions'
   ],
 
-  title: 'Create new role',
+  title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),
   defaultFocus: 'id',
 
   initComponent: function() {
@@ -39,7 +39,7 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
         return 'Role created: ' + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
-      editableMarker: 'You do not have permission to create roles',
+      editableMarker: NX.I18n.get('ADMIN_ROLES_CREATE_ERROR'),
       source: me.source
     };
 

@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
     'NX.Icons'
   ],
 
-  title: 'Paste certificate as PEM',
+  title: NX.I18n.get('ADMIN_SSL_PASTE_TITLE'),
   defaultFocus: 'pem',
 
   /**
@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
           },
           items: [
             { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-pem', 'x32') },
-            { xtype: 'container', html: 'Please paste a SSL certificate in PEM format.' }
+            { xtype: 'container', html: NX.I18n.get('ADMIN_SSL_PASTE_HELP') }
           ]
         },
         {
@@ -57,8 +57,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
       ],
 
       buttons: [
-        { text: 'Load Certificate', action: 'load', formBind: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('ADMIN_SSL_PASTE_SUBMIT_BUTTON'), action: 'load', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_PASTE_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

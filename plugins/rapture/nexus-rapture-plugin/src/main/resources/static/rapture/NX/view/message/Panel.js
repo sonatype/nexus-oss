@@ -60,7 +60,7 @@ Ext.define('NX.view.message.Panel', {
       ],
       hideHeaders: true,
       viewConfig: {
-        emptyText: 'No messages',
+        emptyText: NX.I18n.get('GLOBAL_MESSAGES_EMPTY_STATE'),
         deferEmptyText: false
       }
     }

@@ -51,8 +51,8 @@ Ext.define('NX.coreui.view.upload.UploadFile', {
 
   buttonAlign: 'left',
   buttons: [
-    { text: 'Upload', action: 'upload', ui: 'primary', formBind: true },
-    { text: 'Discard', action: 'discard' }
+    { text: NX.I18n.get('BROWSE_UPLOAD_BUTTON'), action: 'upload', ui: 'primary', formBind: true },
+    { text: NX.I18n.get('BROWSE_UPLOAD_DISCARD_BUTTON'), action: 'discard' }
   ]
 
 });

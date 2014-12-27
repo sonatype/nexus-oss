@@ -30,13 +30,13 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Anonymous security settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_AnonymousSettings.read',
           submit: 'NX.direct.coreui_AnonymousSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure anonymous user',
+        editableMarker: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_ERROR'),
         items: [
           {
             xtype: 'label',

@@ -28,10 +28,10 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
     submit: 'NX.direct.coreui_RepositoryTarget.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository target updated: ' + data['name'];
+    return NX.I18n.get('ADMIN_TARGETS_UPDATE_SUCCESS') + data['name'];
   },
 
-  editableMarker: 'You do not have permission to update targets',
+  editableMarker: NX.I18n.get('ADMIN_TARGETS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;

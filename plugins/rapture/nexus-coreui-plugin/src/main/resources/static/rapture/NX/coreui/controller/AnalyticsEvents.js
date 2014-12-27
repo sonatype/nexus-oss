@@ -70,7 +70,8 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Analytics/Events',
-      description: 'View recorded analytics events',
+      text: NX.I18n.get('ADMIN_EVENTS_TITLE'),
+      description: NX.I18n.get('ADMIN_EVENTS_SUBTITLE'),
       view: { xtype: 'nx-coreui-analytics-event-list' },
       iconConfig: {
         file: 'transmit.png',

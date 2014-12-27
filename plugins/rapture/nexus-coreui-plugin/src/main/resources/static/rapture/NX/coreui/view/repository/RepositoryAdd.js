@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     'NX.Conditions'
   ],
 
-  editableMarker: 'You do not have permission to create repositories',
+  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 
   defaultFocus: 'id',
 

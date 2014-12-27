@@ -48,40 +48,40 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
       }
     },
     {
-      header: 'Type',
+      header: NX.I18n.get('ADMIN_EVENTS_TYPE_COLUMN'),
       dataIndex: 'type',
       flex: 1,
-      tooltip: 'Event type'
+      tooltip: NX.I18n.get('ADMIN_EVENTS_TYPE_TOOLTIP')
     },
     {
-      header: 'Timestamp',
+      header: NX.I18n.get('ADMIN_EVENTS_TIMESTAMP_COLUMN'),
       dataIndex: 'timestamp',
       flex: 1,
-      tooltip: 'Event timestamp in milliseconds'
+      tooltip: NX.I18n.get('ADMIN_EVENTS_TIMESTAMP_TOOLTIP')
     },
     {
       header: 'Sequence',
       dataIndex: 'sequence',
       flex: 1,
-      tooltip: 'Event sequence'
+      tooltip: NX.I18n.get('ADMIN_EVENTS_SEQUENCE_TOOLTIP')
     },
     {
-      header: 'Duration',
+      header: NX.I18n.get('ADMIN_EVENTS_DURATION_COLUMN'),
       dataIndex: 'duration',
       flex: 1,
-      tooltip: 'Event duration in nanoseconds'
+      tooltip: NX.I18n.get('ADMIN_EVENTS_DURATION_TOOLTIP')
     },
     {
-      header: 'User',
+      header: NX.I18n.get('ADMIN_EVENTS_USER_COLUMN'),
       dataIndex: 'userId',
       flex: 1,
-      tooltip: 'Event user identifier.  This value is anonymized when exporting and submitting'
+      tooltip: NX.I18n.get('ADMIN_EVENTS_USER_TOOLTIP')
     },
     {
-      header: 'Attributes',
+      header: NX.I18n.get('ADMIN_EVENTS_ATTRIBUTES_COLUMN'),
       dataIndex: 'attributes',
       flex: 3,
-      tooltip: 'Event attributes specific to the event type',
+      tooltip: NX.I18n.get('ADMIN_EVENTS_ATTRIBUTES_TOOLTIP'),
       renderer: function (value) {
         var text = '';
         Ext.Object.each(value, function (name, value) {
@@ -98,24 +98,24 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
   tbar: [
     {
       xtype: 'button',
-      text: 'Clear',
-      tooltip: 'Clear all event data',
+      text: NX.I18n.get('ADMIN_EVENTS_CLEAR_BUTTON'),
+      tooltip: NX.I18n.get('ADMIN_EVENTS_CLEAR_TOOLTIP'),
       glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
       action: 'clear',
       disabled: true
     },
     {
       xtype: 'button',
-      text: 'Export',
-      tooltip: 'Export and download event data',
+      text: NX.I18n.get('ADMIN_EVENTS_EXPORT_BUTTON'),
+      tooltip: NX.I18n.get('ADMIN_EVENTS_EXPORT_TOOLTIP'),
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'export'
     },
     '-',
     {
       xtype: 'button',
-      text: 'Submit',
-      tooltip: 'Submit event data to Sonatype',
+      text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_BUTTON'),
+      tooltip: NX.I18n.get('ADMIN_EVENTS_SUBMIT_TOOLTIP'),
       glyph: 'xf0ee@FontAwesome' /* fa-cloud-upload */,
       action: 'submit',
       disabled: true

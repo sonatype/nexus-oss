@@ -33,13 +33,13 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'SMTP system settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_SMTP_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_SmtpSettings.read',
           submit: 'NX.direct.coreui_SmtpSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure SMTP',
+        editableMarker: NX.I18n.get('ADMIN_SMTP_UPDATE_ERROR'),
 
         items: [
           {

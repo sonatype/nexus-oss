@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
       'NX.Conditions'
   ],
 
-  title: 'Create new task',
+  title: NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'),
 
   /**
    * @override
@@ -38,10 +38,10 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
         submit: 'NX.direct.coreui_Task.create'
       },
       settingsFormSuccessMessage: function (data) {
-        return 'Task created: ' + data['name'] + ' (' + data['typeName'] + ')';
+        return NX.I18n.get('ADMIN_TASKS_CREATE_SUCCESS') + data['name'] + ' (' + data['typeName'] + ')';
       },
       editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'create'),
-      editableMarker: 'You do not have permission to create tasks',
+      editableMarker: NX.I18n.get('ADMIN_TASKS_CREATE_ERROR'),
       items: {
         xtype: 'tabpanel',
         plain: true,
@@ -56,9 +56,9 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
             items: [
               {
                 xtype: 'combo',
-                fieldLabel: 'Type',
+                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE'),
                 itemCls: 'required-field',
-                helpText: "The type of service that will be scheduled to run.",
+                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE_HELP'),
                 name: 'typeId',
                 store: me.taskTypeStore,
                 displayField: 'name',
@@ -67,28 +67,28 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
                 editable: false,
                 mode: 'local',
                 triggerAction: 'all',
-                emptyText: 'Select...',
+                emptyText: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE_PLACEHOLDER'),
                 selectOnFocus: false
               },
               {
                 xtype: 'checkbox',
-                fieldLabel: 'Enabled',
-                helpText: 'This flag determines if the task is currently active. To disable this task for a period of time, de-select this checkbox.',
+                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_ENABLED'),
+                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_ENABLED_HELP'),
                 name: 'enabled',
                 checked: true,
                 editable: true
               },
               {
                 name: 'name',
-                fieldLabel: 'Name',
-                helpText: 'A name for the scheduled task.',
-                emptyText: 'enter a name'
+                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_NAME'),
+                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_NAME_HELP'),
+                emptyText: NX.I18n.get('ADMIN_TASKS_CREATE_NAME_PLACEHOLDER')
               },
               {
                 xtype: 'nx-email',
                 name: 'alertEmail',
-                fieldLabel: 'Alert Email',
-                helpText: 'The email address where an email will be sent in case that task execution will fail.',
+                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_EMAIL'),
+                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_EMAIL_HELP'),
                 allowBlank: true
               },
               {
@@ -98,7 +98,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
           },
           {
             xtype: 'panel',
-            title: 'Schedule',
+            title: NX.I18n.get('ADMIN_TASKS_CREATE_SCHEDULE'),
             items: { xtype: 'nx-coreui-task-schedulefieldset' }
           }
         ]

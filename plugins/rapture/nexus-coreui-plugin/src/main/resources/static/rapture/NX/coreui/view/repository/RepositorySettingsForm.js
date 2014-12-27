@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
    * @cfg template repository template object
    */
 
-  editableMarker: 'You do not have permission to update repositories',
+  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;

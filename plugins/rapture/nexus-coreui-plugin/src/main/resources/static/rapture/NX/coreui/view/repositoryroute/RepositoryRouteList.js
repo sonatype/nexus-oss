@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteList', {
   ],
 
   viewConfig: {
-    emptyText: 'No repository routes defined',
+    emptyText: NX.I18n.get('ADMIN_ROUTING_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 

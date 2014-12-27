@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
     'NX.Conditions'
   ],
 
-  title: 'Change Password',
+  title: NX.I18n.get('ADMIN_USERS_PASSWORD_TITLE'),
   defaultFocus: 'password',
 
   /**
@@ -41,35 +41,35 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
     me.items = {
       xtype: 'nx-settingsform',
       editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
-      editableMarker: 'You do not have permission to change your password',
+      editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
 
       items: [
         {
           xtype: 'label',
-          html: 'Please enter a new password and enter it again to confirm.'
+          html: NX.I18n.get('ADMIN_USERS_PASSWORD_HELP')
         },
         {
           xtype: 'nx-password',
           name: 'password',
           itemId: 'password',
-          fieldLabel: 'New Password',
-          emptyText: 'enter password'
+          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW'),
+          emptyText: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW_PLACEHOLDER')
         },
         {
           xtype: 'nx-password',
-          fieldLabel: 'Confirm Password',
-          emptyText: 'confirm password',
+          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_CONFIRM'),
+          emptyText: NX.I18n.get('ADMIN_USERS_PASSWORD_CONFIRM_PLACEHOLDER'),
           submitValue: false,
           validator: function () {
             var me = this;
-            return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
+            return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('ADMIN_USERS_CREATE_NO_MATCH');
           }
         }
       ],
 
       buttons: [
-        { text: 'Change password', action: 'changepassword', formBind: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('ADMIN_USERS_PASSWORD_SUBMIT_BUTTON'), action: 'changepassword', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_USERS_PASSWORD_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

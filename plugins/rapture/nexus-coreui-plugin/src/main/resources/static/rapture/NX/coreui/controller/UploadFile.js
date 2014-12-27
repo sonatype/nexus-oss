@@ -81,7 +81,7 @@ Ext.define('NX.coreui.controller.UploadFile', {
         form = button.up('form');
 
     form.submit({
-      waitMsg: 'Uploading your files...',
+      waitMsg: NX.I18n.get('BROWSE_UPLOAD_WAIT'),
       success: function() {
         NX.Messages.add({ text: Ext.String.capitalize(form.entryName) + 's uploaded', type: 'success' });
         me.discardForm(form);

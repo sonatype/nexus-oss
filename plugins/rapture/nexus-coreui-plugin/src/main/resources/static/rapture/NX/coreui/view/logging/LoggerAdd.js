@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-logger-add',
 
-  title: 'Save search filter',
+  title: NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'),
   defaultFocus: 'name',
 
   items: {
@@ -31,25 +31,25 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: 'Name',
-        helpText: 'Logger name.',
-        emptyText: 'enter a logger name'
+        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME'),
+        helpText: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME_HELP'),
+        emptyText: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME_PLACEHOLDER')
       },
       {
         xtype: 'combo',
         name: 'level',
-        fieldLabel: 'Level',
-        helpText: 'Select logger level.',
+        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_LEVEL'),
+        helpText: NX.I18n.get('ADMIN_LOGGING_CREATE_LEVEL_HELP'),
         editable: false,
         value: 'INFO',
         store: [
-          ['TRACE', 'TRACE'],
-          ['DEBUG', 'DEBUG'],
-          ['INFO', 'INFO'],
-          ['WARN', 'WARN'],
-          ['ERROR', 'ERROR'],
-          ['OFF', 'OFF'],
-          ['DEFAULT', 'DEFAULT']
+          ['TRACE', NX.I18n.get('ADMIN_LOGGING_TRACE_ITEM')],
+          ['DEBUG', NX.I18n.get('ADMIN_LOGGING_DEBUG_ITEM')],
+          ['INFO', NX.I18n.get('ADMIN_LOGGING_INFO_ITEM')],
+          ['WARN', NX.I18n.get('ADMIN_LOGGING_WARN_ITEM')],
+          ['ERROR', NX.I18n.get('ADMIN_LOGGING_ERROR_ITEM')],
+          ['OFF', NX.I18n.get('ADMIN_LOGGING_OFF_ITEM')],
+          ['DEFAULT', NX.I18n.get('ADMIN_LOGGING_DEFAULT_ITEM')]
         ],
         queryMode: 'local'
       }

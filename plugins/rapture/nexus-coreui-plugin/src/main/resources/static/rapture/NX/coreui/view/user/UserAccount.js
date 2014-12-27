@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'User account settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('USER_ACCOUNT_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'

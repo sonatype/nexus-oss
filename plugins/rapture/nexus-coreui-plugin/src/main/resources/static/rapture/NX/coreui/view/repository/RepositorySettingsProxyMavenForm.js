@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
     submit: 'NX.direct.coreui_Repository.updateProxyMaven'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository updated: ' + data['id'];
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['id'];
   },
 
   /**
@@ -51,8 +51,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_PLACEHOLDER'),
         editable: false,
         store: [
-          ['RELEASE', 'Release'],
-          ['SNAPSHOT', 'Snapshots']
+          ['RELEASE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_RELEASE_ITEM')],
+          ['SNAPSHOT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_POLICY_SNAPSHOTS_ITEM')]
         ],
         queryMode: 'local',
         readOnly: true,
@@ -96,10 +96,10 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_PLACEHOLDER'),
         editable: false,
         store: [
-          ['IGNORE', 'Ignore'],
-          ['WARN', 'Warn'],
-          ['STRICT_IF_EXISTS', 'Strict If Exists'],
-          ['STRICT', 'Strict']
+          ['IGNORE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_IGNORE_ITEM')],
+          ['WARN', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_WARN_ITEM')],
+          ['STRICT_IF_EXISTS', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_EXISTS_ITEM')],
+          ['STRICT', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_STRICT_ITEM')]
         ],
         queryMode: 'local'
       },

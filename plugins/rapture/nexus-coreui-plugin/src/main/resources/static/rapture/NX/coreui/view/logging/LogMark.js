@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     'NX.Conditions'
   ],
 
-  title: 'Mark log',
+  title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),
   defaultFocus: 'message',
 
   items: {
@@ -32,17 +32,17 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     api: {
       submit: 'NX.direct.logging_Log.mark'
     },
-    settingsFormSuccessMessage: 'Log has been marked',
+    settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
     settingsFormSubmitOnEnter: true,
-    editableMarker: 'You do not have permission to mark the log',
+    editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
     items: [
       {
         xtype: 'textfield',
         name: 'message',
         itemId: 'message',
-        fieldLabel: 'Message',
-        helpText: 'Message to be included in the log',
-        emptyText: 'enter a marker text'
+        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
+        helpText: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE_HELP'),
+        emptyText: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE_PLACEHOLDER')
       }
     ]
   },

@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
     submit: 'NX.direct.coreui_Repository.updateVirtual'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository updated: ' + data['id'];
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['id'];
   },
 
   initComponent: function() {

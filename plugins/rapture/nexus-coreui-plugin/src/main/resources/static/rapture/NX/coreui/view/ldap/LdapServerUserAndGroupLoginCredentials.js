@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     'NX.Icons'
   ],
 
-  title: 'Login Credentials',
+  title: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
     var me = this;
 
     if (!me.message) {
-      me.message = 'You have requested an operation which requires validation of your credentials.';
+      me.message = NX.I18n.get('ADMIN_LDAP_CREDENTIALS_VALIDATION');
     }
 
     Ext.apply(this, {
@@ -62,22 +62,22 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
             },
             items: [
               { xtype: 'component', html: NX.Icons.img('authenticate', 'x32') },
-              { xtype: 'component', html: '<div>Enter credentials to test against the LDAP server.</div>' }
+              { xtype: 'component', html: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_INPUT') }
             ]
           },
           {
             name: 'username',
             itemId: 'username',
-            fieldLabel: 'Username',
-            emptyText: 'enter LDAP username',
+            fieldLabel: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_USERNAME'),
+            emptyText: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_USERNAME_PLACEHOLDER'),
             allowBlank: false
           },
           {
             name: 'password',
             itemId: 'password',
-            fieldLabel: 'Password',
+            fieldLabel: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_PASSWORD'),
             inputType: 'password',
-            emptyText: 'enter LDAP password',
+            emptyText: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_PASSWORD_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }
@@ -85,8 +85,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Test', action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'primary' },
-          { text: 'Cancel', handler: me.close, scope: me }
+          { text: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_SUBMIT_BUTTON'), action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_CANCEL_BUTTON'), handler: me.close, scope: me }
         ]
       }
     });

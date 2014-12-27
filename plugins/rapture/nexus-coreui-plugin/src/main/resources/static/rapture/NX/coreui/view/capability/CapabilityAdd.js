@@ -21,7 +21,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-capability-add',
 
-  title: 'Create new capability',
+  title: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TITLE'),
 
   /**
    * @override
@@ -34,9 +34,9 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
       items: [
         {
           xtype: 'combo',
-          fieldLabel: 'Type',
+          fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE'),
           itemCls: 'required-field',
-          helpText: "Type of configured capability.",
+          helpText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE_HELP'),
           name: 'typeId',
           store: me.capabilityTypeStore,
           displayField: 'name',
@@ -45,13 +45,13 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
           editable: false,
           mode: 'local',
           triggerAction: 'all',
-          emptyText: 'Select...',
+          emptyText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE_PLACEHOLDER'),
           selectOnFocus: false,
           allowBlank: false
         },
         {
           xtype: 'fieldset',
-          title: 'About',
+          title: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ABOUT'),
           autoHeight: true,
           autoScroll: true,
           collapsible: true,
@@ -64,8 +64,8 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
         },
         {
           xtype: 'checkbox',
-          fieldLabel: 'Enabled',
-          helpText: 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+          fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ENABLED'),
+          helpText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ENABLED_HELP'),
           name: 'enabled',
           allowBlank: false,
           checked: true,

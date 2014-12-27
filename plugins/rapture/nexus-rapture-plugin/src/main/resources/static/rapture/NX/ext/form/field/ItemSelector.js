@@ -94,7 +94,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     if (!me.fromField) {
       tbar = {
         xtype: 'nx-searchbox',
-        emptyText: 'filter',
+        emptyText: NX.I18n.get('GLOBAL_ITEM_SELECTOR_FILTER'),
         searchDelay: 200,
         listeners: {
           search: me.onSearch,
