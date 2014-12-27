@@ -46,20 +46,14 @@ public class Router
   public Response dispatch(final Request request) throws Exception {
     checkNotNull(request);
 
-    log.debug("Dispatching: {}", request);
-
-    if (log.isTraceEnabled()) {
-      logRequest(request);
-    }
+    logRequest(request);
 
     // Find route and start context
     Context context = new Context(request);
     Route route = findRoute(context);
     Response response = context.start(route);
 
-    if (log.isTraceEnabled()) {
-      logResponse(response);
-    }
+    logResponse(response);
 
     return response;
   }
@@ -68,23 +62,27 @@ public class Router
    * Log verbose request details.
    */
   private void logRequest(final Request request) {
-    if (request.getHeaders().isEmpty()) {
-      log.trace("No request headers");
-    }
-    else {
-      log.trace("Request headers:");
-      for (Map.Entry<String, String> header : request.getHeaders()) {
-        log.trace("  {}: {}", header.getKey(), header.getValue());
-      }
-    }
+    log.debug("Request: {}", request);
 
-    if (request.getAttributes().isEmpty()) {
-      log.trace("No request attributes");
-    }
-    else {
-      log.trace("Request attributes:");
-      for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
-        log.trace("  {}={}", entry.getKey(), entry.getValue());
+    if (log.isTraceEnabled()) {
+      if (request.getHeaders().isEmpty()) {
+        log.trace("No request headers");
+      }
+      else {
+        log.trace("Request headers:");
+        for (Map.Entry<String, String> header : request.getHeaders()) {
+          log.trace("  {}: {}", header.getKey(), header.getValue());
+        }
+      }
+
+      if (request.getAttributes().isEmpty()) {
+        log.trace("No request attributes");
+      }
+      else {
+        log.trace("Request attributes:");
+        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+          log.trace("  {}={}", entry.getKey(), entry.getValue());
+        }
       }
     }
   }
@@ -93,23 +91,27 @@ public class Router
    * Log verbose response details.
    */
   private void logResponse(final Response response) {
-    if (response.getHeaders().isEmpty()) {
-      log.trace("No response headers");
-    }
-    else {
-      log.trace("Response headers:");
-      for (Map.Entry<String, String> header : response.getHeaders()) {
-        log.trace("  {}: {}", header.getKey(), header.getValue());
-      }
-    }
+    log.debug("Response: {}", response);
 
-    if (response.getAttributes().isEmpty()) {
-      log.trace("No response attributes");
-    }
-    else {
-      log.trace("Response attributes:");
-      for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
-        log.trace("  {}={}", entry.getKey(), entry.getValue());
+    if (log.isTraceEnabled()) {
+      if (response.getHeaders().isEmpty()) {
+        log.trace("No response headers");
+      }
+      else {
+        log.trace("Response headers:");
+        for (Map.Entry<String, String> header : response.getHeaders()) {
+          log.trace("  {}: {}", header.getKey(), header.getValue());
+        }
+      }
+
+      if (response.getAttributes().isEmpty()) {
+        log.trace("No response attributes");
+      }
+      else {
+        log.trace("Response attributes:");
+        for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
+          log.trace("  {}={}", entry.getKey(), entry.getValue());
+        }
       }
     }
   }
