@@ -97,13 +97,15 @@ public class Context
   }
 
   /**
-   * Invokes the next handler in the handler chain. Interceptor-style handlers should invoke this from their {@link
-   * Handler#handle(Context)} method and return the result.
+   * Invokes the next handler in the handler chain.
+   *
+   * Interceptor-style handlers should invoke this from their {@link Handler#handle(Context)}
+   * method and return the result.
    */
   @Nonnull
   public Response proceed() throws Exception {
-    checkState(handlers != null);
-    checkState(handlers.hasNext());
+    checkState(handlers != null, "Context not started");
+    checkState(handlers.hasNext(), "End of handler chain");
 
     // Invoke next handler
     Handler handler = handlers.next();
