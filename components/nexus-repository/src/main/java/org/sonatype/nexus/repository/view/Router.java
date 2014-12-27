@@ -59,7 +59,7 @@ public class Router
   }
 
   /**
-   * Log verbose request details.
+   * Log request details.
    */
   private void logRequest(final Request request) {
     log.debug("Request: {}", request);
@@ -88,7 +88,7 @@ public class Router
   }
 
   /**
-   * Log verbose response details.
+   * Log response details.
    */
   private void logResponse(final Response response) {
     log.debug("Response: {}", response);

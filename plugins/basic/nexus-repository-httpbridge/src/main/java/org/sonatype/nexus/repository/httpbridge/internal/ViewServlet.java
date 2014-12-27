@@ -122,7 +122,7 @@ public class ViewServlet
     Response response = facet.dispatch(new HttpRequest(httpRequest, repo, path.getRemainingPath()));
 
     HttpResponseSender sender = sender(repo);
-    log.debug("HTTP sender: {}", sender);
+    log.debug("HTTP response sender: {}", sender);
     sender.send(response, httpResponse);
   }
 
