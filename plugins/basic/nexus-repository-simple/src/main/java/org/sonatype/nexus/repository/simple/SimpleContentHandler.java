@@ -27,6 +27,9 @@ import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
+import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
+import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 
 /**
  * Simple content handler.
@@ -57,7 +60,7 @@ public class SimpleContentHandler
     log.debug("{} repository '{}' content: {}", method, repository.getName(), name);
 
     switch (method) {
-      case "GET": {
+      case GET: {
         SimpleContent content = contentService.get(repository, name);
         if (content == null) {
           return HttpResponses.notFound(name);
@@ -65,7 +68,7 @@ public class SimpleContentHandler
         return HttpResponses.ok(content.toPayload());
       }
 
-      case "PUT": {
+      case PUT: {
         SimpleContent content = new SimpleContent(context.getRequest().getPayload());
         SimpleContent prev = contentService.put(repository, name, content);
         if (prev == null) {
@@ -74,7 +77,7 @@ public class SimpleContentHandler
         return HttpResponses.noContent();
       }
 
-      case "DELETE": {
+      case DELETE: {
         SimpleContent prev = contentService.delete(repository, name);
         if (prev == null) {
           return HttpResponses.notFound(name);
@@ -83,7 +86,7 @@ public class SimpleContentHandler
       }
 
       default:
-        return HttpResponses.methodNotAllowed(method, "GET", "PUT", "DELETE");
+        return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
     }
   }
 
