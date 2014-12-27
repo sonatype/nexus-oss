@@ -44,4 +44,12 @@ public class SimpleContent
   public Payload toPayload() {
     return new BytesPayload(bytes, type);
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "type='" + type + '\'' +
+        ", size=" + bytes.length +
+        '}';
+  }
 }

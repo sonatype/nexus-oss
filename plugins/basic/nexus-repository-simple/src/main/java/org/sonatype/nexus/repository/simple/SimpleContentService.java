@@ -61,12 +61,23 @@ public class SimpleContentService
     checkNotNull(repository);
     checkNotNull(name);
     checkNotNull(content);
-    return contents(repository).put(name, content);
+    SimpleContent prev = contents(repository).put(name, content);
+    log.debug("{} repository '{}' content: {} -> {}",
+        prev == null ? "Saved" : "Replaced",
+        repository.getName(),
+        name,
+        content
+    );
+    return prev;
   }
 
   public SimpleContent delete(final Repository repository, final String name) {
     checkNotNull(repository);
     checkNotNull(name);
-    return contents(repository).remove(name);
+    SimpleContent prev = contents(repository).remove(name);
+    if (prev != null) {
+      log.debug("Deleted repository '{}' content: {} -> {}", repository.getName(), name, prev);
+    }
+    return prev;
   }
 }

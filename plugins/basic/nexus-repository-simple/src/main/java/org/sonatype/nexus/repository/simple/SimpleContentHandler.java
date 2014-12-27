@@ -57,7 +57,7 @@ public class SimpleContentHandler
     String name = contentName(context);
     String method = context.getRequest().getAction();
     Repository repository = context.getRequest().getRepository();
-    log.debug("{} repository '{}' content: {}", method, repository.getName(), name);
+    log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     switch (method) {
       case GET: {
