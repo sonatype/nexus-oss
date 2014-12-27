@@ -41,7 +41,7 @@ public class StringPayload
 
   public StringPayload(final String content, final Charset charset, final @Nullable String contentType) {
     this.content = checkNotNull(content);
-    this.charset = charset;
+    this.charset = checkNotNull(charset);
     this.contentType = contentType;
   }
 
