@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.simple;
+package org.sonatype.nexus.repository.httpbridge.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,23 +33,21 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: Extract into default impl, as many formats may only need the same bits, but model to lookup still needs format-specific instance
-
 /**
- * Simple {@link HttpResponseSender}.
+ * Default {@link HttpResponseSender}.
  *
  * @since 3.0
  */
-@Named(SimpleFormat.NAME)
+@Named
 @Singleton
-public class SimpleHttpResponseSender
+public class DefaultHttpResponseSender
   extends ComponentSupport
   implements HttpResponseSender
 {
   private final WebUtils webUtils;
 
   @Inject
-  public SimpleHttpResponseSender(final WebUtils webUtils) {
+  public DefaultHttpResponseSender(final WebUtils webUtils) {
     this.webUtils = checkNotNull(webUtils);
   }
 
@@ -57,8 +55,6 @@ public class SimpleHttpResponseSender
   public void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
-    // TODO: attributes?
-
     // add request headers
     for (Map.Entry<String,String> header : response.getHeaders()) {
       httpResponse.addHeader(header.getKey(), header.getValue());

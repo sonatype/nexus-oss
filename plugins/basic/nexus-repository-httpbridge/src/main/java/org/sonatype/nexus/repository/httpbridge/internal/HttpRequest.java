@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.httpbridge.internal;
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.repository.Repository;
@@ -38,7 +40,14 @@ public class HttpRequest
     this.path = checkNotNull(path);
     this.parameters = new HttpParameters(httpServletRequest);
     this.headers = new HttpHeaders(httpServletRequest);
+
+    // copy http-servlet-request attributes
     this.attributes = Maps.newHashMap();
+    Enumeration<String> attributes = httpServletRequest.getAttributeNames();
+    while (attributes.hasMoreElements()) {
+      String name = attributes.nextElement();
+      getAttributes().put(name, httpServletRequest.getAttribute(name));
+    }
 
     // TODO: Can we tell if there is a payload or not from HttpServletRequest api?
     this.payload = new HttpRequestPayload(httpServletRequest);

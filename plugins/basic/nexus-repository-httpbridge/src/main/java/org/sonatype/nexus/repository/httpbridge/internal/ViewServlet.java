@@ -54,12 +54,16 @@ public class ViewServlet
 
   private final Map<String, HttpResponseSender> responseSenders;
 
+  private final DefaultHttpResponseSender defaultHttpResponseSender;
+
   @Inject
   public ViewServlet(final RepositoryManager repositoryManager,
-                     final Map<String, HttpResponseSender> responseSenders)
+                     final Map<String, HttpResponseSender> responseSenders,
+                     final DefaultHttpResponseSender defaultHttpResponseSender)
   {
     this.repositoryManager = checkNotNull(repositoryManager);
     this.responseSenders = checkNotNull(responseSenders);
+    this.defaultHttpResponseSender = checkNotNull(defaultHttpResponseSender);
   }
 
   @Override
@@ -144,12 +148,17 @@ public class ViewServlet
 
   /**
    * Find sender for repository format.
+   *
+   * If no format-specific sender is configured, the default is used.
    */
   private HttpResponseSender sender(final Repository repository) {
     String format = repository.getFormat().getValue();
     log.debug("Looking for HTTP response sender: {}", format);
     HttpResponseSender sender = responseSenders.get(format);
-    checkState(sender != null, "No HTTP response sender for format: %s", format);
+    if (sender == null) {
+      log.debug("Using default HTTP response sender for: {}", format);
+      return defaultHttpResponseSender;
+    }
     return sender;
   }
 }

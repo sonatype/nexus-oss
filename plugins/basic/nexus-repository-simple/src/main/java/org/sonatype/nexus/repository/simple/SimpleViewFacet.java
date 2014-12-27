@@ -19,13 +19,14 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.NotFoundHandler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
+import org.sonatype.nexus.repository.view.handlers.NotFoundHandler;
+import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 
