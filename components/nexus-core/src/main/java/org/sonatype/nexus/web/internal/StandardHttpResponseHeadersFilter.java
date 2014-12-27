@@ -15,6 +15,7 @@ package org.sonatype.nexus.web.internal;
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -24,28 +25,34 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.web.WebUtils;
+import org.sonatype.nexus.SystemStatus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Filter to set some "common" headers on response, instead littering this across
- * code in various servlets.
- * <p/>Note: this will unify response Server header, as some plugins, like Restlet1x does set it
- * already and some does not at all, like siesta. This filter will simply override it.
+ * Adds standard HTTP response headers:
+ *
+ * <ul>
+ *   <li>Server</li>
+ *   <li>X-Frame-Options</li>
+ *   <li>X-Content-Type-Options</li>
+ * </ul>
  *
  * @since 2.8
  */
 @Singleton
-public class CommonHeadersFilter
+public class StandardHttpResponseHeadersFilter
     implements Filter
 {
-
-  private final WebUtils webUtils;
+  private final String serverValue;
 
   @Inject
-  public CommonHeadersFilter(final WebUtils webUtils) {
-    this.webUtils = checkNotNull(webUtils);
+  public StandardHttpResponseHeadersFilter(final Provider<SystemStatus> systemStatusProvider) {
+    checkNotNull(systemStatusProvider);
+
+    // cache "Server" header value
+    SystemStatus status = systemStatusProvider.get();
+    this.serverValue = String.format("Nexus/%s (%s)", status.getVersion(), status.getEditionShort());
   }
 
   @Override
@@ -62,8 +69,16 @@ public class CommonHeadersFilter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
       throws IOException, ServletException
   {
-    // do it Before, as doFilter might commit response (and this even allows some code to customise std headers if needed)
-    webUtils.equipResponseWithStandardHeaders((HttpServletResponse) response);
+    HttpServletResponse httpResponse = (HttpServletResponse)response;
+
+    httpResponse.setHeader("Server", serverValue);
+
+    // NEXUS-6569 Add X-Frame-Options header
+    httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+
+    // NEXUS-5023 disable IE for sniffing into response content
+    httpResponse.setHeader("X-Content-Type-Options", "nosniff");
+
     chain.doFilter(request, response);
   }
 }
