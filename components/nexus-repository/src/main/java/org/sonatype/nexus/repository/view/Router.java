@@ -40,30 +40,33 @@ public class Router
     this.defaultRoute = checkNotNull(defaultRoute, "Missing default route");
   }
 
+  /**
+   * Dispatch request to matching route.
+   */
   public Response dispatch(final Request request) throws Exception {
     checkNotNull(request);
 
-    boolean trace = log.isTraceEnabled();
-
     log.debug("Dispatching: {}", request);
-    if (trace) {
+
+    if (log.isTraceEnabled()) {
       logRequest(request);
     }
 
+    // Find route and start context
     Context context = new Context(request);
     Route route = findRoute(context);
-    log.debug("Selected route: {}", route);
+    Response response = context.start(route);
 
-    context.setHandlers(route.getHandlers());
-
-    Response response = context.proceed();
-    if (trace) {
+    if (log.isTraceEnabled()) {
       logResponse(response);
     }
 
     return response;
   }
 
+  /**
+   * Log verbose request details.
+   */
   private void logRequest(final Request request) {
     if (request.getHeaders().isEmpty()) {
       log.trace("No request headers");
@@ -86,6 +89,9 @@ public class Router
     }
   }
 
+  /**
+   * Log verbose response details.
+   */
   private void logResponse(final Response response) {
     if (response.getHeaders().isEmpty()) {
       log.trace("No response headers");
@@ -108,6 +114,9 @@ public class Router
     }
   }
 
+  /**
+   * Find the first matching route for the given context.
+   */
   private Route findRoute(final Context context) {
     for (Route route : routes) {
       if (route.getMatcher().matches(context)) {

@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.view;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -38,10 +40,12 @@ public class Route
     this.handlers = handlers;
   }
 
+  @Nonnull
   public Matcher getMatcher() {
     return matcher;
   }
 
+  @Nonnull
   public List<Handler> getHandlers() {
     return handlers;
   }

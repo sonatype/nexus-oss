@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class Context
   private ListIterator<Handler> handlers;
 
   public Context(final Request request) {
-    this.request = request;
+    this.request = checkNotNull(request);
   }
 
   public Request getRequest() {
@@ -97,36 +96,43 @@ public class Context
     remove(type.getName());
   }
 
-  public void setHandlers(final List<Handler> handlers) {
-    checkNotNull(handlers);
-    checkState(this.handlers == null, "Handlers can only be set once.");
-    this.handlers = handlers.listIterator();
-  }
-
   /**
    * Invokes the next handler in the handler chain. Interceptor-style handlers should invoke this from their {@link
    * Handler#handle(Context)} method and return the result.
    */
   @Nonnull
   public Response proceed() throws Exception {
-    log.trace("Proceed");
+    checkState(handlers != null);
+    checkState(handlers.hasNext());
 
-    if (handlers.hasNext()) {
-      Handler handler = handlers.next();
-      log.debug("Invoking handler: {}", handler);
+    // Invoke next handler
+    Handler handler = handlers.next();
+    log.debug("Invoking handler: {}", handler);
 
-      try {
-        return handler.handle(this);
-      }
-      finally {
-        // retain handler position in-case of re-proceed
-        if (handlers.hasPrevious()) {
-          handlers.previous();
-        }
+    try {
+      return handler.handle(this);
+    }
+    finally {
+      // retain handler position in-case of re-proceed
+      if (handlers.hasPrevious()) {
+        handlers.previous();
       }
     }
-    else {
-      throw new Exception("Unable to proceed");
-    }
+  }
+
+  //
+  // Framework internal
+  //
+
+  /**
+   * Start route.
+   */
+  @Nonnull
+  Response start(final Route route) throws Exception {
+    checkNotNull(route);
+    checkState(handlers == null, "Already started");
+    log.debug("Starting: {}", route);
+    handlers = route.getHandlers().listIterator();
+    return proceed();
   }
 }
