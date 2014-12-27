@@ -38,7 +38,7 @@ public abstract class ViewFacetSupport
 
   @Override
   public Router getRouter() {
-    checkState(router != null);
+    checkState(router != null, "Not initialized");
     return router;
   }
 
