@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
@@ -25,11 +24,9 @@ import org.sonatype.nexus.repository.view.matchers.AlwaysMatcher;
 public class DefaultRoute
     extends Route
 {
-  public DefaultRoute(final List<Handler> handlers) {
-    super(new AlwaysMatcher(), handlers);
-  }
+  private static final Matcher MATCHER = new AlwaysMatcher();
 
-  public DefaultRoute(final Handler[] handlers) {
-    this(Arrays.asList(handlers));
+  public DefaultRoute(final List<Handler> handlers) {
+    super(MATCHER, handlers);
   }
 }

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.httpbridge.StandardHttpResponseHeadersHandler;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -42,13 +43,17 @@ public class SimpleViewFacet
 {
   private final TimingHandler timingHandler;
 
+  private final StandardHttpResponseHeadersHandler standardHttpResponseHeadersHandler;
+
   private final SimpleContentHandler contentHandler;
 
   @Inject
   public SimpleViewFacet(final TimingHandler timingHandler,
+                         final StandardHttpResponseHeadersHandler standardHttpResponseHeadersHandler,
                          final SimpleContentHandler contentHandler)
   {
     this.timingHandler = checkNotNull(timingHandler);
+    this.standardHttpResponseHeadersHandler = checkNotNull(standardHttpResponseHeadersHandler);
     this.contentHandler = checkNotNull(contentHandler);
   }
 
@@ -59,6 +64,7 @@ public class SimpleViewFacet
     builder.route(new Route.Builder()
         .matcher(new LiteralMatcher("/foo"))
         .handler(timingHandler)
+        .handler(standardHttpResponseHeadersHandler)
         .handler(new Handler()
         {
           @Nonnull
@@ -72,6 +78,7 @@ public class SimpleViewFacet
     builder.route(new Route.Builder()
         .matcher(new RegexMatcher("/content/(.*)"))
         .handler(timingHandler)
+        .handler(standardHttpResponseHeadersHandler)
         .handler(new Handler()
         {
           @Nonnull
@@ -86,6 +93,7 @@ public class SimpleViewFacet
 
     builder.defaultHandlers(
         timingHandler,
+        standardHttpResponseHeadersHandler,
         new Handler()
         {
           @Nonnull

@@ -13,6 +13,7 @@
 
 package org.sonatype.nexus.repository.view;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -149,7 +150,7 @@ public class Router
 
     public Builder defaultHandlers(final Handler... handlers) {
       checkState(this.defaultRoute == null, "Default handlers already configured");
-      this.defaultRoute = new DefaultRoute(handlers);
+      this.defaultRoute = new DefaultRoute(Arrays.asList(handlers));
       return this;
     }
 
