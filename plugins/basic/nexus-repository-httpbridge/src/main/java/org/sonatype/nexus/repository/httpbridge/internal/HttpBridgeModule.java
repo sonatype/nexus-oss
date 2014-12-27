@@ -47,8 +47,7 @@ public class HttpBridgeModule
     {
       @Override
       protected void configure() {
-        // FIXME: Update filters here
-        //addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
+        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
       }
     });
   }
