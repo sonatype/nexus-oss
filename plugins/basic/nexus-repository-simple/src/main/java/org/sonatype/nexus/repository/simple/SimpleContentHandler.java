@@ -13,28 +13,20 @@
 
 package org.sonatype.nexus.repository.simple;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
-import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,44 +39,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
-public class ContentHandler
+public class SimpleContentHandler
     extends ComponentSupport
     implements Handler
 {
-  private static class Content
-  {
-    private final String type;
+  private final SimpleContentService contentService;
 
-    private final byte[] bytes;
-
-    public Content(final Payload payload) throws IOException {
-      checkNotNull(payload);
-      this.type = payload.getContentType();
-      try (InputStream input = checkNotNull(payload.openInputStream())) {
-        this.bytes = ByteStreams.toByteArray(input);
-      }
-    }
-
-    public Payload toPayload() {
-      return new BytesPayload(bytes, type);
-    }
-  }
-
-  /**
-   * Map of repository-name -> [Map of content-name -> content]
-   */
-  private final Map<String,Map<String, Content>> allContents = Maps.newConcurrentMap();
-
-  /**
-   * Return collection of repository specific contents.
-   */
-  private Map<String, Content> repositoryContents(final Repository repository) {
-    Map<String,Content> contents = allContents.get(repository.getName());
-    if (contents == null) {
-      contents = Maps.newConcurrentMap();
-      allContents.put(repository.getName(), contents);
-    }
-    return contents;
+  @Inject
+  public SimpleContentHandler(final SimpleContentService contentService) {
+    this.contentService = checkNotNull(contentService);
   }
 
   @Nonnull
@@ -92,14 +55,12 @@ public class ContentHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     String name = contentName(context);
     String method = context.getRequest().getAction();
-
-    log.debug("{} content: {}", method, name);
-
-    Map<String, Content> contents = repositoryContents(context.getRequest().getRepository());
+    Repository repository = context.getRequest().getRepository();
+    log.debug("{} repository '{}' content: {}", method, repository.getName(), name);
 
     switch (method) {
       case "GET": {
-        Content content = contents.get(name);
+        SimpleContent content = contentService.get(repository, name);
         if (content == null) {
           return Responses.notFound(name);
         }
@@ -107,9 +68,8 @@ public class ContentHandler
       }
 
       case "PUT": {
-        Payload payload = context.getRequest().getPayload();
-        Content content = new Content(payload);
-        Content prev = contents.put(name, content);
+        SimpleContent content = new SimpleContent(context.getRequest().getPayload());
+        SimpleContent prev = contentService.put(repository, name, content);
         if (prev == null) {
           return new Response(Status.success(201));
         }
@@ -117,7 +77,7 @@ public class ContentHandler
       }
 
       case "DELETE": {
-        Content prev = contents.remove(name);
+        SimpleContent prev = contentService.delete(repository, name);
         if (prev == null) {
           return Responses.notFound(name);
         }

@@ -43,11 +43,11 @@ public class SimpleViewFacet
 {
   private final TimingHandler timingHandler;
 
-  private final ContentHandler contentHandler;
+  private final SimpleContentHandler contentHandler;
 
   @Inject
   public SimpleViewFacet(final TimingHandler timingHandler,
-                         final ContentHandler contentHandler)
+                         final SimpleContentHandler contentHandler)
   {
     this.timingHandler = checkNotNull(timingHandler);
     this.contentHandler = checkNotNull(contentHandler);
