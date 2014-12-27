@@ -156,7 +156,6 @@ public class ViewServlet
     log.debug("Looking for HTTP response sender: {}", format);
     HttpResponseSender sender = responseSenders.get(format);
     if (sender == null) {
-      log.debug("Using default HTTP response sender for: {}", format);
       return defaultHttpResponseSender;
     }
     return sender;
