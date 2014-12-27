@@ -48,10 +48,8 @@ public class StandardHttpResponseHeadersFilter
 
   @Inject
   public StandardHttpResponseHeadersFilter(final Provider<SystemStatus> systemStatusProvider) {
-    checkNotNull(systemStatusProvider);
-
     // cache "Server" header value
-    SystemStatus status = systemStatusProvider.get();
+    SystemStatus status = checkNotNull(systemStatusProvider).get();
     this.serverValue = String.format("Nexus/%s (%s)", status.getVersion(), status.getEditionShort());
   }
 
