@@ -15,21 +15,26 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
+import org.sonatype.nexus.repository.view.Headers;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Status;
-import org.sonatype.nexus.web.WebUtils;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,24 +49,27 @@ public class DefaultHttpResponseSender
   extends ComponentSupport
   implements HttpResponseSender
 {
-  private final WebUtils webUtils;
+  private final Provider<SystemStatus> systemStatus;
 
   @Inject
-  public DefaultHttpResponseSender(final WebUtils webUtils) {
-    this.webUtils = checkNotNull(webUtils);
+  public DefaultHttpResponseSender(final Provider<SystemStatus> systemStatus) {
+    this.systemStatus = checkNotNull(systemStatus);
   }
 
   @Override
   public void send(final Response response, final HttpServletResponse httpResponse)
       throws ServletException, IOException
   {
+    // standard headers
+    Headers headers = response.getHeaders();
+    headers.set("Server", "Nexus/" + systemStatus.get().getVersion());
+    headers.set("X-Frame-Options", "SAMEORIGIN");
+    headers.set("X-Content-Type-Options", "nosniff");
+
     // add request headers
-    for (Map.Entry<String,String> header : response.getHeaders()) {
+    for (Map.Entry<String,String> header : headers) {
       httpResponse.addHeader(header.getKey(), header.getValue());
     }
-
-    // add standard headers
-    webUtils.equipResponseWithStandardHeaders(httpResponse);
 
     // write payload details if we have one
     if (response instanceof PayloadResponse) {
@@ -71,8 +79,8 @@ public class DefaultHttpResponseSender
       }
       httpResponse.setContentLength((int) payload.getSize()); // HACK: Upgrade to servlet 3.1 to use proper long values
 
-      try (InputStream input = payload.openInputStream()) {
-        webUtils.sendContent(input, httpResponse);
+      try (InputStream input = payload.openInputStream(); OutputStream output = httpResponse.getOutputStream()) {
+        ByteStreams.copy(input, output);
       }
     }
 
