@@ -116,14 +116,14 @@ public class ViewServlet
     Repository repo = repository(path.getRepositoryName());
     log.debug("Repository: {}", repo);
 
-    // dispatch request
+    // dispatch request and send response
     ViewFacet facet = repo.facet(ViewFacet.class);
-    log.debug("View facet: {}", facet);
+    log.debug("Dispatching to view facet: {}", facet);
     Response response = facet.dispatch(new HttpRequest(httpRequest, repo, path.getRemainingPath()));
 
-    // send response
-    log.debug("Sending response: {}", response);
-    sender(repo).send(response, httpResponse);
+    HttpResponseSender sender = sender(repo);
+    log.debug("HTTP sender: {}", sender);
+    sender.send(response, httpResponse);
   }
 
   /**
