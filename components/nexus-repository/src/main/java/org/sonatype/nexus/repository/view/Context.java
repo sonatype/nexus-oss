@@ -108,7 +108,7 @@ public class Context
     // Invoke next handler
     Handler handler = handlers.next();
     try {
-      log.debug("Invoking handler: {}", handler);
+      log.debug("Proceeding with handler: {}", handler);
       return handler.handle(this);
     }
     finally {
