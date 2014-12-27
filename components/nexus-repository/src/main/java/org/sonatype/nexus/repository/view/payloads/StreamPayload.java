@@ -29,26 +29,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StreamPayload
   implements Payload
 {
-  private final String contentType;
+  private final InputStream stream;
 
   private final long size;
 
-  private final InputStream stream;
+  private final String contentType;
 
-  public StreamPayload(final @Nullable String contentType, final long size, final InputStream stream) {
-    this.contentType = contentType;
-    this.size = size;
+  public StreamPayload(final InputStream stream, final long size, final @Nullable String contentType) {
     this.stream = checkNotNull(stream);
-  }
-
-  @Override
-  public String getContentType() {
-    return contentType;
-  }
-
-  @Override
-  public long getSize() {
-    return size;
+    this.size = size;
+    this.contentType = contentType;
   }
 
   @Override
@@ -57,11 +47,22 @@ public class StreamPayload
   }
 
   @Override
+  public long getSize() {
+    return size;
+  }
+
+  @Nullable
+  @Override
+  public String getContentType() {
+    return contentType;
+  }
+
+  @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "contentType='" + contentType + '\'' +
+        "stream=" + stream +
         ", size=" + size +
-        ", stream=" + stream +
+        ", contentType='" + contentType + '\'' +
         '}';
   }
 }

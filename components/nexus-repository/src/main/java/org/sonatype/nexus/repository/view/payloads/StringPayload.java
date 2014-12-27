@@ -30,23 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StringPayload
   implements Payload
 {
-  private final String contentType;
-
   private final String content;
 
-  public StringPayload(final @Nullable String contentType, final String content) {
-    this.contentType = contentType;
+  private final String contentType;
+
+  public StringPayload(final String content, final @Nullable String contentType) {
     this.content = checkNotNull(content);
-  }
-
-  @Override
-  public String getContentType() {
-    return contentType;
-  }
-
-  @Override
-  public long getSize() {
-    return content.length();
+    this.contentType = contentType;
   }
 
   @Override
@@ -55,10 +45,21 @@ public class StringPayload
   }
 
   @Override
+  public long getSize() {
+    return content.length();
+  }
+
+  @Nullable
+  @Override
+  public String getContentType() {
+    return contentType;
+  }
+
+  @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "contentType='" + contentType + '\'' +
-        ", content='" + content + '\'' +
+        "content='" + content + '\'' +
+        ", contentType='" + contentType + '\'' +
         '}';
   }
 }

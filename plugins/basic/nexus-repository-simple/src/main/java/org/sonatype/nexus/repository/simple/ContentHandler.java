@@ -66,7 +66,7 @@ public class ContentHandler
     }
 
     public Payload toPayload() {
-      return new BytesPayload(type, bytes);
+      return new BytesPayload(bytes, type);
     }
   }
 

@@ -26,10 +26,10 @@ public interface Payload
 {
   long UNKNOWN_SIZE = -1;
 
-  @Nullable
-  String getContentType();
+  InputStream openInputStream() throws IOException;
 
   long getSize();
 
-  InputStream openInputStream() throws IOException;
+  @Nullable
+  String getContentType();
 }

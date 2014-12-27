@@ -30,23 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BytesPayload
   implements Payload
 {
-  private final String contentType;
-
   private final byte[] content;
 
-  public BytesPayload(final @Nullable String contentType, final byte[] content) {
-    this.contentType = contentType;
+  private final String contentType;
+
+  public BytesPayload(final byte[] content, final @Nullable String contentType) {
     this.content = checkNotNull(content);
-  }
-
-  @Override
-  public String getContentType() {
-    return contentType;
-  }
-
-  @Override
-  public long getSize() {
-    return content.length;
+    this.contentType = contentType;
   }
 
   @Override
@@ -55,10 +45,21 @@ public class BytesPayload
   }
 
   @Override
+  public long getSize() {
+    return content.length;
+  }
+
+  @Nullable
+  @Override
+  public String getContentType() {
+    return contentType;
+  }
+
+  @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "contentType='" + contentType + '\'' +
-        ", size=" + getSize() +
+        "size=" + getSize() +
+        ", contentType='" + contentType + '\'' +
         '}';
   }
 }
