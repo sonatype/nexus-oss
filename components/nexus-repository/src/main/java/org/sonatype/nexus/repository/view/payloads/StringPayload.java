@@ -15,10 +15,13 @@ package org.sonatype.nexus.repository.view.payloads;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.view.Payload;
+
+import com.google.common.base.Charsets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,16 +35,27 @@ public class StringPayload
 {
   private final String content;
 
+  private final Charset charset;
+
   private final String contentType;
 
-  public StringPayload(final String content, final @Nullable String contentType) {
+  public StringPayload(final String content, final Charset charset, final @Nullable String contentType) {
     this.content = checkNotNull(content);
+    this.charset = charset;
     this.contentType = contentType;
+  }
+
+  public StringPayload(final String content, final @Nullable String contentType) {
+    this(content, Charsets.UTF_8, contentType);
+  }
+
+  public Charset getCharset() {
+    return charset;
   }
 
   @Override
   public InputStream openInputStream() throws IOException {
-    return new ByteArrayInputStream(content.getBytes());
+    return new ByteArrayInputStream(content.getBytes(charset));
   }
 
   @Override
@@ -59,6 +73,7 @@ public class StringPayload
   public String toString() {
     return getClass().getSimpleName() + "{" +
         "content='" + content + '\'' +
+        ", charset=" + charset +
         ", contentType='" + contentType + '\'' +
         '}';
   }
