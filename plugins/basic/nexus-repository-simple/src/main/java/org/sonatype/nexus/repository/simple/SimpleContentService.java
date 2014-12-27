@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.simple;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -20,6 +21,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -55,6 +57,11 @@ public class SimpleContentService
     checkNotNull(repository);
     checkNotNull(name);
     return contents(repository).get(name);
+  }
+
+  public Set<String> names(final Repository repository) {
+    checkNotNull(repository);
+    return ImmutableSet.copyOf(contents(repository).keySet());
   }
 
   public SimpleContent put(final Repository repository, final String name, final SimpleContent content) {

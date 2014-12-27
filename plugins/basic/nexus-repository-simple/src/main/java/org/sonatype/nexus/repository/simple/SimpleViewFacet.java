@@ -42,13 +42,17 @@ public class SimpleViewFacet
 {
   private final TimingHandler timingHandler;
 
+  private final SimpleIndexHandler indexHandler;
+
   private final SimpleContentHandler contentHandler;
 
   @Inject
   public SimpleViewFacet(final TimingHandler timingHandler,
+                         final SimpleIndexHandler indexHandler,
                          final SimpleContentHandler contentHandler)
   {
     this.timingHandler = checkNotNull(timingHandler);
+    this.indexHandler = checkNotNull(indexHandler);
     this.contentHandler = checkNotNull(contentHandler);
   }
 
@@ -57,30 +61,14 @@ public class SimpleViewFacet
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
-        .matcher(new LiteralMatcher("/foo"))
+        .matcher(new LiteralMatcher("/content/index.html"))
         .handler(timingHandler)
-        .handler(new Handler()
-        {
-          @Nonnull
-          @Override
-          public Response handle(final @Nonnull Context context) throws Exception {
-            return HttpResponses.notFound("Xenu says no /foo for you");
-          }
-        })
+        .handler(indexHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new RegexMatcher("/content/(.*)"))
         .handler(timingHandler)
-        .handler(new Handler()
-        {
-          @Nonnull
-          @Override
-          public Response handle(@Nonnull final Context context) throws Exception {
-            log.debug("Xenu approves");
-            return context.proceed();
-          }
-        })
         .handler(contentHandler)
         .create());
 
@@ -91,7 +79,6 @@ public class SimpleViewFacet
           @Nonnull
           @Override
           public Response handle(@Nonnull final Context context) throws Exception {
-            log.debug("Xenu may not be happy if you keep this up");
             return HttpResponses.notFound();
           }
         }
