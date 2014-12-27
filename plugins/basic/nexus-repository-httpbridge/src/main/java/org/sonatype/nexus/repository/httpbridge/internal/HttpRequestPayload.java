@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.sonatype.nexus.repository.view.Payload;
 
 /**
- * HTTP request payload.
+ * HTTP request payload adapts {@link HttpServletRequest} body-content to {@link Payload}.
  *
  * @since 3.0
  */
