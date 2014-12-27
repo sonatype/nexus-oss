@@ -22,6 +22,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Simple content service.
  *
@@ -50,14 +52,21 @@ public class SimpleContentService
   }
 
   public SimpleContent get(final Repository repository, final String name) {
+    checkNotNull(repository);
+    checkNotNull(name);
     return contents(repository).get(name);
   }
 
   public SimpleContent put(final Repository repository, final String name, final SimpleContent content) {
+    checkNotNull(repository);
+    checkNotNull(name);
+    checkNotNull(content);
     return contents(repository).put(name, content);
   }
 
   public SimpleContent delete(final Repository repository, final String name) {
+    checkNotNull(repository);
+    checkNotNull(name);
     return contents(repository).remove(name);
   }
 }
