@@ -19,12 +19,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.Responses;
-import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -62,30 +60,30 @@ public class SimpleContentHandler
       case "GET": {
         SimpleContent content = contentService.get(repository, name);
         if (content == null) {
-          return Responses.notFound(name);
+          return HttpResponses.notFound(name);
         }
-        return new PayloadResponse(Status.success(200), content.toPayload());
+        return HttpResponses.ok(content.toPayload());
       }
 
       case "PUT": {
         SimpleContent content = new SimpleContent(context.getRequest().getPayload());
         SimpleContent prev = contentService.put(repository, name, content);
         if (prev == null) {
-          return new Response(Status.success(201));
+          return HttpResponses.created();
         }
-        return new Response(Status.success(204));
+        return HttpResponses.noContent();
       }
 
       case "DELETE": {
         SimpleContent prev = contentService.delete(repository, name);
         if (prev == null) {
-          return Responses.notFound(name);
+          return HttpResponses.notFound(name);
         }
-        return new Response(Status.success(204));
+        return HttpResponses.noContent();
       }
 
       default:
-        return Responses.methodNotAllowed(method, "GET", "PUT", "DELETE");
+        return HttpResponses.methodNotAllowed(method, "GET", "PUT", "DELETE");
     }
   }
 
@@ -93,7 +91,7 @@ public class SimpleContentHandler
    * Find content name from request context matcher state.
    */
   private String contentName(final Context context) {
-    RegexMatcher.State matchState = context.require(RegexMatcher.State.class);
-    return matchState.getMatchResult().group(1);
+    RegexMatcher.State state = context.require(RegexMatcher.State.class);
+    return state.getMatchResult().group(1);
   }
 }

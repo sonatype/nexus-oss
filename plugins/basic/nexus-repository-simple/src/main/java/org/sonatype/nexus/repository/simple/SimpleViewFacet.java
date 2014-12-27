@@ -17,15 +17,14 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.Responses;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
-import org.sonatype.nexus.repository.view.handlers.NotFoundHandler;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
@@ -65,7 +64,7 @@ public class SimpleViewFacet
           @Nonnull
           @Override
           public Response handle(final @Nonnull Context context) throws Exception {
-            return Responses.notFound("Xenu says no /foo for you");
+            return HttpResponses.notFound("Xenu says no /foo for you");
           }
         })
         .create());
@@ -93,10 +92,9 @@ public class SimpleViewFacet
           @Override
           public Response handle(@Nonnull final Context context) throws Exception {
             log.debug("Xenu may not be happy if you keep this up");
-            return context.proceed();
+            return HttpResponses.notFound();
           }
-        },
-        new NotFoundHandler()
+        }
     );
 
     return builder.create();

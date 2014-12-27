@@ -13,12 +13,12 @@
 package org.sonatype.nexus.repository.raw;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.raw.cache.RawCacheFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.PayloadResponse;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.Responses;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -61,7 +61,7 @@ public class CachingHandler
         return cachedResponse;
       }
 
-      return Responses.notFound();
+      return HttpResponses.notFound();
     }
   }
 

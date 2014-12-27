@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.repository.raw;
 
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.Responses;
 
 /**
  * This handler sets up the context to contain a request for a remote resource.
@@ -32,7 +32,7 @@ public class RemoteRequestHandler
     final Request request = context.getRequest();
 
     if(!"GET".equals(request.getAction())){
-      return  Responses.methodNotAllowed();
+      return  HttpResponses.methodNotAllowed();
     }
 
     Object remoteRequest = new Object();
