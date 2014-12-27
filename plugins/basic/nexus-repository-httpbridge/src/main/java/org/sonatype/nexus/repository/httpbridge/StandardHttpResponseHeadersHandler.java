@@ -23,17 +23,25 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Headers;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Adds standard HTTP response headers.
+ * Adds standard HTTP response headers:
+ *
+ * <ul>
+ *   <li>Server</li>
+ *   <li>X-Frame-Options</li>
+ *   <li>X-Content-Type-Options</li>
+ * </ul>
  *
  * @since 3.0
  */
 @Named
 @Singleton
 public class StandardHttpResponseHeadersHandler
+  extends ComponentSupport
   implements Handler
 {
   private final String server;
@@ -41,7 +49,9 @@ public class StandardHttpResponseHeadersHandler
   @Inject
   public StandardHttpResponseHeadersHandler(final Provider<SystemStatus> systemStatus) {
     checkNotNull(systemStatus);
-    this.server = String.format("Nexus/%s", systemStatus.get().getVersion());
+
+    SystemStatus status = systemStatus.get();
+    this.server = String.format("Nexus/%s (%s)", status.getVersion(), status.getEditionShort());
   }
 
   @Nonnull
