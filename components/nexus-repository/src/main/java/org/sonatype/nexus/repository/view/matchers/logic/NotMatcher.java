@@ -38,8 +38,8 @@ public class NotMatcher
   @Override
   protected boolean doMatches(final @Nonnull Context context) {
     for (Matcher matcher : matchers) {
-      boolean result = matcher.matches(context);
-      if (result) {
+      boolean matched = matcher.matches(context);
+      if (matched) {
         return false;
       }
     }
