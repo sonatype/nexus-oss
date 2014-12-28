@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  */
 public class Status
 {
-  private boolean successful;
+  private final boolean successful;
 
   private final int code;
 
