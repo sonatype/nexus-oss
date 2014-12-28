@@ -17,10 +17,7 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.nexus.repository.view.Request;
-
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,11 +40,10 @@ public class HttpRequest
     this.headers = new HttpHeaders(httpServletRequest);
 
     // copy http-servlet-request attributes
-    this.attributes = new Attributes(Maps.<String, Object>newHashMap());
     Enumeration<String> attributes = httpServletRequest.getAttributeNames();
     while (attributes.hasMoreElements()) {
       String name = attributes.nextElement();
-      this.attributes.set(name, httpServletRequest.getAttribute(name));
+      getAttributes().set(name, httpServletRequest.getAttribute(name));
     }
 
     // TODO: Can we tell if there is a payload or not from HttpServletRequest api?

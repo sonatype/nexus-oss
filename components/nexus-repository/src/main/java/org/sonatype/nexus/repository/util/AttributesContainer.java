@@ -29,15 +29,13 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public class Attributes
+public class AttributesContainer
   extends ComponentSupport
   implements Iterable<Entry<String,Object>>
 {
   private final Map<String, Object> backing;
 
-  // TODO: This is really more of a trait, and should probably use calling instance logger?
-
-  public Attributes(final Map<String, Object> backing) {
+  public AttributesContainer(final Map<String, Object> backing) {
     this.backing = checkNotNull(backing);
   }
 

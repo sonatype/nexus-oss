@@ -13,9 +13,11 @@
 
 package org.sonatype.nexus.repository.view;
 
-import org.sonatype.nexus.repository.util.Attributes;
+import org.sonatype.nexus.repository.util.AttributesContainer;
 
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * View response.
@@ -24,14 +26,29 @@ import com.google.common.collect.Maps;
  */
 public class Response
 {
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  private static class Attributes
+      extends AttributesContainer
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
+    }
+  }
+
+  private final Attributes attributes = new Attributes();
+
   private final Status status;
 
   private final Headers headers = new Headers();
 
-  private final Attributes attributes = new Attributes(Maps.<String, Object>newHashMap());
-
   public Response(final Status status) {
-    this.status = status;
+    this.status = checkNotNull(status);
+  }
+
+  public AttributesContainer getAttributes() {
+    return attributes;
   }
 
   public Status getStatus() {
@@ -40,10 +57,6 @@ public class Response
 
   public Headers getHeaders() {
     return headers;
-  }
-
-  public Attributes getAttributes() {
-    return attributes;
   }
 
   @Override

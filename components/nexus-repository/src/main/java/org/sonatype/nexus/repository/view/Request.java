@@ -15,7 +15,9 @@ package org.sonatype.nexus.repository.view;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.Attributes;
+import org.sonatype.nexus.repository.util.AttributesContainer;
+
+import com.google.common.collect.Maps;
 
 /**
  * View request.
@@ -24,6 +26,19 @@ import org.sonatype.nexus.repository.util.Attributes;
  */
 public class Request
 {
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  private static class Attributes
+      extends AttributesContainer
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
+    }
+  }
+
+  private final Attributes attributes = new Attributes();
+
   protected Repository repository;
 
   protected String action;
@@ -34,9 +49,11 @@ public class Request
 
   protected Headers headers;
 
-  protected Attributes attributes;
-
   protected Payload payload;
+
+  public AttributesContainer getAttributes() {
+    return attributes;
+  }
 
   // TODO: Add setters and sanity conditions, and/or introduce a builder to be used for direct api usage?
 
@@ -60,10 +77,6 @@ public class Request
 
   public Headers getHeaders() {
     return headers;
-  }
-
-  public Attributes getAttributes() {
-    return attributes;
   }
 
   @Nullable

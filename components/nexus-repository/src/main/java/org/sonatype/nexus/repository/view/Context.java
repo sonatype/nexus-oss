@@ -16,7 +16,7 @@ import java.util.ListIterator;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.util.Attributes;
+import org.sonatype.nexus.repository.util.AttributesContainer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
@@ -32,9 +32,20 @@ import static com.google.common.base.Preconditions.checkState;
 public class Context
     extends ComponentSupport
 {
-  private final Request request;
+  /**
+   * Custom attributes to configure backing and logging.
+   */
+  private static class Attributes
+    extends AttributesContainer
+  {
+    public Attributes() {
+      super(Maps.<String, Object>newHashMap());
+    }
+  }
 
-  private final Attributes attributes = new Attributes(Maps.<String, Object>newHashMap());
+  private final Attributes attributes = new Attributes();
+
+  private final Request request;
 
   private ListIterator<Handler> handlers;
 
@@ -42,12 +53,12 @@ public class Context
     this.request = checkNotNull(request);
   }
 
-  public Request getRequest() {
-    return request;
+  public AttributesContainer getAttributes() {
+    return attributes;
   }
 
-  public Attributes getAttributes() {
-    return attributes;
+  public Request getRequest() {
+    return request;
   }
 
   /**
