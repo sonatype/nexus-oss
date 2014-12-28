@@ -28,19 +28,19 @@ public class LogicMatchers
 {
   public static Matcher and(final Matcher... matchers) {
     checkNotNull(matchers);
-    checkArgument(matchers.length > 1);
+    checkArgument(matchers.length > 1, "AND requires 2 or more matches");
     return new AndMatcher(Arrays.asList(matchers));
   }
 
   public static Matcher or(final Matcher... matchers) {
     checkNotNull(matchers);
-    checkArgument(matchers.length > 1);
+    checkArgument(matchers.length > 1, "OR requires 2 or more matches");
     return new OrMatcher(Arrays.asList(matchers));
   }
 
   public static Matcher not(final Matcher... matchers) {
     checkNotNull(matchers);
-    checkArgument(matchers.length > 0);
+    checkArgument(matchers.length > 0, "NOT requires at least one matcher");
     return new NotMatcher(Arrays.asList(matchers));
   }
 }
