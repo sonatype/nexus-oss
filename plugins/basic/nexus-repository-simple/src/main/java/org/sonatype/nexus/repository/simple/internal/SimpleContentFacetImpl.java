@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
@@ -59,6 +60,7 @@ public class SimpleContentFacetImpl
   }
 
   @Override
+  @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
     ensureStarted();
@@ -66,6 +68,7 @@ public class SimpleContentFacetImpl
   }
 
   @Override
+  @Nullable
   public SimpleContent put(final String name, final SimpleContent content) {
     checkNotNull(name);
     checkNotNull(content);
@@ -82,6 +85,7 @@ public class SimpleContentFacetImpl
   }
 
   @Override
+  @Nullable
   public SimpleContent delete(final String name) {
     checkNotNull(name);
     ensureStarted();

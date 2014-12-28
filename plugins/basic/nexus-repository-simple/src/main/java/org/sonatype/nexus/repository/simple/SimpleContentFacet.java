@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
 
 /**
@@ -23,10 +25,13 @@ import org.sonatype.nexus.repository.Facet;
 public interface SimpleContentFacet
   extends Facet
 {
+  @Nullable
   SimpleContent get(String name);
 
+  @Nullable
   SimpleContent put(String name, SimpleContent content);
 
+  @Nullable
   SimpleContent delete(String name);
 
   String indexHtml();
