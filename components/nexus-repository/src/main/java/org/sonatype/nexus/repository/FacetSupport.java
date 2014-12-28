@@ -84,7 +84,7 @@ public abstract class FacetSupport
     log.debug("Stopped");
   }
 
-  private void doStop() throws Exception {
+  protected void doStop() throws Exception {
     // nop
   }
 
@@ -99,7 +99,7 @@ public abstract class FacetSupport
     log.debug("Destroyed");
   }
 
-  private void doDestroy() throws Exception {
+  protected void doDestroy() throws Exception {
     // nop
   }
 }
