@@ -28,13 +28,13 @@ public class LogicMatchers
 {
   public static Matcher and(final Matcher... matchers) {
     checkNotNull(matchers);
-    checkArgument(matchers.length > 1, "AND requires 2 or more matches");
+    checkArgument(matchers.length > 1, "AND requires 2 or more matchers");
     return new AndMatcher(Arrays.asList(matchers));
   }
 
   public static Matcher or(final Matcher... matchers) {
     checkNotNull(matchers);
-    checkArgument(matchers.length > 1, "OR requires 2 or more matches");
+    checkArgument(matchers.length > 1, "OR requires 2 or more matchers");
     return new OrMatcher(Arrays.asList(matchers));
   }
 
