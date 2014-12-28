@@ -23,7 +23,15 @@ import org.sonatype.nexus.repository.Facet;
 public interface ViewFacet
     extends Facet
 {
+  /**
+   * Install router.
+   *
+   * This must be called before any call to {@link #dispatch}.
+   */
   void install(Router router);
 
+  /**
+   * Dispatch request to router.
+   */
   Response dispatch(Request request) throws Exception;
 }
