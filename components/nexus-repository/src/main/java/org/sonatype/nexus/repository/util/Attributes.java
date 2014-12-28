@@ -35,6 +35,8 @@ public class Attributes
 {
   private final Map<String, Object> backing;
 
+  // TODO: This is really more of a trait, and should probably use calling instance logger?
+
   public Attributes(final Map<String, Object> backing) {
     this.backing = checkNotNull(backing);
   }

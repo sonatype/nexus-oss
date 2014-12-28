@@ -29,8 +29,6 @@ public interface Repository
 
   String getName();
 
-  //Attributes getAttributes();
-
   void init(Configuration configuration) throws Exception;
 
   //void update(Configuration configuration) throws Exception;

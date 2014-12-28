@@ -39,8 +39,6 @@ public class RepositoryImpl
 
   private final Format format;
 
-  //private final Attributes attributes = new Attributes(Maps.<String, Object>newConcurrentMap());
-
   private final FacetLookup facets = new FacetLookup();
 
   private String name;
@@ -74,11 +72,6 @@ public class RepositoryImpl
   public String getName() {
     return name;
   }
-
-  //@Override
-  //public Attributes getAttributes() {
-  //  return attributes;
-  //}
 
   @Override
   public Configuration getConfiguration() {
