@@ -16,8 +16,8 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.repository.Attributes;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.nexus.repository.view.Request;
 
 import static com.google.common.base.Preconditions.checkNotNull;

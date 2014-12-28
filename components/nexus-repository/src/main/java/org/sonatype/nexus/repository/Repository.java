@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository;
 
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.util.Attributes;
 
 /**
  * Repository.

@@ -14,8 +14,8 @@ package org.sonatype.nexus.repository.view;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.Attributes;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.util.Attributes;
 
 /**
  * View request.

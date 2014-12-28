@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import org.sonatype.nexus.repository.util.StringMultimap;
+
 import com.google.common.collect.ListMultimap;
 
 /**

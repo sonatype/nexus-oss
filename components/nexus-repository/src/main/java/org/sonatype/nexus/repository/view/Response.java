@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.repository.view;
 
-import org.sonatype.nexus.repository.Attributes;
+import org.sonatype.nexus.repository.util.Attributes;
 
 /**
  * View response.

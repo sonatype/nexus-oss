@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

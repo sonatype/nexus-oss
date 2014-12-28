@@ -16,7 +16,7 @@ import java.util.ListIterator;
 
 import javax.annotation.Nonnull;
 
-import org.sonatype.nexus.repository.Attributes;
+import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;

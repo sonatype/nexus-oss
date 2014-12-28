@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.view
 
 import org.junit.Before
 import org.junit.Test
+import org.sonatype.nexus.repository.util.StringMultimap
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
