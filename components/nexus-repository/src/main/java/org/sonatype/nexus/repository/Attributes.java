@@ -86,6 +86,16 @@ public class Attributes
     remove(type.getName());
   }
 
+  public boolean defined(final String key) {
+    checkNotNull(key);
+    return backing.containsKey(key);
+  }
+
+  public boolean defined(final Class type) {
+    checkNotNull(type);
+    return defined(type.getName());
+  }
+
   public Set<String> keys() {
     return backing.keySet();
   }
