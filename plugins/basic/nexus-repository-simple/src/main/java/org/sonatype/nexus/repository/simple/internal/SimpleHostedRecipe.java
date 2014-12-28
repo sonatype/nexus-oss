@@ -22,12 +22,9 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.types.HostedType;
-import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -101,14 +98,7 @@ public class SimpleHostedRecipe
 
     builder.defaultHandlers(
         timingHandler,
-        new Handler()
-        {
-          @Nonnull
-          @Override
-          public Response handle(final @Nonnull Context context) throws Exception {
-            return HttpResponses.notFound();
-          }
-        }
+        HttpHandlers.notFound()
     );
 
     viewFacet.install(builder.create());
