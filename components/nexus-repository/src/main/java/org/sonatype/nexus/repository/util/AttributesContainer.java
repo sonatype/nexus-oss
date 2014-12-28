@@ -39,6 +39,10 @@ public class AttributesContainer
     this.backing = checkNotNull(backing);
   }
 
+  private String key(final Class type) {
+    return type.getName();
+  }
+
   @Nullable
   public Object get(final String key) {
     checkNotNull(key);
@@ -49,43 +53,46 @@ public class AttributesContainer
   @SuppressWarnings("unchecked")
   public <T> T get(final Class<T> type) {
     checkNotNull(type);
-    return (T) get(type.getName());
+    return (T) get(key(type));
   }
 
   public Object require(final String key) {
     Object value = get(key);
-    checkState(value != null, "Missing attribute: %s", key);
+    checkState(value != null, "Missing: %s", key);
     return value;
   }
 
   public <T> T require(final Class<T> type) {
     T value = get(type);
-    checkState(value != null, "Missing attribute: %s", type.getName());
+    checkState(value != null, "Missing: %s", key(type));
     return value;
   }
 
   public Object set(final String key, final Object value) {
     checkNotNull(key);
     checkNotNull(value);
-    log.trace("Set: {}={}", key, value);
-    return backing.put(key, value);
+    Object replaced = backing.put(key, value);
+    log.trace("Set: {}={} ({})", key, value, value.getClass().getName());
+    return replaced;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T set(final Class<T> type, final T value) {
     checkNotNull(type);
-    return (T) set(type.getName(), value);
+    return (T) set(key(type), value);
   }
 
   public void remove(final String key) {
     checkNotNull(key);
-    log.trace("Remove: {}", key);
-    backing.remove(key);
+    Object removed = backing.remove(key);
+    if (removed != null) {
+      log.trace("Removed: {}", key);
+    }
   }
 
   public void remove(final Class type) {
     checkNotNull(type);
-    remove(type.getName());
+    remove(key(type));
   }
 
   public boolean defined(final String key) {
@@ -95,7 +102,7 @@ public class AttributesContainer
 
   public boolean defined(final Class type) {
     checkNotNull(type);
-    return defined(type.getName());
+    return defined(key(type));
   }
 
   public Set<String> keys() {
@@ -121,7 +128,7 @@ public class AttributesContainer
 
   public void clear() {
     backing.clear();
-    log.debug("Cleared");
+    log.trace("Cleared");
   }
 
   @Override

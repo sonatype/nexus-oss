@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -49,7 +50,7 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
-  private final Provider<SimpleContentFacetImpl> contentFacet;
+  private final Provider<SimpleContentFacet> contentFacet;
 
   private final TimingHandler timingHandler;
 
@@ -60,7 +61,7 @@ public class SimpleHostedRecipe
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
-                            final Provider<SimpleContentFacetImpl> contentFacet,
+                            final Provider<SimpleContentFacet> contentFacet,
                             final TimingHandler timingHandler,
                             final SimpleIndexHandler indexHandler,
                             final SimpleContentHandler contentHandler)
