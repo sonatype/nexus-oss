@@ -25,8 +25,6 @@ public interface ViewFacet
 {
   /**
    * Install router.
-   *
-   * This must be called before any call to {@link #dispatch}.
    */
   void install(Router router);
 
