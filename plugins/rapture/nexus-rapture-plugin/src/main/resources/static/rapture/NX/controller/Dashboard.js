@@ -31,7 +31,8 @@ Ext.define('NX.controller.Dashboard', {
       path: '/Welcome',
       mode: 'browse',
       view: 'NX.view.dashboard.Welcome',
-      description: 'Welcome to Sonatype Nexus!',
+      text: NX.I18n.get('BROWSE_WELCOME_TITLE'),
+      description: NX.I18n.get('BROWSE_WELCOME_SUBTITLE'),
       iconConfig: {
         file: 'house.png',
         variants: ['x16', 'x32']

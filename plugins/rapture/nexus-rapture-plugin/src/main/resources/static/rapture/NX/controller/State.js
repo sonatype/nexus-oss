@@ -361,13 +361,14 @@ Ext.define('NX.controller.State', {
               'Server disconnected',
               'There is a problem communicating with the server',
               {
+                buttonText: {
+                  ok: 'Retry'
+                },
+
                 fn: function () {
                   // retry after the dialog is dismissed
                   me.statusProvider.connect();
                 }
-
-                // FIXME: Show "Retry" as button text
-                // FIXME: Get icon to show up ... stupid icons
               }
           );
         }

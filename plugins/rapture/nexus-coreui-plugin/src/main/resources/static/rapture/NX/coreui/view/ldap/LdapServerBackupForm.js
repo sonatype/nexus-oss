@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
   settingsFormSuccessMessage: function(data) {
     return 'LDAP server updated: ' + data['name'];
   },
-  editableMarker: 'You do not have permission to update LDAP servers',
+  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-backup-fieldset' },
 

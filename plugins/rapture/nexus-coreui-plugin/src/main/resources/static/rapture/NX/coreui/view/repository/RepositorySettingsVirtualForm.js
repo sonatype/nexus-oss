@@ -46,24 +46,24 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
       {
         xtype: 'checkbox',
         name: 'browseable',
-        fieldLabel: 'Allow file browsing',
-        helpText: 'Allow users to browse the contents of the repository.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
-        fieldLabel: 'Publish URL',
-        helpText: 'Expose the URL of the repository to users.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {
         xtype: 'combo',
         name: 'shadowOf',
         itemId: 'shadowOf',
-        fieldLabel: 'Source repository',
-        helpText: 'Physical repository being presented as a logical view by the repository.',
-        emptyText: 'select a repository',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SOURCE'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SOURCE_HELP'),
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SOURCE_PLACEHOLDER'),
         editable: false,
         readOnly: true,
         store: me.repositoryStore,
@@ -74,8 +74,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
       {
         xtype: 'checkbox',
         name: 'synchronizeAtStartup',
-        fieldLabel: 'Synchronize on Startup',
-        helpText: 'Rebuild virtual links when the server starts.',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SYNCHRONIZE'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_SYNCHRONIZE_HELP'),
         value: true
       }
     ];

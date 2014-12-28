@@ -49,7 +49,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/System Information',
-      description: 'Shows system information',
+      text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_TITLE'),
+      description: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_SUBTITLE'),
       view: { xtype: 'nx-coreui-support-sysinfo' },
       iconConfig: {
         file: 'globe_place.png',

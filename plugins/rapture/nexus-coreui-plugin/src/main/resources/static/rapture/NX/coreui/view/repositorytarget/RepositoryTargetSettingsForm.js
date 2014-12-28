@@ -47,16 +47,16 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: 'Name',
-        helpText: 'The name of the repository target.',
-        emptyText: 'enter a target name'
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME'),
+        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_HELP'),
+        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_PLACEHOLDER')
       },
       {
         xtype: 'combo',
         name: 'format',
-        fieldLabel: 'Repository Type',
-        helpText: 'The content class of the repository target. It will be matched only against repositories with the same content class.',
-        emptyText: 'select a repository type',
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_TYPE'),
+        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_TYPE_HELP'),
+        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_TYPE_PLACEHOLDER'),
         editable: false,
         store: 'RepositoryFormat',
         queryMode: 'local',
@@ -67,9 +67,9 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
         xtype: 'nx-valueset',
         name: 'patterns',
         itemId: 'patterns',
-        fieldLabel: 'Patterns',
-        helpText: 'Enter a pattern expression and click "Add" to add it to the list. Regular expressions are used to match the artifact path. ".*" is used to specify all paths. ".*/com/some/company/.*" will match any artifact with "com.some.company" as the group id or artifact id. "^/com/some/company/.*" will match any artifact starting with com/some/company.',
-        emptyText: 'enter a pattern expression',
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_PATTERNS'),
+        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_PATTERNS_HELP'),
+        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_PATTERNS_PLACEHOLDER'),
         input: {
           xtype: 'nx-regexp'
         },

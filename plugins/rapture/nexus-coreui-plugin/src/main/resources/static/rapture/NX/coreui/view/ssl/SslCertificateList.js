@@ -35,14 +35,14 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
         return 'sslcertificate-default';
       }
     },
-    { header: 'Name', dataIndex: 'subjectCommonName', flex: 1 },
-    { header: 'Issued To', dataIndex: 'issuerCommonName', flex: 1 },
-    { header: 'Issued By', dataIndex: 'issuerCommonName', flex: 1 },
-    { header: 'Fingerprint', dataIndex: 'fingerprint', flex: 1 }
+    { header: NX.I18n.get('ADMIN_SSL_LIST_NAME_COLUMN'), dataIndex: 'subjectCommonName', flex: 1 },
+    { header: NX.I18n.get('ADMIN_SSL_LIST_TO_COLUMN'), dataIndex: 'issuerCommonName', flex: 1 },
+    { header: NX.I18n.get('ADMIN_SSL_LIST_BY_COLUMN'), dataIndex: 'issuerCommonName', flex: 1 },
+    { header: NX.I18n.get('ADMIN_SSL_LIST_FINGERPRINT_COLUMN'), dataIndex: 'fingerprint', flex: 1 }
   ],
 
   viewConfig: {
-    emptyText: 'No SSL certificates',
+    emptyText: NX.I18n.get('ADMIN_SSL_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 
@@ -59,18 +59,18 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
     me.tbar = [
       {
         xtype: 'button',
-        text: 'New',
+        text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'),
         glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
         action: 'new',
         disabled: true,
         menu: [
           {
-            text: 'Load from server',
+            text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'),
             action: 'newfromserver',
             iconCls: NX.Icons.cls('sslcertificate-add-by-server', 'x16')
           },
           {
-            text: 'Paste PEM',
+            text: NX.I18n.get('ADMIN_SSL_LIST_PASTE_BUTTON'),
             action: 'newfrompem',
             iconCls: NX.Icons.cls('sslcertificate-add-by-pem', 'x16')
           }

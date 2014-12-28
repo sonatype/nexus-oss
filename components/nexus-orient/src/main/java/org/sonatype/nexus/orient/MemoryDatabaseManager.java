@@ -10,37 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.internal.orient;
+
+package org.sonatype.nexus.orient;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.orient.Hex;
-import org.sonatype.nexus.orient.RecordIdObfuscator;
-import org.sonatype.nexus.orient.RecordIdObfuscatorSupport;
-
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-
 /**
- * HEX-encoding {@link RecordIdObfuscator}.
+ * In-memory {@link DatabaseManager} implementation.
  *
  * @since 3.0
  */
-@Named("hex")
+@Named("memory")
 @Singleton
-public class HexRecordIdObfuscator
-  extends RecordIdObfuscatorSupport
+public class MemoryDatabaseManager
+    extends DatabaseManagerSupport
 {
   @Override
-  protected String doEncode(final OClass type, final ORID rid) throws Exception {
-    return Hex.encode(rid.toStream());
-  }
-
-  @Override
-  protected ORID doDecode(final OClass type, final String encoded) throws Exception {
-    byte[] decoded = Hex.decode(encoded);
-    return new ORecordId().fromStream(decoded);
+  protected String connectionUri(final String name) {
+    return "memory:" + name;
   }
 }

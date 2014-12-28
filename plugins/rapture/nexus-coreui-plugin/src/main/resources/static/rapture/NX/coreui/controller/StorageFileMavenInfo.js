@@ -46,26 +46,20 @@ Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
   onUpdated: function(container, repositoryId, path) {
     NX.direct.coreui_Maven.readInfo(repositoryId, path, function(response) {
       var panel = container.down('nx-coreui-repositorybrowse-storagefilemaveninfo'),
-          info;
+          info = {};
 
       if (Ext.isObject(response) && response.success && response.data) {
         if (!panel) {
           panel = container.add({ xtype: 'nx-coreui-repositorybrowse-storagefilemaveninfo', weight: 20 });
         }
-        info = {
-          'Group': response.data['groupId'],
-          'Artifact': response.data['artifactId'],
-          'Version': response.data['version']
-        };
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_GROUP')] = response.data['groupId'];
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_ARTIFACT')] = response.data['artifactId'];
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_VERSION')] = response.data['version'];
         if (response.data['classifier']) {
-          info = Ext.apply(info, {
-            'Classifier': response.data['classifier']
-          });
+          info[NX.I18n.get('BROWSE_SEARCH_MAVEN_CLASSIFIER')] = response.data['classifier'];
         }
-        info = Ext.apply(info, {
-          'Extension': response.data['extension'],
-          'XML': '<pre>' + Ext.String.htmlEncode(response.data['xml']) + '</pre>'
-        });
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_EXTENSION')] = response.data['extension'];
+        info[NX.I18n.get('BROWSE_SEARCH_MAVEN_XML')] = '<pre>' + Ext.String.htmlEncode(response.data['xml']) + '</pre>';
         panel.showInfo(info);
       }
       else {

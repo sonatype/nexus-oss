@@ -63,7 +63,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       {
         mode: 'browse',
         path: '/Repository/Standard',
-        description: 'Browse standard repositories',
+        text: NX.I18n.get('BROWSE_STANDARD_TITLE'),
+        description: NX.I18n.get('BROWSE_STANDARD_SUBTITLE'),
         view: { xtype: 'nx-coreui-repositorybrowse-feature', repositoryStore: 'BrowseStandardRepository' },
         weight: 10,
         authenticationRequired: false,
@@ -78,7 +79,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       {
         mode: 'browse',
         path: '/Repository/Managed',
-        description: 'Browse managed repositories',
+        text: NX.I18n.get('BROWSE_MANAGED_TITLE'),
+        description: NX.I18n.get('BROWSE_MANAGED_SUBTITLE'),
         view: { xtype: 'nx-coreui-repositorybrowse-feature', repositoryStore: 'BrowseManagedRepository' },
         weight: 300,
         iconConfig: {
