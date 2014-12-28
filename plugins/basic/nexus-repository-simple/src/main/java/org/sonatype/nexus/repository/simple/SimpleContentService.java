@@ -37,6 +37,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleContentService
   extends ComponentSupport
 {
+  /**
+   * Container for simple repository contents.  Sorted in repository attributes.
+   */
   private static class RepositoryContents
   {
     private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
@@ -44,6 +47,8 @@ public class SimpleContentService
 
   /**
    * Return collection of repository specific contents.
+   *
+   * Store simple contents in repository attributes, so the repository framework manages when these go away.
    */
   private Map<String, SimpleContent> contents(final Repository repository) {
     RepositoryContents contents = repository.getAttributes().get(RepositoryContents.class);
