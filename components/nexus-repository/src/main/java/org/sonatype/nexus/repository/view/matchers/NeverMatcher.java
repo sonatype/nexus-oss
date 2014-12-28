@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.view.matchers;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * Never matcher.
@@ -22,7 +21,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
  * @since 3.0
  */
 public class NeverMatcher
-  extends ComponentSupport
   implements Matcher
 {
   @Override
