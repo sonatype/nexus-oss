@@ -76,6 +76,10 @@ public class SimpleHostedRecipe
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(contentFacet.get());
 
+    configureView(repository);
+  }
+
+  private void configureView(final Repository repository) {
     ViewFacet viewFacet = repository.facet(ViewFacet.class);
 
     // TODO: Consider if we want to add route-ids so we can reference defined routes for re-use (maybe builder state only)?
