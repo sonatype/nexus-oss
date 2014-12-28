@@ -12,38 +12,35 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
+import javax.inject.Named;
 
+import org.sonatype.nexus.repository.FacetSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Support for {@link ViewFacet} implementations.
+ * Default {@link ViewFacet} implementation.
  *
  * @since 3.0
  */
-public abstract class ViewFacetSupport
+@Named
+public class ViewFacetImpl
   extends FacetSupport
   implements ViewFacet
 {
   private Router router;
 
   @Override
-  protected void doInit(final Repository repository) throws Exception {
-    router = createRouter();
-    log.debug("Created router: {}", router);
-  }
-
-  protected abstract Router createRouter() throws Exception;
-
-  @Override
-  public Router getRouter() {
-    checkState(router != null, "Not initialized");
-    return router;
+  public void install(final Router router) {
+    checkNotNull(router);
+    checkState(this.router == null, "Router already installed");
+    this.router = router;
   }
 
   @Override
   public Response dispatch(final Request request) throws Exception {
-    return getRouter().dispatch(request);
+    checkState(router != null, "Router not installed");
+    return router.dispatch(request);
   }
 }

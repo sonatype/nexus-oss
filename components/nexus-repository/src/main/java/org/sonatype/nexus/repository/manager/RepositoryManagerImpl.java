@@ -59,6 +59,8 @@ public class RepositoryManagerImpl
 
   private final Provider<ConfigurationFacet> configFacet;
 
+  private final Provider<ViewFacet> viewFacet;
+
   private final Map<String, Repository> repositories = Maps.newHashMap();
 
   @Inject
@@ -66,12 +68,14 @@ public class RepositoryManagerImpl
                                final ConfigurationStore store,
                                final RepositoryFactory factory,
                                final Provider<ConfigurationFacet> configFacet,
+                               final Provider<ViewFacet> viewFacet,
                                final Map<String,Recipe> recipes)
   {
     this.eventBus = checkNotNull(eventBus);
     this.store = checkNotNull(store);
     this.factory = checkNotNull(factory);
     this.configFacet = checkNotNull(configFacet);
+    this.viewFacet = checkNotNull(viewFacet);
     this.recipes = checkNotNull(recipes);
   }
 
@@ -106,12 +110,10 @@ public class RepositoryManagerImpl
 
     // attach mandatory facets
     repository.attach(configFacet.get());
+    repository.attach(viewFacet.get());
 
     // apply recipe to repository
     recipe.apply(repository);
-
-    // ensure required facets present
-    repository.facet(ViewFacet.class);
 
     return repository;
   }

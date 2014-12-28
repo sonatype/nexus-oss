@@ -22,9 +22,20 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.view.Context;
+import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.Route;
+import org.sonatype.nexus.repository.view.Router;
+import org.sonatype.nexus.repository.view.ViewFacet;
+import org.sonatype.nexus.repository.view.handlers.TimingHandler;
+import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
+import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or;
 
 /**
  * Simple hosted repository recipe.
@@ -40,22 +51,63 @@ public class SimpleHostedRecipe
 
   private final Provider<SimpleContentFacetImpl> contentFacet;
 
-  private final Provider<SimpleViewFacet> viewFacet;
+  private final TimingHandler timingHandler;
+
+  private final SimpleIndexHandler indexHandler;
+
+  private final SimpleContentHandler contentHandler;
 
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
                             final Provider<SimpleContentFacetImpl> contentFacet,
-                            final Provider<SimpleViewFacet> viewFacet)
+                            final TimingHandler timingHandler,
+                            final SimpleIndexHandler indexHandler,
+                            final SimpleContentHandler contentHandler)
   {
     super(type, format);
     this.contentFacet = checkNotNull(contentFacet);
-    this.viewFacet = checkNotNull(viewFacet);
+    this.timingHandler = checkNotNull(timingHandler);
+    this.indexHandler = checkNotNull(indexHandler);
+    this.contentHandler = checkNotNull(contentHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(contentFacet.get());
-    repository.attach(viewFacet.get());
+
+    ViewFacet viewFacet = repository.facet(ViewFacet.class);
+
+    // TODO: Consider if we want to add route-ids so we can reference defined routes for re-use (maybe builder state only)?
+    // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
+
+    Router.Builder builder = new Router.Builder();
+
+    builder.route(new Route.Builder()
+        .matcher(or(
+            new LiteralMatcher("/"),
+            new LiteralMatcher("/index.html")))
+        .handler(timingHandler)
+        .handler(indexHandler)
+        .create());
+
+    builder.route(new Route.Builder()
+        .matcher(new RegexMatcher("/(.*)"))
+        .handler(timingHandler)
+        .handler(contentHandler)
+        .create());
+
+    builder.defaultHandlers(
+        timingHandler,
+        new Handler()
+        {
+          @Override
+          public Response handle(final @Nonnull Context context) throws Exception {
+            return HttpResponses.notFound();
+          }
+        }
+    );
+
+    viewFacet.install(builder.create());
   }
 }

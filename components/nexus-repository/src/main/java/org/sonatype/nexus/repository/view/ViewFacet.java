@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.Facet;
 public interface ViewFacet
     extends Facet
 {
-  Router getRouter();
+  void install(Router router);
 
   Response dispatch(Request request) throws Exception;
 }

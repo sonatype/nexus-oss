@@ -13,48 +13,43 @@
 
 package org.sonatype.nexus.repository.raw;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.repository.view.Router;
-import org.sonatype.nexus.repository.view.ViewFacetSupport;
-
 /**
  * A proxy for the remote content.
  *
  * @since 3.0
  */
-@Named
+//@Named
 public class RawProxyViewFacet
-    extends ViewFacetSupport
+    //extends ViewFacetImpl
 {
   public static final String CONFIG_KEY = "raw_proxy_view_facet";
 
-  @Override
-  protected Router createRouter() throws Exception {
-    //final Configuration configuration = repository.getConfiguration();
-    //
-    //final Router router = getRouter();
-    //
-    //// Do we have the content cached already? Is the cache up to date?
-    //
-    //// Can we find the content remotely?
-    //
-    //
-    //// Build the primary route of the raw proxy view
-    //
-    //final List<Handler> handlers = Lists.newArrayList();
-    //
-    //// Check the cache to see if we
-    ////handlers.add(new CacheCheckHandler(repository));
-    //handlers.add(new RemoteFetchHandler(repository));
-    //
-    //final Route route = new Route(new AlwaysMatcher(), handlers);
-    //
-    //router.route(route);
-    //
-    //// By default, return a 404
-    //router.defaultHandlers(new DefaultRoute(Arrays.asList((Handler) new NotFoundHandler())));
-
-    return null;
-  }
+  //@Override
+  //protected Router createRouter() throws Exception {
+  //  //final Configuration configuration = repository.getConfiguration();
+  //  //
+  //  //final Router router = getRouter();
+  //  //
+  //  //// Do we have the content cached already? Is the cache up to date?
+  //  //
+  //  //// Can we find the content remotely?
+  //  //
+  //  //
+  //  //// Build the primary route of the raw proxy view
+  //  //
+  //  //final List<Handler> handlers = Lists.newArrayList();
+  //  //
+  //  //// Check the cache to see if we
+  //  ////handlers.add(new CacheCheckHandler(repository));
+  //  //handlers.add(new RemoteFetchHandler(repository));
+  //  //
+  //  //final Route route = new Route(new AlwaysMatcher(), handlers);
+  //  //
+  //  //router.route(route);
+  //  //
+  //  //// By default, return a 404
+  //  //router.defaultHandlers(new DefaultRoute(Arrays.asList((Handler) new NotFoundHandler())));
+  //
+  //  return null;
+  //}
 }
