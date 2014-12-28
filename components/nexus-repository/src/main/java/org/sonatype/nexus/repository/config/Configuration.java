@@ -62,7 +62,7 @@ public class Configuration
     this.attributes = attributes;
   }
 
-  public Attributes attributes(final String key) {
+  public ConfigurationAttributes attributes(final String key) {
     checkNotNull(key);
 
     if (attributes == null) {
@@ -75,7 +75,7 @@ public class Configuration
       attributes.put(key, map);
     }
 
-    return new Attributes(key, map);
+    return new ConfigurationAttributes(key, map);
   }
 
   @Override

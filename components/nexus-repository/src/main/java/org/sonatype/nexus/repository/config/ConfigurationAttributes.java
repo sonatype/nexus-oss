@@ -23,35 +23,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Configuration attributes.
+ * {@link Configuration} attributes.
  *
  * @since 3.0
  */
-public class Attributes
+public class ConfigurationAttributes
 {
   @VisibleForTesting
   static final String GRANDPARENT_SEPARATOR = "::";
 
   @Nullable
-  private final Attributes parent;
+  private final ConfigurationAttributes parent;
 
   private final String key;
 
   private final Map<String,Object> map;
 
-  public Attributes(final String key, final Map<String, Object> map) {
+  public ConfigurationAttributes(final String key, final Map<String, Object> map) {
     this(null, key, map);
   }
 
   @VisibleForTesting
-  Attributes(final @Nullable Attributes parent, final String key, final Map<String, Object> map) {
+  ConfigurationAttributes(final @Nullable ConfigurationAttributes parent, final String key,
+                          final Map<String, Object> map) {
     this.parent = parent;
     this.key = checkNotNull(key);
     this.map = checkNotNull(map);
   }
 
   @Nullable
-  public Attributes getParent() {
+  public ConfigurationAttributes getParent() {
     return parent;
   }
 
@@ -94,7 +95,7 @@ public class Attributes
     map.remove(name);
   }
 
-  public Attributes child(final String name) {
+  public ConfigurationAttributes child(final String name) {
     checkNotNull(name);
 
     Object child = map.get(name);
@@ -106,7 +107,7 @@ public class Attributes
       checkState(child instanceof Map, "child '%s' not a Map", name);
     }
     //noinspection unchecked,ConstantConditions
-    return new Attributes(this, name, (Map<String, Object>) child);
+    return new ConfigurationAttributes(this, name, (Map<String, Object>) child);
   }
 
   @Override

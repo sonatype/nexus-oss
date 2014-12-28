@@ -18,8 +18,8 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Attributes;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationAttributes;
 import org.sonatype.nexus.repository.view.Response;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -64,7 +64,7 @@ public class HttpClientFacet
   protected void doInit(final Repository repository) throws Exception {
     final Configuration configuration = repository.getConfiguration();
 
-    final Attributes attributes = configuration.attributes(CONFIG_KEY);
+    final ConfigurationAttributes attributes = configuration.attributes(CONFIG_KEY);
     final String remoteUrl = (String) attributes.get(REMOTE_URL);
 
     this.remoteUrlBase = remoteUrl;

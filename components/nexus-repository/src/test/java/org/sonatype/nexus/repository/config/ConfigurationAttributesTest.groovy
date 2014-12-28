@@ -15,27 +15,27 @@ package org.sonatype.nexus.repository.config
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
+import static ConfigurationAttributes.GRANDPARENT_SEPARATOR
 import static org.junit.Assert.fail
-import static org.sonatype.nexus.repository.config.Attributes.GRANDPARENT_SEPARATOR
 
 /**
- * Tests for {@link Attributes}.
+ * Tests for {@link ConfigurationAttributes}.
  */
-class AttributesTest
+class ConfigurationAttributesTest
   extends TestSupport
 {
   @Test
   void 'parentKey null when no parent'() {
-    Attributes child = new Attributes('foo', [:])
+    ConfigurationAttributes child = new ConfigurationAttributes('foo', [:])
     assert child.key == 'foo'
     assert child.parentKey == null
   }
 
   @Test
   void 'parentKey includes grandparent'() {
-    Attributes grandparent = new Attributes('foo', [:])
-    Attributes parent = grandparent.child('bar')
-    Attributes child = parent.child('baz')
+    ConfigurationAttributes grandparent = new ConfigurationAttributes('foo', [:])
+    ConfigurationAttributes parent = grandparent.child('bar')
+    ConfigurationAttributes child = parent.child('baz')
 
     assert grandparent.key == 'foo'
     assert parent.key == 'bar'
@@ -45,7 +45,7 @@ class AttributesTest
 
   @Test
   void 'set with map value fails'() {
-    Attributes attributes = new Attributes('foo', [:])
+    ConfigurationAttributes attributes = new ConfigurationAttributes('foo', [:])
     try {
       attributes.set('invalid', [:])
       fail()
@@ -57,7 +57,7 @@ class AttributesTest
 
   @Test
   void 'child() with non-map value fails'() {
-    Attributes attributes = new Attributes('foo', [:])
+    ConfigurationAttributes attributes = new ConfigurationAttributes('foo', [:])
     attributes.set('value', false)
 
     try {
