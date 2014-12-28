@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.view;
 
 import org.sonatype.nexus.repository.util.Attributes;
 
+import com.google.common.collect.Maps;
+
 /**
  * View response.
  *
@@ -26,7 +28,7 @@ public class Response
 
   private final Headers headers = new Headers();
 
-  private final Attributes attributes = new Attributes();
+  private final Attributes attributes = new Attributes(Maps.<String, Object>newHashMap());
 
   public Response(final Status status) {
     this.status = status;

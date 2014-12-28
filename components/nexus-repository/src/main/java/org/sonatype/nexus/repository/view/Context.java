@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -32,7 +34,7 @@ public class Context
 {
   private final Request request;
 
-  private final Attributes attributes = new Attributes();
+  private final Attributes attributes = new Attributes(Maps.<String, Object>newHashMap());
 
   private ListIterator<Handler> handlers;
 

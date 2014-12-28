@@ -21,8 +21,6 @@ import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -35,7 +33,11 @@ public class Attributes
   extends ComponentSupport
   implements Iterable<Entry<String,Object>>
 {
-  private final Map<String, Object> backing = Maps.newHashMap();
+  private final Map<String, Object> backing;
+
+  public Attributes(final Map<String, Object> backing) {
+    this.backing = checkNotNull(backing);
+  }
 
   @Nullable
   public Object get(final String key) {

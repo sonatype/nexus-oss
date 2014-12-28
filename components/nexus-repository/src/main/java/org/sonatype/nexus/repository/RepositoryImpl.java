@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,7 +40,7 @@ public class RepositoryImpl
 
   private final Format format;
 
-  private final Attributes attributes = new Attributes();
+  private final Attributes attributes = new Attributes(Maps.<String, Object>newConcurrentMap());
 
   private final FacetLookup facets = new FacetLookup();
 
