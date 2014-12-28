@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.net.URL;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -29,6 +28,8 @@ import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.sisu.goodies.template.TemplateEngine;
+import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -42,22 +43,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class SimpleContentFacetImpl
-  extends FacetSupport
-  implements SimpleContentFacet
+    extends FacetSupport
+    implements SimpleContentFacet
 {
   private final EventBus eventBus;
 
-  private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
+  private final TemplateEngine templateEngine;
+
+  private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
   private volatile String indexHtmlCache;
 
   @Inject
-  public SimpleContentFacetImpl(final EventBus eventBus) {
+  public SimpleContentFacetImpl(final EventBus eventBus,
+                                final @Named("shared") TemplateEngine templateEngine)
+  {
     this.eventBus = checkNotNull(eventBus);
+    this.templateEngine = checkNotNull(templateEngine);
   }
 
   private void reset() {
-    backing.clear();
+    store.clear();
     indexHtmlCache = null;
   }
 
@@ -76,7 +82,7 @@ public class SimpleContentFacetImpl
   public SimpleContent get(final String name) {
     checkNotNull(name);
     ensureStarted();
-    return backing.get(name);
+    return store.get(name);
   }
 
   @Override
@@ -86,7 +92,7 @@ public class SimpleContentFacetImpl
     checkNotNull(content);
     ensureStarted();
 
-    SimpleContent prev = backing.put(name, content);
+    SimpleContent prev = store.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
         prev == null ? "Created" : "Updated",
         getRepository().getName(),
@@ -112,7 +118,7 @@ public class SimpleContentFacetImpl
     checkNotNull(name);
     ensureStarted();
 
-    SimpleContent prev = backing.remove(name);
+    SimpleContent prev = store.remove(name);
 
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
@@ -139,57 +145,15 @@ public class SimpleContentFacetImpl
     // maybe generate index.html
     if (indexHtml == null) {
       // snapshot contents
-      Map<String,SimpleContent> contents = ImmutableMap.copyOf(backing);
+      Map<String, SimpleContent> contents = ImmutableMap.copyOf(store);
 
-      // else build a new index.html
-      String title = String.format("%s contents", getRepository().getName());
+      // TODO: cache template reference
+      URL template = getClass().getResource("index.vm");
+      checkNotNull(template);
 
-      // TODO: Replace with template to generate contents
-
-      StringWriter buff = new StringWriter();
-      PrintWriter output = new PrintWriter(buff);
-      output.println("<html>");
-      output.println("<head>");
-      output.format("<title>%s</title>%n", title);
-      output.println("</head>");
-      output.println("<body>");
-
-      Set<Map.Entry<String, SimpleContent>> entries = contents.entrySet();
-      output.format("<h1>%s</h1>%n", title);
-      output.format("<div><strong>Entries</strong>: %s</div>%n", contents.size());
-      output.println("<hr/>");
-
-      if (!entries.isEmpty()) {
-        output.println("<table style='width: 100%'>");
-
-        output.println("<thead>");
-        output.println("<tr>");
-        output.println("<th style='text-align: left'>Name</th>");
-        output.println("<th style='text-align: left'>Size</th>");
-        output.println("<th style='text-align: left'>Type</th>");
-        output.println("</tr>");
-        output.println("</thead>");
-
-        output.println("<tbody>");
-        for (Map.Entry<String, SimpleContent> entry : entries) {
-          String name = entry.getKey();
-          SimpleContent content = entry.getValue();
-          output.println("<tr>");
-          output.format("<td style='text-align: left'><a href='%s'>%s</a></td>%n", name, name);
-          output.format("<td style='text-align: left'>%s bytes</td>%n", content.getSize());
-          output.format("<td style='text-align: left'>%s</td>%n", content.getType() != null ? content.getType() : "-");
-          output.println("</tr>");
-        }
-        output.println("</tbody>");
-
-        output.println("</table>");
-        output.println("<hr/>");
-      }
-
-      output.println("</body>");
-      output.println("</html>");
-      output.flush();
-      indexHtml = buff.toString();
+      indexHtml = templateEngine.render(this, template, new TemplateParameters()
+          .set("repository", getRepository())
+          .set("contents", contents));
 
       // cache index.html
       indexHtmlCache = indexHtml;
