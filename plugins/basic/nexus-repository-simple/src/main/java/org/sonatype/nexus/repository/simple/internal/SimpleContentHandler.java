@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.simple;
+package org.sonatype.nexus.repository.simple.internal;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -20,6 +20,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.simple.SimpleContentService;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;

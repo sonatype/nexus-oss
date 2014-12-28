@@ -12,85 +12,23 @@
  */
 package org.sonatype.nexus.repository.simple;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Simple content service.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class SimpleContentService
-  extends ComponentSupport
+public interface SimpleContentService
 {
-  /**
-   * Container for simple repository contents.  Sorted in repository attributes.
-   */
-  private static class RepositoryContents
-  {
-    private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
-  }
+  SimpleContent get(Repository repository, String name);
 
-  /**
-   * Return collection of repository specific contents.
-   *
-   * Store simple contents in repository attributes, so the repository framework manages when these go away.
-   */
-  private Map<String, SimpleContent> contents(final Repository repository) {
-    RepositoryContents contents = repository.getAttributes().get(RepositoryContents.class);
-    if (contents == null) {
-      contents = new RepositoryContents();
-      repository.getAttributes().set(RepositoryContents.class, contents);
-    }
-    return contents.backing;
-  }
+  Set<Entry<String, SimpleContent>> entries(Repository repository);
 
-  public SimpleContent get(final Repository repository, final String name) {
-    checkNotNull(repository);
-    checkNotNull(name);
-    return contents(repository).get(name);
-  }
+  SimpleContent put(Repository repository, String name, SimpleContent content);
 
-  public Set<Entry<String, SimpleContent>> entries(final Repository repository) {
-    checkNotNull(repository);
-    return ImmutableSet.copyOf(contents(repository).entrySet());
-  }
-
-  public SimpleContent put(final Repository repository, final String name, final SimpleContent content) {
-    checkNotNull(repository);
-    checkNotNull(name);
-    checkNotNull(content);
-    SimpleContent prev = contents(repository).put(name, content);
-    log.debug("{} repository '{}' content: {} -> {}",
-        prev == null ? "Saved" : "Replaced",
-        repository.getName(),
-        name,
-        content
-    );
-    return prev;
-  }
-
-  public SimpleContent delete(final Repository repository, final String name) {
-    checkNotNull(repository);
-    checkNotNull(name);
-    SimpleContent prev = contents(repository).remove(name);
-    if (prev != null) {
-      log.debug("Deleted repository '{}' content: {} -> {}", repository.getName(), name, prev);
-    }
-    return prev;
-  }
+  SimpleContent delete(Repository repository, String name);
 }

@@ -18,6 +18,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.simple.internal.SimpleContentHandler;
+import org.sonatype.nexus.repository.simple.internal.SimpleIndexHandler;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
