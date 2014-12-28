@@ -40,6 +40,7 @@ public class AttributesMap
   }
 
   private String key(final Class type) {
+    checkNotNull(type);
     return type.getName();
   }
 
@@ -52,7 +53,6 @@ public class AttributesMap
   @Nullable
   @SuppressWarnings("unchecked")
   public <T> T get(final Class<T> type) {
-    checkNotNull(type);
     return (T) get(key(type));
   }
 
@@ -78,7 +78,6 @@ public class AttributesMap
 
   @SuppressWarnings("unchecked")
   public <T> T set(final Class<T> type, final T value) {
-    checkNotNull(type);
     return (T) set(key(type), value);
   }
 
@@ -91,7 +90,6 @@ public class AttributesMap
   }
 
   public void remove(final Class type) {
-    checkNotNull(type);
     remove(key(type));
   }
 
@@ -101,7 +99,6 @@ public class AttributesMap
   }
 
   public boolean defined(final Class type) {
-    checkNotNull(type);
     return defined(key(type));
   }
 
