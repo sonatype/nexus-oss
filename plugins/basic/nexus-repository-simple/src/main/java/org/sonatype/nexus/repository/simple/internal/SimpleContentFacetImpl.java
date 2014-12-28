@@ -18,12 +18,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
+import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -40,9 +45,16 @@ public class SimpleContentFacetImpl
   extends FacetSupport
   implements SimpleContentFacet
 {
+  private final EventBus eventBus;
+
   private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
 
   private volatile String indexHtmlCache;
+
+  @Inject
+  public SimpleContentFacetImpl(final EventBus eventBus) {
+    this.eventBus = checkNotNull(eventBus);
+  }
 
   private void reset() {
     backing.clear();
@@ -73,6 +85,7 @@ public class SimpleContentFacetImpl
     checkNotNull(name);
     checkNotNull(content);
     ensureStarted();
+
     SimpleContent prev = backing.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
         prev == null ? "Saved" : "Replaced",
@@ -80,7 +93,16 @@ public class SimpleContentFacetImpl
         name,
         content
     );
+
     invalidateIndexHtmlCache();
+
+    if (prev == null) {
+      eventBus.post(new SimpleContentCreatedEvent(content));
+    }
+    else {
+      eventBus.post(new SimpleContentUpdatedEvent(content));
+    }
+
     return prev;
   }
 
@@ -89,10 +111,15 @@ public class SimpleContentFacetImpl
   public SimpleContent delete(final String name) {
     checkNotNull(name);
     ensureStarted();
+
     SimpleContent prev = backing.remove(name);
+
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
+
       invalidateIndexHtmlCache();
+
+      eventBus.post(new SimpleContentDeletedEvent(prev));
     }
     return prev;
   }
