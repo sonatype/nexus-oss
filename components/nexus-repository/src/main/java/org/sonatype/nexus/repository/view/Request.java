@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.view;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.util.AttributesContainer;
+import org.sonatype.nexus.repository.util.AttributesMap;
 
 import com.google.common.collect.Maps;
 
@@ -30,7 +30,7 @@ public class Request
    * Custom attributes to configure backing and logging.
    */
   private static class Attributes
-      extends AttributesContainer
+      extends AttributesMap
   {
     public Attributes() {
       super(Maps.<String, Object>newHashMap());
@@ -51,7 +51,7 @@ public class Request
 
   protected Payload payload;
 
-  public AttributesContainer getAttributes() {
+  public AttributesMap getAttributes() {
     return attributes;
   }
 

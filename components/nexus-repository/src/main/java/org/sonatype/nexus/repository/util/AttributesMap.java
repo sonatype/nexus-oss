@@ -29,13 +29,13 @@ import static com.google.common.base.Preconditions.checkState;
  *
  * @since 3.0
  */
-public class AttributesContainer
+public class AttributesMap
   extends ComponentSupport
   implements Iterable<Entry<String,Object>>
 {
   private final Map<String, Object> backing;
 
-  public AttributesContainer(final Map<String, Object> backing) {
+  public AttributesMap(final Map<String, Object> backing) {
     this.backing = checkNotNull(backing);
   }
 

@@ -13,7 +13,7 @@
 
 package org.sonatype.nexus.repository.view;
 
-import org.sonatype.nexus.repository.util.AttributesContainer;
+import org.sonatype.nexus.repository.util.AttributesMap;
 
 import com.google.common.collect.Maps;
 
@@ -30,7 +30,7 @@ public class Response
    * Custom attributes to configure backing and logging.
    */
   private static class Attributes
-      extends AttributesContainer
+      extends AttributesMap
   {
     public Attributes() {
       super(Maps.<String, Object>newHashMap());
@@ -47,7 +47,7 @@ public class Response
     this.status = checkNotNull(status);
   }
 
-  public AttributesContainer getAttributes() {
+  public AttributesMap getAttributes() {
     return attributes;
   }
 
