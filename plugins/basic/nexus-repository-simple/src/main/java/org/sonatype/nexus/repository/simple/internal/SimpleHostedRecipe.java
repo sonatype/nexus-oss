@@ -101,6 +101,7 @@ public class SimpleHostedRecipe
         timingHandler,
         new Handler()
         {
+          @Nonnull
           @Override
           public Response handle(final @Nonnull Context context) throws Exception {
             return HttpResponses.notFound();
