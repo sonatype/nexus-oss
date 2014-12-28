@@ -18,7 +18,7 @@ import java.util.Set;
 import org.sonatype.nexus.repository.Repository;
 
 /**
- * Simple content service.
+ * {@link SimpleContent} service.
  *
  * @since 3.0
  */
