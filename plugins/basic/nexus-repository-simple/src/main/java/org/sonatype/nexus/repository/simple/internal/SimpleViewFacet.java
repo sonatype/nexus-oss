@@ -66,14 +66,14 @@ public class SimpleViewFacet
 
     builder.route(new Route.Builder()
         .matcher(or(
-            new LiteralMatcher("/content/"),
-            new LiteralMatcher("/content/index.html")))
+            new LiteralMatcher("/"),
+            new LiteralMatcher("/index.html")))
         .handler(timingHandler)
         .handler(indexHandler)
         .create());
 
     builder.route(new Route.Builder()
-        .matcher(new RegexMatcher("/content/(.*)"))
+        .matcher(new RegexMatcher("/(.*)"))
         .handler(timingHandler)
         .handler(contentHandler)
         .create());
