@@ -27,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public abstract class LogicMatcher
+abstract class LogicMatcher
   extends ComponentSupport
   implements Matcher
 {
@@ -35,10 +35,6 @@ public abstract class LogicMatcher
 
   public LogicMatcher(final List<Matcher> matchers) {
     this.matchers = checkNotNull(matchers);
-  }
-
-  public List<Matcher> getMatchers() {
-    return matchers;
   }
 
   @Override
