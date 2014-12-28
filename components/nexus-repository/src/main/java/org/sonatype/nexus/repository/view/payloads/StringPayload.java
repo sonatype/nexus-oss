@@ -72,7 +72,7 @@ public class StringPayload
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "content='" + content + '\'' +
+        "size=" + content.length() +
         ", charset=" + charset +
         ", contentType='" + contentType + '\'' +
         '}';
