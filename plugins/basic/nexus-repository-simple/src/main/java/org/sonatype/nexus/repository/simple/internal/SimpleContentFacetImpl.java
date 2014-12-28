@@ -52,6 +52,8 @@ public class SimpleContentFacetImpl
 
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
+  private URL indexHtmlTmpl;
+
   private volatile String indexHtmlCache;
 
   @Inject
@@ -64,12 +66,21 @@ public class SimpleContentFacetImpl
 
   private void reset() {
     store.clear();
+    indexHtmlTmpl = null;
     indexHtmlCache = null;
   }
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
     reset();
+  }
+
+  @Override
+  protected void doStart() throws Exception {
+    // cache index.html template
+    indexHtmlTmpl = getClass().getResource("index.vm");
+    checkNotNull(indexHtmlTmpl);
+    log.debug("index.html Template: {}", indexHtmlTmpl);
   }
 
   @Override
@@ -140,26 +151,23 @@ public class SimpleContentFacetImpl
     ensureStarted();
 
     // resolve volatile to local for thread sanity
-    String indexHtml = indexHtmlCache;
+    String html = indexHtmlCache;
 
     // maybe generate index.html
-    if (indexHtml == null) {
+    if (html == null) {
       // snapshot contents
       Map<String, SimpleContent> contents = ImmutableMap.copyOf(store);
 
-      // TODO: cache template reference
-      URL template = getClass().getResource("index.vm");
-      checkNotNull(template);
-
-      indexHtml = templateEngine.render(this, template, new TemplateParameters()
+      // render html
+      html = templateEngine.render(this, indexHtmlTmpl, new TemplateParameters()
           .set("repository", getRepository())
           .set("contents", contents));
 
       // cache index.html
-      indexHtmlCache = indexHtml;
+      indexHtmlCache = html;
       log.debug("Cached index.html");
     }
 
-    return indexHtml;
+    return html;
   }
 }

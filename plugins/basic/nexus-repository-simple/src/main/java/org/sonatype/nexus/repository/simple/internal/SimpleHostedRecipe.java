@@ -83,9 +83,6 @@ public class SimpleHostedRecipe
   private void configureView(final Repository repository) {
     ViewFacet viewFacet = repository.facet(ViewFacet.class);
 
-    // TODO: Consider if we want to add route-ids so we can reference defined routes for re-use (maybe builder state only)?
-    // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
-
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
