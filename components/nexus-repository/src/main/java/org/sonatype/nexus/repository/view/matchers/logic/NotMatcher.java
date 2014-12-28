@@ -31,10 +31,6 @@ public class NotMatcher
     super(matchers);
   }
 
-  public NotMatcher(final Matcher... matchers) {
-    super(matchers);
-  }
-
   @Override
   protected boolean doMatches(final @Nonnull Context context) {
     for (Matcher matcher : matchers) {

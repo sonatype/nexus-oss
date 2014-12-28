@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.repository.view.matchers.logic;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -22,7 +21,6 @@ import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Logical matcher support.
@@ -37,11 +35,6 @@ public abstract class LogicMatcher
 
   public LogicMatcher(final List<Matcher> matchers) {
     this.matchers = checkNotNull(matchers);
-  }
-
-  public LogicMatcher(final Matcher... matchers) {
-    checkState(matchers != null);
-    this.matchers = Arrays.asList(matchers);
   }
 
   public List<Matcher> getMatchers() {

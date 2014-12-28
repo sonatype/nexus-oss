@@ -28,9 +28,9 @@ import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
-import org.sonatype.nexus.repository.view.matchers.logic.OrMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or;
 
 /**
  * Simple {@link ViewFacet}.
@@ -65,7 +65,7 @@ public class SimpleViewFacet
     // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
 
     builder.route(new Route.Builder()
-        .matcher(new OrMatcher(
+        .matcher(or(
             new LiteralMatcher("/content/"),
             new LiteralMatcher("/content/index.html")))
         .handler(timingHandler)
