@@ -12,14 +12,13 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.util.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,7 +39,7 @@ public class RepositoryImpl
 
   private final Format format;
 
-  private final Attributes attributes = new Attributes(Maps.<String, Object>newConcurrentMap());
+  //private final Attributes attributes = new Attributes(Maps.<String, Object>newConcurrentMap());
 
   private final FacetLookup facets = new FacetLookup();
 
@@ -76,10 +75,10 @@ public class RepositoryImpl
     return name;
   }
 
-  @Override
-  public Attributes getAttributes() {
-    return attributes;
-  }
+  //@Override
+  //public Attributes getAttributes() {
+  //  return attributes;
+  //}
 
   @Override
   public Configuration getConfiguration() {
@@ -178,6 +177,7 @@ public class RepositoryImpl
   }
 
   @Override
+  @Nonnull
   public <T extends Facet> T facet(final Class<T> type) throws MissingFacetException {
     T facet = facets.get(type);
     if (facet == null) {

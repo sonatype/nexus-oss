@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.annotation.Nonnull;
+
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.util.Attributes;
 
 /**
  * Repository.
@@ -28,7 +29,7 @@ public interface Repository
 
   String getName();
 
-  Attributes getAttributes();
+  //Attributes getAttributes();
 
   void init(Configuration configuration) throws Exception;
 
@@ -44,6 +45,7 @@ public interface Repository
 
   void attach(Facet facet) throws Exception;
 
+  @Nonnull
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
 
   Iterable<Facet> facets();
