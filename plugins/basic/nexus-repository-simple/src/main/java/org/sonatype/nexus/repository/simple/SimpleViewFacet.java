@@ -27,8 +27,8 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
-import org.sonatype.nexus.repository.view.matchers.OrMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
+import org.sonatype.nexus.repository.view.matchers.logic.OrMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

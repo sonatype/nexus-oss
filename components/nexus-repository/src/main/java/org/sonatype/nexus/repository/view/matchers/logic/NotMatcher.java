@@ -10,60 +10,39 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.view.matchers;
+package org.sonatype.nexus.repository.view.matchers.logic;
 
-import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Helper to build an OR mapping of matchers.
+ * Logical NOT matcher.
  *
  * @since 3.0
  */
-public class OrMatcher
-  extends ComponentSupport
-  implements Matcher
+public class NotMatcher
+  extends LogicMatcher
 {
-  private final List<Matcher> matchers;
-
-  public OrMatcher(final List<Matcher> matchers) {
-    this.matchers = checkNotNull(matchers);
+  public NotMatcher(final List<Matcher> matchers) {
+    super(matchers);
   }
 
-  public OrMatcher(final Matcher... matchers) {
-    checkState(matchers != null);
-    checkState(matchers.length > 1);
-    this.matchers = Arrays.asList(matchers);
-  }
-
-  public List<Matcher> getMatchers() {
-    return matchers;
+  public NotMatcher(final Matcher... matchers) {
+    super(matchers);
   }
 
   @Override
-  public boolean matches(final Context context) {
-    checkNotNull(context);
-    log.debug("Matching: {}", matchers);
+  protected boolean doMatches(final @Nonnull Context context) {
     for (Matcher matcher : matchers) {
       boolean result = matcher.matches(context);
       if (result) {
-        return true;
+        return false;
       }
     }
-    return false;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "matchers=" + matchers +
-        '}';
+    return true;
   }
 }
