@@ -126,4 +126,6 @@ public class Attributes
   public String toString() {
     return backing.toString();
   }
+
+  // TODO: Coercion support
 }
