@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.ViewFacetSupport;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
+import org.sonatype.nexus.repository.view.matchers.OrMatcher;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -60,18 +61,13 @@ public class SimpleViewFacet
   protected Router createRouter() throws Exception {
     Router.Builder builder = new Router.Builder();
 
-    // TODO: Consider if we want to build an OrMatcher helper?
     // TODO: Consider if we want to add route-ids so we can reference defined routes for re-use (maybe builder state only)?
     // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
 
     builder.route(new Route.Builder()
-        .matcher(new LiteralMatcher("/content/"))
-        .handler(timingHandler)
-        .handler(indexHandler)
-        .create());
-
-    builder.route(new Route.Builder()
-        .matcher(new LiteralMatcher("/content/index.html"))
+        .matcher(OrMatcher.of(
+            new LiteralMatcher("/content/"),
+            new LiteralMatcher("/content/index.html")))
         .handler(timingHandler)
         .handler(indexHandler)
         .create());
