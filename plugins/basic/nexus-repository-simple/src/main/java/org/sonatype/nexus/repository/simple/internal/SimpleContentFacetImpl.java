@@ -104,6 +104,8 @@ public class SimpleContentFacetImpl
 
   @Override
   public String indexHtml() {
+    ensureStarted();
+
     // resolve volatile to local for thread sanity
     String indexHtml = indexHtmlCache;
 
