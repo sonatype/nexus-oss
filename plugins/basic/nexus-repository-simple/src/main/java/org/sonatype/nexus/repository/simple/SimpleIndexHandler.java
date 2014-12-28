@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.simple;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
+import static org.sonatype.nexus.repository.view.ContentTypes.TEXT_HTML;
 
 /**
  * Simple {@code index.html} handler.
@@ -60,31 +62,55 @@ public class SimpleIndexHandler
 
     switch (method) {
       case GET: {
+        // TODO: Replace with template to generate contents
+
+        String title = String.format("%s contents", repository.getName());
+
         StringWriter buff = new StringWriter();
         PrintWriter output = new PrintWriter(buff);
         output.println("<html>");
         output.println("<head>");
-        output.format("<title>%s contents</title>%n", repository.getName());
+        output.format("<title>%s</title>%n", title);
         output.println("</head>");
         output.println("<body>");
 
-        Set<String> names = contentService.names(repository);
-        if (names.isEmpty()) {
-          output.println("No contents");
-        }
-        else {
-          output.println("<ul>");
-          for (String name : names) {
-            output.format("<li>%s</li>%n", name);
+        Set<Map.Entry<String,SimpleContent>> entries = contentService.entries(repository);
+        output.format("<h1>%s</h1>%n", title);
+        output.format("Entries: %s", entries.size());
+        output.print("<hr/>");
+
+        if (!entries.isEmpty()) {
+          output.println("<table style='width: 100%'>");
+
+          output.println("<thead>");
+          output.println("<tr>");
+          output.println("<th style='text-align: left'>Name</th>");
+          output.println("<th style='text-align: left'>Size</th>");
+          output.println("<th style='text-align: left'>Type</th>");
+          output.println("</tr>");
+          output.println("</thead>");
+
+          output.println("<tbody>");
+          for (Map.Entry<String,SimpleContent> entry : entries) {
+            String name = entry.getKey();
+            SimpleContent content = entry.getValue();
+            output.println("<tr>");
+            output.format("<td style='text-align: left'><a href='%s'>%s</a></td>%n", name, name);
+            output.format("<td style='text-align: left'>%s bytes</td>", content.getSize());
+            output.format("<td style='text-align: left'>%s</td>", content.getType() != null ? content.getType() : "-");
+            output.println("</tr>");
           }
-          output.println("</ul>");
+          output.println("</tbody>");
+
+          output.println("</table>");
+          output.print("<hr/>");
         }
 
         output.println("</body>");
         output.println("</html>");
         output.flush();
 
-        return HttpResponses.ok(new StringPayload(buff.toString(), "text/html"));
+        return HttpResponses.ok(new StringPayload(buff.toString(), TEXT_HTML));
       }
 
       default:

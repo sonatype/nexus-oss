@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.simple;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -62,6 +63,11 @@ public class SimpleContentService
   public Set<String> names(final Repository repository) {
     checkNotNull(repository);
     return ImmutableSet.copyOf(contents(repository).keySet());
+  }
+
+  public Set<Entry<String, SimpleContent>> entries(final Repository repository) {
+    checkNotNull(repository);
+    return ImmutableSet.copyOf(contents(repository).entrySet());
   }
 
   public SimpleContent put(final Repository repository, final String name, final SimpleContent content) {

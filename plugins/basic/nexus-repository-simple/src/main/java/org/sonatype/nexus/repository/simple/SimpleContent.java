@@ -41,6 +41,14 @@ public class SimpleContent
     }
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public long getSize() {
+    return bytes.length;
+  }
+
   public Payload toPayload() {
     return new BytesPayload(bytes, type);
   }

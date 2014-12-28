@@ -60,6 +60,16 @@ public class SimpleViewFacet
   protected Router createRouter() throws Exception {
     Router.Builder builder = new Router.Builder();
 
+    // TODO: Consider if we want to build an OrMatcher helper?
+    // TODO: Consider if we want to add route-ids so we can reference defined routes for re-use (maybe builder state only)?
+    // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
+
+    builder.route(new Route.Builder()
+        .matcher(new LiteralMatcher("/content/"))
+        .handler(timingHandler)
+        .handler(indexHandler)
+        .create());
+
     builder.route(new Route.Builder()
         .matcher(new LiteralMatcher("/content/index.html"))
         .handler(timingHandler)
@@ -76,9 +86,8 @@ public class SimpleViewFacet
         timingHandler,
         new Handler()
         {
-          @Nonnull
           @Override
-          public Response handle(@Nonnull final Context context) throws Exception {
+          public Response handle(final @Nonnull Context context) throws Exception {
             return HttpResponses.notFound();
           }
         }
