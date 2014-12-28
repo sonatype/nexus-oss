@@ -88,7 +88,7 @@ public class SimpleContentFacetImpl
 
     SimpleContent prev = backing.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
-        prev == null ? "Saved" : "Replaced",
+        prev == null ? "Created" : "Updated",
         getRepository().getName(),
         name,
         content
