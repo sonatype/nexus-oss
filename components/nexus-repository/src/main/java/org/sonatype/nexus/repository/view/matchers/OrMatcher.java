@@ -37,6 +37,12 @@ public class OrMatcher
     this.matchers = checkNotNull(matchers);
   }
 
+  public OrMatcher(final Matcher... matchers) {
+    checkState(matchers != null);
+    checkState(matchers.length > 1);
+    this.matchers = Arrays.asList(matchers);
+  }
+
   public List<Matcher> getMatchers() {
     return matchers;
   }
@@ -59,15 +65,5 @@ public class OrMatcher
     return getClass().getSimpleName() + "{" +
         "matchers=" + matchers +
         '}';
-  }
-
-  //
-  // Factory
-  //
-
-  public static OrMatcher of(final Matcher... matchers) {
-    checkState(matchers != null);
-    checkState(matchers.length > 1);
-    return new OrMatcher(Arrays.asList(matchers));
   }
 }

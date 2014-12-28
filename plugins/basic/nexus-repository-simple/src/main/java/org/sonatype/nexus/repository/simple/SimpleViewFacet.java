@@ -65,7 +65,7 @@ public class SimpleViewFacet
     // TODO: Consider a set of default handlers, as here we have timingHandler on each route?
 
     builder.route(new Route.Builder()
-        .matcher(OrMatcher.of(
+        .matcher(new OrMatcher(
             new LiteralMatcher("/content/"),
             new LiteralMatcher("/content/index.html")))
         .handler(timingHandler)
