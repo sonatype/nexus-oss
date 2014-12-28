@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-// TODO: Consider extending from repository.Attributes?
+// TODO: Consider extending from util.Attributes?
 
 /**
  * {@link Configuration} attributes.
