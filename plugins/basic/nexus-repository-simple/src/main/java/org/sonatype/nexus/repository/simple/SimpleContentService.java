@@ -37,32 +37,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleContentService
   extends ComponentSupport
 {
-  /**
-   * Map of repository-name -> [Map of content-name -> content]
-   */
-  private final Map<String,Map<String, SimpleContent>> allContents = Maps.newConcurrentMap();
+  private static class RepositoryContents
+  {
+    private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
+  }
 
   /**
    * Return collection of repository specific contents.
    */
   private Map<String, SimpleContent> contents(final Repository repository) {
-    Map<String,SimpleContent> contents = allContents.get(repository.getName());
+    RepositoryContents contents = repository.getAttributes().get(RepositoryContents.class);
     if (contents == null) {
-      contents = Maps.newConcurrentMap();
-      allContents.put(repository.getName(), contents);
+      contents = new RepositoryContents();
+      repository.getAttributes().set(RepositoryContents.class, contents);
     }
-    return contents;
+    return contents.backing;
   }
 
   public SimpleContent get(final Repository repository, final String name) {
     checkNotNull(repository);
     checkNotNull(name);
     return contents(repository).get(name);
-  }
-
-  public Set<String> names(final Repository repository) {
-    checkNotNull(repository);
-    return ImmutableSet.copyOf(contents(repository).keySet());
   }
 
   public Set<Entry<String, SimpleContent>> entries(final Repository repository) {

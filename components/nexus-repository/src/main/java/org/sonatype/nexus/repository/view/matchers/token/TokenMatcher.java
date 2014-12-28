@@ -45,7 +45,7 @@ public class TokenMatcher
       return false;
     }
 
-    context.set(PATH_TOKENS, tokenMap);
+    context.getAttributes().set(PATH_TOKENS, tokenMap);
     return true;
   }
 

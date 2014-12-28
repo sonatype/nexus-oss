@@ -61,7 +61,7 @@ public class RegexMatcher
 
     if (m.matches()) {
       // expose match result in context
-      context.set(State.class, new State()
+      context.getAttributes().set(State.class, new State()
       {
         @Override
         public MatchResult getMatchResult() {

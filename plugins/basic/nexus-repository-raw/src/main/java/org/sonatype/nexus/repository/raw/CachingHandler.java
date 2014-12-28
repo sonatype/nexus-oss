@@ -37,7 +37,7 @@ public class CachingHandler
   @Override
   public Response handle(final Context context) throws Exception {
 
-    final Object remoteRequest = context.get("remoteRequest");
+    final Object remoteRequest = context.getAttributes().get("remoteRequest");
 
     final RawCacheFacet rawCacheFacet = repository.facet(RawCacheFacet.class);
 

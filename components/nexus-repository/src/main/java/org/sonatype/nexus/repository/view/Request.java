@@ -12,10 +12,9 @@
  */
 package org.sonatype.nexus.repository.view;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.repository.Attributes;
 import org.sonatype.nexus.repository.Repository;
 
 /**
@@ -35,7 +34,7 @@ public class Request
 
   protected Headers headers;
 
-  protected Map<String, Object> attributes;
+  protected Attributes attributes;
 
   protected Payload payload;
 
@@ -63,7 +62,7 @@ public class Request
     return headers;
   }
 
-  public Map<String, Object> getAttributes() {
+  public Attributes getAttributes() {
     return attributes;
   }
 

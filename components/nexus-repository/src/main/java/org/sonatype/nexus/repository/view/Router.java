@@ -81,7 +81,7 @@ public class Router
       }
       else {
         log.trace("Request attributes:");
-        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+        for (Map.Entry<String, Object> entry : request.getAttributes()) {
           log.trace("  {}={}", entry.getKey(), entry.getValue());
         }
       }
@@ -110,7 +110,7 @@ public class Router
       }
       else {
         log.trace("Response attributes:");
-        for (Map.Entry<String, Object> entry : response.getAttributes().entrySet()) {
+        for (Map.Entry<String, Object> entry : response.getAttributes()) {
           log.trace("  {}={}", entry.getKey(), entry.getValue());
         }
       }

@@ -13,9 +13,7 @@
 
 package org.sonatype.nexus.repository.view;
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
+import org.sonatype.nexus.repository.Attributes;
 
 /**
  * View response.
@@ -28,7 +26,7 @@ public class Response
 
   private final Headers headers = new Headers();
 
-  private final Map<String, Object> attributes = Maps.newHashMap();
+  private final Attributes attributes = new Attributes();
 
   public Response(final Status status) {
     this.status = status;
@@ -42,7 +40,7 @@ public class Response
     return headers;
   }
 
-  public Map<String, Object> getAttributes() {
+  public Attributes getAttributes() {
     return attributes;
   }
 

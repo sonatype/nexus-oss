@@ -13,14 +13,11 @@
 package org.sonatype.nexus.repository.view;
 
 import java.util.ListIterator;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import org.sonatype.nexus.repository.Attributes;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -35,7 +32,7 @@ public class Context
 {
   private final Request request;
 
-  private final Map<String, Object> attributes = Maps.newHashMap();
+  private final Attributes attributes = new Attributes();
 
   private ListIterator<Handler> handlers;
 
@@ -47,53 +44,8 @@ public class Context
     return request;
   }
 
-  @Nullable
-  public Object get(final String key) {
-    checkNotNull(key);
-    return attributes.get(key);
-  }
-
-  @Nullable
-  @SuppressWarnings("unchecked")
-  public <T> T get(final Class<T> type) {
-    checkNotNull(type);
-    return (T) get(type.getName());
-  }
-
-  public Object require(final String key) {
-    Object value = get(key);
-    checkState(value != null, "Missing context attribute: %s", key);
-    return value;
-  }
-
-  public <T> T require(final Class<T> type) {
-    T value = get(type);
-    checkState(value != null, "Missing context attribute: %s", type.getName());
-    return value;
-  }
-
-  public Object set(final String key, final Object value) {
-    checkNotNull(key);
-    checkNotNull(value);
-    log.trace("Set: {}={}", key, value);
-    return attributes.put(key, value);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T set(final Class<T> type, final T value) {
-    checkNotNull(type);
-    return (T) set(type.getName(), value);
-  }
-
-  public void remove(final String key) {
-    checkNotNull(key);
-    log.trace("Remove: {}", key);
-    attributes.remove(key);
-  }
-
-  public void remove(final Class type) {
-    checkNotNull(type);
-    remove(type.getName());
+  public Attributes getAttributes() {
+    return attributes;
   }
 
   /**

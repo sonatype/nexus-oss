@@ -38,6 +38,8 @@ public class RepositoryImpl
 
   private final Format format;
 
+  private final Attributes attributes = new Attributes();
+
   private final FacetLookup facets = new FacetLookup();
 
   private String name;
@@ -70,6 +72,11 @@ public class RepositoryImpl
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
   }
 
   @Override

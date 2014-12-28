@@ -36,7 +36,7 @@ public class RemoteRequestHandler
     }
 
     Object remoteRequest = new Object();
-    context.set("remoteRequest", remoteRequest);
+    context.getAttributes().set("remoteRequest", remoteRequest);
 
     return context.proceed();
   }
