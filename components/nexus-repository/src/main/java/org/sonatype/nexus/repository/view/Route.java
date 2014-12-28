@@ -72,7 +72,7 @@ public class Route
     private List<Handler> handlers = Lists.newArrayList();
 
     public Builder matcher(final Matcher matcher) {
-      checkState(this.matcher == null, "Matcher already configured");
+      checkState(this.matcher == null, "Only one matcher allowed");
       this.matcher = checkNotNull(matcher);
       return this;
     }
