@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.repository.simple;
 
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.sonatype.nexus.repository.Facet;
 
 /**
@@ -28,9 +25,9 @@ public interface SimpleContentFacet
 {
   SimpleContent get(String name);
 
-  Set<Entry<String, SimpleContent>> entries();
-
   SimpleContent put(String name, SimpleContent content);
 
   SimpleContent delete(String name);
+
+  String indexHtml();
 }

@@ -13,18 +13,12 @@
 
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Map;
-import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
-import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -57,56 +51,7 @@ public class SimpleIndexHandler
 
     switch (method) {
       case GET: {
-        // TODO: Hook up cache to only rebuild index when content changed
-        // TODO: Replace with template to generate contents
-
-        String title = String.format("%s contents", repository.getName());
-
-        StringWriter buff = new StringWriter();
-        PrintWriter output = new PrintWriter(buff);
-        output.println("<html>");
-        output.println("<head>");
-        output.format("<title>%s</title>%n", title);
-        output.println("</head>");
-        output.println("<body>");
-
-        Set<Map.Entry<String,SimpleContent>> entries = facet.entries();
-        output.format("<h1>%s</h1>%n", title);
-        output.format("Entries: %s", entries.size());
-        output.print("<hr/>");
-
-        if (!entries.isEmpty()) {
-          output.println("<table style='width: 100%'>");
-
-          output.println("<thead>");
-          output.println("<tr>");
-          output.println("<th style='text-align: left'>Name</th>");
-          output.println("<th style='text-align: left'>Size</th>");
-          output.println("<th style='text-align: left'>Type</th>");
-          output.println("</tr>");
-          output.println("</thead>");
-
-          output.println("<tbody>");
-          for (Map.Entry<String,SimpleContent> entry : entries) {
-            String name = entry.getKey();
-            SimpleContent content = entry.getValue();
-            output.println("<tr>");
-            output.format("<td style='text-align: left'><a href='%s'>%s</a></td>%n", name, name);
-            output.format("<td style='text-align: left'>%s bytes</td>", content.getSize());
-            output.format("<td style='text-align: left'>%s</td>", content.getType() != null ? content.getType() : "-");
-            output.println("</tr>");
-          }
-          output.println("</tbody>");
-
-          output.println("</table>");
-          output.print("<hr/>");
-        }
-
-        output.println("</body>");
-        output.println("</html>");
-        output.flush();
-
-        return HttpResponses.ok(new StringPayload(buff.toString(), TEXT_HTML));
+        return HttpResponses.ok(new StringPayload(facet.indexHtml(), TEXT_HTML));
       }
 
       default:

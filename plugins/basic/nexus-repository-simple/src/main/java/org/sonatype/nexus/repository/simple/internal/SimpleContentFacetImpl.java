@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.repository.simple.internal;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -23,7 +24,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,14 +41,21 @@ public class SimpleContentFacetImpl
 {
   private final Map<String, SimpleContent> backing = Maps.newConcurrentMap();
 
+  private volatile String indexHtmlCache;
+
+  private void reset() {
+    backing.clear();
+    indexHtmlCache = null;
+  }
+
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    backing.clear();
+    reset();
   }
 
   @Override
   protected void doDestroy() throws Exception {
-    backing.clear();
+    reset();
   }
 
   @Override
@@ -55,12 +63,6 @@ public class SimpleContentFacetImpl
     checkNotNull(name);
     ensureStarted();
     return backing.get(name);
-  }
-
-  @Override
-  public Set<Entry<String, SimpleContent>> entries() {
-    ensureStarted();
-    return ImmutableSet.copyOf(backing.entrySet());
   }
 
   @Override
@@ -75,6 +77,7 @@ public class SimpleContentFacetImpl
         name,
         content
     );
+    invalidateIndexHtmlCache();
     return prev;
   }
 
@@ -85,7 +88,81 @@ public class SimpleContentFacetImpl
     SimpleContent prev = backing.remove(name);
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
+      invalidateIndexHtmlCache();
     }
     return prev;
+  }
+
+  private void invalidateIndexHtmlCache() {
+    indexHtmlCache = null;
+    log.debug("Invalidated index.html cache");
+  }
+
+  @Override
+  public String indexHtml() {
+    // resolve volatile to local for thread sanity
+    String indexHtml = indexHtmlCache;
+
+    // maybe generate index.html
+    if (indexHtml == null) {
+      // snapshot contents
+      Map<String,SimpleContent> contents = ImmutableMap.copyOf(backing);
+
+      // else build a new index.html
+      String title = String.format("%s contents", getRepository().getName());
+
+      // TODO: Replace with template to generate contents
+
+      StringWriter buff = new StringWriter();
+      PrintWriter output = new PrintWriter(buff);
+      output.println("<html>");
+      output.println("<head>");
+      output.format("<title>%s</title>%n", title);
+      output.println("</head>");
+      output.println("<body>");
+
+      Set<Map.Entry<String, SimpleContent>> entries = contents.entrySet();
+      output.format("<h1>%s</h1>%n", title);
+      output.format("<div><strong>Entries</strong>: %s</div>%n", contents.size());
+      output.println("<hr/>");
+
+      if (!entries.isEmpty()) {
+        output.println("<table style='width: 100%'>");
+
+        output.println("<thead>");
+        output.println("<tr>");
+        output.println("<th style='text-align: left'>Name</th>");
+        output.println("<th style='text-align: left'>Size</th>");
+        output.println("<th style='text-align: left'>Type</th>");
+        output.println("</tr>");
+        output.println("</thead>");
+
+        output.println("<tbody>");
+        for (Map.Entry<String, SimpleContent> entry : entries) {
+          String name = entry.getKey();
+          SimpleContent content = entry.getValue();
+          output.println("<tr>");
+          output.format("<td style='text-align: left'><a href='%s'>%s</a></td>%n", name, name);
+          output.format("<td style='text-align: left'>%s bytes</td>%n", content.getSize());
+          output.format("<td style='text-align: left'>%s</td>%n", content.getType() != null ? content.getType() : "-");
+          output.println("</tr>");
+        }
+        output.println("</tbody>");
+
+        output.println("</table>");
+        output.println("<hr/>");
+      }
+
+      output.println("</body>");
+      output.println("</html>");
+      output.flush();
+      indexHtml = buff.toString();
+
+      // cache index.html
+      indexHtmlCache = indexHtml;
+      log.debug("Cached index.html");
+    }
+
+    return indexHtml;
   }
 }
