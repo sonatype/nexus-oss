@@ -14,21 +14,19 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentService;
+import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
@@ -46,13 +44,6 @@ public class SimpleContentHandler
     extends ComponentSupport
     implements Handler
 {
-  private final SimpleContentService contentService;
-
-  @Inject
-  public SimpleContentHandler(final SimpleContentService contentService) {
-    this.contentService = checkNotNull(contentService);
-  }
-
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
@@ -61,9 +52,11 @@ public class SimpleContentHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
+    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+
     switch (method) {
       case GET: {
-        SimpleContent content = contentService.get(repository, name);
+        SimpleContent content = facet.get(name);
         if (content == null) {
           return HttpResponses.notFound(name);
         }
@@ -72,7 +65,7 @@ public class SimpleContentHandler
 
       case PUT: {
         SimpleContent content = new SimpleContent(context.getRequest().getPayload());
-        SimpleContent prev = contentService.put(repository, name, content);
+        SimpleContent prev = facet.put(name, content);
         if (prev == null) {
           return HttpResponses.created();
         }
@@ -80,7 +73,7 @@ public class SimpleContentHandler
       }
 
       case DELETE: {
-        SimpleContent prev = contentService.delete(repository, name);
+        SimpleContent prev = facet.delete(name);
         if (prev == null) {
           return HttpResponses.notFound(name);
         }

@@ -19,21 +19,19 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentService;
+import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.view.ContentTypes.TEXT_HTML;
 
@@ -48,13 +46,6 @@ public class SimpleIndexHandler
     extends ComponentSupport
     implements Handler
 {
-  private final SimpleContentService contentService;
-
-  @Inject
-  public SimpleIndexHandler(final SimpleContentService contentService) {
-    this.contentService = checkNotNull(contentService);
-  }
-
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
@@ -62,8 +53,11 @@ public class SimpleIndexHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' index", method, repository.getName());
 
+    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+
     switch (method) {
       case GET: {
+        // TODO: Hook up cache to only rebuild index when content changed
         // TODO: Replace with template to generate contents
 
         String title = String.format("%s contents", repository.getName());
@@ -76,7 +70,7 @@ public class SimpleIndexHandler
         output.println("</head>");
         output.println("<body>");
 
-        Set<Map.Entry<String,SimpleContent>> entries = contentService.entries(repository);
+        Set<Map.Entry<String,SimpleContent>> entries = facet.entries();
         output.format("<h1>%s</h1>%n", title);
         output.format("Entries: %s", entries.size());
         output.print("<hr/>");

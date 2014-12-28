@@ -15,20 +15,22 @@ package org.sonatype.nexus.repository.simple;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.Facet;
 
 /**
- * {@link SimpleContent} service.
+ * Simple content facet.
  *
  * @since 3.0
  */
-public interface SimpleContentService
+@Facet.Exposed
+public interface SimpleContentFacet
+  extends Facet
 {
-  SimpleContent get(Repository repository, String name);
+  SimpleContent get(String name);
 
-  Set<Entry<String, SimpleContent>> entries(Repository repository);
+  Set<Entry<String, SimpleContent>> entries();
 
-  SimpleContent put(Repository repository, String name, SimpleContent content);
+  SimpleContent put(String name, SimpleContent content);
 
-  SimpleContent delete(Repository repository, String name);
+  SimpleContent delete(String name);
 }

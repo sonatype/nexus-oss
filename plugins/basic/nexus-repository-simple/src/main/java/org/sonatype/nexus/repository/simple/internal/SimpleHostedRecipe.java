@@ -38,20 +38,24 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
+  private final Provider<SimpleContentFacetImpl> contentFacet;
+
   private final Provider<SimpleViewFacet> viewFacet;
 
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
+                            final Provider<SimpleContentFacetImpl> contentFacet,
                             final Provider<SimpleViewFacet> viewFacet)
   {
     super(type, format);
+    this.contentFacet = checkNotNull(contentFacet);
     this.viewFacet = checkNotNull(viewFacet);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
-    // attach custom view facet
+    repository.attach(contentFacet.get());
     repository.attach(viewFacet.get());
   }
 }
