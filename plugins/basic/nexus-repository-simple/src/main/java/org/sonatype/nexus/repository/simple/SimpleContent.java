@@ -23,7 +23,7 @@ import com.google.common.io.ByteStreams;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Simple content container.
+ * Simple content.
  *
  * @since 3.0
  */
