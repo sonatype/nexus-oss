@@ -81,7 +81,9 @@ class AttributesMapTest
     assert value.class == Integer.class
     assert value == 1
 
-    underTest.set('foo', 1)
-    value = underTest.get('foo', Integer.class)
+    underTest.set('foo', false)
+    value = underTest.get('foo', Boolean.class)
+    assert value.class == Boolean.class
+    assert value == false
   }
 }
