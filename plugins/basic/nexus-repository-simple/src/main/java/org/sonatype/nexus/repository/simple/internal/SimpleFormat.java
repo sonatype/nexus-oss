@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Simple (raw in-memory) repository format.
  *
@@ -29,6 +31,7 @@ public class SimpleFormat
 {
   public static final String NAME = "simple";
 
+  @VisibleForTesting
   public SimpleFormat() {
     super(NAME);
   }
