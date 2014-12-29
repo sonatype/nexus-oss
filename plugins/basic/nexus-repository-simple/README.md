@@ -17,7 +17,7 @@
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
     orient:insert into repository_configuration SET repository_name=\'test1\', recipe_name=\'simple-hosted\'
     orient:insert into repository_configuration SET repository_name=\'test2\', recipe_name=\'simple-hosted\'
-    orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'members\': [\'test1\', \'test2\'] }}
+    orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'memberNames\': [\'test1\', \'test2\'] }}
     system:shutdown --force --reboot
 
 # Interact
