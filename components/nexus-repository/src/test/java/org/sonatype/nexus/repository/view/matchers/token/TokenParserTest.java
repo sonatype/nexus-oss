@@ -25,18 +25,19 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Test for {@link TokenMatcher}.
+ * Test for {@link TokenParser}.
  */
-public class TokenMatcherTest
+public class TokenParserTest
   extends TestSupport
 {
   @Test
   public void simplePattern() {
     String pattern = "/{a}/{b}/{c}";
 
-    final TokenMatcherInternal matcher = new TokenMatcherInternal(pattern);
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
 
-    final Map<String, String> tokens = matcher.matchTokens("/yes/no/false");
+    final Map<String, String> tokens = parser.parse("/yes/no/false");
 
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.entrySet(), hasSize(3));
@@ -49,8 +50,10 @@ public class TokenMatcherTest
   @Test
   public void mavenLikeTemplate() {
     final String pattern = "/{group}/{module}/{version}/{name}-{version}.{ext}";
-    final TokenMatcherInternal tokenMatcher = new TokenMatcherInternal(pattern);
-    final Map<String, String> tokens = tokenMatcher.matchTokens("/foo/bar/1234/bar-1234.zip");
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
+
+    final Map<String, String> tokens = parser.parse("/foo/bar/1234/bar-1234.zip");
 
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.entrySet(), hasSize(5));
@@ -65,8 +68,10 @@ public class TokenMatcherTest
   @Test
   public void mavenGroupsHaveMultiplePathSegments() {
     final String pattern = "/{group:.+}/{module}/{version}/{name}-{version}.{ext}";
-    final TokenMatcherInternal tokenMatcher = new TokenMatcherInternal(pattern);
-    final Map<String, String> tokens = tokenMatcher.matchTokens("/org/sonatype/nexus/components/1234/bar-1234.zip");
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
+
+    final Map<String, String> tokens = parser.parse("/org/sonatype/nexus/components/1234/bar-1234.zip");
 
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.entrySet(), hasSize(5));
@@ -81,8 +86,10 @@ public class TokenMatcherTest
   @Test
   public void testNugetOperations() {
     final String pattern = "/{operation}({paramString:.*})";
-    final TokenMatcherInternal tokenMatcher = new TokenMatcherInternal(pattern);
-    final Map<String, String> tokens = tokenMatcher.matchTokens("/Packages()");
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
+
+    final Map<String, String> tokens = parser.parse("/Packages()");
 
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.entrySet(), hasSize(2));
@@ -94,8 +101,10 @@ public class TokenMatcherTest
   @Test
   public void slashesInTheSecondGroup() {
     final String pattern = "/{singleSegment}/{manySegments:.+}";
-    final TokenMatcherInternal tokenMatcher = new TokenMatcherInternal(pattern);
-    final Map<String, String> tokens = tokenMatcher.matchTokens("/1/2/3/4/5");
+    final TokenParser parser = new TokenParser(pattern);
+    log(parser);
+
+    final Map<String, String> tokens = parser.parse("/1/2/3/4/5");
 
     assertThat(tokens, is(notNullValue()));
     assertThat(tokens.entrySet(), hasSize(2));

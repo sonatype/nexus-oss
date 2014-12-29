@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.view.matchers.token;
 
 import java.util.Map;
@@ -17,39 +18,53 @@ import java.util.Map;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.nexus.repository.view.Request;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A {@link Matcher} that examines the {@link Request#getPath() request path} and attempts to parse it using the
- * {@link TokenMatcher}. If there is a match, the tokens are stored in the {@link Context#get(String)}
- * request attribute} {@link #PATH_TOKENS} so that handlers can access them.
+ * {@link TokenParser}.
+ *
+ * If there is a match, the tokens are stored in the context under key {@link TokenMatcher.State}.
  *
  * @since 3.0
  */
 public class TokenMatcher
+    extends ComponentSupport
     implements Matcher
 {
-  public static final String PATH_TOKENS = TokenMatcher.class.getName() + ".pathTokens";
+  public static interface State
+  {
+    Map<String, String> getTokens();
+  }
 
-  private final TokenMatcherInternal tokenMatcher;
+  private final TokenParser parser;
 
   public TokenMatcher(final String pattern) {
-    this.tokenMatcher = new TokenMatcherInternal(pattern);
+    this.parser = new TokenParser(pattern);
   }
-  
+
   @Override
   public boolean matches(final Context context) {
-    final Map<String, String> tokenMap = findTokens(context.getRequest());
+    checkNotNull(context);
 
-    if (tokenMap == null) {
+    String path = context.getRequest().getPath();
+    log.debug("Matching: {}~={} ignore-case: {}", path, parser);
+    final Map<String, String> tokens = parser.parse(path);
+    if (tokens == null) {
       // There was no match.
       return false;
     }
 
-    context.getAttributes().set(PATH_TOKENS, tokenMap);
+    // matched expose tokens in context
+    context.getAttributes().set(State.class, new State()
+    {
+      @Override
+      public Map<String, String> getTokens() {
+        return tokens;
+      }
+    });
     return true;
-  }
-
-  private Map<String, String> findTokens(final Request request) {
-    return tokenMatcher.matchTokens(request.getPath());
   }
 }

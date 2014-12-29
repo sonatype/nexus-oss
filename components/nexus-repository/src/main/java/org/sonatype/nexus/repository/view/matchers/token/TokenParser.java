@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import static com.google.common.base.Preconditions.checkState;
 
 
@@ -38,21 +40,22 @@ import static com.google.common.base.Preconditions.checkState;
  * The backslash ({@code '\'}) serves as an escape character, if (say) it is necessary to use curly braces in the
  * regular expression.  If escape characters appear in regular expressions, these must be double-escaped.
  *
- * Caveat: the {@link TokenMatcher} cannot handle groups in variable regexp definitions. This will cause
+ * Caveat: the {@link TokenParser} cannot handle groups in variable regexp definitions. This will cause
  * parsing errors.
  *
  * @since 3.0
  */
-public class TokenMatcherInternal
+public class TokenParser
+  extends ComponentSupport
 {
   private final List<VariableToken> variables;
 
   private final Pattern pattern;
 
-  public TokenMatcherInternal(final String templatePattern) {
+  public TokenParser(final String templatePattern) {
     final List<Token> tokens = new PatternParser(templatePattern).getTokens();
     pattern = Pattern.compile(regexp(tokens));
-    System.err.println(pattern);
+    log.trace("Pattern: {}", pattern);
 
     // Separate the variable tokens
     variables = new ArrayList<>();
@@ -69,7 +72,7 @@ public class TokenMatcherInternal
    * path as values.  Returns {@code null} if the pattern does not match.
    */
   @Nullable
-  public Map<String, String> matchTokens(String path) {
+  public Map<String, String> parse(final String path) {
     final Matcher matcher = pattern.matcher(path);
     if (!matcher.matches()) {
       return null;
@@ -87,11 +90,19 @@ public class TokenMatcherInternal
     return values;
   }
 
-  private String regexp(List<Token> tokens) {
+  private String regexp(final List<Token> tokens) {
     StringBuilder b = new StringBuilder();
     for (Token token : tokens) {
       b.append(token.toRegexp());
     }
     return b.toString();
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "pattern=" + pattern +
+        ", variables=" + variables +
+        '}';
   }
 }

@@ -24,7 +24,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 /**
- * Parses a template pattern (see {@link TokenMatcher} for syntax) into a series of {@link Token}s.
+ * Parses a template pattern (see {@link TokenParser} for syntax) into a series of {@link Token}s.
  *
  * @since 3.0
  */
@@ -46,7 +46,7 @@ public class PatternParser
 
   private static final List<Character> NONE = Collections.<Character>emptyList();
 
-  public PatternParser(String tokenPattern) {
+  public PatternParser(final String tokenPattern) {
     checkNotNull(tokenPattern);
 
     parseTemplate(new StringCharacterIterator(tokenPattern));
@@ -71,7 +71,7 @@ public class PatternParser
     }
   }
 
-  private void parseVariable(CharacterIterator iterator) {
+  private void parseVariable(final CharacterIterator iterator) {
     // Consume the starting '{' character
     iterator.next();
 
@@ -94,7 +94,7 @@ public class PatternParser
     iterator.next();
   }
 
-  private void parseLiteral(CharacterIterator iterator) {
+  private void parseLiteral(final CharacterIterator iterator) {
     final String literal = readFragment(iterator, END_OF_LITERAL, ESCAPE_CHARS, NONE);
     tokens.add(new LiteralToken(literal));
   }
@@ -106,8 +106,10 @@ public class PatternParser
    *
    * @throws IllegalArgumentException if the fragment isn't at least one character
    */
-  static String readFragment(CharacterIterator iterator, List<Character> stopChars,
-                             List<Character> escapeChars, List<Character> disallowed)
+  static String readFragment(final CharacterIterator iterator,
+                             final List<Character> stopChars,
+                             final List<Character> escapeChars,
+                             final List<Character> disallowed)
   {
     StringBuilder b = new StringBuilder();
     boolean escaping = false;
@@ -143,7 +145,7 @@ public class PatternParser
     }
   }
 
-  private static void checkAllowed(CharacterIterator iterator, List<Character> disallowed) {
+  private static void checkAllowed(final CharacterIterator iterator, final List<Character> disallowed) {
     checkArgument(!disallowed.contains(iterator.current()), "Disallowed character %s at position %s",
         iterator.current(), iterator.getIndex());
   }
