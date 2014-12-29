@@ -60,6 +60,7 @@ public abstract class SimpleContentHandlerSupport
     SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
 
     if (mutable) {
+      // mutable
       switch (method) {
         case GET: {
           SimpleContent content = facet.get(name);
@@ -91,6 +92,7 @@ public abstract class SimpleContentHandlerSupport
       }
     }
     else {
+      // readonly
       switch (method) {
         case GET: {
           SimpleContent content = facet.get(name);
