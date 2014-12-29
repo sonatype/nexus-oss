@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.realms.ldap.internal.persist.entity;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -79,11 +81,13 @@ public final class Connection
   /**
    * System User. The username of user with access to the LDAP server.
    */
+  @Nullable
   private String systemUsername;
 
   /**
    * System Password. The password for the System User.
    */
+  @Nullable
   private String systemPassword;
 
   /**
@@ -99,12 +103,14 @@ public final class Connection
   /**
    * The LDAP backup mirror host.
    */
+  @Nullable
   private Host backupHost;
 
   /**
    * SASL Realm. The authentication realm.
    */
-  private String realm;
+  @Nullable
+  private String saslRealm;
 
   /**
    * Connection timeout. Connection timeout in seconds.
@@ -161,20 +167,22 @@ public final class Connection
     this.host = checkNotNull(host);
   }
 
+  @Nullable
   public Host getBackupHost() {
     return backupHost;
   }
 
-  public void setBackupHost(final Host backupHost) {
+  public void setBackupHost(final @Nullable Host backupHost)
+  {
     this.backupHost = backupHost;
   }
 
-  public String getRealm() {
-    return realm;
+  public String getSaslRealm() {
+    return saslRealm;
   }
 
-  public void setRealm(final String realm) {
-    this.realm = realm;
+  public void setSaslRealm(final String realm) {
+    this.saslRealm = realm;
   }
 
   public int getConnectionTimeout() {

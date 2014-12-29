@@ -18,6 +18,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.component.services.id.EntityIdFactory;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -36,6 +37,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Singleton
+@Named
 public class OrientDBLdapConfigurationSource
     extends LifecycleSupport
     implements LdapConfigurationSource
@@ -112,7 +115,7 @@ public class OrientDBLdapConfigurationSource
       try {
         final ODocument doc = entityAdapter.selectById(db, ldapConfiguration.getId());
         if (doc != null) {
-          entityAdapter.edit(doc, ldapConfiguration);
+          entityAdapter.edit(db, doc, ldapConfiguration);
           return true;
         }
       }

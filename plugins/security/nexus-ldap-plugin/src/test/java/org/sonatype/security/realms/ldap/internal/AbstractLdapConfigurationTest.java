@@ -74,7 +74,7 @@ public abstract class AbstractLdapConfigurationTest
     connInfo.setConnectionRetryDelay(300);
     connInfo.setConnectionTimeout(15);
     connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));
-    connInfo.setRealm("");
+    connInfo.setSaslRealm("");
     connInfo.setSearchBase("ou=searchbase");
     connInfo.setSystemPassword(encodeBase64("systemPassword"));
     connInfo.setSystemUsername(encodeBase64("systemUsername"));

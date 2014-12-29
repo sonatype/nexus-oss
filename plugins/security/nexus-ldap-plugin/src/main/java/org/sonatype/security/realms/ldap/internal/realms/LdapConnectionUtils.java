@@ -78,8 +78,8 @@ public class LdapConnectionUtils
         Integer.toString(ldapServer.getConnection().getConnectionTimeout() * 1000));
 
     // and the realm
-    if (connInfo.getRealm() != null) {
-      connectionProperties.put("java.naming.security.sasl.realm", connInfo.getRealm());
+    if (connInfo.getSaslRealm() != null) {
+      connectionProperties.put("java.naming.security.sasl.realm", connInfo.getSaslRealm());
     }
     defaultLdapContextFactory.setAdditionalEnvironment(connectionProperties);
 

@@ -43,7 +43,7 @@ public class LdapRestTestUtils
     Assert.assertEquals(dto.getConnectionInfo().getPort(), ldapServer.getConnection().getHost().getPort());
     Assert.assertEquals(dto.getConnectionInfo().getProtocol(),
         ldapServer.getConnection().getHost().getProtocol().name());
-    Assert.assertEquals(dto.getConnectionInfo().getRealm(), ldapServer.getConnection().getRealm());
+    Assert.assertEquals(dto.getConnectionInfo().getRealm(), ldapServer.getConnection().getSaslRealm());
     Assert.assertEquals(dto.getConnectionInfo().getSearchBase(), ldapServer.getConnection().getSearchBase());
     Assert.assertEquals(
         ldapServer.getConnection().getSystemUsername(),

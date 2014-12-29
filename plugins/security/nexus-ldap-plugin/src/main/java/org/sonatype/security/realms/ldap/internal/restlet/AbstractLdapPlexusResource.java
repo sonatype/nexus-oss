@@ -164,7 +164,7 @@ public abstract class AbstractLdapPlexusResource
       infoDto.setHost(connInfo.getHost().getHostName());
       infoDto.setPort(connInfo.getHost().getPort());
       infoDto.setProtocol(connInfo.getHost().getProtocol().name());
-      infoDto.setRealm(connInfo.getRealm());
+      infoDto.setRealm(connInfo.getSaslRealm());
       infoDto.setSearchBase(connInfo.getSearchBase());
       infoDto.setSystemUsername(connInfo.getSystemUsername());
       if (connInfo.getSystemPassword() != null) {
