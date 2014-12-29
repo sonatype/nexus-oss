@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import org.sonatype.nexus.repository.Repository;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -21,10 +23,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class SimpleContentEvent
 {
+  private final Repository repository;
+
   private final SimpleContent content;
 
-  public SimpleContentEvent(final SimpleContent content) {
+  public SimpleContentEvent(final Repository repository,
+                            final SimpleContent content)
+  {
+    this.repository = checkNotNull(repository);
     this.content = checkNotNull(content);
+  }
+
+  public Repository getRepository() {
+    return repository;
   }
 
   public SimpleContent getContent() {
@@ -34,7 +45,8 @@ public abstract class SimpleContentEvent
   @Override
   public String toString() {
     return getClass().getSimpleName() + "{" +
-        "content=" + content +
+        "repository=" + repository.getName() +
+        ", content=" + content +
         '}';
   }
 }

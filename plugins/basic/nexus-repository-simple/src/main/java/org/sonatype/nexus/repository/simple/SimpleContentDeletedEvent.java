@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import org.sonatype.nexus.repository.Repository;
+
 /**
  * Simple content deleted event.
  *
@@ -20,7 +22,9 @@ package org.sonatype.nexus.repository.simple;
 public class SimpleContentDeletedEvent
   extends SimpleContentEvent
 {
-  public SimpleContentDeletedEvent(final SimpleContent content) {
-    super(content);
+  public SimpleContentDeletedEvent(final Repository repository,
+                                   final SimpleContent content)
+  {
+    super(repository, content);
   }
 }

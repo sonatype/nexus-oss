@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import org.sonatype.nexus.repository.Repository;
+
 /**
  * Simple content updated event.
  *
@@ -20,7 +22,9 @@ package org.sonatype.nexus.repository.simple;
 public class SimpleContentUpdatedEvent
   extends SimpleContentEvent
 {
-  public SimpleContentUpdatedEvent(final SimpleContent content) {
-    super(content);
+  public SimpleContentUpdatedEvent(final Repository repository,
+                                   final SimpleContent content)
+  {
+    super(repository, content);
   }
 }

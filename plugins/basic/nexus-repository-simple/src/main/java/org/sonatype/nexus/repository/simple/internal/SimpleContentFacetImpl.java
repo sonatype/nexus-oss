@@ -114,10 +114,10 @@ public class SimpleContentFacetImpl
     invalidateIndexHtmlCache();
 
     if (prev == null) {
-      eventBus.post(new SimpleContentCreatedEvent(content));
+      eventBus.post(new SimpleContentCreatedEvent(getRepository(), content));
     }
     else {
-      eventBus.post(new SimpleContentUpdatedEvent(content));
+      eventBus.post(new SimpleContentUpdatedEvent(getRepository(), content));
     }
 
     return prev;
@@ -136,7 +136,7 @@ public class SimpleContentFacetImpl
 
       invalidateIndexHtmlCache();
 
-      eventBus.post(new SimpleContentDeletedEvent(prev));
+      eventBus.post(new SimpleContentDeletedEvent(getRepository(), prev));
     }
     return prev;
   }
