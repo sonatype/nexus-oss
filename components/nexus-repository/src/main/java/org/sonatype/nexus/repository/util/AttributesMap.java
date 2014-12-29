@@ -55,6 +55,7 @@ public class AttributesMap
    */
   private <T> T coerce(final Object value, final Class<T> type) {
     // TODO: PropertyEditor coercion?
+    log.trace("Coerce: {} -> {}", value, type);
     return type.cast(value);
   }
 
