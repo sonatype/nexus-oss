@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Type;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Hosted repository type.
  *
@@ -29,6 +31,7 @@ public class HostedType
 {
   public static final String NAME = "hosted";
 
+  @VisibleForTesting
   public HostedType() {
     super(NAME);
   }

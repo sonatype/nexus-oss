@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Type;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Proxy repository type.
  *
@@ -29,6 +31,7 @@ public class ProxyType
 {
   public static final String NAME = "proxy";
 
+  @VisibleForTesting
   public ProxyType() {
     super(NAME);
   }

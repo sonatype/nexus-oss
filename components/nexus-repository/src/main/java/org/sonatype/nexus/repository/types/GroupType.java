@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Type;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Group repository type.
  *
@@ -29,6 +31,7 @@ public class GroupType
 {
   public static final String NAME = "group";
 
+  @VisibleForTesting
   public GroupType() {
     super(NAME);
   }

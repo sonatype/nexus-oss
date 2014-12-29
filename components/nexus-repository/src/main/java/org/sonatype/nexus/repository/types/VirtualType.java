@@ -17,6 +17,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Type;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Virtual repository type.
  *
@@ -29,6 +31,7 @@ public class VirtualType
 {
   public static final String NAME = "virtual";
 
+  @VisibleForTesting
   public VirtualType() {
     super(NAME);
   }
