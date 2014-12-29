@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.view.matchers.token;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -22,6 +24,7 @@ import static org.junit.Assert.assertThat;
  * Tests for {@link Token}.
  */
 public class TokenTest
+    extends TestSupport
 {
   @Test
   public void literalToken() {
