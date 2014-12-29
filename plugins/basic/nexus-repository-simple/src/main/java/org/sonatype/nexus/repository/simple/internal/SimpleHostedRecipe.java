@@ -74,12 +74,13 @@ public class SimpleHostedRecipe
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(contentFacet.get());
 
-    configureView(repository);
+    configure(repository.facet(ViewFacet.class));
   }
 
-  private void configureView(final Repository repository) {
-    ViewFacet viewFacet = repository.facet(ViewFacet.class);
-
+  /**
+   * Configure {@link ViewFacet}.
+   */
+  private void configure(final ViewFacet facet) {
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
@@ -101,6 +102,6 @@ public class SimpleHostedRecipe
         HttpHandlers.notFound()
     );
 
-    viewFacet.install(builder.create());
+    facet.install(builder.create());
   }
 }
