@@ -25,6 +25,8 @@ import com.google.common.annotations.VisibleForTesting;
  * Logical NOT matcher.
  *
  * @since 3.0
+ *
+ * @see LogicMatchers
  */
 public class NotMatcher
   extends LogicMatcher

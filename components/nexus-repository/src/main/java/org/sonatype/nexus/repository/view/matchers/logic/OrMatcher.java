@@ -25,6 +25,8 @@ import com.google.common.annotations.VisibleForTesting;
  * Logical OR matcher.
  *
  * @since 3.0
+ *
+ * @see LogicMatchers
  */
 public class OrMatcher
   extends LogicMatcher

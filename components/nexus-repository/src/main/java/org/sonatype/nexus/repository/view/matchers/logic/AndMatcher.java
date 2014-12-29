@@ -25,6 +25,8 @@ import com.google.common.annotations.VisibleForTesting;
  * Logical AND matcher.
  *
  * @since 3.0
+ *
+ * @see LogicMatchers
  */
 public class AndMatcher
   extends LogicMatcher
