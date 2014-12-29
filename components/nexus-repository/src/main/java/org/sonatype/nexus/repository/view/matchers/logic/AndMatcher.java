@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Logical AND matcher.
  *
@@ -27,6 +29,7 @@ import org.sonatype.nexus.repository.view.Matcher;
 public class AndMatcher
   extends LogicMatcher
 {
+  @VisibleForTesting
   public AndMatcher(final List<Matcher> matchers) {
     super(matchers);
   }

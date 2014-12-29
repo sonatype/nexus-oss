@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Logical NOT matcher.
  *
@@ -27,6 +29,7 @@ import org.sonatype.nexus.repository.view.Matcher;
 public class NotMatcher
   extends LogicMatcher
 {
+  @VisibleForTesting
   public NotMatcher(final List<Matcher> matchers) {
     super(matchers);
   }

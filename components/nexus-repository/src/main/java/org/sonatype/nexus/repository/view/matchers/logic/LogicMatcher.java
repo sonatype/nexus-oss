@@ -20,6 +20,8 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -33,6 +35,7 @@ abstract class LogicMatcher
 {
   protected final List<Matcher> matchers;
 
+  @VisibleForTesting
   public LogicMatcher(final List<Matcher> matchers) {
     this.matchers = checkNotNull(matchers);
   }
