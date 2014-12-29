@@ -30,7 +30,7 @@ import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher;
-import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or;
@@ -92,7 +92,7 @@ public class SimpleGroupRecipe
         .create());
 
     builder.route(new Route.Builder()
-        .matcher(new RegexMatcher("/(.*)"))
+        .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
         .handler(contentHandler)
         .create());

@@ -22,10 +22,7 @@ import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.matchers.RegexMatcher;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
@@ -39,8 +36,7 @@ import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 @Named
 @Singleton
 public class SimpleContentMutableHandler
-    extends ComponentSupport
-    implements Handler
+    extends SimpleContentHandlerSupport
 {
   @Nonnull
   @Override
@@ -81,13 +77,5 @@ public class SimpleContentMutableHandler
       default:
         return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
     }
-  }
-
-  /**
-   * Find content name from request context matcher state.
-   */
-  private String contentName(final Context context) {
-    RegexMatcher.State state = context.getAttributes().require(RegexMatcher.State.class);
-    return state.getMatchResult().group(1);
   }
 }
