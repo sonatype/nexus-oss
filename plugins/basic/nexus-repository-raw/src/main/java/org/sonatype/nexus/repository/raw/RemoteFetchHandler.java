@@ -12,14 +12,15 @@
  */
 package org.sonatype.nexus.repository.raw;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpClientFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
-
-import org.apache.http.client.methods.HttpGet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -29,22 +30,18 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * @since 3.0
  */
+@Named
+@Singleton
 public class RemoteFetchHandler
     implements Handler
 {
-  private final Repository repository;
-
-  public RemoteFetchHandler(final Repository repository) {
-    this.repository = repository;
-  }
-
   @Override
   public Response handle(final Context context) throws Exception {
     final Request request = context.getRequest();
 
     checkArgument(request.getAction().equals("GET"), "%s can only retarget GET requests", getClass().getSimpleName());
 
-    final HttpClientFacet httpFacet = repository.facet(HttpClientFacet.class);
+    final HttpClientFacet httpFacet = request.getRepository().facet(HttpClientFacet.class);
 
     // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
     final String path = request.getPath();
