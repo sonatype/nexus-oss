@@ -45,6 +45,9 @@ public class AttributesMap
     this(Maps.<String, Object>newHashMap());
   }
 
+  /**
+   * Return the key for given type-key.
+   */
   private String key(final Class type) {
     checkNotNull(type);
     return type.getName();
@@ -59,14 +62,30 @@ public class AttributesMap
     return type.cast(value);
   }
 
-  // TODO: get w/default-value?
-
+  /**
+   * Get attribute value for given key.
+   */
   @Nullable
   public Object get(final String key) {
     checkNotNull(key);
     return backing.get(key);
   }
 
+  /**
+   * Get attribute value for given key with optional default-value if value is null.
+   */
+  @Nullable
+  public Object get(final String key, @Nullable final Object defaultValue) {
+    Object value = get(key);
+    if (value == null) {
+      value = defaultValue;
+    }
+    return value;
+  }
+
+  /**
+   * Get attribute value.
+   */
   @Nullable
   public <T> T get(final Class<T> type) {
     Object value = get(key(type));
@@ -74,7 +93,19 @@ public class AttributesMap
   }
 
   /**
-   * Get attribute value with coercion support.
+   * Get attribute value with type-key with optional default-value if value is null.
+   */
+  @Nullable
+  public <T> T get(final Class<T> type, @Nullable final T defaultValue) {
+    T value = get(type);
+    if (value == null) {
+      value = defaultValue;
+    }
+    return value;
+  }
+
+  /**
+   * Get coerced attribute value for given key.
    */
   public <T> T get(final String key, final Class<T> type) {
     checkNotNull(type);
@@ -82,12 +113,29 @@ public class AttributesMap
     return coerce(value, type);
   }
 
+  /**
+   * Get coerced attribute value for given key with optional default-value if value is null.
+   */
+  public <T> T get(final String key, final Class<T> type, @Nullable final T defaultValue) {
+    T value = get(key, type);
+    if (value == null) {
+      value = defaultValue;
+    }
+    return value;
+  }
+
+  /**
+   * Get required attribute value for given key.
+   */
   public Object require(final String key) {
     Object value = get(key);
     checkState(value != null, "Missing: %s", key);
     return value;
   }
 
+  /**
+   * Get required attribute value for given type-key.
+   */
   public <T> T require(final Class<T> type) {
     T value = get(type);
     checkState(value != null, "Missing: %s", key(type));
@@ -103,6 +151,9 @@ public class AttributesMap
     return coerce(value, type);
   }
 
+  /**
+   * Set keyed attribute value.
+   */
   @Nullable
   public Object set(final String key, final Object value) {
     checkNotNull(key);
@@ -112,11 +163,17 @@ public class AttributesMap
     return replaced;
   }
 
+  /**
+   * Set type-keyed attribute value.
+   */
   @Nullable
   public <T> Object set(final Class<T> type, final T value) {
     return set(key(type), value);
   }
 
+  /**
+   * Remove attribute for given key.
+   */
   @Nullable
   public Object remove(final String key) {
     checkNotNull(key);
@@ -127,24 +184,39 @@ public class AttributesMap
     return removed;
   }
 
+  /**
+   * Remove attribute for given type-key.
+   */
   @Nullable
   public Object remove(final Class type) {
     return remove(key(type));
   }
 
+  /**
+   * Check if attributes contains given key.
+   */
   public boolean defined(final String key) {
     checkNotNull(key);
     return backing.containsKey(key);
   }
 
+  /**
+   * Check if attributes contains given type-key.
+   */
   public boolean defined(final Class type) {
     return defined(key(type));
   }
 
+  /**
+   * Return all attribute keys.
+   */
   public Set<String> keys() {
     return backing.keySet();
   }
 
+  /**
+   * Return all attribute entries.
+   */
   public Set<Entry<String,Object>> entries() {
     return backing.entrySet();
   }
@@ -154,14 +226,23 @@ public class AttributesMap
     return backing.entrySet().iterator();
   }
 
+  /**
+   * Check if attributes contains any values.
+   */
   public boolean isEmpty() {
     return backing.isEmpty();
   }
 
+  /**
+   * Returns the number of defined attributes.
+   */
   public int size() {
     return backing.size();
   }
 
+  /**
+   * Clear all attributes.
+   */
   public void clear() {
     backing.clear();
     log.trace("Cleared");
