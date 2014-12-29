@@ -54,7 +54,7 @@ public final class LdapConfiguration
   }
 
   public void setId(final String id) {
-    this.id = checkNotNull(id);
+    this.id = id;
   }
 
   public String getName() {
@@ -62,7 +62,7 @@ public final class LdapConfiguration
   }
 
   public void setName(final String name) {
-    this.name = checkNotNull(name);
+    this.name = name;
   }
 
   public int getOrder() {

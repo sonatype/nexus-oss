@@ -29,6 +29,7 @@ import org.sonatype.security.realms.ldap.internal.LdapURL;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
@@ -36,6 +37,7 @@ import org.sonatype.security.realms.ldap.internal.realms.DefaultLdapContextFacto
 import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.codec.Base64;
@@ -138,9 +140,37 @@ public abstract class AbstractLdapPlexusResource
   protected LdapConfiguration toLdapModel(final LdapServerConfigurationDTO dto)
       throws ResourceException
   {
-    LdapConfiguration config = convert(dto, new LdapConfiguration());
-    config.setConnection(decode(config.getConnection()));
-    return config;
+    final LdapConfiguration result = new LdapConfiguration();
+    // this method is used in edit/create case, set ID only if we have one
+    if (!Strings.isNullOrEmpty(dto.getId())) {
+      result.setId(dto.getId());
+    }
+    if (!Strings.isNullOrEmpty(dto.getName())) {
+      result.setName(dto.getName());
+    }
+    // result.setOrder();
+    result.setConnection(toLdapModel(dto.getConnectionInfo()));
+
+    final Mapping mapping = new Mapping();
+    final LdapUserAndGroupAuthConfigurationDTO dtoMapping = dto.getUserAndGroupConfig();
+    mapping.setEmailAddressAttribute(dtoMapping.getEmailAddressAttribute());
+    mapping.setLdapGroupsAsRoles(dtoMapping.isLdapGroupsAsRoles());
+    mapping.setGroupBaseDn(dtoMapping.getGroupBaseDn());
+    mapping.setGroupIdAttribute(dtoMapping.getGroupIdAttribute());
+    mapping.setGroupMemberAttribute(dtoMapping.getGroupMemberAttribute());
+    mapping.setGroupMemberFormat(dtoMapping.getGroupMemberFormat());
+    mapping.setGroupObjectClass(dtoMapping.getGroupObjectClass());
+    mapping.setUserPasswordAttribute(dtoMapping.getUserPasswordAttribute());
+    mapping.setUserIdAttribute(dtoMapping.getUserIdAttribute());
+    mapping.setUserObjectClass(dtoMapping.getUserObjectClass());
+    mapping.setLdapFilter(dtoMapping.getLdapFilter());
+    mapping.setUserBaseDn(dtoMapping.getUserBaseDn());
+    mapping.setUserRealNameAttribute(dtoMapping.getUserRealNameAttribute());
+    mapping.setUserSubtree(dtoMapping.isUserSubtree());
+    mapping.setGroupSubtree(dtoMapping.isGroupSubtree());
+    mapping.setUserMemberOfAttribute(dtoMapping.getUserMemberOfAttribute());
+    result.setMapping(mapping);
+    return result;
   }
 
   protected LdapServerConfigurationDTO toDto(LdapConfiguration ldapServer) {
@@ -199,23 +229,54 @@ public abstract class AbstractLdapPlexusResource
     return dto;
   }
 
-  protected LdapUserAndGroupAuthConfigurationDTO toDto(Mapping userAndGroupConfig) {
-    return this.convert(userAndGroupConfig, new LdapUserAndGroupAuthConfigurationDTO());
+  protected LdapUserAndGroupAuthConfigurationDTO toDto(Mapping mapping) {
+    final LdapUserAndGroupAuthConfigurationDTO result = new LdapUserAndGroupAuthConfigurationDTO();
+    result.setEmailAddressAttribute(mapping.getEmailAddressAttribute());
+    result.setLdapGroupsAsRoles(mapping.isLdapGroupsAsRoles());
+    result.setGroupBaseDn(mapping.getGroupBaseDn());
+    result.setGroupIdAttribute(mapping.getGroupIdAttribute());
+    result.setGroupMemberAttribute(mapping.getGroupMemberAttribute());
+    result.setGroupMemberFormat(mapping.getGroupMemberFormat());
+    result.setGroupObjectClass(mapping.getGroupObjectClass());
+    result.setUserPasswordAttribute(mapping.getUserPasswordAttribute());
+    result.setUserIdAttribute(mapping.getUserIdAttribute());
+    result.setUserObjectClass(mapping.getUserObjectClass());
+    result.setLdapFilter(mapping.getLdapFilter());
+    result.setUserBaseDn(mapping.getUserBaseDn());
+    result.setUserRealNameAttribute(mapping.getUserRealNameAttribute());
+    result.setUserSubtree(mapping.isUserSubtree());
+    result.setGroupSubtree(mapping.isGroupSubtree());
+    result.setUserMemberOfAttribute(mapping.getUserMemberOfAttribute());
+    return result;
   }
 
-  protected Connection toLdapModel(LdapConnectionInfoDTO connectionDto)
+  protected Connection toLdapModel(LdapConnectionInfoDTO from)
       throws ResourceException
   {
-    return decode(convert(connectionDto, new Connection()));
-  }
-
-  private <T, F> T convert(F from, T to) {
-    // xstream cheat ahead
-    XStream xstream = new XStream();
-    xstream.setClassLoader(this.getClass().getClassLoader());
-    String fromXml = xstream.toXML(from);
-    to = (T) xstream.fromXML(fromXml, to);
-    return to;
+    final Connection to = new Connection();
+    to.setSearchBase(from.getSearchBase());
+    to.setSystemUsername(from.getSystemUsername());
+    to.setSystemPassword(from.getSystemPassword());
+    to.setAuthScheme(from.getAuthScheme());
+    final Host host = new Host(
+        Protocol.valueOf(from.getProtocol()),
+        from.getHost(),
+        from.getPort()
+    );
+    to.setHost(host);
+    if (!Strings.isNullOrEmpty(from.getBackupMirrorHost())) {
+      final Host backupHost = new Host(
+          Protocol.valueOf(from.getBackupMirrorProtocol()),
+          from.getBackupMirrorHost(),
+          from.getBackupMirrorPort()
+      );
+      to.setBackupHost(backupHost);
+    }
+    to.setSaslRealm(from.getRealm());
+    to.setConnectionTimeout(from.getConnectionTimeout());
+    to.setConnectionRetryDelay(from.getConnectionRetryDelay());
+    to.setCacheTimeout(from.getCacheTimeout());
+    return decode(to);
   }
 
   protected LdapContextFactory buildDefaultLdapContextFactory(final String ldapServerId,
