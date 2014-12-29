@@ -94,10 +94,6 @@ public class HttpResponses
 
   // Method not allowed: 405
 
-  public static Response methodNotAllowed() {
-    return new Response(Status.failure(SC_METHOD_NOT_ALLOWED));
-  }
-
   public static Response methodNotAllowed(final String methodName, final String... allowedMethods) {
     checkNotNull(methodName);
     checkNotNull(allowedMethods);

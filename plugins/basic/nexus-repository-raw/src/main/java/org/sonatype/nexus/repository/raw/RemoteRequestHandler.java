@@ -32,7 +32,7 @@ public class RemoteRequestHandler
     final Request request = context.getRequest();
 
     if(!"GET".equals(request.getAction())){
-      return  HttpResponses.methodNotAllowed();
+      return  HttpResponses.methodNotAllowed(request.getAction(),"GET");
     }
 
     Object remoteRequest = new Object();
