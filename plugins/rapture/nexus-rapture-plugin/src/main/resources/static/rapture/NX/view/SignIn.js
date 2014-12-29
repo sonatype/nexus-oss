@@ -43,15 +43,12 @@ Ext.define('NX.view.SignIn', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
-          labelAlign: 'left',
-          labelWidth: 100,
           anchor: '100%'
         },
         items: [
           {
             name: 'username',
             itemId: 'username',
-            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME'),
             emptyText: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
@@ -60,14 +57,13 @@ Ext.define('NX.view.SignIn', {
             name: 'password',
             itemId: 'password',
             inputType: 'password',
-            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD'),
             emptyText: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             xtype: 'checkbox',
-            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
+            boxLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
             name: 'remember'
           }
         ],
