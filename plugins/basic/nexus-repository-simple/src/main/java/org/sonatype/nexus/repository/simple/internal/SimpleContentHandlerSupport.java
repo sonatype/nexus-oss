@@ -105,7 +105,7 @@ public abstract class SimpleContentHandlerSupport
   /**
    * Find content name from request context matcher state.
    */
-  protected String contentName(final Context context) {
+  private String contentName(final Context context) {
     TokenMatcher.State state = context.getAttributes().require(TokenMatcher.State.class);
     String name = state.getTokens().get("name");
     checkState(name != null, "Missing token: name");
