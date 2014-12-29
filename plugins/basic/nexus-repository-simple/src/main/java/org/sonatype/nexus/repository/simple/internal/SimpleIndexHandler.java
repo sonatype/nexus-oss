@@ -45,7 +45,7 @@ public class SimpleIndexHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     String method = context.getRequest().getAction();
     Repository repository = context.getRequest().getRepository();
-    log.debug("{} repository '{}' index", method, repository.getName());
+    log.debug("{} repository '{}' index.html", method, repository.getName());
 
     SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
 
