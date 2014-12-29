@@ -72,7 +72,7 @@ public class AttributesMap
   }
 
   /**
-   * Get attribute value for given key with optional default-value if value is null.
+   * Get attribute value for given key with default-value if value is null.
    */
   @Nullable
   public Object get(final String key, @Nullable final Object defaultValue) {
@@ -93,7 +93,7 @@ public class AttributesMap
   }
 
   /**
-   * Get attribute value with type-key with optional default-value if value is null.
+   * Get attribute value with type-key with default-value if value is null.
    */
   @Nullable
   public <T> T get(final Class<T> type, @Nullable final T defaultValue) {
@@ -114,7 +114,7 @@ public class AttributesMap
   }
 
   /**
-   * Get coerced attribute value for given key with optional default-value if value is null.
+   * Get coerced attribute value for given key with default-value if value is null.
    */
   public <T> T get(final String key, final Class<T> type, @Nullable final T defaultValue) {
     T value = get(key, type);
@@ -195,7 +195,7 @@ public class AttributesMap
   /**
    * Check if attributes contains given key.
    */
-  public boolean defined(final String key) {
+  public boolean contains(final String key) {
     checkNotNull(key);
     return backing.containsKey(key);
   }
@@ -203,8 +203,8 @@ public class AttributesMap
   /**
    * Check if attributes contains given type-key.
    */
-  public boolean defined(final Class type) {
-    return defined(key(type));
+  public boolean contains(final Class type) {
+    return contains(key(type));
   }
 
   /**
