@@ -55,7 +55,6 @@ class AttributesMapTest
 
   @Test
   void 'size empty and clear'() {
-    log underTest
     assert underTest.isEmpty()
     assert underTest.size() == 0
 
@@ -71,5 +70,18 @@ class AttributesMapTest
     log underTest
     assert underTest.isEmpty()
     assert underTest.size() == 0
+  }
+
+  @Test
+  void 'typed accessors'() {
+    def value
+
+    underTest.set('foo', 1)
+    value = underTest.get('foo', Integer.class)
+    assert value.class == Integer.class
+    assert value == 1
+
+    underTest.set('foo', 1)
+    value = underTest.get('foo', Integer.class)
   }
 }

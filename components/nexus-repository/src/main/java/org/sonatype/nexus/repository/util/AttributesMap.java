@@ -50,6 +50,16 @@ public class AttributesMap
     return type.getName();
   }
 
+  /**
+   * Coerce value to type.
+   */
+  private <T> T coerce(final Object value, final Class<T> type) {
+    // TODO: PropertyEditor coercion?
+    return type.cast(value);
+  }
+
+  // TODO: get w/default-value?
+
   @Nullable
   public Object get(final String key) {
     checkNotNull(key);
@@ -57,9 +67,18 @@ public class AttributesMap
   }
 
   @Nullable
-  @SuppressWarnings("unchecked")
   public <T> T get(final Class<T> type) {
-    return (T) get(key(type));
+    Object value = get(key(type));
+    return type.cast(value);
+  }
+
+  /**
+   * Get attribute value with coercion support.
+   */
+  public <T> T get(final String key, final Class<T> type) {
+    checkNotNull(type);
+    Object value = get(key);
+    return coerce(value, type);
   }
 
   public Object require(final String key) {
@@ -74,6 +93,15 @@ public class AttributesMap
     return value;
   }
 
+  /**
+   * Require attribute value with coercion support.
+   */
+  public <T> T require(final String key, final Class<T> type) {
+    checkNotNull(type);
+    Object value = require(key);
+    return coerce(value, type);
+  }
+
   @Nullable
   public Object set(final String key, final Object value) {
     checkNotNull(key);
@@ -83,7 +111,6 @@ public class AttributesMap
     return replaced;
   }
 
-  @SuppressWarnings("unchecked")
   @Nullable
   public <T> Object set(final Class<T> type, final T value) {
     return set(key(type), value);
@@ -143,6 +170,4 @@ public class AttributesMap
   public String toString() {
     return backing.toString();
   }
-
-  // TODO: Coercion support
 }
