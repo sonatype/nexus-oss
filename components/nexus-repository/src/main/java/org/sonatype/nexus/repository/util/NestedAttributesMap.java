@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.repository.util;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -73,12 +73,16 @@ public class NestedAttributesMap
     return key;
   }
 
+  protected Map<String,Object> newChildBacking() {
+    return Maps.newHashMap();
+  }
+
   public NestedAttributesMap child(final String name) {
     checkNotNull(name);
 
     Object child = backing.get(name);
     if (child == null) {
-      child = new HashMap<String,Object>();
+      child = newChildBacking();
       backing.put(name, child);
     }
     else {
