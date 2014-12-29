@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.httpbridge;
 
 import javax.annotation.Nonnull;
@@ -25,8 +26,11 @@ import org.sonatype.nexus.repository.view.Response;
  */
 public class HttpHandlers
 {
+  public HttpHandlers() {}
+
   public static Handler notFound() {
-    return new Handler() {
+    return new Handler()
+    {
       @Nonnull
       @Override
       public Response handle(@Nonnull final Context context) throws Exception {

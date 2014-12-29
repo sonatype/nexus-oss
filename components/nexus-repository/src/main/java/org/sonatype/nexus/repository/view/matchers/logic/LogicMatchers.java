@@ -26,6 +26,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LogicMatchers
 {
+  private LogicMatchers() {}
+
   public static Matcher and(final Matcher... matchers) {
     checkNotNull(matchers);
     checkArgument(matchers.length > 1, "AND requires 2 or more matchers");

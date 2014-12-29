@@ -17,8 +17,10 @@ package org.sonatype.nexus.repository.httpbridge;
  *
  * @since 3.0
  */
-public final class HttpMethods
+public class HttpMethods
 {
+  private HttpMethods() {}
+
   public static final String OPTIONS = "OPTIONS";
 
   public static final String GET = "GET";

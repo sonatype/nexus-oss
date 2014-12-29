@@ -39,6 +39,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
  */
 public class HttpResponses
 {
+  private HttpResponses() {}
+
   // Ok: 200
 
   public static Response ok(final @Nullable String message) {
