@@ -182,7 +182,7 @@ public class SimpleGroupFacet
   //
 
   /**
-   * Invalidate index cache if any member repositries are mutated.
+   * Invalidate index cache if any member repositories are mutated.
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
     if (members.contains(event.getRepository().getName())) {
