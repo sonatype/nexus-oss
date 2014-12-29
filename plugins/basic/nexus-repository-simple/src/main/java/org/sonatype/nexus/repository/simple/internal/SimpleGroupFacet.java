@@ -117,6 +117,9 @@ public class SimpleGroupFacet
     return repos;
   }
 
+  /**
+   * Find content in members, first non-null content wins.
+   */
   @Nullable
   @Override
   public SimpleContent get(final String name) {
@@ -160,6 +163,9 @@ public class SimpleGroupFacet
 
   /**
    * Returns a union of all member repositories contents.
+   *
+   * Order of members is important, first member with content will be included,
+   * second with same name is masked by former.
    */
   @Override
   public Set<Entry<String, SimpleContent>> entries() {
@@ -168,6 +174,7 @@ public class SimpleGroupFacet
     for (Repository repository : members()) {
       SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
       for (Map.Entry<String,SimpleContent> entry : facet.entries()) {
+        // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {
           union.put(entry.getKey(), entry.getValue());
         }
