@@ -20,27 +20,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Default {@link ViewFacet} implementation.
+ * Configurable {@link ViewFacet} implementation.
  *
  * @since 3.0
  */
 @Named
-public class ViewFacetImpl
+public class ConfigurableViewFacet
   extends FacetSupport
   implements ViewFacet
 {
   private Router router;
 
-  @Override
-  public void install(final Router router) {
+  public void configure(final Router router) {
     checkNotNull(router);
-    checkState(this.router == null, "Router already installed");
+    checkState(this.router == null, "Router already configured");
     this.router = router;
   }
 
   @Override
   public Response dispatch(final Request request) throws Exception {
-    checkState(router != null, "Router not installed");
+    checkState(router != null, "Router not configured");
     return router.dispatch(request);
   }
 }

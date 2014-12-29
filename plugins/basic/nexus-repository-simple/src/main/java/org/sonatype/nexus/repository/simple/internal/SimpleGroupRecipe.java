@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
 import org.sonatype.nexus.repository.types.GroupType;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -47,6 +48,8 @@ public class SimpleGroupRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + GroupType.NAME;
 
+  private final Provider<ConfigurableViewFacet> viewFacet;
+
   private final Provider<SimpleGroupFacet> groupFacet;
 
   private final TimingHandler timingHandler;
@@ -58,12 +61,14 @@ public class SimpleGroupRecipe
   @Inject
   public SimpleGroupRecipe(final @Named(HostedType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
+                           final Provider<ConfigurableViewFacet> viewFacet,
                            final Provider<SimpleGroupFacet> groupFacet,
                            final TimingHandler timingHandler,
                            final SimpleIndexHandler indexHandler,
                            final SimpleContentReadonlyHandler contentHandler)
   {
     super(type, format);
+    this.viewFacet = checkNotNull(viewFacet);
     this.groupFacet = checkNotNull(groupFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
@@ -72,15 +77,14 @@ public class SimpleGroupRecipe
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(configure(viewFacet.get()));
     repository.attach(groupFacet.get());
-
-    configure(repository.facet(ViewFacet.class));
   }
 
   /**
    * Configure {@link ViewFacet}.
    */
-  private void configure(final ViewFacet facet) {
+  private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
@@ -101,6 +105,8 @@ public class SimpleGroupRecipe
         HttpHandlers.badRequest()
     );
 
-    facet.install(builder.create());
+    facet.configure(builder.create());
+
+    return facet;
   }
 }

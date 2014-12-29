@@ -24,6 +24,7 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
 import org.sonatype.nexus.repository.types.HostedType;
+import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -46,6 +47,8 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
+  private final Provider<ConfigurableViewFacet> viewFacet;
+
   private final Provider<SimpleHostedFacet> contentFacet;
 
   private final TimingHandler timingHandler;
@@ -57,12 +60,14 @@ public class SimpleHostedRecipe
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
+                            final Provider<ConfigurableViewFacet> viewFacet,
                             final Provider<SimpleHostedFacet> contentFacet,
                             final TimingHandler timingHandler,
                             final SimpleIndexHandler indexHandler,
                             final SimpleContentMutableHandler contentHandler)
   {
     super(type, format);
+    this.viewFacet = checkNotNull(viewFacet);
     this.contentFacet = checkNotNull(contentFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
@@ -71,15 +76,14 @@ public class SimpleHostedRecipe
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(configure(viewFacet.get()));
     repository.attach(contentFacet.get());
-
-    configure(repository.facet(ViewFacet.class));
   }
 
   /**
    * Configure {@link ViewFacet}.
    */
-  private void configure(final ViewFacet facet) {
+  private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder();
 
     builder.route(new Route.Builder()
@@ -100,6 +104,8 @@ public class SimpleHostedRecipe
         HttpHandlers.badRequest()
     );
 
-    facet.install(builder.create());
+    facet.configure(builder.create());
+
+    return facet;
   }
 }

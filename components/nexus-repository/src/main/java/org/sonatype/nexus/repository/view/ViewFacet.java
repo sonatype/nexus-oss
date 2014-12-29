@@ -24,11 +24,6 @@ public interface ViewFacet
     extends Facet
 {
   /**
-   * Install router.
-   */
-  void install(Router router);
-
-  /**
    * Dispatch request to router.
    */
   Response dispatch(Request request) throws Exception;
