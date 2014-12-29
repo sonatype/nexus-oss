@@ -10,32 +10,32 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.config
+package org.sonatype.nexus.repository.util
 
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import static ConfigurationAttributes.GRANDPARENT_SEPARATOR
 import static org.junit.Assert.fail
+import static org.sonatype.nexus.repository.util.NestedAttributesMap.GRANDPARENT_SEPARATOR
 
 /**
- * Tests for {@link ConfigurationAttributes}.
+ * Tests for {@link NestedAttributesMap}.
  */
-class ConfigurationAttributesTest
+class NestedAttributesMapTest
   extends TestSupport
 {
   @Test
   void 'parentKey null when no parent'() {
-    ConfigurationAttributes child = new ConfigurationAttributes('foo', [:])
+    NestedAttributesMap child = new NestedAttributesMap('foo', [:])
     assert child.key == 'foo'
     assert child.parentKey == null
   }
 
   @Test
   void 'parentKey includes grandparent'() {
-    ConfigurationAttributes grandparent = new ConfigurationAttributes('foo', [:])
-    ConfigurationAttributes parent = grandparent.child('bar')
-    ConfigurationAttributes child = parent.child('baz')
+    NestedAttributesMap grandparent = new NestedAttributesMap('foo', [:])
+    NestedAttributesMap parent = grandparent.child('bar')
+    NestedAttributesMap child = parent.child('baz')
 
     assert grandparent.key == 'foo'
     assert parent.key == 'bar'
@@ -45,7 +45,7 @@ class ConfigurationAttributesTest
 
   @Test
   void 'set with map value fails'() {
-    ConfigurationAttributes attributes = new ConfigurationAttributes('foo', [:])
+    NestedAttributesMap attributes = new NestedAttributesMap('foo', [:])
     try {
       attributes.set('invalid', [:])
       fail()
@@ -57,7 +57,7 @@ class ConfigurationAttributesTest
 
   @Test
   void 'child() with non-map value fails'() {
-    ConfigurationAttributes attributes = new ConfigurationAttributes('foo', [:])
+    NestedAttributesMap attributes = new NestedAttributesMap('foo', [:])
     attributes.set('value', false)
 
     try {

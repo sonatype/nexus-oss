@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.entity.Entity;
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Maps;
 
@@ -62,7 +63,7 @@ public class Configuration
     this.attributes = attributes;
   }
 
-  public ConfigurationAttributes attributes(final String key) {
+  public NestedAttributesMap attributes(final String key) {
     checkNotNull(key);
 
     if (attributes == null) {
@@ -75,7 +76,7 @@ public class Configuration
       attributes.put(key, map);
     }
 
-    return new ConfigurationAttributes(key, map);
+    return new NestedAttributesMap(key, map);
   }
 
   @Override

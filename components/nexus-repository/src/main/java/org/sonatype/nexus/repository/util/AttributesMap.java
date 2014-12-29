@@ -33,7 +33,7 @@ public class AttributesMap
   extends ComponentSupport
   implements Iterable<Entry<String,Object>>
 {
-  private final Map<String, Object> backing;
+  protected final Map<String, Object> backing;
 
   public AttributesMap(final Map<String, Object> backing) {
     this.backing = checkNotNull(backing);
@@ -68,6 +68,7 @@ public class AttributesMap
     return value;
   }
 
+  @Nullable
   public Object set(final String key, final Object value) {
     checkNotNull(key);
     checkNotNull(value);
@@ -77,20 +78,24 @@ public class AttributesMap
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T set(final Class<T> type, final T value) {
-    return (T) set(key(type), value);
+  @Nullable
+  public <T> Object set(final Class<T> type, final T value) {
+    return set(key(type), value);
   }
 
-  public void remove(final String key) {
+  @Nullable
+  public Object remove(final String key) {
     checkNotNull(key);
     Object removed = backing.remove(key);
     if (removed != null) {
       log.trace("Removed: {}", key);
     }
+    return removed;
   }
 
-  public void remove(final Class type) {
-    remove(key(type));
+  @Nullable
+  public Object remove(final Class type) {
+    return remove(key(type));
   }
 
   public boolean defined(final String key) {

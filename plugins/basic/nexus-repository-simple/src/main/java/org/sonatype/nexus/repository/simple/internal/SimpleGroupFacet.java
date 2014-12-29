@@ -25,7 +25,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.config.ConfigurationAttributes;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
@@ -33,6 +32,7 @@ import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Lists;
@@ -81,8 +81,8 @@ public class SimpleGroupFacet
 
     // FIXME: refine api here
     Configuration config = repository.getConfiguration();
-    ConfigurationAttributes attrs = config.attributes("group");
-    memberNames.addAll((Collection<? extends String>) attrs.get("memberNames"));
+    NestedAttributesMap attrs = config.attributes("group");
+    memberNames.addAll((Collection<? extends String>) attrs.require("memberNames"));
     log.debug("Members names: {}", memberNames);
   }
 

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.config;
+package org.sonatype.nexus.repository.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,39 +22,38 @@ import com.google.common.annotations.VisibleForTesting;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-// TODO: Consider extending from util.AttributesContainer?
-
 /**
- * {@link Configuration} attributes.
+ * Nested {@link AttributesMap} supporting parent/child relationship.
  *
  * @since 3.0
  */
-public class ConfigurationAttributes
+public class NestedAttributesMap
+  extends AttributesMap
 {
   @VisibleForTesting
   static final String GRANDPARENT_SEPARATOR = "::";
 
   @Nullable
-  private final ConfigurationAttributes parent;
+  private final NestedAttributesMap parent;
 
   private final String key;
 
-  private final Map<String,Object> map;
-
-  public ConfigurationAttributes(final String key, final Map<String, Object> map) {
-    this(null, key, map);
+  public NestedAttributesMap(final String key, final Map<String, Object> backing) {
+    this(null, key, backing);
   }
 
   @VisibleForTesting
-  ConfigurationAttributes(final @Nullable ConfigurationAttributes parent, final String key,
-                          final Map<String, Object> map) {
+  NestedAttributesMap(final @Nullable NestedAttributesMap parent,
+                      final String key,
+                      final Map<String, Object> backing)
+  {
+    super(backing);
     this.parent = parent;
     this.key = checkNotNull(key);
-    this.map = checkNotNull(map);
   }
 
   @Nullable
-  public ConfigurationAttributes getParent() {
+  public NestedAttributesMap getParent() {
     return parent;
   }
 
@@ -74,42 +73,26 @@ public class ConfigurationAttributes
     return key;
   }
 
-  public boolean defined(final String name) {
-    checkNotNull(name);
-    return map.containsKey(name);
-  }
-
-  @Nullable
-  public Object get(final String name) {
-    checkNotNull(name);
-    return map.get(name);
-  }
-
-  public void set(final String name, final Object value) {
-    checkNotNull(name);
-    checkNotNull(value);
-    checkState(!(value instanceof Map), "Use child() to set a map value");
-    map.put(name, value);
-  }
-
-  public void remove(final String name) {
-    checkNotNull(name);
-    map.remove(name);
-  }
-
-  public ConfigurationAttributes child(final String name) {
+  public NestedAttributesMap child(final String name) {
     checkNotNull(name);
 
-    Object child = map.get(name);
+    Object child = backing.get(name);
     if (child == null) {
       child = new HashMap<String,Object>();
-      map.put(name, child);
+      backing.put(name, child);
     }
     else {
       checkState(child instanceof Map, "child '%s' not a Map", name);
     }
     //noinspection unchecked,ConstantConditions
-    return new ConfigurationAttributes(this, name, (Map<String, Object>) child);
+    return new NestedAttributesMap(this, name, (Map<String, Object>) child);
+  }
+
+  @Nullable
+  @Override
+  public Object set(final String key, final Object value) {
+    checkState(!(value instanceof Map), "Use child() to set a map value");
+    return super.set(key, value);
   }
 
   @Override
@@ -117,27 +100,8 @@ public class ConfigurationAttributes
     return getClass().getSimpleName() + "{" +
         "parent=" + getParentKey() +
         ", key='" + key + '\'' +
-        ", map=" + map +
+        ", backing=" + backing +
         '}';
   }
 
-  //
-  // Coercion support
-  //
-
-  //public <T> T get(final String name, final Class<T> type) {
-  //  checkNotNull(name);
-  //  checkNotNull(type);
-  //
-  //  // TODO:
-  //  return null;
-  //}
-
-  //public <T> void set(final String name, final Class<T> type, final T value) {
-  //  checkNotNull(name);
-  //  checkNotNull(type);
-  //  checkNotNull(value);
-  //
-  //  // TODO:
-  //}
 }
