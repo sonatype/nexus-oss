@@ -50,7 +50,7 @@ public class TokenMatcher
     checkNotNull(context);
 
     String path = context.getRequest().getPath();
-    log.debug("Matching: {}~={} ignore-case: {}", path, parser);
+    log.debug("Matching: {}~={}", path, parser);
     final Map<String, String> tokens = parser.parse(path);
     if (tokens == null) {
       // There was no match.
