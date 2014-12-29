@@ -13,8 +13,8 @@
 
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,59 +28,46 @@ import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.goodies.template.TemplateEngine;
-import org.sonatype.sisu.goodies.template.TemplateParameters;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Default {@link SimpleContentFacet}.
+ * Hosted {@link SimpleContentFacet}.
  *
  * @since 3.0
  */
 @Named
-public class SimpleContentFacetImpl
+public class SimpleHostedFacet
     extends FacetSupport
     implements SimpleContentFacet
 {
   private final EventBus eventBus;
 
-  private final TemplateEngine templateEngine;
+  private final SimpleContentIndexHtmlGenerator indexHtmlGenerator;
 
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
-
-  private URL indexHtmlTmpl;
 
   private volatile String indexHtmlCache;
 
   @Inject
-  public SimpleContentFacetImpl(final EventBus eventBus,
-                                final @Named("shared") TemplateEngine templateEngine)
+  public SimpleHostedFacet(final EventBus eventBus,
+                           final SimpleContentIndexHtmlGenerator indexHtmlGenerator)
   {
     this.eventBus = checkNotNull(eventBus);
-    this.templateEngine = checkNotNull(templateEngine);
+    this.indexHtmlGenerator = checkNotNull(indexHtmlGenerator);
   }
 
   private void reset() {
     store.clear();
-    indexHtmlTmpl = null;
     indexHtmlCache = null;
   }
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
     reset();
-  }
-
-  @Override
-  protected void doStart() throws Exception {
-    // cache index.html template
-    indexHtmlTmpl = getClass().getResource("index.vm");
-    checkNotNull(indexHtmlTmpl);
-    log.debug("index.html Template: {}", indexHtmlTmpl);
   }
 
   @Override
@@ -130,7 +117,6 @@ public class SimpleContentFacetImpl
     ensureStarted();
 
     SimpleContent prev = store.remove(name);
-
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
 
@@ -139,6 +125,11 @@ public class SimpleContentFacetImpl
       eventBus.post(new SimpleContentDeletedEvent(getRepository(), prev));
     }
     return prev;
+  }
+
+  @Override
+  public Set<Map.Entry<String, SimpleContent>> entries() {
+    return ImmutableSet.copyOf(store.entrySet());
   }
 
   private void invalidateIndexHtmlCache() {
@@ -155,13 +146,7 @@ public class SimpleContentFacetImpl
 
     // maybe generate index.html
     if (html == null) {
-      // snapshot contents
-      Map<String, SimpleContent> contents = ImmutableMap.copyOf(store);
-
-      // render html
-      html = templateEngine.render(this, indexHtmlTmpl, new TemplateParameters()
-          .set("repository", getRepository())
-          .set("contents", contents));
+      html = indexHtmlGenerator.generate(getRepository(), store.entrySet());
 
       // cache index.html
       indexHtmlCache = html;

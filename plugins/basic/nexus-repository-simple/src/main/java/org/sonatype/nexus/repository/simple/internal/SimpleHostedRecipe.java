@@ -23,7 +23,6 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
@@ -47,21 +46,21 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
-  private final Provider<SimpleContentFacet> contentFacet;
+  private final Provider<SimpleHostedFacet> contentFacet;
 
   private final TimingHandler timingHandler;
 
   private final SimpleIndexHandler indexHandler;
 
-  private final SimpleContentHandler contentHandler;
+  private final SimpleContentMutableHandler contentHandler;
 
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
-                            final Provider<SimpleContentFacet> contentFacet,
+                            final Provider<SimpleHostedFacet> contentFacet,
                             final TimingHandler timingHandler,
                             final SimpleIndexHandler indexHandler,
-                            final SimpleContentHandler contentHandler)
+                            final SimpleContentMutableHandler contentHandler)
   {
     super(type, format);
     this.contentFacet = checkNotNull(contentFacet);
@@ -98,8 +97,7 @@ public class SimpleHostedRecipe
         .create());
 
     builder.defaultHandlers(
-        timingHandler,
-        HttpHandlers.notFound()
+        HttpHandlers.badRequest()
     );
 
     facet.install(builder.create());

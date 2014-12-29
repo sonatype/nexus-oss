@@ -38,4 +38,14 @@ public class HttpHandlers
       }
     };
   }
+
+  public static Handler badRequest() {
+    return new Handler() {
+      @Nonnull
+      @Override
+      public Response handle(@Nonnull final Context context) throws Exception {
+        return HttpResponses.badRequest();
+      }
+    };
+  }
 }

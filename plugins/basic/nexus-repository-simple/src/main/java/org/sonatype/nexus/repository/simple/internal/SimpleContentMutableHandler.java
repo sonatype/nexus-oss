@@ -32,15 +32,13 @@ import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 
 /**
- * Simple content handler.
- *
- * Allows GET, PUT, DELETE to manage repository-specific named content in-memory.
+ * Simple mutable content handler.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class SimpleContentHandler
+public class SimpleContentMutableHandler
     extends ComponentSupport
     implements Handler
 {

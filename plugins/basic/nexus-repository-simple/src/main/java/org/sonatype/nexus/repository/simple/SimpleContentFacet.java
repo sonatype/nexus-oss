@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.simple;
 
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
@@ -33,6 +36,8 @@ public interface SimpleContentFacet
 
   @Nullable
   SimpleContent delete(String name);
+
+  Set<Map.Entry<String, SimpleContent>> entries();
 
   String indexHtml();
 }

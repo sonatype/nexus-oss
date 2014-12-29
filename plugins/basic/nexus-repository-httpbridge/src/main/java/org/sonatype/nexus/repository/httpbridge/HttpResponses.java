@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -83,6 +84,12 @@ public class HttpResponses
 
   public static Response notFound() {
     return notFound(null);
+  }
+
+  // Bad request: 400
+
+  public static Response badRequest() {
+    return new Response(Status.failure(SC_BAD_REQUEST));
   }
 
   // Method not allowed: 405

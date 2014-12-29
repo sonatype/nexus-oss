@@ -15,16 +15,25 @@
 # Configure Repositories
 
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
-    orient:insert into repository_configuration SET repository_name=\'test\', recipe_name=\'simple-hosted\'
-    orient:insert into repository_configuration SET repository_name=\'anothertest\', recipe_name=\'simple-hosted\'
+    orient:insert into repository_configuration SET repository_name=\'test1\', recipe_name=\'simple-hosted\'
+    orient:insert into repository_configuration SET repository_name=\'test2\', recipe_name=\'simple-hosted\'
+    orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'members\': [\'test1\', \'test2\'] }}
+
     system:shutdown --force --reboot
 
 # Interact
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test/README.md
-    curl -v --upload-file ./README.md http://localhost:8081/repository/test/no-type-README.md
-    curl -v -X GET http://localhost:8081/repository/test/
-    curl -v -X GET http://localhost:8081/repository/test/index.html
-    curl -v -X GET http://localhost:8081/repository/test/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test/no-type-README.md
+## Hosted
+
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/README.md
+    curl -v --upload-file ./README.md http://localhost:8081/repository/test1/no-type-README.md
+    curl -v -X GET http://localhost:8081/repository/test1/
+    curl -v -X GET http://localhost:8081/repository/test1/index.html
+    curl -v -X GET http://localhost:8081/repository/test1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/test1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/test1/no-type-README.md
+
+## Group
+
+    curl -v --upload-file ./README.md http://localhost:8081/repository/testgroup1/README.md
+    
