@@ -55,25 +55,23 @@ public class SimpleGroupFacet
 
   private final RepositoryManager repositoryManager;
 
-  private final SimpleContentIndexHtmlGenerator indexHtmlGenerator;
+  private final SimpleContentIndexHtmlCache indexHtmlCache;
 
   private final List<String> members = Lists.newArrayList();
-
-  private volatile String indexHtmlCache;
 
   @Inject
   public SimpleGroupFacet(final EventBus eventBus,
                           final RepositoryManager repositoryManager,
-                          final SimpleContentIndexHtmlGenerator indexHtmlGenerator)
+                          final SimpleContentIndexHtmlCache indexHtmlCache)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.indexHtmlGenerator = checkNotNull(indexHtmlGenerator);
+    this.indexHtmlCache = checkNotNull(indexHtmlCache);
   }
 
   private void reset() {
     members.clear();
-    indexHtmlCache = null;
+    indexHtmlCache.invalidate();
   }
 
   @Override
@@ -156,19 +154,8 @@ public class SimpleGroupFacet
 
   @Override
   public String indexHtml() {
-    // resolve volatile to local for thread sanity
-    String html = indexHtmlCache;
-
-    // maybe generate index.html
-    if (html == null) {
-      html = indexHtmlGenerator.generate(getRepository(), entries());
-
-      // cache index.html
-      indexHtmlCache = html;
-      log.debug("Cached index.html");
-    }
-
-    return html;
+    ensureStarted();
+    return indexHtmlCache.get(getRepository(), this);
   }
 
   /**
@@ -199,8 +186,7 @@ public class SimpleGroupFacet
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
     if (members.contains(event.getRepository().getName())) {
-      indexHtmlCache = null;
-      log.debug("Invalided index.html cache");
+      indexHtmlCache.invalidate();
     }
   }
 

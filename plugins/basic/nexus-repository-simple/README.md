@@ -18,7 +18,6 @@
     orient:insert into repository_configuration SET repository_name=\'test1\', recipe_name=\'simple-hosted\'
     orient:insert into repository_configuration SET repository_name=\'test2\', recipe_name=\'simple-hosted\'
     orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'members\': [\'test1\', \'test2\'] }}
-
     system:shutdown --force --reboot
 
 # Interact
@@ -35,5 +34,6 @@
 
 ## Group
 
-    curl -v --upload-file ./README.md http://localhost:8081/repository/testgroup1/README.md
-    
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/A.md
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test2/B.md
+    curl -v -X GET http://localhost:8081/repository/testgroup1/

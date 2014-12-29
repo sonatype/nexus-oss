@@ -46,23 +46,21 @@ public class SimpleHostedFacet
 {
   private final EventBus eventBus;
 
-  private final SimpleContentIndexHtmlGenerator indexHtmlGenerator;
+  private final SimpleContentIndexHtmlCache indexHtmlCache;
 
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
-  private volatile String indexHtmlCache;
-
   @Inject
   public SimpleHostedFacet(final EventBus eventBus,
-                           final SimpleContentIndexHtmlGenerator indexHtmlGenerator)
+                           final SimpleContentIndexHtmlCache indexHtmlCache)
   {
     this.eventBus = checkNotNull(eventBus);
-    this.indexHtmlGenerator = checkNotNull(indexHtmlGenerator);
+    this.indexHtmlCache = checkNotNull(indexHtmlCache);
   }
 
   private void reset() {
     store.clear();
-    indexHtmlCache = null;
+    indexHtmlCache.invalidate();
   }
 
   @Override
@@ -98,7 +96,7 @@ public class SimpleHostedFacet
         content
     );
 
-    invalidateIndexHtmlCache();
+    indexHtmlCache.invalidate();
 
     if (prev == null) {
       eventBus.post(new SimpleContentCreatedEvent(getRepository(), content));
@@ -120,7 +118,7 @@ public class SimpleHostedFacet
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
 
-      invalidateIndexHtmlCache();
+      indexHtmlCache.invalidate();
 
       eventBus.post(new SimpleContentDeletedEvent(getRepository(), prev));
     }
@@ -132,27 +130,9 @@ public class SimpleHostedFacet
     return ImmutableSet.copyOf(store.entrySet());
   }
 
-  private void invalidateIndexHtmlCache() {
-    indexHtmlCache = null;
-    log.debug("Invalidated index.html cache");
-  }
-
   @Override
   public String indexHtml() {
     ensureStarted();
-
-    // resolve volatile to local for thread sanity
-    String html = indexHtmlCache;
-
-    // maybe generate index.html
-    if (html == null) {
-      html = indexHtmlGenerator.generate(getRepository(), store.entrySet());
-
-      // cache index.html
-      indexHtmlCache = html;
-      log.debug("Cached index.html");
-    }
-
-    return html;
+    return indexHtmlCache.get(getRepository(), this);
   }
 }

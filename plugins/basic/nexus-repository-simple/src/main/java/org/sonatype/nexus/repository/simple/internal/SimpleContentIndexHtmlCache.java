@@ -10,18 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
 import java.net.URL;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
@@ -29,21 +27,22 @@ import org.sonatype.sisu.goodies.template.TemplateParameters;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Simple content {@code index.html} generator.
+ * Simple content {@code index.html} cache.
  *
  * @since 3.0
  */
 @Named
-@Singleton
-public class SimpleContentIndexHtmlGenerator
+public class SimpleContentIndexHtmlCache
     extends ComponentSupport
 {
   private final TemplateEngine templateEngine;
 
-  private URL template;
+  private final URL template;
+
+  private volatile String htmlCache;
 
   @Inject
-  public SimpleContentIndexHtmlGenerator(final @Named("shared") TemplateEngine templateEngine) {
+  public SimpleContentIndexHtmlCache(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template
@@ -52,9 +51,29 @@ public class SimpleContentIndexHtmlGenerator
     log.debug("Template: {}", template);
   }
 
-  public String generate(final Repository repository, final Set<Entry<String, SimpleContent>> contents) {
-    return templateEngine.render(this, template, new TemplateParameters()
-        .set("repository", repository)
-        .set("contents", contents));
+  public String get(final Repository repository, final SimpleContentFacet facet) {
+    checkNotNull(repository);
+    checkNotNull(facet);
+
+    // resolve volatile to local for thread sanity
+    String html = htmlCache;
+
+    // maybe generate index.html
+    if (html == null) {
+      html = templateEngine.render(this, template, new TemplateParameters()
+          .set("repository", repository)
+          .set("contents", facet.entries()));
+
+      // cache index.html
+      htmlCache = html;
+      log.debug("Cached index.html");
+    }
+
+    return html;
+  }
+
+  public void invalidate() {
+    htmlCache = null;
+    log.debug("Invalided");
   }
 }
