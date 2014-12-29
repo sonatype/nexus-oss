@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.util
 
+import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
@@ -24,20 +25,25 @@ import static org.sonatype.nexus.repository.util.NestedAttributesMap.GRANDPARENT
 class NestedAttributesMapTest
   extends TestSupport
 {
+  private NestedAttributesMap underTest
+
+  @Before
+  void setUp() {
+    underTest = new NestedAttributesMap('foo', [:])
+  }
+
   @Test
   void 'parentKey null when no parent'() {
-    NestedAttributesMap child = new NestedAttributesMap('foo', [:])
-    assert child.key == 'foo'
-    assert child.parentKey == null
+    assert underTest.key == 'foo'
+    assert underTest.parentKey == null
   }
 
   @Test
   void 'parentKey includes grandparent'() {
-    NestedAttributesMap grandparent = new NestedAttributesMap('foo', [:])
-    NestedAttributesMap parent = grandparent.child('bar')
+    NestedAttributesMap parent = underTest.child('bar')
     NestedAttributesMap child = parent.child('baz')
 
-    assert grandparent.key == 'foo'
+    assert underTest.key == 'foo'
     assert parent.key == 'bar'
     assert child.key == 'baz'
     assert "foo${GRANDPARENT_SEPARATOR}bar" == child.parentKey
@@ -45,9 +51,8 @@ class NestedAttributesMapTest
 
   @Test
   void 'set with map value fails'() {
-    NestedAttributesMap attributes = new NestedAttributesMap('foo', [:])
     try {
-      attributes.set('invalid', [:])
+      underTest.set('invalid', [:])
       fail()
     }
     catch (IllegalStateException e) {
@@ -57,11 +62,10 @@ class NestedAttributesMapTest
 
   @Test
   void 'child() with non-map value fails'() {
-    NestedAttributesMap attributes = new NestedAttributesMap('foo', [:])
-    attributes.set('value', false)
+    underTest.set('value', false)
 
     try {
-      attributes.child('value')
+      underTest.child('value')
       fail()
     }
     catch (IllegalStateException e) {
