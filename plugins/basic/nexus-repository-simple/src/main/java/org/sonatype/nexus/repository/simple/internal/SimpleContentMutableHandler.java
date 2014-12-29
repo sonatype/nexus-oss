@@ -13,20 +13,8 @@
 
 package org.sonatype.nexus.repository.simple.internal;
 
-import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
-import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
-import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Response;
-
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 
 /**
  * Simple mutable content handler.
@@ -38,44 +26,7 @@ import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 public class SimpleContentMutableHandler
     extends SimpleContentHandlerSupport
 {
-  @Nonnull
-  @Override
-  public Response handle(final @Nonnull Context context) throws Exception {
-    String name = contentName(context);
-    String method = context.getRequest().getAction();
-    Repository repository = context.getRequest().getRepository();
-    log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
-
-    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
-
-    switch (method) {
-      case GET: {
-        SimpleContent content = facet.get(name);
-        if (content == null) {
-          return HttpResponses.notFound(name);
-        }
-        return HttpResponses.ok(content.toPayload());
-      }
-
-      case PUT: {
-        SimpleContent content = new SimpleContent(context.getRequest().getPayload());
-        SimpleContent prev = facet.put(name, content);
-        if (prev == null) {
-          return HttpResponses.created();
-        }
-        return HttpResponses.noContent();
-      }
-
-      case DELETE: {
-        SimpleContent prev = facet.delete(name);
-        if (prev == null) {
-          return HttpResponses.notFound(name);
-        }
-        return HttpResponses.noContent();
-      }
-
-      default:
-        return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
-    }
+  public SimpleContentMutableHandler() {
+    super(true);
   }
 }
