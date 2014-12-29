@@ -47,7 +47,7 @@ class AttributesMapTest
   }
 
   @Test
-  void 'defined value'() {
+  void 'contains value'() {
     underTest.set('foo', 'bar')
     assert underTest.contains('foo')
     assert !underTest.contains('baz')
