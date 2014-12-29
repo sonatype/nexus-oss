@@ -37,6 +37,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,7 +58,7 @@ public class SimpleGroupFacet
 
   private final SimpleContentIndexHtmlCache indexHtmlCache;
 
-  private final List<String> members = Lists.newArrayList();
+  private final Set<String> memberNames = Sets.newLinkedHashSet();
 
   @Inject
   public SimpleGroupFacet(final EventBus eventBus,
@@ -70,7 +71,7 @@ public class SimpleGroupFacet
   }
 
   private void reset() {
-    members.clear();
+    memberNames.clear();
     indexHtmlCache.invalidate();
   }
 
@@ -81,8 +82,8 @@ public class SimpleGroupFacet
     // FIXME: refine api here
     Configuration config = repository.getConfiguration();
     ConfigurationAttributes attrs = config.attributes("group");
-    members.addAll((Collection<? extends String>) attrs.get("members"));
-    log.debug("Members: {}", members);
+    memberNames.addAll((Collection<? extends String>) attrs.get("memberNames"));
+    log.debug("Members names: {}", memberNames);
   }
 
   @Override
@@ -104,17 +105,17 @@ public class SimpleGroupFacet
    * Return list of member repositories.
    */
   private List<Repository> members() {
-    List<Repository> repos = Lists.newArrayList();
-    for (String member : members) {
-      Repository repository = repositoryManager.get(member);
+    List<Repository> members = Lists.newArrayListWithCapacity(memberNames.size());
+    for (String name : memberNames) {
+      Repository repository = repositoryManager.get(name);
       if (repository != null) {
-        repos.add(repository);
+        members.add(repository);
       }
       else {
-        log.warn("Ignoring missing member repository: {}", member);
+        log.warn("Ignoring missing member repository: {}", name);
       }
     }
-    return repos;
+    return members;
   }
 
   /**
@@ -192,7 +193,7 @@ public class SimpleGroupFacet
    * Invalidate index cache if any member repositories are mutated.
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
-    if (members.contains(event.getRepository().getName())) {
+    if (memberNames.contains(event.getRepository().getName())) {
       indexHtmlCache.invalidate();
     }
   }
