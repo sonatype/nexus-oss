@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
     return NX.I18n.get('ADMIN_USERS_UPDATE_SUCCESS') + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users or is an external user',
+  editableMarker: NX.I18n.get('ADMIN_USERS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;

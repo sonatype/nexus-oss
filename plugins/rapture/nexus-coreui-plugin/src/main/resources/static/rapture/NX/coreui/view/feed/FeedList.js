@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.feed.FeedList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No feed matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('BROWSE_FEEDS_LIST_FILTER_ERROR') }
   ]
 
 });

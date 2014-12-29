@@ -51,7 +51,7 @@ Ext.define('NX.coreui.view.task.TaskList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No scheduled task matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TASKS_LIST_FILTER_ERROR') }
   ]
 
 });

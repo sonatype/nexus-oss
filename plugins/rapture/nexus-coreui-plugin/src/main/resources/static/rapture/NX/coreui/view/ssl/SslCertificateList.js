@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No SSL certificate matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_SSL_LIST_FILTER_ERROR') }
   ],
 
   /**

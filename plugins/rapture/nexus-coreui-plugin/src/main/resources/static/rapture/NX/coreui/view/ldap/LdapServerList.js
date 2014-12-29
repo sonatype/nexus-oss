@@ -49,7 +49,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No LDAP server matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LDAP_LIST_FILTER_ERROR') }
   ]
 
 });

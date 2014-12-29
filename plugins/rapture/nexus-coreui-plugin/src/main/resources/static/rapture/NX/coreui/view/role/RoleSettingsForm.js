@@ -32,7 +32,7 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
     return NX.I18n.get('ADMIN_ROLES_UPDATE_SUCCESS') + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_ROLES_SETTINGS_ERROR'),
+  editableMarker: NX.I18n.get('ADMIN_ROLES_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this,

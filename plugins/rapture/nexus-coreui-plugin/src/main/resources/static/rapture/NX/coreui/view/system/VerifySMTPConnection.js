@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
     'NX.Icons'
   ],
 
-  title: 'Verify SMTP connection',
+  title: NX.I18n.get('ADMIN_SMTP_VERIFY_TITLE'),
   defaultFocus: 'email',
 
   layout: 'fit',
@@ -60,7 +60,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             },
             items: [
               { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
-              { xtype: 'label', html: 'Please enter an email address which will receive the test email message.',
+              { xtype: 'label', html: NX.I18n.get('ADMIN_SMTP_VERIFY_HELP'),
                 margin: '0 0 0 5'
               }
             ]

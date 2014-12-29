@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
         submit: 'NX.direct.coreui_Role.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Role created: ' + data['name'];
+        return NX.I18n.get('ADMIN_ROLES_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
       editableMarker: NX.I18n.get('ADMIN_ROLES_CREATE_ERROR'),

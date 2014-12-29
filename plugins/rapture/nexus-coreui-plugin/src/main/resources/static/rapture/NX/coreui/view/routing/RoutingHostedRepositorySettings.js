@@ -36,7 +36,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
       api: {
         load: 'NX.direct.coreui_RoutingRepositorySettings.read'
       },
-      settingsFormSuccessMessage: 'Routing Repository Settings $action',
+      settingsFormSuccessMessage: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_SUCCESS'),
       buttons: undefined,
       hidden: true
     },

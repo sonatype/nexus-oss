@@ -47,7 +47,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No repository target matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TARGETS_LIST_FILTER_ERROR') }
   ]
 
 });

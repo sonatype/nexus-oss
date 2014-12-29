@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.role.RoleList', {
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_ROLES_LIST_FILTER_ERROR') }
   ],
 
   /**

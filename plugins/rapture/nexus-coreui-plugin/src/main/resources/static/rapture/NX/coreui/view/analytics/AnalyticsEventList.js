@@ -155,7 +155,7 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
             }
           })
     },
-    { ptype: 'gridfilterbox', emptyText: 'No analytics event matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_EVENTS_FILTER_ERROR') }
   ]
 
 });

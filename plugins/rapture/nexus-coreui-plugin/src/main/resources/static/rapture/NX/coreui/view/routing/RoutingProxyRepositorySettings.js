@@ -44,9 +44,9 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
           load: 'NX.direct.coreui_RoutingRepositorySettings.read',
           submit: 'NX.direct.coreui_RoutingRepositorySettings.update'
         },
-        settingsFormSuccessMessage: 'Routing Repository Settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_SUCCESS'),
         editableCondition: NX.Conditions.isPermitted('nexus:repositories', 'update'),
-        editableMarker: 'You do not have permission to update routing repository settings',
+        editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_ERROR'),
 
         items: [
           {

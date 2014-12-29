@@ -88,7 +88,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },
-    { ptype: 'gridfilterbox', emptyText: 'No logger matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LOGGING_FILTER_ERROR') }
   ]
 
 });

@@ -35,7 +35,7 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
       // basic settings
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Security Realms settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_REALMS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_RealmSettings.read',
           submit: 'NX.direct.coreui_RealmSettings.update'
