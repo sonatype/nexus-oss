@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.util.AttributesMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 /**
@@ -50,6 +51,15 @@ public class Request
   protected Headers headers;
 
   protected Payload payload;
+
+  protected Request() {
+    // empty
+  }
+
+  @VisibleForTesting
+  public Request(final String path) {
+    this.path = path;
+  }
 
   public AttributesMap getAttributes() {
     return attributes;
