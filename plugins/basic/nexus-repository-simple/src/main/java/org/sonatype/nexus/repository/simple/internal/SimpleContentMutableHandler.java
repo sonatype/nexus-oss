@@ -27,6 +27,6 @@ public class SimpleContentMutableHandler
     extends SimpleContentHandlerSupport
 {
   public SimpleContentMutableHandler() {
-    super(true);
+    super(MUTABLE);
   }
 }

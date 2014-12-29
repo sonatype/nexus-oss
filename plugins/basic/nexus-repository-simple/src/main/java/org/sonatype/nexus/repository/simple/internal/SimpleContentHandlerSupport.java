@@ -39,6 +39,10 @@ public abstract class SimpleContentHandlerSupport
     extends ComponentSupport
     implements Handler
 {
+  protected static final boolean MUTABLE = true;
+
+  protected static final boolean READONLY = false;
+
   private final boolean mutable;
 
   public SimpleContentHandlerSupport(final boolean mutable) {

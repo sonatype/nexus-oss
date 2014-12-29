@@ -27,6 +27,6 @@ public class SimpleContentReadonlyHandler
     extends SimpleContentHandlerSupport
 {
   public SimpleContentReadonlyHandler() {
-    super(false);
+    super(READONLY);
   }
 }
