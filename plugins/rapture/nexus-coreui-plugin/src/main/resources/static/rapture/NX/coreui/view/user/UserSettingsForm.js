@@ -49,34 +49,27 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         itemId: 'userId',
         readOnly: true,
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ID'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_PLACEHOLDER')
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP')
       },
       { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_PLACEHOLDER')
       },
       {
         name: 'lastName',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST')
       },
       {
         xtype: 'nx-email',
         name: 'email',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
         helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_PLACEHOLDER')
       },
       {
         xtype: 'combo',
         name: 'status',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_HELP'),
         emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_PLACEHOLDER'),
         allowBlank: false,
         editable: false,

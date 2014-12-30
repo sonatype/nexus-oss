@@ -54,7 +54,6 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         name: 'id',
         itemId: 'id',
         fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED_HELP'),
         emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_MAPPED_PLACEHOLDER'),
         editable: false,
         store: 'RoleBySource',
@@ -69,8 +68,6 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         itemId: 'id',
         readOnly: true,
         fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ID_PLACEHOLDER')
       };
     }
 
@@ -87,23 +84,18 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
       idField,
       {
         name: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_NAME')
       },
       {
         name: 'description',
         allowBlank: true,
         fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION_HELP'),
-        emptyText: NX.I18n.get('ADMIN_ROLES_SETTINGS_DESCRIPTION_PLACEHOLDER')
       },
       {
         xtype: 'nx-itemselector',
         name: 'privileges',
         itemId: 'privileges',
         fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES_HELP'),
         allowBlank: true,
         buttons: ['add', 'remove'],
         fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_PRIVILEGES_PICKER'),
@@ -118,7 +110,6 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
         name: 'roles',
         itemId: 'roles',
         fieldLabel: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES'),
-        helpText: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES_HELP'),
         allowBlank: true,
         buttons: ['add', 'remove'],
         fromTitle: NX.I18n.get('ADMIN_ROLES_SETTINGS_ROLES_PICKER'),

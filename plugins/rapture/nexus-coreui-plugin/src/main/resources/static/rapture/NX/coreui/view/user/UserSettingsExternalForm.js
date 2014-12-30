@@ -98,7 +98,6 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         name: 'roles',
         itemId: 'roles',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_HELP'),
         buttons: ['add', 'remove'],
         fromTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_PICKER'),
         toTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_GIVEN_PICKER'),

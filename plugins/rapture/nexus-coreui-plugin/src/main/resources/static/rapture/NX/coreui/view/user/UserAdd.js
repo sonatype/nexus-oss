@@ -55,13 +55,11 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         name: 'password',
         itemId: 'password',
         fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_PASSWORD'),
-        emptyText: NX.I18n.get('ADMIN_USERS_CREATE_PASSWORD_PLACEHOLDER')
       },
       {
         xtype: 'nx-password',
         allowBlank: true,
         fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_CONFIRM'),
-        emptyText: NX.I18n.get('ADMIN_USERS_CREATE_CONFIRM_PLACEHOLDER'),
         submitValue: false,
         validator: function() {
           var me = this;

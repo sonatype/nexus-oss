@@ -55,22 +55,16 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'name',
           itemId: 'name',
           fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME'),
-          helpText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME_HELP'),
-          emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME_PLACEHOLDER')
         },
         {
           name: 'description',
           fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION'),
-          helpText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION_HELP'),
-          emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION_PLACEHOLDER')
         },
         {
           xtype: 'combo',
           name: 'repositoryId',
           itemId: 'repositoryId',
           fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY'),
-          helpText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY_HELP'),
-          emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY_PLACEHOLDER'),
           editable: false,
           store: me.repositoryStore,
           queryMode: 'local',
@@ -82,7 +76,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           name: 'repositoryTargetId',
           itemId: 'repositoryTargetId',
           fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TARGET'),
-          helpText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TARGET_HELP'),
           emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TARGET_PLACEHOLDER'),
           editable: false,
           store: me.targetStore,

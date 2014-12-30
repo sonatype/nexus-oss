@@ -45,20 +45,14 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
       items: [
         {
-          xtype: 'label',
-          html: NX.I18n.get('ADMIN_USERS_PASSWORD_HELP')
-        },
-        {
           xtype: 'nx-password',
           name: 'password',
           itemId: 'password',
           fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW'),
-          emptyText: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW_PLACEHOLDER')
         },
         {
           xtype: 'nx-password',
           fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_CONFIRM'),
-          emptyText: NX.I18n.get('ADMIN_USERS_PASSWORD_CONFIRM_PLACEHOLDER'),
           submitValue: false,
           validator: function () {
             var me = this;
