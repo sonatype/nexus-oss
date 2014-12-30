@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -56,10 +57,11 @@ public class AttributesMap
   /**
    * Coerce value to type.
    */
-  private <T> T coerce(final Object value, final Class<T> type) {
+  @SuppressWarnings("unchecked")
+  private <T> T coerce(final Object value, final TypeToken<T> type) {
     // TODO: PropertyEditor coercion?
     log.trace("Coerce: {} -> {}", value, type);
-    return type.cast(value);
+    return (T) type.getRawType().cast(value);
   }
 
   /**
@@ -107,21 +109,37 @@ public class AttributesMap
   /**
    * Get coerced attribute value for given key.
    */
-  public <T> T get(final String key, final Class<T> type) {
+  public <T> T get(final String key, final TypeToken<T> type) {
     checkNotNull(type);
     Object value = get(key);
     return coerce(value, type);
   }
 
   /**
+   * Get coerced attribute value for given key.
+   */
+  public <T> T get(final String key, final Class<T> type) {
+    checkNotNull(type);
+    return get(key, TypeToken.of(type));
+  }
+
+  /**
    * Get coerced attribute value for given key with default-value if value is null.
    */
-  public <T> T get(final String key, final Class<T> type, @Nullable final T defaultValue) {
+  public <T> T get(final String key, final TypeToken<T> type, @Nullable final T defaultValue) {
     T value = get(key, type);
     if (value == null) {
       value = defaultValue;
     }
     return value;
+  }
+
+  /**
+   * Get coerced attribute value for given key with default-value if value is null.
+   */
+  public <T> T get(final String key, final Class<T> type, @Nullable final T defaultValue) {
+    checkNotNull(type);
+    return get(key, TypeToken.of(type), defaultValue);
   }
 
   /**
@@ -145,10 +163,18 @@ public class AttributesMap
   /**
    * Require attribute value with coercion support.
    */
-  public <T> T require(final String key, final Class<T> type) {
+  public <T> T require(final String key, final TypeToken<T> type) {
     checkNotNull(type);
     Object value = require(key);
     return coerce(value, type);
+  }
+
+  /**
+   * Require attribute value with coercion support.
+   */
+  public <T> T require(final String key, final Class<T> type) {
+    checkNotNull(type);
+    return require(key, TypeToken.of(type));
   }
 
   /**

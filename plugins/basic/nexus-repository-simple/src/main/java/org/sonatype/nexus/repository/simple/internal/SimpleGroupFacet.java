@@ -10,9 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +41,7 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
 /**
  * Group {@link SimpleContentFacet}.
@@ -82,7 +83,7 @@ public class SimpleGroupFacet
     // FIXME: refine api here
     Configuration config = repository.getConfiguration();
     NestedAttributesMap attrs = config.attributes("group");
-    memberNames.addAll((Collection<? extends String>) attrs.require("memberNames"));
+    memberNames.addAll(attrs.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
   }
 
@@ -170,11 +171,11 @@ public class SimpleGroupFacet
    */
   @Override
   public Set<Entry<String, SimpleContent>> entries() {
-    Map<String,SimpleContent> union = Maps.newHashMap();
+    Map<String, SimpleContent> union = Maps.newHashMap();
 
     for (Repository repository : members()) {
       SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
-      for (Map.Entry<String,SimpleContent> entry : facet.entries()) {
+      for (Map.Entry<String, SimpleContent> entry : facet.entries()) {
         // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {
           union.put(entry.getKey(), entry.getValue());
