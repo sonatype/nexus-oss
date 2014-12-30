@@ -12,15 +12,11 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,53 +38,5 @@ public class StorageFacetImpl
   @Override
   protected void doInit(final Repository repository) throws Exception {
     // TODO:
-  }
-
-  @Override
-  public Graph getGraphTx() {
-    return null;
-  }
-
-  @Override
-  public Iterable<Vertex> browseAssets(final Graph graph) {
-    return null;
-  }
-
-  @Override
-  public Iterable<Vertex> browseComponents(final Graph graph) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Vertex findAssetWithId(final Graph graph, final Object id) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Vertex findAssetWithPath(final Graph graph, final String path) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Vertex findComponentWithId(final Graph graph, final Object id) {
-    return null;
-  }
-
-  @Override
-  public Vertex createAsset(final Graph graph) {
-    return null;
-  }
-
-  @Override
-  public Vertex createComponent(final Graph graph) {
-    return null;
-  }
-
-  @Override
-  public void delete(final Vertex vertex) {
-
   }
 }
