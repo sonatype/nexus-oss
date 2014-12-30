@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 
 /**
  * Logical OR matcher.
@@ -45,5 +46,10 @@ public class OrMatcher
       }
     }
     return false;
+  }
+
+  @Override
+  protected String describe() {
+    return Joiner.on(" OR ").join(matchers);
   }
 }

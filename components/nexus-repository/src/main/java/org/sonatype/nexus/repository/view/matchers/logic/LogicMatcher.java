@@ -43,9 +43,13 @@ abstract class LogicMatcher
   @Override
   public boolean matches(final Context context) {
     checkNotNull(context);
-    log.debug("Matching: {}", matchers);
+    if (log.isDebugEnabled()) {
+      log.debug("Matching: {}", describe());
+    }
     return doMatches(context);
   }
+
+  protected abstract String describe();
 
   protected abstract boolean doMatches(final @Nonnull Context context);
 

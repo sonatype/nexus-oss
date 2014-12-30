@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 
 /**
  * Logical NOT matcher.
@@ -45,5 +46,10 @@ public class NotMatcher
       }
     }
     return true;
+  }
+
+  @Override
+  protected String describe() {
+    return "NOT " + Joiner.on(" NOT ").join(matchers);
   }
 }
