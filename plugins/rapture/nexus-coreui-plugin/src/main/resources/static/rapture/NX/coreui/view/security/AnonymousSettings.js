@@ -39,10 +39,6 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
         editableMarker: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_ERROR'),
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW_HELP')
-          },
-          {
             xtype: 'checkbox',
             name: 'enabled',
             value: true,
@@ -61,23 +57,15 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
             collapsed: true,
             items: [
               {
-                xtype: 'label',
-                html: NX.I18n.get('ADMIN_ANONYMOUS_CUSTOMIZE_HELP')
-              },
-              {
                 xtype: 'textfield',
                 name: 'username',
                 fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_PLACEHOLDER'),
                 allowBlank: false
               },
               {
                 xtype: 'nx-password',
                 name: 'password',
                 fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_PLACEHOLDER'),
                 allowBlank: false
               }
             ]

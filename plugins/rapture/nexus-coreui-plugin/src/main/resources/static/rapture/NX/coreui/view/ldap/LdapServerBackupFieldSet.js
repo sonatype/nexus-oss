@@ -31,7 +31,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
       xtype: 'checkbox',
       name: 'backupMirrorEnabled',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_BACKUP_USE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_BACKUP_USE_HELP'),
       listeners: {
         change: function (checkbox, newValue) {
           checkbox.up('panel').showOrHide('backupMirror', newValue);
@@ -42,7 +41,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
       xtype: 'combo',
       name: 'backupMirrorProtocol',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_HELP'),
       emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
       editable: false,
       store: [
@@ -56,7 +54,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
       name: 'backupMirrorHost',
       itemId: 'backupMirrorHost',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_HELP'),
       backupMirror: [true]
     },
     {
