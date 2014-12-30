@@ -52,6 +52,9 @@ public class NestedAttributesMap
     this.key = checkNotNull(key);
   }
 
+  /**
+   * Returns the parent of this attributes or null if there is none.
+   */
   @Nullable
   public NestedAttributesMap getParent() {
     return parent;
@@ -69,14 +72,23 @@ public class NestedAttributesMap
     return null;
   }
 
+  /**
+   * Return the nested attributes key.
+   */
   public String getKey() {
     return key;
   }
 
+  /**
+   * Create new backing for new children attributes backing.
+   */
   protected Map<String,Object> newChildBacking() {
     return Maps.newHashMap();
   }
 
+  /**
+   * Returns nested children attributes for given name.
+   */
   public NestedAttributesMap child(final String name) {
     checkNotNull(name);
 
@@ -92,6 +104,9 @@ public class NestedAttributesMap
     return new NestedAttributesMap(this, name, (Map<String, Object>) child);
   }
 
+  /**
+   * Prevents setting {@link Map} values and require use of {@link #child}.
+   */
   @Nullable
   @Override
   public Object set(final String key, final Object value) {
