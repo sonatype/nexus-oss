@@ -38,7 +38,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_TITLE: 'Sonatype Nexus',
     GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse server contents',
     GLOBAL_HEADER_ADMIN_TOOLTIP: 'Server administration and configuration',
-    GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components…',
+    GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components',
     GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
     GLOBAL_HEADER_USER_TOOLTIP: 'User profile and options',
     GLOBAL_HEADER_SIGN_IN: 'Sign in',
@@ -65,7 +65,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_SIGN_IN_CANCEL: 'Cancel',
 
     // Filter box
-    GLOBAL_FILTER_PLACEHOLDER: 'filter',
+    GLOBAL_FILTER_PLACEHOLDER: 'Filter',
 
     // Dialogs
     GLOBAL_DIALOG_INFO_TITLE: 'Information',
@@ -84,11 +84,11 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_BUTTON_DISCARD: 'Discard',
 
     // Item selector
-    GLOBAL_ITEM_SELECTOR_FILTER: 'filter',
+    GLOBAL_ITEM_SELECTOR_FILTER: 'Filter',
 
     // Settings form
-    GLOBAL_SETTINGS_LOADING: 'Loading…',
-    GLOBAL_SETTINGS_SAVING: 'Saving…',
+    GLOBAL_SETTINGS_LOADING: 'Loading',
+    GLOBAL_SETTINGS_SAVING: 'Saving',
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',

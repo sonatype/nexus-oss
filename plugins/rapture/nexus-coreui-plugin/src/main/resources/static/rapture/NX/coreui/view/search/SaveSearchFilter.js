@@ -31,14 +31,12 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_NAME'),
-        emptyText: NX.I18n.get('BROWSE_SEARCH_SAVE_NAME_HELP')
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_NAME')
       },
       {
         xtype: 'textfield',
         name: 'description',
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_DESCRIPTION'),
-        emptyText: NX.I18n.get('BROWSE_SEARCH_SAVE_DESCRIPTION_HELP'),
         allowBlank: true
       }
     ]
