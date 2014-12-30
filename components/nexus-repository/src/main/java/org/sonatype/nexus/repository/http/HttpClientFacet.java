@@ -22,10 +22,10 @@ import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Response;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,7 +44,7 @@ public class HttpClientFacet
 
   public static final String REMOTE_URL = "remote_url";
 
-  private final HttpClientBuilder httpClientBuilder;
+  private final HttpClientFactory httpClientFactory;
 
   private final HttpPayloadResponseBuilder payloadResponseBuilder;
 
@@ -52,31 +52,38 @@ public class HttpClientFacet
 
   private String remoteUrlBase;
 
-  private CloseableHttpClient httpClient;
+  private HttpClient httpClient;
 
   @Inject
-  public HttpClientFacet(final HttpClientBuilder httpClientBuilder,
+  public HttpClientFacet(final HttpClientFactory httpClientFactory,
                          final HttpPayloadResponseBuilder payloadResponseBuilder,
                          final HttpClientConfigMarshaller marshaller)
   {
-    this.payloadResponseBuilder = payloadResponseBuilder;
-    this.marshaller = marshaller;
-    this.httpClientBuilder = checkNotNull(httpClientBuilder);
+    this.httpClientFactory = checkNotNull(httpClientFactory);
+    this.payloadResponseBuilder = checkNotNull(payloadResponseBuilder);
+    this.marshaller = checkNotNull(marshaller);
   }
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
     final Configuration configuration = repository.getConfiguration();
     final NestedAttributesMap foo = configuration.attributes("httpClientFacet");
-    marshaller.fromMap(foo);
 
+    final HttpClientConfig httpClientConfig = marshaller.fromMap(foo);
 
-    // I don't think this stuff actually belongs in the http client facet
+    httpClient = httpClientFactory.create(httpClientConfig);
 
-      final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
+    // TODO: This stuff probably doesn't belong in the http client facet
+
+    final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     final String remoteUrl = (String) attributes.get(REMOTE_URL);
 
     this.remoteUrlBase = remoteUrl;
+  }
+
+  public HttpClient getHttpClient() {
+    ensureStarted();
+    return httpClient;
   }
 
   /**
@@ -86,9 +93,9 @@ public class HttpClientFacet
     final String uri = remoteUrlBase + uriSuffix;
 
     final HttpGet httpGet = new HttpGet(uri);
+    final HttpResponse response = httpClient.execute(httpGet);
 
-    final CloseableHttpResponse response = httpClient.execute(httpGet);
-
-    return payloadResponseBuilder.buildPayloadResponse(response);
+    // TODO: Temporary - this cast may be illegal
+    return payloadResponseBuilder.buildPayloadResponse((CloseableHttpResponse) response);
   }
 }
