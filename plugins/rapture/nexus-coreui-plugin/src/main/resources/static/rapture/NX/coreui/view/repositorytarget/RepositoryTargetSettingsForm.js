@@ -47,9 +47,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME'),
-        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME')
       },
       {
         xtype: 'combo',

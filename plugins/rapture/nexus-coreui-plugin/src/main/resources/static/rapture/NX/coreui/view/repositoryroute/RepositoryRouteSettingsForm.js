@@ -70,7 +70,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
         name: 'mappingType',
         itemId: 'mappingType',
         fieldLabel: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE'),
-        helpText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE_HELP'),
         emptyText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE_PLACEHOLDER'),
         editable: false,
         store: [
@@ -85,7 +84,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
         name: 'groupId',
         itemId: 'groupId',
         fieldLabel: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP'),
-        helpText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_HELP'),
         emptyText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_PLACEHOLDER'),
         editable: false,
         store: me.groupStore,
