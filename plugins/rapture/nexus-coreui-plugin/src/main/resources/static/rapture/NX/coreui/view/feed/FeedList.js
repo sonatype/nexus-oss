@@ -51,16 +51,6 @@ Ext.define('NX.coreui.view.feed.FeedList', {
     deferEmptyText: false
   },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('BROWSE_FEEDS_LIST_SUBSCRIBE_BUTTON'),
-      glyph: 'xf09e@FontAwesome' /* fa-rss */,
-      action: 'subscribe',
-      disabled: true
-    }
-  ],
-
   plugins: [
     { ptype: 'gridfilterbox', emptyText: NX.I18n.get('BROWSE_FEEDS_LIST_FILTER_ERROR') }
   ]

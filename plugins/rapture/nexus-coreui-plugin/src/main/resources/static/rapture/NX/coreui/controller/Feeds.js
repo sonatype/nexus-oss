@@ -89,7 +89,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         'nx-coreui-feed-list': {
           beforerender: me.loadFeeds
         },
-        'nx-coreui-feed-list button[action=subscribe]': {
+        'nx-coreui-feed-feature button[action=subscribe]': {
           click: me.subscribe,
           afterrender: me.bindSubscribeButton
         }

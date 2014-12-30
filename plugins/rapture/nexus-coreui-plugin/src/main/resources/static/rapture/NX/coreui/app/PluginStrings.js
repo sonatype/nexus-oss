@@ -93,11 +93,11 @@ Ext.define('NX.coreui.app.PluginStrings', {
 
     // Browse -> Feeds
     BROWSE_FEEDS_TITLE: 'Feeds',
-    BROWSE_FEEDS_SUBTITLE: 'System event feeds',
+    BROWSE_FEEDS_SUBTITLE: 'Browse and subscribe to system events',
     BROWSE_FEEDS_LIST_SUBSCRIBE_BUTTON: 'Subscribe',
     BROWSE_FEEDS_LIST_FEED_COLUMN: 'Feed',
     BROWSE_FEEDS_LIST_URL_COLUMN: 'URL',
-    BROWSE_FEEDS_LIST_FILTER_ERROR: 'No feed matched criteria "$filter"',
+    BROWSE_FEEDS_LIST_FILTER_ERROR: 'No feeds matched criteria "$filter"',
     BROWSE_FEEDS_DETAILS_EVENTS_TAB: 'Events',
     BROWSE_FEEDS_DETAILS_TITLE_COLUMN: 'Title',
     BROWSE_FEEDS_DETAILS_DATE_COLUMN: 'Date',
