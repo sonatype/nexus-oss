@@ -30,31 +30,23 @@ Ext.define('NX.coreui.view.upload.UploadArtifactCoordinates', {
     {
       name: 'groupId',
       itemId: 'groupId',
-      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP'),
-      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP_HELP'),
-      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP_PLACEHOLDER')
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP')
     },
     {
       name: 'artifactId',
       itemId: 'artifactId',
-      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID'),
-      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID_HELP'),
-      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID_PLACEHOLDER')
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID')
     },
     {
       name: 'version',
       itemId: 'version',
-      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION'),
-      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION_HELP'),
-      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION_PLACEHOLDER')
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION')
     },
     {
       xtype: 'combo',
       name: 'packaging',
       itemId: 'packaging',
       fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING'),
-      helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING_HELP'),
-      emptyText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING_PLACEHOLDER'),
       queryMode: 'local',
       displayField: 'name',
       valueField: 'id',

@@ -42,7 +42,6 @@ Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
           me.uploader = {
             xtype: 'fileuploadfield',
             fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_FILE'),
-            helpText: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_FILE_HELP'),
             name: me.name,
             allowBlank: false,
             clearOnSubmit: false,
