@@ -67,7 +67,6 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
           xtype: 'nx-datedisplayfield',
           name: 'publishTimestamp',
           fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED'),
-          helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED_HELP'),
           hideIfUndefined: true,
           hidden: true
         },

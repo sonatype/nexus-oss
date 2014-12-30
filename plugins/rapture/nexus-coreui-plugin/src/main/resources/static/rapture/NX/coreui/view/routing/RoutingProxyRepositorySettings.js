@@ -58,7 +58,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             name: 'discoveryEnabled',
             itemId: 'discoveryEnabled',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_HELP'),
             value: true
           },
           {
@@ -66,7 +65,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             name: 'discoveryInterval',
             itemId: 'discoveryInterval',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_HELP'),
             emptyText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_PLACEHOLDER'),
             editable: false,
             value: 24,
@@ -110,7 +108,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             xtype: 'nx-datedisplayfield',
             name: 'publishTimestamp',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED_HELP'),
             hideIfUndefined: true,
             hidden: true
           },
@@ -148,7 +145,6 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
             xtype: 'nx-datedisplayfield',
             name: 'discoveryTimestamp',
             fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_RUN'),
-            helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_RUN_HELP'),
             hideIfUndefined: true,
             hidden: true
           }

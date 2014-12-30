@@ -71,7 +71,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
         xtype: 'checkbox',
         name: 'downloadRemoteIndexes',
         fieldLabel: NX.I18n.get('ADMIN_REPOSTIORIES_SETTINGS_DOWNLOAD'),
-        helpText: NX.I18n.get('ADMIN_REPOSTIORIES_SETTINGS_DOWNLOAD_HELP'),
         value: true
       },
       {
@@ -85,14 +84,12 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE_HELP'),
         value: true
       },
       {
         xtype: 'combo',
         name: 'checksumPolicy',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_HELP'),
         emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CHECKSUM_PLACEHOLDER'),
         editable: false,
         store: [
@@ -107,14 +104,12 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {

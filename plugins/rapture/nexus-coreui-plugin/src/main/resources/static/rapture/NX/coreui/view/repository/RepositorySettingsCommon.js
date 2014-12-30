@@ -32,7 +32,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
       itemId: 'id',
       fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID'),
       helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID_HELP'),
-      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER'),
       readOnly: true,
       validator: function(value) {
         if (/^[a-zA-Z0-9_\-\.]+$/.test(value)) {
@@ -45,13 +44,11 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
       name: 'name',
       fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
       helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_HELP'),
-      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER')
     },
     {
       name: 'providerName',
       itemId: 'providerName',
       fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER_HELP'),
       readOnly: true,
       submitValue: false,
       allowBlank: true
@@ -60,7 +57,6 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
       name: 'formatName',
       itemId: 'formatName',
       fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT'),
-      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT_HELP'),
       readOnly: true,
       submitValue: false,
       allowBlank: true
