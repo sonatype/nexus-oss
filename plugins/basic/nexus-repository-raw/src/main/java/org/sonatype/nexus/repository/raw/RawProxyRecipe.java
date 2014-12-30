@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.http.HttpClientFacet;
+import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route.Builder;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -46,31 +47,34 @@ public class RawProxyRecipe
 
   private final TimingHandler timingHandler;
 
+  private final Provider<ConfigurableViewFacet> viewFacet;
+
   private final Provider<HttpClientFacet> httpClient;
 
   @Inject
   public RawProxyRecipe(final @Named("proxy") Type type,
                         final @Named("raw") Format format, final RemoteFetchHandler remoteFetchHandler,
                         final TimingHandler timingHandler,
-                        final Provider<HttpClientFacet> httpClient)
+                        final Provider<ConfigurableViewFacet> viewFacet, final Provider<HttpClientFacet> httpClient)
   {
     super(type, format);
-    this.httpClient = checkNotNull(httpClient);
-    this.timingHandler = checkNotNull(timingHandler);
+
     this.remoteFetchHandler = checkNotNull(remoteFetchHandler);
+    this.timingHandler = checkNotNull(timingHandler);
+    this.viewFacet = checkNotNull(viewFacet);
+    this.httpClient = checkNotNull(httpClient);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(httpClient.get());
-
-    configure(repository.facet(ViewFacet.class));
+    repository.attach(configure(viewFacet.get()));
   }
 
   /**
    * Configure {@link ViewFacet}.
    */
-  private void configure(final ViewFacet facet) {
+  private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder router = new Router.Builder();
 
     // Build the primary route of the raw proxy view
@@ -86,6 +90,8 @@ public class RawProxyRecipe
     // By default, return a 404
     router.defaultHandlers(notFound());
 
-    facet.install(router.create());
+    facet.configure(router.create());
+
+    return facet;
   }
 }
