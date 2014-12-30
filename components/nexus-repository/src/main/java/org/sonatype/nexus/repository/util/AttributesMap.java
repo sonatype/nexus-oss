@@ -51,6 +51,7 @@ public class AttributesMap
    */
   private String key(final Class type) {
     checkNotNull(type);
+    // TODO: Strip off anonymous class turds?
     return type.getName();
   }
 
