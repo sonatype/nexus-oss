@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.util;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.reflect.TypeToken;
 
@@ -26,4 +27,6 @@ public class TypeTokens
   private TypeTokens() {}
 
   public static final TypeToken<Collection<String>> COLLECTION_STRING = new TypeToken<Collection<String>>() {};
+
+  public static final TypeToken<List<String>> LIST_STRING = new TypeToken<List<String>>() {};
 }
