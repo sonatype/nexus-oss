@@ -62,7 +62,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_NEW_TOOLTIP'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       action: 'new',
       disabled: true
@@ -70,7 +69,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_DELETE_TOOLTIP'),
       glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
       action: 'delete',
       disabled: true
@@ -79,7 +77,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_RESET_TOOLTIP'),
       glyph: 'xf0e2@FontAwesome' /* fa-undo */,
       action: 'reset',
       disabled: true

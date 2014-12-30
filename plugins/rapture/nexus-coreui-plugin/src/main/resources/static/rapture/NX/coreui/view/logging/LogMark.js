@@ -40,9 +40,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
         xtype: 'textfield',
         name: 'message',
         itemId: 'message',
-        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE'),
-        helpText: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE_HELP'),
-        emptyText: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE')
       }
     ]
   },

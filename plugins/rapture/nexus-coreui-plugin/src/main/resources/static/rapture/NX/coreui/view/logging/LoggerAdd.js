@@ -31,15 +31,12 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME'),
-        helpText: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_NAME')
       },
       {
         xtype: 'combo',
         name: 'level',
         fieldLabel: NX.I18n.get('ADMIN_LOGGING_CREATE_LEVEL'),
-        helpText: NX.I18n.get('ADMIN_LOGGING_CREATE_LEVEL_HELP'),
         editable: false,
         value: 'INFO',
         store: [

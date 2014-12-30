@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.user.UserList', {
   tbar: [
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     '-',
-    '<b>' + NX.I18n.get('ADMIN_USERS_LIST_SOURCE') + '</b>',
+    { xtype: 'label', text: NX.I18n.get('ADMIN_USERS_LIST_SOURCE') },
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_DEFAULT_BUTTON'), action: 'filter', menu: [] },
     { xtype: 'nx-coreui-user-searchbox' }
   ]
