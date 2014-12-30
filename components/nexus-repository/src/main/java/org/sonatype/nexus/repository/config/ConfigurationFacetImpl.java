@@ -39,5 +39,6 @@ public class ConfigurationFacetImpl
   @Override
   public void save() throws Exception {
     store.update(getRepository().getConfiguration());
+    log.debug("Saved");
   }
 }
