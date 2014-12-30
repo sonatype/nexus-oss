@@ -40,6 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
+@Deprecated
 public class HttpClientConfigMarshallerImpl
     extends ComponentSupport
     implements HttpClientConfigMarshaller

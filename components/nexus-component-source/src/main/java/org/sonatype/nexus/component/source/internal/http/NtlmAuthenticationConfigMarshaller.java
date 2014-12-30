@@ -33,6 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named(NtlmAuthenticationConfig.TYPE)
 @Singleton
+@Deprecated
 public class NtlmAuthenticationConfigMarshaller
     extends ComponentSupport
     implements AuthenticationConfigMarshaller

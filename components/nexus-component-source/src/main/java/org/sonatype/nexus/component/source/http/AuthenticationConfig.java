@@ -21,6 +21,7 @@ import org.apache.http.auth.Credentials;
  *
  * @since 3.0
  */
+@Deprecated
 public interface AuthenticationConfig
 {
 

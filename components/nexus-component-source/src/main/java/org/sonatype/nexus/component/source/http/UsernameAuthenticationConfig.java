@@ -24,6 +24,7 @@ import org.apache.http.client.config.AuthSchemes;
  *
  * @since 3.0
  */
+@Deprecated
 public class UsernameAuthenticationConfig
     implements AuthenticationConfig
 {

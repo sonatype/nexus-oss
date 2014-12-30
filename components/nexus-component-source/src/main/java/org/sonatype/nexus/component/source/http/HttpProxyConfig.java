@@ -17,6 +17,7 @@ package org.sonatype.nexus.component.source.http;
  *
  * @since 3.0
  */
+@Deprecated
 public class HttpProxyConfig
 {
 

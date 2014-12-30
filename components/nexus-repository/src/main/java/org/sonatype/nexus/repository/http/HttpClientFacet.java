@@ -48,23 +48,32 @@ public class HttpClientFacet
 
   private final HttpPayloadResponseBuilder payloadResponseBuilder;
 
+  private final HttpClientConfigMarshaller marshaller;
+
   private String remoteUrlBase;
 
   private CloseableHttpClient httpClient;
 
   @Inject
   public HttpClientFacet(final HttpClientBuilder httpClientBuilder,
-                         final HttpPayloadResponseBuilder payloadResponseBuilder)
+                         final HttpPayloadResponseBuilder payloadResponseBuilder,
+                         final HttpClientConfigMarshaller marshaller)
   {
     this.payloadResponseBuilder = payloadResponseBuilder;
+    this.marshaller = marshaller;
     this.httpClientBuilder = checkNotNull(httpClientBuilder);
   }
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
     final Configuration configuration = repository.getConfiguration();
+    final NestedAttributesMap foo = configuration.attributes("httpClientFacet");
+    marshaller.fromMap(foo);
 
-    final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
+
+    // I don't think this stuff actually belongs in the http client facet
+
+      final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
     final String remoteUrl = (String) attributes.get(REMOTE_URL);
 
     this.remoteUrlBase = remoteUrl;

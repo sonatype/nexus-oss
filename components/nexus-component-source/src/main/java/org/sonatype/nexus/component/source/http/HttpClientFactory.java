@@ -19,6 +19,7 @@ import org.apache.http.client.HttpClient;
  *
  * @since 3.0
  */
+@Deprecated
 public interface HttpClientFactory
 {
   HttpClient create(final HttpClientConfig config);

@@ -67,6 +67,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Singleton
+@Deprecated
 public class HttpClientFactoryImpl
     extends ComponentSupport
     implements HttpClientFactory

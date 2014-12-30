@@ -19,6 +19,7 @@ import java.util.Map;
  *
  * @since 3.0
  */
+@Deprecated
 public interface HttpClientConfigMarshaller
 {
 
