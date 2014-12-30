@@ -39,18 +39,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
 
       items: [
         {
-          xtype: 'panel',
-          margin: '0 0 10 0',
-          layout: {
-            type: 'hbox'
-          },
-          items: [
-            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-server', 'x32') },
-            { xtype: 'container', html: NX.I18n.get('ADMIN_SSL_LOAD_HELP') }
-          ]
-        },
-        {
           xtype: 'textfield',
+          fieldLabel: NX.I18n.get('ADMIN_SSL_LOAD_HELP'),
           anchor: '100%',
           name: 'server',
           itemId: 'server'

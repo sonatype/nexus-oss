@@ -131,13 +131,13 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
   clear: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation('Clear events', 'Clear analytics event data?', function () {
-      me.getList().getEl().mask('Clearing event data...');
+    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_CLEAR_TITLE'), NX.I18n.get('ADMIN_EVENTS_CLEAR_BODY'), function () {
+      me.getList().getEl().mask(NX.I18n.get('ADMIN_EVENTS_CLEAR_MASK'));
       NX.direct.analytics_Events.clear(function (response) {
         me.getList().getEl().unmask();
         me.load();
         if (Ext.isObject(response) && response.success) {
-          NX.Messages.add({ text: 'Event data has been cleared', type: 'success' });
+          NX.Messages.add({ text: NX.I18n.get('ADMIN_EVENTS_CLEAR_SUCCESS'), type: 'success' });
         }
       });
     });
@@ -150,9 +150,8 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
   exportEvents: function () {
     var me = this;
 
-    NX.Dialogs.askConfirmation('Export events',
-        'Export and download analytics event data?<br/>No data will be sent to Sonatype.', function () {
-          me.getList().getEl().mask('Exporting event data...');
+    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_EXPORT_TITLE'), NX.I18n.get('ADMIN_EVENTS_EXPORT_BODY'), function () {
+          me.getList().getEl().mask(NX.I18n.get('ADMIN_EVENTS_EXPORT_MASK'));
           NX.direct.analytics_Events.exportAll(function (response) {
             me.getList().getEl().unmask();
             if (Ext.isObject(response) && response.success) {
@@ -170,8 +169,7 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     var win = button.up('window'),
         fileName = win.down('form').getValues().name;
 
-    NX.Security.doWithAuthenticationToken(
-        'Downloading analytics events requires validation of your credentials.',
+    NX.Security.doWithAuthenticationToken(NX.I18n.get('ADMIN_EVENTS_DOWNLOAD_AUTHENTICATE'),
         {
           success: function (authToken) {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(
@@ -188,14 +186,13 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
    * Submit events to Sonatype.
    */
   submit: function () {
-    NX.Dialogs.askConfirmation('Submit events', 'Submit analytics event data to Sonatype?', function () {
-      NX.Security.doWithAuthenticationToken(
-          'Submit analytics event data to Sonatype validation of your credentials.',
+    NX.Dialogs.askConfirmation(NX.I18n.get('ADMIN_EVENTS_SUBMIT_TITLE'), NX.I18n.get('ADMIN_EVENTS_SUBMIT_BODY'), function () {
+      NX.Security.doWithAuthenticationToken(NX.I18n.get('ADMIN_EVENTS_SUBMIT_AUTHENTICATE'),
           {
             success: function (authToken) {
               NX.direct.analytics_Events.submit(authToken, function (response) {
                 if (Ext.isObject(response) && response.success) {
-                  NX.Messages.add({ text: 'Event data submission in progress', type: 'success' });
+                  NX.Messages.add({ text: NX.I18n.get('ADMIN_EVENTS_SUBMIT_SUCCESS'), type: 'success' });
                 }
               });
             }

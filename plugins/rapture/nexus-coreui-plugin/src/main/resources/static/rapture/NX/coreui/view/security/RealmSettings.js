@@ -45,10 +45,6 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
 
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_REALMS_HELP')
-          },
-          {
             xtype: 'nx-itemselector',
             name: 'realms',
             buttons: ['up', 'add', 'remove', 'down'],

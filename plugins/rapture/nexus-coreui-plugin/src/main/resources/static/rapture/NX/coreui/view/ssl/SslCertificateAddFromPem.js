@@ -38,17 +38,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
 
       items: [
         {
-          xtype: 'panel',
-          margin: '0 0 10 0',
-          layout: {
-            type: 'hbox'
-          },
-          items: [
-            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-pem', 'x32') },
-            { xtype: 'container', html: NX.I18n.get('ADMIN_SSL_PASTE_HELP') }
-          ]
-        },
-        {
           xtype: 'textareafield',
           anchor: '100%',
           name: 'pem',
