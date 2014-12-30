@@ -30,7 +30,7 @@ import com.google.common.base.Joiner;
  * @see LogicMatchers
  */
 public class AndMatcher
-  extends LogicMatcher
+  extends LogicMultiMatcherSupport
 {
   @VisibleForTesting
   public AndMatcher(final List<Matcher> matchers) {

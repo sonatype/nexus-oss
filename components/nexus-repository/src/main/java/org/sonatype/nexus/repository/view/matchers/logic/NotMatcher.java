@@ -12,15 +12,13 @@
  */
 package org.sonatype.nexus.repository.view.matchers.logic;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logical NOT matcher.
@@ -30,26 +28,27 @@ import com.google.common.base.Joiner;
  * @see LogicMatchers
  */
 public class NotMatcher
-  extends LogicMatcher
+  extends ComponentSupport
+  implements Matcher
 {
+  private final Matcher matcher;
+
   @VisibleForTesting
-  public NotMatcher(final List<Matcher> matchers) {
-    super(matchers);
+  public NotMatcher(final Matcher matcher) {
+    this.matcher = checkNotNull(matcher);
   }
 
   @Override
-  protected boolean doMatches(final @Nonnull Context context) {
-    for (Matcher matcher : matchers) {
-      boolean matched = matcher.matches(context);
-      if (matched) {
-        return false;
-      }
-    }
-    return true;
+  public boolean matches(final Context context) {
+    checkNotNull(context);
+    log.debug("Matching: NOT {}", matcher);
+    return !matcher.matches(context);
   }
 
   @Override
-  protected String describe() {
-    return "NOT " + Joiner.on(" NOT ").join(matchers);
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "matcher=" + matcher +
+        '}';
   }
 }

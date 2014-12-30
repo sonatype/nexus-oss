@@ -25,18 +25,18 @@ import com.google.common.annotations.VisibleForTesting;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Logical matcher support.
+ * Support for logical matchers that operate on 1 or more matchers.
  *
  * @since 3.0
  */
-abstract class LogicMatcher
+abstract class LogicMultiMatcherSupport
   extends ComponentSupport
   implements Matcher
 {
   protected final List<Matcher> matchers;
 
   @VisibleForTesting
-  public LogicMatcher(final List<Matcher> matchers) {
+  public LogicMultiMatcherSupport(final List<Matcher> matchers) {
     this.matchers = checkNotNull(matchers);
   }
 

@@ -30,13 +30,11 @@ class NotMatcherTest
 
   @Test
   void 'NOT 2 matchers'() {
-    def underTest = new NotMatcher([
-        new LiteralMatcher('foo'),
-        new LiteralMatcher('bar')
-    ])
+    def underTest = new NotMatcher(
+        new LiteralMatcher('foo')
+    )
 
     assert !underTest.matches(context('foo'))
-    assert !underTest.matches(context('bar'))
-    assert underTest.matches(context('baz'))
+    assert underTest.matches(context('bar'))
   }
 }

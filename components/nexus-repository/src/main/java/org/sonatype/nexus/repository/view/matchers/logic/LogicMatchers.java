@@ -40,9 +40,7 @@ public class LogicMatchers
     return new OrMatcher(Arrays.asList(matchers));
   }
 
-  public static Matcher not(final Matcher... matchers) {
-    checkNotNull(matchers);
-    checkArgument(matchers.length > 0, "NOT requires at least one matcher");
-    return new NotMatcher(Arrays.asList(matchers));
+  public static Matcher not(final Matcher matcher) {
+    return new NotMatcher(matcher);
   }
 }
