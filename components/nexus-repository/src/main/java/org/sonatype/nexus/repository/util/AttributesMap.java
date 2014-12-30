@@ -59,10 +59,14 @@ public class AttributesMap
    * Coerce value to type.
    */
   @SuppressWarnings("unchecked")
+  @Nullable
   private <T> T coerce(final Object value, final TypeToken<T> type) {
-    // TODO: PropertyEditor coercion?
-    log.trace("Coerce: {} -> {}", value, type);
-    return (T) type.getRawType().cast(value);
+    if (value != null) {
+      // TODO: PropertyEditor coercion?
+      log.trace("Coerce: {} -> {}", value, type);
+      return (T) type.getRawType().cast(value);
+    }
+    return null;
   }
 
   /**
@@ -110,6 +114,7 @@ public class AttributesMap
   /**
    * Get coerced attribute value for given key.
    */
+  @Nullable
   public <T> T get(final String key, final TypeToken<T> type) {
     checkNotNull(type);
     Object value = get(key);
@@ -119,6 +124,7 @@ public class AttributesMap
   /**
    * Get coerced attribute value for given key.
    */
+  @Nullable
   public <T> T get(final String key, final Class<T> type) {
     checkNotNull(type);
     return get(key, TypeToken.of(type));
@@ -127,6 +133,7 @@ public class AttributesMap
   /**
    * Get coerced attribute value for given key with default-value if value is null.
    */
+  @Nullable
   public <T> T get(final String key, final TypeToken<T> type, @Nullable final T defaultValue) {
     T value = get(key, type);
     if (value == null) {
@@ -138,6 +145,7 @@ public class AttributesMap
   /**
    * Get coerced attribute value for given key with default-value if value is null.
    */
+  @Nullable
   public <T> T get(final String key, final Class<T> type, @Nullable final T defaultValue) {
     checkNotNull(type);
     return get(key, TypeToken.of(type), defaultValue);
