@@ -66,7 +66,7 @@ public class SimpleContentIndexHtmlCache
 
       // cache index.html
       htmlCache = html;
-      log.debug("Cached index.html");
+      log.trace("Cached index.html");
     }
 
     return html;
@@ -74,6 +74,6 @@ public class SimpleContentIndexHtmlCache
 
   public void invalidate() {
     htmlCache = null;
-    log.debug("Invalided");
+    log.trace("Invalided");
   }
 }
