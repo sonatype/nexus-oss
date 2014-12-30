@@ -14,13 +14,14 @@ package org.sonatype.nexus.repository.view.matchers.logic;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Matcher;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logical AND matcher.
@@ -30,15 +31,22 @@ import com.google.common.base.Joiner;
  * @see LogicMatchers
  */
 public class AndMatcher
-  extends LogicMultiMatcherSupport
+    extends ComponentSupport
+    implements Matcher
 {
+  private final List<Matcher> matchers;
+
   @VisibleForTesting
   public AndMatcher(final List<Matcher> matchers) {
-    super(matchers);
+    this.matchers = checkNotNull(matchers);
   }
 
   @Override
-  protected boolean doMatches(final @Nonnull Context context) {
+  public boolean matches(final Context context) {
+    checkNotNull(context);
+    if (log.isDebugEnabled()) {
+      log.debug("Matching: {}", Joiner.on(" AND ").join(matchers));
+    }
     for (Matcher matcher : matchers) {
       boolean matched = matcher.matches(context);
       if (!matched) {
@@ -49,7 +57,9 @@ public class AndMatcher
   }
 
   @Override
-  protected String describe() {
-    return Joiner.on(" AND ").join(matchers);
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "matchers=" + matchers +
+        '}';
   }
 }
