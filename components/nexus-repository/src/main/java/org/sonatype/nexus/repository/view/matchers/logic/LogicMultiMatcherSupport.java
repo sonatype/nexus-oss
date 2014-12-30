@@ -25,7 +25,7 @@ import com.google.common.annotations.VisibleForTesting;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Support for logical matchers that operate on 1 or more matchers.
+ * Support for logical matchers that operate on 2 or more matchers.
  *
  * @since 3.0
  */
