@@ -16,7 +16,6 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import org.apache.http.client.HttpClient;
@@ -50,10 +49,9 @@ public class HttpClientFacetImpl
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    Configuration configuration = repository.getConfiguration();
-    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    HttpClientConfig httpClientConfig = marshaller.unmarshall(attributes);
-    httpClient = httpClientFactory.create(httpClientConfig);
+    NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
+    HttpClientConfig config = marshaller.unmarshall(attributes);
+    httpClient = httpClientFactory.create(config);
     log.debug("Created HTTP client: {}", httpClient);
   }
 
