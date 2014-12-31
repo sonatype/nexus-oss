@@ -58,7 +58,6 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
                 xtype: 'combo',
                 fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE'),
                 itemCls: 'required-field',
-                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE_HELP'),
                 name: 'typeId',
                 store: me.taskTypeStore,
                 displayField: 'name',
@@ -73,22 +72,18 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
               {
                 xtype: 'checkbox',
                 fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_ENABLED'),
-                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_ENABLED_HELP'),
                 name: 'enabled',
                 checked: true,
                 editable: true
               },
               {
                 name: 'name',
-                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_NAME'),
-                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_NAME_HELP'),
-                emptyText: NX.I18n.get('ADMIN_TASKS_CREATE_NAME_PLACEHOLDER')
+                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_NAME')
               },
               {
                 xtype: 'nx-email',
                 name: 'alertEmail',
                 fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_EMAIL'),
-                helpText: NX.I18n.get('ADMIN_TASKS_CREATE_EMAIL_HELP'),
                 allowBlank: true
               },
               {

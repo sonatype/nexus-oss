@@ -61,7 +61,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
         name: 'startDate',
         itemId: 'startDate',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE_HELP'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -81,7 +80,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
       {
         xtype: 'checkboxgroup',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_HELP'),
         allowBlank: false,
         blankText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_PLACEHOLDER'),
         items: {

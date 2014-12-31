@@ -46,18 +46,12 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
         fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
       },
       {
-        xtype: 'label',
-        html: NX.I18n.get('ADMIN_AUTHENTICATION_NT')
-      },
-      {
         name: namePrefix + 'uthNtlmHost',
-        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST'),
-        helpText: NX.I18n.get('ADMIN_AUTHENTICATION_HOST_HELP')
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST')
       },
       {
         name: namePrefix + 'uthNtlmDomain',
-        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN'),
-        helpText: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN_HELP')
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN')
       }
     ];
 

@@ -44,10 +44,6 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
 
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_GENERAL_HELP')
-          },
-          {
             xtype: 'textfield',
             name: 'baseUrl',
             itemId: 'baseUrl',

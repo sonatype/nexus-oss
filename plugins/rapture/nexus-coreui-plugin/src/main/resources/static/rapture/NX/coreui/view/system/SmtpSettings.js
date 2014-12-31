@@ -43,10 +43,6 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
 
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_SMTP_HELP')
-          },
-          {
             xtype: 'nx-email',
             name: 'systemEmail',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_EMAIL'),
@@ -82,7 +78,6 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'host',
             itemId: 'host',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_HOSTNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_HOSTNAME_HELP'),
             listeners: {
               change: function(){
                 var cType = this.up('form').down('#connectionType');
@@ -95,7 +90,6 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'port',
             itemId: 'port',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_PORT'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PORT_HELP'),
             minValue: 1,
             maxValue: 65536,
             allowDecimals: false,
@@ -105,13 +99,11 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'username',
             allowBlank: true,
             fieldLabel: NX.I18n.get('ADMIN_SMTP_USERNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_USERNAME_HELP')
           },
           {
             xtype: 'nx-password',
             name: 'password',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_PASSWORD'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PASSWORD_HELP'),
             allowBlank: true
           }
         ]

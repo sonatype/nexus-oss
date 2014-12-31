@@ -33,7 +33,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       name: 'schedule',
       itemId: 'schedule',
       fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_HELP'),
       emptyText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_PLACEHOLDER'),
       editable: false,
       store: [

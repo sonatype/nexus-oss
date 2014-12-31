@@ -34,35 +34,24 @@ Ext.define('NX.coreui.view.user.UserAccount', {
         },
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('USER_ACCOUNT_HELP')
-          },
-          {
             name: 'userId',
             itemId: 'userId',
             readOnly: true,
             fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
             helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_ID_PLACEHOLDER')
           },
           {
             name: 'firstName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_FIRST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_FIRST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST')
           },
           {
             name: 'lastName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_LAST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_LAST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST')
           },
           {
             xtype: 'nx-email',
             name: 'email',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL'),
-            helpText: NX.I18n.get('USER_ACCOUNT_EMAIL_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_EMAIL_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL')
           }
         ]
       }

@@ -65,7 +65,6 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
         {
           xtype: 'checkbox',
           fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ENABLED'),
-          helpText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ENABLED_HELP'),
           name: 'enabled',
           allowBlank: false,
           checked: true,

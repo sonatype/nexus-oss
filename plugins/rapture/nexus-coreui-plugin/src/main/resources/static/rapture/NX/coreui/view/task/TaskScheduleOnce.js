@@ -36,7 +36,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
         name: 'startDate',
         itemId: 'startDate',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE_HELP'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),

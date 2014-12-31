@@ -38,7 +38,6 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
         ui: 'primary',
-        tooltip: NX.I18n.get('ADMIN_SUPPORT_REQUEST_TOOLTIP')
       }
     ]
   }
