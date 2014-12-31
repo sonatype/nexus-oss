@@ -125,8 +125,7 @@ public class HttpClientConfigMarshallerImplTest
    */
   @Test
   void fromMap() {
-    Map<String, Object> innerMap = [:]
-    NestedAttributesMap attributes = new NestedAttributesMap('key', innerMap)
+    NestedAttributesMap attributes = new NestedAttributesMap('key', [:])
 
     NestedAttributesMap connection = attributes.child('connection')
     connection.set('timeout', 1)
@@ -164,33 +163,33 @@ public class HttpClientConfigMarshallerImplTest
 
     HttpClientConfig config = underTest.fromMap(attributes)
 
-    assertThat(config.getConnectionConfig().getTimeout(), is(1))
-    assertThat(config.getConnectionConfig().getRetries(), is(2))
-    assertThat(config.getConnectionConfig().getUrlParameters(), is('params'))
-    assertThat(config.getConnectionConfig().getUserAgentCustomisation(), is('ua'))
-    assertThat(config.getConnectionConfig().getUseTrustStore(), is(true))
+    assertThat(config.connectionConfig.timeout, is(1))
+    assertThat(config.connectionConfig.retries, is(2))
+    assertThat(config.connectionConfig.urlParameters, is('params'))
+    assertThat(config.connectionConfig.userAgentCustomisation, is('ua'))
+    assertThat(config.connectionConfig.useTrustStore, is(true))
 
     def a1 = (UsernameAuthenticationConfig) config.authenticationConfig
-    assertThat(a1.getUsername(), is('foo'))
-    assertThat(a1.getPassword(), is('bar'))
+    assertThat(a1.username, is('foo'))
+    assertThat(a1.password, is('bar'))
 
-    assertThat(config.getProxyConfig().getHttpProxyConfig().getHostname(), is('httpHost'))
-    assertThat(config.getProxyConfig().getHttpProxyConfig().getPort(), is(3))
+    assertThat(config.proxyConfig.httpProxyConfig.hostname, is('httpHost'))
+    assertThat(config.proxyConfig.httpProxyConfig.port, is(3))
 
     def a2 = (UsernameAuthenticationConfig)config.proxyConfig.httpProxyConfig.authenticationConfig
-    assertThat(a2.getUsername(), is('foo1'))
-    assertThat(a2.getPassword(), is('bar1'))
+    assertThat(a2.username, is('foo1'))
+    assertThat(a2.password, is('bar1'))
 
-    assertThat(config.getProxyConfig().getHttpsProxyConfig().getHostname(), is('httpsHost'))
-    assertThat(config.getProxyConfig().getHttpsProxyConfig().getPort(), is(4))
+    assertThat(config.proxyConfig.httpsProxyConfig.hostname, is('httpsHost'))
+    assertThat(config.proxyConfig.httpsProxyConfig.port, is(4))
 
     def a3 = (NtlmAuthenticationConfig) config.proxyConfig.httpsProxyConfig.authenticationConfig
-    assertThat(a3.getUsername(), is('foo2'))
-    assertThat(a3.getPassword(), is('bar2'))
-    assertThat(a3.getNtlmHost(), is('ntlmH'))
-    assertThat(a3.getNtlmDomain(), is('ntlmD'))
+    assertThat(a3.username, is('foo2'))
+    assertThat(a3.password, is('bar2'))
+    assertThat(a3.ntlmHost, is('ntlmH'))
+    assertThat(a3.ntlmDomain, is('ntlmD'))
 
-    def nonProxyHosts = config.getProxyConfig().getNonProxyHosts()
+    def nonProxyHosts = config.proxyConfig.nonProxyHosts
     assert nonProxyHosts.size() == 2
     assert nonProxyHosts[0] == 'h1'
     assert nonProxyHosts[1] == 'h2'

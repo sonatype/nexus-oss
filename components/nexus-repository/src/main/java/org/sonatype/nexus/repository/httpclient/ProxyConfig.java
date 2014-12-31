@@ -29,26 +29,23 @@ public class ProxyConfig
     return httpProxyConfig;
   }
 
+  public void setHttpProxyConfig(final HttpProxyConfig httpProxyConfig) {
+    this.httpProxyConfig = httpProxyConfig;
+  }
+
   public HttpProxyConfig getHttpsProxyConfig() {
     return httpsProxyConfig;
+  }
+
+  public void setHttpsProxyConfig(final HttpProxyConfig httpsProxyConfig) {
+    this.httpsProxyConfig = httpsProxyConfig;
   }
 
   public String[] getNonProxyHosts() {
     return nonProxyHosts;
   }
 
-  public ProxyConfig withHttpProxyConfig(final HttpProxyConfig httpProxyConfig) {
-    this.httpProxyConfig = httpProxyConfig;
-    return this;
-  }
-
-  public ProxyConfig withHttpsProxyConfig(final HttpProxyConfig httpsProxyConfig) {
-    this.httpsProxyConfig = httpsProxyConfig;
-    return this;
-  }
-
-  public ProxyConfig withNonProxyHosts(final String[] nonProxyHosts) {
+  public void setNonProxyHosts(final String[] nonProxyHosts) {
     this.nonProxyHosts = nonProxyHosts;
-    return this;
   }
 }

@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.httpclient;
 
 import java.util.Map;
@@ -44,51 +45,10 @@ public class HttpClientConfigMarshallerImpl
     this.marshallers = checkNotNull(marshallers);
   }
 
-  @Override
-  public void toMap(final HttpClientConfig config, final NestedAttributesMap attributes) {
-    checkNotNull(config);
-    checkNotNull(attributes);
-    connectionToMap(attributes.child("connection"), config.getConnectionConfig());
-    authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
-    proxyToMap(attributes.child("proxy"), config.getProxyConfig());
-  }
-
-  private void connectionToMap(final NestedAttributesMap attributes, final ConnectionConfig connection) {
-    if (connection != null) {
-      putIfNotNull(attributes, "timeout", connection.getTimeout());
-      putIfNotNull(attributes, "retries", connection.getRetries());
-      putIfNotNull(attributes, "urlParameters", connection.getUrlParameters());
-      putIfNotNull(attributes, "userAgentCustomisation", connection.getUserAgentCustomisation());
-      putIfNotNull(attributes, "useTrustStore", connection.getUseTrustStore());
-    }
-  }
-
-  private void authenticationToMap(final NestedAttributesMap attributes, final AuthenticationConfig authentication) {
-    if (authentication != null) {
-      AuthenticationConfigMarshaller marshaller = marshallers.get(authentication.getType());
-      if (marshaller != null) {
-        attributes.set("type", authentication.getType());
-        marshaller.toMap(authentication, attributes);
-      }
-    }
-  }
-
-  private void proxyToMap(final NestedAttributesMap attributes, final ProxyConfig proxy) {
-    if (proxy != null) {
-      httpProxyToMap(attributes.child("http"), proxy.getHttpProxyConfig());
-      httpProxyToMap(attributes.child("https"), proxy.getHttpsProxyConfig());
-      if (proxy.getNonProxyHosts() != null) {
-        putIfNotNull(attributes, "nonProxyHosts", Joiner.on(",").join(proxy.getNonProxyHosts()));
-      }
-    }
-  }
-
-  private void httpProxyToMap(final NestedAttributesMap attributes, final HttpProxyConfig httpProxy) {
-    if (httpProxy != null) {
-      putIfNotNull(attributes, "hostname", httpProxy.getHostname());
-      putIfNotNull(attributes, "port", httpProxy.getPort());
-      authenticationToMap(attributes.child("authentication"), httpProxy.getAuthenticationConfig());
-    }
+  private AuthenticationConfigMarshaller marshaller(final String type) {
+    AuthenticationConfigMarshaller marshaller = marshallers.get(type);
+    checkState(marshaller != null, "Missing marshaller for type: %s", type);
+    return marshaller;
   }
 
   private void putIfNotNull(final NestedAttributesMap attributes, final String key, final Object value) {
@@ -97,71 +57,123 @@ public class HttpClientConfigMarshallerImpl
     }
   }
 
+  //
+  // Marshall
+  //
+
+  @Override
+  public void toMap(final HttpClientConfig config, final NestedAttributesMap attributes) {
+    checkNotNull(config);
+    checkNotNull(attributes);
+
+    if (config.getConnectionConfig() != null) {
+      connectionToMap(attributes.child("connection"), config.getConnectionConfig());
+    }
+    if (config.getAuthenticationConfig() != null) {
+      authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
+    }
+    if (config.getProxyConfig() != null) {
+      proxyToMap(attributes.child("proxy"), config.getProxyConfig());
+    }
+  }
+
+  private void connectionToMap(final NestedAttributesMap attributes, final ConnectionConfig config) {
+    putIfNotNull(attributes, "timeout", config.getTimeout());
+    putIfNotNull(attributes, "retries", config.getRetries());
+    putIfNotNull(attributes, "urlParameters", config.getUrlParameters());
+    putIfNotNull(attributes, "userAgentCustomisation", config.getUserAgentCustomisation());
+    putIfNotNull(attributes, "useTrustStore", config.getUseTrustStore());
+  }
+
+  private void authenticationToMap(final NestedAttributesMap attributes, final AuthenticationConfig config) {
+    AuthenticationConfigMarshaller marshaller = marshaller(config.getType());
+    attributes.set("type", config.getType());
+    marshaller.toMap(config, attributes);
+  }
+
+  private void proxyToMap(final NestedAttributesMap attributes, final ProxyConfig config) {
+    if (config.getHttpProxyConfig() != null) {
+      httpProxyToMap(attributes.child("http"), config.getHttpProxyConfig());
+    }
+    if (config.getHttpsProxyConfig() != null) {
+      httpProxyToMap(attributes.child("https"), config.getHttpsProxyConfig());
+    }
+    if (config.getNonProxyHosts() != null) {
+      putIfNotNull(attributes, "nonProxyHosts", Joiner.on(",").join(config.getNonProxyHosts()));
+    }
+  }
+
+  private void httpProxyToMap(final NestedAttributesMap attributes, final HttpProxyConfig config) {
+    putIfNotNull(attributes, "hostname", config.getHostname());
+    putIfNotNull(attributes, "port", config.getPort());
+    if (config.getAuthenticationConfig() != null) {
+      authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
+    }
+  }
+
+  //
+  // Unmarshall
+  //
+
   @Override
   public HttpClientConfig fromMap(final NestedAttributesMap attributes) {
-    HttpClientConfig httpClient = new HttpClientConfig();
-    httpClient.setConnectionConfig(connectionFromMap(attributes.child("connection")));
-    httpClient.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
-    httpClient.setProxyConfig(proxyFromMap(attributes.child("proxy")));
-    return httpClient;
+    HttpClientConfig config = new HttpClientConfig();
+
+    if (attributes.contains("connection")) {
+      config.setConnectionConfig(connectionFromMap(attributes.child("connection")));
+    }
+    if (attributes.contains("authentication")) {
+      config.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
+    }
+    if (attributes.contains("proxy")) {
+      config.setProxyConfig(proxyFromMap(attributes.child("proxy")));
+    }
+    return config;
   }
 
   private ConnectionConfig connectionFromMap(final NestedAttributesMap attributes) {
-    ConnectionConfig connection = null;
+    ConnectionConfig config = new ConnectionConfig();
 
-    if (attributes.contains("timeout")) {
-      connection = new ConnectionConfig();
-      connection.setTimeout(attributes.get("timeout", Integer.class));
-    }
-    if (attributes.contains("retries")) {
-      connection = connection == null ? new ConnectionConfig() : connection;
-      connection.setRetries(attributes.get("retries", Integer.class));
-    }
-    if (attributes.contains("urlParameters")) {
-      connection = connection == null ? new ConnectionConfig() : connection;
-      connection.setUrlParameters(attributes.get("urlParameters", String.class));
-    }
-    if (attributes.contains("userAgentCustomization")) {
-      connection = connection == null ? new ConnectionConfig() : connection;
-      connection.setUserAgentCustomisation(attributes.get("userAgentCustomization", String.class));
-    }
-    if (attributes.contains("useTrustStore")) {
-      connection = connection == null ? new ConnectionConfig() : connection;
-      connection.setUseTrustStore(attributes.get("useTrustStore", Boolean.class));
-    }
-    return connection;
+    config.setTimeout(attributes.get("timeout", Integer.class));
+    config.setRetries(attributes.get("retries", Integer.class));
+    config.setUrlParameters(attributes.get("urlParameters", String.class));
+    config.setUserAgentCustomisation(attributes.get("userAgentCustomization", String.class));
+    config.setUseTrustStore(attributes.get("useTrustStore", Boolean.class));
+
+    return config;
   }
 
   private ProxyConfig proxyFromMap(final NestedAttributesMap attributes) {
-    ProxyConfig proxy = null;
-    HttpProxyConfig httpProxy = httpProxyFromMap(attributes.child("http"));
-    if (httpProxy != null) {
-      proxy = new ProxyConfig();
-      proxy.withHttpProxyConfig(httpProxy);
-      proxy.withHttpsProxyConfig(httpProxyFromMap(attributes.child("https")));
-      if (attributes.contains("nonProxyHosts")) {
-        proxy.withNonProxyHosts((attributes.require("nonProxyHosts", String.class)).split(","));
-      }
+    ProxyConfig config = new ProxyConfig();
+
+    if (attributes.contains("http")) {
+      config.setHttpProxyConfig(httpProxyFromMap(attributes.child("http")));
     }
-    return proxy;
+    if (attributes.contains("https")) {
+      config.setHttpsProxyConfig(httpProxyFromMap(attributes.child("https")));
+    }
+    if (attributes.contains("nonProxyHosts")) {
+      config.setNonProxyHosts((attributes.require("nonProxyHosts", String.class)).split(","));
+    }
+
+    return config;
   }
 
   private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap attributes) {
-    HttpProxyConfig httpProxy = null;
-    if (attributes.contains("hostname")) {
-      httpProxy = new HttpProxyConfig();
-      httpProxy.setHostname(attributes.get("hostname", String.class));
-      httpProxy.setPort(attributes.get("port", Integer.class));
-      httpProxy.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
+    HttpProxyConfig config = new HttpProxyConfig();
+
+    config.setHostname(attributes.get("hostname", String.class));
+    config.setPort(attributes.get("port", Integer.class));
+    if (attributes.contains("authentication")) {
+      config.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
     }
-    return httpProxy;
+    return config;
   }
 
   private AuthenticationConfig authenticationFromMap(final NestedAttributesMap attributes) {
     String type = attributes.get("type", String.class);
     if (type != null) {
-      AuthenticationConfigMarshaller marshaller = marshallers.get(type);
-      checkState(marshaller != null);
+      AuthenticationConfigMarshaller marshaller = marshaller(type);
       return marshaller.fromMap(attributes);
     }
     return null;
