@@ -21,6 +21,10 @@ Ext.define('NX.view.header.Refresh', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-refresh',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   tooltip: NX.I18n.get('GLOBAL_HEADER_REFRESH_TOOLTIP'),
   glyph: 'xf021@FontAwesome' // fa-refresh
 });

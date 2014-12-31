@@ -18,6 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.app.PluginConfig', {
+  '@aggregate_priority': 100,
 
   namespaces: [
     'NX.coreui'

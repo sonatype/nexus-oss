@@ -21,6 +21,7 @@ Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.Icons',
+    'NX.I18n',
     'NX.Windows'
   ],
   mixins: {

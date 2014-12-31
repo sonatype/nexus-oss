@@ -21,6 +21,10 @@ Ext.define('NX.view.header.Help', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-help',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_TOOLTIP'),
   glyph: 'xf059@FontAwesome', // fa-question-circle
 
