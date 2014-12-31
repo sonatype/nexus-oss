@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.http;
+package org.sonatype.nexus.repository.httpclient;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,13 +22,13 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link UsernameAuthenticationConfig} {@link AuthenticationConfigMarshaller}.
+ * {@link NtlmAuthenticationConfig} {@link AuthenticationConfigMarshaller}.
  *
  * @since 3.0
  */
-@Named(UsernameAuthenticationConfig.TYPE)
+@Named(NtlmAuthenticationConfig.TYPE)
 @Singleton
-public class UsernameAuthenticationConfigMarshaller
+public class NtlmAuthenticationConfigMarshaller
     extends ComponentSupport
     implements AuthenticationConfigMarshaller
 {
@@ -36,17 +36,22 @@ public class UsernameAuthenticationConfigMarshaller
   public void toMap(final AuthenticationConfig config, final NestedAttributesMap configMap) {
     checkNotNull(config);
     checkNotNull(configMap);
-    UsernameAuthenticationConfig cfg = (UsernameAuthenticationConfig) config;
+    NtlmAuthenticationConfig cfg = (NtlmAuthenticationConfig) config;
     configMap.set("username", cfg.getUsername());
     configMap.set("password", cfg.getPassword());
+    configMap.set("ntlmHost", cfg.getNtlmHost());
+    configMap.set("ntlmDomain", cfg.getNtlmDomain());
   }
 
   @Override
   public AuthenticationConfig fromMap(final NestedAttributesMap configMap) {
     checkNotNull(configMap);
-    UsernameAuthenticationConfig result = new UsernameAuthenticationConfig();
+    NtlmAuthenticationConfig result = new NtlmAuthenticationConfig();
     result.setUsername(configMap.get("username", String.class));
     result.setPassword(configMap.get("password", String.class));
+    result.setNtlmHost(configMap.get("ntlmHost", String.class));
+    result.setNtlmDomain(configMap.get("ntlmDomain", String.class));
     return result;
   }
+
 }

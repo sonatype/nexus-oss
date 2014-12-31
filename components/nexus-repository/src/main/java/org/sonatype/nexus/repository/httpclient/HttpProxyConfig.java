@@ -10,16 +10,42 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.http;
-
-import org.apache.http.client.HttpClient;
+package org.sonatype.nexus.repository.httpclient;
 
 /**
- * HTTP Client factory.
+ * HTTP client HTTP proxy configuration.
  *
  * @since 3.0
  */
-public interface HttpClientFactory
+public class HttpProxyConfig
 {
-  HttpClient create(final HttpClientConfig config);
+  private String hostname;
+
+  private Integer port;
+
+  private AuthenticationConfig authenticationConfig;
+
+  public String getHostname() {
+    return hostname;
+  }
+
+  public void setHostname(final String hostname) {
+    this.hostname = hostname;
+  }
+
+  public Integer getPort() {
+    return port;
+  }
+
+  public void setPort(final Integer port) {
+    this.port = port;
+  }
+
+  public AuthenticationConfig getAuthenticationConfig() {
+    return authenticationConfig;
+  }
+
+  public void setAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
+    this.authenticationConfig = authenticationConfig;
+  }
 }

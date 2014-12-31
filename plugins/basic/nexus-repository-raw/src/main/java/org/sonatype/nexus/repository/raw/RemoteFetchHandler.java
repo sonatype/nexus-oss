@@ -15,7 +15,7 @@ package org.sonatype.nexus.repository.raw;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.http.HttpClientFacet;
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;

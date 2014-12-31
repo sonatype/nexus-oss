@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.http;
+package org.sonatype.nexus.repository.httpclient;
 
 import java.io.IOException;
 import java.net.URI;

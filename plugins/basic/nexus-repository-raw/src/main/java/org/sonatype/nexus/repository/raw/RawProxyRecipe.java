@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
-import org.sonatype.nexus.repository.http.HttpClientFacet;
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route.Builder;
 import org.sonatype.nexus.repository.view.Router;

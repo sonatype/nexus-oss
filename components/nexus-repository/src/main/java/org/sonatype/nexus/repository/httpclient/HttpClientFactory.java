@@ -10,22 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.http;
-
-import org.sonatype.nexus.repository.Facet;
+package org.sonatype.nexus.repository.httpclient;
 
 import org.apache.http.client.HttpClient;
 
-// TODO: Move to repository.httpclient
-
 /**
- * Http facet.
+ * HTTP Client factory.
  *
  * @since 3.0
  */
-@Facet.Exposed
-public interface HttpClientFacet
-  extends Facet
+public interface HttpClientFactory
 {
-  HttpClient getHttpClient();
+  HttpClient create(final HttpClientConfig config);
 }

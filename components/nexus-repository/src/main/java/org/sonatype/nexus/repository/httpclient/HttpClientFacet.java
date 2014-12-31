@@ -10,24 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.http;
+package org.sonatype.nexus.repository.httpclient;
 
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.repository.Facet;
+
+import org.apache.http.client.HttpClient;
 
 /**
- * Marshall/Un-marshall {@link AuthenticationConfig} to/from map.
+ * HTTP client facet.
  *
  * @since 3.0
  */
-public interface AuthenticationConfigMarshaller
+@Facet.Exposed
+public interface HttpClientFacet
+  extends Facet
 {
-  /**
-   * Marshall {@link AuthenticationConfig} to a map.
-   */
-  void toMap(AuthenticationConfig config, NestedAttributesMap configMap);
-
-  /**
-   * Un-marshall {@link AuthenticationConfig} from a map.
-   */
-  AuthenticationConfig fromMap(final NestedAttributesMap configMap);
+  HttpClient getHttpClient();
 }
