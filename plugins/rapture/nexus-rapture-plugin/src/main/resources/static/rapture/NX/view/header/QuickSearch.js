@@ -21,6 +21,10 @@ Ext.define('NX.view.header.QuickSearch', {
   extend: 'NX.ext.SearchBox',
   alias: 'widget.nx-header-quicksearch',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   itemId: 'quicksearch',
   cls: 'quicksearch',
   width: 200,

@@ -21,6 +21,10 @@ Ext.define('NX.view.header.BrowseMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-browse-mode',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   mode: 'browse',
   title: 'Browse',
   tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),

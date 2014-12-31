@@ -40,6 +40,8 @@ public class ClassDef
 
   private final List<String> alias = Lists.newArrayList();
 
+  private double priority = Double.MAX_VALUE;
+
   private String extend;
 
   private String override;
@@ -71,6 +73,14 @@ public class ClassDef
     return source;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        ", source=" + source +
+        '}';
+  }
+
   public Set<String> getDependencies() {
     return dependencies;
   }
@@ -81,6 +91,14 @@ public class ClassDef
 
   public List<String> getAlias() {
     return alias;
+  }
+
+  public double getPriority() {
+    return priority;
+  }
+
+  public void setPriority(final double priority) {
+    this.priority = priority;
   }
 
   @Nullable

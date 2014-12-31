@@ -20,6 +20,7 @@
 Ext.define('NX.coreui.controller.Roles', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.Conditions',
     'NX.Messages',
     'NX.Permissions'
   ],

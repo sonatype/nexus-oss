@@ -21,6 +21,10 @@ Ext.define('NX.view.header.SignIn', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-signin',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   text: NX.I18n.get('GLOBAL_HEADER_SIGN_IN'),
   tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_IN_TOOLTIP'),
   glyph: 'xf090@FontAwesome' // fa-sign-in
