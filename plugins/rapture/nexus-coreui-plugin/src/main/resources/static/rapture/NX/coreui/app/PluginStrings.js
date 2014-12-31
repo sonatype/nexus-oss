@@ -723,7 +723,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Support -> Support Request
     ADMIN_SUPPORT_REQUEST_TITLE: 'Support Request',
     ADMIN_SUPPORT_REQUEST_SUBTITLE: 'Submit a support request to Sonatype',
-    ADMIN_SUPPORT_REQUEST_HELP: '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p><p>Attaching a support ZIP to your request will help our engineers give you a faster response.</p>',
+    ADMIN_SUPPORT_REQUEST_HELP: '<p>Please include a complete description of your problem and steps to allow us to reproduce the problem (if available).</p><p>Attaching a <a href="#admin/support/supportzip">support ZIP</a> to your request will help our engineers give you a faster response.</p>',
     ADMIN_SUPPORT_REQUEST_BUTTON: 'Submit request',
 
     // Admin -> Support -> Support ZIP
