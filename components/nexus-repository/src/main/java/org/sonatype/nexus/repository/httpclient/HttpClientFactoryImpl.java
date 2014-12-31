@@ -34,9 +34,9 @@ import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -111,12 +111,12 @@ public class HttpClientFactoryImpl
     if (config.getConnectionConfig() != null) {
       String userAgentSuffix = config.getConnectionConfig().getUserAgentCustomisation();
       String customizedUserAgent = null;
-      if (StringUtils.isNotBlank(userAgentSuffix)) {
+      if (!Strings.nullToEmpty(userAgentSuffix).isEmpty()) {
         customizedUserAgent = builder.getUserAgent() + " " + userAgentSuffix;
         builder.setUserAgent(customizedUserAgent);
       }
       String urlParameters = config.getConnectionConfig().getUrlParameters();
-      if (StringUtils.isBlank(urlParameters)) {
+      if (Strings.nullToEmpty(urlParameters).isEmpty()) {
         urlParameters = null;
       }
       applyRequestExecutor(builder, customizedUserAgent, urlParameters);
