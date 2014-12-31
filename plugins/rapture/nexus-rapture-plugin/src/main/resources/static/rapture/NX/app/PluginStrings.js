@@ -18,7 +18,10 @@
  * @since 3.0
  */
 Ext.define('NX.app.PluginStrings', {
+  '@aggregate_priority': 1,
+
   singleton: true,
+
   requires: [
     'NX.I18n'
   ],

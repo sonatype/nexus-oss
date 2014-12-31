@@ -18,6 +18,8 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.app.PluginStrings', {
+  '@aggregate_priority': 0,
+
   singleton: true,
   requires: [
     'NX.I18n'

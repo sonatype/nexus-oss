@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +45,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
+import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.PropertyGet;
@@ -114,29 +117,45 @@ public class ClassDefScanner
     // TODO: Sort out how/if we want to resolve aliases, ATM this data is collected by not used
 
     // Resolve all references and build map with all class defs (including aliases/alts)
-    Map<String,ClassDef> allClasses = Maps.newHashMap();
+    Map<String, ClassDef> classNames = Maps.newHashMap();
+    List<ClassDef> allClasses = Lists.newArrayList();
     for (ClassDef def : classes.values()) {
-      allClasses.put(def.getName(), def);
+      log.debug("Processing: " + def);
+
+      classNames.put(def.getName(), def);
       for (String alt : def.getAlternateClassName()) {
-        allClasses.put(alt, def);
+        classNames.put(alt, def);
       }
+
       resolve(def);
+
+      allClasses.add(def);
     }
+
+    // Sort all classes by priority, so that lower-priority value is closer to the top (ie. processed sooner)
+    // ie. priority=0 is closer to the top than priority=10
+    Collections.sort(allClasses, new Comparator<ClassDef>()
+    {
+      @Override
+      public int compare(final ClassDef a, final ClassDef b) {
+        return Double.compare(a.getPriority(), b.getPriority());
+      }
+    });
 
     if (debug) {
       log.debug("All classes:");
-      for (String className : allClasses.keySet()) {
-        log.debug("  " + className);
+      for (ClassDef def : allClasses) {
+        log.debug("  " + def.getName());
       }
     }
 
     // build the graph
     DAG graph = new DAG();
-    for (ClassDef def : allClasses.values()) {
+    for (ClassDef def : allClasses) {
       graph.addVertex(def.getName());
       for (String name : def.getDependencies()) {
         // resolve dependencies which have class defs to primary class name
-        ClassDef dep = allClasses.get(name);
+        ClassDef dep = classNames.get(name);
         if (dep != null) {
           name = dep.getName();
         }
@@ -169,7 +188,7 @@ public class ClassDefScanner
     log.debug("Ordered classes:");
     // the graph contains many references, only include those which are class defs
     for (String className : TopologicalSorter.sort(graph)) {
-      ClassDef def = allClasses.get(className);
+      ClassDef def = classNames.get(className);
       // skip duplicates (due to alt/aliases)
       if (def != null && !results.contains(def)) {
         log.debug("  " + def.getName());
@@ -361,6 +380,16 @@ public class ClassDefScanner
     }
 
     /**
+     * Return number literal value.
+     */
+    private double numberLiteral(final AstNode node) {
+      checkState(node instanceof NumberLiteral, node, "Expected number literal only");
+      //noinspection ConstantConditions
+      NumberLiteral number = (NumberLiteral) node;
+      return number.getNumber();
+    }
+
+    /**
      * Returns string array literal values.
      */
     private List<String> arrayStringLiteral(final AstNode node) {
@@ -442,6 +471,11 @@ public class ClassDefScanner
             current.setOverride(stringLiteral(prop.getRight()));
             break;
 
+          case "@aggregate_priority":
+            // number only
+            current.setPriority(numberLiteral(prop.getRight()));
+            break;
+
           case "requires":
             // array of string literals only
             current.setRequires(arrayStringLiteral(prop.getRight()));
@@ -449,7 +483,8 @@ public class ClassDefScanner
 
           case "require":
             // complain if we found 'require' this almost certainly should be 'requires'
-            log.warn(String.format("Found 'require' and probably should be 'requires' in: %s#%s", source, prop.getLineno()));
+            log.warn(
+                String.format("Found 'require' and probably should be 'requires' in: %s#%s", source, prop.getLineno()));
             break;
 
           case "uses":

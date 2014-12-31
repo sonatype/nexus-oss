@@ -29,6 +29,7 @@ Ext.define('NX.app.Application', {
     'Ext.util.LocalStorage',
     'NX.view.Viewport',
     'NX.util.Url',
+    'NX.I18n',
     'NX.State'
   ],
 
