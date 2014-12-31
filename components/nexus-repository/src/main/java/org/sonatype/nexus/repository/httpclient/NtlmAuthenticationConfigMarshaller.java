@@ -22,7 +22,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * {@link NtlmAuthenticationConfig} {@link AuthenticationConfigMarshaller}.
+ * {@link NtlmAuthenticationConfig} marshaller.
  *
  * @since 3.0
  */
@@ -33,7 +33,7 @@ public class NtlmAuthenticationConfigMarshaller
     implements AuthenticationConfigMarshaller
 {
   @Override
-  public void toMap(final AuthenticationConfig config, final NestedAttributesMap attributes) {
+  public void marshall(final AuthenticationConfig config, final NestedAttributesMap attributes) {
     checkNotNull(config);
     checkNotNull(attributes);
     NtlmAuthenticationConfig cfg = (NtlmAuthenticationConfig) config;
@@ -44,7 +44,7 @@ public class NtlmAuthenticationConfigMarshaller
   }
 
   @Override
-  public AuthenticationConfig fromMap(final NestedAttributesMap attributes) {
+  public AuthenticationConfig unmarshall(final NestedAttributesMap attributes) {
     checkNotNull(attributes);
     NtlmAuthenticationConfig result = new NtlmAuthenticationConfig();
     result.setUsername(attributes.get("username", String.class));
@@ -53,5 +53,4 @@ public class NtlmAuthenticationConfigMarshaller
     result.setNtlmDomain(attributes.get("ntlmDomain", String.class));
     return result;
   }
-
 }

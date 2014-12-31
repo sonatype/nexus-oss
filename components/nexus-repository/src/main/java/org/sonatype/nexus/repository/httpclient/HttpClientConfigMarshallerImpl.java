@@ -62,22 +62,22 @@ public class HttpClientConfigMarshallerImpl
   //
 
   @Override
-  public void toMap(final HttpClientConfig config, final NestedAttributesMap attributes) {
+  public void marshall(final HttpClientConfig config, final NestedAttributesMap attributes) {
     checkNotNull(config);
     checkNotNull(attributes);
 
     if (config.getConnectionConfig() != null) {
-      connectionToMap(attributes.child("connection"), config.getConnectionConfig());
+      write(attributes.child("connection"), config.getConnectionConfig());
     }
     if (config.getAuthenticationConfig() != null) {
-      authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
+      write(attributes.child("authentication"), config.getAuthenticationConfig());
     }
     if (config.getProxyConfig() != null) {
-      proxyToMap(attributes.child("proxy"), config.getProxyConfig());
+      write(attributes.child("proxy"), config.getProxyConfig());
     }
   }
 
-  private void connectionToMap(final NestedAttributesMap attributes, final ConnectionConfig config) {
+  private void write(final NestedAttributesMap attributes, final ConnectionConfig config) {
     putIfNotNull(attributes, "timeout", config.getTimeout());
     putIfNotNull(attributes, "retries", config.getRetries());
     putIfNotNull(attributes, "urlParameters", config.getUrlParameters());
@@ -85,29 +85,29 @@ public class HttpClientConfigMarshallerImpl
     putIfNotNull(attributes, "useTrustStore", config.getUseTrustStore());
   }
 
-  private void authenticationToMap(final NestedAttributesMap attributes, final AuthenticationConfig config) {
+  private void write(final NestedAttributesMap attributes, final AuthenticationConfig config) {
     AuthenticationConfigMarshaller marshaller = marshaller(config.getType());
     attributes.set("type", config.getType());
-    marshaller.toMap(config, attributes);
+    marshaller.marshall(config, attributes);
   }
 
-  private void proxyToMap(final NestedAttributesMap attributes, final ProxyConfig config) {
+  private void write(final NestedAttributesMap attributes, final ProxyConfig config) {
     if (config.getHttpProxyConfig() != null) {
-      httpProxyToMap(attributes.child("http"), config.getHttpProxyConfig());
+      write(attributes.child("http"), config.getHttpProxyConfig());
     }
     if (config.getHttpsProxyConfig() != null) {
-      httpProxyToMap(attributes.child("https"), config.getHttpsProxyConfig());
+      write(attributes.child("https"), config.getHttpsProxyConfig());
     }
     if (config.getNonProxyHosts() != null) {
       putIfNotNull(attributes, "nonProxyHosts", Joiner.on(",").join(config.getNonProxyHosts()));
     }
   }
 
-  private void httpProxyToMap(final NestedAttributesMap attributes, final HttpProxyConfig config) {
+  private void write(final NestedAttributesMap attributes, final HttpProxyConfig config) {
     putIfNotNull(attributes, "hostname", config.getHostname());
     putIfNotNull(attributes, "port", config.getPort());
     if (config.getAuthenticationConfig() != null) {
-      authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
+      write(attributes.child("authentication"), config.getAuthenticationConfig());
     }
   }
 
@@ -116,22 +116,24 @@ public class HttpClientConfigMarshallerImpl
   //
 
   @Override
-  public HttpClientConfig fromMap(final NestedAttributesMap attributes) {
+  public HttpClientConfig unmarshall(final NestedAttributesMap attributes) {
+    checkNotNull(attributes);
+
     HttpClientConfig config = new HttpClientConfig();
 
     if (attributes.contains("connection")) {
-      config.setConnectionConfig(connectionFromMap(attributes.child("connection")));
+      config.setConnectionConfig(readConnection(attributes.child("connection")));
     }
     if (attributes.contains("authentication")) {
-      config.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
+      config.setAuthenticationConfig(readAuthentication(attributes.child("authentication")));
     }
     if (attributes.contains("proxy")) {
-      config.setProxyConfig(proxyFromMap(attributes.child("proxy")));
+      config.setProxyConfig(readProxy(attributes.child("proxy")));
     }
     return config;
   }
 
-  private ConnectionConfig connectionFromMap(final NestedAttributesMap attributes) {
+  private ConnectionConfig readConnection(final NestedAttributesMap attributes) {
     ConnectionConfig config = new ConnectionConfig();
 
     config.setTimeout(attributes.get("timeout", Integer.class));
@@ -143,14 +145,14 @@ public class HttpClientConfigMarshallerImpl
     return config;
   }
 
-  private ProxyConfig proxyFromMap(final NestedAttributesMap attributes) {
+  private ProxyConfig readProxy(final NestedAttributesMap attributes) {
     ProxyConfig config = new ProxyConfig();
 
     if (attributes.contains("http")) {
-      config.setHttpProxyConfig(httpProxyFromMap(attributes.child("http")));
+      config.setHttpProxyConfig(readHttpProxy(attributes.child("http")));
     }
     if (attributes.contains("https")) {
-      config.setHttpsProxyConfig(httpProxyFromMap(attributes.child("https")));
+      config.setHttpsProxyConfig(readHttpProxy(attributes.child("https")));
     }
     if (attributes.contains("nonProxyHosts")) {
       config.setNonProxyHosts((attributes.require("nonProxyHosts", String.class)).split(","));
@@ -159,22 +161,21 @@ public class HttpClientConfigMarshallerImpl
     return config;
   }
 
-  private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap attributes) {
+  private HttpProxyConfig readHttpProxy(final NestedAttributesMap attributes) {
     HttpProxyConfig config = new HttpProxyConfig();
 
     config.setHostname(attributes.get("hostname", String.class));
     config.setPort(attributes.get("port", Integer.class));
     if (attributes.contains("authentication")) {
-      config.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
+      config.setAuthenticationConfig(readAuthentication(attributes.child("authentication")));
     }
     return config;
   }
 
-  private AuthenticationConfig authenticationFromMap(final NestedAttributesMap attributes) {
+  private AuthenticationConfig readAuthentication(final NestedAttributesMap attributes) {
     String type = attributes.get("type", String.class);
     if (type != null) {
-      AuthenticationConfigMarshaller marshaller = marshaller(type);
-      return marshaller.fromMap(attributes);
+      return marshaller(type).unmarshall(attributes);
     }
     return null;
   }

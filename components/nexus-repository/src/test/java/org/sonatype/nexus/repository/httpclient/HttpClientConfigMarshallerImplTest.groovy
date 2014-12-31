@@ -78,7 +78,7 @@ public class HttpClientConfigMarshallerImplTest
     )
 
     NestedAttributesMap attributes = new NestedAttributesMap('key', [:])
-    underTest.toMap(config, attributes)
+    underTest.marshall(config, attributes)
 
     log attributes
 
@@ -161,7 +161,7 @@ public class HttpClientConfigMarshallerImplTest
 
     log attributes
 
-    HttpClientConfig config = underTest.fromMap(attributes)
+    HttpClientConfig config = underTest.unmarshall(attributes)
 
     assertThat(config.connectionConfig.timeout, is(1))
     assertThat(config.connectionConfig.retries, is(2))

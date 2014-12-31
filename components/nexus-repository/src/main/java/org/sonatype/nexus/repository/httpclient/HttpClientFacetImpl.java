@@ -52,7 +52,7 @@ public class HttpClientFacetImpl
   protected void doInit(final Repository repository) throws Exception {
     Configuration configuration = repository.getConfiguration();
     NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    HttpClientConfig httpClientConfig = marshaller.fromMap(attributes);
+    HttpClientConfig httpClientConfig = marshaller.unmarshall(attributes);
     httpClient = httpClientFactory.create(httpClientConfig);
     log.debug("Created HTTP client: {}", httpClient);
   }

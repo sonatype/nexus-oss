@@ -24,10 +24,10 @@ public interface AuthenticationConfigMarshaller
   /**
    * Marshall {@link AuthenticationConfig} to attributes.
    */
-  void toMap(AuthenticationConfig config, NestedAttributesMap attributes);
+  void marshall(AuthenticationConfig config, NestedAttributesMap attributes);
 
   /**
    * Un-marshall {@link AuthenticationConfig} from attributes.
    */
-  AuthenticationConfig fromMap(final NestedAttributesMap attributes);
+  AuthenticationConfig unmarshall(final NestedAttributesMap attributes);
 }

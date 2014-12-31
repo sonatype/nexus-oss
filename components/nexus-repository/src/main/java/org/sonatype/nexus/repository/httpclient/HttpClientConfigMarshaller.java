@@ -15,19 +15,13 @@ package org.sonatype.nexus.repository.httpclient;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 /**
- * Marshall/Un-marshall {@link HttpClientConfig} to/from a map.
+ * {@link HttpClientConfig} marshaller.
  *
  * @since 3.0
  */
 public interface HttpClientConfigMarshaller
 {
-  /**
-   * Marshall {@link HttpClientConfig} to a {@link NestedAttributesMap}.
-   */
-  void toMap(HttpClientConfig config, NestedAttributesMap map);
+  void marshall(HttpClientConfig config, NestedAttributesMap attributes);
 
-  /**
-   * Un-marshall {@link HttpClientConfig} from a map.
-   */
-  HttpClientConfig fromMap(NestedAttributesMap configMap);
+  HttpClientConfig unmarshall(NestedAttributesMap attributes);
 }
