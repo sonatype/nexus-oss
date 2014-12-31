@@ -32,45 +32,34 @@ public class HttpClientFacetImpl
     extends FacetSupport
   implements HttpClientFacet
 {
-  public static final String CONFIG_KEY = "http_facet";
-
-  public static final String REMOTE_URL = "remote_url";
+  public static final String CONFIG_KEY = "httpclient";
 
   private final HttpClientFactory httpClientFactory;
 
-  private final HttpPayloadResponseBuilder payloadResponseBuilder;
-
   private final HttpClientConfigMarshaller marshaller;
-
-  private String remoteUrlBase;
 
   private HttpClient httpClient;
 
   @Inject
   public HttpClientFacetImpl(final HttpClientFactory httpClientFactory,
-                             final HttpPayloadResponseBuilder payloadResponseBuilder,
                              final HttpClientConfigMarshaller marshaller)
   {
     this.httpClientFactory = checkNotNull(httpClientFactory);
-    this.payloadResponseBuilder = checkNotNull(payloadResponseBuilder);
     this.marshaller = checkNotNull(marshaller);
   }
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    final Configuration configuration = repository.getConfiguration();
-    final NestedAttributesMap foo = configuration.attributes("httpClientFacet");
-
-    final HttpClientConfig httpClientConfig = marshaller.fromMap(foo);
-
+    Configuration configuration = repository.getConfiguration();
+    NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
+    HttpClientConfig httpClientConfig = marshaller.fromMap(attributes);
     httpClient = httpClientFactory.create(httpClientConfig);
+    log.debug("Created HTTP client: {}", httpClient);
+  }
 
-    // TODO: This stuff probably doesn't belong in the http client facet
-
-    final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    final String remoteUrl = (String) attributes.get(REMOTE_URL);
-
-    this.remoteUrlBase = remoteUrl;
+  @Override
+  protected void doDestroy() throws Exception {
+    httpClient = null;
   }
 
   @Override
@@ -78,17 +67,4 @@ public class HttpClientFacetImpl
     ensureStarted();
     return httpClient;
   }
-
-  ///**
-  // * TODO: What's the right abstraction for the responses?
-  // */
-  //public Response getResponse(String uriSuffix) throws IOException {
-  //  final String uri = remoteUrlBase + uriSuffix;
-  //
-  //  final HttpGet httpGet = new HttpGet(uri);
-  //  final HttpResponse response = httpClient.execute(httpGet);
-  //
-  //  // TODO: Temporary - this cast may be illegal
-  //  return payloadResponseBuilder.buildPayloadResponse((CloseableHttpResponse) response);
-  //}
 }
