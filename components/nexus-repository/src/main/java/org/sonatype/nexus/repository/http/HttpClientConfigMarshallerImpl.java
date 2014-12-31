@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.internal.http;
+package org.sonatype.nexus.repository.http;
 
 import java.util.Map;
 
@@ -43,7 +43,6 @@ public class HttpClientConfigMarshallerImpl
     extends ComponentSupport
     implements HttpClientConfigMarshaller
 {
-
   private final Map<String, AuthenticationConfigMarshaller> authenticationConfigMarshallers;
 
   @Inject
@@ -55,8 +54,8 @@ public class HttpClientConfigMarshallerImpl
 
   @Override
   public void toMap(final HttpClientConfig config, final NestedAttributesMap map) {
-    checkNotNull(config, "config");
-    checkNotNull(map, "map");
+    checkNotNull(config);
+    checkNotNull(map);
     final NestedAttributesMap httpConfig = map.child("http");
     connectionToMap(httpConfig.child("connection"), config.getConnectionConfig());
     authenticationToMap(httpConfig.child("authentication"), config.getAuthenticationConfig());
@@ -159,7 +158,7 @@ public class HttpClientConfigMarshallerImpl
       proxyConfig.withHttpProxyConfig(httpProxyConfig);
       proxyConfig.withHttpsProxyConfig(httpProxyFromMap(configMap.child("https")));
       if (configMap.contains("nonProxyHosts")) {
-        proxyConfig.withNonProxyHosts(((String) configMap.get("nonProxyHosts")).split(","));
+        proxyConfig.withNonProxyHosts((configMap.require("nonProxyHosts", String.class)).split(","));
       }
     }
     return proxyConfig;

@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.internal.http;
+package org.sonatype.nexus.repository.http;
 
 import java.util.Map;
 
@@ -40,9 +40,8 @@ public class NtlmAuthenticationConfigMarshaller
 {
   @Override
   public void toMap(final AuthenticationConfig config, final NestedAttributesMap configMap) {
-
-    checkNotNull(config, "config");
-    checkNotNull(configMap, "config map");
+    checkNotNull(config);
+    checkNotNull(configMap);
     NtlmAuthenticationConfig cfg = (NtlmAuthenticationConfig) config;
 
     configMap.set("username", cfg.getUsername());
@@ -53,7 +52,7 @@ public class NtlmAuthenticationConfigMarshaller
 
   @Override
   public AuthenticationConfig fromMap(final NestedAttributesMap configMap) {
-    checkNotNull(configMap, "config map");
+    checkNotNull(configMap);
     return new NtlmAuthenticationConfig()
         .withUsername(configMap.get("username", String.class))
         .withPassword(configMap.get("password", String.class))

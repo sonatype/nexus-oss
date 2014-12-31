@@ -1,15 +1,19 @@
-package org.sonatype.nexus.repository.internal.http;
+package org.sonatype.nexus.repository.http;
 
 import java.util.Map;
 
 import org.sonatype.nexus.repository.http.AuthenticationConfigMarshaller;
 import org.sonatype.nexus.repository.http.ConnectionConfig;
 import org.sonatype.nexus.repository.http.HttpClientConfig;
+import org.sonatype.nexus.repository.http.HttpClientConfigMarshallerImpl;
 import org.sonatype.nexus.repository.http.HttpProxyConfig;
 import org.sonatype.nexus.repository.http.NtlmAuthenticationConfig;
+import org.sonatype.nexus.repository.http.NtlmAuthenticationConfigMarshaller;
 import org.sonatype.nexus.repository.http.ProxyConfig;
 import org.sonatype.nexus.repository.http.UsernameAuthenticationConfig;
+import org.sonatype.nexus.repository.http.UsernameAuthenticationConfigMarshaller;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.Maps;
 import org.junit.Before;
@@ -19,7 +23,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Tests for {@link HttpClientConfigMarshallerImpl}.
+ */
 public class HttpClientConfigMarshallerImplTest
+    extends TestSupport
 {
   private Map<String, AuthenticationConfigMarshaller> authMarshallers = Maps.newHashMap();
 
@@ -71,7 +79,7 @@ public class HttpClientConfigMarshallerImplTest
 
     new HttpClientConfigMarshallerImpl(authMarshallers).toMap(config, map);
 
-  System.err.println(map.toString());
+    System.err.println(map.toString());
 
     final NestedAttributesMap http = map.child("http");
     final NestedAttributesMap connection = http.child("connection");
