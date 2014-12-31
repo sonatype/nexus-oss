@@ -89,6 +89,10 @@
       <artifactId>joda-time</artifactId>
     </dependency>
 
+    <!--
+    TODO: Consider removing, this is only used for StringUtils.isBlank() and
+    TODO: ... StringUtils.isNotBlank() used in HttpClientFactoryImpl
+    -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>

@@ -12,90 +12,18 @@
  */
 package org.sonatype.nexus.repository.http;
 
-import java.io.IOException;
+import org.sonatype.nexus.repository.Facet;
 
-import javax.inject.Inject;
-
-import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Response;
-
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A facet that provides an HttpClient for use in constructing remote repositories.
- *
- * TODO: This is a trivial implementation, and should grow to incorporate something like the work Alin did for
- * configuring http in component sources.
+ * Http facet.
  *
  * @since 3.0
  */
-public class HttpClientFacet
-    extends FacetSupport
+@Facet.Exposed
+public interface HttpClientFacet
+  extends Facet
 {
-  public static final String CONFIG_KEY = "http_facet";
-
-  public static final String REMOTE_URL = "remote_url";
-
-  private final HttpClientFactory httpClientFactory;
-
-  private final HttpPayloadResponseBuilder payloadResponseBuilder;
-
-  private final HttpClientConfigMarshaller marshaller;
-
-  private String remoteUrlBase;
-
-  private HttpClient httpClient;
-
-  @Inject
-  public HttpClientFacet(final HttpClientFactory httpClientFactory,
-                         final HttpPayloadResponseBuilder payloadResponseBuilder,
-                         final HttpClientConfigMarshaller marshaller)
-  {
-    this.httpClientFactory = checkNotNull(httpClientFactory);
-    this.payloadResponseBuilder = checkNotNull(payloadResponseBuilder);
-    this.marshaller = checkNotNull(marshaller);
-  }
-
-  @Override
-  protected void doInit(final Repository repository) throws Exception {
-    final Configuration configuration = repository.getConfiguration();
-    final NestedAttributesMap foo = configuration.attributes("httpClientFacet");
-
-    final HttpClientConfig httpClientConfig = marshaller.fromMap(foo);
-
-    httpClient = httpClientFactory.create(httpClientConfig);
-
-    // TODO: This stuff probably doesn't belong in the http client facet
-
-    final NestedAttributesMap attributes = configuration.attributes(CONFIG_KEY);
-    final String remoteUrl = (String) attributes.get(REMOTE_URL);
-
-    this.remoteUrlBase = remoteUrl;
-  }
-
-  public HttpClient getHttpClient() {
-    ensureStarted();
-    return httpClient;
-  }
-
-  /**
-   * TODO: What's the right abstraction for the responses?
-   */
-  public Response getResponse(String uriSuffix) throws IOException {
-    final String uri = remoteUrlBase + uriSuffix;
-
-    final HttpGet httpGet = new HttpGet(uri);
-    final HttpResponse response = httpClient.execute(httpGet);
-
-    // TODO: Temporary - this cast may be illegal
-    return payloadResponseBuilder.buildPayloadResponse((CloseableHttpResponse) response);
-  }
+  HttpClient getHttpClient();
 }
