@@ -15,19 +15,19 @@ package org.sonatype.nexus.repository.httpclient;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 /**
- * Marshall/Un-marshall {@link AuthenticationConfig} to/from map.
+ * Marshall/Un-marshall {@link AuthenticationConfig} to/from attributes.
  *
  * @since 3.0
  */
 public interface AuthenticationConfigMarshaller
 {
   /**
-   * Marshall {@link AuthenticationConfig} to a map.
+   * Marshall {@link AuthenticationConfig} to attributes.
    */
-  void toMap(AuthenticationConfig config, NestedAttributesMap configMap);
+  void toMap(AuthenticationConfig config, NestedAttributesMap attributes);
 
   /**
-   * Un-marshall {@link AuthenticationConfig} from a map.
+   * Un-marshall {@link AuthenticationConfig} from attributes.
    */
-  AuthenticationConfig fromMap(final NestedAttributesMap configMap);
+  AuthenticationConfig fromMap(final NestedAttributesMap attributes);
 }

@@ -33,20 +33,20 @@ public class UsernameAuthenticationConfigMarshaller
     implements AuthenticationConfigMarshaller
 {
   @Override
-  public void toMap(final AuthenticationConfig config, final NestedAttributesMap configMap) {
+  public void toMap(final AuthenticationConfig config, final NestedAttributesMap attributes) {
     checkNotNull(config);
-    checkNotNull(configMap);
+    checkNotNull(attributes);
     UsernameAuthenticationConfig cfg = (UsernameAuthenticationConfig) config;
-    configMap.set("username", cfg.getUsername());
-    configMap.set("password", cfg.getPassword());
+    attributes.set("username", cfg.getUsername());
+    attributes.set("password", cfg.getPassword());
   }
 
   @Override
-  public AuthenticationConfig fromMap(final NestedAttributesMap configMap) {
-    checkNotNull(configMap);
+  public AuthenticationConfig fromMap(final NestedAttributesMap attributes) {
+    checkNotNull(attributes);
     UsernameAuthenticationConfig result = new UsernameAuthenticationConfig();
-    result.setUsername(configMap.get("username", String.class));
-    result.setPassword(configMap.get("password", String.class));
+    result.setUsername(attributes.get("username", String.class));
+    result.setPassword(attributes.get("password", String.class));
     return result;
   }
 }

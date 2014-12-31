@@ -33,24 +33,24 @@ public class NtlmAuthenticationConfigMarshaller
     implements AuthenticationConfigMarshaller
 {
   @Override
-  public void toMap(final AuthenticationConfig config, final NestedAttributesMap configMap) {
+  public void toMap(final AuthenticationConfig config, final NestedAttributesMap attributes) {
     checkNotNull(config);
-    checkNotNull(configMap);
+    checkNotNull(attributes);
     NtlmAuthenticationConfig cfg = (NtlmAuthenticationConfig) config;
-    configMap.set("username", cfg.getUsername());
-    configMap.set("password", cfg.getPassword());
-    configMap.set("ntlmHost", cfg.getNtlmHost());
-    configMap.set("ntlmDomain", cfg.getNtlmDomain());
+    attributes.set("username", cfg.getUsername());
+    attributes.set("password", cfg.getPassword());
+    attributes.set("ntlmHost", cfg.getNtlmHost());
+    attributes.set("ntlmDomain", cfg.getNtlmDomain());
   }
 
   @Override
-  public AuthenticationConfig fromMap(final NestedAttributesMap configMap) {
-    checkNotNull(configMap);
+  public AuthenticationConfig fromMap(final NestedAttributesMap attributes) {
+    checkNotNull(attributes);
     NtlmAuthenticationConfig result = new NtlmAuthenticationConfig();
-    result.setUsername(configMap.get("username", String.class));
-    result.setPassword(configMap.get("password", String.class));
-    result.setNtlmHost(configMap.get("ntlmHost", String.class));
-    result.setNtlmDomain(configMap.get("ntlmDomain", String.class));
+    result.setUsername(attributes.get("username", String.class));
+    result.setPassword(attributes.get("password", String.class));
+    result.setNtlmHost(attributes.get("ntlmHost", String.class));
+    result.setNtlmDomain(attributes.get("ntlmDomain", String.class));
     return result;
   }
 
