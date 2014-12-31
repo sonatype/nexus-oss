@@ -12,26 +12,30 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.config.AuthSchemes;
+
+import static org.apache.http.client.config.AuthSchemes.BASIC;
+import static org.apache.http.client.config.AuthSchemes.DIGEST;
 
 /**
- * HTTP client username authentication configuration.
+ * Username authentication configuration.
  *
  * @since 3.0
  */
 public class UsernameAuthenticationConfig
-    implements AuthenticationConfig
+    extends AuthenticationConfig
 {
   public static final String TYPE = "username";
 
   private String username;
 
   private String password;
+
+  public UsernameAuthenticationConfig() {
+    super(TYPE, Lists.newArrayList(DIGEST, BASIC));
+  }
 
   public String getUsername() {
     return username;
@@ -50,24 +54,7 @@ public class UsernameAuthenticationConfig
   }
 
   @Override
-  public String getType() {
-    return TYPE;
-  }
-
-  @Override
   public Credentials getCredentials() {
     return new UsernamePasswordCredentials(username, password);
-  }
-
-  @Override
-  public List<String> getPreferredAuthSchemes() {
-    return Lists.newArrayList(AuthSchemes.DIGEST, AuthSchemes.BASIC);
-  }
-
-  @Override
-  public String toString() {
-    return "UsernameAuthenticationConfig{" +
-        "username='" + username + '\'' +
-        '}';
   }
 }

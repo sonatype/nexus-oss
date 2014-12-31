@@ -16,16 +16,31 @@ import java.util.List;
 
 import org.apache.http.auth.Credentials;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * HTTP client authentication configuration.
  *
  * @since 3.0
  */
-public interface AuthenticationConfig
+public abstract class AuthenticationConfig
 {
-  String getType();
+  private final String type;
 
-  Credentials getCredentials();
+  private final List<String> preferredAuthSchemes;
 
-  List<String> getPreferredAuthSchemes();
+  public AuthenticationConfig(final String type, final List<String> preferredAuthSchemes) {
+    this.type = checkNotNull(type);
+    this.preferredAuthSchemes = checkNotNull(preferredAuthSchemes);
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public List<String> getPreferredAuthSchemes() {
+    return preferredAuthSchemes;
+  }
+
+  public abstract Credentials getCredentials();
 }

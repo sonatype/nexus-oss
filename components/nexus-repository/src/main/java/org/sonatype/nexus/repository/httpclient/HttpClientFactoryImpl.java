@@ -88,9 +88,7 @@ public class HttpClientFactoryImpl
     });
   }
 
-  private void applyConfiguration(final Builder builder,
-                                  final HttpClientConfig config)
-  {
+  private void applyConfiguration(final Builder builder, final HttpClientConfig config) {
     // connection/socket timeouts
     int timeout = 1000;
     if (config.getConnectionConfig() != null && config.getConnectionConfig().getTimeout() != null) {
@@ -136,22 +134,22 @@ public class HttpClientFactoryImpl
   }
 
   private void applyAuthenticationConfig(final Builder builder,
-                                         final AuthenticationConfig authenticationConfig,
-                                         final HttpHost proxyHost)
+                                         final AuthenticationConfig config,
+                                         final HttpHost httpHost)
   {
-    if (authenticationConfig != null) {
+    if (config != null) {
       String authScope = "target";
-      if (proxyHost != null) {
-        authScope = proxyHost.toHostString() + " proxy";
+      if (httpHost != null) {
+        authScope = httpHost.toHostString() + " proxy"; // FIXME: Why "proxy" here?
       }
 
-      log.debug("{} authentication setup using {}", authScope, authenticationConfig);
+      log.debug("{} authentication setup using {}", authScope, config);
 
-      Credentials credentials = checkNotNull(authenticationConfig.getCredentials(), "credentials");
-      List<String> authSchemes = checkNotNull(authenticationConfig.getPreferredAuthSchemes(), "authentication schemes");
+      Credentials credentials = checkNotNull(config.getCredentials(), "credentials");
+      List<String> authSchemes = checkNotNull(config.getPreferredAuthSchemes(), "authentication schemes");
 
-      if (proxyHost != null) {
-        builder.setCredentials(new AuthScope(proxyHost), credentials);
+      if (httpHost != null) {
+        builder.setCredentials(new AuthScope(httpHost), credentials);
         builder.getRequestConfigBuilder().setProxyPreferredAuthSchemes(authSchemes);
       }
       else {

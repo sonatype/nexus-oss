@@ -12,20 +12,21 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.config.AuthSchemes;
+
+import static org.apache.http.client.config.AuthSchemes.BASIC;
+import static org.apache.http.client.config.AuthSchemes.DIGEST;
+import static org.apache.http.client.config.AuthSchemes.NTLM;
 
 /**
- * HTTP client NTLM authentication configuration.
+ * NTLM authentication configuration.
  *
  * @since 3.0
  */
 public class NtlmAuthenticationConfig
-    implements AuthenticationConfig
+    extends AuthenticationConfig
 {
   public static final String TYPE = "ntlm";
 
@@ -36,6 +37,10 @@ public class NtlmAuthenticationConfig
   private String ntlmHost;
 
   private String ntlmDomain;
+
+  public NtlmAuthenticationConfig() {
+    super(TYPE, Lists.newArrayList(NTLM, DIGEST, BASIC));
+  }
 
   public String getUsername() {
     return username;
@@ -69,25 +74,7 @@ public class NtlmAuthenticationConfig
     this.ntlmDomain = ntlmDomain;
   }
 
-  @Override
-  public String getType() {
-    return TYPE;
-  }
-
   public Credentials getCredentials() {
     return new NTCredentials(username, password, ntlmHost, ntlmDomain);
-  }
-
-  @Override
-  public List<String> getPreferredAuthSchemes() {
-    return Lists.newArrayList(AuthSchemes.NTLM, AuthSchemes.DIGEST, AuthSchemes.BASIC);
-  }
-
-  @Override
-  public String toString() {
-    return "NtlmAuthenticationConfig{" +
-        "ntlmDomain='" + ntlmDomain + '\'' +
-        ", username='" + username + '\'' +
-        '}';
   }
 }
