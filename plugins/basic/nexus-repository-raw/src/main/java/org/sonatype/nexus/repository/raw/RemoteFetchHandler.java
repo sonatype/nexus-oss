@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.raw;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpClientFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -46,6 +45,7 @@ public class RemoteFetchHandler
     // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
     final String path = request.getPath();
 
-    return httpFacet.getResponse(path);
+    //return httpFacet.getResponse(path);
+    return null;
   }
 }

@@ -16,6 +16,8 @@ import org.sonatype.nexus.repository.Facet;
 
 import org.apache.http.client.HttpClient;
 
+// TODO: Move to repository.httpclient
+
 /**
  * Http facet.
  *

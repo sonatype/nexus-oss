@@ -12,20 +12,14 @@
  */
 package org.sonatype.nexus.repository.http;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Response;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -85,16 +79,16 @@ public class HttpClientFacetImpl
     return httpClient;
   }
 
-  /**
-   * TODO: What's the right abstraction for the responses?
-   */
-  public Response getResponse(String uriSuffix) throws IOException {
-    final String uri = remoteUrlBase + uriSuffix;
-
-    final HttpGet httpGet = new HttpGet(uri);
-    final HttpResponse response = httpClient.execute(httpGet);
-
-    // TODO: Temporary - this cast may be illegal
-    return payloadResponseBuilder.buildPayloadResponse((CloseableHttpResponse) response);
-  }
+  ///**
+  // * TODO: What's the right abstraction for the responses?
+  // */
+  //public Response getResponse(String uriSuffix) throws IOException {
+  //  final String uri = remoteUrlBase + uriSuffix;
+  //
+  //  final HttpGet httpGet = new HttpGet(uri);
+  //  final HttpResponse response = httpClient.execute(httpGet);
+  //
+  //  // TODO: Temporary - this cast may be illegal
+  //  return payloadResponseBuilder.buildPayloadResponse((CloseableHttpResponse) response);
+  //}
 }
