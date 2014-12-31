@@ -12,10 +12,16 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
+
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
 import static org.apache.http.client.config.AuthSchemes.DIGEST;
 
@@ -56,5 +62,36 @@ public class UsernameAuthenticationConfig
   @Override
   public Credentials getCredentials() {
     return new UsernamePasswordCredentials(username, password);
+  }
+
+  //
+  // Marshaller
+  //
+
+  /**
+   * {@link UsernameAuthenticationConfig} marshaller.
+   */
+  @Named(TYPE)
+  @Singleton
+  public static class MarshallerImpl
+      implements Marshaller
+  {
+    @Override
+    public void marshall(final AuthenticationConfig config, final NestedAttributesMap attributes) {
+      checkNotNull(config);
+      checkNotNull(attributes);
+      UsernameAuthenticationConfig cfg = (UsernameAuthenticationConfig) config;
+      attributes.set("username", cfg.getUsername());
+      attributes.set("password", cfg.getPassword());
+    }
+
+    @Override
+    public AuthenticationConfig unmarshall(final NestedAttributesMap attributes) {
+      checkNotNull(attributes);
+      UsernameAuthenticationConfig result = new UsernameAuthenticationConfig();
+      result.setUsername(attributes.get("username", String.class));
+      result.setPassword(attributes.get("password", String.class));
+      return result;
+    }
   }
 }

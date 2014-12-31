@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.httpclient;
 
 import java.util.List;
 
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
+
 import org.apache.http.auth.Credentials;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,4 +45,18 @@ public abstract class AuthenticationConfig
   }
 
   public abstract Credentials getCredentials();
+
+  //
+  // Marshaller
+  //
+
+  /**
+   * {@link AuthenticationConfig} marshaller.
+   */
+  public static interface Marshaller
+  {
+    void marshall(AuthenticationConfig config, NestedAttributesMap attributes);
+
+    AuthenticationConfig unmarshall(NestedAttributesMap attributes);
+  }
 }

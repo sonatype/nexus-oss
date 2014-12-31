@@ -12,10 +12,16 @@
  */
 package org.sonatype.nexus.repository.httpclient;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.repository.util.NestedAttributesMap;
+
 import com.google.common.collect.Lists;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.http.client.config.AuthSchemes.BASIC;
 import static org.apache.http.client.config.AuthSchemes.DIGEST;
 import static org.apache.http.client.config.AuthSchemes.NTLM;
@@ -76,5 +82,40 @@ public class NtlmAuthenticationConfig
 
   public Credentials getCredentials() {
     return new NTCredentials(username, password, ntlmHost, ntlmDomain);
+  }
+
+  //
+  // Marshaller
+  //
+
+  /**
+   * {@link NtlmAuthenticationConfig} marshaller.
+   */
+  @Named(TYPE)
+  @Singleton
+  public static class MarshallerImpl
+      implements Marshaller
+  {
+    @Override
+    public void marshall(final AuthenticationConfig config, final NestedAttributesMap attributes) {
+      checkNotNull(config);
+      checkNotNull(attributes);
+      NtlmAuthenticationConfig cfg = (NtlmAuthenticationConfig) config;
+      attributes.set("username", cfg.getUsername());
+      attributes.set("password", cfg.getPassword());
+      attributes.set("ntlmHost", cfg.getNtlmHost());
+      attributes.set("ntlmDomain", cfg.getNtlmDomain());
+    }
+
+    @Override
+    public AuthenticationConfig unmarshall(final NestedAttributesMap attributes) {
+      checkNotNull(attributes);
+      NtlmAuthenticationConfig result = new NtlmAuthenticationConfig();
+      result.setUsername(attributes.get("username", String.class));
+      result.setPassword(attributes.get("password", String.class));
+      result.setNtlmHost(attributes.get("ntlmHost", String.class));
+      result.setNtlmDomain(attributes.get("ntlmDomain", String.class));
+      return result;
+    }
   }
 }

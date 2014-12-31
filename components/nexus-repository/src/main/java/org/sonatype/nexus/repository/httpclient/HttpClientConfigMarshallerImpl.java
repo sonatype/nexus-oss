@@ -38,15 +38,15 @@ public class HttpClientConfigMarshallerImpl
     extends ComponentSupport
     implements HttpClientConfigMarshaller
 {
-  private final Map<String, AuthenticationConfigMarshaller> marshallers;
+  private final Map<String, AuthenticationConfig.Marshaller> marshallers;
 
   @Inject
-  public HttpClientConfigMarshallerImpl(final Map<String, AuthenticationConfigMarshaller> marshallers) {
+  public HttpClientConfigMarshallerImpl(final Map<String, AuthenticationConfig.Marshaller> marshallers) {
     this.marshallers = checkNotNull(marshallers);
   }
 
-  private AuthenticationConfigMarshaller marshaller(final String type) {
-    AuthenticationConfigMarshaller marshaller = marshallers.get(type);
+  private AuthenticationConfig.Marshaller marshaller(final String type) {
+    AuthenticationConfig.Marshaller marshaller = marshallers.get(type);
     checkState(marshaller != null, "Missing marshaller for type: %s", type);
     return marshaller;
   }
@@ -86,7 +86,7 @@ public class HttpClientConfigMarshallerImpl
   }
 
   private void write(final NestedAttributesMap attributes, final AuthenticationConfig config) {
-    AuthenticationConfigMarshaller marshaller = marshaller(config.getType());
+    AuthenticationConfig.Marshaller marshaller = marshaller(config.getType());
     attributes.set("type", config.getType());
     marshaller.marshall(config, attributes);
   }

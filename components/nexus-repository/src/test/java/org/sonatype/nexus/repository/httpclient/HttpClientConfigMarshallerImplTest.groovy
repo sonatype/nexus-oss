@@ -31,9 +31,9 @@ public class HttpClientConfigMarshallerImplTest
 
   @Before
   void setUp() {
-    Map<String, AuthenticationConfigMarshaller> marshallers = [:]
-    marshallers[UsernameAuthenticationConfig.TYPE] = new UsernameAuthenticationConfigMarshaller()
-    marshallers[NtlmAuthenticationConfig.TYPE] = new NtlmAuthenticationConfigMarshaller()
+    Map<String, AuthenticationConfig.Marshaller> marshallers = [:]
+    marshallers[UsernameAuthenticationConfig.TYPE] = new UsernameAuthenticationConfig.MarshallerImpl()
+    marshallers[NtlmAuthenticationConfig.TYPE] = new NtlmAuthenticationConfig.MarshallerImpl()
     underTest = new HttpClientConfigMarshallerImpl(marshallers)
   }
 
