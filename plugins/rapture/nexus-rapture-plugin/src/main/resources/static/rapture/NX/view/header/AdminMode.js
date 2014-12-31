@@ -21,6 +21,10 @@ Ext.define('NX.view.header.AdminMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-admin-mode',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   mode: 'admin',
   title: 'Administration',
   tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),

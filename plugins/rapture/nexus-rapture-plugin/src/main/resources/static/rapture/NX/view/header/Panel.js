@@ -21,6 +21,7 @@ Ext.define('NX.view.header.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-header-panel',
   requires: [
+    'NX.I18n',
     'NX.State'
   ],
 

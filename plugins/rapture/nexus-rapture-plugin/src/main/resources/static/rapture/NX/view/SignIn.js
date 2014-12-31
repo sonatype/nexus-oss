@@ -21,6 +21,10 @@ Ext.define('NX.view.SignIn', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-signin',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   title: NX.I18n.get('GLOBAL_SIGN_IN_TITLE'),
 
   layout: 'fit',

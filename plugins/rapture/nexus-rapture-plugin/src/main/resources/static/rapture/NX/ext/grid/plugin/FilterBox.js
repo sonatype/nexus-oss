@@ -21,6 +21,10 @@ Ext.define('NX.ext.grid.plugin.FilterBox', {
   extend: 'NX.ext.grid.plugin.Filtering',
   alias: 'plugin.gridfilterbox',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   /**
    * @cfg {String} emptyText Text to be used as grid empty text when no records are matching the filter. If text
    * contains "${filter}" it will be replaced with filter value.

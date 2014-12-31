@@ -21,6 +21,10 @@ Ext.define('NX.view.header.SignOut', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-signout',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT_TOOLTIP'),
 
   hidden: true,
