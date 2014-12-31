@@ -12,18 +12,11 @@
  */
 package org.sonatype.nexus.repository.http;
 
-import java.util.Map;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.http.AuthenticationConfig;
-import org.sonatype.nexus.repository.http.AuthenticationConfigMarshaller;
-import org.sonatype.nexus.repository.http.NtlmAuthenticationConfig;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

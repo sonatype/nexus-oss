@@ -30,10 +30,6 @@ import org.sonatype.nexus.httpclient.HttpClientFactory.Customizer;
 import org.sonatype.nexus.httpclient.NexusHttpRoutePlanner;
 import org.sonatype.nexus.httpclient.NexusRedirectStrategy;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
-import org.sonatype.nexus.repository.http.AuthenticationConfig;
-import org.sonatype.nexus.repository.http.HttpClientConfig;
-import org.sonatype.nexus.repository.http.HttpClientFactory;
-import org.sonatype.nexus.repository.http.HttpProxyConfig;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;

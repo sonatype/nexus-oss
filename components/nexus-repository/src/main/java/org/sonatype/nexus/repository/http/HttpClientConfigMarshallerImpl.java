@@ -18,13 +18,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.http.AuthenticationConfig;
-import org.sonatype.nexus.repository.http.AuthenticationConfigMarshaller;
-import org.sonatype.nexus.repository.http.ConnectionConfig;
-import org.sonatype.nexus.repository.http.HttpClientConfig;
-import org.sonatype.nexus.repository.http.HttpClientConfigMarshaller;
-import org.sonatype.nexus.repository.http.HttpProxyConfig;
-import org.sonatype.nexus.repository.http.ProxyConfig;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
