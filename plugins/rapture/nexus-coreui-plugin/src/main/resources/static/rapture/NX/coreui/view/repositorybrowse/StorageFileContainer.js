@@ -26,6 +26,7 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
 
   ui: 'light',
   title: 'fun',
+  autoHideTabHeader: false,
 
   /**
    * Repository of currently shown file.

@@ -29,6 +29,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
   layout: 'fit',
 
+  /**
+   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
+   */
+  autoHideTabHeader: true,
+
   tabs: {
     xtype: 'nx-info-panel'
   },
@@ -84,6 +89,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
               pack: 'start'
             },
             tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
+            autoHideTabHeader: me.autoHideTabHeader,
             actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
           }
         }
