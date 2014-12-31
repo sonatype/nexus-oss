@@ -41,36 +41,32 @@ public class NtlmAuthenticationConfig
     return username;
   }
 
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
   public String getPassword() {
     return password;
+  }
+
+  public void setPassword(final String password) {
+    this.password = password;
   }
 
   public String getNtlmHost() {
     return ntlmHost;
   }
 
+  public void setNtlmHost(final String ntlmHost) {
+    this.ntlmHost = ntlmHost;
+  }
+
   public String getNtlmDomain() {
     return ntlmDomain;
   }
 
-  public NtlmAuthenticationConfig withUsername(final String username) {
-    this.username = username;
-    return this;
-  }
-
-  public NtlmAuthenticationConfig withPassword(final String password) {
-    this.password = password;
-    return this;
-  }
-
-  public NtlmAuthenticationConfig withNtlmHost(final String ntlmHost) {
-    this.ntlmHost = ntlmHost;
-    return this;
-  }
-
-  public NtlmAuthenticationConfig withNtlmDomain(final String ntlmDomain) {
+  public void setNtlmDomain(final String ntlmDomain) {
     this.ntlmDomain = ntlmDomain;
-    return this;
   }
 
   @Override

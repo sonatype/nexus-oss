@@ -29,26 +29,23 @@ public class HttpClientConfig
     return connectionConfig;
   }
 
+  public void setConnectionConfig(final ConnectionConfig connectionConfig) {
+    this.connectionConfig = connectionConfig;
+  }
+
   public AuthenticationConfig getAuthenticationConfig() {
     return authenticationConfig;
+  }
+
+  public void setAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
+    this.authenticationConfig = authenticationConfig;
   }
 
   public ProxyConfig getProxyConfig() {
     return proxyConfig;
   }
 
-  public HttpClientConfig withConnectionConfig(final ConnectionConfig connectionConfig) {
-    this.connectionConfig = connectionConfig;
-    return this;
-  }
-
-  public HttpClientConfig withAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
-    this.authenticationConfig = authenticationConfig;
-    return this;
-  }
-
-  public HttpClientConfig withProxyConfig(final ProxyConfig proxyConfig) {
+  public void setProxyConfig(final ProxyConfig proxyConfig) {
     this.proxyConfig = proxyConfig;
-    return this;
   }
 }

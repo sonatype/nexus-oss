@@ -37,18 +37,16 @@ public class UsernameAuthenticationConfig
     return username;
   }
 
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
   public String getPassword() {
     return password;
   }
 
-  public UsernameAuthenticationConfig withUsername(final String username) {
-    this.username = username;
-    return this;
-  }
-
-  public UsernameAuthenticationConfig withPassword(final String password) {
+  public void setPassword(final String password) {
     this.password = password;
-    return this;
   }
 
   @Override

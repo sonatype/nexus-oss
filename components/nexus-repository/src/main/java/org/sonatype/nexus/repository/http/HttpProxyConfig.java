@@ -29,26 +29,23 @@ public class HttpProxyConfig
     return hostname;
   }
 
+  public void setHostname(final String hostname) {
+    this.hostname = hostname;
+  }
+
   public Integer getPort() {
     return port;
+  }
+
+  public void setPort(final Integer port) {
+    this.port = port;
   }
 
   public AuthenticationConfig getAuthenticationConfig() {
     return authenticationConfig;
   }
 
-  public HttpProxyConfig withHostname(final String hostname) {
-    this.hostname = hostname;
-    return this;
-  }
-
-  public HttpProxyConfig withPort(final Integer port) {
-    this.port = port;
-    return this;
-  }
-
-  public HttpProxyConfig withAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
+  public void setAuthenticationConfig(final AuthenticationConfig authenticationConfig) {
     this.authenticationConfig = authenticationConfig;
-    return this;
   }
 }

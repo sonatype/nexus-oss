@@ -111,9 +111,9 @@ public class HttpClientConfigMarshallerImpl
   public HttpClientConfig fromMap(final NestedAttributesMap config) {
     HttpClientConfig clientConfig = new HttpClientConfig();
     final NestedAttributesMap httpConfig = config.child("http");
-    clientConfig.withConnectionConfig(connectionFromMap(httpConfig.child("connection")));
-    clientConfig.withAuthenticationConfig(authenticationFromMap(httpConfig.child("authentication")));
-    clientConfig.withProxyConfig(proxyFromMap(httpConfig.child("proxy")));
+    clientConfig.setConnectionConfig(connectionFromMap(httpConfig.child("connection")));
+    clientConfig.setAuthenticationConfig(authenticationFromMap(httpConfig.child("authentication")));
+    clientConfig.setProxyConfig(proxyFromMap(httpConfig.child("proxy")));
     return clientConfig;
   }
 
@@ -122,23 +122,23 @@ public class HttpClientConfigMarshallerImpl
 
     if (configMap.contains("timeout")) {
       connectionConfig = new ConnectionConfig();
-      connectionConfig.withTimeout((Integer) configMap.get("timeout"));
+      connectionConfig.setTimeout((Integer) configMap.get("timeout"));
     }
     if (configMap.contains("retries")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.withRetries((Integer) configMap.get("retries"));
+      connectionConfig.setRetries((Integer) configMap.get("retries"));
     }
     if (configMap.contains("urlParameters")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.withUrlParameters((String) configMap.get("urlParameters"));
+      connectionConfig.setUrlParameters((String) configMap.get("urlParameters"));
     }
     if (configMap.contains("userAgentCustomization")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.withUserAgentCustomisation((String) configMap.get("userAgentCustomization"));
+      connectionConfig.setUserAgentCustomisation((String) configMap.get("userAgentCustomization"));
     }
     if (configMap.contains("useTrustStore")) {
       connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.withUseTrustStore((Boolean) configMap.get("useTrustStore"));
+      connectionConfig.setUseTrustStore((Boolean) configMap.get("useTrustStore"));
     }
     return connectionConfig;
   }
@@ -157,20 +157,18 @@ public class HttpClientConfigMarshallerImpl
     return proxyConfig;
   }
 
-  private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap configMap)
-  {
+  private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap configMap) {
     HttpProxyConfig httpProxyConfig = null;
     if (configMap.contains("hostname")) {
       httpProxyConfig = new HttpProxyConfig();
-      httpProxyConfig.withHostname((String) configMap.get("hostname"));
-      httpProxyConfig.withPort((Integer) configMap.get("port"));
-      httpProxyConfig.withAuthenticationConfig(authenticationFromMap(configMap.child("authentication")));
+      httpProxyConfig.setHostname((String) configMap.get("hostname"));
+      httpProxyConfig.setPort((Integer) configMap.get("port"));
+      httpProxyConfig.setAuthenticationConfig(authenticationFromMap(configMap.child("authentication")));
     }
     return httpProxyConfig;
   }
 
   private AuthenticationConfig authenticationFromMap(final NestedAttributesMap configMap) {
-
     if (configMap.contains("type")) {
       final AuthenticationConfigMarshaller marshaller = authenticationConfigMarshallers.get(configMap.get("type"));
       return marshaller.fromMap(configMap);
