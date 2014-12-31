@@ -24,6 +24,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Joiner;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link HttpClientConfigMarshaller} implementation.
@@ -36,142 +37,132 @@ public class HttpClientConfigMarshallerImpl
     extends ComponentSupport
     implements HttpClientConfigMarshaller
 {
-  private final Map<String, AuthenticationConfigMarshaller> authenticationConfigMarshallers;
+  private final Map<String, AuthenticationConfigMarshaller> marshallers;
 
   @Inject
-  public HttpClientConfigMarshallerImpl(
-      final Map<String, AuthenticationConfigMarshaller> authenticationConfigMarshallers)
-  {
-    this.authenticationConfigMarshallers = checkNotNull(authenticationConfigMarshallers);
+  public HttpClientConfigMarshallerImpl(final Map<String, AuthenticationConfigMarshaller> marshallers) {
+    this.marshallers = checkNotNull(marshallers);
   }
 
   @Override
-  public void toMap(final HttpClientConfig config, final NestedAttributesMap map) {
+  public void toMap(final HttpClientConfig config, final NestedAttributesMap attributes) {
     checkNotNull(config);
-    checkNotNull(map);
-    final NestedAttributesMap httpConfig = map.child("http");
-    connectionToMap(httpConfig.child("connection"), config.getConnectionConfig());
-    authenticationToMap(httpConfig.child("authentication"), config.getAuthenticationConfig());
-    proxyToMap(httpConfig.child("proxy"), config.getProxyConfig());
+    checkNotNull(attributes);
+    connectionToMap(attributes.child("connection"), config.getConnectionConfig());
+    authenticationToMap(attributes.child("authentication"), config.getAuthenticationConfig());
+    proxyToMap(attributes.child("proxy"), config.getProxyConfig());
   }
 
-  private void connectionToMap(final NestedAttributesMap configMap,
-                               final ConnectionConfig connectionConfig)
-  {
-    if (connectionConfig != null) {
-      putIfNotNull(configMap, "timeout", connectionConfig.getTimeout());
-      putIfNotNull(configMap, "retries", connectionConfig.getRetries());
-      putIfNotNull(configMap, "urlParameters", connectionConfig.getUrlParameters());
-      putIfNotNull(configMap, "userAgentCustomisation", connectionConfig.getUserAgentCustomisation());
-      putIfNotNull(configMap, "useTrustStore", connectionConfig.getUseTrustStore());
+  private void connectionToMap(final NestedAttributesMap attributes, final ConnectionConfig connection) {
+    if (connection != null) {
+      putIfNotNull(attributes, "timeout", connection.getTimeout());
+      putIfNotNull(attributes, "retries", connection.getRetries());
+      putIfNotNull(attributes, "urlParameters", connection.getUrlParameters());
+      putIfNotNull(attributes, "userAgentCustomisation", connection.getUserAgentCustomisation());
+      putIfNotNull(attributes, "useTrustStore", connection.getUseTrustStore());
     }
   }
 
-  private void authenticationToMap(final NestedAttributesMap configMap,
-                                   final AuthenticationConfig authenticationConfig)
-  {
-    if (authenticationConfig != null) {
-      AuthenticationConfigMarshaller marshaller = authenticationConfigMarshallers.get(authenticationConfig.getType());
+  private void authenticationToMap(final NestedAttributesMap attributes, final AuthenticationConfig authentication) {
+    if (authentication != null) {
+      AuthenticationConfigMarshaller marshaller = marshallers.get(authentication.getType());
       if (marshaller != null) {
-        putIfNotNull(configMap, "type", authenticationConfig.getType());
-        marshaller.toMap(authenticationConfig, configMap);
+        attributes.set("type", authentication.getType());
+        marshaller.toMap(authentication, attributes);
       }
     }
   }
 
-  private void proxyToMap(final NestedAttributesMap configMap,
-                          final ProxyConfig proxyConfig)
-  {
-    if (proxyConfig != null) {
-      httpProxyToMap(configMap.child("http"), proxyConfig.getHttpProxyConfig());
-      httpProxyToMap(configMap.child("https"), proxyConfig.getHttpsProxyConfig());
-      if (proxyConfig.getNonProxyHosts() != null) {
-        putIfNotNull(configMap, "nonProxyHosts", Joiner.on(",").join(proxyConfig.getNonProxyHosts()));
+  private void proxyToMap(final NestedAttributesMap attributes, final ProxyConfig proxy) {
+    if (proxy != null) {
+      httpProxyToMap(attributes.child("http"), proxy.getHttpProxyConfig());
+      httpProxyToMap(attributes.child("https"), proxy.getHttpsProxyConfig());
+      if (proxy.getNonProxyHosts() != null) {
+        putIfNotNull(attributes, "nonProxyHosts", Joiner.on(",").join(proxy.getNonProxyHosts()));
       }
     }
   }
 
-  private void httpProxyToMap(final NestedAttributesMap configMap,
-                              final HttpProxyConfig httpProxyConfig)
-  {
-    if (httpProxyConfig != null) {
-      putIfNotNull(configMap, "hostname", httpProxyConfig.getHostname());
-      putIfNotNull(configMap, "port", httpProxyConfig.getPort());
-      authenticationToMap(configMap.child("authentication"), httpProxyConfig.getAuthenticationConfig());
+  private void httpProxyToMap(final NestedAttributesMap attributes, final HttpProxyConfig httpProxy) {
+    if (httpProxy != null) {
+      putIfNotNull(attributes, "hostname", httpProxy.getHostname());
+      putIfNotNull(attributes, "port", httpProxy.getPort());
+      authenticationToMap(attributes.child("authentication"), httpProxy.getAuthenticationConfig());
     }
   }
 
-  private void putIfNotNull(final NestedAttributesMap config, final String key, final Object value) {
+  private void putIfNotNull(final NestedAttributesMap attributes, final String key, final Object value) {
     if (value != null) {
-      config.set(key, value);
+      attributes.set(key, value);
     }
   }
 
   @Override
-  public HttpClientConfig fromMap(final NestedAttributesMap config) {
-    HttpClientConfig clientConfig = new HttpClientConfig();
-    final NestedAttributesMap httpConfig = config.child("http");
-    clientConfig.setConnectionConfig(connectionFromMap(httpConfig.child("connection")));
-    clientConfig.setAuthenticationConfig(authenticationFromMap(httpConfig.child("authentication")));
-    clientConfig.setProxyConfig(proxyFromMap(httpConfig.child("proxy")));
-    return clientConfig;
+  public HttpClientConfig fromMap(final NestedAttributesMap attributes) {
+    HttpClientConfig httpClient = new HttpClientConfig();
+    httpClient.setConnectionConfig(connectionFromMap(attributes.child("connection")));
+    httpClient.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
+    httpClient.setProxyConfig(proxyFromMap(attributes.child("proxy")));
+    return httpClient;
   }
 
-  private ConnectionConfig connectionFromMap(final NestedAttributesMap configMap) {
-    ConnectionConfig connectionConfig = null;
+  private ConnectionConfig connectionFromMap(final NestedAttributesMap attributes) {
+    ConnectionConfig connection = null;
 
-    if (configMap.contains("timeout")) {
-      connectionConfig = new ConnectionConfig();
-      connectionConfig.setTimeout((Integer) configMap.get("timeout"));
+    if (attributes.contains("timeout")) {
+      connection = new ConnectionConfig();
+      connection.setTimeout(attributes.get("timeout", Integer.class));
     }
-    if (configMap.contains("retries")) {
-      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.setRetries((Integer) configMap.get("retries"));
+    if (attributes.contains("retries")) {
+      connection = connection == null ? new ConnectionConfig() : connection;
+      connection.setRetries(attributes.get("retries", Integer.class));
     }
-    if (configMap.contains("urlParameters")) {
-      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.setUrlParameters((String) configMap.get("urlParameters"));
+    if (attributes.contains("urlParameters")) {
+      connection = connection == null ? new ConnectionConfig() : connection;
+      connection.setUrlParameters(attributes.get("urlParameters", String.class));
     }
-    if (configMap.contains("userAgentCustomization")) {
-      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.setUserAgentCustomisation((String) configMap.get("userAgentCustomization"));
+    if (attributes.contains("userAgentCustomization")) {
+      connection = connection == null ? new ConnectionConfig() : connection;
+      connection.setUserAgentCustomisation(attributes.get("userAgentCustomization", String.class));
     }
-    if (configMap.contains("useTrustStore")) {
-      connectionConfig = connectionConfig == null ? new ConnectionConfig() : connectionConfig;
-      connectionConfig.setUseTrustStore((Boolean) configMap.get("useTrustStore"));
+    if (attributes.contains("useTrustStore")) {
+      connection = connection == null ? new ConnectionConfig() : connection;
+      connection.setUseTrustStore(attributes.get("useTrustStore", Boolean.class));
     }
-    return connectionConfig;
+    return connection;
   }
 
-  private ProxyConfig proxyFromMap(final NestedAttributesMap configMap) {
-    ProxyConfig proxyConfig = null;
-    HttpProxyConfig httpProxyConfig = httpProxyFromMap(configMap.child("http"));
-    if (httpProxyConfig != null) {
-      proxyConfig = new ProxyConfig();
-      proxyConfig.withHttpProxyConfig(httpProxyConfig);
-      proxyConfig.withHttpsProxyConfig(httpProxyFromMap(configMap.child("https")));
-      if (configMap.contains("nonProxyHosts")) {
-        proxyConfig.withNonProxyHosts((configMap.require("nonProxyHosts", String.class)).split(","));
+  private ProxyConfig proxyFromMap(final NestedAttributesMap attributes) {
+    ProxyConfig proxy = null;
+    HttpProxyConfig httpProxy = httpProxyFromMap(attributes.child("http"));
+    if (httpProxy != null) {
+      proxy = new ProxyConfig();
+      proxy.withHttpProxyConfig(httpProxy);
+      proxy.withHttpsProxyConfig(httpProxyFromMap(attributes.child("https")));
+      if (attributes.contains("nonProxyHosts")) {
+        proxy.withNonProxyHosts((attributes.require("nonProxyHosts", String.class)).split(","));
       }
     }
-    return proxyConfig;
+    return proxy;
   }
 
-  private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap configMap) {
-    HttpProxyConfig httpProxyConfig = null;
-    if (configMap.contains("hostname")) {
-      httpProxyConfig = new HttpProxyConfig();
-      httpProxyConfig.setHostname((String) configMap.get("hostname"));
-      httpProxyConfig.setPort((Integer) configMap.get("port"));
-      httpProxyConfig.setAuthenticationConfig(authenticationFromMap(configMap.child("authentication")));
+  private HttpProxyConfig httpProxyFromMap(final NestedAttributesMap attributes) {
+    HttpProxyConfig httpProxy = null;
+    if (attributes.contains("hostname")) {
+      httpProxy = new HttpProxyConfig();
+      httpProxy.setHostname(attributes.get("hostname", String.class));
+      httpProxy.setPort(attributes.get("port", Integer.class));
+      httpProxy.setAuthenticationConfig(authenticationFromMap(attributes.child("authentication")));
     }
-    return httpProxyConfig;
+    return httpProxy;
   }
 
-  private AuthenticationConfig authenticationFromMap(final NestedAttributesMap configMap) {
-    if (configMap.contains("type")) {
-      final AuthenticationConfigMarshaller marshaller = authenticationConfigMarshallers.get(configMap.get("type"));
-      return marshaller.fromMap(configMap);
+  private AuthenticationConfig authenticationFromMap(final NestedAttributesMap attributes) {
+    String type = attributes.get("type", String.class);
+    if (type != null) {
+      AuthenticationConfigMarshaller marshaller = marshallers.get(type);
+      checkState(marshaller != null);
+      return marshaller.fromMap(attributes);
     }
     return null;
   }
