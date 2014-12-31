@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.app.PluginStrings', {
-  '@aggregate_priority': 0,
+  '@aggregate_priority': 90,
 
   singleton: true,
   requires: [

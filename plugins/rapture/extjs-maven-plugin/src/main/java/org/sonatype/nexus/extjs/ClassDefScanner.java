@@ -132,13 +132,13 @@ public class ClassDefScanner
       allClasses.add(def);
     }
 
-    // Sort all classes by priority, so that lower-priority value is closer to the top (ie. processed sooner)
-    // ie. priority=0 is closer to the top than priority=10
+    // Sort all classes by priority, so that higher-priority value is closer to the start and processed sooner
+    // ie. priority=10 is closer to the start than priority=1
     Collections.sort(allClasses, new Comparator<ClassDef>()
     {
       @Override
       public int compare(final ClassDef a, final ClassDef b) {
-        return Double.compare(a.getPriority(), b.getPriority());
+        return Double.compare(b.getPriority(), a.getPriority());
       }
     });
 

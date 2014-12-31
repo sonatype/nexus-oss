@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.app.PluginConfig', {
-  '@aggregate_priority': 0,
+  '@aggregate_priority': 100,
 
   requires: [
     'NX.app.PluginStrings'

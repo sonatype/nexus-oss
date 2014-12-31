@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.app.PluginStrings', {
-  '@aggregate_priority': 1,
+  '@aggregate_priority': 90,
 
   singleton: true,
 

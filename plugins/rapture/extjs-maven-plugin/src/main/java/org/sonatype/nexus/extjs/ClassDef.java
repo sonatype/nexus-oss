@@ -40,7 +40,7 @@ public class ClassDef
 
   private final List<String> alias = Lists.newArrayList();
 
-  private double priority = Double.MAX_VALUE;
+  private double priority = 0;
 
   private String extend;
 
