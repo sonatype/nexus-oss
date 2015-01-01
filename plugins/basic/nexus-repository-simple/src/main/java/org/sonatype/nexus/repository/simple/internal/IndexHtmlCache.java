@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
-public class SimpleContentIndexHtmlCache
+public class IndexHtmlCache
     extends ComponentSupport
 {
   private final TemplateEngine templateEngine;
@@ -42,7 +42,7 @@ public class SimpleContentIndexHtmlCache
   private volatile String htmlCache;
 
   @Inject
-  public SimpleContentIndexHtmlCache(final @Named("shared") TemplateEngine templateEngine) {
+  public IndexHtmlCache(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template

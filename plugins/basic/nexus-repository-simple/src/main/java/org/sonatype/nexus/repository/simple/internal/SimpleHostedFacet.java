@@ -46,13 +46,13 @@ public class SimpleHostedFacet
 {
   private final EventBus eventBus;
 
-  private final SimpleContentIndexHtmlCache indexHtmlCache;
+  private final IndexHtmlCache indexHtmlCache;
 
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
   @Inject
   public SimpleHostedFacet(final EventBus eventBus,
-                           final SimpleContentIndexHtmlCache indexHtmlCache)
+                           final IndexHtmlCache indexHtmlCache)
   {
     this.eventBus = checkNotNull(eventBus);
     this.indexHtmlCache = checkNotNull(indexHtmlCache);

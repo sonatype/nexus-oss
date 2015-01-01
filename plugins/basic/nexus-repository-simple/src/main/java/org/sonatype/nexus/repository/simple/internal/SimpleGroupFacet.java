@@ -58,14 +58,14 @@ public class SimpleGroupFacet
 
   private final RepositoryManager repositoryManager;
 
-  private final SimpleContentIndexHtmlCache indexHtmlCache;
+  private final IndexHtmlCache indexHtmlCache;
 
   private final Set<String> memberNames = Sets.newLinkedHashSet();
 
   @Inject
   public SimpleGroupFacet(final EventBus eventBus,
                           final RepositoryManager repositoryManager,
-                          final SimpleContentIndexHtmlCache indexHtmlCache)
+                          final IndexHtmlCache indexHtmlCache)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryManager = checkNotNull(repositoryManager);
