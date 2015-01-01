@@ -24,7 +24,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
 import org.sonatype.nexus.repository.types.GroupType;
-import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
@@ -59,7 +58,7 @@ public class SimpleGroupRecipe
   private final SimpleContentReadonlyHandler contentHandler;
 
   @Inject
-  public SimpleGroupRecipe(final @Named(HostedType.NAME) Type type,
+  public SimpleGroupRecipe(final @Named(GroupType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
                            final Provider<ConfigurableViewFacet> viewFacet,
                            final Provider<SimpleGroupFacet> groupFacet,
