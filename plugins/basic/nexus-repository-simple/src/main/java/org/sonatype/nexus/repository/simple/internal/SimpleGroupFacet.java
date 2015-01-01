@@ -24,7 +24,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
@@ -53,6 +52,8 @@ public class SimpleGroupFacet
     extends FacetSupport
     implements SimpleContentFacet
 {
+  public static final String CONFIG_KEY = "group";
+
   private final EventBus eventBus;
 
   private final RepositoryManager repositoryManager;
@@ -80,10 +81,8 @@ public class SimpleGroupFacet
   protected void doInit(final Repository repository) throws Exception {
     reset();
 
-    // FIXME: refine api here
-    Configuration config = repository.getConfiguration();
-    NestedAttributesMap attrs = config.attributes("group");
-    memberNames.addAll(attrs.require("memberNames", COLLECTION_STRING));
+    NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
+    memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
   }
 
