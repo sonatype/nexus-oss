@@ -37,6 +37,9 @@ Ext.define('NX.view.drilldown.Details', {
   initComponent: function() {
     var me = this;
 
+    // Right-align actions
+    //me.actions.unshift('->');
+
     me.items = [
       {
         xtype: 'panel',

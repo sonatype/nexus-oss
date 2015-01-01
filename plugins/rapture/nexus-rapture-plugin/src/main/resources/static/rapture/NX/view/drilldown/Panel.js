@@ -118,6 +118,7 @@ Ext.define('NX.view.drilldown.Panel', {
     var content = me.up('#feature-content');
     var root = content.down('#feature-root');
     var breadcrumb = content.down('#breadcrumb');
+    var actions = content.down('#nx-actions');
 
     if (me.currentIndex == 0) {
       // Feature's home page, no breadcrumb required
