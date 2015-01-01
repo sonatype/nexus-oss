@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.httpclient;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
@@ -27,23 +28,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
+@Named
 public class HttpClientFacetImpl
     extends FacetSupport
   implements HttpClientFacet
 {
   public static final String CONFIG_KEY = "httpclient";
 
-  private final HttpClientFactory httpClientFactory;
+  private final HttpClientFactory factory;
 
   private final HttpClientConfigMarshaller marshaller;
 
   private HttpClient httpClient;
 
   @Inject
-  public HttpClientFacetImpl(final HttpClientFactory httpClientFactory,
+  public HttpClientFacetImpl(final HttpClientFactory factory,
                              final HttpClientConfigMarshaller marshaller)
   {
-    this.httpClientFactory = checkNotNull(httpClientFactory);
+    this.factory = checkNotNull(factory);
     this.marshaller = checkNotNull(marshaller);
   }
 
@@ -51,7 +53,7 @@ public class HttpClientFacetImpl
   protected void doInit(final Repository repository) throws Exception {
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     HttpClientConfig config = marshaller.unmarshall(attributes);
-    httpClient = httpClientFactory.create(config);
+    httpClient = factory.create(config);
     log.debug("Created HTTP client: {}", httpClient);
   }
 

@@ -18,6 +18,7 @@
     orient:insert into repository_configuration SET repository_name=\'test1\', recipe_name=\'simple-hosted\'
     orient:insert into repository_configuration SET repository_name=\'test2\', recipe_name=\'simple-hosted\'
     orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'memberNames\': [\'test1\', \'test2\'] }}
+    orient:insert into repository_configuration SET repository_name=\'testproxy1\', recipe_name=\'simple-proxy\', attributes={\'proxy\': { \'remoteUrl\': \'http://repo1.maven.org/maven2/junit/junit\' }}
     system:shutdown --force --reboot
 
 # Interact
@@ -37,3 +38,7 @@
     curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/A.md
     curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test2/B.md
     curl -v -X GET http://localhost:8081/repository/testgroup1/
+
+## Proxy
+
+    curl -v -X GET http://localhost:8081/repository/testproxy1/4.12/junit-4.12.pom
