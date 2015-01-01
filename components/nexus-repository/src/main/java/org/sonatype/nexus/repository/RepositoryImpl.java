@@ -104,7 +104,7 @@ public class RepositoryImpl
   public void start() throws Exception {
     checkState(!started, "Already started");
 
-    log.debug("Starting");
+    log.trace("Starting");
 
     for (Facet facet : facets) {
       log.debug("Starting facet: {}", facet);
@@ -115,14 +115,14 @@ public class RepositoryImpl
 
     started = true;
 
-    log.debug("Started");
+    log.trace("Started");
   }
 
   @Override
   public void stop() throws Exception {
     checkState(started, "Not started");
 
-    log.debug("Stopping");
+    log.trace("Stopping");
 
     for (Facet facet : facets) {
       log.debug("Stopping facet: {}", facet);
@@ -133,12 +133,12 @@ public class RepositoryImpl
 
     started = false;
 
-    log.debug("Stopped");
+    log.trace("Stopped");
   }
 
   @Override
   public void destroy() throws Exception {
-    log.debug("Destroying");
+    log.trace("Destroying");
 
     if (started) {
       stop();
@@ -153,7 +153,7 @@ public class RepositoryImpl
 
     eventBus.post(new RepositoryDestroyedEvent(this));
 
-    log.debug("Destroyed");
+    log.trace("Destroyed");
   }
 
   //

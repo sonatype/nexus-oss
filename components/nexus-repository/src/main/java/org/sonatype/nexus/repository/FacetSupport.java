@@ -53,9 +53,9 @@ public abstract class FacetSupport
     checkState(this.repository == null, "Already initialized");
     this.repository = checkNotNull(repository);
 
-    log.debug("Initialising");
+    log.trace("Initialising");
     doInit(repository);
-    log.debug("Initialized");
+    log.trace("Initialized");
   }
 
   protected void doInit(final Repository repository) throws Exception {
@@ -65,10 +65,10 @@ public abstract class FacetSupport
   @Override
   public final void start() throws Exception {
     checkState(!started, "Already started");
-    log.debug("Starting");
+    log.trace("Starting");
     doStart();
     started = true;
-    log.debug("Started");
+    log.trace("Started");
   }
 
   protected void doStart() throws Exception {
@@ -78,10 +78,10 @@ public abstract class FacetSupport
   @Override
   public final void stop() throws Exception {
     checkState(started, "Not started");
-    log.debug("Stopping");
+    log.trace("Stopping");
     doStop();
     started = false;
-    log.debug("Stopped");
+    log.trace("Stopped");
   }
 
   protected void doStop() throws Exception {
@@ -90,13 +90,13 @@ public abstract class FacetSupport
 
   @Override
   public final void destroy() throws Exception {
-    log.debug("Destroying");
+    log.trace("Destroying");
     if (started) {
       stop();
     }
     doDestroy();
     repository = null;
-    log.debug("Destroyed");
+    log.trace("Destroyed");
   }
 
   protected void doDestroy() throws Exception {
