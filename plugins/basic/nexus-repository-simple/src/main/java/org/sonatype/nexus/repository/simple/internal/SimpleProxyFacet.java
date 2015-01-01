@@ -85,7 +85,7 @@ public class SimpleProxyFacet
   }
 
   /**
-   * Find content in members, first non-null content wins.
+   * ???
    */
   @Nullable
   @Override
