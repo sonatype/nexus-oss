@@ -38,14 +38,8 @@ public class SimpleProxyFacet
 
   private String remoteUrl;
 
-  private void reset() {
-    remoteUrl = null;
-  }
-
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    reset();
-
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     remoteUrl = attributes.require("remoteUrl", String.class);
     log.debug("Remote URL: {}", remoteUrl);
@@ -53,7 +47,7 @@ public class SimpleProxyFacet
 
   @Override
   protected void doDestroy() throws Exception {
-    reset();
+    remoteUrl = null;
   }
 
   /**

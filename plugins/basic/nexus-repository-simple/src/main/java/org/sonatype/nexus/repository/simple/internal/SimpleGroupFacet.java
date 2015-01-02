@@ -66,14 +66,8 @@ public class SimpleGroupFacet
     this.repositoryManager = checkNotNull(repositoryManager);
   }
 
-  private void reset() {
-    memberNames.clear();
-  }
-
   @Override
   protected void doInit(final Repository repository) throws Exception {
-    reset();
-
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
@@ -81,7 +75,7 @@ public class SimpleGroupFacet
 
   @Override
   protected void doDestroy() throws Exception {
-    reset();
+    memberNames.clear();
   }
 
   /**

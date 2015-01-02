@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
@@ -44,18 +43,9 @@ public class SimpleStorageFacet
 {
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
-  private void reset() {
-    store.clear();
-  }
-
-  @Override
-  protected void doInit(final Repository repository) throws Exception {
-    reset();
-  }
-
   @Override
   protected void doDestroy() throws Exception {
-    reset();
+    store.clear();
   }
 
   @Override

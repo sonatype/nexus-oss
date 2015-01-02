@@ -20,7 +20,6 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
@@ -57,11 +56,6 @@ public class SimpleIndexFacet
     template = getClass().getResource("index.vm");
     checkNotNull(template);
     log.debug("Template: {}", template);
-  }
-
-  @Override
-  protected void doInit(final Repository repository) throws Exception {
-    htmlCache = null;
   }
 
   @Override
