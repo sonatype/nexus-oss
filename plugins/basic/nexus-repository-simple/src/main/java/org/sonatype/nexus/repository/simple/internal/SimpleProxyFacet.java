@@ -43,21 +43,15 @@ public class SimpleProxyFacet
 
   private final EventBus eventBus;
 
-  private final IndexHtmlCache indexHtmlCache;
-
   private String remoteUrl;
 
   @Inject
-  public SimpleProxyFacet(final EventBus eventBus,
-                          final IndexHtmlCache indexHtmlCache)
-  {
+  public SimpleProxyFacet(final EventBus eventBus) {
     this.eventBus = checkNotNull(eventBus);
-    this.indexHtmlCache = checkNotNull(indexHtmlCache);
   }
 
   private void reset() {
     remoteUrl = null;
-    indexHtmlCache.invalidate();
   }
 
   @Override
@@ -119,7 +113,7 @@ public class SimpleProxyFacet
   @Override
   public String indexHtml() {
     ensureStarted();
-    return indexHtmlCache.get(getRepository(), this);
+    return getRepository().facet(SimpleIndexFacet.class).get(entries());
   }
 
   /**

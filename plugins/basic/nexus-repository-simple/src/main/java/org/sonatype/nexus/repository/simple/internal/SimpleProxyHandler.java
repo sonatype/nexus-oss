@@ -14,6 +14,8 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
@@ -26,29 +28,22 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
+
+// TODO: Remove storage bits from here, leave that for another handler
+// TODO: This should handle the remoting/proxy aspects only and use interceptors to get into storage
 
 /**
- * Support for simple content handlers.
+ * Simple content proxy handler.
  *
  * @since 3.0
  */
-public abstract class SimpleContentHandlerSupport
+@Named
+@Singleton
+public class SimpleProxyHandler
     extends ComponentSupport
     implements Handler
 {
-  protected static final boolean MUTABLE = true;
-
-  protected static final boolean READONLY = false;
-
-  private final boolean mutable;
-
-  public SimpleContentHandlerSupport(final boolean mutable) {
-    this.mutable = mutable;
-  }
-
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
@@ -59,52 +54,17 @@ public abstract class SimpleContentHandlerSupport
 
     SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
 
-    if (mutable) {
-      // mutable
-      switch (method) {
-        case GET: {
-          SimpleContent content = facet.get(name);
-          if (content == null) {
-            return HttpResponses.notFound(name);
-          }
-          return HttpResponses.ok(content.toPayload());
+    switch (method) {
+      case GET: {
+        SimpleContent content = facet.get(name);
+        if (content == null) {
+          return HttpResponses.notFound(name);
         }
-
-        case PUT: {
-          SimpleContent content = new SimpleContent(context.getRequest().getPayload());
-          SimpleContent prev = facet.put(name, content);
-          if (prev == null) {
-            return HttpResponses.created();
-          }
-          return HttpResponses.noContent();
-        }
-
-        case DELETE: {
-          SimpleContent prev = facet.delete(name);
-          if (prev == null) {
-            return HttpResponses.notFound(name);
-          }
-          return HttpResponses.noContent();
-        }
-
-        default:
-          return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
+        return HttpResponses.ok(content.toPayload());
       }
-    }
-    else {
-      // readonly
-      switch (method) {
-        case GET: {
-          SimpleContent content = facet.get(name);
-          if (content == null) {
-            return HttpResponses.notFound(name);
-          }
-          return HttpResponses.ok(content.toPayload());
-        }
 
-        default:
-          return HttpResponses.methodNotAllowed(method, GET);
-      }
+      default:
+        return HttpResponses.methodNotAllowed(method, GET);
     }
   }
 

@@ -42,6 +42,10 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
+// FIXME: This should not extend SimpleContentFacet, as groups don't really have content
+// FIXME: This facet should only manage the members and expose means to determine content entries from members
+// FIXME: Maybe index cache also be managed here too.  May need an IndexHtmlFacet and make this implement both?
+
 /**
  * Group {@link SimpleContentFacet}.
  *
@@ -58,23 +62,18 @@ public class SimpleGroupFacet
 
   private final RepositoryManager repositoryManager;
 
-  private final IndexHtmlCache indexHtmlCache;
-
   private final Set<String> memberNames = Sets.newLinkedHashSet();
 
   @Inject
   public SimpleGroupFacet(final EventBus eventBus,
-                          final RepositoryManager repositoryManager,
-                          final IndexHtmlCache indexHtmlCache)
+                          final RepositoryManager repositoryManager)
   {
     this.eventBus = checkNotNull(eventBus);
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.indexHtmlCache = checkNotNull(indexHtmlCache);
   }
 
   private void reset() {
     memberNames.clear();
-    indexHtmlCache.invalidate();
   }
 
   @Override
@@ -159,7 +158,7 @@ public class SimpleGroupFacet
   @Override
   public String indexHtml() {
     ensureStarted();
-    return indexHtmlCache.get(getRepository(), this);
+    return getRepository().facet(SimpleIndexFacet.class).get(entries());
   }
 
   /**
@@ -194,7 +193,7 @@ public class SimpleGroupFacet
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
     if (memberNames.contains(event.getRepository().getName())) {
-      indexHtmlCache.invalidate();
+      getRepository().facet(SimpleIndexFacet.class).invalidate();
     }
   }
 

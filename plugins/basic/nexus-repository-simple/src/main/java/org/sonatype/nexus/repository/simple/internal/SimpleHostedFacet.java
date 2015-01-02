@@ -46,21 +46,15 @@ public class SimpleHostedFacet
 {
   private final EventBus eventBus;
 
-  private final IndexHtmlCache indexHtmlCache;
-
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
   @Inject
-  public SimpleHostedFacet(final EventBus eventBus,
-                           final IndexHtmlCache indexHtmlCache)
-  {
+  public SimpleHostedFacet(final EventBus eventBus) {
     this.eventBus = checkNotNull(eventBus);
-    this.indexHtmlCache = checkNotNull(indexHtmlCache);
   }
 
   private void reset() {
     store.clear();
-    indexHtmlCache.invalidate();
   }
 
   @Override
@@ -96,7 +90,7 @@ public class SimpleHostedFacet
         content
     );
 
-    indexHtmlCache.invalidate();
+    getRepository().facet(SimpleIndexFacet.class).invalidate();
 
     if (prev == null) {
       eventBus.post(new SimpleContentCreatedEvent(getRepository(), content));
@@ -118,7 +112,7 @@ public class SimpleHostedFacet
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
 
-      indexHtmlCache.invalidate();
+      getRepository().facet(SimpleIndexFacet.class).invalidate();
 
       eventBus.post(new SimpleContentDeletedEvent(getRepository(), prev));
     }
@@ -133,6 +127,6 @@ public class SimpleHostedFacet
   @Override
   public String indexHtml() {
     ensureStarted();
-    return indexHtmlCache.get(getRepository(), this);
+    return getRepository().facet(SimpleIndexFacet.class).get(entries());
   }
 }

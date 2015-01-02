@@ -49,34 +49,39 @@ public class SimpleGroupRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
+  private final Provider<SimpleIndexFacet> indexFacet;
+
   private final Provider<SimpleGroupFacet> groupFacet;
 
   private final TimingHandler timingHandler;
 
   private final SimpleIndexHandler indexHandler;
 
-  private final SimpleContentReadonlyHandler contentHandler;
+  private final SimpleGroupHandler groupHandler;
 
   @Inject
   public SimpleGroupRecipe(final @Named(GroupType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
                            final Provider<ConfigurableViewFacet> viewFacet,
+                           final Provider<SimpleIndexFacet> indexFacet,
                            final Provider<SimpleGroupFacet> groupFacet,
                            final TimingHandler timingHandler,
                            final SimpleIndexHandler indexHandler,
-                           final SimpleContentReadonlyHandler contentHandler)
+                           final SimpleGroupHandler groupHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
+    this.indexFacet = checkNotNull(indexFacet);
     this.groupFacet = checkNotNull(groupFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
-    this.contentHandler = checkNotNull(contentHandler);
+    this.groupHandler = checkNotNull(groupHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
+    repository.attach(indexFacet.get());
     repository.attach(groupFacet.get());
   }
 
@@ -97,7 +102,7 @@ public class SimpleGroupRecipe
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
-        .handler(contentHandler)
+        .handler(groupHandler)
         .create());
 
     builder.defaultHandlers(

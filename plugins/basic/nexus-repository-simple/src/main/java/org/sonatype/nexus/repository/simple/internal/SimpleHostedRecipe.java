@@ -49,34 +49,39 @@ public class SimpleHostedRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
+  private final Provider<SimpleIndexFacet> indexFacet;
+
   private final Provider<SimpleHostedFacet> contentFacet;
 
   private final TimingHandler timingHandler;
 
   private final SimpleIndexHandler indexHandler;
 
-  private final SimpleContentMutableHandler contentHandler;
+  private final SimpleStorageHandler storageHandler;
 
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
                             final Provider<ConfigurableViewFacet> viewFacet,
+                            final Provider<SimpleIndexFacet> indexFacet,
                             final Provider<SimpleHostedFacet> contentFacet,
                             final TimingHandler timingHandler,
                             final SimpleIndexHandler indexHandler,
-                            final SimpleContentMutableHandler contentHandler)
+                            final SimpleStorageHandler storageHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
+    this.indexFacet = checkNotNull(indexFacet);
     this.contentFacet = checkNotNull(contentFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
-    this.contentHandler = checkNotNull(contentHandler);
+    this.storageHandler = checkNotNull(storageHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
+    repository.attach(indexFacet.get());
     repository.attach(contentFacet.get());
   }
 
@@ -97,7 +102,7 @@ public class SimpleHostedRecipe
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
-        .handler(contentHandler)
+        .handler(storageHandler)
         .create());
 
     builder.defaultHandlers(

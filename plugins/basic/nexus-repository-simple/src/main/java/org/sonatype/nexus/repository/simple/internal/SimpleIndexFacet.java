@@ -14,26 +14,30 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import java.net.URL;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Simple content {@code index.html} cache.
+ * Simple {@code index.html} facet.
  *
  * @since 3.0
  */
 @Named
-public class IndexHtmlCache
-    extends ComponentSupport
+@Facet.Exposed
+public class SimpleIndexFacet
+    extends FacetSupport
 {
   private final TemplateEngine templateEngine;
 
@@ -42,7 +46,7 @@ public class IndexHtmlCache
   private volatile String htmlCache;
 
   @Inject
-  public IndexHtmlCache(final @Named("shared") TemplateEngine templateEngine) {
+  public SimpleIndexFacet(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template
@@ -51,9 +55,21 @@ public class IndexHtmlCache
     log.debug("Template: {}", template);
   }
 
-  public String get(final Repository repository, final SimpleContentFacet facet) {
-    checkNotNull(repository);
-    checkNotNull(facet);
+  @Override
+  protected void doInit(final Repository repository) throws Exception {
+    htmlCache = null;
+  }
+
+  @Override
+  protected void doDestroy() throws Exception {
+    htmlCache = null;
+  }
+
+  // TODO: refactor to allow more flexible passing of contents for hosted/proxy and group
+  // TODO: group shouldn't have a content-facet, so we'll need to expose the entries directly not the facet
+
+  public String get(final Set<Entry<String, SimpleContent>> entries) {
+    checkNotNull(entries);
 
     // resolve volatile to local for thread sanity
     String html = htmlCache;
@@ -61,8 +77,8 @@ public class IndexHtmlCache
     // maybe generate index.html
     if (html == null) {
       html = templateEngine.render(this, template, new TemplateParameters()
-          .set("repository", repository)
-          .set("contents", facet.entries()));
+          .set("repository", getRepository())
+          .set("contents", entries));
 
       // cache index.html
       htmlCache = html;

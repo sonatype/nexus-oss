@@ -50,6 +50,8 @@ public class SimpleProxyRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
+  private final Provider<SimpleIndexFacet> indexFacet;
+
   private final Provider<HttpClientFacet> httpClientFacet;
 
   private final Provider<SimpleProxyFacet> proxyFacet;
@@ -58,30 +60,37 @@ public class SimpleProxyRecipe
 
   private final SimpleIndexHandler indexHandler;
 
-  private final SimpleContentReadonlyHandler contentHandler;
+  private final SimpleProxyHandler proxyHandler;
+
+  private final SimpleStorageHandler storageHandler;
 
   @Inject
   public SimpleProxyRecipe(final @Named(ProxyType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
                            final Provider<ConfigurableViewFacet> viewFacet,
+                           final Provider<SimpleIndexFacet> indexFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
                            final TimingHandler timingHandler,
                            final SimpleIndexHandler indexHandler,
-                           final SimpleContentReadonlyHandler contentHandler)
+                           final SimpleProxyHandler proxyHandler,
+                           final SimpleStorageHandler storageHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
+    this.indexFacet = checkNotNull(indexFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
-    this.contentHandler = checkNotNull(contentHandler);
+    this.proxyHandler = checkNotNull(proxyHandler);
+    this.storageHandler = checkNotNull(storageHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
+    repository.attach(indexFacet.get());
     repository.attach(httpClientFacet.get());
     repository.attach(proxyFacet.get());
   }
@@ -103,7 +112,8 @@ public class SimpleProxyRecipe
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
-        .handler(contentHandler)
+        .handler(proxyHandler)
+        .handler(storageHandler)
         .create());
 
     builder.defaultHandlers(
