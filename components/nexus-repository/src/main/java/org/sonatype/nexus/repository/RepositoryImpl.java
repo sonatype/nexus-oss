@@ -97,7 +97,7 @@ public class RepositoryImpl
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
 
-    log.debug("Initialized");
+    log.trace("Initialized");
   }
 
   @Override

@@ -63,7 +63,7 @@ public class FacetLookup
     List<Class<? extends Facet>> types = exposedTypes(root);
     checkState(!types.isEmpty(), "No exposed facets: %s", root);
 
-    log.debug("Adding facet: {}, exposed as: {}", facet, types);
+    log.trace("Adding facet: {}, exposed as: {}", facet, types);
 
     // verify we are not clobbering existing facet types
     for (Class<? extends Facet> type : types) {
