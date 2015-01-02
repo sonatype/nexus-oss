@@ -85,13 +85,10 @@
       <!--<artifactId>orientdb-object</artifactId>-->
     <!--</dependency>-->
 
-    <!--
-    NOTE: excluding for now, enable once we need graphdb features.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>com.orientechnologies</groupId>-->
-      <!--<artifactId>orientdb-graphdb</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-graphdb</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>commons-beanutils</groupId>
