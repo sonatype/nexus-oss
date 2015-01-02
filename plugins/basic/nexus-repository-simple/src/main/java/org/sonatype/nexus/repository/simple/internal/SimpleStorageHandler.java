@@ -31,8 +31,6 @@ import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
 
-// TODO: Make this the storage handler (as its used by proxy and hosted)
-
 /**
  * Simple content hosted handler.
  *

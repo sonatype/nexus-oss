@@ -30,9 +30,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 
-// TODO: Replace group bits in SimpleGroupFacet (which is presently a storage sub-class)
-// TODO: Groups do not have any storage (sans index.html which is separate)
-
 /**
  * Simple content group handler.
  *

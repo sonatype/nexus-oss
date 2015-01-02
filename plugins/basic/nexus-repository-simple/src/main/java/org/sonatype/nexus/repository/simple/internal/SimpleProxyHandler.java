@@ -26,9 +26,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
 
-// TODO: Remove storage bits from here, leave that for another handler
-// TODO: This should handle the remoting/proxy aspects only and use interceptors to get into storage
-
 /**
  * Simple content proxy handler.
  *
