@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.Feeds', {
     'NX.Permissions',
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-feed-list',

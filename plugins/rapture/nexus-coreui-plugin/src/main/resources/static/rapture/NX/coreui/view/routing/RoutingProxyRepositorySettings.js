@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
   alias: 'widget.nx-coreui-routing-proxy-repository-settings',
   requires: [
     'NX.Conditions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   config: {

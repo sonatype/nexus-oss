@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-repositorytarget-settings',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_TARGETS_DETAILS_SETTINGS_TAB'),
   items: { xtype: 'nx-coreui-repositorytarget-settings-form' }

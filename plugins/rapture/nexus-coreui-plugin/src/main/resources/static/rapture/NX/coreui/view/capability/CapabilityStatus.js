@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.capability.CapabilityStatus', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-status',
+  requires: [
+    'NX.I18n'
+  ],
 
   autoScroll: true,
   html: '',

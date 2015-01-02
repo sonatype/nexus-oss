@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-ldapserver-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'LdapServer',
 

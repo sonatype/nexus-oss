@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.search.SaveSearchFilter', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-search-save',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('BROWSE_SEARCH_SAVE_TITLE'),
   defaultFocus: 'name',

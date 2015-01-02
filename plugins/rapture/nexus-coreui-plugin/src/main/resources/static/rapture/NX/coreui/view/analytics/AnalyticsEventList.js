@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.analytics.AnalyticsEventList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-analytics-event-list',
   requires: [
-    'Ext.XTemplate'
+    'Ext.XTemplate',
+    'NX.I18n'
   ],
 
   store: 'AnalyticsEvent',

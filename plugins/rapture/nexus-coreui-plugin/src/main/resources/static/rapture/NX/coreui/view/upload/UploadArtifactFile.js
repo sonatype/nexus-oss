@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.upload.UploadArtifactFile', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-upload-artifact-file',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function() {
     var me = this;

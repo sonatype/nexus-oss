@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
   alias: 'widget.nx-coreui-user-settings-external-form',
   requires: [
     'NX.Conditions',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.I18n'
   ],
 
   api: {

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-task-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Task',
 

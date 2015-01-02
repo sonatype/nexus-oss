@@ -20,6 +20,9 @@
 Ext.define('NX.view.SettingsForm', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-settingsform',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @cfg {boolean} [settingsForm=true] Marker that we have a settings form

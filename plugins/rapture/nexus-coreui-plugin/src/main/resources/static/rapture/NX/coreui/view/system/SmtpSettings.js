@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-system-smtp-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**

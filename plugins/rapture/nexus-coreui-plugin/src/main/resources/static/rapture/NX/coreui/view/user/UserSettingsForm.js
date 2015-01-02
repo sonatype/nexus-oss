@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-user-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {

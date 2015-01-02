@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-ldapserver-connection-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {

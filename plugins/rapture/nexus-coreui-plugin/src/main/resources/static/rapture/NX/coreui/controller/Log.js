@@ -28,7 +28,8 @@ Ext.define('NX.coreui.controller.Log', {
     'NX.util.Url',
     'NX.util.DownloadHelper',
     'NX.Permissions',
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   views: [

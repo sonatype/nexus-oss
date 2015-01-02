@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-repository-settings-virtual-form',
   requires: [
-    'NX.coreui.store.RepositoryReference'
+    'NX.coreui.store.RepositoryReference',
+    'NX.I18n'
   ],
 
   api: {

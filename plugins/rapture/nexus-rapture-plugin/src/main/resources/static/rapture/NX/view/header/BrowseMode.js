@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.BrowseMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-browse-mode',
-
   requires: [
     'NX.I18n'
   ],

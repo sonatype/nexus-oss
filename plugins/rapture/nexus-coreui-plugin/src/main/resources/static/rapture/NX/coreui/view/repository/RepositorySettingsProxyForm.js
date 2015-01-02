@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
   alias: 'widget.nx-repository-settings-proxy-form',
   requires: [
     'NX.coreui.view.AuthenticationSettings',
-    'NX.coreui.view.HttpRequestSettings'
+    'NX.coreui.view.HttpRequestSettings',
+    'NX.I18n'
   ],
 
   api: {

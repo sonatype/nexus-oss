@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-ldapserver-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_LDAP_CREATE_TITLE'),

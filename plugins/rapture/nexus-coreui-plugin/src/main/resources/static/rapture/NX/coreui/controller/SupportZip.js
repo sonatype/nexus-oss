@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.SupportZip', {
     'NX.Security',
     'NX.util.Base64',
     'NX.util.Url',
-    'NX.util.DownloadHelper'
+    'NX.util.DownloadHelper',
+    'NX.I18n'
   ],
 
   mixins: {

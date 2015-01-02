@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-pem',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_SSL_PASTE_TITLE'),

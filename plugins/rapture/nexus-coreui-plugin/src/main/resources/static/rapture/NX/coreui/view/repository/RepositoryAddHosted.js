@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddHosted', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-hosted',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_HOSTED_TITLE'),
 

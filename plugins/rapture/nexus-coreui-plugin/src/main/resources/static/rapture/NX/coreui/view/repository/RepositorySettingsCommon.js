@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-repository-settings-common',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',

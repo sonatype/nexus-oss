@@ -20,6 +20,9 @@
 Ext.define('NX.view.AddWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-addwindow',
+  requires: [
+    'NX.I18n'
+  ],
 
   layout: 'fit',
   autoShow: true,

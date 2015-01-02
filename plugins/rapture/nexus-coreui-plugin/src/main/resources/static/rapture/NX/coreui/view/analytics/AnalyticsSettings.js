@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-analytics-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**

@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-login-credentials',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_TITLE'),

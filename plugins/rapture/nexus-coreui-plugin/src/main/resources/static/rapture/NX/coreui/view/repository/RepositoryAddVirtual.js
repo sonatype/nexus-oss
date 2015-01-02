@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-virtual',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_VIRTUAL_TITLE'),
 

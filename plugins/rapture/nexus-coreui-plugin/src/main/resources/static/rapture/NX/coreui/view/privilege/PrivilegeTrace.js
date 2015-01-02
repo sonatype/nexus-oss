@@ -25,7 +25,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
     'Ext.util.MixedCollection',
     'NX.Icons',
     'NX.coreui.store.Role',
-    'NX.coreui.store.Privilege'
+    'NX.coreui.store.Privilege',
+    'NX.I18n'
   ],
 
   layout: {

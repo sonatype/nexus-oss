@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-summary',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),

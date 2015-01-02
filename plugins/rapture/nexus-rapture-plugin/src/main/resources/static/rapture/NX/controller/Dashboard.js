@@ -19,7 +19,6 @@
  */
 Ext.define('NX.controller.Dashboard', {
   extend: 'Ext.app.Controller',
-
   requires: [
     'NX.I18n'
   ],

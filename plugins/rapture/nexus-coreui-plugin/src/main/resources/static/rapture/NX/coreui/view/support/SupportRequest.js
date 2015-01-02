@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.support.SupportRequest', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-support-supportrequest',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: {
     xtype: 'nx-settingsform',

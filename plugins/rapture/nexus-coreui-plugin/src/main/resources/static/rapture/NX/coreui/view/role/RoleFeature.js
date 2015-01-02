@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.role.RoleFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-role-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'role-default',
 

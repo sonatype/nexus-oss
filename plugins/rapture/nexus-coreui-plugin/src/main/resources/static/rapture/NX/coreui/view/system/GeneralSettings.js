@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
   alias: 'widget.nx-coreui-system-general-settings',
   requires: [
     'NX.Conditions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   /**

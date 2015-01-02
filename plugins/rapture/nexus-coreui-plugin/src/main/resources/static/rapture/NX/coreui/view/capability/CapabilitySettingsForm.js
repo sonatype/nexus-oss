@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.capability.CapabilitySettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-capability-settings-form',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: [
     {

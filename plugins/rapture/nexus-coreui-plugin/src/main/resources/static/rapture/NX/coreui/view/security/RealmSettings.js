@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
   alias: 'widget.nx-coreui-security-realm-settings',
   requires: [
     'NX.Conditions',
-    'NX.ext.form.field.ItemSelector'
+    'NX.ext.form.field.ItemSelector',
+    'NX.I18n'
   ],
 
   /**

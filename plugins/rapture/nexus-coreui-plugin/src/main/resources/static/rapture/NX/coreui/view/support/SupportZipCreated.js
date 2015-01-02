@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.support.SupportZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-support-supportzipcreated',
   requires: [
-      'NX.Icons'
+      'NX.Icons',
+      'NX.I18n'
   ],
 
   fileType: 'Support ZIP',

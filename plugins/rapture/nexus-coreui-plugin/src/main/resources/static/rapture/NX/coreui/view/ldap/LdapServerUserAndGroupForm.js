@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {

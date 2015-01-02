@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repositoryroute-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_ROUTING_CREATE_TITLE'),

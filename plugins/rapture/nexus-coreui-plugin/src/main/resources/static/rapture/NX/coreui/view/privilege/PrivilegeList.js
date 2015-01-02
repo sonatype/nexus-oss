@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-privilege-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'Privilege',

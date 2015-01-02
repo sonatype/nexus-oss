@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.view.support.SysInfo', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-support-sysinfo',
-  ui: 'inset',
-
   requires: [
-    'Ext.XTemplate'
+    'Ext.XTemplate',
+    'NX.I18n'
   ],
+  ui: 'inset',
 
   layout: 'fit',
   autoScroll: true,

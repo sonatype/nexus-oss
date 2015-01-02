@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-user-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'User',
 

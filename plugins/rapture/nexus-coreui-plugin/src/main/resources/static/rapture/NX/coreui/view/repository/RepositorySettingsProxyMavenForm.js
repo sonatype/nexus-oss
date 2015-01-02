@@ -25,7 +25,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
   ],
   requires: [
     'NX.coreui.view.AuthenticationSettings',
-    'NX.coreui.view.HttpRequestSettings'
+    'NX.coreui.view.HttpRequestSettings',
+    'NX.I18n'
   ],
 
   api: {

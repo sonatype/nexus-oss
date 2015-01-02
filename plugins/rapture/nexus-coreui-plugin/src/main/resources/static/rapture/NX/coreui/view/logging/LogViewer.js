@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.logging.LogViewer', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-log-viewer',
+  requires: [
+    'NX.I18n'
+  ],
 
   layout: 'fit',
 

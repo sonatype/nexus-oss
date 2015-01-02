@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repository-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Repository',
 

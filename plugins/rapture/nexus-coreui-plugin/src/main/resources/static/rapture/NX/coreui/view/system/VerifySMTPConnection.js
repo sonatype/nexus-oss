@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-system-verifysmtpconnection',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_SMTP_VERIFY_TITLE'),

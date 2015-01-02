@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.role.RoleSettingsForm', {
   alias: 'widget.nx-coreui-role-settings-form',
   requires: [
     'NX.Conditions',
-    'NX.coreui.store.Role'
+    'NX.coreui.store.Role',
+    'NX.I18n'
   ],
 
   api: {

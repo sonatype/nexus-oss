@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.support.SupportZip', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-support-supportzip',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**

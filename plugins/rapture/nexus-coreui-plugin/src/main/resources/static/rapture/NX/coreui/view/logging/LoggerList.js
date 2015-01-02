@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.logging.LoggerList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-logger-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Logger',
 

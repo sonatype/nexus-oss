@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.maven.MavenUpload', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-maven-upload',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: {
     xtype: 'nx-coreui-upload-artifact',

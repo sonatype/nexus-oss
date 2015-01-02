@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
   requires: [
     'NX.Conditions',
     'NX.coreui.store.RepositoryReference',
-    'NX.coreui.model.Reference'
+    'NX.coreui.model.Reference',
+    'NX.I18n'
   ],
 
   api: {

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.support.FileCreated', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-support-filecreated',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @cfg Icon to show (img)

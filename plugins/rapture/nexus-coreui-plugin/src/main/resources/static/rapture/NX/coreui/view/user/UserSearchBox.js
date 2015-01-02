@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.user.UserSearchBox', {
   extend: 'Ext.form.field.Trigger',
   alias: 'widget.nx-coreui-user-searchbox',
   requires: [
-    'Ext.util.KeyNav'
+    'Ext.util.KeyNav',
+    'NX.I18n'
   ],
 
   emptyText: NX.I18n.get('ADMIN_USERS_LIST_FILTER_PLACEHOLDER'),

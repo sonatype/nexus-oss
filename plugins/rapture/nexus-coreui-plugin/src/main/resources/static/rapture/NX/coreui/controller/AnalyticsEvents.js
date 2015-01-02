@@ -25,7 +25,8 @@ Ext.define('NX.coreui.controller.AnalyticsEvents', {
     'NX.Conditions',
     'NX.State',
     'NX.Messages',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.I18n'
   ],
 
   stores: [

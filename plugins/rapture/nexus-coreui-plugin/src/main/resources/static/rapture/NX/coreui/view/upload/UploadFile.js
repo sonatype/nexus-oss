@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.upload.UploadFile', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-coreui-upload-file',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @cfg entry name

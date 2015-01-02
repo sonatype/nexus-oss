@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-server',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_SSL_LOAD_TITLE'),

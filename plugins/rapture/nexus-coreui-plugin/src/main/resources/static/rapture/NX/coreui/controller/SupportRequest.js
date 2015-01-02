@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.SupportRequest', {
   requires: [
     'NX.State',
     'NX.Permissions',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
 
   views: [

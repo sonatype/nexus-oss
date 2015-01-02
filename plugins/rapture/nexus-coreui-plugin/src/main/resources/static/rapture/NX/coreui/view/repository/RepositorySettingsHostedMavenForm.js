@@ -23,6 +23,9 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedMavenForm', {
     'widget.nx-repository-settings-hosted-maven1-form',
     'widget.nx-repository-settings-hosted-maven2-form'
   ],
+  requires: [
+    'NX.I18n'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateHostedMaven'

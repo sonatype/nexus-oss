@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedulefieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   autoHeight: false,
   autoScroll: true,

@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.AdminMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-admin-mode',
-
   requires: [
     'NX.I18n'
   ],

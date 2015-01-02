@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-task-add',
   requires: [
-      'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'),

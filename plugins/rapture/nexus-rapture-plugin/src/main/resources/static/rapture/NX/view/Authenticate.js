@@ -20,6 +20,9 @@
 Ext.define('NX.view.Authenticate', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-authenticate',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: 'Authenticate',
 

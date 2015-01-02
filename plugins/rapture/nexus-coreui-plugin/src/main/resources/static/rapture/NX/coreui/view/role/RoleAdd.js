@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-role-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),

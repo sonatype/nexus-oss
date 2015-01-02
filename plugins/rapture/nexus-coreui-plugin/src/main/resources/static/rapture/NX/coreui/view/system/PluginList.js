@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.system.PluginList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-system-pluginlist',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'PluginInfo',
 

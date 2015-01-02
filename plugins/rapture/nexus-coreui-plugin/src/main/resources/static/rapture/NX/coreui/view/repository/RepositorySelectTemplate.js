@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-repository-selecttemplate',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'),
 

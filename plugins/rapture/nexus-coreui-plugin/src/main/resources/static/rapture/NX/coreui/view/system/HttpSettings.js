@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
   requires: [
     'NX.Conditions',
     'NX.coreui.view.AuthenticationSettings',
-    'NX.coreui.view.HttpRequestSettings'
+    'NX.coreui.view.HttpRequestSettings',
+    'NX.I18n'
   ],
 
   /**

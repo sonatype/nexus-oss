@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-testresults',
   requires: [
-    'Ext.data.JsonStore'
+    'Ext.data.JsonStore',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_LDAP_MAPPING_TITLE'),

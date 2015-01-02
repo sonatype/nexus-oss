@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-security-anonymous-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   initComponent: function () {

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsLocalStorage', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-repository-settings-localstorage',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.HttpRequestSettings', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-httprequestsettings',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: [
     {

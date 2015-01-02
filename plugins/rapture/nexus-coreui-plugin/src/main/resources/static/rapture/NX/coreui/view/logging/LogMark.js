@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-log-mark',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),

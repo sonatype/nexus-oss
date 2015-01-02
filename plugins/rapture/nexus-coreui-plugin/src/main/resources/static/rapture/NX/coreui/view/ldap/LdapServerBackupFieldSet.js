@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerBackupFieldSet', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-backup-fieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',

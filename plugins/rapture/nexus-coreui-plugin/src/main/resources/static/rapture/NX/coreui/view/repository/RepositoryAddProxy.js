@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddProxy', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-proxy',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_PROXY_TITLE'),
 

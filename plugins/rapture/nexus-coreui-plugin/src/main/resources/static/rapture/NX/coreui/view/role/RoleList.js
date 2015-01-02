@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-role-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'Role',

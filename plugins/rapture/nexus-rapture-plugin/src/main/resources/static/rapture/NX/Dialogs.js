@@ -19,6 +19,9 @@
  */
 Ext.define('NX.Dialogs', {
   singleton: true,
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @public

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-fieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',

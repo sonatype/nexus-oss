@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddHostedMaven', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: ['widget.nx-repository-add-hosted-maven1', 'widget.nx-repository-add-hosted-maven2'],
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_MAVEN_TITLE'),
 

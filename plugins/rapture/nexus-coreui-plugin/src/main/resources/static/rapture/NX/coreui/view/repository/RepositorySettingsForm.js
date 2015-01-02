@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repository-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**

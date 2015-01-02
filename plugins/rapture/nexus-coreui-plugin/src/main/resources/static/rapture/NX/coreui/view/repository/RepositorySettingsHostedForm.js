@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsHostedForm', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-repository-settings-hosted-form',
+  requires: [
+    'NX.I18n'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateHosted'

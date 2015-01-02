@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserAccount', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-user-account',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function () {
     var me = this;

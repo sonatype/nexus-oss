@@ -20,9 +20,9 @@
 Ext.define('NX.view.ChangeOrderWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-changeorderwindow',
-
   requires: [
-    'NX.ext.form.field.ItemOrderer'
+    'NX.ext.form.field.ItemOrderer',
+    'NX.I18n'
   ],
 
   layout: 'fit',

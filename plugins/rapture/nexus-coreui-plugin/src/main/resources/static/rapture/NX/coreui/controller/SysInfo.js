@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.util.Url',
     'NX.util.DownloadHelper',
     'NX.Messages',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'

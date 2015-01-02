@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.AuthenticationSettings', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-authenticationsettings',
+  requires: [
+    'NX.I18n',
+  ],
 
   namePrefix: undefined,
 

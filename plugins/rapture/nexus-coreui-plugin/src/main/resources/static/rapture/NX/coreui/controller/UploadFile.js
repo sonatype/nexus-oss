@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.UploadFile', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Messages'
+    'NX.Messages',
+    'NX.I18n'
   ],
 
   views: [

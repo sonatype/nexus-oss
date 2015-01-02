@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.logging.LoggerAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-logger-add',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'),
   defaultFocus: 'name',

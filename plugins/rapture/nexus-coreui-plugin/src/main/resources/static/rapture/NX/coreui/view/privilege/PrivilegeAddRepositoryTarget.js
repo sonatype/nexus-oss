@@ -24,7 +24,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.Conditions',
     'NX.coreui.store.RepositoryReference',
     'NX.coreui.store.RepositoryTarget',
-    'NX.coreui.model.Reference'
+    'NX.coreui.model.Reference',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'),

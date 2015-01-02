@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-sslcertificate-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'SslCertificate',

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.feed.FeedList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-feed-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Feed',
 

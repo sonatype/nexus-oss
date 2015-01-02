@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
   requires: [
     'Ext.grid.column.Column',
     'NX.Conditions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   models: [
