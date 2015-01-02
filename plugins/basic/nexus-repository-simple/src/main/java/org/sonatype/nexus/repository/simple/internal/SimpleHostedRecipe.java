@@ -49,13 +49,13 @@ public class SimpleHostedRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
-  private final Provider<SimpleIndexFacet> indexFacet;
+  private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
 
   private final Provider<SimpleStorageFacet> storageFacet;
 
   private final TimingHandler timingHandler;
 
-  private final SimpleIndexHandler indexHandler;
+  private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleStorageHandler storageHandler;
 
@@ -63,25 +63,25 @@ public class SimpleHostedRecipe
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
                             final Provider<ConfigurableViewFacet> viewFacet,
-                            final Provider<SimpleIndexFacet> indexFacet,
+                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                             final Provider<SimpleStorageFacet> storageFacet,
                             final TimingHandler timingHandler,
-                            final SimpleIndexHandler indexHandler,
+                            final SimpleIndexHtmlHandler indexHtmlHandler,
                             final SimpleStorageHandler storageHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
-    this.indexFacet = checkNotNull(indexFacet);
+    this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
-    this.indexHandler = checkNotNull(indexHandler);
+    this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.storageHandler = checkNotNull(storageHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
-    repository.attach(indexFacet.get());
+    repository.attach(indexHtmlFacet.get());
     repository.attach(storageFacet.get());
   }
 
@@ -96,7 +96,7 @@ public class SimpleHostedRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
-        .handler(indexHandler)
+        .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()

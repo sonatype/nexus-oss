@@ -50,7 +50,7 @@ public class SimpleProxyRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
-  private final Provider<SimpleIndexFacet> indexFacet;
+  private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
 
   private final Provider<HttpClientFacet> httpClientFacet;
 
@@ -60,7 +60,7 @@ public class SimpleProxyRecipe
 
   private final TimingHandler timingHandler;
 
-  private final SimpleIndexHandler indexHandler;
+  private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleProxyHandler proxyHandler;
 
@@ -70,23 +70,23 @@ public class SimpleProxyRecipe
   public SimpleProxyRecipe(final @Named(ProxyType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
                            final Provider<ConfigurableViewFacet> viewFacet,
-                           final Provider<SimpleIndexFacet> indexFacet,
+                           final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
                            final Provider<SimpleStorageFacet> storageFacet,
                            final TimingHandler timingHandler,
-                           final SimpleIndexHandler indexHandler,
+                           final SimpleIndexHtmlHandler indexHtmlHandler,
                            final SimpleProxyHandler proxyHandler,
                            final SimpleStorageHandler storageHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
-    this.indexFacet = checkNotNull(indexFacet);
+    this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
     this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
-    this.indexHandler = checkNotNull(indexHandler);
+    this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
     this.storageHandler = checkNotNull(storageHandler);
   }
@@ -94,7 +94,7 @@ public class SimpleProxyRecipe
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
-    repository.attach(indexFacet.get());
+    repository.attach(indexHtmlFacet.get());
     repository.attach(httpClientFacet.get());
     repository.attach(proxyFacet.get());
     repository.attach(storageFacet.get());
@@ -111,7 +111,7 @@ public class SimpleProxyRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
-        .handler(indexHandler)
+        .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()

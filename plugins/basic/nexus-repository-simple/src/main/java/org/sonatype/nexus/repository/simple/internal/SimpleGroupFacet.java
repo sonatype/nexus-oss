@@ -156,11 +156,12 @@ public class SimpleGroupFacet
   //
 
   /**
-   * Invalidate index cache if any member repositories are mutated.
+   * Invalidate index.html cache if any member repositories are mutated.
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
     if (memberNames.contains(event.getRepository().getName())) {
-      getRepository().facet(SimpleIndexFacet.class).invalidate();
+      SimpleIndexHtmlFacet indexHtml = getRepository().facet(SimpleIndexHtmlFacet.class);
+      indexHtml.invalidate();
     }
   }
 

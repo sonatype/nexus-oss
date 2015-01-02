@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 @Facet.Exposed
-public class SimpleIndexFacet
+public class SimpleIndexHtmlFacet
     extends FacetSupport
 {
   private final TemplateEngine templateEngine;
@@ -48,13 +48,13 @@ public class SimpleIndexFacet
   private volatile String htmlCache;
 
   @Inject
-  public SimpleIndexFacet(final @Named("shared") TemplateEngine templateEngine) {
+  public SimpleIndexHtmlFacet(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template
     template = getClass().getResource("index.vm");
     checkNotNull(template);
-    log.debug("Template: {}", template);
+    log.trace("Template: {}", template);
   }
 
   @Override

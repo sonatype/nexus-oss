@@ -34,7 +34,7 @@ import static org.sonatype.nexus.repository.view.ContentTypes.TEXT_HTML;
  */
 @Named
 @Singleton
-public class SimpleIndexHandler
+public class SimpleIndexHtmlHandler
     extends ComponentSupport
     implements Handler
 {
@@ -45,11 +45,10 @@ public class SimpleIndexHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' index.html", method, repository.getName());
 
-    SimpleIndexFacet index = repository.facet(SimpleIndexFacet.class);
-
     switch (method) {
       case GET: {
-        return HttpResponses.ok(new StringPayload(index.get(), TEXT_HTML));
+        SimpleIndexHtmlFacet indexHtml = repository.facet(SimpleIndexHtmlFacet.class);
+        return HttpResponses.ok(new StringPayload(indexHtml.get(), TEXT_HTML));
       }
 
       default:
