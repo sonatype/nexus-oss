@@ -32,7 +32,6 @@ import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,17 +57,12 @@ public class SimpleGroupFacet
 {
   public static final String CONFIG_KEY = "group";
 
-  private final EventBus eventBus;
-
   private final RepositoryManager repositoryManager;
 
   private final Set<String> memberNames = Sets.newLinkedHashSet();
 
   @Inject
-  public SimpleGroupFacet(final EventBus eventBus,
-                          final RepositoryManager repositoryManager)
-  {
-    this.eventBus = checkNotNull(eventBus);
+  public SimpleGroupFacet(final RepositoryManager repositoryManager) {
     this.repositoryManager = checkNotNull(repositoryManager);
   }
 
@@ -83,16 +77,6 @@ public class SimpleGroupFacet
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
-  }
-
-  @Override
-  protected void doStart() throws Exception {
-    eventBus.register(this);
-  }
-
-  @Override
-  protected void doStop() throws Exception {
-    eventBus.unregister(this);
   }
 
   @Override

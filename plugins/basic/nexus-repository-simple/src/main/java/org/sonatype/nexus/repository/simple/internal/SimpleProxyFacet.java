@@ -14,7 +14,6 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Facet;
@@ -22,7 +21,6 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,14 +36,7 @@ public class SimpleProxyFacet
 {
   public static final String CONFIG_KEY = "proxy";
 
-  private final EventBus eventBus;
-
   private String remoteUrl;
-
-  @Inject
-  public SimpleProxyFacet(final EventBus eventBus) {
-    this.eventBus = checkNotNull(eventBus);
-  }
 
   private void reset() {
     remoteUrl = null;
@@ -58,16 +49,6 @@ public class SimpleProxyFacet
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     remoteUrl = attributes.require("remoteUrl", String.class);
     log.debug("Remote URL: {}", remoteUrl);
-  }
-
-  @Override
-  protected void doStart() throws Exception {
-    eventBus.register(this);
-  }
-
-  @Override
-  protected void doStop() throws Exception {
-    eventBus.unregister(this);
   }
 
   @Override

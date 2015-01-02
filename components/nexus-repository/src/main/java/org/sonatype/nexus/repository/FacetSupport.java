@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.inject.Inject;
+
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -26,7 +29,17 @@ public abstract class FacetSupport
     extends ComponentSupport
     implements Facet
 {
-  // TODO: Hook up EventBus and default register/unregister logic
+  private EventBus eventBus;
+
+  @Inject
+  public void installDependencies(final EventBus eventBus) {
+    this.eventBus = checkNotNull(eventBus);
+  }
+
+  protected EventBus getEventBus() {
+    checkState(eventBus != null);
+    return eventBus;
+  }
 
   private Repository repository;
 
@@ -69,6 +82,7 @@ public abstract class FacetSupport
     checkState(!started, "Already started");
     log.trace("Starting");
     doStart();
+    eventBus.register(this);
     started = true;
     log.trace("Started");
   }
@@ -81,6 +95,7 @@ public abstract class FacetSupport
   public final void stop() throws Exception {
     checkState(started, "Not started");
     log.trace("Stopping");
+    eventBus.unregister(this);
     doStop();
     started = false;
     log.trace("Stopped");

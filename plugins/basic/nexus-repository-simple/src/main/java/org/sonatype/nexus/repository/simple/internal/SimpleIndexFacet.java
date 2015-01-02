@@ -14,8 +14,6 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import java.net.URL;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,13 +21,11 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
@@ -47,8 +43,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleIndexFacet
     extends FacetSupport
 {
-  private final EventBus eventBus;
-
   private final TemplateEngine templateEngine;
 
   private final URL template;
@@ -56,10 +50,7 @@ public class SimpleIndexFacet
   private volatile String htmlCache;
 
   @Inject
-  public SimpleIndexFacet(final EventBus eventBus,
-                          final @Named("shared") TemplateEngine templateEngine)
-  {
-    this.eventBus = checkNotNull(eventBus);
+  public SimpleIndexFacet(final @Named("shared") TemplateEngine templateEngine) {
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template
@@ -74,25 +65,11 @@ public class SimpleIndexFacet
   }
 
   @Override
-  protected void doStart() throws Exception {
-    eventBus.register(this);
-  }
-
-  @Override
-  protected void doStop() throws Exception {
-    eventBus.unregister(this);
-  }
-
-  @Override
   protected void doDestroy() throws Exception {
     htmlCache = null;
   }
 
-  // TODO: refactor to allow more flexible passing of contents for hosted/proxy and group
-  // TODO: group shouldn't have a content-facet, so we'll need to expose the entries directly not the facet
-
-  public String get(final Set<Entry<String, SimpleContent>> entries) {
-    checkNotNull(entries);
+  public String get() {
     ensureStarted();
 
     // resolve volatile to local for thread sanity
@@ -100,9 +77,11 @@ public class SimpleIndexFacet
 
     // maybe generate index.html
     if (html == null) {
+      SimpleContentFacet content = getRepository().facet(SimpleContentFacet.class);
+
       html = templateEngine.render(this, template, new TemplateParameters()
           .set("repository", getRepository())
-          .set("contents", entries));
+          .set("contents", content.entries()));
 
       // cache index.html
       htmlCache = html;
@@ -110,11 +89,6 @@ public class SimpleIndexFacet
     }
 
     return html;
-  }
-
-  public String get() {
-    SimpleContentFacet content = getRepository().facet(SimpleContentFacet.class);
-    return get(content.entries());
   }
 
   public void invalidate() {
@@ -130,8 +104,7 @@ public class SimpleIndexFacet
    * Invalidate index cache when contents change.
    */
   private void maybeInvalidate(final SimpleContentEvent event) {
-    // TODO: object equality probably is fine here?
-    if (event.getRepository().getName().equals(getRepository().getName())) {
+    if (event.getRepository() == getRepository()) {
       invalidate();
     }
   }
