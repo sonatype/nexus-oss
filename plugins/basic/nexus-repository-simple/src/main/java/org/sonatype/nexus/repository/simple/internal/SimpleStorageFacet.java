@@ -119,10 +119,4 @@ public class SimpleStorageFacet
   public Set<Map.Entry<String, SimpleContent>> entries() {
     return ImmutableSet.copyOf(store.entrySet());
   }
-
-  @Override
-  public String indexHtml() {
-    ensureStarted();
-    return getRepository().facet(SimpleIndexFacet.class).get(entries());
-  }
 }

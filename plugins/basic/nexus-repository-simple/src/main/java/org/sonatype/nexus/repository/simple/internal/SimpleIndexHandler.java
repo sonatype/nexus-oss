@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -47,11 +46,11 @@ public class SimpleIndexHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' index.html", method, repository.getName());
 
-    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+    SimpleIndexFacet facet = repository.facet(SimpleIndexFacet.class);
 
     switch (method) {
       case GET: {
-        return HttpResponses.ok(new StringPayload(facet.indexHtml(), TEXT_HTML));
+        return HttpResponses.ok(new StringPayload(facet.get(), TEXT_HTML));
       }
 
       default:

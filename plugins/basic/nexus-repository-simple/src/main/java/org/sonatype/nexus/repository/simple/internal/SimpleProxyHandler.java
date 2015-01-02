@@ -18,9 +18,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
-import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -28,7 +25,6 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 
 // TODO: Remove storage bits from here, leave that for another handler
 // TODO: This should handle the remoting/proxy aspects only and use interceptors to get into storage
@@ -52,20 +48,23 @@ public class SimpleProxyHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+    // HACK: Disable this for now
+    //SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+    //
+    //switch (method) {
+    //  case GET: {
+    //    SimpleContent content = facet.get(name);
+    //    if (content == null) {
+    //      return HttpResponses.notFound(name);
+    //    }
+    //    return HttpResponses.ok(content.toPayload());
+    //  }
+    //
+    //  default:
+    //    return HttpResponses.methodNotAllowed(method, GET);
+    //}
 
-    switch (method) {
-      case GET: {
-        SimpleContent content = facet.get(name);
-        if (content == null) {
-          return HttpResponses.notFound(name);
-        }
-        return HttpResponses.ok(content.toPayload());
-      }
-
-      default:
-        return HttpResponses.methodNotAllowed(method, GET);
-    }
+    throw new RuntimeException("Not implemented");
   }
 
   /**

@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
@@ -92,6 +93,7 @@ public class SimpleIndexFacet
 
   public String get(final Set<Entry<String, SimpleContent>> entries) {
     checkNotNull(entries);
+    ensureStarted();
 
     // resolve volatile to local for thread sanity
     String html = htmlCache;
@@ -108,6 +110,11 @@ public class SimpleIndexFacet
     }
 
     return html;
+  }
+
+  public String get() {
+    SimpleContentFacet content = getRepository().facet(SimpleContentFacet.class);
+    return get(content.entries());
   }
 
   public void invalidate() {

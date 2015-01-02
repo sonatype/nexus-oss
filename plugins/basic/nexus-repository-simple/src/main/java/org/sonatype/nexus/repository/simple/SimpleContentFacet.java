@@ -40,6 +40,4 @@ public interface SimpleContentFacet
   SimpleContent delete(String name);
 
   Set<Map.Entry<String, SimpleContent>> entries();
-
-  String indexHtml();
 }

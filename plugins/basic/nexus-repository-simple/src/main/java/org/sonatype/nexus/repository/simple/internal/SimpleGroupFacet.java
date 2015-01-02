@@ -155,12 +155,6 @@ public class SimpleGroupFacet
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public String indexHtml() {
-    ensureStarted();
-    return getRepository().facet(SimpleIndexFacet.class).get(entries());
-  }
-
   /**
    * Returns a union of all member repositories contents.
    *
