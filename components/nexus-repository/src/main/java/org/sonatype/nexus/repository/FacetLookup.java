@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -24,6 +25,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,7 +40,15 @@ public class FacetLookup
   extends ComponentSupport
   implements Iterable<Facet>
 {
-  private final Map<Class<? extends Facet>, Facet> backing = Maps.newHashMap();
+  /**
+   * All facet instances.
+   */
+  private final Set<Facet> facets = Sets.newHashSet();
+
+  /**
+   * Exposed type to facet instance map.
+   */
+  private final Map<Class<? extends Facet>, Facet> exposed = Maps.newHashMap();
 
   // TODO: sort out synchronization requirement for usage
 
@@ -57,12 +67,14 @@ public class FacetLookup
 
     // verify we are not clobbering existing facet types
     for (Class<? extends Facet> type : types) {
-      checkState(!backing.containsKey(type), "Duplicate exposed facet type: %s, root type: %s", type, root);
+      checkState(!exposed.containsKey(type), "Duplicate exposed facet type: %s, root type: %s", type, root);
     }
+
+    facets.add(facet);
 
     // map all exposed types to given facet
     for (Class<? extends Facet> type : types) {
-      backing.put(type, facet);
+      exposed.put(type, facet);
     }
   }
 
@@ -94,14 +106,15 @@ public class FacetLookup
   @Nullable
   public <T extends Facet> T get(final Class<T> type) {
     checkNotNull(type);
-    return (T) backing.get(type);
+    return (T) exposed.get(type);
   }
 
   /**
    * Clear all facet bindings.
    */
   public void clear() {
-    backing.clear();
+    facets.clear();
+    exposed.clear();
   }
 
   /**
@@ -109,6 +122,6 @@ public class FacetLookup
    */
   @Override
   public Iterator<Facet> iterator() {
-    return Iterators.unmodifiableIterator(backing.values().iterator());
+    return Iterators.unmodifiableIterator(facets.iterator());
   }
 }

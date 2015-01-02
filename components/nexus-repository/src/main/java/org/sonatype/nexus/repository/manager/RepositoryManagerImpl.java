@@ -153,6 +153,7 @@ public class RepositoryManagerImpl
 
     log.debug("Starting {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
+      log.debug("Starting repository: {}", repository);
       repository.start();
 
       eventBus.post(new RepositoryRestoredEvent(repository));
@@ -168,11 +169,13 @@ public class RepositoryManagerImpl
 
     log.debug("Stopping {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
+      log.debug("Stopping repository: {}", repository);
       repository.stop();
     }
 
     log.debug("Destroying {} repositories", repositories.size());
     for (Repository repository : repositories.values()) {
+      log.debug("Destroying repository: {}", repository);
       repository.destroy();
     }
 
