@@ -76,6 +76,9 @@ Ext.define('NX.app.PluginStrings', {
     //GLOBAL_PAGINATION_CONTROL: 'Page {0} of {1}',
     //GLOBAL_PAGINATION_DISPLAYED: 'Displaying {0} of {1}',
 
+    // Drilldown
+    GLOBAL_DRILLDOWN_GO_BACK: 'Go back to {0}',
+
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',
     BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!'

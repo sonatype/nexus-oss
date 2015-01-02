@@ -23,7 +23,8 @@ Ext.define('NX.view.drilldown.Details', {
   requires: [
     'NX.Icons',
     'NX.Bookmarks',
-    'NX.ext.tab.SortedPanel'
+    'NX.ext.tab.SortedPanel',
+    'NX.view.drilldown.GoBack'
   ],
 
   /**
@@ -38,7 +39,8 @@ Ext.define('NX.view.drilldown.Details', {
     var me = this;
 
     // Right-align actions
-    //me.actions.unshift('->');
+    me.actions.unshift('->');
+    me.actions.unshift({ xtype: 'nx-go-back' });
 
     me.items = [
       {

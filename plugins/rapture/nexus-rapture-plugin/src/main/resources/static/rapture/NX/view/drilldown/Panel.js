@@ -20,6 +20,9 @@
 Ext.define('NX.view.drilldown.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-drilldown-panel',
+  requires: [
+    'NX.I18n'
+  ],
   itemId: 'nx-drilldown-panel',
 
   layout: {
@@ -114,11 +117,11 @@ Ext.define('NX.view.drilldown.Panel', {
    * Update the breadcrumb based on the itemName and itemClass of drilldown items
    */
   refreshBreadcrumb: function() {
-    var me = this;
-    var content = me.up('#feature-content');
-    var root = content.down('#feature-root');
-    var breadcrumb = content.down('#breadcrumb');
-    var actions = content.down('#nx-actions');
+    var me = this,
+      content = me.up('#feature-content'),
+      root = content.down('#feature-root'),
+      breadcrumb = content.down('#breadcrumb'),
+      back, parent;
 
     if (me.currentIndex == 0) {
       // Feature's home page, no breadcrumb required
@@ -182,6 +185,31 @@ Ext.define('NX.view.drilldown.Panel', {
             }
           })(i)
         ]);
+
+        // Set the back button for this view
+        back = me.items.items[i].down('nx-go-back');
+        if (back) {
+          // What happens on click?
+          back.setHandler(
+            function (j) {
+              // Closure within a closure
+              return function () {
+                me.showChild(j, true);
+
+                // Set the bookmark
+                console.log(j);
+                var bookmark = me.items.items[j].itemBookmark;
+                if (bookmark) {
+                  NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+                }
+              }
+            }(i - 1) // Go to the previous page
+          );
+
+          // Where does it go?
+          parent = (i == 1 ? content.currentTitle : me.items.items[i - 1].itemName);
+          back.setText(NX.I18n.format('GLOBAL_DRILLDOWN_GO_BACK', parent));
+        }
       }
 
       root.hide();
