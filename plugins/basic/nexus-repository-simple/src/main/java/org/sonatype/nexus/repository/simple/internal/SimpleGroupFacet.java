@@ -101,8 +101,8 @@ public class SimpleGroupFacet
     ensureStarted();
 
     for (Repository repository : members()) {
-      SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
-      SimpleContent content = facet.get(name);
+      SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
+      SimpleContent content = contents.get(name);
       if (content != null) {
         return content;
       }
@@ -140,8 +140,8 @@ public class SimpleGroupFacet
     Map<String, SimpleContent> union = Maps.newHashMap();
 
     for (Repository repository : members()) {
-      SimpleContentFacet content = repository.facet(SimpleContentFacet.class);
-      for (Map.Entry<String, SimpleContent> entry : content.entries()) {
+      SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
+      for (Map.Entry<String, SimpleContent> entry : contents.entries()) {
         // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {
           union.put(entry.getKey(), entry.getValue());

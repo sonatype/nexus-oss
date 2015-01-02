@@ -49,11 +49,11 @@ public class SimpleGroupHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+    SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
 
     switch (method) {
       case GET: {
-        SimpleContent content = facet.get(name);
+        SimpleContent content = contents.get(name);
         if (content == null) {
           return HttpResponses.notFound(name);
         }

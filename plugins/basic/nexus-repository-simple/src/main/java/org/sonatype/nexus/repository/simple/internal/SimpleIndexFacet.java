@@ -71,11 +71,11 @@ public class SimpleIndexFacet
 
     // maybe generate index.html
     if (html == null) {
-      SimpleContentFacet content = getRepository().facet(SimpleContentFacet.class);
+      SimpleContentFacet contents = getRepository().facet(SimpleContentFacet.class);
 
       html = templateEngine.render(this, template, new TemplateParameters()
           .set("repository", getRepository())
-          .set("contents", content.entries()));
+          .set("contents", contents.entries()));
 
       // cache index.html
       htmlCache = html;
