@@ -15525,16 +15525,17 @@
 .breadcrumb-separator {
   font-size: 18px;
   top: 7px !important;
-  padding-left: 8px;
+  color: gray;
+  padding-left: 12px;
 }
 
 /**
  * cls: 'breadcrumb-icon'
  */
-/* line 54, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
+/* line 55, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/TextItem.scss */
 .breadcrumb-icon {
   top: 9px !important;
-  margin-left: 11px;
+  margin-left: 13px;
 }
 
 /**
