@@ -35,12 +35,12 @@ import com.google.common.collect.Maps;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Hosted {@link SimpleContentFacet}.
+ * Simple storage facet.
  *
  * @since 3.0
  */
 @Named
-public class SimpleHostedFacet
+public class SimpleStorageFacet
     extends FacetSupport
     implements SimpleContentFacet
 {
@@ -49,7 +49,7 @@ public class SimpleHostedFacet
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
   @Inject
-  public SimpleHostedFacet(final EventBus eventBus) {
+  public SimpleStorageFacet(final EventBus eventBus) {
     this.eventBus = checkNotNull(eventBus);
   }
 
@@ -90,8 +90,6 @@ public class SimpleHostedFacet
         content
     );
 
-    getRepository().facet(SimpleIndexFacet.class).invalidate();
-
     if (prev == null) {
       eventBus.post(new SimpleContentCreatedEvent(getRepository(), content));
     }
@@ -111,8 +109,6 @@ public class SimpleHostedFacet
     SimpleContent prev = store.remove(name);
     if (prev != null) {
       log.debug("Deleted repository '{}' content: {} -> {}", getRepository().getName(), name, prev);
-
-      getRepository().facet(SimpleIndexFacet.class).invalidate();
 
       eventBus.post(new SimpleContentDeletedEvent(getRepository(), prev));
     }

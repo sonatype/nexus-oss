@@ -47,7 +47,7 @@ import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 // FIXME: Maybe index cache also be managed here too.  May need an IndexHtmlFacet and make this implement both?
 
 /**
- * Group {@link SimpleContentFacet}.
+ * Simple group facet.
  *
  * @since 3.0
  */

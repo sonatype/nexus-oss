@@ -51,7 +51,7 @@ public class SimpleHostedRecipe
 
   private final Provider<SimpleIndexFacet> indexFacet;
 
-  private final Provider<SimpleHostedFacet> contentFacet;
+  private final Provider<SimpleStorageFacet> storageFacet;
 
   private final TimingHandler timingHandler;
 
@@ -64,7 +64,7 @@ public class SimpleHostedRecipe
                             final @Named(SimpleFormat.NAME) Format format,
                             final Provider<ConfigurableViewFacet> viewFacet,
                             final Provider<SimpleIndexFacet> indexFacet,
-                            final Provider<SimpleHostedFacet> contentFacet,
+                            final Provider<SimpleStorageFacet> storageFacet,
                             final TimingHandler timingHandler,
                             final SimpleIndexHandler indexHandler,
                             final SimpleStorageHandler storageHandler)
@@ -72,7 +72,7 @@ public class SimpleHostedRecipe
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexFacet = checkNotNull(indexFacet);
-    this.contentFacet = checkNotNull(contentFacet);
+    this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
     this.storageHandler = checkNotNull(storageHandler);
@@ -82,7 +82,7 @@ public class SimpleHostedRecipe
   public void apply(final @Nonnull Repository repository) throws Exception {
     repository.attach(configure(viewFacet.get()));
     repository.attach(indexFacet.get());
-    repository.attach(contentFacet.get());
+    repository.attach(storageFacet.get());
   }
 
   /**

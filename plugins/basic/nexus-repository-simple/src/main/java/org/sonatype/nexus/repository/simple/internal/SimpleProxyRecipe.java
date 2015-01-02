@@ -56,6 +56,8 @@ public class SimpleProxyRecipe
 
   private final Provider<SimpleProxyFacet> proxyFacet;
 
+  private final Provider<SimpleStorageFacet> storageFacet;
+
   private final TimingHandler timingHandler;
 
   private final SimpleIndexHandler indexHandler;
@@ -71,6 +73,7 @@ public class SimpleProxyRecipe
                            final Provider<SimpleIndexFacet> indexFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
+                           final Provider<SimpleStorageFacet> storageFacet,
                            final TimingHandler timingHandler,
                            final SimpleIndexHandler indexHandler,
                            final SimpleProxyHandler proxyHandler,
@@ -81,6 +84,7 @@ public class SimpleProxyRecipe
     this.indexFacet = checkNotNull(indexFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
+    this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHandler = checkNotNull(indexHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
@@ -93,6 +97,7 @@ public class SimpleProxyRecipe
     repository.attach(indexFacet.get());
     repository.attach(httpClientFacet.get());
     repository.attach(proxyFacet.get());
+    repository.attach(storageFacet.get());
   }
 
   /**

@@ -13,31 +13,28 @@
 
 package org.sonatype.nexus.repository.simple.internal;
 
-import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Proxy {@link SimpleContentFacet}.
+ * Simple proxy facet.
  *
  * @since 3.0
  */
 @Named
+@Facet.Exposed
 public class SimpleProxyFacet
     extends FacetSupport
-    implements SimpleContentFacet
 {
   public static final String CONFIG_KEY = "proxy";
 
@@ -82,46 +79,12 @@ public class SimpleProxyFacet
    * ???
    */
   @Nullable
-  @Override
   public SimpleContent get(final String name) {
     checkNotNull(name);
     ensureStarted();
 
     // TODO:
 
-    return null;
-  }
-
-  /**
-   * Proxy is read-only.
-   */
-  @Nullable
-  @Override
-  public SimpleContent put(final String name, final SimpleContent content) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Proxy is read-only.
-   */
-  @Nullable
-  @Override
-  public SimpleContent delete(final String name) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String indexHtml() {
-    ensureStarted();
-    return getRepository().facet(SimpleIndexFacet.class).get(entries());
-  }
-
-  /**
-   * ???
-   */
-  @Override
-  public Set<Entry<String, SimpleContent>> entries() {
-    // TODO:
     return null;
   }
 }

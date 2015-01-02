@@ -24,8 +24,15 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
+
+import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,6 +46,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleIndexFacet
     extends FacetSupport
 {
+  private final EventBus eventBus;
+
   private final TemplateEngine templateEngine;
 
   private final URL template;
@@ -46,7 +55,10 @@ public class SimpleIndexFacet
   private volatile String htmlCache;
 
   @Inject
-  public SimpleIndexFacet(final @Named("shared") TemplateEngine templateEngine) {
+  public SimpleIndexFacet(final EventBus eventBus,
+                          final @Named("shared") TemplateEngine templateEngine)
+  {
+    this.eventBus = checkNotNull(eventBus);
     this.templateEngine = checkNotNull(templateEngine);
 
     // resolve template
@@ -58,6 +70,16 @@ public class SimpleIndexFacet
   @Override
   protected void doInit(final Repository repository) throws Exception {
     htmlCache = null;
+  }
+
+  @Override
+  protected void doStart() throws Exception {
+    eventBus.register(this);
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    eventBus.unregister(this);
   }
 
   @Override
@@ -91,5 +113,34 @@ public class SimpleIndexFacet
   public void invalidate() {
     htmlCache = null;
     log.trace("Invalided");
+  }
+
+  //
+  // Events
+  //
+
+  /**
+   * Invalidate index cache when contents change.
+   */
+  private void maybeInvalidate(final SimpleContentEvent event) {
+    // TODO: object equality probably is fine here?
+    if (event.getRepository().getName().equals(getRepository().getName())) {
+      invalidate();
+    }
+  }
+
+  @Subscribe
+  public void on(final SimpleContentCreatedEvent event) {
+    maybeInvalidate(event);
+  }
+
+  @Subscribe
+  public void on(final SimpleContentUpdatedEvent event) {
+    maybeInvalidate(event);
+  }
+
+  @Subscribe
+  public void on(final SimpleContentDeletedEvent event) {
+    maybeInvalidate(event);
   }
 }

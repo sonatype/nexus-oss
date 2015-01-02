@@ -26,6 +26,8 @@ public abstract class FacetSupport
     extends ComponentSupport
     implements Facet
 {
+  // TODO: Hook up EventBus and default register/unregister logic
+
   private Repository repository;
 
   // TODO: Sort out synchronization needed to ensure state sanity
