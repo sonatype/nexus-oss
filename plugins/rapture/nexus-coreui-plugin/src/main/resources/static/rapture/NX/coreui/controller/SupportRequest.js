@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -38,7 +38,8 @@ Ext.define('NX.coreui.controller.SupportRequest', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Support Request',
-      description: 'Submit a support request',
+      text: NX.I18n.get('ADMIN_SUPPORT_REQUEST_TITLE'),
+      description: NX.I18n.get('ADMIN_SUPPORT_REQUEST_SUBTITLE'),
       view: { xtype: 'nx-coreui-support-supportrequest' },
       iconConfig: {
         file: 'premium_support.png',

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -487,7 +487,7 @@ Ext.define('NX.controller.Menu', {
         segments = feature.path.split('/');
         parent = me.getFeatureMenuStore().getRootNode();
         for (var i = 2; i < segments.length; i++) {
-          child = parent.findChild('text', segments[i], false);
+          child = parent.findChild('path', segments.slice(0, i + 1).join('/'), false);
           if (child) {
             if (i < segments.length - 1) {
               child.data = Ext.apply(child.data, {

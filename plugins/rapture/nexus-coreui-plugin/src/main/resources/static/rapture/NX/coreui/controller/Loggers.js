@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -56,7 +56,8 @@ Ext.define('NX.coreui.controller.Loggers', {
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging',
-      description: 'Control logging verbosity levels',
+      text: NX.I18n.get('ADMIN_LOGGING_TITLE'),
+      description: NX.I18n.get('ADMIN_LOGGING_SUBTITLE'),
       view: { xtype: 'nx-coreui-logger-list' },
       iconConfig: {
         file: 'book.png',

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -34,58 +34,58 @@ Ext.define('NX.coreui.store.SearchCriteria', {
     {
       id: 'format',
       config: {
-        fieldLabel: 'Format'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_FORMAT')
       }
     },
     {
       id: 'keyword',
       config: {
-        fieldLabel: 'Keyword',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_KEYWORD'),
         width: 250
       }
     },
     {
       id: 'version',
       config: {
-        fieldLabel: 'Version'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_VERSION')
       }
     },
     {
       id: 'groupid',
       config: {
-        fieldLabel: 'Group ID',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_ID'),
         width: 250
       }
     },
     {
       id: 'artifactid',
       config: {
-        fieldLabel: 'Artifact ID'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_ARTIFACT_ID')
       }
     },
     {
       id: 'classifier',
       config: {
-        fieldLabel: 'Classifier'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASSIFIER')
       }
     },
     {
       id: 'packaging',
       config: {
-        fieldLabel: 'Packaging'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING')
       }
     },
     {
       id: 'sha-1',
       config: {
-        fieldLabel: 'SHA-1',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
         width: 250
       }
     },
     {
       id: 'classname',
       config: {
-        fieldLabel: 'Class name',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASS_NAME'),
         width: 250
       }
     }

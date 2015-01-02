@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -361,13 +361,14 @@ Ext.define('NX.controller.State', {
               'Server disconnected',
               'There is a problem communicating with the server',
               {
+                buttonText: {
+                  ok: 'Retry'
+                },
+
                 fn: function () {
                   // retry after the dialog is dismissed
                   me.statusProvider.connect();
                 }
-
-                // FIXME: Show "Retry" as button text
-                // FIXME: Get icon to show up ... stupid icons
               }
           );
         }

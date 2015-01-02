@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
     'NX.Conditions'
   ],
 
-  title: 'Summary',
+  title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),
   autoScroll: true,
 
   /**
@@ -64,8 +64,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           },
           {
             xtype: 'textarea',
-            fieldLabel: 'Notes',
-            helpText: "Optional notes about configured capability.",
+            fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES'),
+            helpText: NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP'),
             name: 'notes',
             allowBlank: true,
             anchor: '100%'

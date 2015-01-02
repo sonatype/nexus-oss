@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,7 +30,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Repository',
-        description: 'Repository administration',
+        text: NX.I18n.get('ADMIN_REPOSITORY_TITLE'),
+        description: NX.I18n.get('ADMIN_REPOSITORY_SUBTITLE'),
         group: true,
         weight: 50,
         iconConfig: {
@@ -41,7 +42,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Security',
-        description: 'Security administration',
+        text: NX.I18n.get('ADMIN_SECURITY_TITLE'),
+        description: NX.I18n.get('ADMIN_SECURITY_SUBTITLE'),
         group: true,
         weight: 90,
         iconConfig: {
@@ -52,7 +54,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/Support',
-        description: 'Support tools',
+        text: NX.I18n.get('ADMIN_SUPPORT_TITLE'),
+        description: NX.I18n.get('ADMIN_SUPPORT_SUBTITLE'),
         group: true,
         iconConfig: {
           file: 'support.png',
@@ -62,7 +65,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'admin',
         path: '/System',
-        description: 'System administration',
+        text: NX.I18n.get('ADMIN_SYSTEM_TITLE'),
+        description: NX.I18n.get('ADMIN_SYSTEM_SUBTITLE'),
         group: true,
         weight: 1000,
         iconConfig: {
@@ -73,7 +77,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'browse',
         path: '/Repository',
-        description: 'Browse repositories',
+        text: NX.I18n.get('BROWSE_REPOSITORY_TITLE'),
+        description: NX.I18n.get('BROWSE_REPOSITORY_SUBTITLE'),
         group: true,
         iconConfig: {
           file: 'database.png',
@@ -83,7 +88,8 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
       {
         mode: 'browse',
         path: '/Upload',
-        description: 'Upload content to Nexus',
+        text: NX.I18n.get('BROWSE_UPLOAD_TITLE'),
+        description: NX.I18n.get('BROWSE_UPLOAD_SUBTITLE'),
         group: true,
         iconConfig: {
           file: 'upload.png',

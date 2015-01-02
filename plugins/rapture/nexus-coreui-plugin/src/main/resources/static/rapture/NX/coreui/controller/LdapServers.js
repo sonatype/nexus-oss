@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -71,7 +71,8 @@ Ext.define('NX.coreui.controller.LdapServers', {
   features: {
     mode: 'admin',
     path: '/Security/LDAP',
-    description: 'Manage LDAP servers configuration',
+    text: NX.I18n.get('ADMIN_LDAP_TITLE'),
+    description: NX.I18n.get('ADMIN_LDAP_SUBTITLE'),
     view: { xtype: 'nx-coreui-ldapserver-feature' },
     iconConfig: {
       file: 'book_addresses.png',

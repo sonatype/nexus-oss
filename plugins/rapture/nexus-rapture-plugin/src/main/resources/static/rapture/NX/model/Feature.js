@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,13 +23,7 @@ Ext.define('NX.model.Feature', {
   idProperty: 'path',
   fields: [
     { name: 'path' },
-    {
-      name: 'text',
-      convert: function (val, row) {
-        var segments = row.data.path.split('/');
-        return segments[segments.length - 1];
-      }
-    },
+    { name: 'text' },
     { name: 'mode', defaultValue: 'admin' },
     { name: 'weight', defaultValue: 100 },
     { name: 'group', defaultValue: false },

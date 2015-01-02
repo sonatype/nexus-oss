@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     me.items = {
       xtype: 'treepanel',
       itemId: 'roleTree',
-      title: 'Role Containment',
+      title: NX.I18n.get('ADMIN_ROLES_ROLE_TREE'),
       ui: 'treepanel',
       rootVisible: false,
       lines: false,

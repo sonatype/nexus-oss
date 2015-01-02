@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,7 +29,7 @@ Ext.define('NX.coreui.view.search.TextSearchCriteria', {
    */
   removable: false,
 
-  emptyText: 'any',
+  emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_FILTER_PLACEHOLDER'),
 
   padding: '0 5 0 0',
   width: 100,

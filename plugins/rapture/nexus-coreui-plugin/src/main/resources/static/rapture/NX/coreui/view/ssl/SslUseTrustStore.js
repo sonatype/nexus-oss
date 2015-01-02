@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,13 +25,13 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
     var me = this;
 
     if (!me.fieldLabel && !me.boxLabel) {
-      me.fieldLabel = 'Use Nexus TrustStore';
+      me.fieldLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
     }
     if (me.fieldLabel === true) {
-      me.fieldLabel = 'Use Nexus TrustStore';
+      me.fieldLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
     }
     if (me.boxLabel === true) {
-      me.boxLabel = 'Use Nexus TrustStore';
+      me.boxLabel = NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_TRUST_STORE');
     }
 
     me.items = {
@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
         },
         {
           xtype: 'button',
-          text: 'View Certificate',
+          text: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CERTIFICATE_BUTTON'),
           ui: 'plain',
           action: 'showcertificate',
           glyph: 'xf0a3@FontAwesome' /* fa-certificate */,

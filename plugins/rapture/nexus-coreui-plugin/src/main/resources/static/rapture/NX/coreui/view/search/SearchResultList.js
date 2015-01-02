@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
   store: 'SearchResult',
 
   viewConfig: {
-    emptyText: 'No results',
+    emptyText: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_EMPTY_STATE'),
     deferEmptyText: false
   },
 
@@ -38,7 +38,7 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
       }
     },
     {
-      header: 'Component',
+      header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_COMPONENT_COLUMN'),
       dataIndex: 'id',
       menuDisabled: true,
       resizable: false,

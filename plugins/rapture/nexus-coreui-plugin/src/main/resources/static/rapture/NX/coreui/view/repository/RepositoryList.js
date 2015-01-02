@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,15 +39,15 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
             return 'repository-default';
           }
         },
-        { header: 'Name', dataIndex: 'name', flex: 2 },
-        { header: 'Type', dataIndex: 'type',
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 2 },
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_TYPE_COLUMN'), dataIndex: 'type',
           renderer: function(value) {
             return Ext.String.capitalize(value);
           }
         },
-        { header: 'Format', dataIndex: 'formatName' },
-        { header: 'Status', renderer: me.renderStatus, flex: 1 },
-        { header: 'URL', dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FORMAT_COLUMN'), dataIndex: 'formatName' },
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_STATUS_COLUMN'), renderer: me.renderStatus, flex: 1 },
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_URL_COLUMN'), dataIndex: 'url', xtype: 'nx-linkcolumn', flex: 2 }
       ],
       defaults: {
         tdCls: 'nx-middle-align'
@@ -63,7 +63,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   },
 
   tbar: [
-    { xtype: 'button', text: 'New', glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true }
   ],
 
   plugins: [

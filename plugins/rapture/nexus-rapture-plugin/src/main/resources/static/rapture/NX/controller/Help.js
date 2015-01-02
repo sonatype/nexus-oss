@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,6 +21,7 @@ Ext.define('NX.controller.Help', {
   extend: 'Ext.app.Controller',
   requires: [
     'NX.Icons',
+    'NX.I18n',
     'NX.Windows'
   ],
   mixins: {
@@ -124,7 +125,7 @@ Ext.define('NX.controller.Help', {
 
     me.selectedFeature = feature;
 
-    featureHelp.setText('Help for: ' + text);
+    featureHelp.setText(NX.I18n.get('GLOBAL_HEADER_HELP_FEATURE') + text);
     featureHelp.setIconCls(NX.Icons.cls(iconName, 'x16'));
   },
 

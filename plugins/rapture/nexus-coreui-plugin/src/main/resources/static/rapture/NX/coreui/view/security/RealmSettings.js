@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -46,15 +46,14 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
         items: [
           {
             xtype: 'label',
-            html: '<p>Configure the active security realms and realm order.</p>' +
-                '<p>At least one security realm must be active.</p>'
+            html: NX.I18n.get('ADMIN_REALMS_HELP')
           },
           {
             xtype: 'nx-itemselector',
             name: 'realms',
             buttons: ['up', 'add', 'remove', 'down'],
-            fromTitle: 'Available',
-            toTitle: 'Active',
+            fromTitle: NX.I18n.get('ADMIN_REALMS_AVAILABLE'),
+            toTitle: NX.I18n.get('ADMIN_REALMS_ACTIVE'),
             store: 'RealmType',
             valueField: 'id',
             displayField: 'name',

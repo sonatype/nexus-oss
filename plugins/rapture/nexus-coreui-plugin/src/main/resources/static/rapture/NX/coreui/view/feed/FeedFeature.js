@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,6 +26,6 @@ Ext.define('NX.coreui.view.feed.FeedFeature', {
   masters: { xtype: 'nx-coreui-feed-list' },
 
   tabs: [
-    { xtype: 'nx-coreui-feedentry-list', title: 'Events', weight: 10 }
+    { xtype: 'nx-coreui-feedentry-list', title: NX.I18n.get('BROWSE_FEEDS_DETAILS_EVENTS_TAB'), weight: 10 }
   ]
 });

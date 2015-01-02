@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'privilegeTree',
-        title: 'Privileges',
+        title: NX.I18n.get('ADMIN_ROLES_TRACE_PRIVILEGES'),
         ui: 'treepanel',
         rootVisible: false,
         lines: false,
@@ -77,7 +77,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeTrace', {
       {
         xtype: 'treepanel',
         itemId: 'roleTree',
-        title: 'Role Containment',
+        title: NX.I18n.get('ADMIN_ROLES_TRACE_CONTAINMENT'),
         ui: 'treepanel',
         tools: [
           { type: 'collapse', tooltip: 'Collapse all', callback: function(panel) {

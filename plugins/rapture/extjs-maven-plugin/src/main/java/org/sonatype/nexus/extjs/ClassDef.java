@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -40,6 +40,8 @@ public class ClassDef
 
   private final List<String> alias = Lists.newArrayList();
 
+  private double priority = 0;
+
   private String extend;
 
   private String override;
@@ -71,6 +73,14 @@ public class ClassDef
     return source;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "name='" + name + '\'' +
+        ", source=" + source +
+        '}';
+  }
+
   public Set<String> getDependencies() {
     return dependencies;
   }
@@ -81,6 +91,14 @@ public class ClassDef
 
   public List<String> getAlias() {
     return alias;
+  }
+
+  public double getPriority() {
+    return priority;
+  }
+
+  public void setPriority(final double priority) {
+    this.priority = priority;
   }
 
   @Nullable

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -95,7 +95,10 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
     if (model &&
         (model.get('format') === 'maven2' && (model.get('type') === 'hosted') || model.get('type') === 'group')) {
       if (!hostedPanel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-routing-hosted-repository-settings', title: 'Routing' });
+        me.getFeature().addTab({
+          xtype: 'nx-coreui-routing-hosted-repository-settings',
+          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+        });
         hostedPanel = me.getHostedPanel();
       }
       hostedPanel.setRepository(model);
@@ -109,7 +112,10 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
 
     if (model && (model.get('format') === 'maven2' && model.get('type') === 'proxy')) {
       if (!proxyPanel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-routing-proxy-repository-settings', title: 'Routing' });
+        me.getFeature().addTab({
+          xtype: 'nx-coreui-routing-proxy-repository-settings',
+          title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_ROUTING_TAB')
+        });
         proxyPanel = me.getProxyPanel();
       }
       proxyPanel.setRepository(model);

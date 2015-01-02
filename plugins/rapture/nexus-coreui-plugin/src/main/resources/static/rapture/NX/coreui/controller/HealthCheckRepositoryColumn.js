@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -114,7 +114,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     if (!column) {
       column = grid.healthCheckColumn = Ext.create('Ext.grid.column.Column', {
         id: 'healthCheckColumn',
-        header: 'Health Check',
+        header: NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_COLUMN'),
         width: 120,
         renderer: Ext.bind(me.renderHealthCheckColumn, me),
         listeners: {

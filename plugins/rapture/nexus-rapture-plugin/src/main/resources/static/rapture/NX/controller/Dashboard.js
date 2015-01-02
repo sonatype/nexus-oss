@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,10 @@
 Ext.define('NX.controller.Dashboard', {
   extend: 'Ext.app.Controller',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   views: [
     'dashboard.Welcome'
   ],
@@ -31,7 +35,8 @@ Ext.define('NX.controller.Dashboard', {
       path: '/Welcome',
       mode: 'browse',
       view: 'NX.view.dashboard.Welcome',
-      description: 'Welcome to Sonatype Nexus!',
+      text: NX.I18n.get('BROWSE_WELCOME_TITLE'),
+      description: NX.I18n.get('BROWSE_WELCOME_SUBTITLE'),
       iconConfig: {
         file: 'house.png',
         variants: ['x16', 'x32']

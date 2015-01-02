@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleForm', {
     return 'Task rescheduled: ' + data['name'] + ' (' + data['typeName'] + ')';
   },
 
-  editableMarker: 'You do not have permission to update tasks',
+  editableMarker: NX.I18n.get('ADMIN_TASKS_PERMISSION_ERROR'),
 
   items: [
     {

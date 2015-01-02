@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,9 +21,13 @@ Ext.define('NX.view.header.BrowseMode', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-browse-mode',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   mode: 'browse',
   title: 'Browse',
-  tooltip: 'Browse server contents',
+  tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
   glyph: 'xf1b2@FontAwesome' /* fa-cube */
 
 });

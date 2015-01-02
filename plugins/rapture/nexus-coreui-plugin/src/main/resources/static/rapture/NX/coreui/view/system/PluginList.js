@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -32,8 +32,8 @@ Ext.define('NX.coreui.view.system.PluginList', {
         return 'plugin-default';
       }
     },
-    {header: 'Name', dataIndex: 'name', flex: 1},
-    {header: 'Version', dataIndex: 'version', flex: 1}
+    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1},
+    {header: NX.I18n.get('ADMIN_PLUGINS_LIST_VERSION_COLUMN'), dataIndex: 'version', flex: 1}
   ],
 
   plugins: [

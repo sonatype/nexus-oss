@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -102,7 +102,8 @@ Ext.define('NX.coreui.controller.Search', {
         me.getApplication().getFeaturesController().registerFeature({
           mode: 'browse',
           path: '/Search',
-          description: 'Search for components',
+          text: NX.I18n.get('BROWSE_SEARCH_TITLE'),
+          description: NX.I18n.get('BROWSE_SEARCH_SUBTITLE'),
           group: true,
           view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '' },
           iconName: 'search-default',
@@ -119,6 +120,7 @@ Ext.define('NX.coreui.controller.Search', {
           path: '/Search/' + (model.get('readOnly') ? '' : 'Saved/') + model.get('name'),
           view: { xtype: 'nx-searchfeature', searchFilter: model, bookmarkEnding: '/' + model.getId() },
           iconName: 'search-default',
+          text: model.get('text'),
           description: model.get('description'),
           authenticationRequired: false,
           visible: function() {
@@ -257,7 +259,7 @@ Ext.define('NX.coreui.controller.Search', {
     searchCriteriaPanel.add({
       xtype: 'button',
       itemId: 'addButton',
-      text: 'More Criteria',
+      text: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_MORE_BUTTON'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       menu: addCriteriaMenu
     });
@@ -403,16 +405,17 @@ Ext.define('NX.coreui.controller.Search', {
         searchResultModel = model,
         searchResultVersion = me.getSearchResultVersion(),
         searchResultDetails = me.getSearchResultDetails(),
-        searchResultVersionStore = me.getSearchResultVersionStore();
+        searchResultVersionStore = me.getSearchResultVersionStore(),
+        info = {};
 
     me.onSearchResultVersionSelection(null);
 
     if (searchResultModel) {
-      searchResultDetails.items.get(0).showInfo({
-        'Group': searchResultModel.get('groupId'),
-        'Name': searchResultModel.get('artifactId'),
-        'Format': searchResultModel.get('format')
-      });
+      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_GROUP')] = searchResultModel.get('groupId');
+      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_NAME')] = searchResultModel.get('artifactId');
+      info[NX.I18n.get('BROWSE_SEARCH_VERSIONS_FORMAT')] = searchResultModel.get('format');
+
+      searchResultDetails.items.get(0).showInfo(info);
       searchResultVersionStore.clearFilter(true);
       searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
       searchResultVersionStore.addFilter([

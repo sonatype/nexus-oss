@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -63,7 +63,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       {
         mode: 'browse',
         path: '/Repository/Standard',
-        description: 'Browse standard repositories',
+        text: NX.I18n.get('BROWSE_STANDARD_TITLE'),
+        description: NX.I18n.get('BROWSE_STANDARD_SUBTITLE'),
         view: { xtype: 'nx-coreui-repositorybrowse-feature', repositoryStore: 'BrowseStandardRepository' },
         weight: 10,
         authenticationRequired: false,
@@ -78,7 +79,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
       {
         mode: 'browse',
         path: '/Repository/Managed',
-        description: 'Browse managed repositories',
+        text: NX.I18n.get('BROWSE_MANAGED_TITLE'),
+        description: NX.I18n.get('BROWSE_MANAGED_SUBTITLE'),
         view: { xtype: 'nx-coreui-repositorybrowse-feature', repositoryStore: 'BrowseManagedRepository' },
         weight: 300,
         iconConfig: {

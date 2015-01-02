@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,28 +30,28 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'id',
       itemId: 'id',
-      fieldLabel: 'ID',
-      helpText: 'Unique identifier for the repository.',
-      emptyText: 'enter a repository id',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID_HELP'),
+      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER'),
       readOnly: true,
       validator: function(value) {
         if (/^[a-zA-Z0-9_\-\.]+$/.test(value)) {
           return true;
         }
-        return 'Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in ID';
+        return NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_ERROR');
       }
     },
     {
       name: 'name',
-      fieldLabel: 'Name',
-      helpText: 'Repository display name',
-      emptyText: 'enter a repository name'
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_HELP'),
+      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_PLACEHOLDER')
     },
     {
       name: 'providerName',
       itemId: 'providerName',
-      fieldLabel: 'Provider',
-      helpText: 'Repository content provider.',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PROVIDER_HELP'),
       readOnly: true,
       submitValue: false,
       allowBlank: true
@@ -59,8 +59,8 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
     {
       name: 'formatName',
       itemId: 'formatName',
-      fieldLabel: 'Format',
-      helpText: 'Repository content format.',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FORMAT_HELP'),
       readOnly: true,
       submitValue: false,
       allowBlank: true

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -62,7 +62,8 @@ Ext.define('NX.coreui.controller.Privileges', {
   features: {
     mode: 'admin',
     path: '/Security/Privileges',
-    description: 'Manage privileges',
+    text: NX.I18n.get('ADMIN_PRIVILEGES_TITLE'),
+    description: NX.I18n.get('ADMIN_PRIVILEGES_SUBTITLE'),
     view: { xtype: 'nx-coreui-privilege-feature' },
     iconConfig: {
       file: 'medal_gold_1.png',
@@ -104,24 +105,22 @@ Ext.define('NX.coreui.controller.Privileges', {
 
   onSelection: function (list, model) {
     var me = this,
-        info;
+        info = {};
 
     if (Ext.isDefined(model)) {
       me.getFeature().setItemClass(1, NX.Icons.cls('privilege-' + model.get('type'), 'x16'));
-      info = {
-        'Id': model.getId(),
-        'Name': model.get('name'),
-        'Description': model.get('description'),
-        'Method': model.get('method')
-      };
+      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_ID')] = model.getId();
+      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_NAME')] = model.get('name');
+      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_DESCRIPTION')] = model.get('description');
+      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_METHOD')] = model.get('method');
       if (model.get('permission')) {
-        info['Permission'] = model.get('permission');
+        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_PERMISSION')] = model.get('permission');
       }
       if (model.get('repositoryTargetName')) {
-        info['Repository Target'] = model.get('repositoryTargetName');
+        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_TARGET')] = model.get('repositoryTargetName');
       }
       if (model.get('repositoryName')) {
-        info['Repository'] = model.get('repositoryName');
+        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_REPOSITORY')] = model.get('repositoryName');
       }
 
       me.getInfo().showInfo(info);

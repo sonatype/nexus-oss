@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,7 @@
 Ext.define('NX.coreui.controller.Roles', {
   extend: 'NX.controller.Drilldown',
   requires: [
+    'NX.Conditions',
     'NX.Messages',
     'NX.Permissions'
   ],
@@ -63,7 +64,8 @@ Ext.define('NX.coreui.controller.Roles', {
   features: {
     mode: 'admin',
     path: '/Security/Roles',
-    description: 'Manage roles',
+    text: NX.I18n.get('ADMIN_ROLES_TITLE'),
+    description: NX.I18n.get('ADMIN_ROLES_SUBTITLE'),
     view: { xtype: 'nx-coreui-role-feature' },
     iconConfig: {
       file: 'user_policeman.png',
@@ -190,7 +192,7 @@ Ext.define('NX.coreui.controller.Roles', {
         });
       });
       newButton.menu.add({
-        text: 'External Role Mapping',
+        text: NX.I18n.get('ADMIN_ROLES_LIST_EXTERNAL_ROLE_ITEM'),
         menu: menuItems,
         iconCls: NX.Icons.cls('role-externalmapping', 'x16')
       });

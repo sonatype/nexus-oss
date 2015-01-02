@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -29,16 +29,16 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsLocalStorage', {
   items: [
     {
       name: 'defaultLocalStorageUrl',
-      fieldLabel: 'Default Local Storage Location',
-      helpText: 'Default location to store repository contents.',
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_LOCAL'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_LOCAL_HELP'),
       readOnly: true,
       submitValue: false
     },
     {
       name: 'overrideLocalStorageUrl',
-      fieldLabel: 'Override Local Storage Location',
-      helpText: 'Custom location to store repository contents.  Leave blank to use the default.',
-      emptyText: 'enter an override url'
+      fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_OVERRIDE'),
+      helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_OVERRIDE_HELP'),
+      emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_OVERRIDE_PLACEHOLDER')
     }
   ]
 

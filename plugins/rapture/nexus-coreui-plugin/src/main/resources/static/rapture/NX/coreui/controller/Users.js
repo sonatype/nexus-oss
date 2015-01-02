@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -79,7 +79,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'admin',
       path: '/Security/Users',
-      description: 'Manage users',
+      text: NX.I18n.get('ADMIN_USERS_TITLE'),
+      description: NX.I18n.get('ADMIN_USERS_SUBTITLE'),
       view: { xtype: 'nx-coreui-user-feature' },
       iconConfig: {
         file: 'group.png',
@@ -93,7 +94,8 @@ Ext.define('NX.coreui.controller.Users', {
     {
       mode: 'user',
       path: '/Account',
-      description: 'Manage your account',
+      text: NX.I18n.get('USER_ACCOUNT_TITLE'),
+      description: NX.I18n.get('USER_ACCOUNT_SUBTITLE'),
       view: { xtype: 'nx-coreui-user-account' },
       iconConfig: {
         file: 'user.png',

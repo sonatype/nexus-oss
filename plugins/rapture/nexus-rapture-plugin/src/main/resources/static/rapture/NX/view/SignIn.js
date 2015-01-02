@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,11 @@ Ext.define('NX.view.SignIn', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-signin',
 
-  title: 'Sign In',
+  requires: [
+    'NX.I18n'
+  ],
+
+  title: NX.I18n.get('GLOBAL_SIGN_IN_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -51,31 +55,31 @@ Ext.define('NX.view.SignIn', {
           {
             name: 'username',
             itemId: 'username',
-            fieldLabel: 'Username',
-            emptyText: 'enter your username',
+            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME'),
+            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             name: 'password',
             itemId: 'password',
-            fieldLabel: 'Password',
             inputType: 'password',
-            emptyText: 'enter your password',
+            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD'),
+            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           },
           {
             xtype: 'checkbox',
-            fieldLabel: 'Remember me',
+            fieldLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
             name: 'remember'
           }
         ],
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Sign In', action: 'signin', formBind: true, bindToEnter: true, ui: 'primary' },
-          { text: 'Cancel', handler: me.close, scope: me }
+          { text: NX.I18n.get('GLOBAL_SIGN_IN_SUBMIT'), action: 'signin', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: NX.I18n.get('GLOBAL_SIGN_IN_CANCEL'), handler: me.close, scope: me }
         ]
       }
     });

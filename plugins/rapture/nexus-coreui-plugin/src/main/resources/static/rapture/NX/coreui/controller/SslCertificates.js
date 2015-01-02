@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -63,7 +63,8 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     mode: 'admin',
     path: '/Security/SSL Certificates',
     view: { xtype: 'nx-coreui-sslcertificate-feature' },
-    description: 'Manage trusted SSL certificates for use with the Nexus Trust Store',
+    text: NX.I18n.get('ADMIN_SSL_TITLE'),
+    description: NX.I18n.get('ADMIN_SSL_SUBTITLE'),
     iconConfig: {
       file: 'ssl_certificates.png',
       variants: ['x16', 'x32']

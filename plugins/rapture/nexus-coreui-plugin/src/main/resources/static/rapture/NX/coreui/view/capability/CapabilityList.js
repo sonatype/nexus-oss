@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -32,9 +32,9 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
       dataIndex: 'state',
       hideable: false
     },
-    { text: 'Type', dataIndex: 'typeName', flex: 1 },
-    { text: 'Description', dataIndex: 'description', flex: 1, groupable: false },
-    { text: 'Notes', dataIndex: 'notes', flex: 1 }
+    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
+    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1, groupable: false },
+    { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NOTES_COLUMN'), dataIndex: 'notes', flex: 1 }
   ],
 
   viewConfig: {
@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   tbar: [
     {
       xtype: 'button',
-      text: 'New',
+      text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'),
       action: 'new',
       disabled: true,
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */

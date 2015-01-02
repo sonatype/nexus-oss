@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -32,8 +32,8 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
   },
 
   columns: [
-    { header: 'Title', dataIndex: 'title', flex: 2 },
-    { header: 'Date', dataIndex: 'published', flex: 1 }
+    { header: NX.I18n.get('BROWSE_FEEDS_DETAILS_TITLE_COLUMN'), dataIndex: 'title', flex: 2 },
+    { header: NX.I18n.get('BROWSE_FEEDS_DETAILS_DATE_COLUMN'), dataIndex: 'published', flex: 1 }
   ],
 
   dockedItems: [

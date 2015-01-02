@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -79,7 +79,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
   features: {
     mode: 'admin',
     path: '/System/Capabilities',
-    description: 'Manage capabilities',
+    text: NX.I18n.get('ADMIN_CAPABILITIES_TITLE'),
+    description: NX.I18n.get('ADMIN_CAPABILITIES_SUBTITLE'),
     view: { xtype: 'nx-coreui-capability-feature' },
     iconConfig: {
       file: 'brick.png',
@@ -204,11 +205,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   showSummary: function(model) {
     var summary = this.getSummary(),
-        info = {
-          'Type': model.get('typeName'),
-          'Description': model.get('description'),
-          'State': Ext.String.capitalize(model.get('state'))
-        };
+        info = {};
+
+    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_TYPE')] = model.get('typeName');
+    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_DESCRIPTION')] = model.get('description');
+    info[NX.I18n.get('ADMIN_CAPABILITIES_SUMMARY_STATE')] = Ext.String.capitalize(model.get('state'));
 
     if (Ext.isDefined(model.get('tags'))) {
       Ext.apply(info, model.get('tags'));

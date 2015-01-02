@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,14 @@ Ext.define('NX.view.header.User', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-user-mode',
 
+  requires: [
+    'NX.I18n'
+  ],
+
   mode: 'user',
   title: 'User',
   text: 'User',
-  tooltip: 'User profile and options',
+  tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),
   glyph: 'xf007@FontAwesome', // fa-user
 
   autoHide: false,

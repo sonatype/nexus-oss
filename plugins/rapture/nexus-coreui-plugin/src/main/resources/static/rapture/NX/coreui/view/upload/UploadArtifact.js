@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,15 +31,15 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
   items: [
     {
       xtype: 'label',
-      html: '<p>Select the artifacts you wish to upload.</p>'
+      html: '<p>' + NX.I18n.get('BROWSE_MAVEN_ARTIFACT_HELP') + '</p>'
     },
     { xtype: 'nx-coreui-upload-artifact-coordinates', hidden: true, disabled: true }
   ],
 
   buttonAlign: 'left',
   buttons: [
-    { text: 'Upload', action: 'upload', ui: 'primary', formBind: true },
-    { text: 'Discard', action: 'discard' }
+    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON'), action: 'upload', ui: 'primary', formBind: true },
+    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_DISCARD_BUTTON'), action: 'discard' }
   ]
 
 });
