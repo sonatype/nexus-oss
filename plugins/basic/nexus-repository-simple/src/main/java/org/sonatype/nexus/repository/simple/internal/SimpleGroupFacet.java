@@ -28,8 +28,8 @@ import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Lists;
@@ -48,7 +48,7 @@ import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 @Named
 public class SimpleGroupFacet
     extends FacetSupport
-    implements SimpleContentFacet
+    implements SimpleContentsFacet
 {
   public static final String CONFIG_KEY = "group";
 
@@ -100,7 +100,7 @@ public class SimpleGroupFacet
     ensureStarted();
 
     for (Repository repository : members()) {
-      SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
+      SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
       SimpleContent content = contents.get(name);
       if (content != null) {
         return content;
@@ -139,7 +139,7 @@ public class SimpleGroupFacet
     Map<String, SimpleContent> union = Maps.newHashMap();
 
     for (Repository repository : members()) {
-      SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
+      SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
       for (Map.Entry<String, SimpleContent> entry : contents.entries()) {
         // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {

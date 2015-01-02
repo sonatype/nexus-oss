@@ -23,8 +23,8 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
+import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Facet.Exposed
 public class SimpleStorageFacet
     extends FacetSupport
-    implements SimpleContentFacet
+    implements SimpleContentsFacet
 {
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 

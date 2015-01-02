@@ -19,7 +19,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
+import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -48,7 +48,7 @@ public class SimpleGroupHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    SimpleContentFacet contents = repository.facet(SimpleContentFacet.class);
+    SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
 
     switch (method) {
       case GET: {

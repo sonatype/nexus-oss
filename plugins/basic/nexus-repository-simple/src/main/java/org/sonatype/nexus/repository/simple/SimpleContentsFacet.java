@@ -20,12 +20,12 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 
 /**
- * Simple content facet.
+ * Simple contents facet.
  *
  * @since 3.0
  */
 @Facet.Exposed
-public interface SimpleContentFacet
+public interface SimpleContentsFacet
   extends Facet
 {
   @Nullable
