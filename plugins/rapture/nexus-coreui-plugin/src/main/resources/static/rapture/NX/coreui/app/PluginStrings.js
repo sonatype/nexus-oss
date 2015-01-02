@@ -792,7 +792,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_CAPABILITIES_SUMMARY_NOTES: 'Notes',
     ADMIN_CAPABILITIES_SUMMARY_NOTES_HELP: 'Optional notes about configured capability',
     ADMIN_CAPABILITIES_SETTINGS_ENABLED: 'Enable this capability',
-    ADMIN_CAPABILITIES_STATUS_EMPTY_STATE: 'Capability does not provide any status',
+    ADMIN_CAPABILITIES_STATUS_EMPTY_STATE: 'This capability does not provide any status',
 
     // Admin -> System -> Email Server
     ADMIN_SMTP_TITLE: 'Email Server',
