@@ -28,8 +28,8 @@
 @include extjs-tab-ui(
   $ui: 'light',
 
-  $ui-background-color: $color-white,
-  $ui-background-color-over: $color-smoke,
+  $ui-background-color: $color-light-smoke,
+  $ui-background-color-over: $color-gainsboro,
   $ui-background-color-active: $color-gray,
   $ui-background-color-disabled: $color-white,
   //$ui-border-radius: $tab-border-radius,
@@ -37,10 +37,10 @@
   $ui-margin: 0 2px,
   $ui-padding: 5px 12px,
   $ui-text-padding: 0,
-  $ui-border-color: $color-white,
-  $ui-border-color-over: $color-light-smoke,
+  $ui-border-color: $color-light-smoke,
+  $ui-border-color-over: $color-smoke,
   $ui-border-color-active: $color-light-gray,
-  $ui-border-color-disabled: $color-white,
+  $ui-border-color-disabled: $color-light-smoke,
 
   $ui-border-radius: 6px,
   $ui-border-width: 1px,
@@ -96,11 +96,10 @@
   $ui-strip-border-width: 1px,
   $ui-strip-plain-border-width: 1px,
   $ui-strip-border-color: $color-light-gray,
-  $ui-strip-background-color: $color-white,
+  $ui-strip-background-color: $color-light-smoke,
 
-  $ui-border-width: 0px,
-  $ui-padding: 7px 0 0 0,
-  $ui-background-color: $color-white,
+  $ui-padding: 5px 0 2px 0,
+  $ui-background-color: $color-light-smoke,
   $ui-background-gradient: $tabbar-background-gradient
 
   //$ui-scroller-width: $tabbar-scroller-width,
@@ -127,7 +126,7 @@
 // Override default treatment of the bottom borders
 .x-tab-light-top,
 .x-tab-light-top-disabled {
-  border-bottom: 1px solid $color-white;
+  border-bottom: 1px solid $color-light-smoke;
 }
 
 .x-tab-light-top-active {
@@ -135,5 +134,9 @@
 }
 
 .x-tab-light-top-over {
-  border-bottom: 1px solid $color-light-smoke;
+  border-bottom: 1px solid $color-smoke;
+}
+
+.x-panel-light {
+  border-top: 1px solid $color-light-gray;
 }
