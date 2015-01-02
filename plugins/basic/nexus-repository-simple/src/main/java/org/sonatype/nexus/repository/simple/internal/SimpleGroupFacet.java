@@ -41,10 +41,6 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
-// FIXME: This should not extend SimpleContentFacet, as groups don't really have content
-// FIXME: This facet should only manage the members and expose means to determine content entries from members
-// FIXME: Maybe index cache also be managed here too.  May need an IndexHtmlFacet and make this implement both?
-
 /**
  * Simple group facet.
  *
@@ -144,8 +140,8 @@ public class SimpleGroupFacet
     Map<String, SimpleContent> union = Maps.newHashMap();
 
     for (Repository repository : members()) {
-      SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
-      for (Map.Entry<String, SimpleContent> entry : facet.entries()) {
+      SimpleContentFacet content = repository.facet(SimpleContentFacet.class);
+      for (Map.Entry<String, SimpleContent> entry : content.entries()) {
         // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {
           union.put(entry.getKey(), entry.getValue());

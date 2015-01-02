@@ -46,11 +46,11 @@ public class SimpleIndexHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' index.html", method, repository.getName());
 
-    SimpleIndexFacet facet = repository.facet(SimpleIndexFacet.class);
+    SimpleIndexFacet index = repository.facet(SimpleIndexFacet.class);
 
     switch (method) {
       case GET: {
-        return HttpResponses.ok(new StringPayload(facet.get(), TEXT_HTML));
+        return HttpResponses.ok(new StringPayload(index.get(), TEXT_HTML));
       }
 
       default:

@@ -19,8 +19,6 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 
-// TODO: Rename to SimpleContentStorageFacet for clarity?
-
 /**
  * Simple content facet.
  *

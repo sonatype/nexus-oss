@@ -48,22 +48,7 @@ public class SimpleProxyHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    // HACK: Disable this for now
-    //SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
-    //
-    //switch (method) {
-    //  case GET: {
-    //    SimpleContent content = facet.get(name);
-    //    if (content == null) {
-    //      return HttpResponses.notFound(name);
-    //    }
-    //    return HttpResponses.ok(content.toPayload());
-    //  }
-    //
-    //  default:
-    //    return HttpResponses.methodNotAllowed(method, GET);
-    //}
-
+    // TODO:
     throw new RuntimeException("Not implemented");
   }
 

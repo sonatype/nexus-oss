@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -53,11 +52,11 @@ public class SimpleStorageHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    SimpleContentFacet facet = repository.facet(SimpleContentFacet.class);
+    SimpleStorageFacet storage = repository.facet(SimpleStorageFacet.class);
 
     switch (method) {
       case GET: {
-        SimpleContent content = facet.get(name);
+        SimpleContent content = storage.get(name);
         if (content == null) {
           return HttpResponses.notFound(name);
         }
@@ -66,7 +65,7 @@ public class SimpleStorageHandler
 
       case PUT: {
         SimpleContent content = new SimpleContent(context.getRequest().getPayload());
-        SimpleContent prev = facet.put(name, content);
+        SimpleContent prev = storage.put(name, content);
         if (prev == null) {
           return HttpResponses.created();
         }
@@ -74,7 +73,7 @@ public class SimpleStorageHandler
       }
 
       case DELETE: {
-        SimpleContent prev = facet.delete(name);
+        SimpleContent prev = storage.delete(name);
         if (prev == null) {
           return HttpResponses.notFound(name);
         }

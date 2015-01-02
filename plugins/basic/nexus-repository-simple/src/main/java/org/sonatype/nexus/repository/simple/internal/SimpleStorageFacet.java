@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
@@ -37,6 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
+@Facet.Exposed
 public class SimpleStorageFacet
     extends FacetSupport
     implements SimpleContentFacet
