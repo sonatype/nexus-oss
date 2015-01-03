@@ -19,7 +19,6 @@ import java.net.URI;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -54,8 +53,8 @@ public class SimpleProxyFacet
   private HttpClientFacet httpClient;
 
   @Override
-  protected void doInit(final Repository repository) throws Exception {
-    NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
+  protected void doInit() throws Exception {
+    NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     String url = attributes.require("remoteUrl", String.class);
     if (!url.endsWith("/")) {
       url = url + "/";

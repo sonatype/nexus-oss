@@ -69,11 +69,11 @@ public abstract class FacetSupport
     this.repository = checkNotNull(repository);
 
     log.trace("Initialising");
-    doInit(repository);
+    doInit();
     log.trace("Initialized");
   }
 
-  protected void doInit(final Repository repository) throws Exception {
+  protected void doInit() throws Exception {
     // nop
   }
 

@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.Repository;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -40,7 +39,7 @@ public class StorageFacetImpl
   }
 
   @Override
-  protected void doInit(final Repository repository) throws Exception {
+  protected void doInit() throws Exception {
     // TODO:
   }
 
