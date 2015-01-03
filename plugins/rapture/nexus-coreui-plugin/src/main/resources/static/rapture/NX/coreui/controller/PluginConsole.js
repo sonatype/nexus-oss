@@ -21,7 +21,8 @@ Ext.define('NX.coreui.controller.PluginConsole', {
   extend: 'NX.controller.Drilldown',
   requires: [
     'NX.util.Url',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-system-pluginlist',

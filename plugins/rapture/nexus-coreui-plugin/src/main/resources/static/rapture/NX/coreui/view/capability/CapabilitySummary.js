@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-capability-summary',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   title: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_SUMMARY_TAB'),
@@ -49,14 +50,14 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           submit: 'NX.direct.capability_Capability.updateNotes'
         },
         settingsFormSuccessMessage: function (data) {
-          var description = 'Capability updated: ' + data['typeName'];
+          var description = NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_SUCCESS') + data['typeName'];
           if (data['description']) {
             description += ' - ' + data['description'];
           }
           return description;
         },
         editableCondition: NX.Conditions.isPermitted('nexus:capabilities', 'update'),
-        editableMarker: 'You do not have permission to update capabilities',
+        editableMarker: NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_ERROR'),
         items: [
           {
             xtype: 'hiddenfield',

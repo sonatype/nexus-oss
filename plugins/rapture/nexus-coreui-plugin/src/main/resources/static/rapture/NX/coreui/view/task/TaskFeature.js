@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-task-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'task-default',
 

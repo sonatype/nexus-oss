@@ -21,17 +21,18 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositorytarget-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryTarget.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository target updated: ' + data['name'];
+    return NX.I18n.get('ADMIN_TARGETS_UPDATE_SUCCESS') + data['name'];
   },
 
-  editableMarker: 'You do not have permission to update targets',
+  editableMarker: NX.I18n.get('ADMIN_TARGETS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;
@@ -47,9 +48,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME'),
-        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME')
       },
       {
         xtype: 'combo',

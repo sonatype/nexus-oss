@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.role.RoleList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-role-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'Role',
@@ -46,7 +47,7 @@ Ext.define('NX.coreui.view.role.RoleList', {
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No role matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_ROLES_LIST_FILTER_ERROR') }
   ],
 
   /**

@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-security-anonymous-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   initComponent: function () {
@@ -30,18 +31,14 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Anonymous security settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_AnonymousSettings.read',
           submit: 'NX.direct.coreui_AnonymousSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure anonymous user',
+        editableMarker: NX.I18n.get('ADMIN_ANONYMOUS_UPDATE_ERROR'),
         items: [
-          {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_ANONYMOUS_ALLOW_HELP')
-          },
           {
             xtype: 'checkbox',
             name: 'enabled',
@@ -61,23 +58,15 @@ Ext.define('NX.coreui.view.security.AnonymousSettings', {
             collapsed: true,
             items: [
               {
-                xtype: 'label',
-                html: NX.I18n.get('ADMIN_ANONYMOUS_CUSTOMIZE_HELP')
-              },
-              {
                 xtype: 'textfield',
                 name: 'username',
                 fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_USERNAME_PLACEHOLDER'),
                 allowBlank: false
               },
               {
                 xtype: 'nx-password',
                 name: 'password',
                 fieldLabel: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD'),
-                helpText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_HELP'),
-                emptyText: NX.I18n.get('ADMIN_ANONYMOUS_PASSWORD_PLACEHOLDER'),
                 allowBlank: false
               }
             ]

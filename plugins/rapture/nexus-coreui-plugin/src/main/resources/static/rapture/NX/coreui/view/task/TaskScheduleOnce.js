@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-once',
   requires: [
-    'NX.util.DateFormat'
+    'NX.util.DateFormat',
+    'NX.I18n'
   ],
 
   /**
@@ -36,7 +37,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleOnce', {
         name: 'startDate',
         itemId: 'startDate',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE_HELP'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),

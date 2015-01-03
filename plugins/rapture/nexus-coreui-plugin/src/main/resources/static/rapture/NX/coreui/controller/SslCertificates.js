@@ -21,7 +21,8 @@ Ext.define('NX.coreui.controller.SslCertificates', {
   extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Messages',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-sslcertificate-list',

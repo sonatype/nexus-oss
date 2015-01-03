@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-system-verifysmtpconnection',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
-  title: 'Verify SMTP connection',
+  title: NX.I18n.get('ADMIN_SMTP_VERIFY_TITLE'),
   defaultFocus: 'email',
 
   layout: 'fit',
@@ -60,7 +61,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             },
             items: [
               { xtype: 'component', html: NX.Icons.img('verifysmtpconnection', 'x32') },
-              { xtype: 'label', html: 'Please enter an email address which will receive the test email message.',
+              { xtype: 'label', html: NX.I18n.get('ADMIN_SMTP_VERIFY_HELP'),
                 margin: '0 0 0 5'
               }
             ]

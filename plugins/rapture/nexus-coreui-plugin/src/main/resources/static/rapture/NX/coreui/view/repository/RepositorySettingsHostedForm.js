@@ -20,12 +20,15 @@
 Ext.define('NX.coreui.view.repository.RepositorySettingsHostedForm', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-repository-settings-hosted-form',
+  requires: [
+    'NX.I18n'
+  ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateHosted'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository updated: ' + data['id'];
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['id'];
   },
 
   initComponent: function() {
@@ -36,14 +39,14 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedForm', {
       {
         xtype: 'combo',
         name: 'writePolicy',
-        fieldLabel: 'Deployment Policy',
-        helpText: 'Controls if deployments and/or updates to artifacts are allowed.',
-        emptyText: 'select a policy',
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT'),
+        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_HELP'),
+        emptyText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_PLACEHOLDER'),
         editable: false,
         store: [
-          ['ALLOW_WRITE', 'Allow Redeploy'],
-          ['ALLOW_WRITE_ONCE', 'Disable Redeploy'],
-          ['READ_ONLY', 'Read Only']
+          ['ALLOW_WRITE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_ALLOW_ITEM')],
+          ['ALLOW_WRITE_ONCE', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_DISABLE_ITEM')],
+          ['READ_ONLY', NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DEPLOYMENT_RO_ITEM')]
         ],
         queryMode: 'local'
       },
@@ -51,14 +54,12 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsHostedForm', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       }
     ];

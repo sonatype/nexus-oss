@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.Loggers', {
     'NX.Conditions',
     'NX.Dialogs',
     'NX.Permissions',
-    'NX.Messages'
+    'NX.Messages',
+    'NX.I18n'
   ],
 
   stores: [
