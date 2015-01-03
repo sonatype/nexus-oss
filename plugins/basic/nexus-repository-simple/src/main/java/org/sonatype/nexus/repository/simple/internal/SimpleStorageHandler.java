@@ -22,10 +22,8 @@ import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
@@ -44,7 +42,7 @@ public class SimpleStorageHandler
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    String name = contentName(context);
+    String name = ContextHelper.contentName(context);
     String method = context.getRequest().getAction();
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
@@ -80,15 +78,5 @@ public class SimpleStorageHandler
       default:
         return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
     }
-  }
-
-  /**
-   * Find content name from request context matcher state.
-   */
-  private String contentName(final Context context) {
-    TokenMatcher.State state = context.getAttributes().require(TokenMatcher.State.class);
-    String name = state.getTokens().get("name");
-    checkState(name != null, "Missing token: name");
-    return name;
   }
 }
