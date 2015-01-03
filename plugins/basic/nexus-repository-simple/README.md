@@ -42,3 +42,4 @@
 ## Proxy
 
     curl -v -X GET http://localhost:8081/repository/testproxy1/4.12/junit-4.12.pom
+    curl -v -X GET http://localhost:8081/repository/testproxy1/4.12/maven-metadata.xml
