@@ -15,8 +15,8 @@ package org.sonatype.nexus.repository.internal;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.RepositoryFactory;
 import org.sonatype.nexus.repository.RepositoryImpl;
+import org.sonatype.nexus.repository.manager.RepositoryFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;

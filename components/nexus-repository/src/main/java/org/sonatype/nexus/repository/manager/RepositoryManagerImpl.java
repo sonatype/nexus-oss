@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Recipe;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.RepositoryFactory;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
