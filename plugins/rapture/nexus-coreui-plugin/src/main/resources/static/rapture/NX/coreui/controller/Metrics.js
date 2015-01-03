@@ -25,7 +25,8 @@ Ext.define('NX.coreui.controller.Metrics', {
     'NX.Messages',
     'NX.Permissions',
     'NX.util.Url',
-    'NX.util.DownloadHelper'
+    'NX.util.DownloadHelper',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'

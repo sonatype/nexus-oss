@@ -24,10 +24,11 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.Conditions',
     'NX.coreui.store.RepositoryReference',
     'NX.coreui.store.RepositoryTarget',
-    'NX.coreui.model.Reference'
+    'NX.coreui.model.Reference',
+    'NX.I18n'
   ],
 
-  title: 'Create new Repository Target Privilege',
+  title: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'),
   defaultFocus: 'name',
 
   initComponent: function () {
@@ -35,7 +36,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
 
     me.repositoryStore = Ext.create('NX.coreui.store.RepositoryReference');
     me.mon(me.repositoryStore, 'load', function (store) {
-      store.add(Ext.create('NX.coreui.model.Reference', { id: '', name: 'All Repositories' }));
+      store.add(Ext.create('NX.coreui.model.Reference', { id: '', name: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_ALL') }));
     });
     me.repositoryStore.load();
 
@@ -48,29 +49,23 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
         submit: 'NX.direct.coreui_Privilege.createForRepositoryTarget'
       },
       editableCondition: NX.Conditions.isPermitted('security:privileges', 'create'),
-      editableMarker: 'You do not have permission to create privileges',
+      editableMarker: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_ERROR'),
 
       items: [
         {
           name: 'name',
           itemId: 'name',
-          fieldLabel: 'Name',
-          helpText: 'The name of this privilege.',
-          emptyText: 'enter a name'
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME'),
         },
         {
           name: 'description',
-          fieldLabel: 'Description',
-          helpText: 'The description of this privilege.',
-          emptyText: 'enter a description'
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION'),
         },
         {
           xtype: 'combo',
           name: 'repositoryId',
           itemId: 'repositoryId',
-          fieldLabel: 'Repository',
-          helpText: 'The repository or repository group this privilege will be associated with.',
-          emptyText: 'select a repository',
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_REPOSITORY'),
           editable: false,
           store: me.repositoryStore,
           queryMode: 'local',
@@ -81,9 +76,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
           xtype: 'combo',
           name: 'repositoryTargetId',
           itemId: 'repositoryTargetId',
-          fieldLabel: 'Repository Target',
-          helpText: 'The Repository Target that will be applied with this privilege.',
-          emptyText: 'select a target',
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TARGET'),
+          emptyText: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TARGET_PLACEHOLDER'),
           editable: false,
           store: me.targetStore,
           queryMode: 'local',

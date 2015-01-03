@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-user-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'user-default',
 

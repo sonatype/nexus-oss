@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.Help', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-help',
-
   requires: [
     'NX.I18n'
   ],

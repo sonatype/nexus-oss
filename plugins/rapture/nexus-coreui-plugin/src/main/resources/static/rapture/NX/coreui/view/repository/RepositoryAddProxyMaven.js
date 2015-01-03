@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddProxyMaven', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: ['widget.nx-repository-add-proxy-maven1', 'widget.nx-repository-add-proxy-maven2'],
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Create new proxy repository',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_MAVEN_PROXY_TITLE'),
 
   initComponent: function() {
     var me = this;
@@ -33,7 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddProxyMaven', {
         submit: 'NX.direct.coreui_Repository.createProxyMaven'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Maven Proxy repository created: ' + data['id'];
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_MAVEN_PROXY_SUCCESS') + data['id'];
       }
     };
 

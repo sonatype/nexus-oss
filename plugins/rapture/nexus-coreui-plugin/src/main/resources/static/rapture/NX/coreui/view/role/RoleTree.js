@@ -24,7 +24,8 @@ Ext.define('NX.coreui.view.role.RoleTree', {
     'Ext.data.TreeStore',
     'NX.Icons',
     'NX.coreui.store.Role',
-    'NX.coreui.store.Privilege'
+    'NX.coreui.store.Privilege',
+    'NX.I18n'
   ],
 
   layout: 'fit',

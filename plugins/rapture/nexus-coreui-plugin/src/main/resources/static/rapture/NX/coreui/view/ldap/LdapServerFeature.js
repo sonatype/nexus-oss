@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-ldapserver-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'ldapserver-default',
 

@@ -26,7 +26,8 @@ Ext.define('NX.coreui.controller.Users', {
     'NX.Security',
     'NX.Icons',
     'NX.Messages',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-user-list',

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-sslusetruststore',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function () {
     var me = this;

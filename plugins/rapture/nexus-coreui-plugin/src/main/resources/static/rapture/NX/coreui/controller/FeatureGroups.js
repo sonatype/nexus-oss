@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.FeatureGroups', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @override

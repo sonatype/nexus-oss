@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
   alias: 'widget.nx-coreui-user-settings-external-form',
   requires: [
     'NX.Conditions',
-    'NX.Dialogs'
+    'NX.Dialogs',
+    'NX.I18n'
   ],
 
   api: {
@@ -32,7 +33,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
     return 'User role mappings updated: ' + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users or is an not an external user',
+  editableMarker: NX.I18n.get('ADMIN_USERS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;
@@ -49,31 +50,31 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         name: 'userId',
         itemId: 'userId',
         readOnly: true,
-        fieldLabel: 'ID',
-        helpText: 'The ID assigned to this user, will be used as the username.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ID'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP'),
         allowBlank: true
       },
       { name: 'realm', xtype: 'hiddenfield' },
       {
         name: 'firstName',
-        fieldLabel: 'First Name',
-        helpText: 'The first name of the user.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
       },
       {
         name: 'lastName',
-        fieldLabel: 'Last Name',
-        helpText: 'The last name of the user.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
       },
       {
         name: 'email',
-        fieldLabel: 'Email',
-        helpText: 'Email address, to notify user when necessary.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -81,12 +82,12 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
       {
         xtype: 'combo',
         name: 'status',
-        fieldLabel: 'Status',
-        helpText: 'The current status of the user.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_HELP'),
         editable: false,
         store: [
-          ['active', 'Active'],
-          ['disabled', 'Disabled']
+          ['active', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_ACTIVE')],
+          ['disabled', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_DISABLED')]
         ],
         queryMode: 'local',
         allowBlank: true,
@@ -97,11 +98,10 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         xtype: 'nx-itemselector',
         name: 'roles',
         itemId: 'roles',
-        fieldLabel: 'Roles',
-        helpText: 'The roles assigned to this user in Nexus.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES'),
         buttons: ['add', 'remove'],
-        fromTitle: 'Roles',
-        toTitle: 'Given',
+        fromTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_PICKER'),
+        toTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_GIVEN_PICKER'),
         store: 'Role',
         valueField: 'id',
         displayField: 'name',
@@ -112,8 +112,8 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         xtype: 'textarea',
         name: 'externalRoles',
         itemId: 'externalRoles',
-        fieldLabel: 'External Roles',
-        helpText: 'Roles externally assigned to user.',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EXTERNAL'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EXTERNAL_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -150,7 +150,7 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
             if (Ext.Array.contains(externalRoles, roleModel.get('id'))) {
               canRemove = false;
               NX.Dialogs.showInfo(
-                  'Cannot remove role',
+                  NX.I18n.get('ADMIN_USERS_REMOVE_ERROR'),
                   'External mapped role "' + roleModel.get('name')
                       + '" cannot be removed because is assigned to user by external source'
               );

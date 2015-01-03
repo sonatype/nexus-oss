@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.support.SupportRequest', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-support-supportrequest',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: {
     xtype: 'nx-settingsform',
@@ -38,7 +41,6 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
         ui: 'primary',
-        tooltip: NX.I18n.get('ADMIN_SUPPORT_REQUEST_TOOLTIP')
       }
     ]
   }

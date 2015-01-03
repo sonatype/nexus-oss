@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.MavenUpload', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   stores: [

@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddGroup', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-group',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Create new repository group',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_GROUP_TITLE'),
 
   initComponent: function() {
     var me = this;
@@ -33,7 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddGroup', {
         submit: 'NX.direct.coreui_Repository.createGroup'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Group repository created: ' + data['id'];
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_GROUP_SUCCESS') + data['id'];
       }
     };
 

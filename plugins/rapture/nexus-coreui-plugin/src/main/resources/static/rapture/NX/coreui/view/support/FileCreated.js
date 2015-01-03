@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.support.FileCreated', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-support-filecreated',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @cfg Icon to show (img)
@@ -74,7 +77,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               // TODO Style
               xtype: 'textfield',
               name: 'name',
-              fieldLabel: 'Name',
+              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_NAME'),
               helpText: me.fileType + ' file name',
               readOnly: true
             },
@@ -82,14 +85,14 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               // TODO Style
               xtype: 'textfield',
               name: 'size',
-              fieldLabel: 'Size',
+              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_SIZE'),
               helpText: 'Size of ' + me.fileType + ' file in bytes',  // FIXME: Would like to render in bytes/kilobytes/megabytes
               readOnly: true
             },
             {
               xtype: 'textfield',
               name: 'file',
-              fieldLabel: 'Path',
+              fieldLabel: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_PATH'),
               helpText: me.fileType + ' file location',
               readOnly: true,
               selectOnFocus: true
@@ -103,7 +106,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
           buttonAlign: 'left',
           buttons: [
             {
-              text: 'Download',
+              text: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_DOWNLOAD_BUTTON'),
               action: 'download',
               formBind: true,
               bindToEnter: true,
@@ -111,7 +114,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               glyph: 'xf023@FontAwesome' /* fa-lock */
             },
             {
-              text: 'Cancel',
+              text: NX.I18n.get('ADMIN_SUPPORT_ZIP_CREATED_CANCEL_BUTTON'),
               handler: me.close,
               scope: me
             }

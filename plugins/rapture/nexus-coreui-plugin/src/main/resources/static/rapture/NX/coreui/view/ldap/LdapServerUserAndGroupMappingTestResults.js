@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-testresults',
   requires: [
-    'Ext.data.JsonStore'
+    'Ext.data.JsonStore',
+    'NX.I18n'
   ],
 
-  title: 'User Mapping Test Results',
+  title: NX.I18n.get('ADMIN_LDAP_MAPPING_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -34,7 +35,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
 
   buttonAlign: 'left',
   buttons: [
-    { text: 'Close', handler: function () {
+    { text: NX.I18n.get('ADMIN_LDAP_MAPPING_CANCEL_BUTTON'), handler: function () {
       this.up('window').close();
     }}
   ],
@@ -50,10 +51,10 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupMappingTestResults', {
     me.items = {
       xtype: 'grid',
       columns: [
-        { header: 'User Id', dataIndex: 'username', flex: 1 },
-        { header: 'Name', dataIndex: 'realName', flex: 1 },
-        { header: 'Email', dataIndex: 'email', width: 250 },
-        { header: 'Roles', dataIndex: 'membership', flex: 3 }
+        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_ID_COLUMN'), dataIndex: 'username', flex: 1 },
+        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_NAME_COLUMN'), dataIndex: 'realName', flex: 1 },
+        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_EMAIL_COLUMN'), dataIndex: 'email', width: 250 },
+        { header: NX.I18n.get('ADMIN_LDAP_MAPPING_ROLES_COLUMN'), dataIndex: 'membership', flex: 3 }
       ],
       store: Ext.create('Ext.data.JsonStore', {
         fields: ['username', 'realName', 'email', 'membership'],

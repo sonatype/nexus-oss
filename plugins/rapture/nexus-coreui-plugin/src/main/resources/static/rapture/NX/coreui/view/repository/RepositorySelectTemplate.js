@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-repository-selecttemplate',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Select...',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -43,14 +46,14 @@ Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
             return 'repository-default';
           }
         },
-        { header: 'Provider', dataIndex: 'providerName', flex: 2 },
-        { header: 'Type', dataIndex: 'type', flex: 1 }
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_PROVIDER_COLUMN'), dataIndex: 'providerName', flex: 2 },
+        { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TYPE_COLUMN'), dataIndex: 'type', flex: 1 }
       ]
     }
   ],
 
   buttons: [
-    { text: 'Cancel', handler: function () {
+    { text: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_CANCEL_BUTTON'), handler: function () {
       this.up('window').close();
     }}
   ]

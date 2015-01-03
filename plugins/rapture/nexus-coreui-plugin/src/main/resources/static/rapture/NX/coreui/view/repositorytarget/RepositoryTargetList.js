@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repositorytarget-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'RepositoryTarget',
 
@@ -47,7 +50,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No repository target matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TARGETS_LIST_FILTER_ERROR') }
   ]
 
 });

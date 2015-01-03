@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.Search', {
   requires: [
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   masters: ['nx-coreui-search-result-list', 'nx-coreui-search-result-version-list'],

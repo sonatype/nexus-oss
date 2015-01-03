@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.SignIn', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-signin',
-
   requires: [
     'NX.I18n'
   ],

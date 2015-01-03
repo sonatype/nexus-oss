@@ -20,9 +20,9 @@
 Ext.define('NX.view.ChangeOrderWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-changeorderwindow',
-
   requires: [
-    'NX.ext.form.field.ItemOrderer'
+    'NX.ext.form.field.ItemOrderer',
+    'NX.I18n'
   ],
 
   layout: 'fit',
@@ -54,8 +54,8 @@ Ext.define('NX.view.ChangeOrderWindow', {
       },
       buttonAlign: 'left',
       buttons: [
-        { text: 'Save', action: 'save', formBind: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON'), action: 'save', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ORDER_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

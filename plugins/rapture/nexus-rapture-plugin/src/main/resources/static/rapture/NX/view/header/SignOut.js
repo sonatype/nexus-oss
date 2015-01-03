@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.SignOut', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-signout',
-
   requires: [
     'NX.I18n'
   ],

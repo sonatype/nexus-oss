@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-task-schedule-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {

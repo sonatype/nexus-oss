@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.feed.FeedEntryList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-feedentry-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'FeedEntry',

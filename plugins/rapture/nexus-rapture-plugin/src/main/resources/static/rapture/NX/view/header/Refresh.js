@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.Refresh', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-refresh',
-
   requires: [
     'NX.I18n'
   ],

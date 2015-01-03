@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-privilege-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'privilege-default',
 

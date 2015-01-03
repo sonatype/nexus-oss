@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.search.TextSearchCriteria', {
   extend: 'NX.ext.SearchBox',
   alias: 'widget.nx-searchcriteria-text',
+  requires: [
+    'NX.I18n'
+  ],
   mixins: {
     searchCriteria: 'NX.coreui.view.search.SearchCriteria'
   },

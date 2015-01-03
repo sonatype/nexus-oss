@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.search.SaveSearchFilter', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-search-save',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Save search filter',
+  title: NX.I18n.get('BROWSE_SEARCH_SAVE_TITLE'),
   defaultFocus: 'name',
 
   items: {
@@ -31,14 +34,12 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: 'Name',
-        emptyText: 'enter a filter name'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_NAME')
       },
       {
         xtype: 'textfield',
         name: 'description',
-        fieldLabel: 'Description',
-        emptyText: 'enter a filter description',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_DESCRIPTION'),
         allowBlank: true
       }
     ]

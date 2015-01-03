@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.support.SupportZipCreated', {
   extend: 'NX.coreui.view.support.FileCreated',
   alias: 'widget.nx-coreui-support-supportzipcreated',
   requires: [
-      'NX.Icons'
+      'NX.Icons',
+      'NX.I18n'
   ],
 
   fileType: 'Support ZIP',
@@ -48,7 +49,7 @@ Ext.define('NX.coreui.view.support.SupportZipCreated', {
       // TODO Style
       items: [
         { xtype: 'component', html: NX.Icons.img('supportzip-truncated', 'x32') },
-        { xtype: 'component', html: 'Contents have been truncated due to exceeded size limits.',
+        { xtype: 'component', html: NX.I18n.get('ADMIN_SUPPORT_ZIP_TRUNCATED'),
           margin: '0 0 0 5'
         }
       ],

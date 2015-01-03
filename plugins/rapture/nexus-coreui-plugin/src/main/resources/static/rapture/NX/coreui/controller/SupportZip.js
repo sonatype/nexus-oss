@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.SupportZip', {
     'NX.Security',
     'NX.util.Base64',
     'NX.util.Url',
-    'NX.util.DownloadHelper'
+    'NX.util.DownloadHelper',
+    'NX.I18n'
   ],
 
   mixins: {
@@ -96,7 +97,7 @@ Ext.define('NX.coreui.controller.SupportZip', {
         fileName = win.down('form').getValues().name;
 
     NX.Security.doWithAuthenticationToken(
-        'Downloading support ZIP requires validation of your credentials.',
+        NX.I18n.get('ADMIN_SUPPORT_ZIP_DOWNLOAD_AUTHENTICATE'),
         {
           success: function (authToken) {
             NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf(

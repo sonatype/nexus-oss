@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.upload.UploadArtifact', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-coreui-upload-artifact',
+  requires: [
+    'NX.I18n'
+  ],
 
   bodyPadding: 10,
 

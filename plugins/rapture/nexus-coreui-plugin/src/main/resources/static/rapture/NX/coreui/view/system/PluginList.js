@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.system.PluginList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-system-pluginlist',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'PluginInfo',
 
@@ -37,7 +40,7 @@ Ext.define('NX.coreui.view.system.PluginList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No plugin matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PLUGINS_LIST_FILTER_ERROR') }
   ]
 
 });

@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-sslcertificate-details',
   requires: [
-    'NX.util.DateFormat'
+    'NX.util.DateFormat',
+    'NX.I18n'
   ],
 
   title: 'Summary',

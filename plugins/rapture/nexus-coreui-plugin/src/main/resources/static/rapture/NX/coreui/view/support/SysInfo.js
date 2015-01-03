@@ -20,11 +20,11 @@
 Ext.define('NX.coreui.view.support.SysInfo', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-support-sysinfo',
-  ui: 'inset',
-
   requires: [
-    'Ext.XTemplate'
+    'Ext.XTemplate',
+    'NX.I18n'
   ],
+  ui: 'inset',
 
   layout: 'fit',
   autoScroll: true,
@@ -33,7 +33,6 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_DOWNLOAD_TOOLTIP'),
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'download'
     },
@@ -41,7 +40,6 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_SYSTEM_INFORMATION_PRINT_TOOLTIP'),
       glyph: 'xf02f@FontAwesome' /* fa-print */,
       action: 'print'
     }

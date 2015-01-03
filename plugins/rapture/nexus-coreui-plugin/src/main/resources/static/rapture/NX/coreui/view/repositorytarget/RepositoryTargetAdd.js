@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repositorytarget-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new target',
+  title: NX.I18n.get('ADMIN_TARGETS_CREATE_TITLE'),
   defaultFocus: 'name',
 
   /**
@@ -39,10 +40,10 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
         submit: 'NX.direct.coreui_RepositoryTarget.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Repository target created: ' + data['name'];
+        return NX.I18n.get('ADMIN_TARGETS_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:targets', 'create'),
-      editableMarker: 'You do not have permission to create targets'
+      editableMarker: NX.I18n.get('ADMIN_TARGETS_CREATE_ERROR')
     };
 
     me.callParent();

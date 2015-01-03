@@ -20,7 +20,6 @@
 Ext.define('NX.view.header.User', {
   extend: 'NX.view.header.Mode',
   alias: 'widget.nx-header-user-mode',
-
   requires: [
     'NX.I18n'
   ],

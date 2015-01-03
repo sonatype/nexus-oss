@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.upload.UploadArtifactCoordinates', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-upload-artifact-coordinates',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',
@@ -30,31 +33,23 @@ Ext.define('NX.coreui.view.upload.UploadArtifactCoordinates', {
     {
       name: 'groupId',
       itemId: 'groupId',
-      fieldLabel: 'Group',
-      helpText: 'Maven group id of uploaded artifacts.',
-      emptyText: 'enter a group name'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_GROUP')
     },
     {
       name: 'artifactId',
       itemId: 'artifactId',
-      fieldLabel: 'Artifact',
-      helpText: 'Maven artifact id of uploaded artifacts.',
-      emptyText: 'enter an artifact name'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_ID')
     },
     {
       name: 'version',
       itemId: 'version',
-      fieldLabel: 'Version',
-      helpText: 'Maven version of uploaded artifacts.',
-      emptyText: 'enter a version'
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_VERSION')
     },
     {
       xtype: 'combo',
       name: 'packaging',
       itemId: 'packaging',
-      fieldLabel: 'Packaging',
-      helpText: 'Maven packaging.',
-      emptyText: 'select or enter packaging',
+      fieldLabel: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_PACKAGING'),
       queryMode: 'local',
       displayField: 'name',
       valueField: 'id',

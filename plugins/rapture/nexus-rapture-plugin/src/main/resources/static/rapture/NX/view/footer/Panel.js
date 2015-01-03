@@ -20,7 +20,6 @@
 Ext.define('NX.view.footer.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-footer',
-
   requires: [
     'NX.I18n'
   ],

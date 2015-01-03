@@ -19,6 +19,9 @@
  */
 Ext.define('NX.coreui.controller.StorageFileMavenInfo', {
   extend: 'Ext.app.Controller',
+  requires: [
+    'NX.I18n'
+  ],
 
   views: [
     'repositorybrowse.StorageFileMavenInfo'

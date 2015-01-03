@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-role-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new role',
+  title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),
   defaultFocus: 'id',
 
   initComponent: function() {
@@ -36,10 +37,10 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
         submit: 'NX.direct.coreui_Role.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Role created: ' + data['name'];
+        return NX.I18n.get('ADMIN_ROLES_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
-      editableMarker: 'You do not have permission to create roles',
+      editableMarker: NX.I18n.get('ADMIN_ROLES_CREATE_ERROR'),
       source: me.source
     };
 

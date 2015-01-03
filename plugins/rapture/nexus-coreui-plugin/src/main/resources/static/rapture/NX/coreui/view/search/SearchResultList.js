@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.search.SearchResultList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-search-result-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'SearchResult',
 

@@ -21,17 +21,18 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-task-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_Task.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Task updated: ' + data['name'] + ' (' + data['typeName'] + ')';
+    return NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS') + data['name'] + ' (' + data['typeName'] + ')';
   },
 
-  editableMarker: 'You do not have permission to update tasks or task is not user manageable',
+  editableMarker: NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_ERROR'),
 
   items: [
     {
@@ -41,7 +42,6 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     {
       xtype: 'checkbox',
       fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_ENABLED'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_ENABLED_HELP'),
       name: 'enabled',
       allowBlank: false,
       checked: true,
@@ -49,15 +49,12 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     },
     {
       name: 'name',
-      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME_HELP'),
-      emptyText: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME_PLACEHOLDER')
+      fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_NAME')
     },
     {
       xtype: 'nx-email',
       name: 'alertEmail',
       fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL_HELP'),
       allowBlank: true
     },
     { xtype: 'nx-coreui-formfield-settingsfieldset' }

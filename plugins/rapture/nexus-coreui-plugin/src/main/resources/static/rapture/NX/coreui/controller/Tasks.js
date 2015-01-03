@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.Tasks', {
     'NX.Conditions',
     'NX.Dialogs',
     'NX.Messages',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-task-list',

@@ -20,6 +20,9 @@
 Ext.define('NX.view.AddWindow', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-addwindow',
+  requires: [
+    'NX.I18n'
+  ],
 
   layout: 'fit',
   autoShow: true,
@@ -37,8 +40,8 @@ Ext.define('NX.view.AddWindow', {
     if (Ext.isDefined(me.items) && !Ext.isArray(me.items)) {
       if (!me.items.buttons) {
         me.items.buttons = [
-          { text: 'Add', action: 'add', formBind: true, ui: 'primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
-          { text: 'Cancel', handler: function () {
+          { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
+          { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
             this.up('window').close();
           }}
         ];

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskScheduleAdvanced', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-advanced',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function () {
     var me = this;

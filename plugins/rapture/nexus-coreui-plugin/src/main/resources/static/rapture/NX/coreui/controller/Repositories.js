@@ -26,7 +26,8 @@ Ext.define('NX.coreui.controller.Repositories', {
     'NX.Dialogs',
     'NX.Messages',
     'NX.Bookmarks',
-    'NX.Permissions'
+    'NX.Permissions',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-repository-list',
