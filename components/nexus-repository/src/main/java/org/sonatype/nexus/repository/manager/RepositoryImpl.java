@@ -83,7 +83,7 @@ public class RepositoryImpl
 
   @Override
   public Configuration getConfiguration() {
-    checkState(configuration != null);
+    checkState(configuration != null, "Not initialized");
     return configuration;
   }
 
