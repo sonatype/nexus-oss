@@ -51,8 +51,6 @@ public class FacetLookup
    */
   private final Map<Class<? extends Facet>, Facet> exposed = Maps.newHashMap();
 
-  // TODO: sort out synchronization requirement for usage
-
   /**
    * Add a facet and bind exposed types.
    */

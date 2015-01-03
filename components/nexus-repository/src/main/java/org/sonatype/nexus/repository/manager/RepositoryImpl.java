@@ -171,7 +171,7 @@ public class RepositoryImpl
   @Override
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
-
+    checkState(!started, "Already started");
     log.debug("Attaching facet: {}", facet);
     facet.init(this);
     facets.add(facet);
