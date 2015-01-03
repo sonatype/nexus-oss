@@ -32,8 +32,7 @@
   $ui-background-color-over: $color-gainsboro,
   $ui-background-color-active: $color-gray,
   $ui-background-color-disabled: $color-white,
-  //$ui-border-radius: $tab-border-radius,
-  //$ui-border-width: $tab-border-width,
+  
   $ui-margin: 0 2px,
   $ui-padding: 5px 12px,
   $ui-text-padding: 0,
@@ -44,48 +43,11 @@
 
   $ui-border-radius: 6px,
   $ui-border-width: 1px,
-  //$ui-cursor: $tab-cursor,
-  //$ui-cursor-disabled: $tab-cursor-disabled,
-  //$ui-font-size: $tab-font-size,
-  //$ui-font-size-over: $tab-font-size-over,
-  //$ui-font-size-active: $tab-font-size-active,
-  //$ui-font-size-disabled: $tab-font-size-disabled,
-  //$ui-font-weight: $tab-font-weight,
-  //$ui-font-weight-over: $tab-font-weight-over,
-  //$ui-font-weight-active: $tab-font-weight-active,
-  //$ui-font-weight-disabled: $tab-font-weight-disabled,
-  //$ui-font-family: $tab-font-family,
-  //$ui-font-family-over: $tab-font-family-over,
-  //$ui-font-family-active: $tab-font-family-active,
-  //$ui-font-family-disabled: $tab-font-family-disabled,
-  //$ui-line-height: $tab-line-height,
+
   $ui-color: $color-navy-blue,
   $ui-color-over: $color-navy-blue,
   $ui-color-active: $color-white,
-  $ui-color-disabled: $color-night-rider//,
-  //$ui-background-gradient: $tab-background-gradient,
-  //$ui-background-gradient-over: $tab-background-gradient-over,
-  //$ui-background-gradient-active: $tab-background-gradient-active,
-  //$ui-background-gradient-disabled: $tab-background-gradient-disabled,
-  //$ui-inner-border-width: 0px//,
-  //$ui-icon-width: $tab-icon-width,
-  //$ui-icon-height: $tab-icon-height,
-  //$ui-icon-spacing: $tab-icon-spacing,
-  //$ui-icon-background-position: $tab-icon-background-position,
-  //$ui-glyph-color: $tab-glyph-color,
-  //$ui-glyph-color-over: $tab-glyph-color-over,
-  //$ui-glyph-color-active: $tab-glyph-color-active,
-  //$ui-glyph-color-disabled: $tab-glyph-color-disabled,
-  //$ui-glyph-opacity: $tab-glyph-opacity,
-  //$ui-glyph-opacity-disabled: $tab-glyph-opacity-disabled,
-  //$ui-opacity-disabled: $tab-opacity-disabled,
-  //$ui-text-opacity-disabled: $tab-text-opacity-disabled,
-  //$ui-icon-opacity-disabled: $tab-icon-opacity-disabled,
-  //$ui-closable-icon-width: $tab-closable-icon-width,
-  //$ui-closable-icon-height: $tab-closable-icon-height,
-  //$ui-closable-icon-top: $tab-closable-icon-top,
-  //$ui-closable-icon-right: $tab-closable-icon-right,
-  //$ui-closable-icon-spacing: $tab-closable-icon-spacing
+  $ui-color-disabled: $color-night-rider
 );
 
 @include extjs-tab-bar-ui(
@@ -101,14 +63,6 @@
   $ui-padding: 5px 0 2px 0,
   $ui-background-color: $color-light-smoke,
   $ui-background-gradient: $tabbar-background-gradient
-
-  //$ui-scroller-width: $tabbar-scroller-width,
-  //$ui-scroller-cursor: $tabbar-scroller-cursor,
-  //$ui-scroller-cursor-disabled: $tabbar-scroller-cursor-disabled,
-  //$ui-scroller-opacity: $tabbar-scroller-opacity,
-  //$ui-scroller-opacity-over: $tabbar-scroller-opacity-over,
-  //$ui-scroller-opacity-pressed: $tabbar-scroller-opacity-pressed,
-  //$ui-scroller-opacity-disabled: $tabbar-scroller-opacity-disabled
 );
 
 // FIXME: Only apply for top, right and left tabs need additional tweaks
