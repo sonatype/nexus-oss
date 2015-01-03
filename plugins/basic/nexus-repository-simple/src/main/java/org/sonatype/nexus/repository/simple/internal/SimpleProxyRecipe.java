@@ -56,15 +56,11 @@ public class SimpleProxyRecipe
 
   private final Provider<SimpleProxyFacet> proxyFacet;
 
-  private final Provider<SimpleStorageFacet> storageFacet;
-
   private final TimingHandler timingHandler;
 
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleProxyHandler proxyHandler;
-
-  private final SimpleStorageHandler storageHandler;
 
   @Inject
   public SimpleProxyRecipe(final @Named(ProxyType.NAME) Type type,
@@ -73,22 +69,18 @@ public class SimpleProxyRecipe
                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
-                           final Provider<SimpleStorageFacet> storageFacet,
                            final TimingHandler timingHandler,
                            final SimpleIndexHtmlHandler indexHtmlHandler,
-                           final SimpleProxyHandler proxyHandler,
-                           final SimpleStorageHandler storageHandler)
+                           final SimpleProxyHandler proxyHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
-    this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
-    this.storageHandler = checkNotNull(storageHandler);
   }
 
   @Override
@@ -97,7 +89,6 @@ public class SimpleProxyRecipe
     repository.attach(indexHtmlFacet.get());
     repository.attach(httpClientFacet.get());
     repository.attach(proxyFacet.get());
-    repository.attach(storageFacet.get());
   }
 
   /**
@@ -118,7 +109,6 @@ public class SimpleProxyRecipe
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
         .handler(proxyHandler)
-        .handler(storageHandler)
         .create());
 
     builder.defaultHandlers(

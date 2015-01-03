@@ -66,6 +66,8 @@ public class SimpleGroupFacet
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
+
+    // TODO: Validate members are compatible on start?
   }
 
   @Override
@@ -99,6 +101,8 @@ public class SimpleGroupFacet
     checkNotNull(name);
     ensureStarted();
 
+    // TODO: Should this really be going through the repository's view?
+    // TODO: ... and thus need the Request and likely should move this logic to handler?
     for (Repository repository : members()) {
       SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
       SimpleContent content = contents.get(name);

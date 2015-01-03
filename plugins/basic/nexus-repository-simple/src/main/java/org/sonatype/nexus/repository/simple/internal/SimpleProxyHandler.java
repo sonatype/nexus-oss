@@ -17,6 +17,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -24,6 +27,7 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 
 /**
  * Simple content proxy handler.
@@ -44,8 +48,20 @@ public class SimpleProxyHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    // TODO:
-    throw new RuntimeException("Not implemented");
+    SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
+
+    switch (method) {
+      case GET: {
+        SimpleContent content = contents.get(name);
+        if (content == null) {
+          return HttpResponses.notFound(name);
+        }
+        return HttpResponses.ok(content.toPayload());
+      }
+
+      default:
+        return HttpResponses.methodNotAllowed(method, GET);
+    }
   }
 
   /**

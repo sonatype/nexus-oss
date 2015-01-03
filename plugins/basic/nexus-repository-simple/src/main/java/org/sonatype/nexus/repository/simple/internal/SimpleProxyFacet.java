@@ -12,16 +12,31 @@
  */
 package org.sonatype.nexus.repository.simple.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
+import org.sonatype.nexus.repository.view.Payload;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// HACK: For now implement based on sub-class to get proxy working, then refactor to be interceptor friendly?
 
 /**
  * Simple proxy facet.
@@ -29,18 +44,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 @Named
-@Facet.Exposed
 public class SimpleProxyFacet
-    extends FacetSupport
+    extends SimpleStorageFacet
 {
   public static final String CONFIG_KEY = "proxy";
 
-  private String remoteUrl;
+  private URI remoteUrl;
 
   @Override
   protected void doInit(final Repository repository) throws Exception {
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
-    remoteUrl = attributes.require("remoteUrl", String.class);
+    String url = attributes.require("remoteUrl", String.class);
+    if (!url.endsWith("/")) {
+      url = url + "/";
+    }
+    this.remoteUrl = new URI(url);
     log.debug("Remote URL: {}", remoteUrl);
   }
 
@@ -49,16 +67,84 @@ public class SimpleProxyFacet
     remoteUrl = null;
   }
 
-  /**
-   * ???
-   */
   @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
     ensureStarted();
 
-    // TODO:
+    SimpleContent content = super.get(name);
+    if (content == null) {
+      try {
+        content = fetch(name);
+        if (content != null) {
+          put(name, content);
+        }
+      }
+      catch (IOException e) {
+        log.warn("Failed to fetch: {}", name, e);
+      }
+    }
 
-    return null;
+    return content;
+  }
+
+  @Nullable
+  private SimpleContent fetch(final String name) throws IOException {
+    HttpClient client = getRepository().facet(HttpClientFacet.class).getHttpClient();
+    HttpGet request = new HttpGet(remoteUrl.resolve(name));
+    log.debug("Fetching: {}", request);
+
+    HttpResponse response = client.execute(request);
+    log.debug("Response: {}", response);
+
+    StatusLine status = response.getStatusLine();
+    log.debug("Status: {}", status);
+
+    SimpleContent content = null;
+    if (status.getStatusCode() == HttpStatus.SC_OK) {
+      HttpEntity entity = response.getEntity();
+      try {
+        log.debug("Entity: {}", entity);
+        content = new SimpleContent(new HttpEntityPayload(entity));
+      }
+      finally {
+        EntityUtils.consume(entity);
+      }
+    }
+
+    return content;
+  }
+
+  /**
+   * Adapts {@link HttpEntity} to {@link Payload}.
+   */
+  private static class HttpEntityPayload
+    implements Payload
+  {
+    private final HttpEntity entity;
+
+    public HttpEntityPayload(final HttpEntity entity) {
+      this.entity = entity;
+    }
+
+    @Override
+    public InputStream openInputStream() throws IOException {
+      return entity.getContent();
+    }
+
+    @Override
+    public long getSize() {
+      return entity.getContentLength();
+    }
+
+    @Nullable
+    @Override
+    public String getContentType() {
+      Header header = entity.getContentType();
+      if (header != null) {
+        return header.getValue();
+      }
+      return null;
+    }
   }
 }
