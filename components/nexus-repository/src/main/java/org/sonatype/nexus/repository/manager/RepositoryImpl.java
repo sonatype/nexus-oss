@@ -10,11 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository;
+package org.sonatype.nexus.repository.manager;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.Format;
+import org.sonatype.nexus.repository.MissingFacetException;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.RepositoryDestroyedEvent;
+import org.sonatype.nexus.repository.RepositoryStartedEvent;
+import org.sonatype.nexus.repository.RepositoryStoppedEvent;
+import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;

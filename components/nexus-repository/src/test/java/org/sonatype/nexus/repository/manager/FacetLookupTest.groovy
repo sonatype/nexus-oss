@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository
+package org.sonatype.nexus.repository.manager
 
 import org.junit.Before
 import org.junit.Test
+import org.sonatype.nexus.repository.Facet
+import org.sonatype.nexus.repository.FacetSupport
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
 
 /**
- * Tests for {@link FacetLookup}.
+ * Tests for {@link org.sonatype.nexus.repository.manager.FacetLookup}.
  */
 class FacetLookupTest
   extends TestSupport
