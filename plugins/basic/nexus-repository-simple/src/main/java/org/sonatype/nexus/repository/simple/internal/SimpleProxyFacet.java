@@ -51,6 +51,8 @@ public class SimpleProxyFacet
 
   private URI remoteUrl;
 
+  private HttpClientFacet httpClient;
+
   @Override
   protected void doInit(final Repository repository) throws Exception {
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
@@ -60,6 +62,16 @@ public class SimpleProxyFacet
     }
     this.remoteUrl = new URI(url);
     log.debug("Remote URL: {}", remoteUrl);
+  }
+
+  @Override
+  protected void doStart() throws Exception {
+    httpClient = getRepository().facet(HttpClientFacet.class);
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    httpClient = null;
   }
 
   @Override
@@ -90,7 +102,8 @@ public class SimpleProxyFacet
 
   @Nullable
   private SimpleContent fetch(final String name) throws IOException {
-    HttpClient client = getRepository().facet(HttpClientFacet.class).getHttpClient();
+    HttpClient client = httpClient.getHttpClient();
+
     HttpGet request = new HttpGet(remoteUrl.resolve(name));
     log.debug("Fetching: {}", request);
 

@@ -56,6 +56,8 @@ public class SimpleGroupFacet
 
   private final Set<String> memberNames = Sets.newLinkedHashSet();
 
+  private SimpleIndexHtmlFacet indexHtml;
+
   @Inject
   public SimpleGroupFacet(final RepositoryManager repositoryManager) {
     this.repositoryManager = checkNotNull(repositoryManager);
@@ -66,8 +68,18 @@ public class SimpleGroupFacet
     NestedAttributesMap attributes = repository.getConfiguration().attributes(CONFIG_KEY);
     memberNames.addAll(attributes.require("memberNames", COLLECTION_STRING));
     log.debug("Members names: {}", memberNames);
+  }
 
-    // TODO: Validate members are compatible on start?
+  @Override
+  protected void doStart() throws Exception {
+    indexHtml = getRepository().facet(SimpleIndexHtmlFacet.class);
+
+    // TODO: Validate members are compatible?
+  }
+
+  @Override
+  protected void doStop() throws Exception {
+    indexHtml = null;
   }
 
   @Override
@@ -164,7 +176,6 @@ public class SimpleGroupFacet
    */
   private void maybeInvalidateIndexHtmlCache(final SimpleContentEvent event) {
     if (memberNames.contains(event.getRepository().getName())) {
-      SimpleIndexHtmlFacet indexHtml = getRepository().facet(SimpleIndexHtmlFacet.class);
       indexHtml.invalidate();
     }
   }
