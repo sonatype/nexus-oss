@@ -70,7 +70,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
       },
       items: [
         {
-          xtype: 'toolbar',
+          xtype: 'nx-drilldown-actions',
           items: {
             xtype: 'nx-go-back'
           }
@@ -96,20 +96,14 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
     },
     items: [
       {
-        xtype: 'toolbar',
+        xtype: 'nx-drilldown-actions',
         items: {
           xtype: 'nx-go-back'
         }
       },
       {
         xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-        header: false,
-        plain: true,
-
-        style: {
-          'background-color': 'white',
-          'padding-top': '10px'
-        }
+        header: false
       }
     ]
   },

@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
           editableMarker: 'You do not have permission to create LDAP servers',
           items: {
         xtype: 'tabpanel',
-            plain: true,
+            ui: 'light',
             items: [
           { xtype: 'nx-coreui-ldapserver-connection-fieldset', title: 'Connection' },
           { xtype: 'nx-coreui-ldapserver-backup-fieldset', title: 'Backup Mirror' },

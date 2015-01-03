@@ -4354,6 +4354,18 @@
 }
 
 /**
+ * @class Ext.toolbar.Toolbar
+ */
+/**
+ * cls: 'nx-drilldown-actions'
+ */
+/* line 9, ../../../baseapp/packages/rapture-theme/sass/src/Ext/toolbar/Toolbar.scss */
+.nx-drilldown-actions {
+  border-bottom: 1px solid #cbcbcb !important;
+  z-index: 9;
+}
+
+/**
  * @class Ext.panel.Panel
  */
 /**
@@ -17492,11 +17504,6 @@
 /* line 136, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-over {
   border-bottom: 1px solid #ebebeb;
-}
-
-/* line 140, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
-.x-panel-light {
-  border-top: 1px solid #cbcbcb;
 }
 
 /**

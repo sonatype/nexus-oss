@@ -44,7 +44,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
       editableMarker: 'You do not have permission to create tasks',
       items: {
         xtype: 'tabpanel',
-        plain: true,
+        ui: 'light',
         items: [
           {
             xtype: 'panel',
