@@ -12,7 +12,12 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.Facet;
+
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Storage {@link Facet}.
@@ -23,7 +28,67 @@ import org.sonatype.nexus.repository.Facet;
 public interface StorageFacet
   extends Facet
 {
-  // BREAD components
+  /**
+   * Gets a transaction for working with the graph.
+   */
+  Graph getGraphTx();
 
-  // BREAD assets
+  // Browse Assets and Components
+
+  /**
+   * Gets all vertices representing assets in the graph.
+   */
+  Iterable<Vertex> browseAssets(Graph graph);
+
+  /**
+   * Gets all vertices representing components in the graph.
+   */
+  Iterable<Vertex> browseComponents(Graph graph);
+
+  // Read Assets and Components
+
+  /**
+   * Gets a vertex representing an asset with a given id, or {@code null}.
+   *
+   * The id may be a {@code String}, {@code ODocument}, {@code OIdentifiable}, or {@code EntityId}.
+   */
+  @Nullable
+  Vertex findAssetWithId(Graph graph, Object id);
+
+  /**
+   * Gets a vertex representing an asset with a given path, or {@code null}.
+   */
+  @Nullable
+  Vertex findAssetWithPath(Graph graph, String path);
+
+  /**
+   * Gets a vertex representing an asset with a given id, or {@code null}.
+   *
+   * The id may be a {@code String}, {@code ODocument}, {@code OIdentifiable}, or {@code EntityId}.
+   */
+  @Nullable
+  Vertex findComponentWithId(Graph graph, Object id);
+
+  // Edit Assets and Components (edits can be done directly on Vertex objects, followed by calling graph.commit())
+
+  // Add Assets and Components
+
+  /**
+   * Creates a new vertex representing an asset.
+   */
+  Vertex createAsset(Graph graph);
+
+  /**
+   * Creates a new vertex representing a component.
+   */
+  Vertex createComponent(Graph graph);
+
+  // Delete Assets and Components
+
+  /**
+   * Removes a vertex from the graph.
+   */
+  void delete(Vertex vertex);
+
+  // TODO: Blob CR_D
 }

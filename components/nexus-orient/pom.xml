@@ -77,14 +77,6 @@
       <artifactId>orientdb-server</artifactId>
     </dependency>
 
-    <!--
-    NOTE: Not using object-api this is not recommended for usage by orient support.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>com.orientechnologies</groupId>-->
-      <!--<artifactId>orientdb-object</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-graphdb</artifactId>
