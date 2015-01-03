@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class RepositoryEvent
 {
-  private Repository repository;
+  private final Repository repository;
 
   public RepositoryEvent(final Repository repository) {
     this.repository = checkNotNull(repository);
