@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerChangeOrder', {
   extend: 'NX.view.ChangeOrderWindow',
   alias: 'widget.nx-coreui-ldapserver-changeorder',
   requires: [
-    'NX.coreui.store.LdapServer'
+    'NX.coreui.store.LdapServer',
+    'NX.I18n'
   ],
 
-  title: 'Change LDAP Servers ordering',
+  title: NX.I18n.get('ADMIN_LDAP_ORDER_TITLE'),
 
   /**
    * @override

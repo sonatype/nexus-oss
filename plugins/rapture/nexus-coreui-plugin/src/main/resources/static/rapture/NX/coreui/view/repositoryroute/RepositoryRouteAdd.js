@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repositoryroute-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new route',
+  title: NX.I18n.get('ADMIN_ROUTING_CREATE_TITLE'),
   defaultFocus: 'pattern',
 
   /**
@@ -39,10 +40,10 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
         submit: 'NX.direct.coreui_RepositoryRoute.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Repository route created: ' + data['pattern'];
+        return NX.I18n.get('ADMIN_ROUTING_CREATE_SUCCESS') + data['pattern'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:routes', 'create'),
-      editableMarker: 'You do not have permission to create routes'
+      editableMarker: NX.I18n.get('ADMIN_ROUTING_CREATE_ERROR')
     };
 
     me.callParent();

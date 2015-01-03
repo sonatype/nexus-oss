@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-analytics-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**
@@ -33,13 +34,13 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Analytics Settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.analytics_Settings.read',
           submit: 'NX.direct.analytics_Settings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:analytics', 'update'),
-        editableMarker: 'You do not have permission to configure analytics',
+        editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
 
         items: [
           {

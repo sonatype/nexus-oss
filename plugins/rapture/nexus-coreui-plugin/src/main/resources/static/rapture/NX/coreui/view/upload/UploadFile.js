@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.upload.UploadFile', {
   extend: 'Ext.form.Panel',
   alias: 'widget.nx-coreui-upload-file',
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @cfg entry name
@@ -51,8 +54,8 @@ Ext.define('NX.coreui.view.upload.UploadFile', {
 
   buttonAlign: 'left',
   buttons: [
-    { text: 'Upload', action: 'upload', ui: 'primary', formBind: true },
-    { text: 'Discard', action: 'discard' }
+    { text: NX.I18n.get('BROWSE_UPLOAD_BUTTON'), action: 'upload', ui: 'primary', formBind: true },
+    { text: NX.I18n.get('BROWSE_UPLOAD_DISCARD_BUTTON'), action: 'discard' }
   ]
 
 });

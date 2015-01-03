@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddHostedMaven', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: ['widget.nx-repository-add-hosted-maven1', 'widget.nx-repository-add-hosted-maven2'],
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Create new Maven hosted repository',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_MAVEN_TITLE'),
 
   initComponent: function() {
     var me = this;
@@ -33,7 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddHostedMaven', {
         submit: 'NX.direct.coreui_Repository.createHostedMaven'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Maven Hosted repository created: ' + data['id'];
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_MAVEN_SUCCESS') + data['id'];
       }
     };
 

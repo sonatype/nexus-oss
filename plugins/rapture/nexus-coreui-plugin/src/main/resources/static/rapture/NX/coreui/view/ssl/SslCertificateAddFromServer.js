@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-server',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
-  title: 'Load certificate from server',
+  title: NX.I18n.get('ADMIN_SSL_LOAD_TITLE'),
   defaultFocus: 'server',
 
   /**
@@ -39,18 +40,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
 
       items: [
         {
-          xtype: 'panel',
-          margin: '0 0 10 0',
-          layout: {
-            type: 'hbox'
-          },
-          items: [
-            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-server', 'x32') },
-            { xtype: 'container', html: 'Please enter a hostname, hostname:port or a URL to fetch a SSL certificate from.' }
-          ]
-        },
-        {
           xtype: 'textfield',
+          fieldLabel: NX.I18n.get('ADMIN_SSL_LOAD_HELP'),
           anchor: '100%',
           name: 'server',
           itemId: 'server'
@@ -58,8 +49,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
       ],
 
       buttons: [
-        { text: 'Load Certificate', action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('ADMIN_SSL_LOAD_SUBMIT_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_LOAD_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.maven.MavenUpload', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-maven-upload',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: {
     xtype: 'nx-coreui-upload-artifact',
@@ -38,8 +41,6 @@ Ext.define('NX.coreui.view.maven.MavenUpload', {
         xtype: 'combo',
         name: 'repositoryId',
         fieldLabel: NX.I18n.get('BROWSE_MAVEN_REPOSITORY'),
-        helpText: NX.I18n.get('BROWSE_MAVEN_REPOSITORY_HELP'),
-        emptyText: NX.I18n.get('BROWSE_MAVEN_REPOSITORY_PLACEHOLDER'),
         queryMode: 'local',
         displayField: 'name',
         valueField: 'id',

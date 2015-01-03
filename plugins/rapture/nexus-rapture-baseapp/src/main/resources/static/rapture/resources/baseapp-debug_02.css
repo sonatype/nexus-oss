@@ -15496,7 +15496,7 @@
 .product-name {
   color: white;
   font-size: 20px;
-  font-weight: 200px;
+  font-weight: 200;
 }
 
 /**
@@ -17480,28 +17480,28 @@
 
 /*</if slicer>*/
 /* */
-/* line 117, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 71, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-body-light-top {
   padding-left: 5px;
 }
 
-/* line 122, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 76, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-strip-light-top {
   border-bottom: 1px solid white;
 }
 
-/* line 128, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 82, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top,
 .x-tab-light-top-disabled {
   border-bottom: 1px solid #f4f4f4;
 }
 
-/* line 132, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 86, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-active {
   border-bottom: 1px solid #cbcbcb;
 }
 
-/* line 136, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 90, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-over {
   border-bottom: 1px solid #ebebeb;
 }
