@@ -21,6 +21,6 @@ public class MissingFacetException
     extends RuntimeException
 {
   public MissingFacetException(final Repository repository, final Class<? extends Facet> type) {
-    super(String.format("No facet of type %s in repository %s", type.getSimpleName(), repository.getName()));
+    super(String.format("No facet of type %s attached to repository %s", type.getSimpleName(), repository.getName()));
   }
 }
