@@ -10,11 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.util
 
 import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import java.util.concurrent.locks.ReentrantLock
 
 import static org.junit.Assert.fail
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.INITIALISED
@@ -37,7 +40,7 @@ class SimpleStateGuardTest
   }
 
   private static class TriggeredAction
-    implements SimpleStateGuard.Action
+      implements SimpleStateGuard.Action
   {
     boolean triggered = false
 
@@ -52,6 +55,7 @@ class SimpleStateGuardTest
   @Before
   void setUp() {
     underTest = new SimpleStateGuard.Builder<State>()
+        .lock(new ReentrantLock())
         .initial(NEW)
         .create();
 

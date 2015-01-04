@@ -10,13 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.util;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nullable;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -28,21 +33,80 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class SimpleStateGuard<T extends Enum>
-  extends ComponentSupport
+    extends ComponentSupport
 {
+  private final Lock lock;
+
   private T current;
 
-  public SimpleStateGuard(final T initial) {
+  public SimpleStateGuard(final Lock lock,
+                          final T initial)
+  {
+    this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
   }
 
-  // TODO: Sort out synchronization needed to ensure state sanity
+  private void lock() {
+    try {
+      // TODO: Expose for configuration, or hard-code reasonable values?
+      lock.tryLock(1, TimeUnit.MINUTES);
+    }
+    catch (InterruptedException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  private void unlock() {
+    lock.unlock();
+  }
 
   /**
    * Returns the current state.
    */
   public T getCurrent() {
-    return current;
+    lock();
+    try {
+      return current;
+    }
+    finally {
+      unlock();
+    }
+  }
+
+  /**
+   * Check if the current state is given state.
+   */
+  public boolean is(final T state) {
+    lock();
+    try {
+      return current == state;
+    }
+    finally {
+      unlock();
+    }
+  }
+
+  /**
+   * Ensure the current state is one of allowed.
+   */
+  public void ensure(final T... allowed) {
+    lock();
+    try {
+      doEnsure(allowed);
+    }
+    finally {
+      unlock();
+    }
+  }
+
+  private void doEnsure(final T... allowed) {
+    for (T allow : allowed) {
+      if (current == allow) {
+        return;
+      }
+    }
+
+    throw new IllegalStateException("Invalid state: " + current.name() + "; allowed: " + Arrays.toString(allowed));
   }
 
   /**
@@ -57,24 +121,6 @@ public class SimpleStateGuard<T extends Enum>
    */
   public Guard guard(final T... allowed) {
     return new Guard(allowed);
-  }
-
-  /**
-   * Ensure the current state is one of allowed.
-   */
-  private void ensure(final T... allowed) {
-    for (T allow : allowed) {
-      if (current == allow) {
-        return;
-      }
-    }
-
-    throw new IllegalStateException("Invalid state: " + current.name() + "; allowed: " + Arrays.toString(allowed));
-  }
-
-  @Override
-  public String toString() {
-    return current.name();
   }
 
   //
@@ -100,22 +146,28 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public void run(final Action action) {
-      if (allowed != null) {
-        ensure(allowed);
-      }
-
+      lock();
       try {
-        log.trace("Transitioning to: {}, from: {}", to, current);
+        if (allowed != null) {
+          doEnsure(allowed);
+        }
 
-        action.run();
-        current = to;
+        try {
+          log.trace("Transitioning to: {}, from: {}", to, current);
 
-        log.trace("Transitioned to: {}", to);
+          action.run();
+          current = to;
+
+          log.trace("Transitioned to: {}", to);
+        }
+        catch (Exception e) { // Throwable?
+          log.error("Failed transition to: {}", to, e);
+          // TODO: Support failed state
+          // TODO: Rethrow?
+        }
       }
-      catch (Exception e) { // Throwable?
-        log.error("Failed transition to: {}", to, e);
-        // TODO: Support failed state
-        // TODO: Rethrow?
+      finally {
+        unlock();
       }
     }
   }
@@ -133,8 +185,14 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public void run(final Action action) throws Exception {
-      ensure(allowed);
-      action.run();
+      lock();
+      try {
+        doEnsure(allowed);
+        action.run();
+      }
+      finally {
+        unlock();
+      }
     }
   }
 
@@ -153,13 +211,18 @@ public class SimpleStateGuard<T extends Enum>
 
   public static class Builder<T extends Enum>
   {
+    private Lock lock;
+
     private T initial;
 
     // error state?
 
     // final states?
 
-    // lock
+    public Builder<T> lock(final Lock lock) {
+      this.lock = lock;
+      return this;
+    }
 
     public Builder<T> initial(final T initial) {
       this.initial = initial;
@@ -167,8 +230,9 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public SimpleStateGuard<T> create() {
-      checkState(initial != null);
-      return new SimpleStateGuard<>(initial);
+      checkState(lock != null, "Missing: lock");
+      checkState(initial != null, "Missing: initial");
+      return new SimpleStateGuard<>(lock, initial);
     }
   }
 }
