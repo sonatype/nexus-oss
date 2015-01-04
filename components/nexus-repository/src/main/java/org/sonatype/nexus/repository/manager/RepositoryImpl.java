@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.manager;
 
 import javax.annotation.Nonnull;
@@ -24,12 +25,19 @@ import org.sonatype.nexus.repository.RepositoryStartedEvent;
 import org.sonatype.nexus.repository.RepositoryStoppedEvent;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.util.SimpleStateGuard;
+import org.sonatype.nexus.repository.util.SimpleStateGuard.Action;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.DESTROYED;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.INITIALISED;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.NEW;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.STARTED;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.STOPPED;
 
 /**
  * {@link Repository} implementation.
@@ -95,9 +103,8 @@ public class RepositoryImpl
   // State
   //
 
-  // TODO: Sort out synchronization needed to ensure state sanity
-
-  private static enum State
+  // visible for static import usage
+  static enum State
   {
     NEW,
     INITIALISED,
@@ -106,19 +113,9 @@ public class RepositoryImpl
     DESTROYED
   }
 
-  private State state = State.NEW;
-
-  private void ensureState(final State... allowed) {
-    assert allowed != null && allowed.length > 0;
-
-    for (State allow : allowed) {
-      if (state == allow) {
-        return;
-      }
-    }
-
-    throw new IllegalStateException("Invalid state: " + state.name());
-  }
+  private final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
+      .initial(NEW)
+      .create();
 
   //
   // Lifecycle
@@ -126,80 +123,113 @@ public class RepositoryImpl
 
   @Override
   public void init(final Configuration configuration) throws Exception {
-    ensureState(State.NEW);
+    checkNotNull(configuration);
 
-    log.trace("Initialising");
+    states.transition(INITIALISED)
+        .from(NEW)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doInit(configuration);
+          }
+        });
+  }
 
-    this.configuration = checkNotNull(configuration);
+  private void doInit(final Configuration configuration) throws Exception {
+    this.configuration = configuration;
     this.name = configuration.getRepositoryName();
-
-    state = State.INITIALISED;
-
-    log.trace("Initialized");
   }
 
   @Override
   public void update(final Configuration configuration) throws Exception {
-    ensureState(State.STOPPED);
+    checkNotNull(configuration);
 
-    log.trace("Updating");
+    states.transition(STOPPED)
+        .from(STOPPED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doUpdate(configuration);
+          }
+        });
+  }
 
-    this.configuration = checkNotNull(configuration);
+  private void doUpdate(final Configuration configuration) throws Exception {
+    this.configuration = configuration;
 
+    // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Updating facet: {}", facet);
       facet.update();
     }
-
-    log.trace("Updated");
   }
 
   @Override
   public void start() throws Exception {
-    ensureState(State.INITIALISED, State.STOPPED);
+    states.transition(STARTED)
+        .from(INITIALISED, STOPPED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doStart();
+          }
+        });
+  }
 
-    log.trace("Starting");
-
+  private void doStart() throws Exception {
+    // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Starting facet: {}", facet);
       facet.start();
     }
 
-    state = State.STARTED;
-
     eventBus.post(new RepositoryStartedEvent(this));
-
-    log.trace("Started");
   }
 
   @Override
   public void stop() throws Exception {
-    ensureState(State.STARTED);
+    states.transition(STOPPED)
+        .from(STARTED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doStop();
+          }
+        });
+  }
 
-    log.trace("Stopping");
-
+  private void doStop() throws Exception {
+    // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Stopping facet: {}", facet);
       facet.stop();
     }
 
-    state = State.STOPPED;
-
     eventBus.post(new RepositoryStoppedEvent(this));
-
-    log.trace("Stopped");
   }
 
   @Override
   public void destroy() throws Exception {
-    // allow any state
+    states.transition(DESTROYED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doDestroy();
+          }
+        });
+  }
 
-    log.trace("Destroying");
-
-    if (state == State.STARTED) {
-      stop();
+  private void doDestroy() throws Exception {
+    if (states.getCurrent() == STARTED) {
+      doStop();
     }
 
+    // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Destroying facet: {}", facet);
       facet.destroy();
@@ -208,11 +238,7 @@ public class RepositoryImpl
     facets.clear();
     configuration = null;
 
-    state = State.DESTROYED;
-
     eventBus.post(new RepositoryDestroyedEvent(this));
-
-    log.trace("Destroyed");
   }
 
   //
@@ -222,12 +248,20 @@ public class RepositoryImpl
   @Override
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
-    ensureState(State.INITIALISED);
 
+    states.guard(INITIALISED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doAttach(facet);
+          }
+        });
+  }
+
+  private void doAttach(final Facet facet) throws Exception {
     log.debug("Attaching facet: {}", facet);
-
     facet.init(this);
-
     facets.add(facet);
   }
 
