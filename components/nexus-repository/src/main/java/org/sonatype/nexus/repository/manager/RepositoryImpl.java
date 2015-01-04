@@ -36,6 +36,7 @@ import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.DESTROYED;
+import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.FAILED;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.INITIALISED;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.NEW;
 import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.STARTED;
@@ -112,12 +113,14 @@ public class RepositoryImpl
     INITIALISED,
     STARTED,
     STOPPED,
-    DESTROYED
+    DESTROYED,
+    FAILED
   }
 
   private final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
       .lock(new ReentrantLock())
       .initial(NEW)
+      .failure(FAILED)
       .create();
 
   //
