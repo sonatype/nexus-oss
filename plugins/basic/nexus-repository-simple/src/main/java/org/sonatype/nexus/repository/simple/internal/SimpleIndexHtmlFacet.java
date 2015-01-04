@@ -63,7 +63,7 @@ public class SimpleIndexHtmlFacet
   }
 
   public String get() {
-    ensureStarted();
+    ensureState(State.STARTED);
 
     // resolve volatile to local for thread sanity
     String html = htmlCache;

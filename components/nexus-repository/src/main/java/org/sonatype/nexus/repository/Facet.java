@@ -28,7 +28,7 @@ public interface Facet
 {
   void init(Repository repository) throws Exception;
 
-  //void update() throws Exception;
+  void update() throws Exception;
 
   void start() throws Exception;
 
@@ -38,6 +38,8 @@ public interface Facet
 
   /**
    * Marks {@link Facet} interface and/or implementation as exposed.
+   *
+   * Exposed types can be accessed via {@link Repository#facet}.
    */
   @Documented
   @Target(TYPE)

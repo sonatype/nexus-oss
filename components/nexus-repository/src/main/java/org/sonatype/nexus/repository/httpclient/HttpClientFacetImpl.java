@@ -63,7 +63,8 @@ public class HttpClientFacetImpl
 
   @Override
   public HttpClient getHttpClient() {
-    ensureStarted();
+    ensureState(State.STARTED);
+
     return httpClient;
   }
 }

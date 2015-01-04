@@ -223,7 +223,7 @@ public class RepositoryManagerImpl
 
     // TODO: Ensure configuration sanity, before we apply to repository
     repository.stop();
-    // TODO: figure out how to reconfigure, save and config-facet usage
+    repository.update(configuration);
     repository.start();
 
     eventBus.post(new RepositoryUpdatedEvent(repository));

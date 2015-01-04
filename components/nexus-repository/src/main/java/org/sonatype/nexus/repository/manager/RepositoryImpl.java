@@ -30,7 +30,6 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link Repository} implementation.
@@ -49,12 +48,9 @@ public class RepositoryImpl
 
   private final FacetLookup facets = new FacetLookup();
 
-  private String name;
-
   private Configuration configuration;
 
-  // TODO: Sort out synchronization needed to ensure state sanity
-  private volatile boolean started;
+  private String name;
 
   @Inject
   public RepositoryImpl(final EventBus eventBus,
@@ -78,13 +74,12 @@ public class RepositoryImpl
 
   @Override
   public String getName() {
-    return name;
+    return checkNotNull(name);
   }
 
   @Override
   public Configuration getConfiguration() {
-    checkState(configuration != null, "Not initialized");
-    return configuration;
+    return checkNotNull(configuration);
   }
 
   @Override
@@ -97,20 +92,71 @@ public class RepositoryImpl
   }
 
   //
+  // State
+  //
+
+  // TODO: Sort out synchronization needed to ensure state sanity
+
+  private static enum State
+  {
+    NEW,
+    INITIALISED,
+    STARTED,
+    STOPPED,
+    DESTROYED
+  }
+
+  private State state = State.NEW;
+
+  private void ensureState(final State... allowed) {
+    assert allowed != null && allowed.length > 0;
+
+    for (State allow : allowed) {
+      if (state == allow) {
+        return;
+      }
+    }
+
+    throw new IllegalStateException("Invalid state: " + state.name());
+  }
+
+  //
   // Lifecycle
   //
 
   @Override
   public void init(final Configuration configuration) throws Exception {
+    ensureState(State.NEW);
+
+    log.trace("Initialising");
+
     this.configuration = checkNotNull(configuration);
     this.name = configuration.getRepositoryName();
+
+    state = State.INITIALISED;
 
     log.trace("Initialized");
   }
 
   @Override
+  public void update(final Configuration configuration) throws Exception {
+    ensureState(State.STOPPED);
+
+    log.trace("Updating");
+
+    this.configuration = checkNotNull(configuration);
+
+    for (Facet facet : facets) {
+      log.debug("Updating facet: {}", facet);
+      facet.update();
+    }
+
+    log.trace("Updated");
+  }
+
+  @Override
   public void start() throws Exception {
-    checkState(!started, "Already started");
+    ensureState(State.INITIALISED, State.STOPPED);
 
     log.trace("Starting");
 
@@ -119,16 +165,16 @@ public class RepositoryImpl
       facet.start();
     }
 
-    eventBus.post(new RepositoryStartedEvent(this));
+    state = State.STARTED;
 
-    started = true;
+    eventBus.post(new RepositoryStartedEvent(this));
 
     log.trace("Started");
   }
 
   @Override
   public void stop() throws Exception {
-    checkState(started, "Not started");
+    ensureState(State.STARTED);
 
     log.trace("Stopping");
 
@@ -137,18 +183,20 @@ public class RepositoryImpl
       facet.stop();
     }
 
-    eventBus.post(new RepositoryStoppedEvent(this));
+    state = State.STOPPED;
 
-    started = false;
+    eventBus.post(new RepositoryStoppedEvent(this));
 
     log.trace("Stopped");
   }
 
   @Override
   public void destroy() throws Exception {
+    // allow any state
+
     log.trace("Destroying");
 
-    if (started) {
+    if (state == State.STARTED) {
       stop();
     }
 
@@ -158,6 +206,9 @@ public class RepositoryImpl
     }
 
     facets.clear();
+    configuration = null;
+
+    state = State.DESTROYED;
 
     eventBus.post(new RepositoryDestroyedEvent(this));
 
@@ -171,9 +222,12 @@ public class RepositoryImpl
   @Override
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
-    checkState(!started, "Already started");
+    ensureState(State.INITIALISED);
+
     log.debug("Attaching facet: {}", facet);
+
     facet.init(this);
+
     facets.add(facet);
   }
 
@@ -186,10 +240,5 @@ public class RepositoryImpl
     }
 
     return facet;
-  }
-
-  @Override
-  public Iterable<Facet> facets() {
-    return facets;
   }
 }

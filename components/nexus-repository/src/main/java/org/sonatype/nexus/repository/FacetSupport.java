@@ -43,20 +43,37 @@ public abstract class FacetSupport
 
   private Repository repository;
 
-  // TODO: Sort out synchronization needed to ensure state sanity
-  private volatile boolean started;
-
-  protected boolean isStarted() {
-    return started;
-  }
-
-  protected void ensureStarted() {
-    checkState(started, "Not started");
-  }
-
   protected Repository getRepository() {
-    checkState(repository != null, "Not initialized");
-    return repository;
+    return checkNotNull(repository);
+  }
+
+  //
+  // State
+  //
+
+  // TODO: Sort out synchronization needed to ensure state sanity
+
+  protected static enum State
+  {
+    NEW,
+    INITIALISED,
+    STARTED,
+    STOPPED,
+    DESTROYED
+  }
+
+  private State state = State.NEW;
+
+  protected void ensureState(final State... allowed) {
+    assert allowed != null && allowed.length > 0;
+
+    for (State allow : allowed) {
+      if (state == allow) {
+        return;
+      }
+    }
+
+    throw new IllegalStateException("Invalid state: " + state.name());
   }
 
   //
@@ -65,11 +82,16 @@ public abstract class FacetSupport
 
   @Override
   public final void init(final Repository repository) throws Exception {
-    checkState(this.repository == null, "Already initialized");
+    ensureState(State.NEW);
+
     this.repository = checkNotNull(repository);
 
     log.trace("Initialising");
+
     doInit();
+
+    state = State.INITIALISED;
+
     log.trace("Initialized");
   }
 
@@ -78,12 +100,32 @@ public abstract class FacetSupport
   }
 
   @Override
+  public void update() throws Exception {
+    ensureState(State.STOPPED);
+
+    log.trace("Updating");
+
+    doUpdate();
+
+    log.trace("Updated");
+  }
+
+  protected void doUpdate() throws Exception {
+    // nop
+  }
+
+  @Override
   public final void start() throws Exception {
-    checkState(!started, "Already started");
+    ensureState(State.INITIALISED, State.STOPPED);
+
     log.trace("Starting");
+
     doStart();
+
     eventBus.register(this);
-    started = true;
+
+    state = State.STARTED;
+
     log.trace("Started");
   }
 
@@ -93,11 +135,16 @@ public abstract class FacetSupport
 
   @Override
   public final void stop() throws Exception {
-    checkState(started, "Not started");
+    ensureState(State.STARTED);
+
     log.trace("Stopping");
+
     eventBus.unregister(this);
+
     doStop();
-    started = false;
+
+    state = State.STOPPED;
+
     log.trace("Stopped");
   }
 
@@ -107,12 +154,20 @@ public abstract class FacetSupport
 
   @Override
   public final void destroy() throws Exception {
+    // allow any state
+
     log.trace("Destroying");
-    if (started) {
+
+    if (state == State.STARTED) {
       stop();
     }
+
     doDestroy();
+
     repository = null;
+
+    state = State.DESTROYED;
+
     log.trace("Destroyed");
   }
 

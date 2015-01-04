@@ -53,7 +53,8 @@ public class SimpleStorageFacet
   @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureStarted();
+    ensureState(State.STARTED);
+
     return store.get(name);
   }
 
@@ -62,7 +63,7 @@ public class SimpleStorageFacet
   public SimpleContent put(final String name, final SimpleContent content) {
     checkNotNull(name);
     checkNotNull(content);
-    ensureStarted();
+    ensureState(State.STARTED);
 
     SimpleContent prev = store.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
@@ -86,7 +87,7 @@ public class SimpleStorageFacet
   @Nullable
   public SimpleContent delete(final String name) {
     checkNotNull(name);
-    ensureStarted();
+    ensureState(State.STARTED);
 
     SimpleContent prev = store.remove(name);
     if (prev != null) {

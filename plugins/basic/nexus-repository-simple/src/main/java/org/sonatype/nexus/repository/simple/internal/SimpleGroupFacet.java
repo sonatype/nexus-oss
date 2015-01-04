@@ -111,7 +111,7 @@ public class SimpleGroupFacet
   @Override
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureStarted();
+    ensureState(State.STARTED);
 
     // TODO: Should this really be going through the repository's view?
     // TODO: ... and thus need the Request and likely should move this logic to handler?

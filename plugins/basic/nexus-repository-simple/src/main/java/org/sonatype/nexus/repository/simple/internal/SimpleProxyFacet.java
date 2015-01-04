@@ -81,7 +81,7 @@ public class SimpleProxyFacet
   @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureStarted();
+    ensureState(State.STARTED);
 
     SimpleContent content = super.get(name);
     if (content == null) {

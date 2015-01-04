@@ -31,7 +31,7 @@ public interface Repository
 
   void init(Configuration configuration) throws Exception;
 
-  //void update(Configuration configuration) throws Exception;
+  void update(Configuration configuration) throws Exception;
 
   void start() throws Exception;
 
@@ -45,6 +45,4 @@ public interface Repository
 
   @Nonnull
   <T extends Facet> T facet(Class<T> type) throws MissingFacetException;
-
-  Iterable<Facet> facets();
 }
