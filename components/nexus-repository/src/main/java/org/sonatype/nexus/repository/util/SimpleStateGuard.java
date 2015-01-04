@@ -38,14 +38,23 @@ public class SimpleStateGuard<T extends Enum>
 
   // TODO: Sort out synchronization needed to ensure state sanity
 
+  /**
+   * Returns the current state.
+   */
   public T getCurrent() {
     return current;
   }
 
+  /**
+   * Create a transition to given state.
+   */
   public Transition transition(final T to) {
     return new Transition(to);
   }
 
+  /**
+   * Create a guard which allows execution in the given states.
+   */
   public Guard guard(final T... allowed) {
     return new Guard(allowed);
   }
@@ -106,6 +115,7 @@ public class SimpleStateGuard<T extends Enum>
       catch (Exception e) { // Throwable?
         log.error("Failed transition to: {}", to, e);
         // TODO: Support failed state
+        // TODO: Rethrow?
       }
     }
   }
