@@ -52,22 +52,6 @@ class SimpleStateGuardTest
     }
   }
 
-  private static class FailureException
-    extends Exception
-  {
-    FailureException() {
-      super('FAILED')
-    }
-  }
-
-  private static class FailureError
-      extends Error
-  {
-    FailureError() {
-      super('FAILED')
-    }
-  }
-
   private SimpleStateGuard<State> underTest
 
   @Before
@@ -110,6 +94,14 @@ class SimpleStateGuardTest
     assert !action.triggered
   }
 
+  private static class FailureException
+      extends Exception
+  {
+    FailureException() {
+      super('FAILED')
+    }
+  }
+
   @Test
   void 'transition with action failing with exception'() {
     try {
@@ -129,6 +121,14 @@ class SimpleStateGuardTest
     }
 
     assert underTest.current == FAILED
+  }
+
+  private static class FailureError
+      extends Error
+  {
+    FailureError() {
+      super('FAILED')
+    }
   }
 
   @Test
