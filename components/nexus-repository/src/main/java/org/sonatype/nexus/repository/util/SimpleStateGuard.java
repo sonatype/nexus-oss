@@ -134,6 +134,9 @@ public class SimpleStateGuard<T extends Enum>
   // Transition
   //
 
+  /**
+   * Transition from current state to target state and execute an action.
+   */
   public class Transition
   {
     private final T to;
@@ -189,6 +192,9 @@ public class SimpleStateGuard<T extends Enum>
   // Guard
   //
 
+  /**
+   * Execute an action if current state is allowed.
+   */
   public class Guard
   {
     private final T[] allowed;
