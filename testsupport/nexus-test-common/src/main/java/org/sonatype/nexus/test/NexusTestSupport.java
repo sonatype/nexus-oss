@@ -82,7 +82,7 @@ public abstract class NexusTestSupport
   @Override
   protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
     configuration.setAutoWiring(true);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_CACHE);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
   @Override
