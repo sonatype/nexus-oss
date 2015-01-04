@@ -160,20 +160,21 @@ public class SimpleStateGuard<T extends Enum>
         }
 
         try {
-          log.trace("Transitioning to: {}, from: {}", to, current);
+          log.trace("Transitioning: {} -> {}", current, to);
 
           action.run();
           current = to;
 
-          log.trace("Transitioned to: {}", to);
+          log.trace("Transitioned: {}", to);
         }
         catch (Throwable t) {
+          log.error("Failed transition: {} -> {}", current, to, t);
+
           // maybe set failure state
           if (failure != null) {
             current = failure;
           }
 
-          log.error("Failed transition to: {}", to, t);
           Throwables.propagateIfPossible(t, Exception.class, Error.class);
           throw Throwables.propagate(t);
         }
