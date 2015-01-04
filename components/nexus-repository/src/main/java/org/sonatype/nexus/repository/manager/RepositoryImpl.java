@@ -134,12 +134,12 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doInit(configuration);
+            _init(configuration);
           }
         });
   }
 
-  private void doInit(final Configuration configuration) throws Exception {
+  private void _init(final Configuration configuration) throws Exception {
     this.configuration = configuration;
     this.name = configuration.getRepositoryName();
   }
@@ -154,12 +154,12 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doUpdate(configuration);
+            _update(configuration);
           }
         });
   }
 
-  private void doUpdate(final Configuration configuration) throws Exception {
+  private void _update(final Configuration configuration) throws Exception {
     this.configuration = configuration;
 
     // TODO: handle exceptions
@@ -177,12 +177,12 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doStart();
+            _start();
           }
         });
   }
 
-  private void doStart() throws Exception {
+  private void _start() throws Exception {
     // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Starting facet: {}", facet);
@@ -200,12 +200,12 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doStop();
+            _stop();
           }
         });
   }
 
-  private void doStop() throws Exception {
+  private void _stop() throws Exception {
     // TODO: handle exceptions
     for (Facet facet : facets) {
       log.debug("Stopping facet: {}", facet);
@@ -222,14 +222,14 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doDestroy();
+            _destroy();
           }
         });
   }
 
-  private void doDestroy() throws Exception {
+  private void _destroy() throws Exception {
     if (states.is(STARTED)) {
-      doStop();
+      _stop();
     }
 
     // TODO: handle exceptions
@@ -257,12 +257,12 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            doAttach(facet);
+            _attach(facet);
           }
         });
   }
 
-  private void doAttach(final Facet facet) throws Exception {
+  private void _attach(final Facet facet) throws Exception {
     log.debug("Attaching facet: {}", facet);
     facet.init(this);
     facets.add(facet);

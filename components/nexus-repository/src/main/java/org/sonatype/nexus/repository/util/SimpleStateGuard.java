@@ -90,16 +90,19 @@ public class SimpleStateGuard<T extends Enum>
    * Ensure the current state is one of allowed.
    */
   public void ensure(final T... allowed) {
+    checkNotNull(allowed);
+    checkArgument(allowed.length != 0);
+
     lock();
     try {
-      doEnsure(allowed);
+      _ensure(allowed);
     }
     finally {
       unlock();
     }
   }
 
-  private void doEnsure(final T... allowed) {
+  private void _ensure(final T[] allowed) {
     for (T allow : allowed) {
       if (current == allow) {
         return;
@@ -149,7 +152,7 @@ public class SimpleStateGuard<T extends Enum>
       lock();
       try {
         if (allowed != null) {
-          doEnsure(allowed);
+          _ensure(allowed);
         }
 
         try {
@@ -189,7 +192,7 @@ public class SimpleStateGuard<T extends Enum>
     public void run(final Action action) throws Exception {
       lock();
       try {
-        doEnsure(allowed);
+        _ensure(allowed);
         action.run();
       }
       finally {
