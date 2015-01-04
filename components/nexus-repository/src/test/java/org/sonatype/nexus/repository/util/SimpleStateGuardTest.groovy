@@ -20,6 +20,7 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 import java.util.concurrent.locks.ReentrantLock
 
 import static org.junit.Assert.fail
+import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.FAILED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.INITIALISED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.NEW
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STARTED
@@ -36,7 +37,8 @@ class SimpleStateGuardTest
     INITIALISED,
     STARTED,
     STOPPED,
-    DESTROYED
+    DESTROYED,
+    FAILED
   }
 
   private static class TriggeredAction
@@ -50,6 +52,22 @@ class SimpleStateGuardTest
     }
   }
 
+  private static class FailureException
+    extends Exception
+  {
+    FailureException() {
+      super('FAILED')
+    }
+  }
+
+  private static class FailureError
+      extends Error
+  {
+    FailureError() {
+      super('FAILED')
+    }
+  }
+
   private SimpleStateGuard<State> underTest
 
   @Before
@@ -57,7 +75,8 @@ class SimpleStateGuardTest
     underTest = new SimpleStateGuard.Builder<State>()
         .lock(new ReentrantLock())
         .initial(NEW)
-        .create();
+        .failure(FAILED)
+        .create()
 
     assert underTest.current == NEW
   }
@@ -89,6 +108,48 @@ class SimpleStateGuardTest
 
     assert underTest.current == NEW
     assert !action.triggered
+  }
+
+  @Test
+  void 'transition with action failing with exception'() {
+    try {
+      underTest.transition(INITIALISED)
+          .from(NEW)
+          .run(new SimpleStateGuard.Action() {
+        @Override
+        void run() throws Exception {
+          throw new FailureException()
+        }
+      })
+
+      fail()
+    }
+    catch (FailureException e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
+  }
+
+  @Test
+  void 'transition with action failing with error'() {
+    try {
+      underTest.transition(INITIALISED)
+          .from(NEW)
+          .run(new SimpleStateGuard.Action() {
+        @Override
+        void run() throws Exception {
+          throw new FailureError()
+        }
+      })
+
+      fail()
+    }
+    catch (FailureError e) {
+      // expected
+    }
+
+    assert underTest.current == FAILED
   }
 
   @Test

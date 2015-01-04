@@ -39,11 +39,16 @@ public class SimpleStateGuard<T extends Enum>
 
   private T current;
 
+  @Nullable
+  private T failure;
+
   public SimpleStateGuard(final Lock lock,
-                          final T initial)
+                          final T initial,
+                          final @Nullable T failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
+    this.failure = failure;
   }
 
   private void lock() {
@@ -148,7 +153,7 @@ public class SimpleStateGuard<T extends Enum>
       return this;
     }
 
-    public void run(final Action action) {
+    public void run(final Action action) throws Exception {
       lock();
       try {
         if (allowed != null) {
@@ -163,10 +168,15 @@ public class SimpleStateGuard<T extends Enum>
 
           log.trace("Transitioned to: {}", to);
         }
-        catch (Exception e) { // Throwable?
-          log.error("Failed transition to: {}", to, e);
-          // TODO: Support failed state
-          // TODO: Rethrow?
+        catch (Throwable t) {
+          // maybe set failure state
+          if (failure != null) {
+            current = failure;
+          }
+
+          log.error("Failed transition to: {}", to, t);
+          Throwables.propagateIfPossible(t, Exception.class, Error.class);
+          throw Throwables.propagate(t);
         }
       }
       finally {
@@ -220,7 +230,7 @@ public class SimpleStateGuard<T extends Enum>
 
     private T initial;
 
-    // error state?
+    private T failure;
 
     // final states?
 
@@ -229,15 +239,20 @@ public class SimpleStateGuard<T extends Enum>
       return this;
     }
 
-    public Builder<T> initial(final T initial) {
-      this.initial = initial;
+    public Builder<T> initial(final T state) {
+      this.initial = state;
+      return this;
+    }
+
+    public Builder<T> failure(final T state) {
+      this.failure = state;
       return this;
     }
 
     public SimpleStateGuard<T> create() {
       checkState(lock != null, "Missing: lock");
       checkState(initial != null, "Missing: initial");
-      return new SimpleStateGuard<>(lock, initial);
+      return new SimpleStateGuard<>(lock, initial, failure);
     }
   }
 }
