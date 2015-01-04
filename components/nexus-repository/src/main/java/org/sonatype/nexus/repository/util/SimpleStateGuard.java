@@ -181,7 +181,9 @@ public class SimpleStateGuard<T extends Enum>
     private final T[] allowed;
 
     public Guard(final T[] allowed) {
-      this.allowed = checkNotNull(allowed);
+      checkNotNull(allowed);
+      checkArgument(allowed.length != 0);
+      this.allowed = allowed;
     }
 
     public void run(final Action action) throws Exception {
