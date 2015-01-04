@@ -19,6 +19,11 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.repository.FacetSupport.State.DESTROYED;
+import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
+import static org.sonatype.nexus.repository.FacetSupport.State.NEW;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STOPPED;
 
 /**
  * Support for {@link Facet} implementations.
@@ -62,7 +67,7 @@ public abstract class FacetSupport
     DESTROYED
   }
 
-  private State state = State.NEW;
+  private State state = NEW;
 
   protected void ensureState(final State... allowed) {
     assert allowed != null && allowed.length > 0;
@@ -82,7 +87,7 @@ public abstract class FacetSupport
 
   @Override
   public final void init(final Repository repository) throws Exception {
-    ensureState(State.NEW);
+    ensureState(NEW);
 
     this.repository = checkNotNull(repository);
 
@@ -90,7 +95,7 @@ public abstract class FacetSupport
 
     doInit();
 
-    state = State.INITIALISED;
+    state = INITIALISED;
 
     log.trace("Initialized");
   }
@@ -101,7 +106,7 @@ public abstract class FacetSupport
 
   @Override
   public void update() throws Exception {
-    ensureState(State.STOPPED);
+    ensureState(STOPPED);
 
     log.trace("Updating");
 
@@ -116,7 +121,7 @@ public abstract class FacetSupport
 
   @Override
   public final void start() throws Exception {
-    ensureState(State.INITIALISED, State.STOPPED);
+    ensureState(INITIALISED, STOPPED);
 
     log.trace("Starting");
 
@@ -124,7 +129,7 @@ public abstract class FacetSupport
 
     eventBus.register(this);
 
-    state = State.STARTED;
+    state = STARTED;
 
     log.trace("Started");
   }
@@ -135,7 +140,7 @@ public abstract class FacetSupport
 
   @Override
   public final void stop() throws Exception {
-    ensureState(State.STARTED);
+    ensureState(STARTED);
 
     log.trace("Stopping");
 
@@ -143,7 +148,7 @@ public abstract class FacetSupport
 
     doStop();
 
-    state = State.STOPPED;
+    state = STOPPED;
 
     log.trace("Stopped");
   }
@@ -158,7 +163,7 @@ public abstract class FacetSupport
 
     log.trace("Destroying");
 
-    if (state == State.STARTED) {
+    if (state == STARTED) {
       stop();
     }
 
@@ -166,7 +171,7 @@ public abstract class FacetSupport
 
     repository = null;
 
-    state = State.DESTROYED;
+    state = DESTROYED;
 
     log.trace("Destroyed");
   }
