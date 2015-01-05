@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Named
 @Singleton
-public class RemoteFetchHandler
+public class RawRemoteFetchHandler
     implements Handler
 {
   @Override
