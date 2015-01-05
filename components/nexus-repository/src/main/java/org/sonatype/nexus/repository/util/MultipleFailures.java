@@ -70,7 +70,7 @@ public class MultipleFailures
   }
 
   /**
-   * Maybe throw {@link MultipleFailuresException} if there are any failures.
+   * Maybe throw {@link MultipleFailuresException} if there are any failures with optional message.
    */
   public void propagate(final @Nullable String message) throws MultipleFailuresException {
     if (!failures.isEmpty()) {
