@@ -351,7 +351,7 @@ public class LdapManagerTest
   }
 
   private LdapConfiguration clone(final LdapConfiguration ldapServer) {
-    ObjectMapper objectMapper = new ObjectMapper();
+    final ObjectMapper objectMapper = new ObjectMapper();
     try {
       return objectMapper.readValue(objectMapper.writeValueAsString(ldapServer), LdapConfiguration.class);
     }

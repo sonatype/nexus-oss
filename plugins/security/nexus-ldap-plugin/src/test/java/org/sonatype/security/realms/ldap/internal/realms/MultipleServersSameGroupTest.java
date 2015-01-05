@@ -15,13 +15,17 @@ package org.sonatype.security.realms.ldap.internal.realms;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
-import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
+import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,12 +37,21 @@ public class MultipleServersSameGroupTest
 
   private MockLdapConnector twoConnector = null;
 
+  @Override
+  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+    result.put("one", createServerConfiguration("one"));
+    result.put("two", createServerConfiguration("two"));
+    return result;
+  }
+
+  @Override
   protected List<LdapConnector> getLdapConnectors() {
     List<LdapConnector> connectors = new ArrayList<LdapConnector>();
-    this.oneConnector = this.buildMainMockServer("one");
+    this.oneConnector = this.buildMainMockServer(ldapClientConfigurations.get("one").getId());
     connectors.add(oneConnector);
 
-    this.twoConnector = this.buildMainMockServerTwo("two");
+    this.twoConnector = this.buildMainMockServerTwo(ldapClientConfigurations.get("two").getId());
     connectors.add(twoConnector);
 
     return connectors;

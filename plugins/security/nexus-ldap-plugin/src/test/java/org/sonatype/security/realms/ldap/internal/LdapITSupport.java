@@ -13,7 +13,12 @@
 
 package org.sonatype.security.realms.ldap.internal;
 
+import java.io.File;
+
+import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 /**
  * Support for LDAP ITs (slow UTs) with real OrientDB backed configuration source.
@@ -24,5 +29,23 @@ public abstract class LdapITSupport
   @Override
   protected SecurityConfiguration getSecurityConfig() {
     return SecurityTestSupportSecurity.securityWithLdapRealm();
+  }
+
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+
+    // adjust it, ITs by default uses different groups
+    final Mapping mapping = ldapConfiguration.getMapping();
+    mapping.setGroupObjectClass("groupOfUniqueNames");
+    mapping.setGroupMemberAttribute("uniqueMember");
+    return ldapConfiguration;
+  }
+
+  @Override
+  protected File resolveDefaultLdifFile() {
+    return util.resolveFile("src/test/resources/defaults/it/default-ldap.ldif");
   }
 }

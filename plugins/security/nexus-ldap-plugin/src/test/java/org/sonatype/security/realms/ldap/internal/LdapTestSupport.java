@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
 import org.sonatype.plexus.rest.DefaultReferenceFactory;
 import org.sonatype.plexus.rest.ReferenceFactory;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationSource;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
@@ -32,11 +33,11 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Prot
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.thoughtworks.xstream.XStream;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.codec.Base64;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -49,6 +50,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * Support for LDAP UTs with in-memory configuration source.
@@ -92,6 +94,7 @@ public abstract class LdapTestSupport
         binder.bind(Config.class).toInstance(new ConfigImpl(false));
         binder.bind(ReferenceFactory.class).toInstance(new DefaultReferenceFactory());
         binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
+        binder.bind(SecuritySystem.class).toInstance(mock(SecuritySystem.class));
       }
     });
   }
@@ -161,7 +164,9 @@ public abstract class LdapTestSupport
     return result;
   }
 
-  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
     final LdapConfiguration ldapConfiguration = new LdapConfiguration();
     ldapConfiguration.setId("unused"); // create will override it anyway
     ldapConfiguration.setName(name);
@@ -221,7 +226,11 @@ public abstract class LdapTestSupport
     if (classSpecificLdif.isFile()) {
       return classSpecificLdif;
     }
-    return util.resolveFile("src/test/resources/defaults/default-ldap.ldif");
+    return resolveDefaultLdifFile();
+  }
+
+  protected File resolveDefaultLdifFile() {
+    return util.resolveFile("src/test/resources/defaults/ut/default-ldap.ldif");
   }
 
   // ==
@@ -263,9 +272,9 @@ public abstract class LdapTestSupport
   protected void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual)
       throws Exception
   {
-    XStream xstream = new XStream();
-    String originalConfig = xstream.toXML(expected);
-    String newConfig = xstream.toXML(actual);
-    assertThat(newConfig, equalTo(originalConfig));
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String expectedString = objectMapper.writeValueAsString(expected);
+    final String actualString = objectMapper.writeValueAsString(actual);
+    assertThat(expected, equalTo(actual));
   }
 }

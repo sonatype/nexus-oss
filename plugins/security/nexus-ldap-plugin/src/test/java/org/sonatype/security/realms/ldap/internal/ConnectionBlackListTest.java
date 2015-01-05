@@ -25,8 +25,10 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfigurati
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class ConnectionBlackListTest
     extends LdapTestSupport
 {

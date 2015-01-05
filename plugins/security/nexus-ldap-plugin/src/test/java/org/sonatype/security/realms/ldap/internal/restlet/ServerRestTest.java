@@ -13,13 +13,16 @@
 package org.sonatype.security.realms.ldap.internal.restlet;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
-import com.thoughtworks.xstream.XStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Request;
@@ -80,7 +83,7 @@ public class ServerRestTest
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer1);
 
     LdapServerRequest ldapRequest = new LdapServerRequest();
-    ldapRequest.setData(this.convert(ldapServer1, new LdapServerConfigurationDTO()));
+    ldapRequest.setData(toDto(ldapServer1));
 
     ldapRequest.getData().setName("testPut-new");
     ldapRequest.getData().getConnectionInfo().setHost("newhost");
@@ -147,15 +150,62 @@ public class ServerRestTest
     catch (ResourceException e) {
       Assert.assertEquals(404, e.getStatus().getCode());
     }
-
   }
 
-  private <T, F> T convert(F from, T to) {
-    // xstream cheat ahead
-    XStream xstream = new XStream();
-    xstream.setClassLoader(Thread.currentThread().getContextClassLoader());
-    String fromXml = xstream.toXML(from);
-    to = (T) xstream.fromXML(fromXml, to);
-    return to;
+  protected LdapServerConfigurationDTO toDto(LdapConfiguration ldapServer) {
+    LdapServerConfigurationDTO dto = new LdapServerConfigurationDTO();
+    dto.setId(ldapServer.getId());
+    dto.setName(ldapServer.getName());
+
+    if (ldapServer.getConnection() != null) {
+      Connection connInfo = ldapServer.getConnection();
+
+      LdapConnectionInfoDTO infoDto = new LdapConnectionInfoDTO();
+      infoDto.setAuthScheme(connInfo.getAuthScheme());
+      if (connInfo.getBackupHost() != null) {
+        infoDto.setBackupMirrorHost(connInfo.getBackupHost().getHostName());
+        infoDto.setBackupMirrorPort(connInfo.getBackupHost().getPort());
+        infoDto.setBackupMirrorProtocol(connInfo.getBackupHost().getProtocol().name());
+      }
+      infoDto.setCacheTimeout(connInfo.getCacheTimeout());
+      infoDto.setConnectionRetryDelay(connInfo.getConnectionRetryDelay());
+      infoDto.setConnectionTimeout(connInfo.getConnectionTimeout());
+      infoDto.setHost(connInfo.getHost().getHostName());
+      infoDto.setPort(connInfo.getHost().getPort());
+      infoDto.setProtocol(connInfo.getHost().getProtocol().name());
+      infoDto.setRealm(connInfo.getSaslRealm());
+      infoDto.setSearchBase(connInfo.getSearchBase());
+      infoDto.setSystemUsername(connInfo.getSystemUsername());
+      infoDto.setSystemPassword(connInfo.getSystemPassword());
+      dto.setConnectionInfo(infoDto);
+    }
+
+    if (ldapServer.getMapping() != null) {
+      dto.setUserAndGroupConfig(toDto(ldapServer.getMapping()));
+    }
+
+    return dto;
   }
+
+  protected LdapUserAndGroupAuthConfigurationDTO toDto(Mapping mapping) {
+    final LdapUserAndGroupAuthConfigurationDTO result = new LdapUserAndGroupAuthConfigurationDTO();
+    result.setEmailAddressAttribute(mapping.getEmailAddressAttribute());
+    result.setLdapGroupsAsRoles(mapping.isLdapGroupsAsRoles());
+    result.setGroupBaseDn(mapping.getGroupBaseDn());
+    result.setGroupIdAttribute(mapping.getGroupIdAttribute());
+    result.setGroupMemberAttribute(mapping.getGroupMemberAttribute());
+    result.setGroupMemberFormat(mapping.getGroupMemberFormat());
+    result.setGroupObjectClass(mapping.getGroupObjectClass());
+    result.setUserPasswordAttribute(mapping.getUserPasswordAttribute());
+    result.setUserIdAttribute(mapping.getUserIdAttribute());
+    result.setUserObjectClass(mapping.getUserObjectClass());
+    result.setLdapFilter(mapping.getLdapFilter());
+    result.setUserBaseDn(mapping.getUserBaseDn());
+    result.setUserRealNameAttribute(mapping.getUserRealNameAttribute());
+    result.setUserSubtree(mapping.isUserSubtree());
+    result.setGroupSubtree(mapping.isGroupSubtree());
+    result.setUserMemberOfAttribute(mapping.getUserMemberOfAttribute());
+    return result;
+  }
+
 }

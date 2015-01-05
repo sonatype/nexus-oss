@@ -41,7 +41,7 @@ public class ServerOrderRestTest
       throws Exception
   {
     LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
-    ldapConfigurationManager.deleteLdapServerConfiguration("default");
+    ldapConfigurationManager.deleteLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
 
     // add 2 ldapServers
     LdapConfiguration ldapServer1 = new LdapConfiguration();
@@ -97,7 +97,7 @@ public class ServerOrderRestTest
       throws Exception
   {
     LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
-    ldapConfigurationManager.deleteLdapServerConfiguration("default");
+    ldapConfigurationManager.deleteLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
 
     // add 2 ldapServers
     LdapConfiguration ldapServer1 = new LdapConfiguration();

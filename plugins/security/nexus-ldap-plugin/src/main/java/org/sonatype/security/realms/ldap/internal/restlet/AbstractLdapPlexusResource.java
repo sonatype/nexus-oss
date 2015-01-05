@@ -204,26 +204,7 @@ public abstract class AbstractLdapPlexusResource
     }
 
     if (ldapServer.getMapping() != null) {
-      Mapping userGroupConf = ldapServer.getMapping();
-      LdapUserAndGroupAuthConfigurationDTO userGroupDto = new LdapUserAndGroupAuthConfigurationDTO();
-      dto.setUserAndGroupConfig(userGroupDto);
-
-      userGroupDto.setEmailAddressAttribute(userGroupConf.getEmailAddressAttribute());
-      userGroupDto.setGroupBaseDn(userGroupConf.getGroupBaseDn());
-      userGroupDto.setGroupIdAttribute(userGroupConf.getGroupIdAttribute());
-      userGroupDto.setGroupMemberAttribute(userGroupConf.getGroupMemberAttribute());
-      userGroupDto.setGroupMemberFormat(userGroupConf.getGroupMemberFormat());
-      userGroupDto.setGroupObjectClass(userGroupConf.getGroupObjectClass());
-      userGroupDto.setGroupSubtree(userGroupConf.isGroupSubtree());
-      userGroupDto.setLdapGroupsAsRoles(userGroupConf.isLdapGroupsAsRoles());
-      userGroupDto.setUserBaseDn(userGroupConf.getUserBaseDn());
-      userGroupDto.setUserIdAttribute(userGroupConf.getUserIdAttribute());
-      userGroupDto.setUserMemberOfAttribute(userGroupConf.getUserMemberOfAttribute());
-      userGroupDto.setUserObjectClass(userGroupConf.getUserObjectClass());
-      userGroupDto.setUserPasswordAttribute(userGroupConf.getUserPasswordAttribute());
-      userGroupDto.setUserRealNameAttribute(userGroupConf.getUserRealNameAttribute());
-      userGroupDto.setUserSubtree(userGroupConf.isUserSubtree());
-      userGroupDto.setLdapFilter(userGroupConf.getLdapFilter());
+      dto.setUserAndGroupConfig(toDto(ldapServer.getMapping()));
     }
 
     return dto;

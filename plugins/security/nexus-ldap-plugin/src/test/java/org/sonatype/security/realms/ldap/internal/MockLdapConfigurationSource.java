@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.realms.ldap.internal;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,11 +30,11 @@ import com.google.common.collect.Maps;
 public class MockLdapConfigurationSource
     implements LdapConfigurationSource
 {
-  private final Map<String, LdapConfiguration> configuration;
+  private final LinkedHashMap<String, LdapConfiguration> configuration;
 
   public MockLdapConfigurationSource()
   {
-    this.configuration = Maps.newHashMap();
+    this.configuration = Maps.newLinkedHashMap();
   }
 
   @Override
@@ -45,6 +46,11 @@ public class MockLdapConfigurationSource
   public String create(final LdapConfiguration ldapConfiguration) {
     ldapConfiguration.setId(UUID.randomUUID().toString());
     configuration.put(ldapConfiguration.getId(), ldapConfiguration);
+    // keep ordering
+    int order = 1;
+    for (LdapConfiguration c : configuration.values()) {
+      c.setOrder(order++);
+    }
     return ldapConfiguration.getId();
   }
 

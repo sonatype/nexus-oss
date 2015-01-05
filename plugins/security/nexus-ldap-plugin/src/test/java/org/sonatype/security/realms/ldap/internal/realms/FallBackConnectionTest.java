@@ -18,25 +18,23 @@ import java.util.Map;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
-
-import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
-import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
-import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class FallBackConnectionTest
     extends AbstractMockLdapConnectorTest
 {
@@ -53,12 +51,25 @@ public class FallBackConnectionTest
     return result;
   }
 
-  @Override
-  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
-    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
-    ldapConfiguration.getConnection().setConnectionRetryDelay(10);
-    ldapConfiguration.getConnection().setCacheTimeout(-1);
-    return ldapConfiguration;
+  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
+    final LdapServer mainServer = ldapServers.get("main");
+    final LdapServer backupServer = ldapServers.get("backup");
+    final LdapConfiguration mainClientConfiguration = createLdapClientConfigurationForServer("main", 1, mainServer);
+    mainClientConfiguration.getConnection().setConnectionRetryDelay(10);
+    mainClientConfiguration.getConnection().setCacheTimeout(-1);
+
+    // set backup host
+    final Host backupHost = new Host(Protocol.ldap, "localhost", backupServer.getPort());
+    mainClientConfiguration.getConnection().setBackupHost(backupHost);
+
+    mainClientConfiguration.getMapping().setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    mainClientConfiguration.getMapping().setGroupObjectClass("groupOfUniqueNames");
+    mainClientConfiguration.getMapping().setGroupMemberAttribute("uniqueMember");
+    mainClientConfiguration.getMapping().setUserSubtree(false);
+
+    final Map<String, LdapConfiguration> result = Maps.newHashMap();
+    result.put("main", mainClientConfiguration);
+    return result;
   }
 
   @Override
