@@ -54,10 +54,10 @@ public class RepositoryUpdateMirrorEventListener
     inspect(e);
   }
 
-  private void inspect(final Object evt) {
-    final UpdateSiteProxyRepository updateSite = ((RepositoryEvent) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
+  private void inspect(final RepositoryEvent event) {
+    final UpdateSiteProxyRepository updateSite = event.getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
 
-    if (updateSite != null && (evt instanceof RepositoryEventExpireNotFoundCaches || ((RepositoryConfigurationUpdatedEvent) evt).isRemoteUrlChanged())) {
+    if (updateSite != null && (event instanceof RepositoryEventExpireNotFoundCaches || ((RepositoryConfigurationUpdatedEvent) event).isRemoteUrlChanged())) {
       UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
       log.debug("Submitted UpdateSiteMirrorTask for {}", updateSite);
     }

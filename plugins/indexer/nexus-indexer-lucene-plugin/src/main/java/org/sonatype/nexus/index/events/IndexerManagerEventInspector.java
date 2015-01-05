@@ -81,19 +81,17 @@ public class IndexerManagerEventInspector
     }
   }
 
-  private void inspectForIndexerManager(final Object evt) {
-    RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-    Repository repository = ievt.getRepository();
+  private void inspectForIndexerManager(final RepositoryItemEvent event) {
+    Repository repository = event.getRepository();
 
     // should we sync at all
     if (repository != null && repository.isIndexable()) {
       try {
-        if (ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore) {
-          getIndexerManager().addItemToIndex(repository, ievt.getItem());
+        if (event instanceof RepositoryItemEventCache || event instanceof RepositoryItemEventStore) {
+          getIndexerManager().addItemToIndex(repository, event.getItem());
         }
-        else if (ievt instanceof RepositoryItemEventDelete) {
-          getIndexerManager().removeItemFromIndex(repository, ievt.getItem());
+        else if (event instanceof RepositoryItemEventDelete) {
+          getIndexerManager().removeItemFromIndex(repository, event.getItem());
         }
       }
       catch (Exception e) // TODO be more specific
@@ -102,5 +100,4 @@ public class IndexerManagerEventInspector
       }
     }
   }
-
 }
