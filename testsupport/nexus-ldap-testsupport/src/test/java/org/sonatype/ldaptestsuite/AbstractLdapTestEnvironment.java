@@ -39,7 +39,7 @@ public abstract class AbstractLdapTestEnvironment
   public void startLdap()
       throws Exception
   {
-    this.ldapServer = new LdapServer(buildConfiguration());
+    this.ldapServer = new LdapServer(buildConfiguration()).start();
   }
 
   protected abstract LdapServerConfiguration buildConfiguration();
@@ -48,7 +48,7 @@ public abstract class AbstractLdapTestEnvironment
   public void stopLdap()
       throws Exception
   {
-    ldapServer.close();
+    ldapServer.stop();
     ldapServer = null;
   }
 }

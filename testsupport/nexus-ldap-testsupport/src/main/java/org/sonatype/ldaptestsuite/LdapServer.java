@@ -12,7 +12,6 @@
  */
 package org.sonatype.ldaptestsuite;
 
-import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -71,17 +70,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Simple wrapper for ApacheDS LDAP server.
  */
 public class LdapServer
-    implements Closeable
 {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   private final LdapServerConfiguration configuration;
 
-  private final int port;
+  private int port;
 
-  private final DirectoryService directoryService;
+  private DirectoryService directoryService;
 
-  private final org.apache.directory.server.ldap.LdapServer ldapService;
+  private org.apache.directory.server.ldap.LdapServer ldapService;
 
   /**
    * the context root for the system partition
@@ -100,14 +98,15 @@ public class LdapServer
 
   public LdapServer(final LdapServerConfiguration configuration) {
     this.configuration = checkNotNull(configuration);
+    this.port = configuration.getPort();
+  }
+
+  public LdapServer start() {
     if (this.configuration.isDeleteOnStart()) {
       deleteWorkingDirectory();
     }
     this.configuration.getWorkingDirectory().mkdirs();
-    if (configuration.getPort() > 0) {
-      this.port = this.configuration.getPort();
-    }
-    else {
+    if (this.port < 1) {
       try (ServerSocket socket = new ServerSocket(0)) {
         this.port = socket.getLocalPort();
       }
@@ -183,16 +182,16 @@ public class LdapServer
     }
     catch (Exception e) {
       try {
-        close();
+        stop();
       }
       finally {
         throw Throwables.propagate(e);
       }
     }
+    return this;
   }
 
-  @Override
-  public void close() {
+  public LdapServer stop() {
     try {
       ldapService.stop();
       if (schemaRoot != null) {
@@ -225,6 +224,7 @@ public class LdapServer
         log.error("Failed to stop directoryService", e);
       }
     }
+    return this;
   }
 
   /**
