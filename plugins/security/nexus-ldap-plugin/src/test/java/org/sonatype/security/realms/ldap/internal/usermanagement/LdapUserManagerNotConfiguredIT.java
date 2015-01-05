@@ -12,11 +12,15 @@
  */
 package org.sonatype.security.realms.ldap.internal.usermanagement;
 
+import java.util.Map;
+
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.MockLdapConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -25,11 +29,8 @@ public class LdapUserManagerNotConfiguredIT
     extends LdapITSupport
 {
   @Override
-  public void setUp()
-      throws Exception
-  {
-    super.setUp();
-    ((MockLdapConfigurationSource) ldapConfigurationSource).purge();
+  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    return Maps.newHashMap();
   }
 
   @Test

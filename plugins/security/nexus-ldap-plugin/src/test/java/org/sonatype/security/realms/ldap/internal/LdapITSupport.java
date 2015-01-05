@@ -39,6 +39,7 @@ public abstract class LdapITSupport
 
     // adjust it, ITs by default uses different groups
     final Mapping mapping = ldapConfiguration.getMapping();
+    mapping.setUserMemberOfAttribute(null);
     mapping.setGroupObjectClass("groupOfUniqueNames");
     mapping.setGroupMemberAttribute("uniqueMember");
     return ldapConfiguration;

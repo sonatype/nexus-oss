@@ -16,6 +16,7 @@ package org.sonatype.security.realms.ldap.internal.realms;
 public class EncryptedPassSchemaIT
     extends LdapSchemaTestSupport
 {
+  @Override
   protected boolean isPasswordsEncrypted() {
     return true;
   }
