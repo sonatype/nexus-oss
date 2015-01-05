@@ -27,6 +27,7 @@ import org.sonatype.nexus.repository.RepositoryStartedEvent;
 import org.sonatype.nexus.repository.RepositoryStoppedEvent;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.util.MultipleFailures;
 import org.sonatype.nexus.repository.util.SimpleStateGuard;
 import org.sonatype.nexus.repository.util.SimpleStateGuard.Action;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -157,11 +158,18 @@ public class RepositoryImpl
           public void run() throws Exception {
             self.configuration = configuration;
 
-            // TODO: handle exceptions
+            MultipleFailures failures = new MultipleFailures();
             for (Facet facet : facets) {
-              log.debug("Updating facet: {}", facet);
-              facet.update();
+              try {
+                log.debug("Updating facet: {}", facet);
+                facet.update();
+              }
+              catch (Throwable t) {
+                log.error("Failed to update facet: {}", facet, t);
+                failures.add(t);
+              }
             }
+            failures.propagate();
           }
         });
   }
@@ -176,11 +184,18 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            // TODO: handle exceptions
+            MultipleFailures failures = new MultipleFailures();
             for (Facet facet : facets) {
-              log.debug("Starting facet: {}", facet);
-              facet.start();
+              try {
+                log.debug("Starting facet: {}", facet);
+                facet.start();
+              }
+              catch (Throwable t) {
+                log.error("Failed to start facet: {}", facet, t);
+                failures.add(t);
+              }
             }
+            failures.propagate();
 
             eventBus.post(new RepositoryStartedEvent(self));
           }
@@ -197,11 +212,18 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            // TODO: handle exceptions
+            MultipleFailures failures = new MultipleFailures();
             for (Facet facet : facets) {
-              log.debug("Stopping facet: {}", facet);
-              facet.stop();
+              try {
+                log.debug("Stopping facet: {}", facet);
+                facet.stop();
+              }
+              catch (Throwable t) {
+                log.error("Failed to stop facet: {}", facet, t);
+                failures.add(t);
+              }
             }
+            failures.propagate();
 
             eventBus.post(new RepositoryStoppedEvent(self));
           }
@@ -221,11 +243,18 @@ public class RepositoryImpl
               stop();
             }
 
-            // TODO: handle exceptions
+            MultipleFailures failures = new MultipleFailures();
             for (Facet facet : facets) {
-              log.debug("Destroying facet: {}", facet);
-              facet.destroy();
+              try {
+                log.debug("Destroying facet: {}", facet);
+                facet.destroy();
+              }
+              catch (Throwable t) {
+                log.error("Failed to destroy facet: {}", facet, t);
+                failures.add(t);
+              }
             }
+            failures.propagate();
 
             facets.clear();
             configuration = null;
