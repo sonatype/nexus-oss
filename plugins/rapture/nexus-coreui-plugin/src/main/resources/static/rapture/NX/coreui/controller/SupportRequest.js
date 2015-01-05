@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,7 +22,8 @@ Ext.define('NX.coreui.controller.SupportRequest', {
   requires: [
     'NX.State',
     'NX.Permissions',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
 
   views: [

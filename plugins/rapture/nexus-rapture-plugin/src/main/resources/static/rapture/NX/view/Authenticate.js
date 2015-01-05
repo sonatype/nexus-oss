@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.view.Authenticate', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-authenticate',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: 'Authenticate',
 
@@ -52,8 +55,6 @@ Ext.define('NX.view.Authenticate', {
         bodyPadding: 10,
         defaultType: 'textfield',
         defaults: {
-          labelAlign: 'left',
-          labelWidth: 100,
           anchor: '100%'
         },
         items: [
@@ -71,17 +72,15 @@ Ext.define('NX.view.Authenticate', {
           {
             name: 'username',
             itemId: 'username',
-            fieldLabel: 'Username',
-            emptyText: 'enter your username',
+            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER'),
             allowBlank: false,
             readOnly: true
           },
           {
             name: 'password',
             itemId: 'password',
-            fieldLabel: 'Password',
             inputType: 'password',
-            emptyText: 'enter your password',
+            emptyText: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER'),
             allowBlank: false,
             validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
           }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',
   alias: 'widget.nx-itemselector',
   requires: [
-    'Ext.ux.form.MultiSelect'
+    'Ext.ux.form.MultiSelect',
+    'NX.I18n'
   ],
 
   width: 600,
@@ -94,7 +95,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     if (!me.fromField) {
       tbar = {
         xtype: 'nx-searchbox',
-        emptyText: 'filter',
+        emptyText: NX.I18n.get('GLOBAL_ITEM_SELECTOR_FILTER'),
         searchDelay: 200,
         listeners: {
           search: me.onSearch,

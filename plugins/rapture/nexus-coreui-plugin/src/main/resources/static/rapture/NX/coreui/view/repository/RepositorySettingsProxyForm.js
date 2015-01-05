@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,14 +22,15 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
   alias: 'widget.nx-repository-settings-proxy-form',
   requires: [
     'NX.coreui.view.AuthenticationSettings',
-    'NX.coreui.view.HttpRequestSettings'
+    'NX.coreui.view.HttpRequestSettings',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateProxy'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository updated: ' + data['id'];
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['id'];
   },
 
   initComponent: function() {
@@ -55,21 +56,18 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyForm', {
         xtype: 'checkbox',
         name: 'fileTypeValidation',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_FILE_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {

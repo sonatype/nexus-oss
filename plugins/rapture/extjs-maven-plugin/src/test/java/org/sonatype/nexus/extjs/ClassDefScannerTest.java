@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -57,7 +57,7 @@ public class ClassDefScannerTest
     List<ClassDef> classes = scanner.scan(files);
     log("Classes:");
     for (ClassDef def : classes) {
-      log("  {}", def.getName());
+      log("  {} [priority: {}]", def.getName(), def.getPriority());
       for (String dep : def.getDependencies()) {
         log("    + {}", dep);
       }
@@ -80,6 +80,32 @@ public class ClassDefScannerTest
     assertThat(bar.getDependencies(), contains("Baz"));
 
     ClassDef foo = classes.get(2);
+    assertThat(foo.getName(), is("Foo"));
+    assertThat(foo.getDependencies(), contains("Bar"));
+  }
+
+  @Test
+  public void priorityOrder() throws Exception {
+    File basedir = util.resolveFile("src/test/resources/priority");
+    List<ClassDef> classes = scan(basedir);
+
+    assertThat(classes, hasSize(5));
+
+    ClassDef poo = classes.get(0);
+    assertThat(poo.getName(), is("Poo"));
+
+    ClassDef ick = classes.get(1);
+    assertThat(ick.getName(), is("Ick"));
+    assertThat(ick.getDependencies(), contains("Poo"));
+
+    ClassDef baz = classes.get(2);
+    assertThat(baz.getName(), is("Baz"));
+
+    ClassDef bar = classes.get(3);
+    assertThat(bar.getName(), is("Bar"));
+    assertThat(bar.getDependencies(), contains("Baz"));
+
+    ClassDef foo = classes.get(4);
     assertThat(foo.getName(), is("Foo"));
     assertThat(foo.getDependencies(), contains("Bar"));
   }

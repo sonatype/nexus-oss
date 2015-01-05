@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,17 +21,18 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-user-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_User.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'User updated: ' + data['userId'];
+    return NX.I18n.get('ADMIN_USERS_UPDATE_SUCCESS') + data['userId'];
   },
 
-  editableMarker: 'You do not have permission to update users or is an external user',
+  editableMarker: NX.I18n.get('ADMIN_USERS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;
@@ -49,34 +50,27 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         itemId: 'userId',
         readOnly: true,
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ID'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_PLACEHOLDER')
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ID_HELP')
       },
       { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_PLACEHOLDER')
       },
       {
         name: 'lastName',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST')
       },
       {
         xtype: 'nx-email',
         name: 'email',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
         helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
-        emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_PLACEHOLDER')
       },
       {
         xtype: 'combo',
         name: 'status',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_HELP'),
         emptyText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_PLACEHOLDER'),
         allowBlank: false,
         editable: false,

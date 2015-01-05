@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repositorytarget-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'RepositoryTarget',
 
@@ -47,7 +50,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No repository target matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_TARGETS_LIST_FILTER_ERROR') }
   ]
 
 });

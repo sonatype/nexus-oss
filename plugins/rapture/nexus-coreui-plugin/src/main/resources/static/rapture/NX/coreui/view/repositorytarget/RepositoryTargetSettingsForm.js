@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,17 +21,18 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repositorytarget-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryTarget.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository target updated: ' + data['name'];
+    return NX.I18n.get('ADMIN_TARGETS_UPDATE_SUCCESS') + data['name'];
   },
 
-  editableMarker: 'You do not have permission to update targets',
+  editableMarker: NX.I18n.get('ADMIN_TARGETS_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;
@@ -47,9 +48,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetSettingsForm', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME'),
-        helpText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_HELP'),
-        emptyText: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME_PLACEHOLDER')
+        fieldLabel: NX.I18n.get('ADMIN_TARGETS_SETTINGS_NAME')
       },
       {
         xtype: 'combo',

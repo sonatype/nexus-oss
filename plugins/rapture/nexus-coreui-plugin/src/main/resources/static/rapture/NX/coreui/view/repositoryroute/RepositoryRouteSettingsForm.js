@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,16 +23,17 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
   requires: [
     'NX.Conditions',
     'NX.coreui.store.RepositoryReference',
-    'NX.coreui.model.Reference'
+    'NX.coreui.model.Reference',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_RepositoryRoute.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository route updated: ' + data['pattern'];
+    return NX.I18n.get('ADMIN_ROUTING_UPDATE_SUCCESS') + data['pattern'];
   },
-  editableMarker: 'You do not have permission to update routes',
+  editableMarker: NX.I18n.get('ADMIN_ROUTING_UPDATE_ERROR'),
 
   models: [
     'Reference'
@@ -45,7 +46,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
 
     me.groupStore = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
     me.mon(me.groupStore, 'load', function(store) {
-      store.add(Ext.create('NX.coreui.model.Reference', { id: '*', name: 'All Repository Groups' }));
+      store.add(Ext.create('NX.coreui.model.Reference', { id: '*', name: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_ALL_ITEM') }));
     });
     me.groupStore.filter({ property: 'type', value: 'group' });
 
@@ -70,7 +71,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
         name: 'mappingType',
         itemId: 'mappingType',
         fieldLabel: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE'),
-        helpText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE_HELP'),
         emptyText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_RULE_PLACEHOLDER'),
         editable: false,
         store: [
@@ -85,7 +85,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettingsForm', {
         name: 'groupId',
         itemId: 'groupId',
         fieldLabel: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP'),
-        helpText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_HELP'),
         emptyText: NX.I18n.get('ADMIN_ROUTING_SETTINGS_GROUP_PLACEHOLDER'),
         editable: false,
         store: me.groupStore,

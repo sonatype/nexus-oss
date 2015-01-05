@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.feed.FeedList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-feed-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Feed',
 
@@ -51,18 +54,8 @@ Ext.define('NX.coreui.view.feed.FeedList', {
     deferEmptyText: false
   },
 
-  tbar: [
-    {
-      xtype: 'button',
-      text: NX.I18n.get('BROWSE_FEEDS_LIST_SUBSCRIBE_BUTTON'),
-      glyph: 'xf09e@FontAwesome' /* fa-rss */,
-      action: 'subscribe',
-      disabled: true
-    }
-  ],
-
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No feed matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('BROWSE_FEEDS_LIST_FILTER_ERROR') }
   ]
 
 });

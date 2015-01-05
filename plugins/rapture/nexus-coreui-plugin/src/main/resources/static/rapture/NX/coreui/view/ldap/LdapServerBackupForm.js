@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,16 +21,17 @@ Ext.define('NX.coreui.view.ldap.LdapServerBackupForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-ldapserver-backup-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.ldap_LdapServer.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'LDAP server updated: ' + data['name'];
+    return NX.I18n.get('ADMIN_LDAP_UPDATE_SUCCESS') + data['name'];
   },
-  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
+  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-backup-fieldset' },
 

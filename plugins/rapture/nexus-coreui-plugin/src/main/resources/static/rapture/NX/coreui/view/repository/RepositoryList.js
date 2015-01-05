@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2007-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repository.RepositoryList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repository-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Repository',
 
@@ -67,11 +70,11 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No repositories matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_REPOSITORIES_LIST_FILTER_ERROR') }
   ],
 
   renderStatus: function(value, metaData, model) {
-    var status = (model.get('localStatus') === 'IN_SERVICE') ? 'In Service' : 'Out of Service',
+    var status = (model.get('localStatus') === 'IN_SERVICE') ? NX.I18n.get('ADMIN_REPOSITORIES_LIST_IN_SERVICE') : NX.I18n.get('ADMIN_REPOSITORIES_LIST_OUT_SERVICE'),
         available = model.get('remoteStatus') === 'AVAILABLE',
         unknown = model.get('remoteStatus') === 'UNKNOWN',
         reason = model.get('remoteReason');
@@ -83,7 +86,7 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
     if (model.get('type') === 'proxy') {
       if (model.get('proxyMode').search(/BLOCKED/) === 0) {
         status += model.get('proxyMode') ===
-            'BLOCKED_AUTO' ? ' - Remote Automatically Blocked' : ' - Remote Manually Blocked';
+            'BLOCKED_AUTO' ? NX.I18n.get('ADMIN_REPOSITORIES_LIST_AUTO_BLOCK') : NX.I18n.get('ADMIN_REPOSITORIES_LIST_MANUAL_BLOCK');
         if (available) {
           status += ' and Available';
         }
@@ -94,11 +97,11 @@ Ext.define('NX.coreui.view.repository.RepositoryList', {
       else { // allow
         if (model.get('localStatus') === 'IN_SERVICE') {
           if (!available && unknown) {
-            status += unknown ? ' - <I>checking remote...</I>' : ' - Attempting to Proxy and Remote Unavailable';
+            status += unknown ? NX.I18n.get('ADMIN_REPOSITORIES_LIST_CHECK_REMOTE') : NX.I18n.get('ADMIN_REPOSITORIES_LIST_PROXY');
           }
         }
         else { // Out of service
-          status += available ? ' - Remote Available' : ' - Remote Unavailable';
+          status += available ? NX.I18n.get('ADMIN_REPOSITORIES_LIST_REMOTE_AVAILABLE') : NX.I18n.get('ADMIN_REPOSITORIES_LIST_REMOTE_UNAVAILABLE');
         }
       }
     }
