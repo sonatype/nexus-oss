@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-analytics-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**
@@ -33,13 +34,13 @@ Ext.define('NX.coreui.view.analytics.AnalyticsSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Analytics Settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.analytics_Settings.read',
           submit: 'NX.direct.analytics_Settings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:analytics', 'update'),
-        editableMarker: 'You do not have permission to configure analytics',
+        editableMarker: NX.I18n.get('ADMIN_ANALYTICS_UPDATE_ERROR'),
 
         items: [
           {

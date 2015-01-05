@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.capability.CapabilityList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-capability-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Capability',
 

@@ -20,7 +20,6 @@
 Ext.define('NX.ext.grid.plugin.FilterBox', {
   extend: 'NX.ext.grid.plugin.Filtering',
   alias: 'plugin.gridfilterbox',
-
   requires: [
     'NX.I18n'
   ],

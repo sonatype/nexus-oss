@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     'Ext.ToolTip',
     'NX.Conditions',
     'NX.Permissions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   models: [

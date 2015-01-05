@@ -23,7 +23,8 @@ Ext.define('NX.coreui.controller.Feeds', {
     'NX.Permissions',
     'NX.Bookmarks',
     'NX.Conditions',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
 
   masters: 'nx-coreui-feed-list',
@@ -89,7 +90,7 @@ Ext.define('NX.coreui.controller.Feeds', {
         'nx-coreui-feed-list': {
           beforerender: me.loadFeeds
         },
-        'nx-coreui-feed-list button[action=subscribe]': {
+        'nx-coreui-feed-feature button[action=subscribe]': {
           click: me.subscribe,
           afterrender: me.bindSubscribeButton
         }

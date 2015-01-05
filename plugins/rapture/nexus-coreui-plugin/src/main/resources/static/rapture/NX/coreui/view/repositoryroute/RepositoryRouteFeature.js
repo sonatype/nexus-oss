@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-repositoryroute-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'repositoryroute-default',
 

@@ -20,25 +20,27 @@
 Ext.define('NX.coreui.view.HttpRequestSettings', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-httprequestsettings',
+  requires: [
+    'NX.I18n'
+  ],
 
   items: [
     {
       xtype: 'textfield',
       name: 'userAgentCustomisation',
-      fieldLabel: 'User-agent customization',
-      helpText: 'Custom fragment to append to "User-Agent" header in HTTP requests.'
+      fieldLabel: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION'),
+      helpText: NX.I18n.get('ADMIN_HTTP_CUSTOMIZATION_HELP')
     },
     {
       xtype: 'textfield',
       name: 'urlParameters',
-      fieldLabel: 'URL parameters',
-      helpText: "Additional parameters appended to HTTP requests after '?'"
+      fieldLabel: NX.I18n.get('ADMIN_HTTP_PARAMETERS'),
+      helpText: NX.I18n.get('ADMIN_HTTP_PARAMETERS_HELP')
     },
     {
       xtype: 'numberfield',
       name: 'timeout',
-      fieldLabel: 'Timeout',
-      helpText: 'Number of seconds to wait for a successful connection before retrying.',
+      fieldLabel: NX.I18n.get('ADMIN_HTTP_TIMEOUT'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,
@@ -47,8 +49,7 @@ Ext.define('NX.coreui.view.HttpRequestSettings', {
     {
       xtype: 'numberfield',
       name: 'retries',
-      fieldLabel: 'Retry attempts',
-      helpText: 'Number of connection attempts before giving up.',
+      fieldLabel: NX.I18n.get('ADMIN_HTTP_ATTEMPTS'),
       allowDecimals: false,
       allowExponential: false,
       minValue: 0,

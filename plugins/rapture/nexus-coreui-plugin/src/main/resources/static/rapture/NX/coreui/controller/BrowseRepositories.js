@@ -25,7 +25,8 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     'NX.Permissions',
     'NX.Bookmarks',
     'NX.Messages',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'

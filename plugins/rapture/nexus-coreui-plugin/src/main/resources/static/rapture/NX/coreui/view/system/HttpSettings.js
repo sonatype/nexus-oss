@@ -23,7 +23,8 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
   requires: [
     'NX.Conditions',
     'NX.coreui.view.AuthenticationSettings',
-    'NX.coreui.view.HttpRequestSettings'
+    'NX.coreui.view.HttpRequestSettings',
+    'NX.I18n'
   ],
 
   /**
@@ -35,25 +36,17 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'HTTP system settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_HTTP_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_HttpSettings.read',
           submit: 'NX.direct.coreui_HttpSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure http',
+        editableMarker: NX.I18n.get('ADMIN_HTTP_UPDATE_ERROR'),
         items: [
           // request settings
           {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_HTTP_HELP')
-          },
-          {
             xtype: 'nx-coreui-httprequestsettings'
-          },
-          {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_HTTP_PROXY_HELP')
           },
           {
             xtype: 'nx-optionalfieldset',
@@ -61,10 +54,6 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
             checkboxToggle: true,
             checkboxName: 'httpEnabled',
             items: [
-              {
-                xtype: 'label',
-                html: NX.I18n.get('ADMIN_HTTP_PROXY_SETTINGS')
-              },
               {
                 xtype: 'textfield',
                 name: 'httpHost',
@@ -76,7 +65,6 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 xtype: 'numberfield',
                 name: 'httpPort',
                 fieldLabel: NX.I18n.get('ADMIN_HTTP_PROXY_PORT'),
-                helpText: NX.I18n.get('ADMIN_HTTP_PROXY_PORT_HELP'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -99,7 +87,6 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 name: 'nonProxyHosts',
                 fieldLabel: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY'),
                 helpText: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY_HELP'),
-                emptyText: NX.I18n.get('ADMIN_HTTP_PROXY_NON_PROXY_PLACEHOLDER'),
                 sorted: true
               }
             ]
@@ -114,10 +101,6 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
             collapsed: true,
             items: [
               {
-                xtype: 'label',
-                html: NX.I18n.get('ADMIN_HTTPS_PROXY_SETTINGS')
-              },
-              {
                 xtype: 'textfield',
                 name: 'httpsHost',
                 fieldLabel: NX.I18n.get('ADMIN_HTTPS_PROXY_HOST'),
@@ -128,7 +111,6 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
                 xtype: 'numberfield',
                 name: 'httpsPort',
                 fieldLabel: NX.I18n.get('ADMIN_HTTPS_PROXY_PORT'),
-                helpText: NX.I18n.get('ADMIN_HTTPS_PROXY_PORT_HELP'),
                 minValue: 1,
                 maxValue: 65535,
                 allowDecimals: false,
@@ -137,7 +119,7 @@ Ext.define('NX.coreui.view.system.HttpSettings', {
               },
               {
                 xtype: 'nx-optionalfieldset',
-                title: NX.I18n.get('ADMIN_HTTP_PROXY_AUTHENTICATION'),
+                title: NX.I18n.get('ADMIN_HTTPS_PROXY_AUTHENTICATION'),
                 checkboxToggle: true,
                 checkboxName: 'httpsAuthEnabled',
                 collapsed: true,

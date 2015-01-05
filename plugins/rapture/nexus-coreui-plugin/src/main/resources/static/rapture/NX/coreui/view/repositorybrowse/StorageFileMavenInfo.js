@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositorybrowse.StorageFileMavenInfo', {
   extend: 'NX.view.info.Panel',
   alias: 'widget.nx-coreui-repositorybrowse-storagefilemaveninfo',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: NX.I18n.get('BROWSE_SEARCH_DETAILS_MAVEN_TAB')
 

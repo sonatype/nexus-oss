@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserAccount', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-user-account',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function () {
     var me = this;
@@ -27,42 +30,31 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'User account settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('USER_ACCOUNT_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'
         },
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('USER_ACCOUNT_HELP')
-          },
-          {
             name: 'userId',
             itemId: 'userId',
             readOnly: true,
             fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
             helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_ID_PLACEHOLDER')
           },
           {
             name: 'firstName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_FIRST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_FIRST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST')
           },
           {
             name: 'lastName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_LAST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_LAST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST')
           },
           {
             xtype: 'nx-email',
             name: 'email',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL'),
-            helpText: NX.I18n.get('USER_ACCOUNT_EMAIL_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_EMAIL_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL')
           }
         ]
       }

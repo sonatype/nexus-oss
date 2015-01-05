@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-repository-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  editableMarker: 'You do not have permission to create repositories',
+  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 
   defaultFocus: 'id',
 

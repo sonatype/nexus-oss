@@ -20,6 +20,9 @@
 Ext.define('NX.view.message.Panel', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-message-panel',
+  requires: [
+    'NX.I18n'
+  ],
 
   border: false,
   ui: 'messages',
@@ -60,7 +63,7 @@ Ext.define('NX.view.message.Panel', {
       ],
       hideHeaders: true,
       viewConfig: {
-        emptyText: 'No messages',
+        emptyText: NX.I18n.get('GLOBAL_MESSAGES_EMPTY_STATE'),
         deferEmptyText: false
       }
     }

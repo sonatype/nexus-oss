@@ -21,17 +21,18 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.ldap_LdapServer.update'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'LDAP server updated: ' + data['name'];
+    return NX.I18n.get('ADMIN_LDAP_UPDATE_SUCCESS') + data['name'];
   },
 
-  editableMarker: NX.I18n.get('ADMIN_LDAP_CONNECTION_PERMISSION_ERROR'),
+  editableMarker: NX.I18n.get('ADMIN_LDAP_UPDATE_ERROR'),
 
   items: { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset' },
 

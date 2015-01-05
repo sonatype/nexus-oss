@@ -39,21 +39,21 @@ Ext.define('NX.app.PluginStrings', {
 
     // Header
     GLOBAL_HEADER_TITLE: 'Sonatype Nexus',
-    GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse Server Contents',
+    GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse server contents',
     GLOBAL_HEADER_ADMIN_TOOLTIP: 'Server administration and configuration',
-    GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search…',
+    GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components',
     GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
     GLOBAL_HEADER_USER_TOOLTIP: 'User profile and options',
-    GLOBAL_HEADER_SIGN_IN: 'Sign In',
-    GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Have an account?',
+    GLOBAL_HEADER_SIGN_IN: 'Sign in',
+    GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Administer the server',
     GLOBAL_HEADER_SIGN_OUT_TOOLTIP: 'Sign out',
     GLOBAL_HEADER_HELP_TOOLTIP: 'Help',
     GLOBAL_HEADER_HELP_FEATURE: 'Help for: ',
     GLOBAL_HEADER_HELP_ABOUT: 'About',
     GLOBAL_HEADER_HELP_DOCUMENTATION: 'Documentation',
-    GLOBAL_HEADER_HELP_KB: 'Knowledge Base',
+    GLOBAL_HEADER_HELP_KB: 'Knowledge base',
     GLOBAL_HEADER_HELP_COMMUNITY: 'Community',
-    GLOBAL_HEADER_HELP_ISSUES: 'Issue Tracker',
+    GLOBAL_HEADER_HELP_ISSUES: 'Issue tracker',
     GLOBAL_HEADER_HELP_SUPPORT: 'Support',
 
     // Footer
@@ -61,20 +61,37 @@ Ext.define('NX.app.PluginStrings', {
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
-    GLOBAL_SIGN_IN_USERNAME: 'Username',
-    GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER: 'enter your username',
-    GLOBAL_SIGN_IN_PASSWORD: 'Password',
-    GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER: 'enter your password',
+    GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER: 'Username',
+    GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER: 'Password',
     GLOBAL_SIGN_IN_REMEMBER_ME: 'Remember me',
-    GLOBAL_SIGN_IN_SUBMIT: 'Sign In',
+    GLOBAL_SIGN_IN_SUBMIT: 'Sign in',
     GLOBAL_SIGN_IN_CANCEL: 'Cancel',
 
     // Filter box
-    GLOBAL_FILTER_PLACEHOLDER: 'filter',
+    GLOBAL_FILTER_PLACEHOLDER: 'Filter',
 
-    // Pagination
-    //GLOBAL_PAGINATION_CONTROL: 'Page {0} of {1}',
-    //GLOBAL_PAGINATION_DISPLAYED: 'Displaying {0} of {1}',
+    // Dialogs
+    GLOBAL_DIALOG_INFO_TITLE: 'Information',
+    GLOBAL_DIALOG_ERROR_TITLE: 'Error',
+    GLOBAL_DIALOG_ERROR_FAILED: 'Operation failed',
+    GLOBAL_DIALOG_ADD_SUBMIT_BUTTON: 'Add',
+    GLOBAL_DIALOG_ADD_CANCEL_BUTTON: 'Cancel',
+    GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON: 'Save',
+    GLOBAL_DIALOG_ORDER_CANCEL_BUTTON: 'Cancel',
+
+    // Messages
+    GLOBAL_MESSAGES_EMPTY_STATE: 'No messages',
+
+    // Buttons
+    GLOBAL_BUTTON_SAVE: 'Save',
+    GLOBAL_BUTTON_DISCARD: 'Discard',
+
+    // Item selector
+    GLOBAL_ITEM_SELECTOR_FILTER: 'Filter',
+
+    // Settings form
+    GLOBAL_SETTINGS_LOADING: 'Loading',
+    GLOBAL_SETTINGS_SAVING: 'Saving',
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',

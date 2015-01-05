@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-repositorytarget-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'target-default',
 

@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.logging.LoggerList', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-coreui-logger-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'Logger',
 
@@ -62,7 +65,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_NEW_TOOLTIP'),
       glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
       action: 'new',
       disabled: true
@@ -70,7 +72,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_DELETE_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_DELETE_TOOLTIP'),
       glyph: 'xf056@FontAwesome' /* fa-minus-circle */,
       action: 'delete',
       disabled: true
@@ -79,7 +80,6 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOGGING_RESET_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOGGING_RESET_TOOLTIP'),
       glyph: 'xf0e2@FontAwesome' /* fa-undo */,
       action: 'reset',
       disabled: true
@@ -88,7 +88,7 @@ Ext.define('NX.coreui.view.logging.LoggerList', {
 
   plugins: [
     { pluginId: 'editor', ptype: 'rowediting', clicksToEdit: 1, errorSummary: false },
-    { ptype: 'gridfilterbox', emptyText: 'No logger matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_LOGGING_FILTER_ERROR') }
   ]
 
 });

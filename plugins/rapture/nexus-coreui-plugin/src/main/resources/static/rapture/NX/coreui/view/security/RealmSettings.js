@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
   alias: 'widget.nx-coreui-security-realm-settings',
   requires: [
     'NX.Conditions',
-    'NX.ext.form.field.ItemSelector'
+    'NX.ext.form.field.ItemSelector',
+    'NX.I18n'
   ],
 
   /**
@@ -35,19 +36,15 @@ Ext.define('NX.coreui.view.security.RealmSettings', {
       // basic settings
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'Security Realms settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_REALMS_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_RealmSettings.read',
           submit: 'NX.direct.coreui_RealmSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure realms',
+        editableMarker: NX.I18n.get('ADMIN_REALMS_UPDATE_ERROR'),
 
         items: [
-          {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_REALMS_HELP')
-          },
           {
             xtype: 'nx-itemselector',
             name: 'realms',

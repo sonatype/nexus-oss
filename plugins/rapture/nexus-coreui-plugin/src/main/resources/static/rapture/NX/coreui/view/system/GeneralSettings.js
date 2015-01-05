@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
   alias: 'widget.nx-coreui-system-general-settings',
   requires: [
     'NX.Conditions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   /**
@@ -34,19 +35,15 @@ Ext.define('NX.coreui.view.system.GeneralSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'General system settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_GENERAL_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_GeneralSettings.read',
           submit: 'NX.direct.coreui_GeneralSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure general settings',
+        editableMarker: NX.I18n.get('ADMIN_GENERAL_UPDATE_ERROR'),
 
         items: [
-          {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_GENERAL_HELP')
-          },
           {
             xtype: 'textfield',
             name: 'baseUrl',

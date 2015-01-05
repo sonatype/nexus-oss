@@ -21,7 +21,8 @@ Ext.define('NX.ext.form.field.ItemSelector', {
   extend: 'Ext.ux.form.ItemSelector',
   alias: 'widget.nx-itemselector',
   requires: [
-    'Ext.ux.form.MultiSelect'
+    'Ext.ux.form.MultiSelect',
+    'NX.I18n'
   ],
 
   width: 600,
@@ -94,7 +95,7 @@ Ext.define('NX.ext.form.field.ItemSelector', {
     if (!me.fromField) {
       tbar = {
         xtype: 'nx-searchbox',
-        emptyText: 'filter',
+        emptyText: NX.I18n.get('GLOBAL_ITEM_SELECTOR_FILTER'),
         searchDelay: 200,
         listeners: {
           search: me.onSearch,

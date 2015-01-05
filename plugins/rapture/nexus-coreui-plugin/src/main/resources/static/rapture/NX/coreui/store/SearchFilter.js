@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.store.SearchFilter', {
   extend: 'Ext.data.Store',
   model: 'NX.coreui.model.SearchFilter',
+  requires: [
+    'NX.I18n',
+  ],
 
   autoLoad: true,
 

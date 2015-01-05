@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.capability.CapabilityFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-capability-feature',
+  requires: [
+    'NX.I18n'
+  ],
 
   iconName: 'capability-default',
 

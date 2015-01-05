@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-userandgroup-fieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',
@@ -31,7 +34,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
       xtype: 'combo',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE'),
       emptyText: NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE_PLACEHOLDER'),
-      helpText : NX.I18n.get('ADMIN_LDAP_GROUP_TEMPLATE_HELP'),
       editable: false,
       store: 'LdapSchemaTemplate',
       displayField: 'name',
@@ -72,18 +74,15 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     },
     {
       name: 'userIdAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_ID'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_ID_HELP')
+      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_ID')
     },
     {
       name: 'userRealNameAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_REAL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_REAL_HELP')
+      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_REAL')
     },
     {
       name: 'userEmailAddressAttribute',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_EMAIL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_USER_EMAIL_HELP')
+      fieldLabel: NX.I18n.get('ADMIN_LDAP_USER_EMAIL')
     },
     {
       name: 'userPasswordAttribute',
@@ -96,7 +95,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
       xtype: 'checkbox',
       name: 'ldapGroupsAsRoles',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_MAP'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_MAP_HELP'),
       value: true,
       listeners: {
         change: function (checkbox, newValue) {
@@ -149,7 +147,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupFieldSet', {
     {
       name: 'groupIdAttribute',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_GROUP_ID'),
-      helpText: NX.I18n.get('ADMIN_LDAP_GROUP_ID_HELP'),
       groupType: ['static']
     },
     {

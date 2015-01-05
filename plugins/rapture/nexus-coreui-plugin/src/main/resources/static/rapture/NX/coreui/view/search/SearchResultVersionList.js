@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.search.SearchResultVersionList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-search-result-version-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'SearchResultVersion',
 

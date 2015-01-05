@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-ldapserver-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new LDAP server',
+  title: NX.I18n.get('ADMIN_LDAP_CREATE_TITLE'),
   defaultFocus: 'name',
 
   /**
@@ -39,17 +40,17 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
         submit: 'NX.direct.ldap_LdapServer.create'
       },
       settingsFormSuccessMessage: function (data) {
-        return 'LDAP server created: ' + data['name'];
+        return NX.I18n.get('ADMIN_LDAP_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:ldapconfig', 'create'),
-          editableMarker: 'You do not have permission to create LDAP servers',
+          editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
           items: {
         xtype: 'tabpanel',
             plain: true,
             items: [
-          { xtype: 'nx-coreui-ldapserver-connection-fieldset', title: 'Connection' },
-          { xtype: 'nx-coreui-ldapserver-backup-fieldset', title: 'Backup Mirror' },
-          { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset', title: 'User & Group' }
+          { xtype: 'nx-coreui-ldapserver-connection-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB') },
+          { xtype: 'nx-coreui-ldapserver-backup-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB') },
+          { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB') }
         ]
       }
     };
@@ -57,9 +58,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
     me.callParent(arguments);
 
     me.items.get(0).getDockedItems('toolbar[dock="bottom"]')[0].add(
-        { xtype: 'button', text: 'Verify connection', groupBind: 'connection', action: 'verifyconnection' },
-        { xtype: 'button', text: 'Verify user mapping', formBind: true, action: 'verifyusermapping' },
-        { xtype: 'button', text: 'Verify login', formBind: true, action: 'verifylogin' }
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_CONNECTION_VERIFY_BUTTON'), groupBind: 'connection', action: 'verifyconnection' },
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_MAPPING_BUTTON'), formBind: true, action: 'verifyusermapping' },
+        { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_GROUP_LOGIN_BUTTON'), formBind: true, action: 'verifylogin' }
     );
   }
 });

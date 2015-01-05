@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-virtual',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Create new virtual repository',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_VIRTUAL_TITLE'),
 
   initComponent: function() {
     var me = this;
@@ -33,7 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
         submit: 'NX.direct.coreui_Repository.createVirtual'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Shadow repository created: ' + data['id'];
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_VIRTUAL_SUCCESS') + data['id'];
       }
     };
 
