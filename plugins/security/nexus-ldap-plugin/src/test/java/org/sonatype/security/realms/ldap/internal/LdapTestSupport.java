@@ -94,9 +94,20 @@ public abstract class LdapTestSupport
         binder.bind(Config.class).toInstance(new ConfigImpl(false));
         binder.bind(ReferenceFactory.class).toInstance(new DefaultReferenceFactory());
         binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
-        binder.bind(SecuritySystem.class).toInstance(mock(SecuritySystem.class));
+        final SecuritySystem securitySystem = getBoundSecuritySystem();
+        if (securitySystem != null) {
+          binder.bind(SecuritySystem.class).toInstance(securitySystem);
+        }
       }
     });
+  }
+
+  /**
+   * SecuritySystem to bind in this test. Usually, you want a mock, but there are FEW ITs/UTs that might want
+   * the "real thing", and override this method to return {@code null} or return any other prepped instance.
+   */
+  protected SecuritySystem getBoundSecuritySystem() {
+    return mock(SecuritySystem.class);
   }
 
   @Before

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
@@ -24,6 +25,8 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.SecurityTestSupportSecurity;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -37,10 +40,18 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.Mockito.mock;
 
 public class LdapUserManagerIT
     extends LdapITSupport
 {
+  /**
+   * This IT uses real security manager, so it needs it in container.
+   */
+  @Override
+  protected SecuritySystem getBoundSecuritySystem() {
+    return null;
+  }
 
   @Override
   protected SecurityConfiguration getSecurityConfig() {
@@ -62,6 +73,31 @@ public class LdapUserManagerIT
       throws Exception
   {
     return this.lookup(UserManager.class, LdapPlugin.USER_SOURCE);
+  }
+
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+
+    // adjust it, ITs by default uses different groups
+    final Mapping mapping = ldapConfiguration.getMapping();
+    mapping.setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    mapping.setGroupObjectClass("groupOfUniqueNames");
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setGroupMemberAttribute("uniqueMember");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserRealNameAttribute("sn");
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setUserSubtree(false);
+    mapping.setLdapGroupsAsRoles(true);
+
+    return ldapConfiguration;
   }
 
   @Test
