@@ -120,7 +120,7 @@ public class DefaultLdapConfigurationManager
   }
 
   @Override
-  public synchronized void addLdapServerConfiguration(final LdapConfiguration ldapServerConfiguration)
+  public synchronized String addLdapServerConfiguration(final LdapConfiguration ldapServerConfiguration)
       throws IllegalArgumentException
   {
     checkNotNull(ldapServerConfiguration);
@@ -132,6 +132,7 @@ public class DefaultLdapConfigurationManager
     if (firstEntry) {
       mayActivateLdapRealm();
     }
+    return ldapServerConfiguration.getId();
   }
 
 

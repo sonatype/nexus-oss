@@ -29,7 +29,8 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfigurati
 import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
-import com.thoughtworks.xstream.XStream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +43,21 @@ public class LdapManagerTest
     final Map<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
     result.put("backup", createServerConfiguration("backup"));
     result.put("second", createServerConfiguration("second"));
+    return result;
+  }
+
+  @Override
+  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
+    final Map<String, LdapConfiguration> result = super.createLdapClientConfigurations();
+
+    // backup is not default kind
+    final LdapConfiguration backup = result.get("backup");
+    backup.getMapping().setGroupMemberAttribute("uniqueMember");
+    backup.getMapping().setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    backup.getMapping().setGroupObjectClass("groupOfUniqueNames");
+    backup.getMapping().setUserMemberOfAttribute(null);
+    backup.getMapping().setUserSubtree(false);
+
     return result;
   }
 
@@ -77,7 +93,8 @@ public class LdapManagerTest
     EnterpriseLdapManager ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     LdapConfigurationManager ldapConfiguration = this.lookup(LdapConfigurationManager.class);
 
-    LdapConfiguration ldapServer = ldapConfiguration.getLdapServerConfiguration("default");
+    LdapConfiguration ldapServer = ldapConfiguration
+        .getLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
     ldapServer = this.clone(ldapServer);
 
     Assert.assertNotNull(ldapManager.authenticateUserTest("brianf", "brianf123", ldapServer));
@@ -98,7 +115,8 @@ public class LdapManagerTest
     EnterpriseLdapManager ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     LdapConfigurationManager ldapConfiguration = this.lookup(LdapConfigurationManager.class);
 
-    LdapConfiguration ldapServer = ldapConfiguration.getLdapServerConfiguration("default");
+    LdapConfiguration ldapServer = ldapConfiguration
+        .getLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
     ldapServer = this.clone(ldapServer);
     ldapServer.getConnection().getHost().setHostName("INVALIDSERVERNAME");
 
@@ -332,8 +350,13 @@ public class LdapManagerTest
     Assert.assertEquals(0, ldapManager.searchUsers("z", null).size());
   }
 
-  private LdapConfiguration clone(LdapConfiguration ldapServer) {
-    XStream xstream = new XStream();
-    return (LdapConfiguration) xstream.fromXML(xstream.toXML(ldapServer));
+  private LdapConfiguration clone(final LdapConfiguration ldapServer) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      return objectMapper.readValue(objectMapper.writeValueAsString(ldapServer), LdapConfiguration.class);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

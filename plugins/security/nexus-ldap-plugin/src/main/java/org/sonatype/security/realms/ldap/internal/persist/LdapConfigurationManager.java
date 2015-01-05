@@ -40,7 +40,7 @@ public interface LdapConfigurationManager
    * Creates LDAP server configuration with new ID that is returned. The realm might get activated,
    * if the added server is very first in the configuration.
    */
-  void addLdapServerConfiguration(LdapConfiguration ldapServerConfiguration)
+  String addLdapServerConfiguration(LdapConfiguration ldapServerConfiguration)
       throws IllegalArgumentException;
 
   /**

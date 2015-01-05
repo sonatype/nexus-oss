@@ -15,11 +15,13 @@ package org.sonatype.security.realms.ldap.internal;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.junit.Assert;
@@ -28,6 +30,15 @@ import org.junit.Test;
 public class ConnectionBlackListTest
     extends LdapTestSupport
 {
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+    ldapConfiguration.getConnection().setConnectionTimeout(1);
+    ldapConfiguration.getConnection().setConnectionRetryDelay(7);
+    ldapConfiguration.getConnection().setCacheTimeout(0);
+    return ldapConfiguration;
+  }
+
   @Test
   public void testAuthenticate()
       throws Exception

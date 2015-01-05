@@ -36,6 +36,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.thoughtworks.xstream.XStream;
 import net.sf.ehcache.CacheManager;
 import org.apache.shiro.codec.Base64;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -46,6 +47,8 @@ import org.junit.Before;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Support for LDAP UTs with in-memory configuration source.
@@ -56,6 +59,8 @@ public abstract class LdapTestSupport
   protected Map<String, LdapServerConfiguration> ldapServerConfigurations = Maps.newHashMap();
 
   protected Map<String, LdapServer> ldapServers = Maps.newHashMap();
+
+  protected Map<String, LdapConfiguration> ldapClientConfigurations = Maps.newHashMap();
 
   protected LdapConfigurationSource ldapConfigurationSource = new MockLdapConfigurationSource();
 
@@ -96,8 +101,12 @@ public abstract class LdapTestSupport
       throws Exception
   {
     ldapServerConfigurations = createLdapServerConfigurations();
+    for (Map.Entry<String, LdapServerConfiguration> configurationEntry : ldapServerConfigurations.entrySet()) {
+      final LdapServer ldapServer = new LdapServer(configurationEntry.getValue());
+      ldapServers.put(configurationEntry.getKey(), ldapServer);
+    }
     startLdapServers();
-    final Map<String, LdapConfiguration> ldapClientConfigurations = createLdapClientConfigurations();
+    ldapClientConfigurations = createLdapClientConfigurations();
     for (LdapConfiguration configuration : ldapClientConfigurations.values()) {
       ldapConfigurationSource.create(configuration);
     }
@@ -110,10 +119,8 @@ public abstract class LdapTestSupport
   }
 
   protected synchronized void startLdapServer(final String name) {
-    checkArgument(ldapServerConfigurations.containsKey(name), "Unknown LDAP Server %s", name);
-    checkArgument(!ldapServers.containsKey(name), "LDAP Server %s already started", name);
-    final LdapServer ldapServer = new LdapServer(ldapServerConfigurations.get(name));
-    ldapServers.put(name, ldapServer);
+    checkArgument(ldapServers.containsKey(name), "Unknown LDAP Server %s", name);
+    final LdapServer ldapServer = ldapServers.get(name).start();
   }
 
   @After
@@ -134,48 +141,56 @@ public abstract class LdapTestSupport
     checkArgument(ldapServerConfigurations.containsKey(name), "Unknown LDAP Server %s", name);
     final LdapServer ldapServer = ldapServers.get(name);
     if (ldapServer != null) {
-      ldapServer.close();
-      ldapServers.remove(name);
+      ldapServer.stop();
     }
   }
 
   protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
     final Map<String, LdapConfiguration> result = Maps.newHashMap();
     // default implementation creates entries for all defined LDAP servers
+    int order = 0;
     for (String name : ldapServers.keySet()) {
       final LdapServer ldapServer = ldapServers.get(name);
+      order++;
 
-      final LdapConfiguration ldapConfiguration = new LdapConfiguration();
-      ldapConfiguration.setId("unused"); // create will override it anyway
-      ldapConfiguration.setName(name);
-      ldapConfiguration.setOrder(1);
-      Connection connection = new Connection();
-      connection.setSearchBase("o=sonatype");
-      connection.setSystemUsername("uid=admin,ou=system");
-      connection.setSystemPassword("secret");
-      connection.setAuthScheme("simple");
-      connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
-      ldapConfiguration.setConnection(connection);
-
-      final Mapping mapping = new Mapping();
-      mapping.setGroupBaseDn("ou=groups");
-      mapping.setGroupIdAttribute("cn");
-      // mapping.setGroupMemberAttribute("groupMemberAttribute");
-      mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
-      mapping.setGroupObjectClass("organizationalRole");
-      mapping.setLdapGroupsAsRoles(true);
-      mapping.setEmailAddressAttribute("mail");
-      mapping.setUserMemberOfAttribute("businesscategory");
-      mapping.setUserBaseDn("ou=people");
-      mapping.setUserIdAttribute("uid");
-      mapping.setUserObjectClass("inetOrgPerson");
-      mapping.setUserPasswordAttribute("userPassword");
-      mapping.setUserRealNameAttribute("sn");
-      mapping.setUserSubtree(true);
-      ldapConfiguration.setMapping(mapping);
-      result.put(name, ldapConfiguration);
+      final LdapConfiguration ldapConfiguration = createLdapClientConfigurationForServer(name, order, ldapServer);
+      if (ldapConfiguration != null) {
+        result.put(name, ldapConfiguration);
+      }
     }
     return result;
+  }
+
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
+    final LdapConfiguration ldapConfiguration = new LdapConfiguration();
+    ldapConfiguration.setId("unused"); // create will override it anyway
+    ldapConfiguration.setName(name);
+    ldapConfiguration.setOrder(order);
+    Connection connection = new Connection();
+    connection.setSearchBase("o=sonatype");
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("secret");
+    connection.setAuthScheme("simple");
+    connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
+    ldapConfiguration.setConnection(connection);
+
+    final Mapping mapping = new Mapping();
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    // mapping.setGroupMemberAttribute("groupMemberAttribute");
+    mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
+    mapping.setGroupObjectClass("organizationalRole");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserRealNameAttribute("sn");
+    mapping.setUserSubtree(true);
+    ldapConfiguration.setMapping(mapping);
+    return ldapConfiguration;
   }
 
   protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
@@ -207,5 +222,50 @@ public abstract class LdapTestSupport
       return classSpecificLdif;
     }
     return util.resolveFile("src/test/resources/defaults/default-ldap.ldif");
+  }
+
+  // ==
+
+  protected Mapping buildUserAndGroupAuthConfiguration() {
+    final Mapping userGroupConf = new Mapping();
+    userGroupConf.setUserMemberOfAttribute("userMemberOfAttribute");
+    userGroupConf.setGroupBaseDn("groupBaseDn");
+    userGroupConf.setGroupIdAttribute("groupIdAttribute");
+    userGroupConf.setGroupMemberAttribute("groupMemberAttribute");
+    userGroupConf.setGroupMemberFormat("groupMemberFormat");
+    userGroupConf.setGroupObjectClass("groupObjectClass");
+    userGroupConf.setLdapGroupsAsRoles(true);
+    userGroupConf.setEmailAddressAttribute("emailAddressAttribute");
+    userGroupConf.setUserBaseDn("userBaseDn");
+    userGroupConf.setUserIdAttribute("userIdAttribute");
+    userGroupConf.setUserObjectClass("userObjectClass");
+    userGroupConf.setUserPasswordAttribute("userPasswordAttribute");
+    userGroupConf.setUserRealNameAttribute("userRealNameAttribute");
+    userGroupConf.setUserSubtree(true);
+    return userGroupConf;
+  }
+
+  protected Connection buildConnectionInfo() throws UnsupportedEncodingException {
+    Connection connInfo = new Connection();
+    connInfo.setAuthScheme("ldap");
+    connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
+    connInfo.setCacheTimeout(30);
+    connInfo.setConnectionRetryDelay(300);
+    connInfo.setConnectionTimeout(15);
+    connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));
+    connInfo.setSaslRealm("");
+    connInfo.setSearchBase("ou=searchbase");
+    connInfo.setSystemPassword(encodeBase64("systemPassword"));
+    connInfo.setSystemUsername(encodeBase64("systemUsername"));
+    return connInfo;
+  }
+
+  protected void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual)
+      throws Exception
+  {
+    XStream xstream = new XStream();
+    String originalConfig = xstream.toXML(expected);
+    String newConfig = xstream.toXML(actual);
+    assertThat(newConfig, equalTo(originalConfig));
   }
 }

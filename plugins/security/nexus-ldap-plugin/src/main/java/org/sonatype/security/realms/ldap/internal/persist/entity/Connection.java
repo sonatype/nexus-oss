@@ -14,6 +14,8 @@ package org.sonatype.security.realms.ldap.internal.persist.entity;
 
 import javax.annotation.Nullable;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,6 +33,10 @@ public final class Connection
     private String hostName;
 
     private int port;
+
+    @VisibleForTesting
+    public Host() {
+    }
 
     public Host(final Protocol protocol, final String hostName, final int port) {
       setProtocol(protocol);

@@ -14,7 +14,10 @@ package org.sonatype.security.realms.ldap.internal.realms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
 
@@ -23,7 +26,13 @@ import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesF
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
+import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,9 +46,25 @@ public class FallBackConnectionTest
   private MockLdapConnector backupConnector = null;
 
   @Override
+  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+    result.put("main", createServerConfiguration("main"));
+    result.put("backup", createServerConfiguration("backup"));
+    return result;
+  }
+
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+    ldapConfiguration.getConnection().setConnectionRetryDelay(10);
+    ldapConfiguration.getConnection().setCacheTimeout(-1);
+    return ldapConfiguration;
+  }
+
+  @Override
   protected List<LdapConnector> getLdapConnectors() {
     List<LdapConnector> connectors = new ArrayList<LdapConnector>();
-    this.mainConnector = this.buildMainMockServer("backup");
+    this.mainConnector = this.buildMainMockServer("main");
     this.backupConnector = this.buildBackupMockServer("backup");
     LdapConnector fallBackConnector = new FailoverLdapConnector(mainConnector, backupConnector, 2);
     connectors.add(fallBackConnector);
