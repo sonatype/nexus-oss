@@ -246,12 +246,11 @@ public class DefaultFSLocalRepositoryStorage
             link.setModified(target.lastModified());
             link.setCreated(target.lastModified());
 
-            repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
-
             // NEXUS-7850: NEXUS-7851: filter out unwanted cases, by not treating them as links
             final Attributes attributes = link.getRepositoryItemAttributes();
             if (Strings.isNullOrEmpty(attributes.getRemoteUrl()) &&
                 !attributes.containsKey(AccessManager.REQUEST_REMOTE_ADDRESS)) {
+              repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
               return link;
             }
           }
