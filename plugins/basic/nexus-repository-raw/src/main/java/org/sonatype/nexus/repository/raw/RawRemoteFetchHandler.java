@@ -21,6 +21,7 @@ import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
@@ -46,13 +47,18 @@ public class RawRemoteFetchHandler
     final HttpClientFacet httpFacet = request.getRepository().facet(HttpClientFacet.class);
 
     // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
-    final String path = request.getPath();
+
+    final RawRemoteSourceFacet facet = context.getRequest().getRepository().facet(RawRemoteSourceFacet.class);
+
+    final String remoteUrlBase = facet.getRemoteUrlBase();
+
+    final HttpGet httpGet = new HttpGet(remoteUrlBase + request.getPath());
 
     final HttpClient httpClient = httpFacet.getHttpClient();
 
-    new HttpGet()
+    // TODO: Actually wire this up.
+    final HttpResponse execute = httpClient.execute(httpGet);
 
-    //return httpFacet.getResponse(path);
     return null;
   }
 }
