@@ -35,12 +35,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
-      <!--exclusions>
-        <exclusion>
-          <groupId>org.sonatype.nexus</groupId>
-          <artifactId>base-configuration</artifactId>
-        </exclusion>
-      </exclusions-->
     </dependency>
 
     <dependency>
