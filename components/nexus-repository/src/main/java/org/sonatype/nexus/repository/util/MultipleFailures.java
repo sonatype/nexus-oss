@@ -60,11 +60,7 @@ public class MultipleFailures
         buff.append(message).append("; ");
       }
 
-      buff.append(failures.size());
-      buff.append(" failure");
-      if (failures.size() > 1) {
-        buff.append("s");
-      }
+      Plural.append(buff, failures.size(), "failure");
       return buff.toString();
     }
   }
