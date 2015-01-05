@@ -719,7 +719,6 @@
               Exclude test resource files, many of these need specific content w/o headers.
               -->
               <exclude>**/src/test/*resources/**</exclude>
-              <exclude>**/legacy-testsuite/resources/**</exclude>
 
               <!--
               Exclude third-party resources.
