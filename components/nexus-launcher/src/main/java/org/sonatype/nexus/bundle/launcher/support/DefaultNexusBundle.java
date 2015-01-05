@@ -19,12 +19,14 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -114,6 +116,11 @@ public class DefaultNexusBundle
    * SSL port if HTTPS support is enabled, otherwise -1.
    */
   private int sslPort;
+
+  /**
+   * Secure URL or null
+   */
+  private URL secureUrl;
 
   @Inject
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
@@ -217,6 +224,18 @@ public class DefaultNexusBundle
     }
   }
 
+  @Override
+  protected String composeApplicationURL() {
+    final String contextPath = getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
+    return String.format("http://%s:%s%s/", getConfiguration().getHostName(), getPort(), contextPath);
+  }
+
+  @Override
+  public URL getSecureUrl() {
+    return this.secureUrl;
+  }
+
+
   /**
    * Additionally <br/>
    * - configures Nexus/Jetty port<br/>
@@ -245,6 +264,9 @@ public class DefaultNexusBundle
     else {
       sslPort = getConfiguration().getSslPort();
     }
+
+    this.secureUrl = new URL(getUrl().toExternalForm().replaceFirst("http://", "https://")
+      .replaceFirst(String.valueOf(getPort()), String.valueOf(getSslPort())));
 
     configureJSW(strategy);
     configureNexusProperties(strategy);
@@ -679,6 +701,9 @@ public class DefaultNexusBundle
 
       nexusProperties.setProperty("application-port", String.valueOf(getPort()));
       nexusProperties.setProperty("application-port-ssl", String.valueOf(getSslPort()));
+      if(getConfiguration().getContextPath() != null){
+        nexusProperties.setProperty("nexus-webapp-context-path", getConfiguration().getContextPath());
+      }
 
       final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
       if (!systemProperties.isEmpty()) {

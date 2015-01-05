@@ -13,6 +13,7 @@
 package org.sonatype.nexus.bundle.launcher;
 
 import java.io.File;
+import java.net.URL;
 
 import org.sonatype.sisu.bl.WebBundle;
 
@@ -60,5 +61,11 @@ public interface NexusBundle
    * Returns the SSL port if HTTPS support is enabled, otherwise -1.
    */
   int getSslPort();
+
+  /**
+   * @return the Secure URL bundle is running on, or null if not yet configured
+   * @since 2.11.2
+   */
+  URL getSecureUrl();
 
 }
