@@ -37,6 +37,8 @@ class Shoes4Scenario
     exec(['git', 'clone', 'git@github.com:shoes/shoes4.git'])
     // cd into it
     cd 'shoes4'
+    // use tagged release
+    exec(['git', 'checkout', 'v4.0.0.pre2'])
     // read version (is defined in src)
     String version
     file('lib/shoes/version.rb').text.eachLine { if (it =~ /VERSION =/) version = it }
