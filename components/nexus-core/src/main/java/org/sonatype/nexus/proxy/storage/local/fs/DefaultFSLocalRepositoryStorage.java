@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -344,7 +345,13 @@ public class DefaultFSLocalRepositoryStorage
           if (!cl.isReusable()) {
             bufferedInputStream = new BufferedInputStream(cl.getContent());
             bufferedInputStream.mark(1024);
-            cl = new PreparedContentLocator(bufferedInputStream, cl.getMimeType(), cl.getLength());
+            // link persister with close the stream, so wrap it and prevent closing
+            cl = new PreparedContentLocator(new FilterInputStream(bufferedInputStream) {
+              @Override
+              public void close() {
+                // nop
+              }
+            }, cl.getMimeType(), cl.getLength());
           } else {
             bufferedInputStream = null;
           }
