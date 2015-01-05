@@ -20,10 +20,12 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport
 import java.util.concurrent.locks.ReentrantLock
 
 import static org.junit.Assert.fail
+import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.DESTROYED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.FAILED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.INITIALISED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.NEW
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STARTED
+import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STOPPED
 
 /**
  * Tests for {@link SimpleStateGuard}.
@@ -52,6 +54,15 @@ class SimpleStateGuardTest
     }
   }
 
+  private static class NopAction
+      implements SimpleStateGuard.Action
+  {
+    @Override
+    void run() throws Exception {
+      // nop
+    }
+  }
+
   private SimpleStateGuard<State> underTest
 
   @Before
@@ -74,6 +85,44 @@ class SimpleStateGuardTest
 
     assert underTest.current == INITIALISED
     assert action.triggered
+  }
+
+  @Test
+  void 'nested transition'() {
+    underTest.transition(INITIALISED)
+        .from(NEW)
+        .run(new NopAction())
+    assert underTest.current == INITIALISED
+
+    underTest.transition(STARTED)
+        .from(INITIALISED)
+        .run(new NopAction())
+    assert underTest.current == STARTED
+
+    def stoppedAction = new TriggeredAction()
+    def stop = {
+      underTest.transition(STOPPED)
+          .from(STARTED)
+          .run(stoppedAction)
+    }
+
+    def destroyedAction = new TriggeredAction() {
+      @Override
+      void run() throws Exception {
+        if (underTest.is(STARTED)) {
+          stop()
+        }
+        assert underTest.current == STOPPED
+        super.run()
+      }
+    }
+
+    underTest.transition(DESTROYED)
+        .run(destroyedAction)
+
+    assert underTest.current == DESTROYED
+    assert stoppedAction.triggered
+    assert destroyedAction.triggered
   }
 
   @Test
