@@ -91,7 +91,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_LSTATUS,
-        new Date(), // HACK: could restore by having event have date
+        revt.getEventDate(),
         null, // TODO: who changed it?
         "/", // link to UI
         data
@@ -117,7 +117,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         FeedRecorder.REPO_PSTATUS,
-        new Date(), // HACK: could restore by having event have date
+        revt.getEventDate(),
         null, // TODO: who changed it?
         "/", // link to UI
         data

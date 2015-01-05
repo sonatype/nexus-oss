@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import java.util.Date;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -23,8 +25,11 @@ public abstract class RepositoryEvent
 {
   private final Repository repository;
 
+  private final Date date;
+
   public RepositoryEvent(final Repository repository) {
     this.repository = repository;
+    this.date = new Date();
   }
 
   /**
@@ -34,6 +39,10 @@ public abstract class RepositoryEvent
    */
   public Repository getRepository() {
     return repository;
+  }
+
+  public Date getEventDate() {
+    return date;
   }
 
   @Override

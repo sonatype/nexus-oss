@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import java.util.Date;
+
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
@@ -23,12 +25,18 @@ public abstract class RepositoryRegistryEvent
 {
   private final RepositoryRegistry repositoryRegistry;
 
+  private final Date date;
+
   public RepositoryRegistryEvent(final RepositoryRegistry repositoryRegistry) {
     this.repositoryRegistry = repositoryRegistry;
+    this.date = new Date();
   }
 
   public RepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;
   }
 
+  public Date getEventDate() {
+    return date;
+  }
 }

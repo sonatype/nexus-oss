@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
-import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -108,7 +107,7 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          new Date(), // HACK: could restore by having item events have date
+          ievt.getEventDate(),
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data
@@ -162,7 +161,7 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          new Date(), // HACK: could restore by having item events have date
+          event.getEventDate(),
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data

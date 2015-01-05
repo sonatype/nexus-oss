@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.configuration;
 
+import java.util.Date;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
@@ -23,11 +25,18 @@ public abstract class ConfigurationEvent
 {
   private final ApplicationConfiguration configuration;
 
+  private final Date date;
+
   public ConfigurationEvent(ApplicationConfiguration configuration) {
     this.configuration = configuration;
+    this.date = new Date();
   }
 
   public ApplicationConfiguration getApplicationConfiguration() {
     return configuration;
+  }
+
+  public Date getEventDate() {
+    return date;
   }
 }
