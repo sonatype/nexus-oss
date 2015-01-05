@@ -36,10 +36,10 @@ public class SimpleStateGuard<T extends Enum>
 {
   private final Lock lock;
 
-  private T current;
-
   @Nullable
-  private T failure;
+  private final T failure;
+
+  private T current;
 
   public SimpleStateGuard(final Lock lock,
                           final T initial,
