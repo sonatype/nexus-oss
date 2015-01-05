@@ -41,7 +41,7 @@ class MultipleFailuresTest
   void 'propagate single'() {
     underTest.add(new Exception('TEST'))
     try {
-      underTest.propagate()
+      underTest.propagate('OOPS')
       fail()
     }
     catch (MultipleFailures.MultipleFailuresException e) {
@@ -61,7 +61,7 @@ class MultipleFailuresTest
     underTest.add(new Exception('FOO'))
     underTest.add(new Exception('BAR'))
     try {
-      underTest.propagate()
+      underTest.propagate('OOPS')
       fail()
     }
     catch (MultipleFailures.MultipleFailuresException e) {

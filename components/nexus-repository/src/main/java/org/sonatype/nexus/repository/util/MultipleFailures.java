@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.util;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -42,7 +44,8 @@ public class MultipleFailures
   public class MultipleFailuresException
     extends Exception
   {
-    private MultipleFailuresException() {
+    private MultipleFailuresException(final @Nullable String message) {
+      super(message);
       for (Throwable failure : failures) {
         addSuppressed(failure);
       }
@@ -51,6 +54,12 @@ public class MultipleFailures
     @Override
     public String getMessage() {
       StringBuilder buff = new StringBuilder();
+
+      String message = super.getMessage();
+      if (message != null) {
+        buff.append(message).append("; ");
+      }
+
       buff.append(failures.size());
       buff.append(" failure");
       if (failures.size() > 1) {
@@ -63,10 +72,17 @@ public class MultipleFailures
   /**
    * Maybe throw {@link MultipleFailuresException} if there are any failures.
    */
-  public void propagate() throws MultipleFailuresException {
+  public void propagate(final @Nullable String message) throws MultipleFailuresException {
     if (!failures.isEmpty()) {
       log.trace("Propagating: {}", failures);
-      throw new MultipleFailuresException();
+      throw new MultipleFailuresException(message);
     }
+  }
+
+  /**
+   * Maybe throw {@link MultipleFailuresException} if there are any failures.
+   */
+  public void propagate() throws MultipleFailuresException {
+    propagate(null);
   }
 }
