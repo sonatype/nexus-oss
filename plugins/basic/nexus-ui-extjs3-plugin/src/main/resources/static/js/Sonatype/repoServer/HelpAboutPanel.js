@@ -52,7 +52,7 @@ NX.define('Sonatype.repoServer.HelpAboutPanel', {
   getHelpText : function() {
     return '<div class="little-padding">'
           + 'Sonatype Nexus&trade; ' + Sonatype.utils.edition + (Sonatype.utils.edition ? ' Edition' : '')
-          + '<br/>Copyright &copy; 2008-2013 Sonatype, Inc.'
+          + '<br/>Copyright &copy; 2008-2015 Sonatype, Inc.'
           + '<br/>All rights reserved. Includes the third-party code listed at <a href="'
           + Sonatype.utils.attributionsURL + '" target="_new">' + Sonatype.utils.attributionsURL + '</a>.'
           + '<br/>'
