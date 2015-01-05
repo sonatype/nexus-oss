@@ -57,7 +57,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_HELP_SUPPORT: 'Support',
 
     // Footer
-    GLOBAL_FOOTER_COPYRIGHT: 'Sonatype Nexus™ © Copyright Sonatype, Inc.',
+    GLOBAL_FOOTER_COPYRIGHT: 'Sonatype Nexus™ Copyright © 2008-2015, Sonatype Inc. All rights reserved.',
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
