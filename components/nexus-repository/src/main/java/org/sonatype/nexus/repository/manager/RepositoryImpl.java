@@ -130,6 +130,7 @@ public class RepositoryImpl
   @Override
   public void init(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
+    final RepositoryImpl self = this;
 
     states.transition(INITIALISED)
         .from(NEW)
@@ -137,19 +138,16 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            _init(configuration);
+            self.configuration = configuration;
+            self.name = configuration.getRepositoryName();
           }
         });
-  }
-
-  private void _init(final Configuration configuration) throws Exception {
-    this.configuration = configuration;
-    this.name = configuration.getRepositoryName();
   }
 
   @Override
   public void update(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
+    final RepositoryImpl self = this;
 
     states.transition(STOPPED)
         .from(STOPPED)
@@ -157,94 +155,84 @@ public class RepositoryImpl
         {
           @Override
           public void run() throws Exception {
-            _update(configuration);
+            self.configuration = configuration;
+
+            // TODO: handle exceptions
+            for (Facet facet : facets) {
+              log.debug("Updating facet: {}", facet);
+              facet.update();
+            }
           }
         });
   }
 
-  private void _update(final Configuration configuration) throws Exception {
-    this.configuration = configuration;
-
-    // TODO: handle exceptions
-    for (Facet facet : facets) {
-      log.debug("Updating facet: {}", facet);
-      facet.update();
-    }
-  }
-
   @Override
   public void start() throws Exception {
+    final RepositoryImpl self = this;
+
     states.transition(STARTED)
         .from(INITIALISED, STOPPED)
         .run(new Action()
         {
           @Override
           public void run() throws Exception {
-            _start();
+            // TODO: handle exceptions
+            for (Facet facet : facets) {
+              log.debug("Starting facet: {}", facet);
+              facet.start();
+            }
+
+            eventBus.post(new RepositoryStartedEvent(self));
           }
         });
   }
 
-  private void _start() throws Exception {
-    // TODO: handle exceptions
-    for (Facet facet : facets) {
-      log.debug("Starting facet: {}", facet);
-      facet.start();
-    }
-
-    eventBus.post(new RepositoryStartedEvent(this));
-  }
-
   @Override
   public void stop() throws Exception {
+    final RepositoryImpl self = this;
+
     states.transition(STOPPED)
         .from(STARTED)
         .run(new Action()
         {
           @Override
           public void run() throws Exception {
-            _stop();
+            // TODO: handle exceptions
+            for (Facet facet : facets) {
+              log.debug("Stopping facet: {}", facet);
+              facet.stop();
+            }
+
+            eventBus.post(new RepositoryStoppedEvent(self));
           }
         });
   }
 
-  private void _stop() throws Exception {
-    // TODO: handle exceptions
-    for (Facet facet : facets) {
-      log.debug("Stopping facet: {}", facet);
-      facet.stop();
-    }
-
-    eventBus.post(new RepositoryStoppedEvent(this));
-  }
-
   @Override
   public void destroy() throws Exception {
+    final RepositoryImpl self = this;
+
     states.transition(DESTROYED)
         .run(new Action()
         {
           @Override
           public void run() throws Exception {
-            _destroy();
+            if (states.is(STARTED)) {
+              stop();
+            }
+
+            // TODO: handle exceptions
+            for (Facet facet : facets) {
+              log.debug("Destroying facet: {}", facet);
+              facet.destroy();
+            }
+
+            facets.clear();
+            configuration = null;
+
+            eventBus.post(new RepositoryDestroyedEvent(self));
           }
         });
-  }
-
-  private void _destroy() throws Exception {
-    if (states.is(STARTED)) {
-      _stop();
-    }
-
-    // TODO: handle exceptions
-    for (Facet facet : facets) {
-      log.debug("Destroying facet: {}", facet);
-      facet.destroy();
-    }
-
-    facets.clear();
-    configuration = null;
-
-    eventBus.post(new RepositoryDestroyedEvent(this));
   }
 
   //
@@ -254,21 +242,18 @@ public class RepositoryImpl
   @Override
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
+    final RepositoryImpl self = this;
 
     states.guard(INITIALISED)
         .run(new Action()
         {
           @Override
           public void run() throws Exception {
-            _attach(facet);
+            log.debug("Attaching facet: {}", facet);
+            facet.init(self);
+            facets.add(facet);
           }
         });
-  }
-
-  private void _attach(final Facet facet) throws Exception {
-    log.debug("Attaching facet: {}", facet);
-    facet.init(this);
-    facets.add(facet);
   }
 
   @Override
