@@ -16,8 +16,8 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
  * Storage {@link Facet}.
@@ -28,46 +28,58 @@ import com.tinkerpop.blueprints.Vertex;
 public interface StorageFacet
   extends Facet
 {
+  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
+
+  static String E_HAS_LABEL = "has_label";
+
+  static String E_OWNS_ASSET = "owns_asset";
+
+  static String E_OWNS_COMPONENT = "owns_component";
+
+  static String E_PART_OF_COMPONENT = "part_of_component";
+
+  static String P_PATH = "path";
+
+  static String V_ASSET = "asset";
+
+  static String V_COMPONENT = "component";
+
+  static String V_LABEL = "label";
+
+  static String V_REPOSITORY = "repository";
+
   /**
    * Gets a transaction for working with the graph.
    */
-  Graph getGraphTx();
+  OrientGraph getGraphTx();
 
   // Browse Assets and Components
 
   /**
    * Gets all vertices representing assets in the graph.
    */
-  Iterable<Vertex> browseAssets(Graph graph);
+  Iterable<Vertex> browseAssets(OrientGraph graph);
 
   /**
    * Gets all vertices representing components in the graph.
    */
-  Iterable<Vertex> browseComponents(Graph graph);
+  Iterable<Vertex> browseComponents(OrientGraph graph);
 
   // Read Assets and Components
 
   /**
-   * Gets a vertex representing an asset with a given id, or {@code null}.
+   * Gets a vertex with a given id, or {@code null}.
    *
    * The id may be a {@code String}, {@code ODocument}, {@code OIdentifiable}, or {@code EntityId}.
    */
   @Nullable
-  Vertex findAssetWithId(Graph graph, Object id);
+  Vertex findById(OrientGraph graph, Object id);
 
   /**
    * Gets a vertex representing an asset with a given path, or {@code null}.
    */
   @Nullable
-  Vertex findAssetWithPath(Graph graph, String path);
-
-  /**
-   * Gets a vertex representing an asset with a given id, or {@code null}.
-   *
-   * The id may be a {@code String}, {@code ODocument}, {@code OIdentifiable}, or {@code EntityId}.
-   */
-  @Nullable
-  Vertex findComponentWithId(Graph graph, Object id);
+  Vertex findByPath(OrientGraph graph, String path);
 
   // Edit Assets and Components (edits can be done directly on Vertex objects, followed by calling graph.commit())
 
@@ -76,19 +88,19 @@ public interface StorageFacet
   /**
    * Creates a new vertex representing an asset.
    */
-  Vertex createAsset(Graph graph);
+  Vertex createAsset(OrientGraph graph);
 
   /**
    * Creates a new vertex representing a component.
    */
-  Vertex createComponent(Graph graph);
+  Vertex createComponent(OrientGraph graph);
 
   // Delete Assets and Components
 
   /**
    * Removes a vertex from the graph.
    */
-  void delete(Vertex vertex);
+  void delete(OrientGraph graph, Vertex vertex);
 
   // TODO: Blob CR_D
 }

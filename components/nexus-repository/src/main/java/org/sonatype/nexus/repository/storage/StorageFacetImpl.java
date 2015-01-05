@@ -15,13 +15,21 @@ package org.sonatype.nexus.repository.storage;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.entity.EntityId;
 
-import com.tinkerpop.blueprints.Graph;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
+import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -31,63 +39,102 @@ public class StorageFacetImpl
   extends FacetSupport
   implements StorageFacet
 {
-  private final StorageService storage;
+  private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
-  public StorageFacetImpl(final StorageService storage) {
-    this.storage = checkNotNull(storage);
+  public StorageFacetImpl(@Named(GraphDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+    this.databaseInstanceProvider = databaseInstanceProvider;
+
+    // initialize schema if needed
+    final OrientGraphNoTx graph = new OrientGraphNoTx(databaseInstanceProvider.get().acquire());
+    try {
+      initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean apply(final OrientVertexType type) {
+          graph.createKeyIndex(P_PATH, Vertex.class, new Parameter("class", V_ASSET));
+          return true;
+        }
+      });
+      initVertexType(graph, V_COMPONENT, null);
+      initVertexType(graph, V_LABEL, null);
+      initVertexType(graph, V_REPOSITORY, null);
+
+      initEdgeType(graph, E_CONTAINS_COMPONENTS_WITH_LABEL, null);
+      initEdgeType(graph, E_HAS_LABEL, null);
+      initEdgeType(graph, E_OWNS_ASSET, null);
+      initEdgeType(graph, E_OWNS_COMPONENT, null);
+      initEdgeType(graph, E_PART_OF_COMPONENT, null);
+    }
+    finally {
+      graph.shutdown();
+    }
+  }
+
+  private void initVertexType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
+    if (graph.getVertexType(name) == null) {
+      OrientVertexType type = graph.createVertexType(name);
+      if (predicate != null) {
+        predicate.apply(type);
+      }
+    }
+  }
+
+  private void initEdgeType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
+    if (graph.getEdgeType(name) == null) {
+      OrientEdgeType type = graph.createEdgeType(name);
+      if (predicate != null) {
+        predicate.apply(type);
+      }
+    }
   }
 
   @Override
-  protected void doInit() throws Exception {
-    // TODO:
+  public OrientGraph getGraphTx() {
+    ODatabaseDocumentTx documentTx = databaseInstanceProvider.get().acquire();
+    return new OrientGraph(documentTx);
   }
 
   @Override
-  public Graph getGraphTx() {
-    return null;
+  public Iterable<Vertex> browseAssets(final OrientGraph graph) {
+    return graph.getVerticesOfClass(V_ASSET);
   }
 
   @Override
-  public Iterable<Vertex> browseAssets(final Graph graph) {
-    return null;
-  }
-
-  @Override
-  public Iterable<Vertex> browseComponents(final Graph graph) {
-    return null;
+  public Iterable<Vertex> browseComponents(final OrientGraph graph) {
+    return graph.getVerticesOfClass(V_COMPONENT);
   }
 
   @Nullable
   @Override
-  public Vertex findAssetWithId(final Graph graph, final Object id) {
-    return null;
+  public Vertex findById(final OrientGraph graph, final Object id) {
+    if (id instanceof EntityId) {
+      EntityId entityId = (EntityId) id;
+      return graph.getVertex(entityId.getValue());
+    }
+    else {
+      return graph.getVertex(id);
+    }
   }
 
   @Nullable
   @Override
-  public Vertex findAssetWithPath(final Graph graph, final String path) {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public Vertex findComponentWithId(final Graph graph, final Object id) {
-    return null;
+  public Vertex findByPath(final OrientGraph graph, final String path) {
+    return Iterables.getFirst(graph.getVertices(V_ASSET + "." + P_PATH, path), null);
   }
 
   @Override
-  public Vertex createAsset(final Graph graph) {
-    return null;
+  public Vertex createAsset(final OrientGraph graph) {
+    return graph.addVertex(V_ASSET, (String) null);
   }
 
   @Override
-  public Vertex createComponent(final Graph graph) {
-    return null;
+  public Vertex createComponent(final OrientGraph graph) {
+    return graph.addVertex(V_COMPONENT, (String) null);
   }
 
   @Override
-  public void delete(final Vertex vertex) {
-
+  public void delete(final OrientGraph graph, final Vertex vertex) {
+    graph.removeVertex(vertex);
   }
 }
