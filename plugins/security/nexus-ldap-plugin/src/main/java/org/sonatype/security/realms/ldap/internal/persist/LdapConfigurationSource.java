@@ -28,9 +28,9 @@ public interface LdapConfigurationSource
   List<LdapConfiguration> loadAll();
 
   /**
-   * Creates a new entry. Fails if ID already exists.
+   * Creates a new entry, with newly assigned ID that is returned.
    */
-  void create(LdapConfiguration ldapConfiguration);
+  String create(LdapConfiguration ldapConfiguration);
 
   /**
    * Updates existing entry. Returns {@code true} if entry found and updated.

@@ -12,33 +12,34 @@
  */
 package org.sonatype.security.realms.ldap.internal.usermanagement;
 
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
+import org.sonatype.security.realms.ldap.internal.MockLdapConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class LdapUserManagerNotConfiguredIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
   @Override
   public void setUp()
       throws Exception
   {
     super.setUp();
-    getLdapRealmConfig().delete();
+    ((MockLdapConfigurationSource) ldapConfigurationSource).purge();
   }
 
   @Test
   public void testNotConfigured()
       throws Exception
   {
-    UserManager userManager = this.lookup(UserManager.class, "LDAP");
+    final UserManager userManager = lookup(UserManager.class, "LDAP");
     try {
       userManager.getUser("cstamas");
-
-      Assert.fail("Expected UserNotFoundTransientException");
+      fail("Expected UserNotFoundTransientException");
     }
     catch (UserNotFoundException e) {
       // OSS LDAP did throw transient when not configured, but Pro does not, it thrown only on error

@@ -37,7 +37,7 @@ public interface LdapConfigurationManager
   LdapConfiguration getLdapServerConfiguration(String id) throws LdapServerNotFoundException;
 
   /**
-   * Creates LDAP server configuration. If {@code mayActivate} is {@code true}, then realm might get activated,
+   * Creates LDAP server configuration with new ID that is returned. The realm might get activated,
    * if the added server is very first in the configuration.
    */
   void addLdapServerConfiguration(LdapConfiguration ldapServerConfiguration)

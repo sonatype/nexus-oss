@@ -13,11 +13,12 @@
 package org.sonatype.security.realms.ldap.internal.persist;
 
 import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
 import org.junit.Test;
 
 public class PasswordHelperTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
 
   @Test

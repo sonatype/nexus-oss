@@ -15,6 +15,7 @@ package org.sonatype.security.realms.ldap.internal.realms;
 import java.util.Collection;
 import java.util.Set;
 
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 
@@ -22,13 +23,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class DefaultLdapManagerIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
 
   private LdapManager getLdapManager()
       throws Exception
   {
-    return (LdapManager) this.lookup(LdapManager.class);
+    return lookup(LdapManager.class);
   }
 
   @Test

@@ -10,27 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
-public class SimpleLdapServer
+package org.sonatype.security.realms.ldap.internal;
+
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+
+/**
+ * Support for LDAP ITs (slow UTs) with real OrientDB backed configuration source.
+ */
+public abstract class LdapITSupport
     extends LdapTestSupport
 {
-
-  /**
-   * @param args
-   * @throws Exception
-   */
-  public static void main(String[] args)
-      throws Exception
-  {
-    try {
-      SimpleLdapServer server = new SimpleLdapServer();
-      server.setUp();
-    }
-    finally {
-      // System.exit( 0 );
-    }
-
+  @Override
+  protected SecurityConfiguration getSecurityConfig() {
+    return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
-
 }

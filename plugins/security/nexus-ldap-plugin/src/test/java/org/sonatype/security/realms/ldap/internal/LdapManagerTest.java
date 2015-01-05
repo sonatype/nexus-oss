@@ -14,9 +14,11 @@ package org.sonatype.security.realms.ldap.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
@@ -29,13 +31,19 @@ import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import com.thoughtworks.xstream.XStream;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class LdapManagerTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
+  @Override
+  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    // reuse the "default" one, but add the two more
+    final Map<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
+    result.put("backup", createServerConfiguration("backup"));
+    result.put("second", createServerConfiguration("second"));
+    return result;
+  }
 
   @Test
   public void testAuthenticate()

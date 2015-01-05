@@ -24,15 +24,22 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
-import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
+import org.sonatype.security.realms.ldap.internal.persist.orient.OrientDBLdapConfigurationSource;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
 public abstract class AbstractMockLdapConnectorTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
 
   private EnterpriseLdapManager ldapManager = null;
@@ -60,8 +67,49 @@ public abstract class AbstractMockLdapConnectorTest
       IOUtils.copy(reader, out);
     }
 
+    ldapConfigurationSource.create(getTestConfiguration());
+
     this.ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     this.resetLdapConnectors();
+  }
+
+  /**
+   * Default configuration (was /src/test/resources/defaults/ldap.xml). Tests will want to override if defaults
+   * are not sufficient.
+   */
+  protected LdapConfiguration getTestConfiguration() {
+    final LdapConfiguration result = new LdapConfiguration();
+    result.setId("default");
+    result.setName("ldap://localhost:12345");
+    result.setOrder(1);
+
+    final Connection connection = new Connection();
+    connection.setSearchBase("o=sonatype");
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("{E4Eqa2AYXjEHjSzdtIWmYs+2o9M03rUMO0sUhDRoW7k=}");
+    connection.setAuthScheme("simple");
+    connection.setHost(new Host(Protocol.ldap, "localhost", 12345));
+    connection.setConnectionTimeout(300);
+    connection.setConnectionRetryDelay(30);
+    connection.setCacheTimeout(300);
+    result.setConnection(connection);
+
+    final Mapping mapping = new Mapping();
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
+    mapping.setGroupObjectClass("organizationalRole");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserRealNameAttribute("sn");
+    result.setMapping(mapping);
+
+    return result;
   }
 
   protected void resetLdapConnectors() throws Exception {

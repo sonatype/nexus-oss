@@ -17,14 +17,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.security.realms.ldap.LdapPlugin;
-
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
-import org.sonatype.security.realms.ldap.internal.SecurityTestSupportSecurity;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.realms.ldap.LdapPlugin;
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
+import org.sonatype.security.realms.ldap.internal.SecurityTestSupportSecurity;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -40,7 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class LdapUserManagerIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
 
   @Override

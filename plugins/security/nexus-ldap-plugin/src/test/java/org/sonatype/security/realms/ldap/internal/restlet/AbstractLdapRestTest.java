@@ -14,6 +14,7 @@ package org.sonatype.security.realms.ldap.internal.restlet;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
@@ -107,7 +108,6 @@ public abstract class AbstractLdapRestTest
 
   @Override
   protected List<LdapConnector> getLdapConnectors() {
-    return new ArrayList<LdapConnector>();
+    return Collections.emptyList();
   }
-
 }

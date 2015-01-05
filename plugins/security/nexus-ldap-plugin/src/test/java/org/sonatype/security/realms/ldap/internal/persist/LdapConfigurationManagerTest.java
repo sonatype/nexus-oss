@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
@@ -23,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class LdapConfigurationManagerTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
 
   @Test
@@ -197,7 +198,7 @@ public class LdapConfigurationManagerTest
 
     // the order at this point is 1, 2, 3, 4
     // we will change it to 3, 1, 4, 2
-    List<String> newOrder = new ArrayList<String>();
+    List<String> newOrder = new ArrayList<>();
     newOrder.add(ldapServer3.getId());
     newOrder.add(ldapServer1.getId());
     newOrder.add(ldapServer4.getId());

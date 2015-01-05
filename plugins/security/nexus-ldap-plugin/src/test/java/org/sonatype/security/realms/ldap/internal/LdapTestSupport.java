@@ -14,80 +14,59 @@
 package org.sonatype.security.realms.ldap.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.ldaptestsuite.Partition;
+import org.sonatype.nexus.proxy.maven.routing.Config;
+import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
+import org.sonatype.plexus.rest.DefaultReferenceFactory;
+import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.security.guice.SecurityModule;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationSource;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.google.inject.Binder;
 import com.google.inject.Module;
 import net.sf.ehcache.CacheManager;
-import org.apache.commons.io.IOUtils;
+import org.apache.shiro.codec.Base64;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.junit.After;
+import org.junit.Before;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
+
+/**
+ * Support for LDAP UTs with in-memory configuration source.
+ */
 public abstract class LdapTestSupport
     extends SecurityTestSupport
 {
-  private LdapServer ldapServer;
+  protected Map<String, LdapServerConfiguration> ldapServerConfigurations = Maps.newHashMap();
 
-  private File ldapRealmConfig;
+  protected Map<String, LdapServer> ldapServers = Maps.newHashMap();
 
-  @Override
-  protected void customizeModules(final List<Module> modules) {
-    super.customizeModules(modules);
-    modules.add(new SecurityModule());
-  }
+  protected LdapConfigurationSource ldapConfigurationSource = new MockLdapConfigurationSource();
 
-  protected LdapServer getLdapServer() {
-    return ldapServer;
-  }
-
-  protected File getLdapRealmConfig() {
-    return ldapRealmConfig;
-  }
-
-  @Override
-  public void setUp()
-      throws Exception
-  {
-    super.setUp();
-
-    // check if we have a custom ldap.xml for this test
-    String classname = this.getClass().getName();
-    File sourceLdapXml =
-        new File(getBasedir() + "/target/test-classes/" + classname.replace('.', '/') + "-ldap.xml");
-
-    ldapServer = (LdapServer) lookup(LdapServer.ROLE);
-    ldapRealmConfig = new File(getConfHomeDir(), "ldap.xml");
-    if (sourceLdapXml.exists()) {
-      this.interpolateLdapXml(sourceLdapXml, ldapRealmConfig);
+  public static String encodeBase64(final String value) {
+    try {
+      return Base64.encodeToString(value.getBytes(PREFERRED_ENCODING));
     }
-    else {
-      this.interpolateLdapXml("/test-conf/etc/ldap.xml", ldapRealmConfig);
+    catch (UnsupportedEncodingException e) {
+      throw Throwables.propagate(e);
     }
-  }
-
-  @Override
-  public void tearDown()
-      throws Exception
-  {
-    lookup(CacheManager.class).shutdown();
-
-    if (ldapServer != null && ldapServer.isStarted()) {
-      ldapServer.stop();
-      ldapServer = null;
-    }
-
-    super.tearDown();
   }
 
   @Override
@@ -97,53 +76,137 @@ public abstract class LdapTestSupport
     configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
-  /**
-   * Copies a resource from from the classpath to the given output file and closes streams.
-   */
-  protected void copyResourceToFile(String resource, File outputFile)
-      throws IOException
+  @Override
+  protected void customizeModules(final List<Module> modules) {
+    super.customizeModules(modules);
+    modules.add(new SecurityModule());
+    // test specific bindings
+    modules.add(new Module()
+    {
+      @Override
+      public void configure(final Binder binder) {
+        binder.bind(Config.class).toInstance(new ConfigImpl(false));
+        binder.bind(ReferenceFactory.class).toInstance(new DefaultReferenceFactory());
+        binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
+      }
+    });
+  }
+
+  @Before
+  public void startLdap()
+      throws Exception
   {
-    try (InputStream in = getClass().getResourceAsStream(resource);
-         OutputStream out = new FileOutputStream(outputFile)) {
-      IOUtils.copy(in, out);
+    ldapServerConfigurations = createLdapServerConfigurations();
+    startLdapServers();
+    final Map<String, LdapConfiguration> ldapClientConfigurations = createLdapClientConfigurations();
+    for (LdapConfiguration configuration : ldapClientConfigurations.values()) {
+      ldapConfigurationSource.create(configuration);
     }
   }
 
-  protected void copyResourceToFile(String resource, String outputFilePath)
-      throws IOException
-  {
-    copyResourceToFile(resource, new File(outputFilePath));
-  }
-
-  /**
-   * Interpolates the ldap.xml file and copies it to the outputfile.
-   */
-  protected void interpolateLdapXml(String resource, File outputFile)
-      throws IOException
-  {
-    try (InputStream in = getClass().getResourceAsStream(resource)) {
-      interpolateLdapXml(in, outputFile);
+  protected synchronized void startLdapServers() {
+    for (String name : ldapServerConfigurations.keySet()) {
+      startLdapServer(name);
     }
   }
 
-  protected void interpolateLdapXml(File sourceFile, File outputFile)
-      throws IOException
+  protected synchronized void startLdapServer(final String name) {
+    checkArgument(ldapServerConfigurations.containsKey(name), "Unknown LDAP Server %s", name);
+    checkArgument(!ldapServers.containsKey(name), "LDAP Server %s already started", name);
+    final LdapServer ldapServer = new LdapServer(ldapServerConfigurations.get(name));
+    ldapServers.put(name, ldapServer);
+  }
+
+  @After
+  public void stopLdap()
+      throws Exception
   {
-    try (FileInputStream fis = new FileInputStream(sourceFile)) {
-      interpolateLdapXml(fis, outputFile);
+    lookup(CacheManager.class).shutdown();
+    stopLdapServers();
+  }
+
+  protected synchronized void stopLdapServers() {
+    for (String name : ldapServerConfigurations.keySet()) {
+      stopLdapServer(name);
     }
   }
 
-  private void interpolateLdapXml(InputStream inputStream, File outputFile)
-      throws IOException
-  {
-    HashMap<String, Object> interpolationMap = new HashMap<String, Object>();
-    interpolationMap.put("port", Integer.toString(getLdapServer().getPort()));
-
-    try (Reader reader = new InterpolationFilterReader(new InputStreamReader(inputStream), interpolationMap);
-         OutputStream out = new FileOutputStream(outputFile)) {
-      IOUtils.copy(reader, out);
+  protected synchronized void stopLdapServer(final String name) {
+    checkArgument(ldapServerConfigurations.containsKey(name), "Unknown LDAP Server %s", name);
+    final LdapServer ldapServer = ldapServers.get(name);
+    if (ldapServer != null) {
+      ldapServer.close();
+      ldapServers.remove(name);
     }
   }
 
+  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
+    final Map<String, LdapConfiguration> result = Maps.newHashMap();
+    // default implementation creates entries for all defined LDAP servers
+    for (String name : ldapServers.keySet()) {
+      final LdapServer ldapServer = ldapServers.get(name);
+
+      final LdapConfiguration ldapConfiguration = new LdapConfiguration();
+      ldapConfiguration.setId("unused"); // create will override it anyway
+      ldapConfiguration.setName(name);
+      ldapConfiguration.setOrder(1);
+      Connection connection = new Connection();
+      connection.setSearchBase("o=sonatype");
+      connection.setSystemUsername("uid=admin,ou=system");
+      connection.setSystemPassword("secret");
+      connection.setAuthScheme("simple");
+      connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
+      ldapConfiguration.setConnection(connection);
+
+      final Mapping mapping = new Mapping();
+      mapping.setGroupBaseDn("ou=groups");
+      mapping.setGroupIdAttribute("cn");
+      // mapping.setGroupMemberAttribute("groupMemberAttribute");
+      mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
+      mapping.setGroupObjectClass("organizationalRole");
+      mapping.setLdapGroupsAsRoles(true);
+      mapping.setEmailAddressAttribute("mail");
+      mapping.setUserMemberOfAttribute("businesscategory");
+      mapping.setUserBaseDn("ou=people");
+      mapping.setUserIdAttribute("uid");
+      mapping.setUserObjectClass("inetOrgPerson");
+      mapping.setUserPasswordAttribute("userPassword");
+      mapping.setUserRealNameAttribute("sn");
+      mapping.setUserSubtree(true);
+      ldapConfiguration.setMapping(mapping);
+      result.put(name, ldapConfiguration);
+    }
+    return result;
+  }
+
+  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+    result.put("default", createServerConfiguration("default"));
+    return result;
+  }
+
+  protected LdapServerConfiguration createServerConfiguration(final String name) {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(createPartition(name))
+        .build();
+  }
+
+  protected Partition createPartition(final String name) {
+    return Partition.builder()
+        .withNameAndSuffix(name, "o=sonatype")
+        .withIndexedAttributes("objectClass", "o")
+        .withRootEntryClasses("top", "organization")
+        .withLdifFile(resolveLdifFile(name)).build();
+  }
+
+  protected File resolveLdifFile(final String name) {
+    checkNotNull(name);
+    final File classSpecificLdif = util
+        .resolveFile("src/test/resources/" + getClass().getName().replace('.', '/') + "-" + name + "-ldap.ldif");
+    if (classSpecificLdif.isFile()) {
+      return classSpecificLdif;
+    }
+    return util.resolveFile("src/test/resources/defaults/default-ldap.ldif");
+  }
 }

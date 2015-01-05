@@ -18,6 +18,7 @@ import java.util.SortedSet;
 
 import org.sonatype.security.realms.ldap.LdapPlugin;
 
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public abstract class LdapSchemaTestSupport
-    extends LdapTestSupport
+    extends LdapITSupport
 {
 
   private LdapManager ldapManager;

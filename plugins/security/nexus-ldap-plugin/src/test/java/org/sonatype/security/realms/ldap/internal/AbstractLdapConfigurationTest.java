@@ -15,7 +15,6 @@ package org.sonatype.security.realms.ldap.internal;
 import java.io.UnsupportedEncodingException;
 
 import org.sonatype.security.configuration.model.SecurityConfiguration;
-import org.sonatype.security.realms.ldap.internal.persist.PasswordHelper;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
@@ -23,29 +22,20 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfigurati
 import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 import com.thoughtworks.xstream.XStream;
-import org.junit.Assert;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class AbstractLdapConfigurationTest
-    extends AbstractEnterpriseLdapTest
+    extends LdapITSupport
 {
-  private PasswordHelper passwordHelper;
-
-  @Override
-  public void setUp()
-      throws Exception
-  {
-    super.setUp();
-    this.passwordHelper = this.lookup(PasswordHelper.class);
-  }
-
   @Override
   protected SecurityConfiguration getSecurityConfig() {
     return SecurityTestSupportSecurity.securityWithLdapRealm();
   }
 
   protected Mapping buildUserAndGroupAuthConfiguration() {
-    Mapping userGroupConf = new Mapping();
-
+    final Mapping userGroupConf = new Mapping();
     userGroupConf.setUserMemberOfAttribute("userMemberOfAttribute");
     userGroupConf.setGroupBaseDn("groupBaseDn");
     userGroupConf.setGroupIdAttribute("groupIdAttribute");
@@ -53,7 +43,6 @@ public abstract class AbstractLdapConfigurationTest
     userGroupConf.setGroupMemberFormat("groupMemberFormat");
     userGroupConf.setGroupObjectClass("groupObjectClass");
     userGroupConf.setLdapGroupsAsRoles(true);
-
     userGroupConf.setEmailAddressAttribute("emailAddressAttribute");
     userGroupConf.setUserBaseDn("userBaseDn");
     userGroupConf.setUserIdAttribute("userIdAttribute");
@@ -61,13 +50,11 @@ public abstract class AbstractLdapConfigurationTest
     userGroupConf.setUserPasswordAttribute("userPasswordAttribute");
     userGroupConf.setUserRealNameAttribute("userRealNameAttribute");
     userGroupConf.setUserSubtree(true);
-
     return userGroupConf;
   }
 
   protected Connection buildConnectionInfo() throws UnsupportedEncodingException {
     Connection connInfo = new Connection();
-
     connInfo.setAuthScheme("ldap");
     connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
     connInfo.setCacheTimeout(30);
@@ -78,15 +65,7 @@ public abstract class AbstractLdapConfigurationTest
     connInfo.setSearchBase("ou=searchbase");
     connInfo.setSystemPassword(encodeBase64("systemPassword"));
     connInfo.setSystemUsername(encodeBase64("systemUsername"));
-
     return connInfo;
-  }
-
-  protected void compareConfigurations(String expectedConfigurationAsString, String actualConfigurationAsString)
-      throws Exception
-  {
-    Assert.assertEquals(expectedConfigurationAsString.replace("\r", ""),
-        actualConfigurationAsString.replace("\r", ""));
   }
 
   protected void compareConfiguration(LdapConfiguration expected, LdapConfiguration actual)
@@ -95,7 +74,6 @@ public abstract class AbstractLdapConfigurationTest
     XStream xstream = new XStream();
     String originalConfig = xstream.toXML(expected);
     String newConfig = xstream.toXML(actual);
-
-    Assert.assertEquals(originalConfig, newConfig);
+    assertThat(newConfig, equalTo(originalConfig));
   }
 }

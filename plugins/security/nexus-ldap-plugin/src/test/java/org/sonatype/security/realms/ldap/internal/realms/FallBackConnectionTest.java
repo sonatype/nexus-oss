@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class FallBackConnectionTest
     extends AbstractMockLdapConnectorTest
 {
@@ -37,6 +36,7 @@ public class FallBackConnectionTest
 
   private MockLdapConnector backupConnector = null;
 
+  @Override
   protected List<LdapConnector> getLdapConnectors() {
     List<LdapConnector> connectors = new ArrayList<LdapConnector>();
     this.mainConnector = this.buildMainMockServer("backup");

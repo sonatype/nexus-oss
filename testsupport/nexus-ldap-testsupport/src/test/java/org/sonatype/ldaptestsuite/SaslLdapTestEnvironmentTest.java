@@ -19,20 +19,36 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class SaslLdapTestEnvironmentTest
     extends AbstractLdapTestEnvironment
 {
-
+  @Override
+  protected LdapServerConfiguration buildConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withSasl("localhost", "ldap/localhost@EXAMPLE.COM", "ou=people,o=sonatype", "localhost")
+        .withPartitions(
+            Partition.builder()
+                .withNameAndSuffix("sonatype", "o=sonatype")
+                .withIndexedAttributes("objectClass", "o")
+                .withRootEntryClasses("top", "organization")
+                .withLdifFile(util.resolveFile("src/test/resources/sonatype.ldif")).build())
+        .build();
+  }
 
   /**
    * Tests to make sure DIGEST-MD5 binds below the RootDSE work.
    */
-  public void testSaslDigestMd5Bind() throws Exception {
-
-    Hashtable<String, String> env = new Hashtable<String, String>();
+  @Test
+  public void saslDigestMd5Bind() throws Exception {
+    Hashtable<String, String> env = new Hashtable<>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:12345");
-
+    env.put(Context.PROVIDER_URL, "ldap://localhost:" + getLdapServer().getPort());
     env.put(Context.SECURITY_AUTHENTICATION, "DIGEST-MD5");
     //        env.put( Context.SECURITY_PRINCIPAL, "admin" );
     env.put(Context.SECURITY_PRINCIPAL, "tstevens");
@@ -40,24 +56,16 @@ public class SaslLdapTestEnvironmentTest
 
     // Specify realm
     env.put("java.naming.security.sasl.realm", "localhost");
-
     // Request privacy protection
     env.put("javax.security.sasl.qop", "auth-conf");
 
-    DirContext context = new InitialDirContext(env);
-
-    String[] attrIDs =
-        {"uid"};
-
+    final DirContext context = new InitialDirContext(env);
+    String[] attrIDs = {"uid"};
     Attributes attrs = context.getAttributes("uid=tstevens,ou=people,o=sonatype", attrIDs);
-
     String uid = null;
-
     if (attrs.get("uid") != null) {
       uid = (String) attrs.get("uid").get();
     }
-
-    assertEquals(uid, "tstevens");
+    assertThat(uid, equalTo("tstevens"));
   }
-
 }

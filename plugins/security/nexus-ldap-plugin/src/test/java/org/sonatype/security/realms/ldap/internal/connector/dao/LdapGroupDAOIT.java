@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.realms.ldap.internal.connector.dao;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -20,15 +19,17 @@ import java.util.Set;
 import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
+import com.google.common.collect.Maps;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertTrue;
 
 public class LdapGroupDAOIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
-
   @Test
   public void testSimple()
       throws Exception
@@ -46,10 +47,10 @@ public class LdapGroupDAOIT
   protected void doTestWithGroupMemberFormat(String groupMemberFormat)
       throws Exception
   {
-    Map<String, Object> env = new HashMap<String, Object>();
+    Map<String, Object> env = Maps.newHashMap();
     // Create a new context pointing to the overseas partition
     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + getLdapServer().getPort() + "/o=sonatype");
+    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
     env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
     env.put(Context.SECURITY_CREDENTIALS, "secret");
     env.put(Context.SECURITY_AUTHENTICATION, "simple");
@@ -58,7 +59,7 @@ public class LdapGroupDAOIT
     // env.put( Context.PROVIDER_URL, "o=sonatype" );
     // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
 
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
@@ -69,7 +70,7 @@ public class LdapGroupDAOIT
     configuration.setLdapGroupsAsRoles(true);
     configuration.setUserMemberOfAttribute("");
 
-    LdapGroupDAO lgm = (LdapGroupDAO) lookup(LdapGroupDAO.class.getName());
+    LdapGroupDAO lgm = lookup(LdapGroupDAO.class);
 
     Set<String> groups = lgm.getGroupMembership("cstamas", initialContext, configuration);
     assertTrue(groups.contains("public"));

@@ -95,12 +95,13 @@ public class OrientDBLdapConfigurationSource
   }
 
   @Override
-  public void create(final LdapConfiguration ldapConfiguration) {
+  public String create(final LdapConfiguration ldapConfiguration) {
     try (ODatabaseDocumentTx db = openDb()) {
       db.begin();
       try {
         ldapConfiguration.setId(entityIdFactory.newId().asUniqueString());
         entityAdapter.add(db, ldapConfiguration);
+        return ldapConfiguration.getId();
       }
       finally {
         db.commit();
