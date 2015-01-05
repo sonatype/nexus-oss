@@ -60,24 +60,6 @@ public class RepositorySubscriber
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventAdd e) {
-    inspect(e);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventRemove e) {
-    inspect(e);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void on(final RepositoryConfigurationUpdatedEvent e) {
-    inspect(e);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
   public void on(final RepositoryEventLocalStatusChanged revt) {
     final Map<String, String> data = Maps.newHashMap();
     putIfNotNull(data, "oldLocalStatus", revt.getOldLocalStatus().name());
@@ -125,16 +107,39 @@ public class RepositorySubscriber
     getFeedRecorder().addEvent(fe);
   }
 
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventAdd e) {
+    inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventRemove e) {
+    inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent e) {
+    inspect(e);
+  }
+
   private void inspect(Object evt) {
     if (!isNexusStarted()) {
       return;
     }
     final Repository repository;
+    final Date date;
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
-      repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
+      RepositoryRegistryRepositoryEvent target = (RepositoryRegistryRepositoryEvent)evt;
+      repository = target.getRepository();
+      date = target.getEventDate();
     }
     else {
-      repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
+      RepositoryConfigurationUpdatedEvent target = (RepositoryConfigurationUpdatedEvent)evt;
+      repository = target.getRepository();
+      date = target.getEventDate();
     }
 
     final Map<String, String> data = Maps.newHashMap();
@@ -164,7 +169,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         action,
-        new Date(), // HACK: could restore by having event have date
+        date,
         null, // TODO: who changed it?
         "/", // link to UI
         data
