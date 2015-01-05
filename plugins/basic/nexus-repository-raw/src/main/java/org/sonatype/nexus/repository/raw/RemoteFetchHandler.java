@@ -21,6 +21,9 @@ import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
 import org.sonatype.nexus.repository.view.Response;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
@@ -44,6 +47,10 @@ public class RemoteFetchHandler
 
     // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
     final String path = request.getPath();
+
+    final HttpClient httpClient = httpFacet.getHttpClient();
+
+    new HttpGet()
 
     //return httpFacet.getResponse(path);
     return null;
