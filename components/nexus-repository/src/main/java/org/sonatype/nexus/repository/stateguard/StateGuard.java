@@ -95,6 +95,8 @@ public class StateGuard
     }
   }
 
+  // TODO: Consider removing public ensure, generally not going to be used properly, guard() should used instead
+
   /**
    * Ensure the current state is one of allowed.
    */
