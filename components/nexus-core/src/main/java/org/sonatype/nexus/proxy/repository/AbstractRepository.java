@@ -84,7 +84,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.sonatype.nexus.proxy.ItemNotFoundException.reasonFor;
 
 /**

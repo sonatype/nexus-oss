@@ -374,7 +374,6 @@ public class ContentServlet
     try {
       try {
         StorageItem item = repositoryRouter.retrieveItem(rsr);
-
         if (item instanceof StorageLinkItem) {
           final StorageLinkItem link = (StorageLinkItem) item;
           if (DEREFERENCE_LINKS) {
@@ -438,8 +437,8 @@ public class ContentServlet
       }
       else {
         // cycle detected, current link already processed
-        throw new ItemNotFoundException(ItemNotFoundException.reasonFor(link.getResourceStoreRequest(), link
-                .getRepositoryItemUid().getRepository(),
+        throw new ItemNotFoundException(ItemNotFoundException.reasonFor(link.getResourceStoreRequest(),
+            link.getRepositoryItemUid().getRepository(),
             "Link item %s introduced a cycle while referencing it, cycle is %s", link.getRepositoryItemUid(), hops));
       }
     }
