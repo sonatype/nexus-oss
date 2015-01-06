@@ -13,6 +13,7 @@
 
 require 'rubygems/gem_runner'
 require 'rubygems/exceptions'
+require 'rubygems/spec_fetcher'
 require 'stringio'
 
 module Nexus
@@ -41,6 +42,8 @@ module Nexus
 
       out.string
 
+    ensure
+      Gem::SpecFetcher.fetcher = nil
     end
 
   end
