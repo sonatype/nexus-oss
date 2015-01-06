@@ -24,6 +24,7 @@
 package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -112,20 +113,19 @@ public class RawStorageFacetImpl
 
         final BlobStore store = blobStoreManager.getStore(defaultBlobStore);
 
-        final Blob blob = store.create(content.toPayload().openInputStream(), headers);
+        final Blob blob = store.create(content.openInputStream(), headers);
 
         // TODO: The blob node needs to be worked out too, obviously
         final BlobRef blobRef = new BlobRef("NODE", defaultBlobStore, blob.getId().asUniqueString());
 
         asset.setProperty(BLOB_REF_PROPERTY, blobRef.toString());
-        asset.setProperty(CONTENT_TYPE_PROPERTY, content.getType());
+        asset.setProperty(CONTENT_TYPE_PROPERTY, content.getContentType());
 
         return marshall(asset, blob);
       }
     });
   }
 
-  @Nullable
   @Override
   public boolean delete(final String path) throws IOException {
     return (boolean) inTx(new GraphOperation()
@@ -194,8 +194,25 @@ public class RawStorageFacetImpl
     return store.delete(blobId);
   }
 
-  private RawContent marshall(Vertex asset, Blob blob) {
-    // CONTENT_TYPE_PROPERTY
-    return null;
+  private RawContent marshall(final Vertex asset, final Blob blob) {
+    final String contentType = asset.getProperty(CONTENT_TYPE_PROPERTY);
+
+    return new RawContent()
+    {
+      @Override
+      public String getContentType() {
+        return contentType;
+      }
+
+      @Override
+      public long getSize() {
+        return blob.getMetrics().getContentSize();
+      }
+
+      @Override
+      public InputStream openInputStream() {
+        return blob.getInputStream();
+      }
+    };
   }
 }

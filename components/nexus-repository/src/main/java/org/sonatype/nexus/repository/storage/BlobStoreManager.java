@@ -23,7 +23,6 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
  */
 public interface BlobStoreManager
 {
-  @Nullable
   BlobStore getStore(String storeName);
 
   // TODO: Extend this interface to include blob store management features, such as declaring them.

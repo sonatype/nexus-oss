@@ -18,9 +18,10 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.raw.RawContentImpl;
 
 /**
- * Provides persistent storage for {@link RawContent}.
+ * Provides persistent storage for {@link RawContentImpl}.
  *
  * @since 3.0
  */
@@ -33,6 +34,5 @@ public interface RawStorageFacet
   @Nullable
   RawContent put(String path, RawContent content) throws IOException;
 
-  @Nullable
   boolean delete(String path) throws IOException;
 }

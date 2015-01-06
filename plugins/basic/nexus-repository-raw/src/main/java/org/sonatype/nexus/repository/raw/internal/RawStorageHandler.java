@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.raw.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,14 +24,18 @@ import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
+import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.PUT;
+import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
+import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
 
 /**
  * Raw content hosted handler.
@@ -58,11 +65,11 @@ public class RawStorageHandler
         if (content == null) {
           return HttpResponses.notFound(name);
         }
-        return HttpResponses.ok(content.toPayload());
+        return HttpResponses.ok(toPayload(content));
       }
 
       case PUT: {
-        RawContent content = new RawContent(context.getRequest().getPayload());
+        RawContent content = toContent(context.getRequest().getPayload());
         RawContent prev = storage.put(name, content);
         if (prev == null) {
           return HttpResponses.created();
@@ -83,6 +90,10 @@ public class RawStorageHandler
     }
   }
 
+  /**
+   * Pull the parsed content name/path out of the context.
+   */
+  @Nonnull
   private String contentName(final Context context) {
     TokenMatcher.State state = context.getAttributes().require(TokenMatcher.State.class);
     String name = state.getTokens().get("name");
