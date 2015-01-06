@@ -126,14 +126,14 @@ public class StateGuard
    * Create a transition to given state.
    */
   public Transition transition(final String to) {
-    return new Transition(to);
+    return new TransitionImpl(to);
   }
 
   /**
    * Create a guard which allows execution in the given states.
    */
   public Guard guard(final String... allowed) {
-    return new Guard(allowed);
+    return new GuardImpl(allowed);
   }
 
   //
@@ -143,18 +143,19 @@ public class StateGuard
   /**
    * Transition from current state to target state and execute an action.
    */
-  public class Transition
+  private class TransitionImpl
+    implements Transition
   {
     private final String to;
 
     @Nullable
     private String[] allowed;
 
-    Transition(final String to) {
+    private TransitionImpl(final String to) {
       this.to = checkNotNull(to);
     }
 
-    public Transition from(final String... allowed) {
+    public TransitionImpl from(final String... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -201,11 +202,12 @@ public class StateGuard
   /**
    * Execute an action or callable if current state is allowed.
    */
-  public class Guard
+  private class GuardImpl
+    implements Guard
   {
     private final String[] allowed;
 
-    Guard(final String[] allowed) {
+    private GuardImpl(final String[] allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
