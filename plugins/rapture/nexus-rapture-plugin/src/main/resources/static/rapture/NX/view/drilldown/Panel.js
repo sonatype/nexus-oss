@@ -20,6 +20,9 @@
 Ext.define('NX.view.drilldown.Panel', {
   extend: 'Ext.container.Container',
   alias: 'widget.nx-drilldown-panel',
+  requires: [
+    'NX.I18n'
+  ],
   itemId: 'nx-drilldown-panel',
 
   layout: {
@@ -114,10 +117,11 @@ Ext.define('NX.view.drilldown.Panel', {
    * Update the breadcrumb based on the itemName and itemClass of drilldown items
    */
   refreshBreadcrumb: function() {
-    var me = this;
-    var content = me.up('#feature-content');
-    var root = content.down('#feature-root');
-    var breadcrumb = content.down('#breadcrumb');
+    var me = this,
+      content = me.up('#feature-content'),
+      root = content.down('#feature-root'),
+      breadcrumb = content.down('#breadcrumb'),
+      back, parent;
 
     if (me.currentIndex == 0) {
       // Feature's home page, no breadcrumb required

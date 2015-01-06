@@ -27,8 +27,6 @@ Ext.define('NX.view.feature.Content', {
   layout: 'fit',
 
   header: {
-    height: 50,
-
     items: [
       {
         xtype: 'panel',

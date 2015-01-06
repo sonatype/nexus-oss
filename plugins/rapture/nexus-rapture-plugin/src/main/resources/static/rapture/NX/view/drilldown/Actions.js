@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2007-2014 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,21 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-/*global Ext, NX*/
+/*global Ext*/
 
 /**
- * Repository route "Settings" panel.
+ * A toolbar to hold actions for master/detail panels
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteSettings', {
-  extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-repositoryroute-settings',
-  requires: [
-    'NX.I18n'
-  ],
 
-  title: NX.I18n.get('ADMIN_ROUTING_DETAILS_SETTINGS_TAB'),
-
-  items: { xtype: 'nx-coreui-repositoryroute-settings-form' }
+Ext.define('NX.view.drilldown.Actions', {
+  extend: 'Ext.toolbar.Toolbar',
+  alias: 'widget.nx-drilldown-actions',
+  cls: 'nx-drilldown-actions'
 });

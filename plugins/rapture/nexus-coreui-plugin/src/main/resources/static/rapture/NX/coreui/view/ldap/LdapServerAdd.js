@@ -46,7 +46,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
           editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
           items: {
         xtype: 'tabpanel',
-            plain: true,
+            ui: 'light',
             items: [
           { xtype: 'nx-coreui-ldapserver-connection-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB') },
           { xtype: 'nx-coreui-ldapserver-backup-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB') },

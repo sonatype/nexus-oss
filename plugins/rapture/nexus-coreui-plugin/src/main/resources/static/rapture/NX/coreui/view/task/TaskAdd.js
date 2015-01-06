@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
       editableMarker: NX.I18n.get('ADMIN_TASKS_CREATE_ERROR'),
       items: {
         xtype: 'tabpanel',
-        plain: true,
+        ui: 'light',
         items: [
           {
             xtype: 'panel',

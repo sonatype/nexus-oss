@@ -93,6 +93,9 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_SETTINGS_LOADING: 'Loading',
     GLOBAL_SETTINGS_SAVING: 'Saving',
 
+    // Drilldown
+    GLOBAL_DRILLDOWN_GO_BACK: 'Go back to {0}',
+
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',
     BROWSE_WELCOME_SUBTITLE: 'Welcome to Sonatype Nexus!'
