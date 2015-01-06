@@ -67,7 +67,7 @@ public class Nexus4383LogoutResourceIT
 
 
   /**
-   * 1.) Make a get request to set a cookie </BR>
+   * 1.) Make a login request to set a cookie </BR>
    * 2.) verify cookie works (do not send basic auth) </BR>
    * 3.) do logout  </BR>
    * 4.) repeat step 2 and expect failure.
@@ -79,7 +79,7 @@ public class Nexus4383LogoutResourceIT
     TestContext context = TestContainer.getInstance().getTestContext();
     String username = context.getAdminUsername();
     String password = context.getPassword();
-    String url = this.getBaseNexusUrl() + RequestFacade.SERVICE_LOCAL + "status";
+    String url = this.getBaseNexusUrl() + RequestFacade.SERVICE_LOCAL + "authentication/login";
     String logoutUrl = this.getBaseNexusUrl() + RequestFacade.SERVICE_LOCAL + "authentication/logout";
 
     Header userAgentHeader = new BasicHeader("User-Agent", "Something Stateful");
