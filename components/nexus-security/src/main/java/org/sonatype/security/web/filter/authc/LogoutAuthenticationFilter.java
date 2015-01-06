@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.web.filter.authc;
 
+import javax.servlet.Filter;
+import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +23,16 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 
 /**
- * A filter simply to log out.
- *
- * @author cstamas
+ * Perform sign-out of the {@link HttpSession} and {@link Subject} while leaving the response content up to
+ * downstream components.
+ * <p />
+ * Note: Downstream sign-out related {@link Filter filters} and {@link Servlet servlets} need to expect the session
+ * to be invalidated and subject signed out after processing by this filter.
  */
 public class LogoutAuthenticationFilter
     extends AuthenticationFilter
 {
+
   /**
    * We are letting everyone in.
    */
@@ -48,10 +53,17 @@ public class LogoutAuthenticationFilter
   }
 
   /**
-   * On postHandle, if we have subject, log it out.
+   * Ensures a logout request by always:
+   *
+   * <ul>
+   * <li>invalidating any existing session cookie</li>
+   * <li>signs out the current Subject using {@link Subject#logout}</li>
+   * </ul>
+   *
+   * @return always true to allow further handling of response content
    */
   @Override
-  public void postHandle(ServletRequest request, ServletResponse response)
+  public boolean preHandle(ServletRequest request, ServletResponse response)
       throws Exception
   {
     if (HttpServletRequest.class.isAssignableFrom(request.getClass())) {
@@ -67,5 +79,7 @@ public class LogoutAuthenticationFilter
     if (subject != null) {
       subject.logout();
     }
+
+    return true;
   }
 }
