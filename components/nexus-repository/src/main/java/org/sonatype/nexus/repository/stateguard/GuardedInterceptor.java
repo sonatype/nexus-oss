@@ -10,10 +10,16 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.stateguard;
+
+import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link Guarded} interceptor.
@@ -21,10 +27,28 @@ import org.aopalliance.intercept.MethodInvocation;
  * @since 3.0
  */
 public class GuardedInterceptor
-  implements MethodInterceptor
+    implements MethodInterceptor
 {
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
-    return null;
+    assert invocation != null;
+
+    final Object target = invocation.getThis();
+    StateGuard states = ((StateGuardAware) target).getStateGuard();
+    final Method method = invocation.getMethod();
+
+    Guarded config = method.getAnnotation(Guarded.class);
+    checkState(config != null);
+    assert config != null; // IDEA
+
+    Guard guard = states.guard(config.by());
+
+    return guard.run(new Callable<Object>()
+    {
+      @Override
+      public Object call() throws Exception {
+        return method.invoke(target);
+      }
+    });
   }
 }

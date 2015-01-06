@@ -12,8 +12,12 @@
  */
 package org.sonatype.nexus.repository.stateguard;
 
+import java.lang.reflect.Method;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * {@link Transitions} interceptor.
@@ -21,10 +25,33 @@ import org.aopalliance.intercept.MethodInvocation;
  * @since 3.0
  */
 public class TransitionsInterceptor
-  implements MethodInterceptor
+    implements MethodInterceptor
 {
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
+    assert invocation != null;
+
+    final Object target = invocation.getThis();
+    StateGuard states = ((StateGuardAware) target).getStateGuard();
+    final Method method = invocation.getMethod();
+
+    Transitions config = method.getAnnotation(Transitions.class);
+    checkState(config != null);
+    assert config != null; // IDEA
+
+    Transition transition = states.transition(config.to());
+    if (config.from() != null) {
+      transition = transition.from(config.from());
+    }
+
+    transition.run(new Action()
+    {
+      @Override
+      public void run() throws Exception {
+        method.invoke(target);
+      }
+    });
+
     return null;
   }
 }
