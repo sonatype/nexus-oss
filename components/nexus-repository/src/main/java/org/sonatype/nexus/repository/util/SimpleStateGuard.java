@@ -16,6 +16,7 @@ package org.sonatype.nexus.repository.util;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
@@ -41,9 +42,9 @@ public class SimpleStateGuard<T extends Enum>
 
   private T current;
 
-  public SimpleStateGuard(final Lock lock,
-                          final T initial,
-                          final @Nullable T failure)
+  SimpleStateGuard(final Lock lock,
+                   final T initial,
+                   final @Nullable T failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
@@ -52,7 +53,6 @@ public class SimpleStateGuard<T extends Enum>
 
   private void lock() {
     try {
-      // TODO: Expose for configuration, or hard-code reasonable values?
       lock.tryLock(1, TimeUnit.MINUTES);
     }
     catch (InterruptedException e) {
@@ -144,7 +144,7 @@ public class SimpleStateGuard<T extends Enum>
     @Nullable
     private T[] allowed;
 
-    public Transition(final T to) {
+    Transition(final T to) {
       this.to = checkNotNull(to);
     }
 
@@ -199,7 +199,7 @@ public class SimpleStateGuard<T extends Enum>
   {
     private final T[] allowed;
 
-    public Guard(final T[] allowed) {
+    Guard(final T[] allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -256,6 +256,11 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public SimpleStateGuard<T> create() {
+      Lock lock = this.lock;
+      if (lock == null) {
+        lock = new ReentrantLock();
+      }
+
       return new SimpleStateGuard<>(lock, initial, failure);
     }
   }

@@ -13,8 +13,6 @@
 
 package org.sonatype.nexus.repository.manager;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -119,7 +117,6 @@ public class RepositoryImpl
   }
 
   private final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
-      .lock(new ReentrantLock())
       .initial(NEW)
       .failure(FAILED)
       .create();

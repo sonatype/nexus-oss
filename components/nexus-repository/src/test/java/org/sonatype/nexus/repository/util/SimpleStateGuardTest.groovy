@@ -17,8 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
-import java.util.concurrent.locks.ReentrantLock
-
 import static org.junit.Assert.fail
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.DESTROYED
 import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.FAILED
@@ -68,7 +66,6 @@ class SimpleStateGuardTest
   @Before
   void setUp() {
     underTest = new SimpleStateGuard.Builder<State>()
-        .lock(new ReentrantLock())
         .initial(NEW)
         .failure(FAILED)
         .create()
