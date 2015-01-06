@@ -62,6 +62,9 @@ public abstract class ObrITSupport
   public static final String PORTLET_API =
       "org/apache/portals/portlet-api_2.0_spec/1.0/portlet-api_2.0_spec-1.0.jar";
 
+  public static final String JACOCO_REPORT =
+      "org/jacoco/org.jacoco.report/0.6.2.201302030002/org.jacoco.report-0.6.2.201302030002.jar";
+
   public ObrITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
