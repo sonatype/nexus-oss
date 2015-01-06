@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.componentviews;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 /**
  * Abstract parent for events fired by the {@link ViewRegistry}.
  *
@@ -21,12 +19,10 @@ import org.sonatype.nexus.events.AbstractEvent;
  */
 @Deprecated
 public abstract class ViewRegistryEvent
-    extends AbstractEvent<ViewRegistry>
 {
   private final View view;
 
   public ViewRegistryEvent(final ViewRegistry component, final View view) {
-    super(component);
     this.view = view;
   }
 }

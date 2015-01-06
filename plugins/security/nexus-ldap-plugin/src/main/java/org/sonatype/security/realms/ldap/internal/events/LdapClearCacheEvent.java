@@ -12,14 +12,10 @@
  */
 package org.sonatype.security.realms.ldap.internal.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 public class LdapClearCacheEvent
-    extends AbstractEvent<Object>
 {
 
   public LdapClearCacheEvent(Object component) {
-    super(component);
   }
 
 }

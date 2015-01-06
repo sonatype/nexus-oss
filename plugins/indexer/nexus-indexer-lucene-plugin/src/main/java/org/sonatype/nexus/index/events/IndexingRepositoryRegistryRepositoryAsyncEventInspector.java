@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.index.tasks.RepairIndexTask;
 import org.sonatype.nexus.index.tasks.UpdateIndexTask;
@@ -30,8 +29,8 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -80,7 +79,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     inspect(evt);
   }
 
-  protected void inspect(Event<?> evt) {
+  private void inspect(Object evt) {
     if (!systemStatusProvider.get().isNexusStarted()) {
       return;
     }
@@ -105,7 +104,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
     }
   }
 
-  private void inspectForIndexerManager(Event<?> evt, Repository repository) {
+  private void inspectForIndexerManager(Object evt, Repository repository) {
     try {
       // we are handling repo events, like addition and removal
       if (evt instanceof RepositoryRegistryEventAdd) {

@@ -16,16 +16,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 public class AbstractVetoableEvent<T>
-    extends AbstractEvent<T>
-    implements Vetoable
 {
   private final ArrayList<Veto> vetos = new ArrayList<Veto>();
 
   public AbstractVetoableEvent(T component) {
-    super(component);
   }
 
   public List<Veto> getVetos() {
