@@ -191,7 +191,7 @@ public class LdapConfigurationEntityAdapter
     final Host host = new Host(
         Protocol.valueOf(hostDocument.<String>field("protocol", OType.STRING)),
         hostDocument.<String>field("hostName", OType.STRING),
-        hostDocument.<Integer>field("protocol", OType.INTEGER)
+        hostDocument.<Integer>field("port", OType.INTEGER)
     );
     connection.setHost(host);
     final ODocument backupHostDocument = document.field("backupHost", OType.EMBEDDED);
@@ -199,7 +199,7 @@ public class LdapConfigurationEntityAdapter
       final Host backupHost = new Host(
           Protocol.valueOf(hostDocument.<String>field("protocol", OType.STRING)),
           hostDocument.<String>field("hostName", OType.STRING),
-          hostDocument.<Integer>field("protocol", OType.INTEGER)
+          hostDocument.<Integer>field("port", OType.INTEGER)
       );
       connection.setBackupHost(backupHost);
     }
