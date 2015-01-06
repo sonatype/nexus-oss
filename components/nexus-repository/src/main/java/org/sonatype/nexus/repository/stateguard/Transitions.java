@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
 /**
  * Marks a method as transitioning from states to state.
  *
+ * Target object must implement {@link StateGuardAware}.
+ *
  * @since 3.0
  */
 @Retention(RetentionPolicy.RUNTIME)

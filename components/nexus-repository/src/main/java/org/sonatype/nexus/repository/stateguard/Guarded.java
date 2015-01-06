@@ -20,6 +20,8 @@ import java.lang.annotation.Target;
 /**
  * Marks a method as guarded by one or more states.
  *
+ * Target object must implement {@link StateGuardAware}.
+ *
  * @since 3.0
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -28,7 +28,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * State guard.
+ * State guard provides support to transition from state to state and execute an action, as well as guard
+ * execution of an action if state is acceptable.
  *
  * @since 3.0
  */
@@ -84,6 +85,8 @@ public class StateGuard
 
   /**
    * Check if the current state is given state.
+   *
+   * Code executed after may not have the same state, to execute and ensure state is allowed use {@link #guard} instead.
    */
   public boolean is(final String state) {
     Lock lock = readLock();
@@ -95,10 +98,10 @@ public class StateGuard
     }
   }
 
-  // TODO: Consider removing public ensure, generally not going to be used properly, guard() should used instead
-
   /**
    * Ensure the current state is one of allowed.
+   *
+   * Code executed after may not have the same state, to execute and ensure state is allowed use {@link #guard} instead.
    */
   public void ensure(final String... allowed) {
     checkNotNull(allowed);
