@@ -185,31 +185,6 @@ Ext.define('NX.view.drilldown.Panel', {
             }
           })(i)
         ]);
-
-        // Set the back button for this view
-        back = me.items.items[i].down('nx-go-back');
-        if (back) {
-          // What happens on click?
-          back.setHandler(
-            function (j) {
-              // Closure within a closure
-              return function () {
-                me.showChild(j, true);
-
-                // Set the bookmark
-                console.log(j);
-                var bookmark = me.items.items[j].itemBookmark;
-                if (bookmark) {
-                  NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
-                }
-              }
-            }(i - 1) // Go to the previous page
-          );
-
-          // Where does it go?
-          parent = (i == 1 ? content.currentTitle : me.items.items[i - 1].itemName);
-          back.setText(NX.I18n.format('GLOBAL_DRILLDOWN_GO_BACK', parent));
-        }
       }
 
       root.hide();

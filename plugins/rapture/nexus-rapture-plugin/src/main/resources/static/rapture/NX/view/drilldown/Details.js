@@ -24,7 +24,6 @@ Ext.define('NX.view.drilldown.Details', {
     'NX.Icons',
     'NX.Bookmarks',
     'NX.ext.tab.SortedPanel',
-    'NX.view.drilldown.GoBack',
     'NX.view.drilldown.Actions'
   ],
 
@@ -38,13 +37,6 @@ Ext.define('NX.view.drilldown.Details', {
    */
   initComponent: function() {
     var me = this;
-
-    // Add a ‘go back’ button to the toolbar
-    if (!me.actions) {
-      me.actions = [];
-    }
-    me.actions.unshift('->');
-    me.actions.unshift({ xtype: 'nx-go-back' });
 
     me.items = [
       {

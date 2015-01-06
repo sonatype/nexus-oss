@@ -51,6 +51,9 @@ Ext.define('NX.view.AboutWindow', {
           type: 'hbox',
           align: 'stretch'
         },
+        bodyStyle: {
+          backgroundColor: '#F4F4F4'
+        },
         items: [
           {
             xtype: 'component',
@@ -66,7 +69,7 @@ Ext.define('NX.view.AboutWindow', {
       },
       {
         xtype: 'tabpanel',
-        plain: true,
+        ui: 'light',
         flex: 1,
         items: [
           {
