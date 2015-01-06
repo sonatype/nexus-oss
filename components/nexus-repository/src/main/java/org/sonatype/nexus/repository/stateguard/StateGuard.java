@@ -33,19 +33,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class StateGuard<StateT extends Enum>
+public class StateGuard
     extends ComponentSupport
 {
   private final ReadWriteLock lock;
 
   @Nullable
-  private final StateT failure;
+  private final String failure;
 
-  private StateT current;
+  private String current;
 
   StateGuard(final ReadWriteLock lock,
-             final StateT initial,
-             final @Nullable StateT failure)
+             final String initial,
+             final @Nullable String failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
@@ -73,7 +73,7 @@ public class StateGuard<StateT extends Enum>
   /**
    * Returns the current state.
    */
-  public StateT getCurrent() {
+  public String getCurrent() {
     Lock lock = readLock();
     try {
       return current;
@@ -86,10 +86,10 @@ public class StateGuard<StateT extends Enum>
   /**
    * Check if the current state is given state.
    */
-  public boolean is(final StateT state) {
+  public boolean is(final String state) {
     Lock lock = readLock();
     try {
-      return current == state;
+      return current.equals(state);
     }
     finally {
       lock.unlock();
@@ -99,8 +99,7 @@ public class StateGuard<StateT extends Enum>
   /**
    * Ensure the current state is one of allowed.
    */
-  @SafeVarargs
-  public final void ensure(final StateT... allowed) {
+  public void ensure(final String... allowed) {
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
@@ -113,28 +112,27 @@ public class StateGuard<StateT extends Enum>
     }
   }
 
-  private void _ensure(final StateT[] allowed) {
-    for (StateT allow : allowed) {
-      if (current == allow) {
+  private void _ensure(final String[] allowed) {
+    for (String allow : allowed) {
+      if (current.equals(allow)) {
         return;
       }
     }
 
-    throw new IllegalStateException("Invalid state: " + current.name() + "; allowed: " + Arrays.toString(allowed));
+    throw new IllegalStateException("Invalid state: " + current + "; allowed: " + Arrays.toString(allowed));
   }
 
   /**
    * Create a transition to given state.
    */
-  public Transition transition(final StateT to) {
+  public Transition transition(final String to) {
     return new Transition(to);
   }
 
   /**
    * Create a guard which allows execution in the given states.
    */
-  @SafeVarargs
-  public final Guard guard(final StateT... allowed) {
+  public Guard guard(final String... allowed) {
     return new Guard(allowed);
   }
 
@@ -147,17 +145,16 @@ public class StateGuard<StateT extends Enum>
    */
   public class Transition
   {
-    private final StateT to;
+    private final String to;
 
     @Nullable
-    private StateT[] allowed;
+    private String[] allowed;
 
-    Transition(final StateT to) {
+    Transition(final String to) {
       this.to = checkNotNull(to);
     }
 
-    @SafeVarargs
-    public final Transition from(final StateT... allowed) {
+    public Transition from(final String... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -206,9 +203,9 @@ public class StateGuard<StateT extends Enum>
    */
   public class Guard
   {
-    private final StateT[] allowed;
+    private final String[] allowed;
 
-    Guard(final StateT[] allowed) {
+    Guard(final String[] allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -266,54 +263,36 @@ public class StateGuard<StateT extends Enum>
   }
 
   //
-  // Action
-  //
-
-  public static interface Action
-  {
-    void run() throws Exception;
-  }
-
-  //
-  // Aware
-  //
-
-  public static interface Aware
-  {
-    StateGuard getStateGuard();
-  }
-
-  //
   // Builder
   //
 
-  public static class Builder<StateT extends Enum>
+  public static class Builder
   {
     private ReadWriteLock lock;
 
-    private StateT initial;
+    private String initial;
 
-    private StateT failure;
+    private String failure;
 
     // final states?
 
-    public Builder<StateT> lock(final ReadWriteLock lock) {
+    public Builder lock(final ReadWriteLock lock) {
       this.lock = lock;
       return this;
     }
 
-    public Builder<StateT> initial(final StateT state) {
+    public Builder initial(final String state) {
       this.initial = state;
       return this;
     }
 
-    public Builder<StateT> failure(final StateT state) {
+    public Builder failure(final String state) {
       this.failure = state;
       return this;
     }
 
-    public StateGuard<StateT> create() {
-      return new StateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
+    public StateGuard create() {
+      return new StateGuard(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
     }
   }
 }

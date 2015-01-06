@@ -24,8 +24,8 @@ import org.sonatype.nexus.repository.RepositoryStartedEvent;
 import org.sonatype.nexus.repository.RepositoryStoppedEvent;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.stateguard.Action;
 import org.sonatype.nexus.repository.stateguard.StateGuard;
-import org.sonatype.nexus.repository.stateguard.StateGuard.Action;
 import org.sonatype.nexus.repository.util.MultipleFailures;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -104,17 +104,17 @@ public class RepositoryImpl
   // State
   //
 
-  static enum State
+  static final class State
   {
-    NEW,
-    INITIALISED,
-    STARTED,
-    STOPPED,
-    DESTROYED,
-    FAILED
+    public static final String NEW = "NEW";
+    public static final String INITIALISED = "INITIALISED";
+    public static final String STARTED = "STARTED";
+    public static final String STOPPED = "STOPPED";
+    public static final String DESTROYED = "DESTROYED";
+    public static final String FAILED = "FAILED";
   }
 
-  private final StateGuard<State> states = new StateGuard.Builder<State>()
+  private final StateGuard states = new StateGuard.Builder()
       .initial(NEW)
       .failure(FAILED)
       .create();
