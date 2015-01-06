@@ -33,19 +33,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class SimpleStateGuard<T extends Enum>
+public class SimpleStateGuard<StateT extends Enum>
     extends ComponentSupport
 {
   private final ReadWriteLock lock;
 
   @Nullable
-  private final T failure;
+  private final StateT failure;
 
-  private T current;
+  private StateT current;
 
   SimpleStateGuard(final ReadWriteLock lock,
-                   final T initial,
-                   final @Nullable T failure)
+                   final StateT initial,
+                   final @Nullable StateT failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
@@ -70,11 +70,10 @@ public class SimpleStateGuard<T extends Enum>
     return tryLock(lock.writeLock());
   }
 
-
   /**
    * Returns the current state.
    */
-  public T getCurrent() {
+  public StateT getCurrent() {
     Lock lock = readLock();
     try {
       return current;
@@ -87,7 +86,7 @@ public class SimpleStateGuard<T extends Enum>
   /**
    * Check if the current state is given state.
    */
-  public boolean is(final T state) {
+  public boolean is(final StateT state) {
     Lock lock = readLock();
     try {
       return current == state;
@@ -101,7 +100,7 @@ public class SimpleStateGuard<T extends Enum>
    * Ensure the current state is one of allowed.
    */
   @SafeVarargs
-  public final void ensure(final T... allowed) {
+  public final void ensure(final StateT... allowed) {
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
@@ -114,8 +113,8 @@ public class SimpleStateGuard<T extends Enum>
     }
   }
 
-  private void _ensure(final T[] allowed) {
-    for (T allow : allowed) {
+  private void _ensure(final StateT[] allowed) {
+    for (StateT allow : allowed) {
       if (current == allow) {
         return;
       }
@@ -127,7 +126,7 @@ public class SimpleStateGuard<T extends Enum>
   /**
    * Create a transition to given state.
    */
-  public Transition transition(final T to) {
+  public Transition transition(final StateT to) {
     return new Transition(to);
   }
 
@@ -135,7 +134,7 @@ public class SimpleStateGuard<T extends Enum>
    * Create a guard which allows execution in the given states.
    */
   @SafeVarargs
-  public final Guard guard(final T... allowed) {
+  public final Guard guard(final StateT... allowed) {
     return new Guard(allowed);
   }
 
@@ -148,17 +147,17 @@ public class SimpleStateGuard<T extends Enum>
    */
   public class Transition
   {
-    private final T to;
+    private final StateT to;
 
     @Nullable
-    private T[] allowed;
+    private StateT[] allowed;
 
-    Transition(final T to) {
+    Transition(final StateT to) {
       this.to = checkNotNull(to);
     }
 
     @SafeVarargs
-    public final Transition from(final T... allowed) {
+    public final Transition from(final StateT... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -207,9 +206,9 @@ public class SimpleStateGuard<T extends Enum>
    */
   public class Guard
   {
-    private final T[] allowed;
+    private final StateT[] allowed;
 
-    Guard(final T[] allowed) {
+    Guard(final StateT[] allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -240,32 +239,32 @@ public class SimpleStateGuard<T extends Enum>
   // Builder
   //
 
-  public static class Builder<T extends Enum>
+  public static class Builder<StateT extends Enum>
   {
     private ReadWriteLock lock;
 
-    private T initial;
+    private StateT initial;
 
-    private T failure;
+    private StateT failure;
 
     // final states?
 
-    public Builder<T> lock(final ReadWriteLock lock) {
+    public Builder<StateT> lock(final ReadWriteLock lock) {
       this.lock = lock;
       return this;
     }
 
-    public Builder<T> initial(final T state) {
+    public Builder<StateT> initial(final StateT state) {
       this.initial = state;
       return this;
     }
 
-    public Builder<T> failure(final T state) {
+    public Builder<StateT> failure(final StateT state) {
       this.failure = state;
       return this;
     }
 
-    public SimpleStateGuard<T> create() {
+    public SimpleStateGuard<StateT> create() {
       return new SimpleStateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
     }
   }
