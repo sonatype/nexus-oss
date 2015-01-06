@@ -227,6 +227,10 @@ public class LdapServer
     return this;
   }
 
+  public boolean isStarted() {
+    return directoryService != null && directoryService.isStarted();
+  }
+
   /**
    * Returns the actual port LDAP server is using.
    */
