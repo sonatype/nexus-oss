@@ -119,6 +119,7 @@ public class ObrIT
     upload(hRId, OSGI_COMPENDIUM);
     upload(hRId, GERONIMO_SERVLET);
     upload(hRId, PORTLET_API);
+    upload(hRId, JACOCO_REPORT);
 
     deployUsingObrIntoFelix(hRId);
   }
