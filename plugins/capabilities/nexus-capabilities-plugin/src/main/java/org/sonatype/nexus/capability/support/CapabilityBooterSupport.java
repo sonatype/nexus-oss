@@ -37,7 +37,7 @@ public abstract class CapabilityBooterSupport
 {
   @Subscribe
   public void handle(final Ready event) {
-    final CapabilityRegistry registry = event.getEventSender();
+    final CapabilityRegistry registry = event.getCapabilityRegistry();
     try {
       boot(registry);
     }

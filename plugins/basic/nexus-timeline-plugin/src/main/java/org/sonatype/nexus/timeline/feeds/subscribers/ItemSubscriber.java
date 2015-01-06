@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -117,38 +116,36 @@ public class ItemSubscriber
     }
   }
 
-  private void inspectForNexus(Event<?> evt) {
-    RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
+  private void inspectForNexus(RepositoryItemEvent event) {
     // filter out links and dirs/collections and hidden files
-    if (StorageFileItem.class.isAssignableFrom(ievt.getItem().getClass())
-        && !ievt.getItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)
-        && !ievt.getItemUid().getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class) // "maven-metadata.xml"
-        && !ievt.getItemUid().getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class) // "*.asc"
-        && !ievt.getItemUid().getBooleanAttributeValue(IsMavenChecksumAttribute.class) // "*.sha1" or "*.md5"
-        && !((StorageFileItem) ievt.getItem()).isContentGenerated()) {
+    if (StorageFileItem.class.isAssignableFrom(event.getItem().getClass())
+        && !event.getItemUid().getBooleanAttributeValue(IsHiddenAttribute.class)
+        && !event.getItemUid().getBooleanAttributeValue(IsMavenRepositoryMetadataAttribute.class) // "maven-metadata.xml"
+        && !event.getItemUid().getBooleanAttributeValue(IsMavenArtifactSignatureAttribute.class) // "*.asc"
+        && !event.getItemUid().getBooleanAttributeValue(IsMavenChecksumAttribute.class) // "*.sha1" or "*.md5"
+        && !((StorageFileItem) event.getItem()).isContentGenerated()) {
 
       String action;
-      if (ievt instanceof RepositoryItemEventCacheCreate) {
+      if (event instanceof RepositoryItemEventCacheCreate) {
         action = FeedRecorder.ITEM_CACHED;
       }
-      else if (ievt instanceof RepositoryItemEventCacheUpdate) {
+      else if (event instanceof RepositoryItemEventCacheUpdate) {
         action = FeedRecorder.ITEM_CACHED_UPDATE;
       }
-      else if (ievt instanceof RepositoryItemEventStoreCreate) {
+      else if (event instanceof RepositoryItemEventStoreCreate) {
         action = FeedRecorder.ITEM_DEPLOYED;
       }
-      else if (ievt instanceof RepositoryItemEventStoreUpdate) {
+      else if (event instanceof RepositoryItemEventStoreUpdate) {
         action = FeedRecorder.ITEM_DEPLOYED_UPDATE;
       }
-      else if (ievt instanceof RepositoryItemEventDelete) {
+      else if (event instanceof RepositoryItemEventDelete) {
         action = FeedRecorder.ITEM_DELETED;
       }
       else {
         return;
       }
 
-      final StorageFileItem fileItem = (StorageFileItem) ievt.getItem();
+      final StorageFileItem fileItem = (StorageFileItem) event.getItem();
       final Map<String, String> data = Maps.newHashMap();
       putIfNotNull(data, "repoId", fileItem.getRepositoryItemUid().getRepository().getId());
       putIfNotNull(data, "repoName", fileItem.getRepositoryItemUid().getRepository().getName());
@@ -164,7 +161,7 @@ public class ItemSubscriber
       final FeedEvent fe = new FeedEvent(
           FeedRecorder.FAMILY_ITEM,
           action,
-          evt.getEventDate(),
+          event.getEventDate(),
           userId,
           "/content/repositories/" + fileItem.getRepositoryId() + fileItem.getPath(), // link to item
           data

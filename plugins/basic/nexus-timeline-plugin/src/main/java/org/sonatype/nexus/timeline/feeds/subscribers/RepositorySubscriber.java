@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.timeline.feeds.subscribers;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -21,7 +22,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -56,24 +56,6 @@ public class RepositorySubscriber
   {
     super(feedRecorder);
     this.systemStatusProvider = checkNotNull(systemStatusProvider);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventAdd e) {
-    inspect(e);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventRemove e) {
-    inspect(e);
-  }
-
-  @Subscribe
-  @AllowConcurrentEvents
-  public void on(final RepositoryConfigurationUpdatedEvent e) {
-    inspect(e);
   }
 
   @Subscribe
@@ -125,16 +107,39 @@ public class RepositorySubscriber
     getFeedRecorder().addEvent(fe);
   }
 
-  private void inspect(Event<?> evt) {
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventAdd e) {
+    inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryRegistryEventRemove e) {
+    inspect(e);
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void on(final RepositoryConfigurationUpdatedEvent e) {
+    inspect(e);
+  }
+
+  private void inspect(Object evt) {
     if (!isNexusStarted()) {
       return;
     }
     final Repository repository;
+    final Date date;
     if (evt instanceof RepositoryRegistryRepositoryEvent) {
-      repository = ((RepositoryRegistryRepositoryEvent) evt).getRepository();
+      RepositoryRegistryRepositoryEvent target = (RepositoryRegistryRepositoryEvent)evt;
+      repository = target.getRepository();
+      date = target.getEventDate();
     }
     else {
-      repository = ((RepositoryConfigurationUpdatedEvent) evt).getRepository();
+      RepositoryConfigurationUpdatedEvent target = (RepositoryConfigurationUpdatedEvent)evt;
+      repository = target.getRepository();
+      date = target.getEventDate();
     }
 
     final Map<String, String> data = Maps.newHashMap();
@@ -164,7 +169,7 @@ public class RepositorySubscriber
     final FeedEvent fe = new FeedEvent(
         FeedRecorder.FAMILY_REPO,
         action,
-        evt.getEventDate(),
+        date,
         null, // TODO: who changed it?
         "/", // link to UI
         data

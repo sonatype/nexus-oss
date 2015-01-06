@@ -16,7 +16,6 @@ import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -40,9 +39,6 @@ public class AbstractGroupRepositoryTest
 
   @Mock(answer = Answers.RETURNS_SMART_NULLS)
   private Repository repo;
-
-  @Mock
-  private Event basicEvent;
 
   @Mock
   private RepositoryRegistryEventRemove removeEvent;

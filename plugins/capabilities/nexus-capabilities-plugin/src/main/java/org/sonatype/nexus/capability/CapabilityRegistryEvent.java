@@ -12,23 +12,22 @@
  */
 package org.sonatype.nexus.capability;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 /**
  * {@link CapabilityRegistry} related events.
  *
  * @since capabilities 2.0
  */
 public class CapabilityRegistryEvent
-    extends AbstractEvent<CapabilityRegistry>
 {
+  private final CapabilityRegistry capabilityRegistry;
+
   public CapabilityRegistryEvent(final CapabilityRegistry capabilityRegistry) {
-    super(capabilityRegistry);
+    this.capabilityRegistry = capabilityRegistry;
   }
 
   @Override
   public String toString() {
-    return getEventSender().toString();
+    return capabilityRegistry.toString();
   }
 
   /**
@@ -57,8 +56,15 @@ public class CapabilityRegistryEvent
   public static class Ready
       extends CapabilityRegistryEvent
   {
+    private final CapabilityRegistry capabilityRegistry;
+
     public Ready(final CapabilityRegistry capabilityRegistry) {
       super(capabilityRegistry);
+      this.capabilityRegistry = capabilityRegistry;
+    }
+
+    public CapabilityRegistry getCapabilityRegistry() {
+      return capabilityRegistry;
     }
 
     @Override

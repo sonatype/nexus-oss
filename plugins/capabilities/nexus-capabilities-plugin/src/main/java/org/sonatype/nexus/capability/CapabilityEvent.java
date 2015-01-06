@@ -14,8 +14,6 @@ package org.sonatype.nexus.capability;
 
 import java.util.Map;
 
-import org.sonatype.nexus.events.AbstractEvent;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -24,7 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since capabilities 2.0
  */
 public class CapabilityEvent
-    extends AbstractEvent<CapabilityRegistry>
 {
 
   private final CapabilityReference reference;
@@ -32,7 +29,6 @@ public class CapabilityEvent
   public CapabilityEvent(final CapabilityRegistry capabilityRegistry,
                          final CapabilityReference reference)
   {
-    super(checkNotNull(capabilityRegistry));
     this.reference = checkNotNull(reference);
   }
 

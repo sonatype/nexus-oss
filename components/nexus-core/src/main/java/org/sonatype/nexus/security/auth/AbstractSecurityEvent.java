@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.security.auth;
 
-import org.sonatype.nexus.events.AbstractEvent;
+import java.util.Date;
 
 /**
  * Abstract helper class for security related events. It carries the "minimal" subset of authc/authz events: the client
@@ -22,16 +22,21 @@ import org.sonatype.nexus.events.AbstractEvent;
  * @since 2.0
  */
 public abstract class AbstractSecurityEvent
-    extends AbstractEvent<Object>
 {
   private final ClientInfo clientInfo;
 
+  private final Date date;
+
   public AbstractSecurityEvent(final Object sender, final ClientInfo clientInfo) {
-    super(sender);
     this.clientInfo = clientInfo;
+    this.date = new Date();
   }
 
   public ClientInfo getClientInfo() {
     return clientInfo;
+  }
+
+  public Date getEventDate() {
+    return date;
   }
 }

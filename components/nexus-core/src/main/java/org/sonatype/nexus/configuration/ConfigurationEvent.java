@@ -12,8 +12,9 @@
  */
 package org.sonatype.nexus.configuration;
 
+import java.util.Date;
+
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * The abstract event that is occured when configuration related change had occured.
@@ -21,13 +22,21 @@ import org.sonatype.nexus.events.AbstractEvent;
  * @author cstamas
  */
 public abstract class ConfigurationEvent
-    extends AbstractEvent<ApplicationConfiguration>
 {
+  private final ApplicationConfiguration configuration;
+
+  private final Date date;
+
   public ConfigurationEvent(ApplicationConfiguration configuration) {
-    super(configuration);
+    this.configuration = configuration;
+    this.date = new Date();
   }
 
   public ApplicationConfiguration getApplicationConfiguration() {
-    return getEventSender();
+    return configuration;
+  }
+
+  public Date getEventDate() {
+    return date;
   }
 }

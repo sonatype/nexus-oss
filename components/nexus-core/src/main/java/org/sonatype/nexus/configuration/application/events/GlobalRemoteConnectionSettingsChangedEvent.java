@@ -13,7 +13,6 @@
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
-import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Event fired when global remote connection settings are changed (within configuration change). The settings carried
@@ -23,15 +22,15 @@ import org.sonatype.nexus.events.AbstractEvent;
  * query it too <em>after</em> you received this event .
  */
 public class GlobalRemoteConnectionSettingsChangedEvent
-    extends AbstractEvent<GlobalRemoteConnectionSettings>
 {
+  private GlobalRemoteConnectionSettings settings;
 
   public GlobalRemoteConnectionSettingsChangedEvent(GlobalRemoteConnectionSettings settings) {
-    super(settings);
+    this.settings = settings;
   }
 
-  public GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings() {
-    return getEventSender();
+  public GlobalRemoteConnectionSettings getSettings() {
+    return settings;
   }
 
 }

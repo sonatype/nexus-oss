@@ -13,7 +13,6 @@
 package org.sonatype.nexus.configuration.application.events;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
-import org.sonatype.nexus.events.AbstractEvent;
 
 /**
  * Event fired when global remote Proxy settings are changed (within configuration change). The settings carried in
@@ -24,13 +23,16 @@ import org.sonatype.nexus.events.AbstractEvent;
  * @since 2.6
  */
 public class GlobalRemoteProxySettingsChangedEvent
-    extends AbstractEvent<GlobalRemoteProxySettings>
 {
 
-  public GlobalRemoteProxySettingsChangedEvent(
-      final GlobalRemoteProxySettings remoteProxySettingsConfiguration)
+  private GlobalRemoteProxySettings settings;
+
+  public GlobalRemoteProxySettingsChangedEvent(final GlobalRemoteProxySettings settings)
   {
-    super(remoteProxySettingsConfiguration);
+    this.settings = settings;
   }
 
+  public GlobalRemoteProxySettings getSettings() {
+    return settings;
+  }
 }

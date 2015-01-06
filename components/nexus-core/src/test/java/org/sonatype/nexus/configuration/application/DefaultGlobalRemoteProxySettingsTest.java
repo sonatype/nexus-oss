@@ -14,7 +14,6 @@ package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteHttpProxySettings;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -37,7 +36,7 @@ public class DefaultGlobalRemoteProxySettingsTest
     NexusConfiguration cfg = lookup(NexusConfiguration.class);
     cfg.loadConfiguration();
 
-    final Event<GlobalRemoteProxySettings>[] event = new Event[1];
+    final GlobalRemoteProxySettingsChangedEvent[] event = new GlobalRemoteProxySettingsChangedEvent[1];
     lookup(EventBus.class).register(new Object()
     {
       @Subscribe
@@ -56,10 +55,10 @@ public class DefaultGlobalRemoteProxySettingsTest
 
     cfg.saveConfiguration();
 
-    Assert.assertNotNull(event[0].getEventSender());
-    Assert.assertEquals(settings, event[0].getEventSender());
-    Assert.assertEquals("foo.bar.com", event[0].getEventSender().getHttpProxySettings().getHostname());
-    Assert.assertEquals(1234, event[0].getEventSender().getHttpProxySettings().getPort());
+    Assert.assertNotNull(event[0]);
+    Assert.assertEquals(settings, event[0].getSettings());
+    Assert.assertEquals("foo.bar.com", event[0].getSettings().getHttpProxySettings().getHostname());
+    Assert.assertEquals(1234, event[0].getSettings().getHttpProxySettings().getPort());
   }
 
 }

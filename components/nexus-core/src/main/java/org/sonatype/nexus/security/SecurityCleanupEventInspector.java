@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
@@ -58,52 +57,33 @@ public class SecurityCleanupEventInspector
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final RepositoryRegistryEventRemove e) {
-    inspect(e);
+  public void on(final RepositoryRegistryEventRemove event) {
+    String repositoryId = event.getRepository().getId();
+
+    try {
+      // Delete target privs that match repo/groupId
+      cleanupPrivileges(TargetPrivilegeRepositoryPropertyDescriptor.ID, repositoryId);
+      cleanupPrivileges(TargetPrivilegeGroupPropertyDescriptor.ID, repositoryId);
+    }
+    catch (NoSuchPrivilegeException | NoSuchAuthorizationManagerException e) {
+      log.error("Unable to clean privileges attached to repository", e);
+    }
   }
 
   @Subscribe
   @AllowConcurrentEvents
-  public void on(final TargetRegistryEventRemove e) {
-    inspect(e);
-  }
+  public void on(final TargetRegistryEventRemove event) {
+    String targetId = event.getTarget().getId();
 
-  protected void inspect(Event<?> evt) {
-    if (evt instanceof RepositoryRegistryEventRemove) {
-      RepositoryRegistryEventRemove rEvt = (RepositoryRegistryEventRemove) evt;
-
-      String repositoryId = rEvt.getRepository().getId();
-
-      try {
-        // Delete target privs that match repo/groupId
-        cleanupPrivileges(TargetPrivilegeRepositoryPropertyDescriptor.ID, repositoryId);
-        cleanupPrivileges(TargetPrivilegeGroupPropertyDescriptor.ID, repositoryId);
-      }
-      catch (NoSuchPrivilegeException e) {
-        log.error("Unable to clean privileges attached to repository", e);
-      }
-      catch (NoSuchAuthorizationManagerException e) {
-        log.error("Unable to clean privileges attached to repository", e);
-      }
+    try {
+      cleanupPrivileges(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId);
     }
-    if (evt instanceof TargetRegistryEventRemove) {
-      TargetRegistryEventRemove rEvt = (TargetRegistryEventRemove) evt;
-
-      String targetId = rEvt.getTarget().getId();
-
-      try {
-        cleanupPrivileges(TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId);
-      }
-      catch (NoSuchPrivilegeException e) {
-        log.error("Unable to clean privileges attached to target: {}", targetId, e);
-      }
-      catch (NoSuchAuthorizationManagerException e) {
-        log.error("Unable to clean privileges attached to target: {}", targetId, e);
-      }
+    catch (NoSuchPrivilegeException | NoSuchAuthorizationManagerException e) {
+      log.error("Unable to clean privileges attached to target: {}", targetId, e);
     }
   }
 
-  protected void cleanupPrivileges(String propertyId, String propertyValue)
+  private void cleanupPrivileges(String propertyId, String propertyValue)
       throws NoSuchPrivilegeException, NoSuchAuthorizationManagerException
   {
     Set<Privilege> privileges = security.listPrivileges();
@@ -123,6 +103,5 @@ public class SecurityCleanupEventInspector
     for (String privilegeId : removedIds) {
       configManager.cleanRemovedPrivilege(privilegeId);
     }
-
   }
 }
