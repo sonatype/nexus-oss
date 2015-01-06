@@ -38,6 +38,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
     xtype: 'nx-info-panel'
   },
 
+  // List of masters to use when creating a new object
+  createWizard: null,
+
   // List of masters to use (xtype objects)
   masters: null,
 
@@ -49,49 +52,52 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   initComponent: function () {
     var me = this,
-      items = [];
+      items = [],
+      maxCount;
 
-    // Normalize list of masters
+    // Normalize list of masters and create wizards
     me.masters = Ext.isArray(me.masters) ? me.masters : [me.masters];
+    me.createWizard = Ext.isArray(me.createWizard) ? me.createWizard : [me.createWizard];
 
-    // Add masters
-    for (var i = 0; i < me.masters.length; ++i) {
-      items.push(
+    // How many panels do we need?
+    maxCount = (me.masters.length > me.createWizard.length ? me.masters.length : me.createWizard.length) + 1;
+
+    // Add the detail panel to the masters array
+    if (me.detail) {
+      // Use a custom detail panel
+      me.masters.push(me.detail);
+    } else {
+      // Use the default tab panel
+      me.masters.push(
         {
-          xtype: 'nx-drilldown-item',
-          layout: 'fit',
-          items: me.masters[i]
+          xtype: 'nx-drilldown-details',
+          ui: 'drilldown-tabs',
+          header: false,
+          plain: true,
+
+          layout: {
+            type: 'vbox',
+            align: 'stretch',
+            pack: 'start'
+          },
+
+          tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
+          autoHideTabHeader: me.autoHideTabHeader,
+          actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
         }
       );
     }
 
-    // Add details
-    if (me.detail) {
-      // Use a custom detail panel
-      items.push({ xtype: 'nx-drilldown-item', layout: 'fit', items: me.detail });
-    } else {
-      // Use the default tab panel
+    // Stack all panels onto the items array
+    for (var i = 0; i < maxCount; ++i) {
       items.push(
         {
           xtype: 'nx-drilldown-item',
-
-          layout: 'fit',
-
-          items: {
-            xtype: 'nx-drilldown-details',
-            ui: 'drilldown-tabs',
-            header: false,
-            plain: true,
-
-            layout: {
-              type: 'vbox',
-              align: 'stretch',
-              pack: 'start'
-            },
-            tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
-            autoHideTabHeader: me.autoHideTabHeader,
-            actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
-          }
+          layout: 'card',
+          items: [
+            me.masters[i],
+            (i > 0 ? me.createWizard[i - 1] : undefined)
+          ]
         }
       );
     }
@@ -133,6 +139,14 @@ Ext.define('NX.view.drilldown.Drilldown', {
   showChild: function (index, animate) {
     var me = this;
     me.down('nx-drilldown-panel').showChild(index, animate);
+  },
+
+  /**
+   * Show the referenced step in the create wizard
+   */
+  showCreateWizard: function (index, animate, cmp) {
+    var me = this;
+    me.down('nx-drilldown-panel').showCreateWizard(index, animate, cmp);
   },
 
   /**

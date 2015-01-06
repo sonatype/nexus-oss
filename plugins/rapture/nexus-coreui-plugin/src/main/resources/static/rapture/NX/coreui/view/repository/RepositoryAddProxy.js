@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddProxy', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_PROXY_TITLE'),
+  //title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_PROXY_TITLE'),
 
   initComponent: function() {
     var me = this;

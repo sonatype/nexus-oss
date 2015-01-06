@@ -285,6 +285,20 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * Make the create wizard appear
+   *
+   * @param index The zero-based step in the create wizard
+   * @param animate Whether to animate the panel into view
+   * @param cmp An optional component to load
+   */
+  loadCreateWizard: function (index, animate, cmp) {
+    var me = this,
+      feature = me.getFeature();
+
+    feature.showCreateWizard(index, animate, cmp);
+  },
+
+  /**
    * Bookmark specified model / selected tab.
    */
   bookmark: function (model) {

@@ -39,5 +39,10 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
     },
     '-',
     { xtype: 'button', text: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_BROWSE_BUTTON'), glyph: 'xf0e8@FontAwesome' /* fa-sitemap */, action: 'browse' }
+  ],
+
+  createWizard: [
+    { xtype: 'nx-coreui-repository-selecttemplate' },
+    { xtype: 'panel' }
   ]
 });

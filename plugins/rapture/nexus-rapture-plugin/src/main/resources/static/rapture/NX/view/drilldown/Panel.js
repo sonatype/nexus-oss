@@ -87,9 +87,9 @@ Ext.define('NX.view.drilldown.Panel', {
   },
 
   /**
-   * Shift this panel to display the referenced drilldown item
+   * Shift this panel to display the referenced master or detail panel
    *
-   * @param index The index of the drilldown item to display
+   * @param index The index of the master/detail panel to display
    * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
    */
   showChild: function (index, animate) {
@@ -103,7 +103,48 @@ Ext.define('NX.view.drilldown.Panel', {
         setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
       }
 
-      // Show the new panel
+      // Show the requested panel
+      me.items.items[index].getLayout().setActiveItem(0); // And proper card
+      var left = me.items.items[index].el.getLeft() - me.el.getLeft();
+      me.el.first().move('l', left, animate);
+      me.currentIndex = index;
+
+      me.refreshBreadcrumb();
+      me.resizeBreadcrumb();
+    }
+  },
+
+  /**
+   * Shift this panel to display the referenced step in the create wizard
+   *
+   * @param index The index of the create wizard to display
+   * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
+   * @param cmp An optional component to load into the panel
+   */
+  showCreateWizard: function (index, animate, cmp) {
+    var me = this;
+
+    // Create wizard is +1 relative to the root drilldown item
+    ++index;
+
+    if (me.items.items[index].el) {
+
+      // Hack to prevent resize events until the animation is complete
+      if (animate) {
+        me.ownerCt.suspendEvents(false);
+        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
+      }
+
+      // Load the component (if specified)
+      if (cmp) {
+        if (me.items.items[index].items[1]) {
+          me.items.items[index].remove(me.items.items[index].items[1], true);
+        }
+        me.items.items[index].add(cmp);
+      }
+
+      // Show the requested panel
+      me.items.items[index].getLayout().setActiveItem(1); // And proper card
       var left = me.items.items[index].el.getLeft() - me.el.getLeft();
       me.el.first().move('l', left, animate);
       me.currentIndex = index;

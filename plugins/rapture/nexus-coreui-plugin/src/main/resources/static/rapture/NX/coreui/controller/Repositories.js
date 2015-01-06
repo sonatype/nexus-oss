@@ -119,7 +119,7 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-repository-selecttemplate grid': {
+        'nx-coreui-repository-selecttemplate': {
           selectionchange: me.showAddWindow
         }
       }
@@ -275,7 +275,9 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @private
    */
   showSelectTemplateWindow: function() {
-    Ext.widget('nx-coreui-repository-selecttemplate');
+    var me = this;
+
+    me.loadCreateWizard(0, true, null);
   },
 
   /**
@@ -286,9 +288,8 @@ Ext.define('NX.coreui.controller.Repositories', {
         template = Ext.apply({}, selected[0].data),
         cmpClass = me.findComponent('add', template, false);
 
-    me.getSelectTemplate().close();
     if (cmpClass) {
-      cmpClass.create({ template: template });
+      me.loadCreateWizard(1, true, cmpClass.create({ template: template }));
     }
   },
 
