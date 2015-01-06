@@ -35,9 +35,13 @@ public class TransitionsInterceptor
   public Object invoke(final MethodInvocation invocation) throws Throwable {
     assert invocation != null;
 
-    final Object target = invocation.getThis();
+    Object target = invocation.getThis();
+    Method method = invocation.getMethod();
+
+    checkState(target instanceof StateGuardAware, "Invocation target ({}) does not implement: {}",
+        target.getClass(), StateGuardAware.class);
     StateGuard states = ((StateGuardAware) target).getStateGuard();
-    final Method method = invocation.getMethod();
+    checkState(states != null);
 
     Transitions config = method.getAnnotation(Transitions.class);
     checkState(config != null);
