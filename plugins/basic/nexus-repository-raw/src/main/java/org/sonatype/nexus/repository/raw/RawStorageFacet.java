@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 
 /**
+ * Provides persistent storage for {@link RawContent}.
+ *
  * @since 3.0
  */
 public interface RawStorageFacet

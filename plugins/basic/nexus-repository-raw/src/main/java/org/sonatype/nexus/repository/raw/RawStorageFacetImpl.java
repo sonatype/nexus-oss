@@ -90,9 +90,11 @@ public class RawStorageFacetImpl
 
         final Blob blob = store.create(content.toPayload().openInputStream(), headers);
 
+        // TODO: The blob node needs to be worked out too, obviously
         final BlobRef blobRef = new BlobRef("NODE", defaultBlobStore, blob.getId().asUniqueString());
 
         asset.setProperty(BLOB_REF_PROPERTY, blobRef.toString());
+        asset.setProperty(CONTENT_TYPE_PROPERTY, content.getType());
 
         return marshall(asset, blob);
       }
@@ -169,6 +171,7 @@ public class RawStorageFacetImpl
   }
 
   private RawContent marshall(Vertex asset, Blob blob) {
+    // CONTENT_TYPE_PROPERTY
     return null;
   }
 }
