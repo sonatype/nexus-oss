@@ -61,7 +61,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
       ]
     },
     {
-      type: 'panel',
+      xtype: 'panel',
       region: 'center',
       layout: {
         type: 'vbox',
@@ -83,13 +83,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   detail: {
     xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-    header: false,
-    plain: true,
-
-    style: {
-      'background-color': 'white',
-      'padding-top': '10px'
-    }
+    header: false
   },
 
   initComponent: function() {
