@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,7 +24,8 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     'Ext.ToolTip',
     'NX.Conditions',
     'NX.Permissions',
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   models: [

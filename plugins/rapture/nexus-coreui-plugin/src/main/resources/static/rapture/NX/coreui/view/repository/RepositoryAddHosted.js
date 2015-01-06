@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.repository.RepositoryAddHosted', {
   extend: 'NX.coreui.view.repository.RepositoryAdd',
   alias: 'widget.nx-repository-add-hosted',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Create new hosted repository',
+  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_HOSTED_TITLE'),
 
   initComponent: function() {
     var me = this;
@@ -33,7 +36,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAddHosted', {
         submit: 'NX.direct.coreui_Repository.createHosted'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Hosted repository created: ' + data['id'];
+        return NX.I18n.get('ADMIN_REPOSITORIES_CREATE_HOSTED_SUCCESS') + data['id'];
       }
     };
 

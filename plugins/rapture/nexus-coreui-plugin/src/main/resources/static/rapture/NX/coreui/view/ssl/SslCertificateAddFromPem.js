@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-add-from-pem',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
-  title: 'Paste certificate as PEM',
+  title: NX.I18n.get('ADMIN_SSL_PASTE_TITLE'),
   defaultFocus: 'pem',
 
   /**
@@ -38,17 +39,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
 
       items: [
         {
-          xtype: 'panel',
-          margin: '0 0 10 0',
-          layout: {
-            type: 'hbox'
-          },
-          items: [
-            { xtype: 'container', html: NX.Icons.img('sslcertificate-add-by-pem', 'x32') },
-            { xtype: 'container', html: 'Please paste a SSL certificate in PEM format.' }
-          ]
-        },
-        {
           xtype: 'textareafield',
           anchor: '100%',
           name: 'pem',
@@ -57,8 +47,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
       ],
 
       buttons: [
-        { text: 'Load Certificate', action: 'load', formBind: true, ui: 'primary' },
-        { text: 'Cancel', handler: function () {
+        { text: NX.I18n.get('ADMIN_SSL_PASTE_SUBMIT_BUTTON'), action: 'load', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_PASTE_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}
       ]

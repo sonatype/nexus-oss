@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-sslcertificate-list',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.I18n'
   ],
 
   store: 'SslCertificate',
@@ -47,7 +48,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateList', {
   },
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No SSL certificate matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_SSL_LIST_FILTER_ERROR') }
   ],
 
   /**

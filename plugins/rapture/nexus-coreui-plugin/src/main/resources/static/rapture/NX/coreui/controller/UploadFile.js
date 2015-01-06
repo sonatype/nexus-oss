@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,7 +20,8 @@
 Ext.define('NX.coreui.controller.UploadFile', {
   extend: 'Ext.app.Controller',
   requires: [
-    'NX.Messages'
+    'NX.Messages',
+    'NX.I18n'
   ],
 
   views: [
@@ -81,7 +82,7 @@ Ext.define('NX.coreui.controller.UploadFile', {
         form = button.up('form');
 
     form.submit({
-      waitMsg: 'Uploading your files...',
+      waitMsg: NX.I18n.get('BROWSE_UPLOAD_WAIT'),
       success: function() {
         NX.Messages.add({ text: Ext.String.capitalize(form.entryName) + 's uploaded', type: 'success' });
         me.discardForm(form);

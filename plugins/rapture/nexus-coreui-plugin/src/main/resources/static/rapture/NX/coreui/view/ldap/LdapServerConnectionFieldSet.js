@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-ldapserver-connection-fieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   defaults: {
     xtype: 'textfield',
@@ -30,17 +33,14 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
   items: [
     {
       name: 'name',
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME_HELP'),
       itemId: 'name',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME'),
-      emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_NAME_PLACEHOLDER')
     },
     {
       xtype: 'combo',
       name: 'protocol',
       itemId: 'protocol',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_HELP'),
       emptyText: NX.I18n.get('ADMIN_LDAP_CONNECTION_PROTOCOL_PLACEHOLDER'),
       editable: false,
       store: [
@@ -64,7 +64,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       name: 'host',
       itemId: 'host',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_HOST_HELP'),
       listeners: {
         change: function(){
           var protocol = this.up('form').down('#protocol');
@@ -141,21 +140,18 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
       xtype: 'numberfield',
       name: 'connectionTimeout',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_TIMEOUT'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_TIMEOUT_HELP'),
       value: 30
     },
     {
       xtype: 'numberfield',
       name: 'connectionRetryDelay',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_RETRY'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_RETRY_HELP'),
       value: 300
     },
     {
       xtype: 'numberfield',
       name: 'cacheTimeout',
       fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_CACHE'),
-      helpText: NX.I18n.get('ADMIN_LDAP_CONNECTION_CACHE_HELP'),
       value: 600
     }
   ],

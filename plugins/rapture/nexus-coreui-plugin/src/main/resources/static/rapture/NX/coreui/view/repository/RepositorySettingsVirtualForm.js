@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,14 +21,15 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
   extend: 'NX.coreui.view.repository.RepositorySettingsForm',
   alias: 'widget.nx-repository-settings-virtual-form',
   requires: [
-    'NX.coreui.store.RepositoryReference'
+    'NX.coreui.store.RepositoryReference',
+    'NX.I18n'
   ],
 
   api: {
     submit: 'NX.direct.coreui_Repository.updateVirtual'
   },
   settingsFormSuccessMessage: function(data) {
-    return 'Repository updated: ' + data['id'];
+    return NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_SUCCESS') + data['id'];
   },
 
   initComponent: function() {
@@ -47,14 +48,12 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsVirtualForm', {
         xtype: 'checkbox',
         name: 'browseable',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_BROWSING_HELP'),
         value: true
       },
       {
         xtype: 'checkbox',
         name: 'exposed',
         fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH'),
-        helpText: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_PUBLISH_HELP'),
         value: true
       },
       {

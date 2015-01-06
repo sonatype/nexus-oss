@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,15 +21,16 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-sslcertificate-details-window',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Certificate Details',
+  title: NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'),
 
   items: {
     xtype: 'nx-coreui-sslcertificate-details',
     buttons: [
-      { text: 'Cancel',
+      { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
         handler: function () {
           this.up('window').close();
         }
@@ -52,7 +53,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
         if (model) {
           if (model.get('inNexusSSLTrustStore')) {
             tbar.insert(0, {
-              text: 'Remove Certificate from TrustStore',
+              text: NX.I18n.get('ADMIN_SSL_DETAILS_REMOVE'),
               action: 'remove',
               formBind: true,
               disabled: true,
@@ -71,7 +72,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
           }
           else {
             tbar.insert(0, {
-              text: 'Add Certificate to TrustStore',
+              text: NX.I18n.get('ADMIN_SSL_DETAILS_ADD'),
               action: 'add',
               formBind: true,
               disabled: true,

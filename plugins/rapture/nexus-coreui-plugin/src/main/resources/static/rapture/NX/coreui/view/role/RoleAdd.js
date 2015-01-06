@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-role-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new role',
+  title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),
   defaultFocus: 'id',
 
   initComponent: function() {
@@ -36,10 +37,10 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
         submit: 'NX.direct.coreui_Role.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'Role created: ' + data['name'];
+        return NX.I18n.get('ADMIN_ROLES_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
-      editableMarker: 'You do not have permission to create roles',
+      editableMarker: NX.I18n.get('ADMIN_ROLES_CREATE_ERROR'),
       source: me.source
     };
 

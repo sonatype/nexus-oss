@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.system.PluginList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-system-pluginlist',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'PluginInfo',
 
@@ -37,7 +40,7 @@ Ext.define('NX.coreui.view.system.PluginList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No plugin matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_PLUGINS_LIST_FILTER_ERROR') }
   ]
 
 });

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,8 +20,11 @@
 Ext.define('NX.coreui.view.search.SaveSearchFilter', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-search-save',
+  requires: [
+    'NX.I18n'
+  ],
 
-  title: 'Save search filter',
+  title: NX.I18n.get('BROWSE_SEARCH_SAVE_TITLE'),
   defaultFocus: 'name',
 
   items: {
@@ -31,14 +34,12 @@ Ext.define('NX.coreui.view.search.SaveSearchFilter', {
         xtype: 'textfield',
         name: 'name',
         itemId: 'name',
-        fieldLabel: 'Name',
-        emptyText: 'enter a filter name'
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_NAME')
       },
       {
         xtype: 'textfield',
         name: 'description',
-        fieldLabel: 'Description',
-        emptyText: 'enter a filter description',
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_SAVE_DESCRIPTION'),
         allowBlank: true
       }
     ]

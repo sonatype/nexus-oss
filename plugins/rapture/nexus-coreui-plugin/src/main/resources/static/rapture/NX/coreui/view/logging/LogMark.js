@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.logging.LogMark', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-log-mark',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Mark log',
+  title: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'),
   defaultFocus: 'message',
 
   items: {
@@ -32,17 +33,15 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     api: {
       submit: 'NX.direct.logging_Log.mark'
     },
-    settingsFormSuccessMessage: 'Log has been marked',
+    settingsFormSuccessMessage: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_SUCCESS'),
     settingsFormSubmitOnEnter: true,
-    editableMarker: 'You do not have permission to mark the log',
+    editableMarker: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_ERROR'),
     items: [
       {
         xtype: 'textfield',
         name: 'message',
         itemId: 'message',
-        fieldLabel: 'Message',
-        helpText: 'Message to be included in the log',
-        emptyText: 'enter a marker text'
+        fieldLabel: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_MESSAGE')
       }
     ]
   },

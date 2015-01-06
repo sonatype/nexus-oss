@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.logging.LogViewer', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-log-viewer',
+  requires: [
+    'NX.I18n'
+  ],
 
   layout: 'fit',
 
@@ -36,7 +39,6 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOG_VIEWER_DOWNLOAD_TOOLTIP'),
       glyph: 'xf019@FontAwesome' /* fa-download */,
       action: 'download'
     },
@@ -44,16 +46,19 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
     {
       xtype: 'button',
       text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'),
-      tooltip: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TOOLTIP'),
       glyph: 'xf11e@FontAwesome' /* fa-flag-checkered */,
       action: 'mark',
       disabled: true
     },
     '->',
     {
+      xtype: 'label',
+      text: NX.I18n.get('ADMIN_LOG_VIEWER_REFRESH_INTERVAL')
+    },
+    {
       xtype: 'combo',
       itemId: 'refreshPeriod',
-      width: 200,
+      width: 140,
       editable: false,
       value: 0,
       store: [

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-system-smtp-settings',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**
@@ -33,19 +34,15 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'SMTP system settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('ADMIN_SMTP_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_SmtpSettings.read',
           submit: 'NX.direct.coreui_SmtpSettings.update'
         },
         editableCondition: NX.Conditions.isPermitted('nexus:settings', 'update'),
-        editableMarker: 'You do not have permission to configure SMTP',
+        editableMarker: NX.I18n.get('ADMIN_SMTP_UPDATE_ERROR'),
 
         items: [
-          {
-            xtype: 'label',
-            html: NX.I18n.get('ADMIN_SMTP_HELP')
-          },
           {
             xtype: 'nx-email',
             name: 'systemEmail',
@@ -82,7 +79,6 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'host',
             itemId: 'host',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_HOSTNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_HOSTNAME_HELP'),
             listeners: {
               change: function(){
                 var cType = this.up('form').down('#connectionType');
@@ -95,7 +91,6 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'port',
             itemId: 'port',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_PORT'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PORT_HELP'),
             minValue: 1,
             maxValue: 65536,
             allowDecimals: false,
@@ -105,13 +100,11 @@ Ext.define('NX.coreui.view.system.SmtpSettings', {
             name: 'username',
             allowBlank: true,
             fieldLabel: NX.I18n.get('ADMIN_SMTP_USERNAME'),
-            helpText: NX.I18n.get('ADMIN_SMTP_USERNAME_HELP')
           },
           {
             xtype: 'nx-password',
             name: 'password',
             fieldLabel: NX.I18n.get('ADMIN_SMTP_PASSWORD'),
-            helpText: NX.I18n.get('ADMIN_SMTP_PASSWORD_HELP'),
             allowBlank: true
           }
         ]

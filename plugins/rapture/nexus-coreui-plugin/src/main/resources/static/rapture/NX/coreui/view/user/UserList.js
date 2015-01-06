@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserList', {
   extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-user-list',
+  requires: [
+    'NX.I18n'
+  ],
 
   store: 'User',
 
@@ -41,14 +44,14 @@ Ext.define('NX.coreui.view.user.UserList', {
   ],
 
   viewConfig: {
-    emptyText: 'No users defined',
+    emptyText: NX.I18n.get('ADMIN_USERS_LIST_EMPTY_STATE'),
     deferEmptyText: false
   },
 
   tbar: [
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true },
     '-',
-    '<b>' + NX.I18n.get('ADMIN_USERS_LIST_SOURCE') + '</b>',
+    { xtype: 'label', text: NX.I18n.get('ADMIN_USERS_LIST_SOURCE') },
     { xtype: 'button', text: NX.I18n.get('ADMIN_USERS_LIST_DEFAULT_BUTTON'), action: 'filter', menu: [] },
     { xtype: 'nx-coreui-user-searchbox' }
   ]

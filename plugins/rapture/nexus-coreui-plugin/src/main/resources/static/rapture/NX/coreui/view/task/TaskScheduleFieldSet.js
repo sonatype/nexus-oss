@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedulefieldset',
+  requires: [
+    'NX.I18n'
+  ],
 
   autoHeight: false,
   autoScroll: true,
@@ -33,7 +36,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       name: 'schedule',
       itemId: 'schedule',
       fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE'),
-      helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_HELP'),
       emptyText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_RECURRENCE_PLACEHOLDER'),
       editable: false,
       store: [

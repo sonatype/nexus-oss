@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-routing-hosted-repository-settings',
   requires: [
-    'NX.util.Url'
+    'NX.util.Url',
+    'NX.I18n'
   ],
 
   config: {
@@ -36,7 +37,7 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
       api: {
         load: 'NX.direct.coreui_RoutingRepositorySettings.read'
       },
-      settingsFormSuccessMessage: 'Routing Repository Settings $action',
+      settingsFormSuccessMessage: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_UPDATE_SUCCESS'),
       buttons: undefined,
       hidden: true
     },
@@ -67,7 +68,6 @@ Ext.define('NX.coreui.view.routing.RoutingHostedRepositorySettings', {
           xtype: 'nx-datedisplayfield',
           name: 'publishTimestamp',
           fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED'),
-          helpText: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISHED_HELP'),
           hideIfUndefined: true,
           hidden: true
         },

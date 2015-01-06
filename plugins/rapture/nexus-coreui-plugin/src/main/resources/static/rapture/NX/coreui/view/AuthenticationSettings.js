@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.AuthenticationSettings', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-authenticationsettings',
+  requires: [
+    'NX.I18n',
+  ],
 
   namePrefix: undefined,
 
@@ -37,27 +40,21 @@ Ext.define('NX.coreui.view.AuthenticationSettings', {
     me.items = [
       {
         name: namePrefix + 'uthUsername',
-        fieldLabel: 'Username',
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_USERNAME'),
         allowBlank: false
       },
       {
         xtype: 'nx-password',
         name: namePrefix + 'uthPassword',
-        fieldLabel: 'Password'
-      },
-      {
-        xtype: 'label',
-        html: 'Windows NT Lan Manager options:'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_PASSWORD')
       },
       {
         name: namePrefix + 'uthNtlmHost',
-        fieldLabel: 'NT LAN Host',
-        helpText: 'Lan Manager host-name.'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_HOST')
       },
       {
         name: namePrefix + 'uthNtlmDomain',
-        fieldLabel: 'NT LAN Manager Domain',
-        helpText: 'Lan Manager domain-name.'
+        fieldLabel: NX.I18n.get('ADMIN_AUTHENTICATION_DOMAIN')
       }
     ];
 

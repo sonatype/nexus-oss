@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,7 +21,8 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
   extend: 'Ext.form.FieldContainer',
   alias: 'widget.nx-coreui-task-schedule-monthly',
   requires: [
-    'NX.util.DateFormat'
+    'NX.util.DateFormat',
+    'NX.I18n'
   ],
 
   /**
@@ -61,7 +62,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
         name: 'startDate',
         itemId: 'startDate',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_START_DATE_HELP'),
         allowBlank: false,
         format: 'm/d/Y',
         value: new Date(),
@@ -81,7 +81,6 @@ Ext.define('NX.coreui.view.task.TaskScheduleMonthly', {
       {
         xtype: 'checkboxgroup',
         fieldLabel: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS'),
-        helpText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_HELP'),
         allowBlank: false,
         blankText: NX.I18n.get('ADMIN_TASKS_SCHEDULE_DAYS_PLACEHOLDER'),
         items: {

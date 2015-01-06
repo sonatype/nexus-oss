@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,14 +21,15 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsForm', {
   extend: 'NX.view.SettingsForm',
   alias: 'widget.nx-coreui-repository-settings-form',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
   /**
    * @cfg template repository template object
    */
 
-  editableMarker: 'You do not have permission to update repositories',
+  editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_UPDATE_ERROR'),
 
   initComponent: function() {
     var me = this;

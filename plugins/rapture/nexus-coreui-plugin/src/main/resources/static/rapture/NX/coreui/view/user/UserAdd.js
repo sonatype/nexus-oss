@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,11 @@ Ext.define('NX.coreui.view.user.UserAdd', {
   extend: 'NX.view.AddWindow',
   alias: 'widget.nx-coreui-user-add',
   requires: [
-    'NX.Conditions'
+    'NX.Conditions',
+    'NX.I18n'
   ],
 
-  title: 'Create new user',
+  title: NX.I18n.get('ADMIN_USERS_CREATE_TITLE'),
   defaultFocus: 'userId',
 
   /**
@@ -39,10 +40,10 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         submit: 'NX.direct.coreui_User.create'
       },
       settingsFormSuccessMessage: function(data) {
-        return 'User created: ' + data['userId'];
+        return NX.I18n.get('ADMIN_USERS_CREATE_SUCCESS') + data['userId'];
       },
       editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
-      editableMarker: 'You do not have permission to create users'
+      editableMarker: NX.I18n.get('ADMIN_USERS_CREATE_ERROR')
     };
 
     me.callParent(arguments);
@@ -54,18 +55,16 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         xtype: 'nx-password',
         name: 'password',
         itemId: 'password',
-        fieldLabel: 'Password',
-        emptyText: 'enter a password'
+        fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_PASSWORD'),
       },
       {
         xtype: 'nx-password',
         allowBlank: true,
-        fieldLabel: 'Confirm Password',
-        emptyText: 'confirm above password',
+        fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_CONFIRM'),
         submitValue: false,
         validator: function() {
           var me = this;
-          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : 'Passwords do not match';
+          return (me.up('form').down('#password').getValue() === me.getValue()) ? true : NX.I18n.get('ADMIN_USERS_CREATE_NO_MATCH');
         }
       }
     ]);

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,6 +19,9 @@
  */
 Ext.define('NX.Dialogs', {
   singleton: true,
+  requires: [
+    'NX.I18n'
+  ],
 
   /**
    * @public
@@ -28,7 +31,7 @@ Ext.define('NX.Dialogs', {
 
     // set default configuration
     Ext.applyIf(options, {
-      title: title || 'Information',
+      title: title || NX.I18n.get('GLOBAL_DIALOG_INFO_TITLE'),
       msg: message,
       buttons: Ext.Msg.OK,
       icon: Ext.MessageBox.INFO,
@@ -46,8 +49,8 @@ Ext.define('NX.Dialogs', {
 
     // set default configuration
     Ext.applyIf(options, {
-      title: title || 'Error',
-      msg: message || 'Operation failed',
+      title: title || NX.I18n.get('GLOBAL_DIALOG_ERROR_TITLE'),
+      msg: message || NX.I18n.get('GLOBAL_DIALOG_ERROR_FAILED'),
       buttons: Ext.Msg.OK,
       icon: Ext.MessageBox.ERROR,
       closable: false

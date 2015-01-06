@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -20,6 +20,9 @@
 Ext.define('NX.coreui.view.user.UserAccount', {
   extend: 'NX.view.SettingsPanel',
   alias: 'widget.nx-coreui-user-account',
+  requires: [
+    'NX.I18n'
+  ],
 
   initComponent: function () {
     var me = this;
@@ -27,42 +30,31 @@ Ext.define('NX.coreui.view.user.UserAccount', {
     me.items = [
       {
         xtype: 'nx-settingsform',
-        settingsFormSuccessMessage: 'User account settings $action',
+        settingsFormSuccessMessage: NX.I18n.get('USER_ACCOUNT_UPDATE_SUCCESS'),
         api: {
           load: 'NX.direct.coreui_User.readAccount',
           submit: 'NX.direct.coreui_User.updateAccount'
         },
         items: [
           {
-            xtype: 'label',
-            html: NX.I18n.get('USER_ACCOUNT_HELP')
-          },
-          {
             name: 'userId',
             itemId: 'userId',
             readOnly: true,
             fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
             helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_ID_PLACEHOLDER')
           },
           {
             name: 'firstName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_FIRST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_FIRST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_FIRST')
           },
           {
             name: 'lastName',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST'),
-            helpText: NX.I18n.get('USER_ACCOUNT_LAST_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_LAST_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_LAST')
           },
           {
             xtype: 'nx-email',
             name: 'email',
-            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL'),
-            helpText: NX.I18n.get('USER_ACCOUNT_EMAIL_HELP'),
-            emptyText: NX.I18n.get('USER_ACCOUNT_EMAIL_PLACEHOLDER')
+            fieldLabel: NX.I18n.get('USER_ACCOUNT_EMAIL')
           }
         ]
       }
