@@ -126,7 +126,7 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
     final DefaultStorageLinkItem link = new DefaultStorageLinkItem(repository, new ResourceStoreRequest("/link/path"),
         true, true, repositoryItemUidFactory.createUid(repository, "/link/target"));
     subject.storeItem(repository, link);
-    // this would puke with unsupported Ex
+    // verify work is done ok by retrieving it
     final StorageItem retrievedLink = subject.retrieveItem(repository, new ResourceStoreRequest("/link/path"));
     assertThat(retrievedLink, notNullValue());
     assertThat(retrievedLink, instanceOf(StorageLinkItem.class));
@@ -157,7 +157,7 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
   }
 
   @Test
-  public void retrieveLinkProper() throws Exception {
+  public void retrieveExistingLinkProper() throws Exception {
     // link has no relevant attributes
     final File linkPath = new File(baseDir, "link/path");
     linkPath.getParentFile().mkdirs();
@@ -173,7 +173,7 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
 
   @Test
   public void retrieveExistingProxiedLink() throws Exception {
-    // proxies ones has remoteUrl
+    // proxied ones has remoteUrl
     doAnswer(new Answer<Void>()
     {
       @Override
@@ -188,6 +188,7 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
     Files.asCharSink(linkPath, Charsets.UTF_8).write("LINK to test:/link/target");
     final StorageItem retrievedLink = subject.retrieveItem(repository, new ResourceStoreRequest("/link/path"));
     assertThat(retrievedLink, notNullValue());
+    // is NOT a link, is a plain FILE
     assertThat(retrievedLink, instanceOf(StorageFileItem.class));
   }
 
@@ -208,6 +209,7 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
     Files.asCharSink(linkPath, Charsets.UTF_8).write("LINK to test:/link/target");
     final StorageItem retrievedLink = subject.retrieveItem(repository, new ResourceStoreRequest("/link/path"));
     assertThat(retrievedLink, notNullValue());
+    // is NOT a link, is a plain FILE
     assertThat(retrievedLink, instanceOf(StorageFileItem.class));
   }
 }
