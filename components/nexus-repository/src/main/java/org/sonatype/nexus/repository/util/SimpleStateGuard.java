@@ -16,7 +16,8 @@ package org.sonatype.nexus.repository.util;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
 
@@ -35,14 +36,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleStateGuard<T extends Enum>
     extends ComponentSupport
 {
-  private final Lock lock;
+  private final ReadWriteLock lock;
 
   @Nullable
   private final T failure;
 
   private T current;
 
-  SimpleStateGuard(final Lock lock,
+  SimpleStateGuard(final ReadWriteLock lock,
                    final T initial,
                    final @Nullable T failure)
   {
@@ -51,29 +52,35 @@ public class SimpleStateGuard<T extends Enum>
     this.failure = failure;
   }
 
-  private void lock() {
+  private Lock tryLock(final Lock lock) {
     try {
       lock.tryLock(1, TimeUnit.MINUTES);
     }
     catch (InterruptedException e) {
       throw Throwables.propagate(e);
     }
+    return lock;
   }
 
-  private void unlock() {
-    lock.unlock();
+  private Lock readLock() {
+    return tryLock(lock.readLock());
   }
+
+  private Lock writeLock() {
+    return tryLock(lock.writeLock());
+  }
+
 
   /**
    * Returns the current state.
    */
   public T getCurrent() {
-    lock();
+    Lock lock = readLock();
     try {
       return current;
     }
     finally {
-      unlock();
+      lock.unlock();
     }
   }
 
@@ -81,12 +88,12 @@ public class SimpleStateGuard<T extends Enum>
    * Check if the current state is given state.
    */
   public boolean is(final T state) {
-    lock();
+    Lock lock = readLock();
     try {
       return current == state;
     }
     finally {
-      unlock();
+      lock.unlock();
     }
   }
 
@@ -98,12 +105,12 @@ public class SimpleStateGuard<T extends Enum>
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
-    lock();
+    Lock lock = readLock();
     try {
       _ensure(allowed);
     }
     finally {
-      unlock();
+      lock.unlock();
     }
   }
 
@@ -159,7 +166,7 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public void run(final Action action) throws Exception {
-      lock();
+      Lock lock = writeLock();
       try {
         if (allowed != null) {
           _ensure(allowed);
@@ -186,7 +193,7 @@ public class SimpleStateGuard<T extends Enum>
         }
       }
       finally {
-        unlock();
+        lock.unlock();
       }
     }
   }
@@ -209,13 +216,13 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public void run(final Action action) throws Exception {
-      lock();
+      Lock lock = readLock();
       try {
         _ensure(allowed);
         action.run();
       }
       finally {
-        unlock();
+        lock.unlock();
       }
     }
   }
@@ -235,7 +242,7 @@ public class SimpleStateGuard<T extends Enum>
 
   public static class Builder<T extends Enum>
   {
-    private Lock lock;
+    private ReadWriteLock lock;
 
     private T initial;
 
@@ -243,7 +250,7 @@ public class SimpleStateGuard<T extends Enum>
 
     // final states?
 
-    public Builder<T> lock(final Lock lock) {
+    public Builder<T> lock(final ReadWriteLock lock) {
       this.lock = lock;
       return this;
     }
@@ -259,7 +266,7 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public SimpleStateGuard<T> create() {
-      return new SimpleStateGuard<>(lock != null ? lock : new ReentrantLock(), initial, failure);
+      return new SimpleStateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
     }
   }
 }
