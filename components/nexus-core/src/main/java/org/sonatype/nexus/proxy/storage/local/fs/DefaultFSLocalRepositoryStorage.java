@@ -343,15 +343,15 @@ public class DefaultFSLocalRepositoryStorage
         try {
           final BufferedInputStream bufferedInputStream;
           if (!cl.isReusable()) {
-            bufferedInputStream = new BufferedInputStream(cl.getContent());
-            bufferedInputStream.mark(1024);
-            // link persister with close the stream, so wrap it and prevent closing
-            cl = new PreparedContentLocator(new FilterInputStream(bufferedInputStream) {
+            // link persister will close the stream, so prevent it doing so
+            bufferedInputStream = new BufferedInputStream(cl.getContent()) {
               @Override
               public void close() {
                 // nop
               }
-            }, cl.getMimeType(), cl.getLength());
+            };
+            bufferedInputStream.mark(1024);
+            cl = new PreparedContentLocator(bufferedInputStream, cl.getMimeType(), cl.getLength());
           } else {
             bufferedInputStream = null;
           }
