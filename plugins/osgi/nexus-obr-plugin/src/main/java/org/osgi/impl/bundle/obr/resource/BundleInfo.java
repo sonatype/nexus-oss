@@ -437,6 +437,9 @@ public class BundleInfo
         if (attribute.endsWith(":")) {
           // Ignore
         }
+        else if (attribute.equalsIgnoreCase("bundle-version")) {
+          // Ignore for now, see https://issues.apache.org/jira/browse/FELIX-4754
+        }
         else {
           filter.append("(");
           filter.append(attribute);
