@@ -93,7 +93,8 @@ public class SimpleStateGuard<T extends Enum>
   /**
    * Ensure the current state is one of allowed.
    */
-  public void ensure(final T... allowed) {
+  @SafeVarargs
+  public final void ensure(final T... allowed) {
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
@@ -126,7 +127,8 @@ public class SimpleStateGuard<T extends Enum>
   /**
    * Create a guard which allows execution in the given states.
    */
-  public Guard guard(final T... allowed) {
+  @SafeVarargs
+  public final Guard guard(final T... allowed) {
     return new Guard(allowed);
   }
 
@@ -148,7 +150,8 @@ public class SimpleStateGuard<T extends Enum>
       this.to = checkNotNull(to);
     }
 
-    public Transition from(final T... allowed) {
+    @SafeVarargs
+    public final Transition from(final T... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
@@ -256,12 +259,7 @@ public class SimpleStateGuard<T extends Enum>
     }
 
     public SimpleStateGuard<T> create() {
-      Lock lock = this.lock;
-      if (lock == null) {
-        lock = new ReentrantLock();
-      }
-
-      return new SimpleStateGuard<>(lock, initial, failure);
+      return new SimpleStateGuard<>(lock != null ? lock : new ReentrantLock(), initial, failure);
     }
   }
 }
