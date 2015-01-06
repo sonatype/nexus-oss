@@ -14,9 +14,10 @@ package org.sonatype.nexus.repository;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.repository.stateguard.Action;
+import org.sonatype.nexus.repository.stateguard.Guarded;
 import org.sonatype.nexus.repository.stateguard.StateGuard;
 import org.sonatype.nexus.repository.stateguard.StateGuardAware;
+import org.sonatype.nexus.repository.stateguard.Transitions;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -85,20 +86,10 @@ public abstract class FacetSupport
   //
 
   @Override
-  public final void init(final Repository repository) throws Exception {
-    checkNotNull(repository);
-    final FacetSupport self = this;
-
-    states.transition(INITIALISED)
-        .from(NEW)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            self.repository = repository;
-            doInit();
-          }
-        });
+  @Transitions(from = NEW, to = INITIALISED)
+  public void init(final Repository repository) throws Exception {
+    this.repository = checkNotNull(repository);
+    doInit();
   }
 
   protected void doInit() throws Exception {
@@ -106,15 +97,9 @@ public abstract class FacetSupport
   }
 
   @Override
+  @Guarded(by = STOPPED)
   public void update() throws Exception {
-    states.guard(STOPPED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            doUpdate();
-          }
-        });
+    doUpdate();
   }
 
   protected void doUpdate() throws Exception {
@@ -122,19 +107,10 @@ public abstract class FacetSupport
   }
 
   @Override
-  public final void start() throws Exception {
-    final FacetSupport self = this;
-
-    states.transition(STARTED)
-        .from(INITIALISED, STOPPED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            doStart();
-            eventBus.register(self);
-          }
-        });
+  @Transitions(from={INITIALISED, STOPPED}, to=STARTED)
+  public void start() throws Exception {
+    doStart();
+    eventBus.register(this);
   }
 
   protected void doStart() throws Exception {
@@ -142,18 +118,10 @@ public abstract class FacetSupport
   }
 
   @Override
-  public final void stop() throws Exception {
-    final FacetSupport self = this;
-
-    states.transition(STOPPED)
-        .from(STARTED)
-        .run(new Action() {
-          @Override
-          public void run() throws Exception {
-            eventBus.unregister(self);
-            doStop();
-          }
-        });
+  @Transitions(from=STARTED, to=STOPPED)
+  public void stop() throws Exception {
+    eventBus.unregister(this);
+    doStop();
   }
 
   protected void doStop() throws Exception {
@@ -161,22 +129,14 @@ public abstract class FacetSupport
   }
 
   @Override
-  public final void destroy() throws Exception {
-    final FacetSupport self = this;
+  @Transitions(to=DESTROYED)
+  public void destroy() throws Exception {
+    if (states.is(STARTED)) {
+      stop();
+    }
 
-    states.transition(DESTROYED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            if (states.is(STARTED)) {
-              stop();
-            }
-
-            doDestroy();
-            self.repository = null;
-          }
-        });
+    doDestroy();
+    this.repository = null;
   }
 
   protected void doDestroy() throws Exception {

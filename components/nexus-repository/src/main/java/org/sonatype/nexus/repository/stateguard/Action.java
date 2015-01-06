@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.repository.stateguard;
 
+import javax.annotation.Nullable;
+
 /**
  * Runnable action.
  *
  * @since 3.0
  */
-public interface Action
+public interface Action<V>
 {
-  void run() throws Exception;
+  @Nullable
+  V run() throws Exception;
 }

@@ -46,22 +46,23 @@ class StateGuardTest
   }
 
   private static class TriggeredAction
-      implements Action
+      implements Action<Void>
   {
     boolean triggered = false
 
     @Override
-    void run() throws Exception {
+    Void run() throws Exception {
       triggered = true
+      return null;
     }
   }
 
   private static class NopAction
-      implements Action
+      implements Action<Void>
   {
     @Override
-    void run() throws Exception {
-      // nop
+    Void run() throws Exception {
+      return null;
     }
   }
 
@@ -107,14 +108,16 @@ class StateGuardTest
           .run(stoppedAction)
     }
 
-    def destroyedAction = new TriggeredAction() {
+    def destroyedAction = new Action<Void>() {
+      boolean triggered
       @Override
-      void run() throws Exception {
+      Void run() throws Exception {
         if (underTest.is(STARTED)) {
           stop()
         }
         assert underTest.current == STOPPED
-        super.run()
+        triggered = true
+        return null
       }
     }
 
@@ -157,9 +160,9 @@ class StateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new Action() {
+          .run(new Action<Void>() {
         @Override
-        void run() throws Exception {
+        Void run() throws Exception {
           throw new FailureException()
         }
       })
@@ -186,9 +189,9 @@ class StateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new Action() {
+          .run(new Action<Void>() {
         @Override
-        void run() throws Exception {
+        Void run() throws Exception {
           throw new FailureError()
         }
       })

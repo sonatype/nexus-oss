@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.stateguard;
 
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -155,6 +154,14 @@ public class StateGuard
       this.to = checkNotNull(to);
     }
 
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "to='" + to + '\'' +
+          ", allowed=" + Arrays.toString(allowed) +
+          '}';
+    }
+
     public TransitionImpl from(final String... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
@@ -163,7 +170,8 @@ public class StateGuard
     }
 
     @Override
-    public void run(final Action action) throws Exception {
+    @Nullable
+    public <V> V run(final Action<V> action) throws Exception {
       Lock lock = writeLock();
       try {
         if (allowed != null) {
@@ -173,10 +181,12 @@ public class StateGuard
         try {
           log.trace("Transitioning: {} -> {}", current, to);
 
-          action.run();
+          V result = action.run();
           current = to;
 
           log.trace("Transitioned: {}", to);
+
+          return result;
         }
         catch (Throwable t) {
           log.error("Failed transition: {} -> {}", current, to, t);
@@ -215,27 +225,21 @@ public class StateGuard
     }
 
     @Override
-    public void run(final Action action) throws Exception {
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "allowed=" + Arrays.toString(allowed) +
+          '}';
+    }
+
+    @Override
+    @Nullable
+    public <V> V run(final Action<V> action) throws Exception {
       checkNotNull(action);
 
       Lock lock = readLock();
       try {
         _ensure(allowed);
-        action.run();
-      }
-      finally {
-        lock.unlock();
-      }
-    }
-
-    @Override
-    public <V> V run(final Callable<V> callable) throws Exception {
-      checkNotNull(callable);
-
-      Lock lock = readLock();
-      try {
-        _ensure(allowed);
-        return callable.call();
+        return action.run();
       }
       finally {
         lock.unlock();

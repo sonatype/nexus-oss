@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.stateguard;
 
+import javax.annotation.Nullable;
+
 /**
  * State transition.
  *
@@ -19,7 +21,8 @@ package org.sonatype.nexus.repository.stateguard;
  */
 public interface Transition
 {
-  Transition from(String... allowed);
+  Transition from(String... from);
 
-  void run(Action action) throws Exception;
+  @Nullable
+  <V> V run(Action<V> action) throws Exception;
 }

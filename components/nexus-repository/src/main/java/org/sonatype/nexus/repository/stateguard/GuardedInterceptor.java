@@ -14,7 +14,8 @@
 package org.sonatype.nexus.repository.stateguard;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
+
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -27,6 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class GuardedInterceptor
+    extends ComponentSupport
     implements MethodInterceptor
 {
   @Override
@@ -39,16 +41,13 @@ public class GuardedInterceptor
 
     Guarded config = method.getAnnotation(Guarded.class);
     checkState(config != null);
-    assert config != null; // IDEA
-
     Guard guard = states.guard(config.by());
 
-    return guard.run(new Callable<Object>()
-    {
-      @Override
-      public Object call() throws Exception {
-        return method.invoke(target);
-      }
-    });
+    log.trace("Invoking: {} -> {}", guard, method);
+
+    MethodInvocationAction action = new MethodInvocationAction(invocation);
+    Object result = guard.run(action);
+    action.maybeThrow();
+    return result;
   }
 }

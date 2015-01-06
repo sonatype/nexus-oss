@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.stateguard;
 
-import java.util.concurrent.Callable;
+import javax.annotation.Nullable;
 
 /**
  * Guarded state.
@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
  */
 public interface Guard
 {
-  void run(Action action) throws Exception;
-
-  <V> V run(Callable<V> action) throws Exception;
+  @Nullable
+  <V> V run(Action<V> action) throws Exception;
 }

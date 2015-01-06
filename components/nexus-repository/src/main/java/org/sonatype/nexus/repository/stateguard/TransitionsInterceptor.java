@@ -10,9 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.stateguard;
 
 import java.lang.reflect.Method;
+
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -25,6 +28,7 @@ import static com.google.common.base.Preconditions.checkState;
  * @since 3.0
  */
 public class TransitionsInterceptor
+    extends ComponentSupport
     implements MethodInterceptor
 {
   @Override
@@ -37,21 +41,16 @@ public class TransitionsInterceptor
 
     Transitions config = method.getAnnotation(Transitions.class);
     checkState(config != null);
-    assert config != null; // IDEA
-
     Transition transition = states.transition(config.to());
-    if (config.from() != null) {
+    if (config.from() != null && config.from().length != 0) {
       transition = transition.from(config.from());
     }
 
-    transition.run(new Action()
-    {
-      @Override
-      public void run() throws Exception {
-        method.invoke(target);
-      }
-    });
+    log.trace("Invoking: {} -> {}", transition, method);
 
-    return null;
+    MethodInvocationAction action = new MethodInvocationAction(invocation);
+    Object result = transition.run(action);
+    action.maybeThrow();
+    return result;
   }
 }
