@@ -213,6 +213,7 @@ public class StateGuard
       this.allowed = allowed;
     }
 
+    @Override
     public void run(final Action action) throws Exception {
       checkNotNull(action);
 
@@ -229,6 +230,7 @@ public class StateGuard
     /**
      * Helper to {link #run(Action)} and propagate exceptions.
      */
+    @Override
     public void runX(final Action action) {
       try {
         run(action);
@@ -238,6 +240,7 @@ public class StateGuard
       }
     }
 
+    @Override
     public <V> V run(final Callable<V> callable) throws Exception {
       checkNotNull(callable);
 
@@ -254,6 +257,7 @@ public class StateGuard
     /**
      * Helper to {link #run(Callable)} and propagate exceptions.
      */
+    @Override
     public <V> V runX(final Callable<V> callable) {
       try {
         return run(callable);
