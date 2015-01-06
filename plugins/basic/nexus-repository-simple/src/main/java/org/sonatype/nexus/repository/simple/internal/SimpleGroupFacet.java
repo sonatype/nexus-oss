@@ -38,6 +38,7 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
 
 /**
@@ -111,7 +112,7 @@ public class SimpleGroupFacet
   @Override
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     // TODO: Should this really be going through the repository's view?
     // TODO: ... and thus need the Request and likely should move this logic to handler?

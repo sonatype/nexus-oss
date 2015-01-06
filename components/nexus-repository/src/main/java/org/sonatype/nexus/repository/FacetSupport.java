@@ -14,12 +14,15 @@ package org.sonatype.nexus.repository;
 
 import javax.inject.Inject;
 
+import org.sonatype.nexus.repository.util.SimpleStateGuard;
+import org.sonatype.nexus.repository.util.SimpleStateGuard.Action;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.FacetSupport.State.DESTROYED;
+import static org.sonatype.nexus.repository.FacetSupport.State.FAILED;
 import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
 import static org.sonatype.nexus.repository.FacetSupport.State.NEW;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
@@ -56,30 +59,20 @@ public abstract class FacetSupport
   // State
   //
 
-  // TODO: Sort out synchronization needed to ensure state sanity
-
-  protected static enum State
+  public static enum State
   {
     NEW,
     INITIALISED,
     STARTED,
     STOPPED,
-    DESTROYED
+    DESTROYED,
+    FAILED
   }
 
-  private State state = NEW;
-
-  protected void ensureState(final State... allowed) {
-    assert allowed != null && allowed.length > 0;
-
-    for (State allow : allowed) {
-      if (state == allow) {
-        return;
-      }
-    }
-
-    throw new IllegalStateException("Invalid state: " + state.name());
-  }
+  protected final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
+      .initial(NEW)
+      .failure(FAILED)
+      .create();
 
   //
   // Lifecycle
@@ -87,17 +80,19 @@ public abstract class FacetSupport
 
   @Override
   public final void init(final Repository repository) throws Exception {
-    ensureState(NEW);
+    checkNotNull(repository);
+    final FacetSupport self = this;
 
-    this.repository = checkNotNull(repository);
-
-    log.trace("Initialising");
-
-    doInit();
-
-    state = INITIALISED;
-
-    log.trace("Initialized");
+    states.transition(INITIALISED)
+        .from(NEW)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            self.repository = repository;
+            doInit();
+          }
+        });
   }
 
   protected void doInit() throws Exception {
@@ -106,13 +101,14 @@ public abstract class FacetSupport
 
   @Override
   public void update() throws Exception {
-    ensureState(STOPPED);
-
-    log.trace("Updating");
-
-    doUpdate();
-
-    log.trace("Updated");
+    states.guard(STOPPED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doUpdate();
+          }
+        });
   }
 
   protected void doUpdate() throws Exception {
@@ -121,17 +117,18 @@ public abstract class FacetSupport
 
   @Override
   public final void start() throws Exception {
-    ensureState(INITIALISED, STOPPED);
+    final FacetSupport self = this;
 
-    log.trace("Starting");
-
-    doStart();
-
-    eventBus.register(this);
-
-    state = STARTED;
-
-    log.trace("Started");
+    states.transition(STARTED)
+        .from(INITIALISED, STOPPED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            doStart();
+            eventBus.register(self);
+          }
+        });
   }
 
   protected void doStart() throws Exception {
@@ -140,17 +137,17 @@ public abstract class FacetSupport
 
   @Override
   public final void stop() throws Exception {
-    ensureState(STARTED);
+    final FacetSupport self = this;
 
-    log.trace("Stopping");
-
-    eventBus.unregister(this);
-
-    doStop();
-
-    state = STOPPED;
-
-    log.trace("Stopped");
+    states.transition(STOPPED)
+        .from(STARTED)
+        .run(new Action() {
+          @Override
+          public void run() throws Exception {
+            eventBus.unregister(self);
+            doStop();
+          }
+        });
   }
 
   protected void doStop() throws Exception {
@@ -159,21 +156,21 @@ public abstract class FacetSupport
 
   @Override
   public final void destroy() throws Exception {
-    // allow any state
+    final FacetSupport self = this;
 
-    log.trace("Destroying");
+    states.transition(DESTROYED)
+        .run(new Action()
+        {
+          @Override
+          public void run() throws Exception {
+            if (states.is(STARTED)) {
+              stop();
+            }
 
-    if (state == STARTED) {
-      stop();
-    }
-
-    doDestroy();
-
-    repository = null;
-
-    state = DESTROYED;
-
-    log.trace("Destroyed");
+            doDestroy();
+            self.repository = null;
+          }
+        });
   }
 
   protected void doDestroy() throws Exception {

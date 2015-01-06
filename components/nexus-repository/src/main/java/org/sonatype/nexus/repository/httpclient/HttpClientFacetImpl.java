@@ -49,6 +49,11 @@ public class HttpClientFacetImpl
   }
 
   @Override
+  public HttpClient getHttpClient() {
+    return checkNotNull(httpClient);
+  }
+
+  @Override
   protected void doInit() throws Exception {
     NestedAttributesMap attributes = getRepository().getConfiguration().attributes(CONFIG_KEY);
     HttpClientConfig config = marshaller.unmarshall(attributes);
@@ -59,12 +64,5 @@ public class HttpClientFacetImpl
   @Override
   protected void doDestroy() throws Exception {
     httpClient = null;
-  }
-
-  @Override
-  public HttpClient getHttpClient() {
-    ensureState(State.STARTED);
-
-    return httpClient;
   }
 }

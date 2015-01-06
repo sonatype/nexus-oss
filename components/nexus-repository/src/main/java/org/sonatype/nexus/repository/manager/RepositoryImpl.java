@@ -105,7 +105,6 @@ public class RepositoryImpl
   // State
   //
 
-  // visible for static import usage
   static enum State
   {
     NEW,
@@ -147,8 +146,7 @@ public class RepositoryImpl
     checkNotNull(configuration);
     final RepositoryImpl self = this;
 
-    states.transition(STOPPED)
-        .from(STOPPED)
+    states.guard(STOPPED)
         .run(new Action()
         {
           @Override

@@ -34,6 +34,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 // HACK: For now implement based on sub-class to get proxy working, then refactor to be interceptor friendly?
 
@@ -81,7 +82,7 @@ public class SimpleProxyFacet
   @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     SimpleContent content = super.get(name);
     if (content == null) {

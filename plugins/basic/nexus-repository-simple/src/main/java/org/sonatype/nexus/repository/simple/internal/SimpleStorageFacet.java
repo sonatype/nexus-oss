@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
  * Simple storage facet.
@@ -53,7 +54,7 @@ public class SimpleStorageFacet
   @Nullable
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     return store.get(name);
   }
@@ -63,7 +64,7 @@ public class SimpleStorageFacet
   public SimpleContent put(final String name, final SimpleContent content) {
     checkNotNull(name);
     checkNotNull(content);
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     SimpleContent prev = store.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
@@ -87,7 +88,7 @@ public class SimpleStorageFacet
   @Nullable
   public SimpleContent delete(final String name) {
     checkNotNull(name);
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     SimpleContent prev = store.remove(name);
     if (prev != null) {

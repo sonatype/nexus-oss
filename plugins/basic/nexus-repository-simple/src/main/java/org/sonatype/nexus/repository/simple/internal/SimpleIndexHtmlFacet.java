@@ -30,6 +30,7 @@ import org.sonatype.sisu.goodies.template.TemplateParameters;
 import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
  * Simple {@code index.html} facet.
@@ -63,7 +64,7 @@ public class SimpleIndexHtmlFacet
   }
 
   public String get() {
-    ensureState(State.STARTED);
+    states.ensure(STARTED);
 
     // resolve volatile to local for thread sanity
     String html = htmlCache;
