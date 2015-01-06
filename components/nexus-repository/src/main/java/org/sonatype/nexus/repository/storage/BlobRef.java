@@ -12,18 +12,54 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import org.sonatype.nexus.blobstore.api.BlobId;
+
 /**
- * Blob reference.
+ * A Blob reference - a blobId
  *
  * @since 3.0
  */
-public interface BlobRef
+public class BlobRef
 {
-  // <store>@<node>:<blob>
+  private final String node;
 
-  String getNode();
+  private final String store;
 
-  String getStore();
+  private final String blob;
 
-  String getBlob();
+  public BlobRef(final String node, final String store, final String blob) {
+    this.node = node;
+    this.store = store;
+    this.blob = blob;
+  }
+
+
+  public BlobRef(String ref) {
+    // TODO: Parse the consolidated reference string
+    throw new UnsupportedOperationException("Not implemented.");
+  }
+
+  /**
+   * @return the blob ref encoded as a string, using the syntax <store>@<node>:<blob>
+   */
+  public String toString() {
+    return String.format("%1@%2:%3", getStore(), getNode(), getBlob());
+
+  }
+
+  public String getNode() {
+    return node;
+  }
+
+  public String getStore() {
+    return store;
+  }
+
+  public String getBlob() {
+    return blob;
+  }
+
+  public BlobId getBlobId() {
+    return new BlobId(getBlob());
+  }
 }

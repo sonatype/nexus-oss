@@ -43,7 +43,7 @@ import static org.sonatype.nexus.repository.httpbridge.HttpHandlers.notFound;
 public class RawProxyRecipe
     extends RecipeSupport
 {
-  private final RemoteFetchHandler remoteFetchHandler;
+  private final RawRemoteFetchHandler rawRemoteFetchHandler;
 
   private final TimingHandler timingHandler;
 
@@ -53,13 +53,13 @@ public class RawProxyRecipe
 
   @Inject
   public RawProxyRecipe(final @Named("proxy") Type type,
-                        final @Named("raw") Format format, final RemoteFetchHandler remoteFetchHandler,
+                        final @Named("raw") Format format, final RawRemoteFetchHandler rawRemoteFetchHandler,
                         final TimingHandler timingHandler,
                         final Provider<ConfigurableViewFacet> viewFacet, final Provider<HttpClientFacet> httpClient)
   {
     super(type, format);
 
-    this.remoteFetchHandler = checkNotNull(remoteFetchHandler);
+    this.rawRemoteFetchHandler = checkNotNull(rawRemoteFetchHandler);
     this.timingHandler = checkNotNull(timingHandler);
     this.viewFacet = checkNotNull(viewFacet);
     this.httpClient = checkNotNull(httpClient);
@@ -84,7 +84,7 @@ public class RawProxyRecipe
     proxyRoute.handler(timingHandler);
     // TODO: Do we have the content cached already? Is the cache up to date?
     // Find the content remotely, or return 404
-    proxyRoute.handler(remoteFetchHandler).handler(notFound());
+    proxyRoute.handler(rawRemoteFetchHandler).handler(notFound());
     router.route(proxyRoute.create());
 
     // By default, return a 404

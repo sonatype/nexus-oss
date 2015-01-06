@@ -25,12 +25,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
-public class CachingHandler
+public class RawCachingHandler
     implements Handler
 {
   private final Repository repository;
 
-  public CachingHandler(final Repository repository) {
+  public RawCachingHandler(final Repository repository) {
     this.repository = checkNotNull(repository);
   }
 

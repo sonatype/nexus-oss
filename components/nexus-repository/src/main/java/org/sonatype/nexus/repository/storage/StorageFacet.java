@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.InputStream;
+import java.util.Map;
+
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
@@ -37,6 +40,10 @@ public interface StorageFacet
   static String E_OWNS_COMPONENT = "owns_component";
 
   static String E_PART_OF_COMPONENT = "part_of_component";
+
+  static String P_BLOB_REF = "blob_ref";
+
+  static String P_CONTENT_TYPE = "content_type";
 
   static String P_PATH = "path";
 
@@ -102,5 +109,21 @@ public interface StorageFacet
    */
   void delete(OrientGraph graph, Vertex vertex);
 
-  // TODO: Blob CR_D
+  // Create, Read, and Update Blobs
+
+  /**
+   * Creates a new Blob.
+   */
+  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
+
+  /**
+   * Gets a Blob.
+   */
+  @Nullable
+  org.sonatype.nexus.blobstore.api.Blob getBlob(BlobRef blobRef);
+
+  /**
+   * Deletes a Blob.
+   */
+  boolean deleteBlob(BlobRef blobRef);
 }

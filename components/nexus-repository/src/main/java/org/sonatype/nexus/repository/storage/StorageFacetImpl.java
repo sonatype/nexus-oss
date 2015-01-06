@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.InputStream;
+import java.util.Map;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.entity.EntityId;
@@ -24,6 +28,7 @@ import org.sonatype.nexus.repository.entity.EntityId;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
@@ -39,10 +44,14 @@ public class StorageFacetImpl
   extends FacetSupport
   implements StorageFacet
 {
+  private final BlobStore blobStore;
+
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
-  public StorageFacetImpl(@Named(GraphDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+  public StorageFacetImpl(BlobStore blobStore,
+                          @Named(GraphDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+    this.blobStore = blobStore;
     this.databaseInstanceProvider = databaseInstanceProvider;
 
     // initialize schema if needed
@@ -52,6 +61,7 @@ public class StorageFacetImpl
         @SuppressWarnings("unchecked")
         @Override
         public boolean apply(final OrientVertexType type) {
+          type.createProperty(P_PATH, OType.STRING);
           graph.createKeyIndex(P_PATH, Vertex.class, new Parameter("class", V_ASSET));
           return true;
         }
@@ -136,5 +146,22 @@ public class StorageFacetImpl
   @Override
   public void delete(final OrientGraph graph, final Vertex vertex) {
     graph.removeVertex(vertex);
+  }
+
+  @Override
+  public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
+    org.sonatype.nexus.blobstore.api.Blob blob = blobStore.create(inputStream, headers);
+    return new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
+  }
+
+  @Nullable
+  @Override
+  public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
+    return blobStore.get(blobRef.getBlobId());
+  }
+
+  @Override
+  public boolean deleteBlob(final BlobRef blobRef) {
+    return blobStore.delete(blobRef.getBlobId());
   }
 }

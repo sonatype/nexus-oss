@@ -23,7 +23,7 @@ import org.sonatype.nexus.repository.view.Response;
  *
  * @since 3.0
  */
-public class RemoteRequestHandler
+public class RawRemoteRequestHandler
     implements Handler
 {
   @Override
