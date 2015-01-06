@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.stateguard.Action;
 import org.sonatype.nexus.repository.stateguard.StateGuard;
+import org.sonatype.nexus.repository.stateguard.StateGuardAware;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -35,7 +36,7 @@ import static org.sonatype.nexus.repository.FacetSupport.State.STOPPED;
  */
 public abstract class FacetSupport
     extends ComponentSupport
-    implements Facet
+    implements Facet, StateGuardAware
 {
   private EventBus eventBus;
 
@@ -73,6 +74,11 @@ public abstract class FacetSupport
       .initial(NEW)
       .failure(FAILED)
       .create();
+
+  @Override
+  public StateGuard getStateGuard() {
+    return states;
+  }
 
   //
   // Lifecycle

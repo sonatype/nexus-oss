@@ -272,6 +272,9 @@ public class StateGuard
   // Builder
   //
 
+  /**
+   * {@link StateGuard} builder.
+   */
   public static class Builder
   {
     private ReadWriteLock lock;

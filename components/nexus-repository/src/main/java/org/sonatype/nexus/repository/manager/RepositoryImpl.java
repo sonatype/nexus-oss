@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.stateguard.Action;
 import org.sonatype.nexus.repository.stateguard.StateGuard;
+import org.sonatype.nexus.repository.stateguard.StateGuardAware;
 import org.sonatype.nexus.repository.util.MultipleFailures;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
@@ -47,7 +48,7 @@ import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.STOPPED
  */
 public class RepositoryImpl
     extends ComponentSupport
-    implements Repository
+    implements Repository, StateGuardAware
 {
   private final EventBus eventBus;
 
@@ -118,6 +119,11 @@ public class RepositoryImpl
       .initial(NEW)
       .failure(FAILED)
       .create();
+
+  @Override
+  public StateGuard getStateGuard() {
+    return states;
+  }
 
   //
   // Lifecycle
