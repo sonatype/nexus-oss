@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -505,7 +505,7 @@ public class ClientIT
     assertThat(target.id(), is(id));
     assertThat(target.name(), is(id + "name"));
     assertThat(target.contentClass(), is("maven2"));
-    assertThat(target.patterns(), contains("test1", "test2"));
+    assertThat(target.patterns(), containsInAnyOrder("test1", "test2"));
   }
 
   private RepositoryTarget createTarget(final String id, final String... patterns) {

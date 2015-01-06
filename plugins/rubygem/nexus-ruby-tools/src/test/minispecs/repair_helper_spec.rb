@@ -1,6 +1,6 @@
 #
 # Sonatype Nexus (TM) Open Source Version
-# Copyright (c) 2007-2014 Sonatype, Inc.
+# Copyright (c) 2008-2015 Sonatype, Inc.
 # All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 #
 # This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -64,7 +64,7 @@ describe Nexus::RepairHelperImpl do
     # also includes all the gems coming from maven-tools dependency !!
     # i.e. a new jruby.version can change that number !!
     # puts Dir[ File.join( broken_to, 'quick', '**', '*' ) ].join("\n")
-    Dir[ File.join( broken_to, 'quick', '**', '*' ) ].size.must_equal 31
+    Dir[ File.join( broken_to, 'quick', '**', '*' ) ].size.must_equal 32
   end
 
 end

@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2007-2014 Sonatype, Inc.
+    Copyright (c) 2008-2015 Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,7 +19,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-rubygem</artifactId>
-    <version>2.11.1-SNAPSHOT</version>
+    <version>2.11.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-ruby-tools</artifactId>
@@ -65,6 +65,19 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>target/rubygems-provided</directory>
+	<includes>
+	  <include>gems/**</include>
+	  <include>specifications/*</include>
+	</includes>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
@@ -77,7 +90,7 @@
           </execution>
         </executions>
         <configuration>
-          <includeGemsInResources>provided</includeGemsInResources>
+          <includeRubygemsInResources>true</includeRubygemsInResources>
         </configuration>
       </plugin>
 

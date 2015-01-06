@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2014 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -15,6 +15,7 @@ package org.sonatype.nexus.testsuite.npm.publish;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 import org.sonatype.nexus.testsuite.npm.NpmITSupport;
 
@@ -57,15 +58,20 @@ public class PublishIT
   @Test
   public void npmCliPublish() throws Exception {
     // create a NPM hosted repository that accept packages (use defaults)
-    final NpmHostedRepository privateRegistry = createNpmHostedRepository(testMethodName());
+    // npm client 2.0.0+ requires a lowercase package name only
+    final String packageName = testMethodName().toLowerCase(Locale.ENGLISH);
+    final NpmHostedRepository privateRegistry = createNpmHostedRepository(packageName);
 
     final File localDirectory = util.createTempDir();
     final File projectDir = util.createTempDir();
-    copyPackageJson(testMethodName(), "0.0.1", privateRegistry.contentUri(), projectDir);
+    copyPackageJson(packageName, "0.0.1", privateRegistry.contentUri(), projectDir);
     final File npmrc = testData().resolveFile(".npmrc");
+
     final String cmd = String
         .format("npm --registry %s --cache %s --userconfig %s publish %s",
-            privateRegistry.contentUri(),
+            // appending slash to workaround bug in npm cli versions 2.1.7 to 2.1.16
+            // https://github.com/npm/npm/issues/6982
+            privateRegistry.contentUri() + "/",
             localDirectory.getAbsolutePath(),
             npmrc.getAbsolutePath(),
             projectDir.getAbsolutePath());
@@ -88,7 +94,7 @@ public class PublishIT
       log(stdOut);
 
       assertThat(exitCode, equalTo(0)); // exited OK
-      assertThat(stdOut, containsString("+ "+testMethodName()+"@0.0.1")); // published
+      assertThat(stdOut, containsString("+ "+packageName+"@0.0.1")); // published
     }
 
     // 2nd run: re-publishing same version, should fail (default is not allow redeploy)
@@ -133,7 +139,7 @@ public class PublishIT
       log(stdOut);
 
       assertThat(exitCode, equalTo(0)); // exited OK
-      assertThat(stdOut, containsString("+ "+testMethodName()+"@0.0.1")); // published
+      assertThat(stdOut, containsString("+ "+packageName+"@0.0.1")); // published
     }
   }
 }

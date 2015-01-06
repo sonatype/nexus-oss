@@ -1,6 +1,6 @@
 #
 # Sonatype Nexus (TM) Open Source Version
-# Copyright (c) 2007-2014 Sonatype, Inc.
+# Copyright (c) 2008-2015 Sonatype, Inc.
 # All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 #
 # This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -13,6 +13,7 @@
 
 require 'rubygems/gem_runner'
 require 'rubygems/exceptions'
+require 'rubygems/spec_fetcher'
 require 'stringio'
 
 module Nexus
@@ -41,6 +42,8 @@ module Nexus
 
       out.string
 
+    ensure
+      Gem::SpecFetcher.fetcher = nil
     end
 
   end
