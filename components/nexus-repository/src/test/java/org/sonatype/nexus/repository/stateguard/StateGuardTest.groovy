@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,25 +10,24 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.repository.util
+package org.sonatype.nexus.repository.stateguard
 
 import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.DESTROYED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.FAILED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.INITIALISED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.NEW
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STARTED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STOPPED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.DESTROYED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.FAILED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.INITIALISED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.NEW
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STARTED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STOPPED
 
 /**
- * Tests for {@link SimpleStateGuard}.
+ * Tests for {@link StateGuard}.
  */
-class SimpleStateGuardTest
+class StateGuardTest
     extends TestSupport
 {
   static enum State
@@ -42,7 +41,7 @@ class SimpleStateGuardTest
   }
 
   private static class TriggeredAction
-      implements SimpleStateGuard.Action
+      implements StateGuard.Action
   {
     boolean triggered = false
 
@@ -53,7 +52,7 @@ class SimpleStateGuardTest
   }
 
   private static class NopAction
-      implements SimpleStateGuard.Action
+      implements StateGuard.Action
   {
     @Override
     void run() throws Exception {
@@ -61,11 +60,11 @@ class SimpleStateGuardTest
     }
   }
 
-  private SimpleStateGuard<State> underTest
+  private StateGuard<State> underTest
 
   @Before
   void setUp() {
-    underTest = new SimpleStateGuard.Builder<State>()
+    underTest = new StateGuard.Builder<State>()
         .initial(NEW)
         .failure(FAILED)
         .create()
@@ -153,7 +152,7 @@ class SimpleStateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new SimpleStateGuard.Action() {
+          .run(new StateGuard.Action() {
         @Override
         void run() throws Exception {
           throw new FailureException()
@@ -182,7 +181,7 @@ class SimpleStateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new SimpleStateGuard.Action() {
+          .run(new StateGuard.Action() {
         @Override
         void run() throws Exception {
           throw new FailureError()

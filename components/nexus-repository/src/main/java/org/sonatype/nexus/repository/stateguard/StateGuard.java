@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,8 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
-package org.sonatype.nexus.repository.util;
+package org.sonatype.nexus.repository.stateguard;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
@@ -30,11 +29,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Simple state guard.
+ * State guard.
  *
  * @since 3.0
  */
-public class SimpleStateGuard<StateT extends Enum>
+public class StateGuard<StateT extends Enum>
     extends ComponentSupport
 {
   private final ReadWriteLock lock;
@@ -44,9 +43,9 @@ public class SimpleStateGuard<StateT extends Enum>
 
   private StateT current;
 
-  SimpleStateGuard(final ReadWriteLock lock,
-                   final StateT initial,
-                   final @Nullable StateT failure)
+  StateGuard(final ReadWriteLock lock,
+             final StateT initial,
+             final @Nullable StateT failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
@@ -228,6 +227,9 @@ public class SimpleStateGuard<StateT extends Enum>
       }
     }
 
+    /**
+     * Helper to {link #run(Action)} and propagate exceptions.
+     */
     public void runX(final Action action) {
       try {
         run(action);
@@ -250,6 +252,9 @@ public class SimpleStateGuard<StateT extends Enum>
       }
     }
 
+    /**
+     * Helper to {link #run(Callable)} and propagate exceptions.
+     */
     public <V> V runX(final Callable<V> callable) {
       try {
         return run(callable);
@@ -267,6 +272,15 @@ public class SimpleStateGuard<StateT extends Enum>
   public static interface Action
   {
     void run() throws Exception;
+  }
+
+  //
+  // Aware
+  //
+
+  public static interface Aware
+  {
+    StateGuard getStateGuard();
   }
 
   //
@@ -298,8 +312,8 @@ public class SimpleStateGuard<StateT extends Enum>
       return this;
     }
 
-    public SimpleStateGuard<StateT> create() {
-      return new SimpleStateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
+    public StateGuard<StateT> create() {
+      return new StateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
     }
   }
 }

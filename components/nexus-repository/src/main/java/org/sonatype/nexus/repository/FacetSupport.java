@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,8 +14,8 @@ package org.sonatype.nexus.repository;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.repository.util.SimpleStateGuard;
-import org.sonatype.nexus.repository.util.SimpleStateGuard.Action;
+import org.sonatype.nexus.repository.stateguard.StateGuard;
+import org.sonatype.nexus.repository.stateguard.StateGuard.Action;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -69,7 +69,7 @@ public abstract class FacetSupport
     FAILED
   }
 
-  protected final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
+  protected final StateGuard<State> states = new StateGuard.Builder<State>()
       .initial(NEW)
       .failure(FAILED)
       .create();
