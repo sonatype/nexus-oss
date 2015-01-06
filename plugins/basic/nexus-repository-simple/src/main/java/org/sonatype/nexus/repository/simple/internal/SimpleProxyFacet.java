@@ -21,6 +21,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
+import org.sonatype.nexus.repository.stateguard.Guarded;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -80,9 +81,9 @@ public class SimpleProxyFacet
   }
 
   @Nullable
+  @Guarded(by=STARTED)
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    states.ensure(STARTED);
 
     SimpleContent content = super.get(name);
     if (content == null) {

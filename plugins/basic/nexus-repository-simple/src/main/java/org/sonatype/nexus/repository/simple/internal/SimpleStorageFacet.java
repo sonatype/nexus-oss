@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
+import org.sonatype.nexus.repository.stateguard.Guarded;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -52,19 +53,19 @@ public class SimpleStorageFacet
 
   @Override
   @Nullable
+  @Guarded(by=STARTED)
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    states.ensure(STARTED);
 
     return store.get(name);
   }
 
   @Override
   @Nullable
+  @Guarded(by=STARTED)
   public SimpleContent put(final String name, final SimpleContent content) {
     checkNotNull(name);
     checkNotNull(content);
-    states.ensure(STARTED);
 
     SimpleContent prev = store.put(name, content);
     log.debug("{} repository '{}' content: {} -> {}",
@@ -86,9 +87,9 @@ public class SimpleStorageFacet
 
   @Override
   @Nullable
+  @Guarded(by=STARTED)
   public SimpleContent delete(final String name) {
     checkNotNull(name);
-    states.ensure(STARTED);
 
     SimpleContent prev = store.remove(name);
     if (prev != null) {
@@ -100,6 +101,7 @@ public class SimpleStorageFacet
   }
 
   @Override
+  @Guarded(by=STARTED)
   public Set<Map.Entry<String, SimpleContent>> entries() {
     return ImmutableSet.copyOf(store.entrySet());
   }
