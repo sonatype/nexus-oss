@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -51,6 +51,9 @@ Ext.define('NX.view.AboutWindow', {
           type: 'hbox',
           align: 'stretch'
         },
+        bodyStyle: {
+          backgroundColor: '#F4F4F4'
+        },
         items: [
           {
             xtype: 'component',
@@ -66,7 +69,7 @@ Ext.define('NX.view.AboutWindow', {
       },
       {
         xtype: 'tabpanel',
-        plain: true,
+        ui: 'light',
         flex: 1,
         items: [
           {

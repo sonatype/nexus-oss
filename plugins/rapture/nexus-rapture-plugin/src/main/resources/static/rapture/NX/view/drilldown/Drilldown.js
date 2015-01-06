@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,6 +28,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
   ],
 
   layout: 'fit',
+
+  /**
+   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
+   */
+  autoHideTabHeader: true,
 
   tabs: {
     xtype: 'nx-info-panel'
@@ -84,6 +89,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
               pack: 'start'
             },
             tabs: Ext.isArray(me.tabs) ? Ext.Array.clone(me.tabs) : Ext.apply({}, me.tabs),
+            autoHideTabHeader: me.autoHideTabHeader,
             actions: Ext.isArray(me.actions) ? Ext.Array.clone(me.actions) : me.actions
           }
         }

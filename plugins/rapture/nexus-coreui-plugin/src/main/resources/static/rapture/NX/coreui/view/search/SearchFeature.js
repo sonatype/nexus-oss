@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -61,7 +61,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
       ]
     },
     {
-      type: 'panel',
+      xtype: 'panel',
       region: 'center',
       layout: {
         type: 'vbox',
@@ -83,13 +83,7 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
   detail: {
     xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-    header: false,
-    plain: true,
-
-    style: {
-      'background-color': 'white',
-      'padding-top': '10px'
-    }
+    header: false
   },
 
   initComponent: function() {

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2007-2015 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -57,7 +57,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_HELP_SUPPORT: 'Support',
 
     // Footer
-    GLOBAL_FOOTER_COPYRIGHT: 'Sonatype Nexus™ © Copyright Sonatype, Inc.',
+    GLOBAL_FOOTER_COPYRIGHT: 'Copyright © 2008-2015, Sonatype Inc. All rights reserved.',
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
@@ -92,6 +92,9 @@ Ext.define('NX.app.PluginStrings', {
     // Settings form
     GLOBAL_SETTINGS_LOADING: 'Loading',
     GLOBAL_SETTINGS_SAVING: 'Saving',
+
+    // Drilldown
+    GLOBAL_DRILLDOWN_GO_BACK: 'Go back to {0}',
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',
