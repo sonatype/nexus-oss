@@ -275,8 +275,10 @@ Ext.define('NX.coreui.controller.Repositories', {
    * @private
    */
   showSelectTemplateWindow: function() {
-    var me = this;
+    var me = this,
+      feature = me.getFeature();
 
+    feature.setItemName(1, "Create Repository");
     me.loadCreateWizard(0, true, null);
   },
 
@@ -286,9 +288,11 @@ Ext.define('NX.coreui.controller.Repositories', {
   showAddWindow: function(selectionModel, selected) {
     var me = this,
         template = Ext.apply({}, selected[0].data),
-        cmpClass = me.findComponent('add', template, false);
+        cmpClass = me.findComponent('add', template, false),
+        feature = me.getFeature();
 
     if (cmpClass) {
+      feature.setItemName(2, template.providerName);
       me.loadCreateWizard(1, true, cmpClass.create({ template: template }));
     }
   },
