@@ -40,11 +40,9 @@ public class FixedDefaultWebSessionManager
 
   @Inject
   public void configureProperties(
-      final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout,
-      final @Named("${shiro.secureSessionCookies:-false}") boolean secureSessionCookies)
+      final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout)
   {
     setGlobalSessionTimeout(globalSessionTimeout);
-    getSessionIdCookie().setSecure(secureSessionCookies);
   }
 
   @Inject
