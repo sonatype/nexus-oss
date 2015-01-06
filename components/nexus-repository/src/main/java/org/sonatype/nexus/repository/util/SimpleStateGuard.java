@@ -14,6 +14,7 @@
 package org.sonatype.nexus.repository.util;
 
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -202,7 +203,7 @@ public class SimpleStateGuard<StateT extends Enum>
   //
 
   /**
-   * Execute an action if current state is allowed.
+   * Execute an action or callable if current state is allowed.
    */
   public class Guard
   {
@@ -215,6 +216,8 @@ public class SimpleStateGuard<StateT extends Enum>
     }
 
     public void run(final Action action) throws Exception {
+      checkNotNull(action);
+
       Lock lock = readLock();
       try {
         _ensure(allowed);
@@ -222,6 +225,37 @@ public class SimpleStateGuard<StateT extends Enum>
       }
       finally {
         lock.unlock();
+      }
+    }
+
+    public void runX(final Action action) {
+      try {
+        run(action);
+      }
+      catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+    }
+
+    public <V> V run(final Callable<V> callable) throws Exception {
+      checkNotNull(callable);
+
+      Lock lock = readLock();
+      try {
+        _ensure(allowed);
+        return callable.call();
+      }
+      finally {
+        lock.unlock();
+      }
+    }
+
+    public <V> V runX(final Callable<V> callable) {
+      try {
+        return run(callable);
+      }
+      catch (Exception e) {
+        throw Throwables.propagate(e);
       }
     }
   }
