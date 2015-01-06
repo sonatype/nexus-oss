@@ -162,6 +162,7 @@ public class StateGuard
       return this;
     }
 
+    @Override
     public void run(final Action action) throws Exception {
       Lock lock = writeLock();
       try {
@@ -227,19 +228,6 @@ public class StateGuard
       }
     }
 
-    /**
-     * Helper to {link #run(Action)} and propagate exceptions.
-     */
-    @Override
-    public void runX(final Action action) {
-      try {
-        run(action);
-      }
-      catch (Exception e) {
-        throw Throwables.propagate(e);
-      }
-    }
-
     @Override
     public <V> V run(final Callable<V> callable) throws Exception {
       checkNotNull(callable);
@@ -251,19 +239,6 @@ public class StateGuard
       }
       finally {
         lock.unlock();
-      }
-    }
-
-    /**
-     * Helper to {link #run(Callable)} and propagate exceptions.
-     */
-    @Override
-    public <V> V runX(final Callable<V> callable) {
-      try {
-        return run(callable);
-      }
-      catch (Exception e) {
-        throw Throwables.propagate(e);
       }
     }
   }
