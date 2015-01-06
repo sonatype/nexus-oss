@@ -23,8 +23,14 @@ Ext.define('NX.view.drilldown.Details', {
   requires: [
     'NX.Icons',
     'NX.Bookmarks',
-    'NX.ext.tab.SortedPanel'
+    'NX.ext.tab.SortedPanel',
+    'NX.view.drilldown.Actions'
   ],
+
+  /**
+   * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
+   */
+  autoHideTabHeader: true,
 
   /**
    * @override
@@ -50,8 +56,7 @@ Ext.define('NX.view.drilldown.Details', {
         hidden: true
       },
       {
-        xtype: 'toolbar',
-        itemId: 'nx-drilldown-actions',
+        xtype: 'nx-drilldown-actions',
         items: me.actions,
         hidden: (me.actions ? false : true)
       },
@@ -62,7 +67,8 @@ Ext.define('NX.view.drilldown.Details', {
         activeTab: 0,
         layoutOnTabChange: true,
         flex: 1,
-        items: me.tabs
+        items: me.tabs,
+        autoHideTabHeader: me.autoHideTabHeader
       }
     ];
 

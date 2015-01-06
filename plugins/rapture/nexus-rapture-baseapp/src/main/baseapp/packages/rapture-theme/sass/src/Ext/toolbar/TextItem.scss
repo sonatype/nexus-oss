@@ -8,7 +8,7 @@
 .product-name {
   color: $color-white;
   font-size: 20px;
-  font-weight: 200px;
+  font-weight: 200;
 }
 
 /**
@@ -45,7 +45,8 @@
 .breadcrumb-separator {
   font-size: $font-size-h4;
   top: 7px !important;
-  padding-left: 8px;
+  color: $color-gray;
+  padding-left: 12px;
 }
 
 /**
@@ -53,5 +54,5 @@
  */
 .breadcrumb-icon {
   top: 9px !important;
-  margin-left: 11px;
+  margin-left: 13px;
 }

@@ -96,6 +96,45 @@
   top: 7px !important;
 }
 
+@include extjs-button-toolbar-small-ui(
+  $ui: 'drilldown',
+
+  $text-padding: 0,
+
+  $color: $color-navy-blue,
+  $color-over: $color-dark-cerulean,
+  $color-focus: $color-dark-cerulean,
+  $color-pressed: $color-cornflower,
+  $color-disabled: $color-night-rider,
+
+  $font-size: $font-size-body,
+
+  $background-gradient: transparent,
+  $background-gradient-over: transparent,
+  $background-gradient-focus: transparent,
+  $background-gradient-pressed: transparent,
+  $background-gradient-disabled: transparent,
+
+  $background-color: transparent,
+  $background-color-over: transparent,
+  $background-color-focus: transparent,
+  $background-color-pressed: transparent,
+  $background-color-disabled: transparent,
+
+  //$border-width: 0,
+
+  $border-color: transparent,
+  $border-color-over: transparent,
+  $border-color-focus: transparent,
+  $border-color-pressed: transparent,
+  $border-color-disabled: transparent,
+
+  $glyph-color: $color-navy-blue,
+
+  $opacity-disabled: 1,
+  $inner-opacity-disabled: 1
+);
+
 /**
  * ui: 'default'
  */
