@@ -14,6 +14,7 @@ package com.sonatype.nexus.testsuite.ldap;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.ldaptestsuite.LdapServerConfiguration;
@@ -65,7 +66,7 @@ public abstract class AbstractLdapIT
     if (isStartLdapServer()) {
       ldapServer.start();
     }
-    ldapClientConfiguration();
+    mayCreateLdapClientConfiguration();
   }
 
   protected boolean isStartLdapServer() {
@@ -85,7 +86,17 @@ public abstract class AbstractLdapIT
         .build();
   }
 
-  protected void ldapClientConfiguration() throws Exception {
+  protected void mayCreateLdapClientConfiguration() throws Exception {
+    final List<Configuration> configurations = getLdapClient().get();
+    for (Configuration configuration : configurations) {
+      if (configuration.getName().equals(getTestId())) {
+        return;
+      }
+    }
+    createLdapClientConfiguration();
+  }
+
+  protected void createLdapClientConfiguration() throws Exception {
     final Configuration configuration = getLdapClient().create();
     configuration.setName(getTestId());
     final Connection connection = configuration.getConnection();

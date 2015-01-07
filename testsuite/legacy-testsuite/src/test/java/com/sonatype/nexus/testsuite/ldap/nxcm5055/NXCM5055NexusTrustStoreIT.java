@@ -83,7 +83,7 @@ public class NXCM5055NexusTrustStoreIT
   }
 
   @Override
-  protected void ldapClientConfiguration() throws Exception {
+  protected void createLdapClientConfiguration() throws Exception {
     final Configuration configuration = getLdapClient().create();
     configuration.setName(getTestId());
     final Connection connection = configuration.getConnection();
