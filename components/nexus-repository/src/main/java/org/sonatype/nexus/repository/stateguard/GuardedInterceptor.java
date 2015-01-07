@@ -38,7 +38,7 @@ public class GuardedInterceptor
     Object target = invocation.getThis();
     Method method = invocation.getMethod();
 
-    checkState(target instanceof StateGuardAware, "Invocation target ({}) does not implement: {}",
+    checkState(target instanceof StateGuardAware, "Invocation target (%s) does not implement: %s",
         target.getClass(), StateGuardAware.class);
     StateGuard states = ((StateGuardAware) target).getStateGuard();
     checkState(states != null);
