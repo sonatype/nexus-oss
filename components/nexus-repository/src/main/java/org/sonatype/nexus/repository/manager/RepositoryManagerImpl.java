@@ -26,15 +26,17 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.config.ConfigurationStore;
+import org.sonatype.nexus.repository.stateguard.Guarded;
+import org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
  * Default {@link RepositoryManager} implementation.
@@ -44,7 +46,7 @@ import static com.google.common.base.Preconditions.checkState;
 @Named
 @Singleton
 public class RepositoryManagerImpl
-    extends LifecycleSupport
+    extends StateGuardLifecycleSupport
     implements RepositoryManager
 {
   private final EventBus eventBus;
@@ -181,25 +183,24 @@ public class RepositoryManagerImpl
   }
 
   @Override
+  @Guarded(by=STARTED)
   public Iterable<Repository> browse() {
-    ensureStarted();
-
     return ImmutableList.copyOf(repositories.values());
   }
 
   @Nullable
   @Override
+  @Guarded(by=STARTED)
   public Repository get(final String name) {
     checkNotNull(name);
-    ensureStarted();
 
     return repositories.get(name);
   }
 
   @Override
+  @Guarded(by=STARTED)
   public Repository create(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    ensureStarted();
 
     log.debug("Creating repository: {}", configuration);
     store.create(configuration);
@@ -214,9 +215,9 @@ public class RepositoryManagerImpl
   }
 
   @Override
+  @Guarded(by=STARTED)
   public Repository update(final Configuration configuration) throws Exception {
     checkNotNull(configuration);
-    ensureStarted();
 
     log.debug("Updating repository: {}", configuration);
     Repository repository = repository(configuration.getRepositoryName());
@@ -232,9 +233,9 @@ public class RepositoryManagerImpl
   }
 
   @Override
+  @Guarded(by=STARTED)
   public void delete(final String name) throws Exception {
     checkNotNull(name);
-    ensureStarted();
 
     log.debug("Deleting repository: {}", name);
     Repository repository = repository(name);
