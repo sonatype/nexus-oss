@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_ROUTING_CREATE_TITLE'),
   defaultFocus: 'pattern',
 
   /**

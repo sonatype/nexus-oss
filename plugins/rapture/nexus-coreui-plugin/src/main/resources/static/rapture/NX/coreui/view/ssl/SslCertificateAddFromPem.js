@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_SSL_PASTE_TITLE'),
   defaultFocus: 'pem',
 
   /**

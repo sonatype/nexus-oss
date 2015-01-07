@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_LDAP_CREATE_TITLE'),
   defaultFocus: 'name',
 
   /**

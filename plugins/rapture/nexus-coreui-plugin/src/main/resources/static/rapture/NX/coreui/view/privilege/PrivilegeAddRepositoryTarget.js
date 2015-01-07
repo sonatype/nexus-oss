@@ -28,7 +28,6 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'),
   defaultFocus: 'name',
 
   initComponent: function () {

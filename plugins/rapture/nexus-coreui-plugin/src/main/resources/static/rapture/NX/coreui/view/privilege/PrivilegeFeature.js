@@ -30,5 +30,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeFeature', {
 
   actions: [
     { xtype: 'button', text: NX.I18n.get('ADMIN_PRIVILEGES_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
-  ]
+  ],
+
+  createWizard: { xtype: 'nx-coreui-privilege-add-repositorytarget' }
 });

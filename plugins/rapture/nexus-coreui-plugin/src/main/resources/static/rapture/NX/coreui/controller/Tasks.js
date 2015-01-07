@@ -222,9 +222,12 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    */
   showAddWindow: function() {
-    Ext.widget('nx-coreui-task-add', {
-      taskTypeStore: this.getTaskTypeStore()
-    });
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-task-add', { taskTypeStore: this.getTaskTypeStore() }));
   },
 
   /**

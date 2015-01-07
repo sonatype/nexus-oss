@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),
   defaultFocus: 'id',
 
   initComponent: function() {

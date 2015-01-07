@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.user.UserAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_USERS_CREATE_TITLE'),
   defaultFocus: 'userId',
 
   /**

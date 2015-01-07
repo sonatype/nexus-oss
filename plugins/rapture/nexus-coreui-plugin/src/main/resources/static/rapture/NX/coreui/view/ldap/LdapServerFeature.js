@@ -36,5 +36,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerFeature', {
 
   actions: [
     { xtype: 'button', text: NX.I18n.get('ADMIN_LDAP_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
-  ]
+  ],
+
+  createWizard: { xtype: 'nx-coreui-ldapserver-add' }
 });

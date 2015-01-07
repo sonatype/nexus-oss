@@ -25,8 +25,6 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'),
-
   /**
    * @override
    */

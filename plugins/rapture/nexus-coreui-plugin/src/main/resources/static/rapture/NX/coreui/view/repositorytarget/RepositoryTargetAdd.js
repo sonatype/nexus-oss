@@ -25,7 +25,6 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_TARGETS_CREATE_TITLE'),
   defaultFocus: 'name',
 
   /**

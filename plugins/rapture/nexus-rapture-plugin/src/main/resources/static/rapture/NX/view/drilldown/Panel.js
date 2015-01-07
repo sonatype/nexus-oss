@@ -134,8 +134,8 @@ Ext.define('NX.view.drilldown.Panel', {
 
       // Load the component (if specified)
       if (cmp) {
-        if (me.items.items[index].items[1]) {
-          me.items.items[index].remove(me.items.items[index].items[1], true);
+        if (me.items.items[index].items.items[1]) {
+          me.items.items[index].remove(me.items.items[index].items.items[1], true);
         }
         me.items.items[index].add(cmp);
       }

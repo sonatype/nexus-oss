@@ -24,8 +24,6 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TITLE'),
-
   /**
    * @override
    */

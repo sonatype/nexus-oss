@@ -40,5 +40,7 @@ Ext.define('NX.coreui.view.capability.CapabilityFeature', {
     '-',
     { xtype: 'button', text: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_ENABLE_BUTTON'), action: 'enable', disabled: true, glyph: 'xf04b@FontAwesome' /* fa-play */ },
     { xtype: 'button', text: NX.I18n.get('ADMIN_CAPABILITIES_DETAILS_DISABLE_BUTTON'), action: 'disable', disabled: true, glyph: 'xf04d@FontAwesome' /* fa-stop */ }
-  ]
+  ],
+
+  createWizard: { xtype: 'panel' }
 });
