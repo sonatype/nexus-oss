@@ -66,7 +66,7 @@ public abstract class AbstractLdapIT
     if (isStartLdapServer()) {
       ldapServer.start();
     }
-    mayCreateLdapClientConfiguration();
+    safeCreateLdapClientConfiguration();
   }
 
   protected boolean isStartLdapServer() {
@@ -86,12 +86,10 @@ public abstract class AbstractLdapIT
         .build();
   }
 
-  protected void mayCreateLdapClientConfiguration() throws Exception {
+  protected void safeCreateLdapClientConfiguration() throws Exception {
     final List<Configuration> configurations = getLdapClient().get();
     for (Configuration configuration : configurations) {
-      if (configuration.getName().equals(getTestId())) {
-        return;
-      }
+      configuration.remove();
     }
     createLdapClientConfiguration();
   }
