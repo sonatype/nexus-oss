@@ -10,13 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.ldap.internal.usermanagement;
+package org.sonatype.security.realms.ldap.usermanagement;
 
 import java.util.Map;
 
 import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.realms.ldap.internal.LdapITSupport;
-import org.sonatype.security.realms.ldap.internal.MockLdapConfigurationSource;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 

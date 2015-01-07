@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.ldap.internal.realms;
+package org.sonatype.security.realms.ldap.realms;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +25,7 @@ import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

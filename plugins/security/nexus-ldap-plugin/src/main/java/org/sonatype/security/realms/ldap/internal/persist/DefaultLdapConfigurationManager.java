@@ -27,13 +27,12 @@ import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.persist.entity.Validator;
-import org.sonatype.security.realms.ldap.internal.realms.LdapRealm;
+import org.sonatype.security.realms.ldap.realms.LdapRealm;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
