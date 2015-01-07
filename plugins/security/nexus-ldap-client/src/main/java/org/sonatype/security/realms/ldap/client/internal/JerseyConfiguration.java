@@ -25,9 +25,11 @@ import org.sonatype.security.realms.ldap.client.Connection.Protocol;
 import org.sonatype.security.realms.ldap.client.Mapping;
 import org.sonatype.security.realms.ldap.client.internal.JerseyConfiguration.ConfigurationXO;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import org.apache.commons.codec.binary.Base64;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -182,28 +184,35 @@ public class JerseyConfiguration
     final ConfigurationXO result = new ConfigurationXO();
     result.name = checkNotNull(dto.getName());
     final Connection connection = new Connection();
-    connection.setSearchBase(dto.getConnectionInfo().getSearchBase());
-    connection.setSystemUsername(dto.getConnectionInfo().getSystemUsername());
-    connection.setSystemPassword(dto.getConnectionInfo().getSystemPassword());
-    connection.setAuthScheme(dto.getConnectionInfo().getAuthScheme());
+    final LdapConnectionInfoDTO dtoConnection = dto.getConnectionInfo();
+    connection.setSearchBase(dtoConnection.getSearchBase());
+    if (!Strings.isNullOrEmpty(dtoConnection.getSystemUsername())) {
+      connection.setSystemUsername(new String(Base64.decodeBase64(
+          dtoConnection.getSystemUsername().getBytes(Charsets.UTF_8)), Charsets.UTF_8));
+    }
+    if (!Strings.isNullOrEmpty(dtoConnection.getSystemPassword())) {
+      connection.setSystemPassword(new String(Base64.decodeBase64(
+          dtoConnection.getSystemPassword().getBytes(Charsets.UTF_8)), Charsets.UTF_8));
+    }
+    connection.setAuthScheme(dtoConnection.getAuthScheme());
     final Host host = new Host(
-        Protocol.valueOf(dto.getConnectionInfo().getProtocol()),
-        dto.getConnectionInfo().getHost(),
-        dto.getConnectionInfo().getPort()
+        Protocol.valueOf(dtoConnection.getProtocol()),
+        dtoConnection.getHost(),
+        dtoConnection.getPort()
     );
     connection.setHost(host);
-    if (!Strings.isNullOrEmpty(dto.getConnectionInfo().getBackupMirrorHost())) {
+    if (!Strings.isNullOrEmpty(dtoConnection.getBackupMirrorHost())) {
       final Host backupHost = new Host(
-          Protocol.valueOf(dto.getConnectionInfo().getBackupMirrorProtocol()),
-          dto.getConnectionInfo().getBackupMirrorHost(),
-          dto.getConnectionInfo().getBackupMirrorPort()
+          Protocol.valueOf(dtoConnection.getBackupMirrorProtocol()),
+          dtoConnection.getBackupMirrorHost(),
+          dtoConnection.getBackupMirrorPort()
       );
       connection.setBackupHost(backupHost);
     }
-    connection.setSaslRealm(dto.getConnectionInfo().getRealm());
-    connection.setConnectionTimeout(dto.getConnectionInfo().getConnectionTimeout());
-    connection.setConnectionRetryDelay(dto.getConnectionInfo().getConnectionRetryDelay());
-    connection.setCacheTimeout(dto.getConnectionInfo().getCacheTimeout());
+    connection.setSaslRealm(dtoConnection.getRealm());
+    connection.setConnectionTimeout(dtoConnection.getConnectionTimeout());
+    connection.setConnectionRetryDelay(dtoConnection.getConnectionRetryDelay());
+    connection.setCacheTimeout(dtoConnection.getCacheTimeout());
     result.connection = connection;
 
     final Mapping mapping = new Mapping();
@@ -248,8 +257,12 @@ public class JerseyConfiguration
     infoDto.setProtocol(connInfo.getHost().getProtocol().name());
     infoDto.setRealm(connInfo.getSaslRealm());
     infoDto.setSearchBase(connInfo.getSearchBase());
-    infoDto.setSystemUsername(connInfo.getSystemUsername());
-    infoDto.setSystemPassword(connInfo.getSystemPassword());
+    if (!Strings.isNullOrEmpty(connInfo.getSystemUsername())) {
+      infoDto.setSystemUsername(Base64.encodeBase64String(connInfo.getSystemUsername().getBytes(Charsets.UTF_8)));
+    }
+    if (!Strings.isNullOrEmpty(connInfo.getSystemPassword())) {
+      infoDto.setSystemPassword(Base64.encodeBase64String(connInfo.getSystemPassword().getBytes(Charsets.UTF_8)));
+    }
     dto.setConnectionInfo(infoDto);
 
     final LdapUserAndGroupAuthConfigurationDTO mappingDto = new LdapUserAndGroupAuthConfigurationDTO();
