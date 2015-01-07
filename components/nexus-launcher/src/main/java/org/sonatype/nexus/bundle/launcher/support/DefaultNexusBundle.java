@@ -79,6 +79,12 @@ public class DefaultNexusBundle
 
   private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "useBundlePluginsIfPresent";
 
+  private static final int COMMAND_MONITOR_READY_CHECK_INITIAL_DELAY_SECONDS = 1;
+
+  private static final int COMMAND_MONITOR_READY_CHECK_TIMEOUT_SECONDS = 15;
+
+  private static final int COMMAND_MONITOR_READY_CHECK_INTERVAL_SECONDS = 1;
+
   /**
    * File task builder.
    * Cannot be null.
@@ -329,7 +335,6 @@ public class DefaultNexusBundle
     }
     else {
       // when not suspending, we expect the internal command monitor thread to start well before bundle is ready
-      // so we only give it 10 seconds to be available
       log.info("{} ({}) pinging command monitor at {}:{}", getName(), getConfiguration().getId(),
           getConfiguration().getHostName(), commandMonitorPort);
       final boolean monitorInstalled = new TimedCondition()
@@ -342,16 +347,18 @@ public class DefaultNexusBundle
           new CommandMonitorTalker(LOCALHOST, commandMonitorPort).send(PingCommand.NAME);
           return true;
         }
-      }.await(Time.seconds(1), Time.seconds(10), Time.seconds(1));
+      }.await(Time.seconds(COMMAND_MONITOR_READY_CHECK_INITIAL_DELAY_SECONDS),
+          Time.seconds(COMMAND_MONITOR_READY_CHECK_TIMEOUT_SECONDS),
+          Time.seconds(COMMAND_MONITOR_READY_CHECK_INTERVAL_SECONDS));
       if (monitorInstalled) {
         log.debug("{} ({}) command monitor detected at {}:{}", getName(), getConfiguration().getId(),
             getConfiguration().getHostName(), commandMonitorPort);
       }
       else {
         throw new RuntimeException(
-            format("%s (%s) no command monitor detected at %s:%s within 10 seconds", getName(),
+            format("%s (%s) no command monitor detected at %s:%s within %s seconds", getName(),
                 getConfiguration().getId(), getConfiguration().getHostName(),
-                commandMonitorPort
+                commandMonitorPort, COMMAND_MONITOR_READY_CHECK_TIMEOUT_SECONDS
             )
         );
       }
