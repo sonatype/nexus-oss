@@ -32,6 +32,7 @@ import org.apache.shiro.web.servlet.AdviceFilter;
  * value and finally the Restlet version header value at the end.
  *
  * @see NexusHttpServerConverter
+ * @since 2.11.2
  */
 @Named
 @Singleton

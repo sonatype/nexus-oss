@@ -21,6 +21,8 @@ import org.restlet.util.Series;
 /**
  * Custom {@link HttpServerConverter} that prevents restlet from adding general headers
  * that would duplicate those added elsewhere.
+ *
+ * @since 2.11.2
  */
 public class NexusHttpServerConverter extends HttpServerConverter
 {

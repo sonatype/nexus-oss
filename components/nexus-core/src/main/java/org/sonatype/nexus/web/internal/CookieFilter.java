@@ -26,7 +26,7 @@ import org.apache.shiro.web.servlet.AdviceFilter;
 /**
  * Cookie munging filter.
  *
- * @since 2.11.1
+ * @since 2.11.2
  */
 @Named
 @Singleton
