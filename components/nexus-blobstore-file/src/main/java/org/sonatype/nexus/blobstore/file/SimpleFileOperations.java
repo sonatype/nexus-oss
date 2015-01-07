@@ -19,9 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import org.sonatype.nexus.blobstore.file.FileOperations;
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.ByteStreams;
@@ -47,7 +45,7 @@ public class SimpleFileOperations
     // Ensure path exists for new blob
     Path dir = path.getParent();
     checkNotNull(dir, "Null parent for path: %s", path);
-    DirSupport.mkdir(dir);
+    DirectoryHelper.mkdir(dir);
 
     final MetricsInputStream input = new MetricsInputStream(data);
     try {

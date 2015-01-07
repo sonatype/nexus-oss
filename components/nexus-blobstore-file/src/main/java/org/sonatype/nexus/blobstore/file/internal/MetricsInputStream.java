@@ -19,10 +19,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
-import org.sonatype.nexus.orient.Hex;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.CountingInputStream;
+
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 /**
  * A utility to collect metrics about the content of an input stream.
@@ -47,7 +48,7 @@ public class MetricsInputStream
   }
 
   public String getMessageDigest() {
-    return Hex.encode(messageDigest.digest());
+    return encodeHexString(messageDigest.digest());
   }
 
   public long getSize() {

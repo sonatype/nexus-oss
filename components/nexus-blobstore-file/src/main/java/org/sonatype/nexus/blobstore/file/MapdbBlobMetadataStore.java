@@ -29,7 +29,6 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;
@@ -90,7 +89,7 @@ public class MapdbBlobMetadataStore
 
   @Override
   protected void doStart() throws Exception {
-    DirSupport.mkdir(file.getParentFile());
+    DirectoryHelper.mkdir(file.getParentFile());
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
         .makeTxMaker();
