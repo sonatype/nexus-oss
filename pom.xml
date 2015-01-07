@@ -425,6 +425,14 @@
               <version>1.0</version>
             </signature>
           </configuration>
+          <dependencies>
+            <!-- MANIMALSNIFFER-51 -->
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm-all</artifactId>
+              <version>5.0.3</version>
+            </dependency>
+          </dependencies>
         </plugin>
 
         <!--
