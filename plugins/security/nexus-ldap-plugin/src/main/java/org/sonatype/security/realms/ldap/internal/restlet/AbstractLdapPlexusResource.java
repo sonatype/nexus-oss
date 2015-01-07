@@ -20,7 +20,6 @@ import javax.net.ssl.SSLContext;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
-import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
@@ -97,7 +96,7 @@ public abstract class AbstractLdapPlexusResource
       this.doDelete(context, request, response);
     }
     catch (IllegalArgumentException e) {
-      throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -109,7 +108,7 @@ public abstract class AbstractLdapPlexusResource
       return this.doGet(context, request, response, variant);
     }
     catch (IllegalArgumentException e) {
-      throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -121,7 +120,7 @@ public abstract class AbstractLdapPlexusResource
       return this.doPost(context, request, response, payload);
     }
     catch (IllegalArgumentException e) {
-      throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -133,7 +132,7 @@ public abstract class AbstractLdapPlexusResource
       return this.doPut(context, request, response, payload);
     }
     catch (IllegalArgumentException e) {
-      throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
