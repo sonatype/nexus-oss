@@ -81,7 +81,7 @@ public class DefaultNexusBundle
 
   private static final String USE_BUNDLE_PLUGINS_IF_PRESENT = "useBundlePluginsIfPresent";
 
-  private static final int COMMAND_MONITOR_READY_CHECK_INITIAL_DELAY_SECONDS = 2;
+  private static final int COMMAND_MONITOR_READY_CHECK_INITIAL_DELAY_SECONDS = 1;
 
   private static final int COMMAND_MONITOR_READY_CHECK_TIMEOUT_SECONDS = 15;
 
