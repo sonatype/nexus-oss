@@ -21,9 +21,8 @@ import java.security.NoSuchAlgorithmException;
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
 
 import com.google.common.base.Throwables;
+import com.google.common.io.BaseEncoding;
 import com.google.common.io.CountingInputStream;
-
-import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 /**
  * A utility to collect metrics about the content of an input stream.
@@ -47,8 +46,10 @@ public class MetricsInputStream
     this.countingInputStream = countingStream;
   }
 
+  private static final BaseEncoding HEX = BaseEncoding.base16().lowerCase();
+
   public String getMessageDigest() {
-    return encodeHexString(messageDigest.digest());
+    return HEX.encode(messageDigest.digest());
   }
 
   public long getSize() {
