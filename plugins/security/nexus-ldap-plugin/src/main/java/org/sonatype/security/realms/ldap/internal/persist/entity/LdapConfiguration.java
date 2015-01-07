@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.realms.ldap.internal.persist.entity;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public final class LdapConfiguration
 {
@@ -78,7 +78,8 @@ public final class LdapConfiguration
   }
 
   public void setConnection(final Connection connection) {
-    this.connection = checkNotNull(connection);
+    checkArgument(connection != null, "connection null");
+    this.connection = connection;
   }
 
   public Mapping getMapping() {
@@ -86,6 +87,7 @@ public final class LdapConfiguration
   }
 
   public void setMapping(final Mapping mapping) {
-    this.mapping = checkNotNull(mapping);
+    checkArgument(mapping != null, "mapping null");
+    this.mapping = mapping;
   }
 }

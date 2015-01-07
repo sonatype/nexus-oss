@@ -15,9 +15,9 @@ package org.sonatype.security.realms.ldap.internal.persist.entity;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Connection
 {
@@ -49,7 +49,8 @@ public final class Connection
     }
 
     public void setProtocol(final Protocol protocol) {
-      this.protocol = checkNotNull(protocol);
+      checkArgument(protocol != null, "protocol null");
+      this.protocol = protocol;
     }
 
     public String getHostName() {
@@ -57,7 +58,8 @@ public final class Connection
     }
 
     public void setHostName(final String hostName) {
-      this.hostName = checkNotNull(hostName);
+      checkArgument(!Strings.isNullOrEmpty(hostName), "hostName empty");
+      this.hostName = hostName;
     }
 
     public int getPort() {
@@ -138,7 +140,8 @@ public final class Connection
   }
 
   public void setSearchBase(final String searchBase) {
-    this.searchBase = checkNotNull(searchBase);
+    checkArgument(!Strings.isNullOrEmpty(searchBase), "searchBase empty");
+    this.searchBase = searchBase;
   }
 
   public String getSystemUsername() {
@@ -170,7 +173,8 @@ public final class Connection
   }
 
   public void setHost(final Host host) {
-    this.host = checkNotNull(host);
+    checkArgument(host != null, "host null");
+    this.host = host;
   }
 
   @Nullable
