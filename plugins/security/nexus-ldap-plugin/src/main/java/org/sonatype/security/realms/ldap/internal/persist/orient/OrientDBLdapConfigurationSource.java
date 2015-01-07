@@ -27,7 +27,9 @@ import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -95,35 +97,47 @@ public class OrientDBLdapConfigurationSource
 
   @Override
   public String create(final LdapConfiguration ldapConfiguration) {
-    try (ODatabaseDocumentTx db = openDb()) {
-      db.begin();
-      try {
-        ldapConfiguration.setId(entityIdFactory.newId().asUniqueString());
-        entityAdapter.add(db, ldapConfiguration);
-        return ldapConfiguration.getId();
+    try {
+      try (ODatabaseDocumentTx db = openDb()) {
+        db.begin();
+        try {
+          ldapConfiguration.setId(entityIdFactory.newId().asUniqueString());
+          entityAdapter.add(db, ldapConfiguration);
+          return ldapConfiguration.getId();
+        }
+        finally {
+          db.commit();
+        }
       }
-      finally {
-        db.commit();
-      }
+    }
+    catch (ORecordDuplicatedException e) {
+      throw new IllegalArgumentException(
+          "Duplicated record: id=" + ldapConfiguration.getId() + ", name=" + ldapConfiguration.getName(), e);
     }
   }
 
   @Override
   public boolean update(final LdapConfiguration ldapConfiguration) {
-    try (ODatabaseDocumentTx db = openDb()) {
-      db.begin();
-      try {
-        final ODocument doc = entityAdapter.selectById(db, ldapConfiguration.getId());
-        if (doc != null) {
-          entityAdapter.edit(db, doc, ldapConfiguration);
-          return true;
+    try {
+      try (ODatabaseDocumentTx db = openDb()) {
+        db.begin();
+        try {
+          final ODocument doc = entityAdapter.selectById(db, ldapConfiguration.getId());
+          if (doc != null) {
+            entityAdapter.edit(db, doc, ldapConfiguration);
+            return true;
+          }
+        }
+        finally {
+          db.commit();
         }
       }
-      finally {
-        db.commit();
-      }
+      return false;
     }
-    return false;
+    catch (OConcurrentModificationException e) {
+      throw new IllegalArgumentException(
+          "Stale update attempt id=" + ldapConfiguration.getId() + ", name=" + ldapConfiguration.getName(), e);
+    }
   }
 
   @Override
