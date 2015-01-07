@@ -38,7 +38,7 @@ public class NXCM1356LdapUpgradeFromOssIT
     // Assuming the LDAP realm
     List<String> realms = globalConfig.getSecurityRealms();
     Assert.assertEquals("Ldap realm was not configured, realms found are: " + realms, realms.get(0),
-        "LdapAuthenticatingRealm");
+        "LdapRealm");
   }
 
   protected boolean isStartLdapServer() {
