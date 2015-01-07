@@ -114,13 +114,13 @@ Ext.define('NX.coreui.controller.Repositories', {
           click: me.navigateToBrowseMode
         },
         'nx-coreui-repository-list button[action=new]': {
-          click: me.showSelectTemplateWindow
+          click: me.showSelectTemplatePanel
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repository-selecttemplate': {
-          selectionchange: me.showAddWindow
+          selectionchange: me.showAddRepositoryPanel
         }
       }
     });
@@ -160,6 +160,34 @@ Ext.define('NX.coreui.controller.Repositories', {
       settingsPanel.loadRecord(model);
 
       Ext.resumeLayouts(true);
+    }
+  },
+
+  /**
+   * @private
+   */
+  showSelectTemplatePanel: function() {
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
+    me.loadCreateWizard(1, true, null);
+  },
+
+  /**
+   * @private
+   */
+  showAddRepositoryPanel: function(selectionModel, selected) {
+    var me = this,
+      template = Ext.apply({}, selected[0].data),
+      cmpClass = me.findComponent('add', template, false),
+      feature = me.getFeature();
+
+    if (cmpClass) {
+      // Show the second panel in the create wizard, and set the breadcrumb
+      feature.setItemName(2, NX.I18n.format('ADMIN_REPOSITORIES_CREATE_TITLE', template.providerName));
+      me.loadCreateWizard(2, true, cmpClass.create({ template: template }));
     }
   },
 
@@ -268,32 +296,6 @@ Ext.define('NX.coreui.controller.Repositories', {
           me.updateRepositoryModels(response.data);
         }
       });
-    }
-  },
-
-  /**
-   * @private
-   */
-  showSelectTemplateWindow: function() {
-    var me = this,
-      feature = me.getFeature();
-
-    feature.setItemName(1, "Create Repository");
-    me.loadCreateWizard(0, true, null);
-  },
-
-  /**
-   * @private
-   */
-  showAddWindow: function(selectionModel, selected) {
-    var me = this,
-        template = Ext.apply({}, selected[0].data),
-        cmpClass = me.findComponent('add', template, false),
-        feature = me.getFeature();
-
-    if (cmpClass) {
-      feature.setItemName(2, template.providerName);
-      me.loadCreateWizard(1, true, cmpClass.create({ template: template }));
     }
   },
 

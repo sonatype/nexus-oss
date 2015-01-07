@@ -24,8 +24,6 @@ Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
     'NX.I18n'
   ],
 
-  //title: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'),
-
   store: 'RepositoryTemplate',
   columns: [
     {
@@ -38,12 +36,6 @@ Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
     },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_PROVIDER_COLUMN'), dataIndex: 'providerName', flex: 2 },
     { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TYPE_COLUMN'), dataIndex: 'type', flex: 1 }
-  ]//,
-
-  /*buttons: [
-    { text: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_CANCEL_BUTTON'), handler: function () {
-      this.up('window').close();
-    }}
-  ]*/
+  ]
 
 });

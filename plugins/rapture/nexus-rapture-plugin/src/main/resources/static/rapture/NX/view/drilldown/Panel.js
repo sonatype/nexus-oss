@@ -124,9 +124,6 @@ Ext.define('NX.view.drilldown.Panel', {
   showCreateWizard: function (index, animate, cmp) {
     var me = this;
 
-    // Create wizard is +1 relative to the root drilldown item
-    ++index;
-
     if (me.items.items[index].el) {
 
       // Hack to prevent resize events until the animation is complete
@@ -215,12 +212,12 @@ Ext.define('NX.view.drilldown.Panel', {
               disabled: (i === me.currentIndex ? true : false), // Disabled if it’s the last item in the breadcrumb
               text: me.items.items[j].itemName,
               handler: function() {
-                me.showChild(j, true);
-
-                // Set the bookmark
                 var bookmark = me.items.items[j].itemBookmark;
                 if (bookmark) {
+                  me.showChild(j, true);
                   NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
+                } else {
+                  me.showCreateWizard(j, true, null);
                 }
               }
             }

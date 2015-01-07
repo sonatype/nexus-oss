@@ -295,6 +295,12 @@ Ext.define('NX.controller.Drilldown', {
     var me = this,
       feature = me.getFeature();
 
+    // Reset all non-root bookmarks
+    for (var i = 1; i <= index; ++i) {
+      feature.setItemBookmark(i, null);
+    }
+
+    // Show the specified step in the wizard
     feature.showCreateWizard(index, animate, cmp);
   },
 
