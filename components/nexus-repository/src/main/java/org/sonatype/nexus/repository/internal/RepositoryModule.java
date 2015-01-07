@@ -17,6 +17,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryFactory;
 import org.sonatype.nexus.repository.manager.RepositoryImpl;
+import org.sonatype.nexus.repository.stateguard.StateGuardModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -30,6 +31,8 @@ public class RepositoryModule
 {
   @Override
   protected void configure() {
+    install(new StateGuardModule());
+
     install(new FactoryModuleBuilder()
             .implement(Repository.class, RepositoryImpl.class)
             .build(RepositoryFactory.class)

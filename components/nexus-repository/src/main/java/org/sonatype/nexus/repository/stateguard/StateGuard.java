@@ -10,10 +10,9 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.util;
+package org.sonatype.nexus.repository.stateguard;
 
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -29,23 +28,24 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Simple state guard.
+ * State guard provides support to transition from state to state and execute an action, as well as guard
+ * execution of an action if state is acceptable.
  *
  * @since 3.0
  */
-public class SimpleStateGuard<StateT extends Enum>
+public class StateGuard
     extends ComponentSupport
 {
   private final ReadWriteLock lock;
 
   @Nullable
-  private final StateT failure;
+  private final String failure;
 
-  private StateT current;
+  private String current;
 
-  SimpleStateGuard(final ReadWriteLock lock,
-                   final StateT initial,
-                   final @Nullable StateT failure)
+  StateGuard(final ReadWriteLock lock,
+             final String initial,
+             final @Nullable String failure)
   {
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
@@ -73,7 +73,7 @@ public class SimpleStateGuard<StateT extends Enum>
   /**
    * Returns the current state.
    */
-  public StateT getCurrent() {
+  public String getCurrent() {
     Lock lock = readLock();
     try {
       return current;
@@ -85,11 +85,13 @@ public class SimpleStateGuard<StateT extends Enum>
 
   /**
    * Check if the current state is given state.
+   *
+   * Code executed after may not have the same state, to execute and ensure state is allowed use {@link #guard} instead.
    */
-  public boolean is(final StateT state) {
+  public boolean is(final String state) {
     Lock lock = readLock();
     try {
-      return current == state;
+      return current.equals(state);
     }
     finally {
       lock.unlock();
@@ -98,9 +100,10 @@ public class SimpleStateGuard<StateT extends Enum>
 
   /**
    * Ensure the current state is one of allowed.
+   *
+   * Code executed after may not have the same state, to execute and ensure state is allowed use {@link #guard} instead.
    */
-  @SafeVarargs
-  public final void ensure(final StateT... allowed) {
+  public void ensure(final String... allowed) {
     checkNotNull(allowed);
     checkArgument(allowed.length != 0);
 
@@ -113,29 +116,28 @@ public class SimpleStateGuard<StateT extends Enum>
     }
   }
 
-  private void _ensure(final StateT[] allowed) {
-    for (StateT allow : allowed) {
-      if (current == allow) {
+  private void _ensure(final String[] allowed) {
+    for (String allow : allowed) {
+      if (current.equals(allow)) {
         return;
       }
     }
 
-    throw new IllegalStateException("Invalid state: " + current.name() + "; allowed: " + Arrays.toString(allowed));
+    throw new IllegalStateException("Invalid state: " + current + "; allowed: " + Arrays.toString(allowed));
   }
 
   /**
    * Create a transition to given state.
    */
-  public Transition transition(final StateT to) {
-    return new Transition(to);
+  public Transition transition(final String to) {
+    return new TransitionImpl(to);
   }
 
   /**
    * Create a guard which allows execution in the given states.
    */
-  @SafeVarargs
-  public final Guard guard(final StateT... allowed) {
-    return new Guard(allowed);
+  public Guard guard(final String... allowed) {
+    return new GuardImpl(allowed);
   }
 
   //
@@ -145,26 +147,36 @@ public class SimpleStateGuard<StateT extends Enum>
   /**
    * Transition from current state to target state and execute an action.
    */
-  public class Transition
+  private class TransitionImpl
+    implements Transition
   {
-    private final StateT to;
+    private final String to;
 
     @Nullable
-    private StateT[] allowed;
+    private String[] allowed;
 
-    Transition(final StateT to) {
+    private TransitionImpl(final String to) {
       this.to = checkNotNull(to);
     }
 
-    @SafeVarargs
-    public final Transition from(final StateT... allowed) {
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "to='" + to + '\'' +
+          ", allowed=" + Arrays.toString(allowed) +
+          '}';
+    }
+
+    public TransitionImpl from(final String... allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
       return this;
     }
 
-    public void run(final Action action) throws Exception {
+    @Override
+    @Nullable
+    public <V> V run(final Action<V> action) throws Exception {
       Lock lock = writeLock();
       try {
         if (allowed != null) {
@@ -174,10 +186,12 @@ public class SimpleStateGuard<StateT extends Enum>
         try {
           log.trace("Transitioning: {} -> {}", current, to);
 
-          action.run();
+          V result = action.run();
           current = to;
 
           log.trace("Transitioned: {}", to);
+
+          return result;
         }
         catch (Throwable t) {
           log.error("Failed transition: {} -> {}", current, to, t);
@@ -204,101 +218,74 @@ public class SimpleStateGuard<StateT extends Enum>
   /**
    * Execute an action or callable if current state is allowed.
    */
-  public class Guard
+  private class GuardImpl
+    implements Guard
   {
-    private final StateT[] allowed;
+    private final String[] allowed;
 
-    Guard(final StateT[] allowed) {
+    private GuardImpl(final String[] allowed) {
       checkNotNull(allowed);
       checkArgument(allowed.length != 0);
       this.allowed = allowed;
     }
 
-    public void run(final Action action) throws Exception {
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "allowed=" + Arrays.toString(allowed) +
+          '}';
+    }
+
+    @Override
+    @Nullable
+    public <V> V run(final Action<V> action) throws Exception {
       checkNotNull(action);
 
       Lock lock = readLock();
       try {
         _ensure(allowed);
-        action.run();
+        return action.run();
       }
       finally {
         lock.unlock();
       }
     }
-
-    public void runX(final Action action) {
-      try {
-        run(action);
-      }
-      catch (Exception e) {
-        throw Throwables.propagate(e);
-      }
-    }
-
-    public <V> V run(final Callable<V> callable) throws Exception {
-      checkNotNull(callable);
-
-      Lock lock = readLock();
-      try {
-        _ensure(allowed);
-        return callable.call();
-      }
-      finally {
-        lock.unlock();
-      }
-    }
-
-    public <V> V runX(final Callable<V> callable) {
-      try {
-        return run(callable);
-      }
-      catch (Exception e) {
-        throw Throwables.propagate(e);
-      }
-    }
-  }
-
-  //
-  // Action
-  //
-
-  public static interface Action
-  {
-    void run() throws Exception;
   }
 
   //
   // Builder
   //
 
-  public static class Builder<StateT extends Enum>
+  /**
+   * {@link StateGuard} builder.
+   */
+  public static class Builder
   {
     private ReadWriteLock lock;
 
-    private StateT initial;
+    private String initial;
 
-    private StateT failure;
+    private String failure;
 
     // final states?
 
-    public Builder<StateT> lock(final ReadWriteLock lock) {
+    public Builder lock(final ReadWriteLock lock) {
       this.lock = lock;
       return this;
     }
 
-    public Builder<StateT> initial(final StateT state) {
+    public Builder initial(final String state) {
       this.initial = state;
       return this;
     }
 
-    public Builder<StateT> failure(final StateT state) {
+    public Builder failure(final String state) {
       this.failure = state;
       return this;
     }
 
-    public SimpleStateGuard<StateT> create() {
-      return new SimpleStateGuard<>(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
+    public StateGuard create() {
+      return new StateGuard(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
     }
   }
 }

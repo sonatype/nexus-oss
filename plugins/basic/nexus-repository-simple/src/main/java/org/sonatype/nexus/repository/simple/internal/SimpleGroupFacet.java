@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
+import org.sonatype.nexus.repository.stateguard.Guarded;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Lists;
@@ -110,9 +111,9 @@ public class SimpleGroupFacet
    */
   @Nullable
   @Override
+  @Guarded(by=STARTED)
   public SimpleContent get(final String name) {
     checkNotNull(name);
-    states.ensure(STARTED);
 
     // TODO: Should this really be going through the repository's view?
     // TODO: ... and thus need the Request and likely should move this logic to handler?
@@ -152,6 +153,7 @@ public class SimpleGroupFacet
    * second with same name is masked by former.
    */
   @Override
+  @Guarded(by=STARTED)
   public Set<Entry<String, SimpleContent>> entries() {
     Map<String, SimpleContent> union = Maps.newHashMap();
 

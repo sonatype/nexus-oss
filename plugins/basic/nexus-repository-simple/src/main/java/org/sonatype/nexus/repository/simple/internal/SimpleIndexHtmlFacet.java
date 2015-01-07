@@ -24,6 +24,7 @@ import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
+import org.sonatype.nexus.repository.stateguard.Guarded;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
@@ -63,9 +64,8 @@ public class SimpleIndexHtmlFacet
     htmlCache = null;
   }
 
+  @Guarded(by=STARTED)
   public String get() {
-    states.ensure(STARTED);
-
     // resolve volatile to local for thread sanity
     String html = htmlCache;
 

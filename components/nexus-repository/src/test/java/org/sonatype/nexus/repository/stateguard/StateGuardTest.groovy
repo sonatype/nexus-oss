@@ -10,61 +10,67 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.util
+package org.sonatype.nexus.repository.stateguard
 
 import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.DESTROYED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.FAILED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.INITIALISED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.NEW
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STARTED
-import static org.sonatype.nexus.repository.util.SimpleStateGuardTest.State.STOPPED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.DESTROYED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.FAILED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.INITIALISED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.NEW
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STARTED
+import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STOPPED
 
 /**
- * Tests for {@link SimpleStateGuard}.
+ * Tests for {@link StateGuard}.
  */
-class SimpleStateGuardTest
+class StateGuardTest
     extends TestSupport
 {
-  static enum State
+  static class State
   {
-    NEW,
-    INITIALISED,
-    STARTED,
-    STOPPED,
-    DESTROYED,
-    FAILED
+    public static final String NEW = 'NEW'
+
+    public static final String INITIALISED = 'INITIALISED'
+
+    public static final String STARTED = 'STARTED'
+
+    public static final String STOPPED = 'STOPPED'
+
+    public static final String DESTROYED = 'DESTROYED'
+
+    public static final String FAILED = 'FAILED'
   }
 
   private static class TriggeredAction
-      implements SimpleStateGuard.Action
+      implements Action<Void>
   {
     boolean triggered = false
 
     @Override
-    void run() throws Exception {
+    Void run() throws Exception {
       triggered = true
+      return null;
     }
   }
 
   private static class NopAction
-      implements SimpleStateGuard.Action
+      implements Action<Void>
   {
     @Override
-    void run() throws Exception {
-      // nop
+    Void run() throws Exception {
+      return null;
     }
   }
 
-  private SimpleStateGuard<State> underTest
+  private StateGuard underTest
 
   @Before
   void setUp() {
-    underTest = new SimpleStateGuard.Builder<State>()
+    underTest = new StateGuard.Builder()
         .initial(NEW)
         .failure(FAILED)
         .create()
@@ -102,14 +108,16 @@ class SimpleStateGuardTest
           .run(stoppedAction)
     }
 
-    def destroyedAction = new TriggeredAction() {
+    def destroyedAction = new Action<Void>() {
+      boolean triggered
       @Override
-      void run() throws Exception {
+      Void run() throws Exception {
         if (underTest.is(STARTED)) {
           stop()
         }
         assert underTest.current == STOPPED
-        super.run()
+        triggered = true
+        return null
       }
     }
 
@@ -152,9 +160,9 @@ class SimpleStateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new SimpleStateGuard.Action() {
+          .run(new Action<Void>() {
         @Override
-        void run() throws Exception {
+        Void run() throws Exception {
           throw new FailureException()
         }
       })
@@ -181,9 +189,9 @@ class SimpleStateGuardTest
     try {
       underTest.transition(INITIALISED)
           .from(NEW)
-          .run(new SimpleStateGuard.Action() {
+          .run(new Action<Void>() {
         @Override
-        void run() throws Exception {
+        Void run() throws Exception {
           throw new FailureError()
         }
       })

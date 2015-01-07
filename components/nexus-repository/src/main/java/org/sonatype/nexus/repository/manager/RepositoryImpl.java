@@ -24,9 +24,11 @@ import org.sonatype.nexus.repository.RepositoryStartedEvent;
 import org.sonatype.nexus.repository.RepositoryStoppedEvent;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.stateguard.Guarded;
+import org.sonatype.nexus.repository.stateguard.StateGuard;
+import org.sonatype.nexus.repository.stateguard.StateGuardAware;
+import org.sonatype.nexus.repository.stateguard.Transitions;
 import org.sonatype.nexus.repository.util.MultipleFailures;
-import org.sonatype.nexus.repository.util.SimpleStateGuard;
-import org.sonatype.nexus.repository.util.SimpleStateGuard.Action;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -47,7 +49,7 @@ import static org.sonatype.nexus.repository.manager.RepositoryImpl.State.STOPPED
  */
 public class RepositoryImpl
     extends ComponentSupport
-    implements Repository
+    implements Repository, StateGuardAware
 {
   private final EventBus eventBus;
 
@@ -104,158 +106,119 @@ public class RepositoryImpl
   // State
   //
 
-  static enum State
+  static final class State
   {
-    NEW,
-    INITIALISED,
-    STARTED,
-    STOPPED,
-    DESTROYED,
-    FAILED
+    public static final String NEW = "NEW";
+    public static final String INITIALISED = "INITIALISED";
+    public static final String STARTED = "STARTED";
+    public static final String STOPPED = "STOPPED";
+    public static final String DESTROYED = "DESTROYED";
+    public static final String FAILED = "FAILED";
   }
 
-  private final SimpleStateGuard<State> states = new SimpleStateGuard.Builder<State>()
+  private final StateGuard states = new StateGuard.Builder()
       .initial(NEW)
       .failure(FAILED)
       .create();
+
+  @Override
+  @Nonnull
+  public StateGuard getStateGuard() {
+    return states;
+  }
 
   //
   // Lifecycle
   //
 
   @Override
+  @Transitions(from=NEW, to=INITIALISED)
   public void init(final Configuration configuration) throws Exception {
-    checkNotNull(configuration);
-    final RepositoryImpl self = this;
-
-    states.transition(INITIALISED)
-        .from(NEW)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            self.configuration = configuration;
-            self.name = configuration.getRepositoryName();
-          }
-        });
+    this.configuration = checkNotNull(configuration);
+    this.name = configuration.getRepositoryName();
   }
 
   @Override
+  @Guarded(by=STOPPED)
   public void update(final Configuration configuration) throws Exception {
-    checkNotNull(configuration);
-    final RepositoryImpl self = this;
+    this.configuration = checkNotNull(configuration);
 
-    states.guard(STOPPED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            self.configuration = configuration;
-
-            MultipleFailures failures = new MultipleFailures();
-            for (Facet facet : facets) {
-              try {
-                log.debug("Updating facet: {}", facet);
-                facet.update();
-              }
-              catch (Throwable t) {
-                log.error("Failed to update facet: {}", facet, t);
-                failures.add(t);
-              }
-            }
-            failures.propagate("Failed to update facets");
-          }
-        });
+    MultipleFailures failures = new MultipleFailures();
+    for (Facet facet : facets) {
+      try {
+        log.debug("Updating facet: {}", facet);
+        facet.update();
+      }
+      catch (Throwable t) {
+        log.error("Failed to update facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.propagate("Failed to update facets");
   }
 
   @Override
+  @Transitions(from={INITIALISED, STOPPED}, to=STARTED)
   public void start() throws Exception {
-    final RepositoryImpl self = this;
+    MultipleFailures failures = new MultipleFailures();
+    for (Facet facet : facets) {
+      try {
+        log.debug("Starting facet: {}", facet);
+        facet.start();
+      }
+      catch (Throwable t) {
+        log.error("Failed to start facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.propagate("Failed to start facets");
 
-    states.transition(STARTED)
-        .from(INITIALISED, STOPPED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            MultipleFailures failures = new MultipleFailures();
-            for (Facet facet : facets) {
-              try {
-                log.debug("Starting facet: {}", facet);
-                facet.start();
-              }
-              catch (Throwable t) {
-                log.error("Failed to start facet: {}", facet, t);
-                failures.add(t);
-              }
-            }
-            failures.propagate("Failed to start facets");
-
-            eventBus.post(new RepositoryStartedEvent(self));
-          }
-        });
+    eventBus.post(new RepositoryStartedEvent(this));
   }
 
   @Override
+  @Transitions(from=STARTED, to=STOPPED)
   public void stop() throws Exception {
-    final RepositoryImpl self = this;
+    MultipleFailures failures = new MultipleFailures();
+    for (Facet facet : facets) {
+      try {
+        log.debug("Stopping facet: {}", facet);
+        facet.stop();
+      }
+      catch (Throwable t) {
+        log.error("Failed to stop facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.propagate("Failed to stop facets");
 
-    states.transition(STOPPED)
-        .from(STARTED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            MultipleFailures failures = new MultipleFailures();
-            for (Facet facet : facets) {
-              try {
-                log.debug("Stopping facet: {}", facet);
-                facet.stop();
-              }
-              catch (Throwable t) {
-                log.error("Failed to stop facet: {}", facet, t);
-                failures.add(t);
-              }
-            }
-            failures.propagate("Failed to stop facets");
-
-            eventBus.post(new RepositoryStoppedEvent(self));
-          }
-        });
+    eventBus.post(new RepositoryStoppedEvent(this));
   }
 
   @Override
+  @Transitions(to=DESTROYED)
   public void destroy() throws Exception {
-    final RepositoryImpl self = this;
+    if (states.is(STARTED)) {
+      stop();
+    }
 
-    states.transition(DESTROYED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            if (states.is(STARTED)) {
-              stop();
-            }
+    MultipleFailures failures = new MultipleFailures();
+    for (Facet facet : facets) {
+      try {
+        log.debug("Destroying facet: {}", facet);
+        facet.destroy();
+      }
+      catch (Throwable t) {
+        log.error("Failed to destroy facet: {}", facet, t);
+        failures.add(t);
+      }
+    }
+    failures.propagate("Failed to destroy facets");
 
-            MultipleFailures failures = new MultipleFailures();
-            for (Facet facet : facets) {
-              try {
-                log.debug("Destroying facet: {}", facet);
-                facet.destroy();
-              }
-              catch (Throwable t) {
-                log.error("Failed to destroy facet: {}", facet, t);
-                failures.add(t);
-              }
-            }
-            failures.propagate("Failed to destroy facets");
+    facets.clear();
+    configuration = null;
 
-            facets.clear();
-            configuration = null;
-
-            eventBus.post(new RepositoryDestroyedEvent(self));
-          }
-        });
+    eventBus.post(new RepositoryDestroyedEvent(this));
   }
 
   //
@@ -263,20 +226,12 @@ public class RepositoryImpl
   //
 
   @Override
+  @Guarded(by=INITIALISED)
   public void attach(final Facet facet) throws Exception {
     checkNotNull(facet);
-    final RepositoryImpl self = this;
-
-    states.guard(INITIALISED)
-        .run(new Action()
-        {
-          @Override
-          public void run() throws Exception {
-            log.debug("Attaching facet: {}", facet);
-            facet.init(self);
-            facets.add(facet);
-          }
-        });
+    log.debug("Attaching facet: {}", facet);
+    facet.init(this);
+    facets.add(facet);
   }
 
   @Override
