@@ -42,13 +42,38 @@ public class JerseyConfiguration
    * A hack to not expose Restlet ancient DTOs but keep state. The restlet DTOs are hidden and used only
    * for transport, basically keeping client users "safe" from changing them.
    */
-  static class ConfigurationXO
+  // TODO: currently XO has getters/setters to enable BeanUtils simple copy, see EntitySupport
+  public static class ConfigurationXO
   {
-    String name;
+    private String name;
 
-    Connection connection;
+    private Connection connection;
 
-    Mapping mapping;
+    private Mapping mapping;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(final String name) {
+      this.name = name;
+    }
+
+    public Connection getConnection() {
+      return connection;
+    }
+
+    public void setConnection(final Connection connection) {
+      this.connection = connection;
+    }
+
+    public Mapping getMapping() {
+      return mapping;
+    }
+
+    public void setMapping(final Mapping mapping) {
+      this.mapping = mapping;
+    }
   }
 
   private final JerseyNexusClient client;
@@ -155,9 +180,7 @@ public class JerseyConfiguration
   private static ConfigurationXO toXO(final LdapServerConfigurationDTO dto)
   {
     final ConfigurationXO result = new ConfigurationXO();
-    if (!Strings.isNullOrEmpty(dto.getName())) {
-      result.name = dto.getName();
-    }
+    result.name = checkNotNull(dto.getName());
     final Connection connection = new Connection();
     connection.setSearchBase(dto.getConnectionInfo().getSearchBase());
     connection.setSystemUsername(dto.getConnectionInfo().getSystemUsername());
