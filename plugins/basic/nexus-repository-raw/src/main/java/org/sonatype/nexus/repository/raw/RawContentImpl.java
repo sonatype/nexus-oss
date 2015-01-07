@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 
 import com.google.common.io.ByteStreams;
 
@@ -15,7 +14,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RawContentImpl
     implements RawContent
-{  private final String type;
+{
+  private final String type;
 
   private final byte[] bytes;
 

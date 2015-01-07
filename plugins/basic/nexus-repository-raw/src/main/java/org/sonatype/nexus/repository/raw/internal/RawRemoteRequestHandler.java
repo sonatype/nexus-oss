@@ -31,8 +31,8 @@ public class RawRemoteRequestHandler
 
     final Request request = context.getRequest();
 
-    if(!"GET".equals(request.getAction())){
-      return  HttpResponses.methodNotAllowed(request.getAction(),"GET");
+    if (!"GET".equals(request.getAction())) {
+      return HttpResponses.methodNotAllowed(request.getAction(), "GET");
     }
 
     Object remoteRequest = new Object();

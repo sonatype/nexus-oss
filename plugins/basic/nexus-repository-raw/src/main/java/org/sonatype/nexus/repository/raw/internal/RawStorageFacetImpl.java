@@ -30,25 +30,22 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.BlobRef;
-import org.sonatype.nexus.repository.storage.BlobStoreManager;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
+ * A {@link RawStorageFacet} that persists to a {@link StorageFacet}.
+ *
  * @since 3.0
  */
 public class RawStorageFacetImpl
@@ -59,21 +56,8 @@ public class RawStorageFacetImpl
 
   public static final String BLOB_REF_PROPERTY = "blob_ref";
 
-  private final BlobStoreManager blobStoreManager;
-
-  private String defaultBlobStore;
-
   @Inject
-  public RawStorageFacetImpl(final BlobStoreManager blobStoreManager) {
-    this.blobStoreManager = checkNotNull(blobStoreManager, "blob store manager");
-  }
-
-  @Override
-  protected void doInit() throws Exception {
-    final Configuration config = getRepository().getConfiguration();
-    final NestedAttributesMap storageConfig = config.attributes("storage");
-
-    defaultBlobStore = storageConfig.get("defaultBlobStore", String.class);
+  public RawStorageFacetImpl() {
   }
 
   @Nullable
@@ -89,7 +73,8 @@ public class RawStorageFacetImpl
         }
 
         final BlobRef blobRef = getBlobRef(path, asset);
-        final Blob blob = getBlob(blobRef);
+
+        final Blob blob = storage.getBlob(blobRef);
         checkState(blob != null, "asset at path %s refers to missing blob %s", path, blobRef);
 
         return marshall(asset, blob);
@@ -99,8 +84,8 @@ public class RawStorageFacetImpl
 
   @Nullable
   @Override
-  public RawContent put(final String path, final RawContent content) throws IOException {
-    return (RawContent) inTx(new GraphOperation()
+  public void put(final String path, final RawContent content) throws IOException {
+    inTx(new GraphOperation()
     {
       @Override
       public Object execute(final OrientGraph graph, final StorageFacet storage) throws IOException {
@@ -111,17 +96,11 @@ public class RawStorageFacetImpl
         final ImmutableMap<String, String> headers = ImmutableMap
             .of(BlobStore.BLOB_NAME_HEADER, path, BlobStore.CREATED_BY_HEADER, "unknown");
 
-        final BlobStore store = blobStoreManager.getStore(defaultBlobStore);
-
-        final Blob blob = store.create(content.openInputStream(), headers);
-
-        // TODO: The blob node needs to be worked out too, obviously
-        final BlobRef blobRef = new BlobRef("NODE", defaultBlobStore, blob.getId().asUniqueString());
+        final BlobRef blobRef = storage.createBlob(content.openInputStream(), headers);
 
         asset.setProperty(BLOB_REF_PROPERTY, blobRef.toString());
         asset.setProperty(CONTENT_TYPE_PROPERTY, content.getContentType());
-
-        return marshall(asset, blob);
+        return null;
       }
     });
   }
@@ -138,7 +117,7 @@ public class RawStorageFacetImpl
         }
 
         final BlobRef blobRef = getBlobRef(path, asset);
-        final boolean delete = deleteBlob(blobRef);
+        final boolean delete = storage.deleteBlob(blobRef);
         if (!delete) {
           log.warn("Deleted asset {} referenced missing blob {}", path, blobRef);
         }
@@ -180,18 +159,6 @@ public class RawStorageFacetImpl
     String blobRefStr = asset.getProperty(BLOB_REF_PROPERTY);
     checkState(blobRefStr != null, "asset at path %s has missing blob reference", path);
     return new BlobRef(blobRefStr);
-  }
-
-  private Blob getBlob(final BlobRef blobRef) {
-    final BlobId blobId = blobRef.getBlobId();
-    final BlobStore store = blobStoreManager.getStore(blobRef.getStore());
-    return store.get(blobId);
-  }
-
-  private boolean deleteBlob(final BlobRef blobRef) {
-    final BlobId blobId = blobRef.getBlobId();
-    final BlobStore store = blobStoreManager.getStore(blobRef.getStore());
-    return store.delete(blobId);
   }
 
   private RawContent marshall(final Vertex asset, final Blob blob) {

@@ -25,7 +25,7 @@ import org.sonatype.nexus.repository.Format;
 @Named(RawFormat.NAME)
 @Singleton
 public class RawFormat
-  extends Format
+    extends Format
 {
   public static final String NAME = "raw";
 

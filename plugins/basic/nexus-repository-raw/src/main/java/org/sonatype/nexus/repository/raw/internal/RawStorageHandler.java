@@ -12,9 +12,6 @@
  */
 package org.sonatype.nexus.repository.raw.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -24,10 +21,8 @@ import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -70,11 +65,8 @@ public class RawStorageHandler
 
       case PUT: {
         RawContent content = toContent(context.getRequest().getPayload());
-        RawContent prev = storage.put(name, content);
-        if (prev == null) {
-          return HttpResponses.created();
-        }
-        return HttpResponses.noContent();
+        storage.put(name, content);
+        return HttpResponses.created();
       }
 
       case DELETE: {
@@ -98,6 +90,7 @@ public class RawStorageHandler
     TokenMatcher.State state = context.getAttributes().require(TokenMatcher.State.class);
     String name = state.getTokens().get("name");
     checkState(name != null, "Missing token: name");
+
     return name;
   }
 }

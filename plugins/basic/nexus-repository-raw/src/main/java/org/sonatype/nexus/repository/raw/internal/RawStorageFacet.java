@@ -31,8 +31,7 @@ public interface RawStorageFacet
   @Nullable
   RawContent get(String path) throws IOException;
 
-  @Nullable
-  RawContent put(String path, RawContent content) throws IOException;
+  void put(String path, RawContent content) throws IOException;
 
   boolean delete(String path) throws IOException;
 }
