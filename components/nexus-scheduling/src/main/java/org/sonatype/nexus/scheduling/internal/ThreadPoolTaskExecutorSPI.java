@@ -74,11 +74,11 @@ public class ThreadPoolTaskExecutorSPI
   private class ThreadPoolTaskInfo<T>
       implements TaskInfo<T>, Callable<T>
   {
-    private Task<T> task;
+    private final Task<T> task;
 
-    private Schedule schedule;
+    private final Schedule schedule;
 
-    private Date runStarted;
+    private final Date runStarted;
 
     private long runDuration;
 
