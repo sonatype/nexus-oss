@@ -53,26 +53,36 @@ public interface StorageFacet
 
   static String V_LABEL = "label";
 
-  static String V_REPOSITORY = "repository";
+  static String V_BUCKET = "bucket";
 
   /**
    * Gets a transaction for working with the graph.
    */
   OrientGraph getGraphTx();
 
-  // Browse Assets and Components
+  // Browse Vertices
 
   /**
-   * Gets all vertices representing assets in the graph.
+   * Gets all asset vertices.
    */
   Iterable<Vertex> browseAssets(OrientGraph graph);
 
   /**
-   * Gets all vertices representing components in the graph.
+   * Gets all bucket vertices.
+   */
+  Iterable<Vertex> browseBuckets(OrientGraph graph);
+
+  /**
+   * Gets all component vertices.
    */
   Iterable<Vertex> browseComponents(OrientGraph graph);
 
-  // Read Assets and Components
+  /**
+   * Gets all label vertices.
+   */
+  Iterable<Vertex> browseLabels(OrientGraph graph);
+
+  // Read Vertices
 
   /**
    * Gets a vertex with a given id, or {@code null}.
@@ -88,19 +98,29 @@ public interface StorageFacet
   @Nullable
   Vertex findByPath(OrientGraph graph, String path);
 
-  // Edit Assets and Components (edits can be done directly on Vertex objects, followed by calling graph.commit())
+  // Edit Vertices (edits can be done directly on Vertex objects, followed by calling graph.commit())
 
-  // Add Assets and Components
+  // Add Vertices
 
   /**
-   * Creates a new vertex representing an asset.
+   * Creates a new asset vertex.
    */
   Vertex createAsset(OrientGraph graph);
 
   /**
-   * Creates a new vertex representing a component.
+   * Creates a new bucket vertex.
+   */
+  Vertex createBucket(OrientGraph graph);
+
+  /**
+   * Creates a new component vertex.
    */
   Vertex createComponent(OrientGraph graph);
+
+  /**
+   * Creates a new label vertex.
+   */
+  Vertex createLabel(OrientGraph graph);
 
   // Delete Assets and Components
 

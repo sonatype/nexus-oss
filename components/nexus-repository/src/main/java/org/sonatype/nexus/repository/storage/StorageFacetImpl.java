@@ -66,9 +66,9 @@ public class StorageFacetImpl
           return true;
         }
       });
+      initVertexType(graph, V_BUCKET, null);
       initVertexType(graph, V_COMPONENT, null);
       initVertexType(graph, V_LABEL, null);
-      initVertexType(graph, V_REPOSITORY, null);
 
       initEdgeType(graph, E_CONTAINS_COMPONENTS_WITH_LABEL, null);
       initEdgeType(graph, E_HAS_LABEL, null);
@@ -111,8 +111,18 @@ public class StorageFacetImpl
   }
 
   @Override
+  public Iterable<Vertex> browseBuckets(final OrientGraph graph) {
+    return graph.getVerticesOfClass(V_BUCKET);
+  }
+
+  @Override
   public Iterable<Vertex> browseComponents(final OrientGraph graph) {
     return graph.getVerticesOfClass(V_COMPONENT);
+  }
+
+  @Override
+  public Iterable<Vertex> browseLabels(final OrientGraph graph) {
+    return graph.getVerticesOfClass(V_LABEL);
   }
 
   @Nullable
@@ -139,8 +149,18 @@ public class StorageFacetImpl
   }
 
   @Override
+  public Vertex createBucket(final OrientGraph graph) {
+    return graph.addVertex(V_BUCKET, (String) null);
+  }
+
+  @Override
   public Vertex createComponent(final OrientGraph graph) {
     return graph.addVertex(V_COMPONENT, (String) null);
+  }
+
+  @Override
+  public Vertex createLabel(final OrientGraph graph) {
+    return graph.addVertex(V_LABEL, (String) null);
   }
 
   @Override
