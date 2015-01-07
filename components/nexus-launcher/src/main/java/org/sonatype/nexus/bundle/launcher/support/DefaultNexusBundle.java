@@ -275,7 +275,7 @@ public class DefaultNexusBundle
       final String contextPath =
           getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
       this.secureUrl = new URL(
-          String.format("https://%s:%s/%s/", getConfiguration().getHostName(), getSslPort(), contextPath));
+          String.format("https://%s:%s%s/", getConfiguration().getHostName(), getSslPort(), contextPath));
     }
 
     configureJSW(strategy);
