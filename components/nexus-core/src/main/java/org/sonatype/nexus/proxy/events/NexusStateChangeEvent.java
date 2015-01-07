@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import java.util.Date;
+
 /**
  * The event that is occured when nexus has started (fired as last step of boot process, everything is in place).
  *
@@ -20,7 +22,14 @@ package org.sonatype.nexus.proxy.events;
 public abstract class NexusStateChangeEvent
     extends AbstractVetoableEvent<Object>
 {
+  private final Date date;
+
   public NexusStateChangeEvent(Object sender) {
     super(sender);
+    this.date = new Date();
+  }
+
+  public Date getEventDate() {
+    return date;
   }
 }

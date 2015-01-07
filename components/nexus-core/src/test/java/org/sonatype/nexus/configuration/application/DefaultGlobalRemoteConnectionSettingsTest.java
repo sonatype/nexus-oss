@@ -14,7 +14,6 @@ package org.sonatype.nexus.configuration.application;
 
 import org.sonatype.nexus.NexusAppTestSupport;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;
@@ -33,7 +32,7 @@ public class DefaultGlobalRemoteConnectionSettingsTest
     NexusConfiguration cfg = lookup(NexusConfiguration.class);
     cfg.loadConfiguration();
 
-    final Event<GlobalRemoteConnectionSettings>[] event = new Event[1];
+    final GlobalRemoteConnectionSettingsChangedEvent[] event = new GlobalRemoteConnectionSettingsChangedEvent[1];
     lookup(EventBus.class).register(new Object()
     {
       @Subscribe
@@ -49,10 +48,10 @@ public class DefaultGlobalRemoteConnectionSettingsTest
 
     cfg.saveConfiguration();
 
-    Assert.assertNotNull(event[0].getEventSender());
-    Assert.assertEquals(settings, event[0].getEventSender());
-    Assert.assertEquals(2, event[0].getEventSender().getConnectionTimeout());
-    Assert.assertEquals(3, event[0].getEventSender().getRetrievalRetryCount());
+    Assert.assertNotNull(event[0].getSettings());
+    Assert.assertEquals(settings, event[0].getSettings());
+    Assert.assertEquals(2, event[0].getSettings().getConnectionTimeout());
+    Assert.assertEquals(3, event[0].getSettings().getRetrievalRetryCount());
 
   }
 }

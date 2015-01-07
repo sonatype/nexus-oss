@@ -379,6 +379,7 @@
                     <xml>org.apache.felix:org.osgi.compendium:1.4.0</xml>
                     <xml>org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0</xml>
                     <xml>org.apache.portals:portlet-api_2.0_spec:1.0</xml>
+                    <xml>org.jacoco:org.jacoco.report:0.6.2.201302030002</xml>
                   </extraArtifacts>
                 </configuration>
               </execution>

@@ -52,8 +52,8 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
-import org.sonatype.nexus.proxy.events.VetoFormatter;
-import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
+import org.sonatype.nexus.proxy.events.AbstractVetoableEvent;
+import org.sonatype.nexus.proxy.events.Veto;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -82,6 +82,7 @@ import com.google.common.collect.Collections2;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.codehaus.plexus.util.ExceptionUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -121,8 +122,6 @@ public class DefaultNexusConfiguration
   private final RepositoryRegistry repositoryRegistry;
 
   private final SecuritySystem securitySystem;
-
-  private final VetoFormatter vetoFormatter;
 
   private final List<ConfigurationModifier> configurationModifiers;
 
@@ -175,7 +174,6 @@ public class DefaultNexusConfiguration
                                    final RepositoryTypeRegistry repositoryTypeRegistry,
                                    final RepositoryRegistry repositoryRegistry,
                                    final SecuritySystem securitySystem,
-                                   final VetoFormatter vetoFormatter,
                                    final List<ConfigurationModifier> configurationModifiers,
                                    final @Named("nexus-uber") ClassLoader uberClassLoader,
                                    final ApplicationDirectories applicationDirectories)
@@ -190,7 +188,6 @@ public class DefaultNexusConfiguration
     this.repositoryTypeRegistry = checkNotNull(repositoryTypeRegistry);
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
     this.securitySystem = checkNotNull(securitySystem);
-    this.vetoFormatter = checkNotNull(vetoFormatter);
     this.configurationModifiers = checkNotNull(configurationModifiers);
     this.uberClassLoader = checkNotNull(uberClassLoader);
     this.applicationDirectories = checkNotNull(applicationDirectories);
@@ -203,6 +200,55 @@ public class DefaultNexusConfiguration
       throws ConfigurationException, IOException
   {
     loadConfiguration(false);
+  }
+
+  private static class VetoFormatterRequest
+  {
+    private AbstractVetoableEvent<?> event;
+
+    private boolean detailed;
+
+    public VetoFormatterRequest(AbstractVetoableEvent<?> event, boolean detailed) {
+      this.event = event;
+      this.detailed = detailed;
+    }
+
+    public AbstractVetoableEvent<?> getEvent() {
+      return event;
+    }
+
+    public boolean isDetailed() {
+      return detailed;
+    }
+  }
+
+  private static class DefaultVetoFormatter
+  {
+    private static final String LINE_SEPERATOR = System.getProperty("line.separator");
+
+    public String format(VetoFormatterRequest request) {
+      StringBuilder sb = new StringBuilder();
+
+      if (request != null
+          && request.getEvent() != null
+          && request.getEvent().isVetoed()) {
+        sb.append("Event ").append(request.getEvent().toString()).append(" has been vetoed by one or more components.");
+
+        if (request.isDetailed()) {
+          sb.append(LINE_SEPERATOR);
+
+          for (Veto veto : request.getEvent().getVetos()) {
+            sb.append("vetoer: ").append(veto.getVetoer().toString());
+            sb.append("cause:");
+            sb.append(LINE_SEPERATOR);
+            sb.append(ExceptionUtils.getFullStackTrace(veto.getReason()));
+            sb.append(LINE_SEPERATOR);
+          }
+        }
+      }
+
+      return sb.toString();
+    }
   }
 
   @Override
@@ -246,8 +292,7 @@ public class DefaultNexusConfiguration
       eventBus.post(loadEvent);
 
       if (loadEvent.isVetoed()) {
-        log.info(
-            vetoFormatter.format(new VetoFormatterRequest(loadEvent, log.isDebugEnabled())));
+        log.info(new DefaultVetoFormatter().format(new VetoFormatterRequest(loadEvent, log.isDebugEnabled())));
 
         throw new ConfigurationException("The Nexus configuration is invalid!");
       }
@@ -341,7 +386,7 @@ public class DefaultNexusConfiguration
       return true;
     }
     else {
-      log.info(vetoFormatter.format(new VetoFormatterRequest(prepare, log.isDebugEnabled())));
+      log.info(new DefaultVetoFormatter().format(new VetoFormatterRequest(prepare, log.isDebugEnabled())));
 
       eventBus.post(new ConfigurationRollbackEvent(this));
 

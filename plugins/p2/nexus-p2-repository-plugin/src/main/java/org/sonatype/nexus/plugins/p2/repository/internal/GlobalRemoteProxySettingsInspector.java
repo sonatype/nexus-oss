@@ -20,7 +20,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.GlobalRemoteProxySettings;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteProxySettingsChangedEvent;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -54,15 +53,15 @@ public class GlobalRemoteProxySettingsInspector
 
   @Subscribe
   public void on(final NexusStartedEvent e) {
-    inspect(e);
+    resetSettings();
   }
 
   @Subscribe
   public void on(final GlobalRemoteProxySettingsChangedEvent e) {
-    inspect(e);
+    resetSettings();
   }
 
-  protected void inspect(final Event<?> evt) {
+  private void resetSettings() {
     // FIXME: Sort out what to do with http/https here
     RemoteHttpProxySettings httpProxySettings = globalRemoteProxySettings.getHttpProxySettings();
 
