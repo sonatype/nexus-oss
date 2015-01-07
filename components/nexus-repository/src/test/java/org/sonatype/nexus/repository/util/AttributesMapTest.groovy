@@ -32,6 +32,13 @@ class AttributesMapTest
   }
 
   @Test
+  void 'set null removes'() {
+    underTest.set('foo', 'bar')
+    underTest.set('foo', null)
+    assert !underTest.contains('foo')
+  }
+
+  @Test
   void 'required value'() {
     underTest.set('foo', 'bar')
     def value = underTest.require('foo')

@@ -190,9 +190,11 @@ public class AttributesMap
    * Set keyed attribute value.
    */
   @Nullable
-  public Object set(final String key, final Object value) {
+  public Object set(final String key, final @Nullable Object value) {
     checkNotNull(key);
-    checkNotNull(value);
+    if (value == null) {
+      return remove(key);
+    }
     Object replaced = backing.put(key, value);
     log.trace("Set: {}={} ({})", key, value, value.getClass().getName());
     return replaced;
@@ -202,7 +204,7 @@ public class AttributesMap
    * Set type-keyed attribute value.
    */
   @Nullable
-  public <T> Object set(final Class<T> type, final T value) {
+  public <T> Object set(final Class<T> type, final @Nullable T value) {
     return set(key(type), value);
   }
 

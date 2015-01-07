@@ -50,12 +50,6 @@ public class HttpClientConfigMarshallerImpl
     return marshaller;
   }
 
-  private void putIfNotNull(final NestedAttributesMap attributes, final String key, final Object value) {
-    if (value != null) {
-      attributes.set(key, value);
-    }
-  }
-
   //
   // Marshall
   //
@@ -77,11 +71,11 @@ public class HttpClientConfigMarshallerImpl
   }
 
   private void write(final NestedAttributesMap attributes, final ConnectionConfig config) {
-    putIfNotNull(attributes, "timeout", config.getTimeout());
-    putIfNotNull(attributes, "retries", config.getRetries());
-    putIfNotNull(attributes, "urlParameters", config.getUrlParameters());
-    putIfNotNull(attributes, "userAgentCustomisation", config.getUserAgentCustomisation());
-    putIfNotNull(attributes, "useTrustStore", config.getUseTrustStore());
+    attributes.set("timeout", config.getTimeout());
+    attributes.set("retries", config.getRetries());
+    attributes.set("urlParameters", config.getUrlParameters());
+    attributes.set("userAgentCustomisation", config.getUserAgentCustomisation());
+    attributes.set("useTrustStore", config.getUseTrustStore());
   }
 
   private void write(final NestedAttributesMap attributes, final AuthenticationConfig config) {
@@ -98,13 +92,13 @@ public class HttpClientConfigMarshallerImpl
       write(attributes.child("https"), config.getHttpsProxyConfig());
     }
     if (config.getNonProxyHosts() != null) {
-      putIfNotNull(attributes, "nonProxyHosts", Joiner.on(",").join(config.getNonProxyHosts()));
+      attributes.set("nonProxyHosts", Joiner.on(",").join(config.getNonProxyHosts()));
     }
   }
 
   private void write(final NestedAttributesMap attributes, final HttpProxyConfig config) {
-    putIfNotNull(attributes, "hostname", config.getHostname());
-    putIfNotNull(attributes, "port", config.getPort());
+    attributes.set("hostname", config.getHostname());
+    attributes.set("port", config.getPort());
     if (config.getAuthenticationConfig() != null) {
       write(attributes.child("authentication"), config.getAuthenticationConfig());
     }
