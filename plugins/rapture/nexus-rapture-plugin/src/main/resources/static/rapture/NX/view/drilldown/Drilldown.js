@@ -56,7 +56,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
       maxCount;
 
     // Normalize list of masters and create wizards
-    me.masters = Ext.isArray(me.masters) ? me.masters : [me.masters];
+    if (me.masters && !Ext.isArray(me.masters)) {
+      me.masters = [me.masters];
+    } else {
+      me.masters = [];
+    }
     me.createWizard = Ext.isArray(me.createWizard) ? me.createWizard : [me.createWizard];
 
     // How many panels do we need?

@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Loggers', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.controller.Drilldown',
   requires: [
     'NX.Conditions',
     'NX.Dialogs',
@@ -35,13 +35,12 @@ Ext.define('NX.coreui.controller.Loggers', {
   ],
   views: [
     'logging.LoggerAdd',
-    'logging.LoggerList'
+    'logging.LoggerList',
+    'logging.LoggerFeature'
   ],
   refs: [
-    {
-      ref: 'list',
-      selector: 'nx-coreui-logger-list'
-    }
+    { ref: 'feature', selector: 'nx-coreui-logging-feature' },
+    { ref: 'list', selector: 'nx-coreui-logger-list' }
   ],
 
   init: function () {
@@ -59,7 +58,7 @@ Ext.define('NX.coreui.controller.Loggers', {
       path: '/Support/Logging',
       text: NX.I18n.get('ADMIN_LOGGING_TITLE'),
       description: NX.I18n.get('ADMIN_LOGGING_SUBTITLE'),
-      view: { xtype: 'nx-coreui-logger-list' },
+      view: { xtype: 'nx-coreui-logging-feature' },
       iconConfig: {
         file: 'book.png',
         variants: ['x16', 'x32']
@@ -137,7 +136,12 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows add logger window.
    */
   showAddWindow: function (button) {
-    Ext.widget({ xtype: 'nx-coreui-logger-add' });
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, null);
   },
 
   /**

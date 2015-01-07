@@ -24,7 +24,6 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'),
   defaultFocus: 'name',
 
   items: {
