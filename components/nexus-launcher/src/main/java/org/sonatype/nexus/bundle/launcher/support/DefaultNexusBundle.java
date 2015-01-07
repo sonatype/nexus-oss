@@ -265,8 +265,12 @@ public class DefaultNexusBundle
       sslPort = getConfiguration().getSslPort();
     }
 
-    this.secureUrl = new URL(getUrl().toExternalForm().replaceFirst("http://", "https://")
-      .replaceFirst(String.valueOf(getPort()), String.valueOf(getSslPort())));
+    if (getSslPort() > 0) {
+      final String contextPath =
+          getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
+      this.secureUrl = new URL(
+          String.format("https://%s:%s/%s/", getConfiguration().getHostName(), getSslPort(), contextPath));
+    }
 
     configureJSW(strategy);
     configureNexusProperties(strategy);
