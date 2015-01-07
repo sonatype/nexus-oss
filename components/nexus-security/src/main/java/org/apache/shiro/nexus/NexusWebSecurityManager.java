@@ -33,7 +33,6 @@ public class NexusWebSecurityManager
    * Constructor which disables all RememberMe functionality.
    */
   public NexusWebSecurityManager() {
-    super();
     this.setRememberMeManager(null);
   }
 
