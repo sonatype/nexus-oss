@@ -121,12 +121,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-add combo[name=typeId]': {
           select: me.changeTaskType
         }
-      },
-      store: {
-        '#TaskType': {
-          load: me.onTaskTypeLoad,
-          datachanged: me.onTaskTypeLoad
-        }
       }
     });
   },
@@ -236,11 +230,11 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @combo {Ext.form.field.ComboBox} combobox task type combobox
    */
   changeTaskType: function(combobox) {
-    var win = combobox.up('window'),
+    var form = combobox.up('nx-settingsform'),
         taskTypeModel;
 
     taskTypeModel = this.getTaskTypeStore().getById(combobox.value);
-    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
+    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
   },
 
   /**
@@ -254,15 +248,6 @@ Ext.define('NX.coreui.controller.Tasks', {
     if (list) {
       me.getTaskTypeStore().load();
     }
-  },
-
-  /**
-   * @private
-   * When task type store re-loads, reselect current selected task if any.
-   */
-  onTaskTypeLoad: function() {
-    var me = this;
-    me.reselect();
   },
 
   /**

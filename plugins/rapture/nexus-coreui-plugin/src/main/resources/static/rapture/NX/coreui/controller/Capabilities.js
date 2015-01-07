@@ -110,10 +110,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
       store: {
         '#Capability': {
           load: me.onCapabilityLoad
-        },
-        '#CapabilityType': {
-          load: me.onCapabilityTypeLoad,
-          datachanged: me.onCapabilityTypeLoad
         }
       },
       component: {
@@ -265,12 +261,12 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @combo {Ext.form.field.ComboBox} combobox capability type combobox
    */
   changeCapabilityType: function(combobox) {
-    var win = combobox.up('window'),
+    var form = combobox.up('nx-settingsform'),
         capabilityTypeModel;
 
     capabilityTypeModel = this.getCapabilityTypeStore().getById(combobox.value);
-    win.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
-    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
+    form.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
+    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
   },
 
   /**
@@ -284,15 +280,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     if (list) {
       me.getCapabilityTypeStore().load();
     }
-  },
-
-  /**
-   * @private
-   * When capability type store re-loads, reselect current selected capability if any.
-   */
-  onCapabilityTypeLoad: function() {
-    var me = this;
-    me.reselect();
   },
 
   /**
