@@ -50,7 +50,7 @@ public class StorageFacetImpl
 
   @Inject
   public StorageFacetImpl(BlobStore blobStore,
-                          @Named(GraphDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+                          @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
     this.blobStore = blobStore;
     this.databaseInstanceProvider = databaseInstanceProvider;
 

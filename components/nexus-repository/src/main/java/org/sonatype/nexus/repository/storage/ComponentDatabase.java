@@ -22,12 +22,12 @@ import org.sonatype.nexus.orient.DatabaseManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class GraphDatabase
+public class ComponentDatabase
 {
-  public static final String NAME = "graph";
+  public static final String NAME = "componentdb";
 
   /**
-   * Shared {@code graph} database instance provider.
+   * Shared {@code componentdb} database instance provider.
    *
    * @since 3.0
    */
