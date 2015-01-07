@@ -117,6 +117,7 @@ public class RepositoryImpl
   }
 
   private final StateGuard states = new StateGuard.Builder()
+      .logger(createLogger())
       .initial(NEW)
       .failure(FAILED)
       .create();

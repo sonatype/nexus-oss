@@ -20,9 +20,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.sisu.goodies.common.Loggers;
 
 import com.google.common.base.Throwables;
+import org.slf4j.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,8 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class StateGuard
-    extends ComponentSupport
 {
+  private final Logger log;
+
   private final ReadWriteLock lock;
 
   @Nullable
@@ -43,10 +45,12 @@ public class StateGuard
 
   private String current;
 
-  StateGuard(final ReadWriteLock lock,
+  StateGuard(final Logger log,
+             final ReadWriteLock lock,
              final String initial,
              final @Nullable String failure)
   {
+    this.log = checkNotNull(log);
     this.lock = checkNotNull(lock);
     this.current = checkNotNull(initial);
     this.failure = failure;
@@ -261,6 +265,8 @@ public class StateGuard
    */
   public static class Builder
   {
+    private Logger logger;
+
     private ReadWriteLock lock;
 
     private String initial;
@@ -268,6 +274,11 @@ public class StateGuard
     private String failure;
 
     // final states?
+
+    public Builder logger(final Logger logger) {
+      this.logger = logger;
+      return this;
+    }
 
     public Builder lock(final ReadWriteLock lock) {
       this.lock = lock;
@@ -285,7 +296,12 @@ public class StateGuard
     }
 
     public StateGuard create() {
-      return new StateGuard(lock != null ? lock : new ReentrantReadWriteLock(), initial, failure);
+      return new StateGuard(
+          logger != null ? logger : Loggers.getLogger(StateGuard.class),
+          lock != null ? lock : new ReentrantReadWriteLock(),
+          initial,
+          failure
+      );
     }
   }
 }
