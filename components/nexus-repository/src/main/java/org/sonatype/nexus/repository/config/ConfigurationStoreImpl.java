@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.config;
 
 import java.util.List;
@@ -20,12 +21,14 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
+import org.sonatype.nexus.repository.stateguard.Guarded;
+import org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport;
 
 import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.STARTED;
 
 /**
  * Orient {@link ConfigurationStore} implementation.
@@ -35,8 +38,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class ConfigurationStoreImpl
-  extends LifecycleSupport
-  implements ConfigurationStore
+    extends StateGuardLifecycleSupport
+    implements ConfigurationStore
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
@@ -58,11 +61,11 @@ public class ConfigurationStoreImpl
   }
 
   private ODatabaseDocumentTx openDb() {
-    ensureStarted();
     return databaseInstance.get().acquire();
   }
 
   @Override
+  @Guarded(by = STARTED)
   public List<Configuration> list() {
     try (ODatabaseDocumentTx db = openDb()) {
       return entityAdapter.browse(db, Lists.<Configuration>newArrayList());
@@ -70,6 +73,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void create(final Configuration configuration) {
     checkNotNull(configuration);
 
@@ -79,6 +83,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void update(final Configuration configuration) {
     checkNotNull(configuration);
 
@@ -88,6 +93,7 @@ public class ConfigurationStoreImpl
   }
 
   @Override
+  @Guarded(by = STARTED)
   public void delete(final Configuration configuration) {
     checkNotNull(configuration);
 

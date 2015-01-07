@@ -10,14 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.storage;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
-import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,8 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named
 @Singleton
 public class StorageServiceImpl
-  extends LifecycleSupport
-  implements StorageService
+    extends StateGuardLifecycleSupport
+    implements StorageService
 {
   private final EventBus eventBus;
 
