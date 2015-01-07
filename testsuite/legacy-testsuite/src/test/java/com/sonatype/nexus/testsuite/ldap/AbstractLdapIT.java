@@ -51,8 +51,6 @@ import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 public abstract class AbstractLdapIT
     extends AbstractNexusIntegrationTest
 {
-  public final String LDIF_DIR = "../../ldif_dir";
-
   private LdapServer ldapServer;
 
   @BeforeClass
