@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.stateguard;
 
+import javax.annotation.Nonnull;
+
 /**
  * Exposes {@link StateGuard}.
  *
@@ -19,5 +21,6 @@ package org.sonatype.nexus.repository.stateguard;
  */
 public interface StateGuardAware
 {
+  @Nonnull
   StateGuard getStateGuard();
 }

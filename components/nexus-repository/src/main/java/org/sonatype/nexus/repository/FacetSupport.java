@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.repository.stateguard.Guarded;
@@ -77,6 +78,7 @@ public abstract class FacetSupport
       .create();
 
   @Override
+  @Nonnull
   public StateGuard getStateGuard() {
     return states;
   }

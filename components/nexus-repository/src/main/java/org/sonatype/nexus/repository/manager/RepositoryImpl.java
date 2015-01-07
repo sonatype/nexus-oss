@@ -122,6 +122,7 @@ public class RepositoryImpl
       .create();
 
   @Override
+  @Nonnull
   public StateGuard getStateGuard() {
     return states;
   }
