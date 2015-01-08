@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.file;
+package org.sonatype.nexus.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +30,10 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.sisu.goodies.common.SimpleFormat;
-
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -481,7 +479,7 @@ public final class DirSupport
   private static void validateDirectory(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.isDirectory(path), SimpleFormat.template("%s is not a directory", path));
+      Preconditions.checkArgument(Files.isDirectory(path), String.format("%s is not a directory", path));
     }
   }
 
@@ -491,7 +489,7 @@ public final class DirSupport
   private static void validateDirectoryOrFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.exists(path), SimpleFormat.template("%s does not exists", path));
+      Preconditions.checkArgument(Files.exists(path), String.format("%s does not exists", path));
     }
   }
 
