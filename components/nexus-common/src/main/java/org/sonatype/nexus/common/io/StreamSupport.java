@@ -40,6 +40,8 @@ public final class StreamSupport
       StreamSupport.class.getName() + ".BUFFER_SIZE", 8192
   );
 
+  // TODO: Perhaps remove this and simply use Guava ByteStreams?
+
   /**
    * Copies provided input stream to the provided output stream, probably using buffer of provided size. The buffer
    * size is used only as "hint", as the actual copy might not be done with buffer having the exact size of passed in
