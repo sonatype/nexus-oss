@@ -56,7 +56,6 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
-import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
