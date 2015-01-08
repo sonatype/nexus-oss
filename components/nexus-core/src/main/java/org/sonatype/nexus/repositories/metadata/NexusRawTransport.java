@@ -15,6 +15,7 @@ package org.sonatype.nexus.repositories.metadata;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
@@ -23,7 +24,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.repository.metadata.RawTransport;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 public class NexusRawTransport
     implements RawTransport

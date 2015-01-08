@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven.routing.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.maven.routing.Config;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * Default implementation. For now it uses mostly system properties for things like scrape depth and similar, while

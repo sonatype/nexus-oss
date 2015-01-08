@@ -25,6 +25,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -39,7 +40,6 @@ import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskScheduler;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
 import org.sonatype.nexus.yum.internal.MetadataProcessor;

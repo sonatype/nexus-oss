@@ -15,9 +15,9 @@ package org.sonatype.nexus.configuration.application;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Singleton

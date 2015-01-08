@@ -29,7 +29,11 @@
 
   <dependencies>
 
-    <!-- Nexus in-reactor modules -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-common</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration-model</artifactId>

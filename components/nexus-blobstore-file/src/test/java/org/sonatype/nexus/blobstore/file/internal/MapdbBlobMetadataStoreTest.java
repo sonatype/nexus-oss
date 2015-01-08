@@ -16,11 +16,11 @@ import java.io.File;
 import java.util.List;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
-import org.sonatype.nexus.blobstore.file.AutoClosableIterable;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
+import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;

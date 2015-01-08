@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
