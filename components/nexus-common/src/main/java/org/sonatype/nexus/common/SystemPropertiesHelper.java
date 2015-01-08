@@ -14,7 +14,7 @@ package org.sonatype.nexus.common;
 
 public class SystemPropertiesHelper
 {
-  public final static int getInteger(final String key, final int defaultValue) {
+  public static int getInteger(final String key, final int defaultValue) {
     final String value = System.getProperty(key);
 
     if (value == null || value.trim().length() == 0) {
@@ -29,7 +29,7 @@ public class SystemPropertiesHelper
     }
   }
 
-  public final static long getLong(final String key, final long defaultValue) {
+  public static long getLong(final String key, final long defaultValue) {
     final String value = System.getProperty(key);
 
     if (value == null || value.trim().length() == 0) {
@@ -44,7 +44,7 @@ public class SystemPropertiesHelper
     }
   }
 
-  public final static boolean getBoolean(final String key, final boolean defaultValue) {
+  public static boolean getBoolean(final String key, final boolean defaultValue) {
     final String value = System.getProperty(key);
 
     if (value == null || value.trim().length() == 0) {
@@ -54,7 +54,7 @@ public class SystemPropertiesHelper
     return Boolean.valueOf(value);
   }
 
-  public final static String getString(final String key, final String defaultValue) {
+  public static String getString(final String key, final String defaultValue) {
     return System.getProperty(key, defaultValue);
   }
 }
