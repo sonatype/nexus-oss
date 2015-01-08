@@ -26,7 +26,6 @@ import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.core.filter.NexusClientExceptionsConverterFilter;
 import org.sonatype.nexus.client.core.subsystem.Restlet1xClient;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
@@ -50,7 +49,6 @@ import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
-import org.sonatype.sisu.siesta.client.Filters;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.hamcrest.core.Is;
@@ -505,7 +503,7 @@ public class ClientIT
     assertThat(target.id(), is(id));
     assertThat(target.name(), is(id + "name"));
     assertThat(target.contentClass(), is("maven2"));
-    assertThat(target.patterns(), contains("test1", "test2"));
+    assertThat(target.patterns(), containsInAnyOrder("test1", "test2"));
   }
 
   private RepositoryTarget createTarget(final String id, final String... patterns) {
