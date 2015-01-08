@@ -40,7 +40,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawHostedRecipe
     extends RecipeSupport
 {
-  private final Provider<RawStorageFacetImpl> storageFacet;
+  // TODO: For now, we use an in-memory raw storage facet
+  private final Provider<InMemoryRawStorageFacet> rawStorageFacet;
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
@@ -51,20 +52,20 @@ public class RawHostedRecipe
   @Inject
   public RawHostedRecipe(final Type type, final Format format,
                          final Provider<ConfigurableViewFacet> viewFacet,
-                         final Provider<RawStorageFacetImpl> storageFacet,
+                         final Provider<InMemoryRawStorageFacet> rawStorageFacet,
                          final TimingHandler timingHandler,
                          final RawStorageHandler rawStorageHandler)
   {
     super(type, format);
     this.viewFacet = checkNotNull(viewFacet);
-    this.storageFacet = checkNotNull(storageFacet);
+    this.rawStorageFacet = checkNotNull(rawStorageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.rawStorageHandler = checkNotNull(rawStorageHandler);
   }
 
   @Override
   public void apply(@Nonnull final Repository repository) throws Exception {
-    repository.attach(storageFacet.get());
+    repository.attach(rawStorageFacet.get());
     repository.attach(configure(viewFacet.get()));
   }
 
@@ -73,14 +74,6 @@ public class RawHostedRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder();
-
-    //builder.route(new Route.Builder()
-    //    .matcher(or(
-    //        new LiteralMatcher("/"),
-    //        new LiteralMatcher("/index.html")))
-    //    .handler(timingHandler)
-    //    .handler(indexHtmlHandler)
-    //    .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
