@@ -10,12 +10,14 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util;
+package org.sonatype.nexus.configuration.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+// FIXME: Remove this garbage
 
 /**
  * Transforms words (from singular to plural, from camelCase to under_score, etc.). I got bored of doing Real Work...
@@ -24,7 +26,7 @@ import java.util.regex.Pattern;
  *
  * @author chuyeow
  */
-public class Inflector
+class Inflector
 {
   // Pfft, can't think of a better name, but this is needed to avoid the price of initializing the pattern on each call.
   private static final Pattern UNDERSCORE_PATTERN_1 = Pattern.compile("([A-Z]+)([A-Z][a-z])");
