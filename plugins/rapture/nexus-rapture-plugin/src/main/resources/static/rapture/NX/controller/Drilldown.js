@@ -80,7 +80,7 @@ Ext.define('NX.controller.Drilldown', {
       componentListener[me.masters[i] + ' button[action=new]'] = {
         afterrender: me.bindNewButton
       };
-      componentListener[me.masters[i] + ' ^ nx-drilldown-panel nx-drilldown-details > tabpanel'] = {
+      componentListener[me.masters[i] + ' ^ nx-drilldown-details > tabpanel'] = {
         tabchange: function() {
           // Get the model for the last master
           var segments = NX.Bookmarks.getBookmark().getSegments().slice(1),
@@ -95,7 +95,7 @@ Ext.define('NX.controller.Drilldown', {
 
       // bind to a delete button if delete function defined
       if (me.deleteModel) {
-        componentListener[me.masters[i] + ' ^ nx-drilldown-panel nx-drilldown-details button[action=delete]'] = {
+        componentListener[me.masters[i] + ' ^ nx-drilldown-details button[action=delete]'] = {
           afterrender: me.bindDeleteButton,
           click: me.onDelete
         };
