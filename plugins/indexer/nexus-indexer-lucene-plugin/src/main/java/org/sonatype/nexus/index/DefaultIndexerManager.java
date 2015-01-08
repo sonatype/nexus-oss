@@ -40,7 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeSupport;

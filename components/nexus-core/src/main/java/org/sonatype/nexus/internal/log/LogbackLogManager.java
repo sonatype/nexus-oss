@@ -36,7 +36,7 @@ import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.sonatype.nexus.common.FileSupport;
+import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;

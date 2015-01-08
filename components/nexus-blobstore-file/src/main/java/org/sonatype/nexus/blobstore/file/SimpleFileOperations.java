@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.sonatype.nexus.blobstore.file.internal.MetricsInputStream;
-import org.sonatype.nexus.common.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.io.ByteStreams;

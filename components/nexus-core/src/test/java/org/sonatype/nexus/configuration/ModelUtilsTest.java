@@ -20,7 +20,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
 
-import org.sonatype.nexus.common.FileSupport;
+import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;

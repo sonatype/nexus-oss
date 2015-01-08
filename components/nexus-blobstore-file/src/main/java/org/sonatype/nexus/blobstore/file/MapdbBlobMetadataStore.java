@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
 import org.sonatype.nexus.blobstore.api.BlobMetrics;
-import org.sonatype.nexus.common.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.google.common.collect.Maps;

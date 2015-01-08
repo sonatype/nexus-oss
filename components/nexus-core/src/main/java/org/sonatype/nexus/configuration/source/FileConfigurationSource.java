@@ -31,7 +31,7 @@ import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.common.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.configuration.ApplicationInterpolatorProvider;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.Configuration;
