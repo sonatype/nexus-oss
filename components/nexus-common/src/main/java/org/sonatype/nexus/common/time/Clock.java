@@ -15,18 +15,28 @@ package org.sonatype.nexus.common.time;
 import org.joda.time.DateTime;
 
 /**
- * A provider of the current time, used instead of direct calls to {@link System#currentTimeMillis()} so that
- * the clock can be mocked out.
+ * A provider of the current time.
  *
  * @since 3.0
  */
 public class Clock
 {
-  public long currentTimeMillis(){
+  /**
+   * Current time in milli-seconds.
+   */
+  public long millis(){
     return System.currentTimeMillis();
   }
 
-  public DateTime getTime(){
-    return new DateTime();
+  /**
+   * Current time in nano-seconds.
+   */
+  public long nanos() { return System.nanoTime(); }
+
+  /**
+   * Current date-time.
+   */
+  public DateTime dateTime(){
+    return new DateTime(millis());
   }
 }
