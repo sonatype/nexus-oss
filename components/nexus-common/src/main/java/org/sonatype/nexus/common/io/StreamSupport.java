@@ -21,6 +21,8 @@ import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// FIXME: Rename to Streams, or StreamHelper
+
 /**
  * Stream related support class. Offers static helper methods for common stream related operations
  * used in Nexus core and plugins for manipulating streams.

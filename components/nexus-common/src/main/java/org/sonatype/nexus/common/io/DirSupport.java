@@ -36,6 +36,8 @@ import com.google.common.base.Predicate;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// FIXME: Rename to Directories, or DirectoryHelper
+
 /**
  * FS directory related support class. Offers static helper methods for common FS related operations
  * used in Nexus core and plugins for manipulating FS directories (aka "folders"). Goal of this class is

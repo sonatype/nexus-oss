@@ -27,6 +27,8 @@ import com.google.common.base.Charsets;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// FIXME: Rename to Files, or FileHelper
+
 /**
  * FS regular file related support class. Offers static helper methods for common FS related operations
  * used in Nexus core and plugins for manipulating FS files (aka "regular files"). Goal of this class is
