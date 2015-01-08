@@ -246,14 +246,16 @@ public class ThreadPoolTaskExecutorSPI
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
     final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
-    final ThreadPoolTaskInfo<T> taskInfo;
     if (tasks.containsKey(taskConfiguration.getId())) {
-      taskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
-      taskInfo.getCurrentState().getFuture().cancel(true);
+      final ThreadPoolTaskInfo<T> oldTaskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
+      if (oldTaskInfo != null) {
+        final Future<T> oldTaskFuture = oldTaskInfo.getCurrentState().getFuture();
+        if (oldTaskFuture != null) {
+          oldTaskFuture.cancel(true);
+        }
+      }
     }
-    else {
-      taskInfo = new ThreadPoolTaskInfo<>(task, schedule);
-    }
+    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo<>(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
     tasks.put(task.getId(), taskInfo);
     taskFutures.put(task.getId(), future);
