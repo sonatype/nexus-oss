@@ -159,7 +159,8 @@ public class M2Repository
   @Override
   public boolean shouldServeByPolicies(ResourceStoreRequest request) {
     if (M2ArtifactRecognizer.isMetadata(request.getRequestPath())) {
-      if (M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
+      Gav gav = getGavCalculator().pathToGav(request.getRequestPath());
+      if (gav != null && gav.isSnapshot()) {
         return RepositoryPolicy.SNAPSHOT.equals(getRepositoryPolicy());
       }
       else {
@@ -236,12 +237,13 @@ public class M2Repository
     if (M2ArtifactRecognizer.isMetadata(item.getPath())) {
       return isOld(getMetadataMaxAge(), item);
     }
-    if (M2ArtifactRecognizer.isSnapshot(item.getPath())) {
-      return isOld(getArtifactMaxAge(), item);
-    }
 
     // we are using Gav to test the path
     final Gav gav = getGavCalculator().pathToGav(item.getPath());
+
+    if (gav != null && gav.isSnapshot()) {
+      return isOld(getArtifactMaxAge(), item);
+    }
 
     if (gav == null) {
       // this is not an artifact, it is just any "file"
@@ -285,9 +287,11 @@ public class M2Repository
   {
     // allow updating of metadata
     // we also need to allow updating snapshots
-    if (!M2ArtifactRecognizer.isMetadata(request.getRequestPath())
-        && !M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
-      super.enforceWritePolicy(request, action);
+    if (!M2ArtifactRecognizer.isMetadata(request.getRequestPath())) {
+      Gav gav = getGavCalculator().pathToGav(request.getRequestPath());
+      if (gav == null || !gav.isSnapshot()) {
+        super.enforceWritePolicy(request, action);
+      }
     }
   }
 
