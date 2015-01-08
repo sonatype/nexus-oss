@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class StreamSupport
 {
-
   private StreamSupport() {
     // no instance
   }

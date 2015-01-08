@@ -151,7 +151,7 @@ public final class FileSupport
   private static void validateFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.isRegularFile(path), String.format("%s is not a regular file", path));
+      checkArgument(Files.isRegularFile(path), "%s is not a regular file", path);
     }
   }
 

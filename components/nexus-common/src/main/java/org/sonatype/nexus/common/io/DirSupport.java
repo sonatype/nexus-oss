@@ -479,7 +479,7 @@ public final class DirSupport
   private static void validateDirectory(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.isDirectory(path), String.format("%s is not a directory", path));
+      checkArgument(Files.isDirectory(path), "%s is not a directory", path);
     }
   }
 
@@ -489,7 +489,7 @@ public final class DirSupport
   private static void validateDirectoryOrFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.exists(path), String.format("%s does not exists", path));
+      checkArgument(Files.exists(path), "%s does not exists", path);
     }
   }
 
