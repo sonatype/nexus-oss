@@ -40,12 +40,15 @@ public final class GAVCoordinate
   // Constructors
   // ----------------------------------------------------------------------
 
-  public GAVCoordinate(final String groupId, final String artifactId, final String version) {
+  GAVCoordinate(final String groupId, final String artifactId, final String version) {
     this(groupId, artifactId, version, null, null);
   }
 
-  public GAVCoordinate(final String groupId, final String artifactId, final String version, final String classifier,
-                       final String type)
+  GAVCoordinate(final String groupId,
+                final String artifactId,
+                final String version,
+                final String classifier,
+                final String type)
   {
     this.groupId = checkNotNull(groupId);
     this.artifactId = checkNotNull(artifactId);
