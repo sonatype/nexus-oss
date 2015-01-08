@@ -23,8 +23,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -151,7 +151,7 @@ public final class FileSupport
   private static void validateFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      Preconditions.checkArgument(Files.isRegularFile(path), String.format("%s is not a regular file", path));
+      checkArgument(Files.isRegularFile(path), String.format("%s is not a regular file", path));
     }
   }
 

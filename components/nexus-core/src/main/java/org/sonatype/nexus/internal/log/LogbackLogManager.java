@@ -37,6 +37,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.sonatype.nexus.common.io.FileSupport;
+import org.sonatype.nexus.common.io.LimitedInputStream;
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationCustomizer;
@@ -45,8 +47,6 @@ import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.LoggerLevel;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import org.sonatype.nexus.util.io.LimitedInputStream;
-import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
