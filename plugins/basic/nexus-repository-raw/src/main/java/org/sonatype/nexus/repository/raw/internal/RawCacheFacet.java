@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.view.PayloadResponse;
  *
  * @since 3.0
  */
+@Facet.Exposed
 public interface RawCacheFacet
     extends Facet
 {

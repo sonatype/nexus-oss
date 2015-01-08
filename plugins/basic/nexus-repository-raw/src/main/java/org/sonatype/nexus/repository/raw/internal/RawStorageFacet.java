@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.raw.RawContentImpl;
  *
  * @since 3.0
  */
+@Facet.Exposed
 public interface RawStorageFacet
     extends Facet
 {
