@@ -33,9 +33,7 @@ public class M2ArtifactRecognizer
 
   /**
    * Is this item M2 Snapshot?
-   * @deprecated Use Gav.isSnapshot()
    */
-  @Deprecated
   public static boolean isSnapshot(String path) {
     return path.indexOf("SNAPSHOT") != -1;
   }

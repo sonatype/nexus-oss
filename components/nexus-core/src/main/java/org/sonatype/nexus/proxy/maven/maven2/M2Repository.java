@@ -159,8 +159,7 @@ public class M2Repository
   @Override
   public boolean shouldServeByPolicies(ResourceStoreRequest request) {
     if (M2ArtifactRecognizer.isMetadata(request.getRequestPath())) {
-      Gav gav = getGavCalculator().pathToGav(request.getRequestPath());
-      if (gav != null && gav.isSnapshot()) {
+      if (M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
         return RepositoryPolicy.SNAPSHOT.equals(getRepositoryPolicy());
       }
       else {
