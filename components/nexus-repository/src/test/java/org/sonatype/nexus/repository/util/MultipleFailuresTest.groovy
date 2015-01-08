@@ -44,7 +44,7 @@ class MultipleFailuresTest
       underTest.propagate('OOPS')
       fail()
     }
-    catch (MultipleFailures.MultipleFailuresException e) {
+    catch (Exception e) {
       log e.toString(), e
       println '----8<----'
       e.printStackTrace()
@@ -64,7 +64,7 @@ class MultipleFailuresTest
       underTest.propagate('OOPS')
       fail()
     }
-    catch (MultipleFailures.MultipleFailuresException e) {
+    catch (Exception e) {
       log e.toString(), e
       println '----8<----'
       e.printStackTrace()
