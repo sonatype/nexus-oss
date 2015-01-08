@@ -24,6 +24,7 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.entity.EntityId;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -49,13 +50,17 @@ public class StorageFacetImpl
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
-  public StorageFacetImpl(BlobStore blobStore,
+  public StorageFacetImpl(EventBus eventBus,
+                          BlobStore blobStore,
                           @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+    // TODO: whose responsibility is it to call this?
+    installDependencies(eventBus);
+
     this.blobStore = blobStore;
     this.databaseInstanceProvider = databaseInstanceProvider;
 
     // initialize schema if needed
-    final OrientGraphNoTx graph = new OrientGraphNoTx(databaseInstanceProvider.get().acquire());
+    final OrientGraphNoTx graph = new CheckedOrientGraphNoTx(databaseInstanceProvider.get().acquire());
     try {
       initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>() {
         @SuppressWarnings("unchecked")
@@ -96,6 +101,13 @@ public class StorageFacetImpl
       if (predicate != null) {
         predicate.apply(type);
       }
+    }
+  }
+
+  private static class CheckedOrientGraphNoTx extends OrientGraphNoTx {
+    public CheckedOrientGraphNoTx(ODatabaseDocumentTx doc) {
+      super(doc);
+      checkForGraphSchema(doc);
     }
   }
 
