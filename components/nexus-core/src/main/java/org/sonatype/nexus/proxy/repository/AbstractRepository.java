@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ItemNotFoundException.ItemNotFoundInRepositoryReason;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -62,6 +63,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
@@ -1160,6 +1162,16 @@ public abstract class AbstractRepository
   {
     if (!this.getLocalStatus().shouldServiceRequest()) {
       throw new RepositoryNotAvailableException(this);
+    }
+
+    // for external requests, ensure item is remotely accessible
+    if (request.isExternal()) {
+      final RepositoryItemUid uid = createUid(request.getRequestPath());
+      if (!uid.getBooleanAttributeValue(IsRemotelyAccessibleAttribute.class)) {
+        log.debug("Request for remotely non-accessible UID {} is forbidden", uid);
+        throw new ItemNotFoundException(
+            ItemNotFoundException.reasonFor(request, this, "External access to UID %s not allowed!", uid));
+      }
     }
 
     // check for writing to read only repo

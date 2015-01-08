@@ -69,18 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.io.ByteStreams.limit;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_PARTIAL_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
-import static javax.servlet.http.HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
-import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+import static javax.servlet.http.HttpServletResponse.*;
 
 /**
  * Provides access to repositories contents.
@@ -447,8 +436,8 @@ public class ContentServlet
       }
       else {
         // cycle detected, current link already processed
-        throw new ItemNotFoundException(ItemNotFoundException.reasonFor(link.getResourceStoreRequest(), link
-            .getRepositoryItemUid().getRepository(),
+        throw new ItemNotFoundException(ItemNotFoundException.reasonFor(link.getResourceStoreRequest(),
+            link.getRepositoryItemUid().getRepository(),
             "Link item %s introduced a cycle while referencing it, cycle is %s", link.getRepositoryItemUid(), hops));
       }
     }
