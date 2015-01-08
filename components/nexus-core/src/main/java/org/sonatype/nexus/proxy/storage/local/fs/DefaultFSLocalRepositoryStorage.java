@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,6 +37,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
@@ -44,10 +47,12 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -213,7 +218,6 @@ public class DefaultFSLocalRepositoryStorage
 
     final RepositoryItemUid uid = repository.createUid(path);
 
-    final AbstractStorageItem result;
     if (target.isDirectory()) {
       request.setRequestPath(path);
 
@@ -221,7 +225,7 @@ public class DefaultFSLocalRepositoryStorage
           new DefaultStorageCollectionItem(repository, request, target.canRead(), target.canWrite());
       coll.setModified(target.lastModified());
       coll.setCreated(target.lastModified());
-      result = coll;
+      return coll;
     }
     else if (target.isFile() && !mustBeACollection) {
       request.setRequestPath(path);
@@ -242,9 +246,14 @@ public class DefaultFSLocalRepositoryStorage
             repository.getAttributesHandler().fetchAttributes(link);
             link.setModified(target.lastModified());
             link.setCreated(target.lastModified());
-            result = link;
 
-            repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
+            // NEXUS-7850: NEXUS-7851: filter out unwanted cases, by not treating them as links
+            final Attributes attributes = link.getRepositoryItemAttributes();
+            if (Strings.isNullOrEmpty(attributes.getRemoteUrl()) &&
+                !attributes.containsKey(AccessManager.REQUEST_REMOTE_ADDRESS)) {
+              repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), link);
+              return link;
+            }
           }
           catch (NoSuchRepositoryException e) {
             log.warn("Stale link object found on UID: {}, deleting it.", uid);
@@ -254,17 +263,16 @@ public class DefaultFSLocalRepositoryStorage
                 RepositoryStringUtils.getHumanizedNameString(repository)), e);
           }
         }
-        else {
-          DefaultStorageFileItem file =
-              new DefaultStorageFileItem(repository, request, target.canRead(), target.canWrite(),
-                  fileContent);
-          repository.getAttributesHandler().fetchAttributes(file);
-          file.setModified(target.lastModified());
-          file.setCreated(target.lastModified());
-          result = file;
+        // is a file
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem(repository, request, target.canRead(), target.canWrite(),
+                fileContent);
+        repository.getAttributesHandler().fetchAttributes(file);
+        file.setModified(target.lastModified());
+        file.setCreated(target.lastModified());
 
-          repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), file);
-        }
+        repository.getAttributesHandler().touchItemLastRequested(System.currentTimeMillis(), file);
+        return file;
       }
       catch (FileNotFoundException e) {
         // It is possible for this file to have been removed after the call to target.exists()
@@ -284,8 +292,6 @@ public class DefaultFSLocalRepositoryStorage
           "Path %s not found in local storage of repository %s", request.getRequestPath(),
           RepositoryStringUtils.getHumanizedNameString(repository)));
     }
-
-    return result;
   }
 
   public boolean isReachable(Repository repository, ResourceStoreRequest request)
@@ -333,6 +339,33 @@ public class DefaultFSLocalRepositoryStorage
         prepareStorageFileItemForStore(fItem);
 
         cl = fItem.getContentLocator();
+
+        try {
+          final BufferedInputStream bufferedInputStream;
+          if (!cl.isReusable()) {
+            // link persister will close the stream, so prevent it doing so
+            bufferedInputStream = new BufferedInputStream(cl.getContent()) {
+              @Override
+              public void close() {
+                // nop
+              }
+            };
+            bufferedInputStream.mark(1024);
+            cl = new PreparedContentLocator(bufferedInputStream, cl.getMimeType(), cl.getLength());
+          } else {
+            bufferedInputStream = null;
+          }
+          if (getLinkPersister().isLinkContent(cl)) {
+            // we are about to store a file that has link content, ban this store attempt
+            throw new UnsupportedStorageOperationException("Illegal Link API use on path " + item.getPath());
+          }
+          if (bufferedInputStream != null) {
+            bufferedInputStream.reset();
+          }
+        } catch (IOException e) {
+          // meh, need to wrap it
+          throw new LocalStorageException("Link-check failed ", e);
+        }
       }
       else if (item instanceof StorageLinkItem) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
