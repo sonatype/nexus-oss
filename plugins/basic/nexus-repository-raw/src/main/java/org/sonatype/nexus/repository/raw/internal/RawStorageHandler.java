@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.raw.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,7 +49,7 @@ public class RawStorageHandler
   @Nonnull
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
-    String name = contentName(context);
+    String name = normalizePath(contentName(context));
     String method = context.getRequest().getAction();
 
     Repository repository = context.getRequest().getRepository();
@@ -65,6 +68,7 @@ public class RawStorageHandler
 
       case PUT: {
         RawContent content = toContent(context.getRequest().getPayload());
+
         storage.put(name, content);
         return HttpResponses.created();
       }
@@ -80,6 +84,15 @@ public class RawStorageHandler
       default:
         return HttpResponses.methodNotAllowed(method, GET, PUT, DELETE);
     }
+  }
+
+  /**
+   * Normalize the incoming URI, eliminating "." and ".." references as per {@link URI#normalize()}.
+   */
+  private String normalizePath(final String name) throws URISyntaxException {
+    final URI uri = new URI(name);
+    final URI normalized = uri.normalize();
+    return normalized.toString();
   }
 
   /**
