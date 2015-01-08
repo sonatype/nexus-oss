@@ -13,8 +13,8 @@
 package org.sonatype.security.realms.ldap.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -38,17 +38,17 @@ public class LdapManagerTest
     extends LdapTestSupport
 {
   @Override
-  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
     // reuse the "default" one, but add the two more
-    final Map<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
-    result.put("backup", createServerConfiguration("backup"));
+    final LinkedHashMap<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
     result.put("second", createServerConfiguration("second"));
+    result.put("backup", createServerConfiguration("backup"));
     return result;
   }
 
   @Override
-  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
-    final Map<String, LdapConfiguration> result = super.createLdapClientConfigurations();
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    final LinkedHashMap<String, LdapConfiguration> result = super.createLdapClientConfigurations();
 
     // backup is not default kind
     final LdapConfiguration backup = result.get("backup");

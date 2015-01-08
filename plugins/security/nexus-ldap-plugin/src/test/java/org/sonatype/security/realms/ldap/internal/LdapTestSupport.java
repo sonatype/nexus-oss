@@ -14,6 +14,7 @@ package org.sonatype.security.realms.ldap.internal;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +59,11 @@ import static org.mockito.Mockito.mock;
 public abstract class LdapTestSupport
     extends SecurityTestSupport
 {
-  protected Map<String, LdapServerConfiguration> ldapServerConfigurations = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServerConfiguration> ldapServerConfigurations = Maps.newLinkedHashMap();
 
-  protected Map<String, LdapServer> ldapServers = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServer> ldapServers = Maps.newLinkedHashMap();
 
-  protected Map<String, LdapConfiguration> ldapClientConfigurations = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapConfiguration> ldapClientConfigurations = Maps.newLinkedHashMap();
 
   protected LdapConfigurationSource ldapConfigurationSource = new MockLdapConfigurationSource();
 
@@ -159,8 +160,8 @@ public abstract class LdapTestSupport
     }
   }
 
-  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
-    final Map<String, LdapConfiguration> result = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    final LinkedHashMap<String, LdapConfiguration> result = Maps.newLinkedHashMap();
     // default implementation creates entries for all defined LDAP servers
     int order = 0;
     for (String name : ldapServers.keySet()) {
@@ -209,8 +210,8 @@ public abstract class LdapTestSupport
     return ldapConfiguration;
   }
 
-  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final LinkedHashMap<String, LdapServerConfiguration> result = Maps.newLinkedHashMap();
     result.put("default", createServerConfiguration("default"));
     return result;
   }

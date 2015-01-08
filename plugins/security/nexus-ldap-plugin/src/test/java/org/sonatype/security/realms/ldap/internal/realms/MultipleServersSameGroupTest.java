@@ -14,6 +14,7 @@ package org.sonatype.security.realms.ldap.internal.realms;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -38,8 +39,8 @@ public class MultipleServersSameGroupTest
   private MockLdapConnector twoConnector = null;
 
   @Override
-  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final LinkedHashMap<String, LdapServerConfiguration> result = Maps.newLinkedHashMap();
     result.put("one", createServerConfiguration("one"));
     result.put("two", createServerConfiguration("two"));
     return result;

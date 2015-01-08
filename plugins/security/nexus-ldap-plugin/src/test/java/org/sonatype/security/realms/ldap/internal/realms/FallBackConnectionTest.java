@@ -13,6 +13,7 @@
 package org.sonatype.security.realms.ldap.internal.realms;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,14 +45,14 @@ public class FallBackConnectionTest
   private MockLdapConnector backupConnector = null;
 
   @Override
-  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    final Map<String, LdapServerConfiguration> result = Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    final LinkedHashMap<String, LdapServerConfiguration> result = Maps.newLinkedHashMap();
     result.put("main", createServerConfiguration("main"));
     result.put("backup", createServerConfiguration("backup"));
     return result;
   }
 
-  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
     final LdapServer mainServer = ldapServers.get("main");
     final LdapServer backupServer = ldapServers.get("backup");
     final LdapConfiguration mainClientConfiguration = createLdapClientConfigurationForServer("main", 1, mainServer);
@@ -67,7 +68,7 @@ public class FallBackConnectionTest
     mainClientConfiguration.getMapping().setGroupMemberAttribute("uniqueMember");
     mainClientConfiguration.getMapping().setUserSubtree(false);
 
-    final Map<String, LdapConfiguration> result = Maps.newHashMap();
+    final LinkedHashMap<String, LdapConfiguration> result = Maps.newLinkedHashMap();
     result.put("main", mainClientConfiguration);
     return result;
   }

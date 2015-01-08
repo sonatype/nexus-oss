@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.realms.ldap.usermanagement;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.sonatype.ldaptestsuite.LdapServerConfiguration;
@@ -28,8 +29,8 @@ public class LdapUserManagerNotConfiguredIT
     extends LdapITSupport
 {
   @Override
-  protected Map<String, LdapServerConfiguration> createLdapServerConfigurations() {
-    return Maps.newHashMap();
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    return Maps.newLinkedHashMap();
   }
 
   @Test

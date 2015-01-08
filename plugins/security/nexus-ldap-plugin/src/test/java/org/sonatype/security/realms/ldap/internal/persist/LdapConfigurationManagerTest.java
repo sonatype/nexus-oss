@@ -13,6 +13,7 @@
 package org.sonatype.security.realms.ldap.internal.persist;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,8 @@ public class LdapConfigurationManagerTest
     extends LdapTestSupport
 {
   @Override
-  protected Map<String, LdapConfiguration> createLdapClientConfigurations() {
-    return Maps.newHashMap();
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    return Maps.newLinkedHashMap();
   }
 
   @Test
