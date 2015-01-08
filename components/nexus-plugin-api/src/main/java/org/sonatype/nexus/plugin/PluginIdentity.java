@@ -18,7 +18,6 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.util.GAVCoordinate;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Properties2;
 
