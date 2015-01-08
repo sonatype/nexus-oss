@@ -29,9 +29,9 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
 import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;

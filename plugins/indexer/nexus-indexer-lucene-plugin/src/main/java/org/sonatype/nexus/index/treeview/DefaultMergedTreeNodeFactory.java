@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.index.treeview;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

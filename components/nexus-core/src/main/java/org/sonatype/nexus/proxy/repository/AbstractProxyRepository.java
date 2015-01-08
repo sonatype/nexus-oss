@@ -25,7 +25,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

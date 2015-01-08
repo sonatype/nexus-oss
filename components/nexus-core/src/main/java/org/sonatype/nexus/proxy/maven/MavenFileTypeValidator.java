@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;

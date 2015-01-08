@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;

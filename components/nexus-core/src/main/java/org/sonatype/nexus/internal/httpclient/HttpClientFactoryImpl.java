@@ -22,7 +22,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.httpclient.HttpClientFactory;
 import org.sonatype.nexus.httpclient.SSLContextSelector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;

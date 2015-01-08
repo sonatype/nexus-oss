@@ -21,7 +21,7 @@ import javax.net.ssl.SSLContext;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.email.SmtpSessionParametersCustomizer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 

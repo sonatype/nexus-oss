@@ -17,8 +17,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 
-import org.sonatype.nexus.common.SystemPropertiesHelper;
 import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
