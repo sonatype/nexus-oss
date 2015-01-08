@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Maven GAV coordinates.
  */
 @Deprecated
-final class GAVCoordinate
+public final class GAVCoordinate
 {
   // ----------------------------------------------------------------------
   // Implementation fields
