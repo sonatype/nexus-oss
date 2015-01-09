@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.index.IndexerManager;
@@ -24,7 +25,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;

@@ -23,6 +23,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -35,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryTaskSupport;
 import org.sonatype.nexus.scheduling.Cancelable;
 import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskInfo;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
 import org.sonatype.nexus.yum.YumRegistry;

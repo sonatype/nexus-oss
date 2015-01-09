@@ -18,11 +18,11 @@ import java.security.MessageDigest;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.proxy.attributes.AbstractStorageItemInspector;
 import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 import static com.google.common.io.ByteStreams.nullOutputStream;
 

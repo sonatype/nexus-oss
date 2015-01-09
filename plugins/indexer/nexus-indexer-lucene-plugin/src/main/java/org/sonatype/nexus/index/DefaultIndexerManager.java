@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -71,7 +72,6 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskInterruptedException;
-import org.sonatype.nexus.util.file.DirSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Throwables2;
 

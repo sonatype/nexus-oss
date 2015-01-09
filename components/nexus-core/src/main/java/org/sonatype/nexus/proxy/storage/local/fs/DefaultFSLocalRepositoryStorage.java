@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -61,7 +62,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.PathUtils;
-import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;

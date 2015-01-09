@@ -19,7 +19,7 @@ import javax.inject.Named;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

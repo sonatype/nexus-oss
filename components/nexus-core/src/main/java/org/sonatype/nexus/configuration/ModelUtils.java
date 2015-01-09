@@ -30,7 +30,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
 
-import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.sisu.goodies.common.Loggers;
 import org.sonatype.sisu.goodies.common.io.FileReplacer;
 import org.sonatype.sisu.goodies.common.io.FileReplacer.ContentWriter;

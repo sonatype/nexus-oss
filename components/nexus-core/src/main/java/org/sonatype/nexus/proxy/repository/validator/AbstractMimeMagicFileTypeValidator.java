@@ -17,10 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

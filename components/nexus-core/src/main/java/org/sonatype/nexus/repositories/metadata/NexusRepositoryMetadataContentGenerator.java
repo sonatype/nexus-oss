@@ -19,6 +19,7 @@ import java.io.InputStream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -28,7 +29,6 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.nexus.web.BaseUrlHolder;
 
 @Named(NexusRepositoryMetadataContentGenerator.ID)

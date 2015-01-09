@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.sonatype.nexus.guice.AbstractInterceptorModule;
+import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
 
 import com.google.common.base.Strings;
 import com.google.inject.Key;

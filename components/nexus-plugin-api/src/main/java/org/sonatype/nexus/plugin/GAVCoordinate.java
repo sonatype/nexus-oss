@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util;
+package org.sonatype.nexus.plugin;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -40,12 +40,15 @@ public final class GAVCoordinate
   // Constructors
   // ----------------------------------------------------------------------
 
-  public GAVCoordinate(final String groupId, final String artifactId, final String version) {
+  GAVCoordinate(final String groupId, final String artifactId, final String version) {
     this(groupId, artifactId, version, null, null);
   }
 
-  public GAVCoordinate(final String groupId, final String artifactId, final String version, final String classifier,
-                       final String type)
+  GAVCoordinate(final String groupId,
+                final String artifactId,
+                final String version,
+                final String classifier,
+                final String type)
   {
     this.groupId = checkNotNull(groupId);
     this.artifactId = checkNotNull(artifactId);

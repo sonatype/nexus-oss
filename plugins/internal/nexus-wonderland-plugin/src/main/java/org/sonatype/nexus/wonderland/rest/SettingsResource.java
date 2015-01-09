@@ -20,11 +20,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.wonderland.WonderlandPlugin;
 import org.sonatype.nexus.wonderland.model.PropertyXO;
-import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.siesta.Resource;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NonNls;

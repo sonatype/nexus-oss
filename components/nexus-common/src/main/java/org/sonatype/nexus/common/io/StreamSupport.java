@@ -10,16 +10,18 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.io;
+package org.sonatype.nexus.common.io;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// FIXME: Rename to Streams, or StreamHelper
 
 /**
  * Stream related support class. Offers static helper methods for common stream related operations
@@ -30,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class StreamSupport
 {
-
   private StreamSupport() {
     // no instance
   }
@@ -38,6 +39,8 @@ public final class StreamSupport
   public static final int BUFFER_SIZE = SystemPropertiesHelper.getInteger(
       StreamSupport.class.getName() + ".BUFFER_SIZE", 8192
   );
+
+  // TODO: Perhaps remove this and simply use Guava ByteStreams?
 
   /**
    * Copies provided input stream to the provided output stream, probably using buffer of provided size. The buffer

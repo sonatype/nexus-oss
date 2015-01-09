@@ -15,6 +15,7 @@ package org.sonatype.nexus.blobstore.file;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
+import org.sonatype.nexus.common.collect.AutoClosableIterable;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 /**

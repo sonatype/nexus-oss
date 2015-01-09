@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -41,7 +42,6 @@ import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 

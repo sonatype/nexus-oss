@@ -21,6 +21,10 @@ import org.codehaus.plexus.util.Base64;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
 
+// TODO: Update to use Guava's BaseEncoding helpers and free from plexus-utils
+// TODO: Update to use Guava's Hasher helpers and free from DigesterUtils
+// TODO: Migrate to nexus-common once ^^^ is done
+
 /**
  * Provides static methods for working with token-like thingies.
  *

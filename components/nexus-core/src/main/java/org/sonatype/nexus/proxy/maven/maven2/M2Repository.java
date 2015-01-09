@@ -26,6 +26,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -55,9 +56,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
-import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;

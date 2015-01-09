@@ -19,12 +19,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.NexusMimeTypes;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.AbstractMimeMagicFileTypeValidator;
 import org.sonatype.nexus.proxy.repository.validator.XMLUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 

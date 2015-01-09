@@ -28,6 +28,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>nexus-common</module>
     <module>base-configuration</module>
     <module>nexus-analytics-api</module>
     <module>nexus-blobstore-api</module>

@@ -29,6 +29,9 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.io.DirSupport;
+import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageEOFException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -42,9 +45,6 @@ import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.nexus.util.io.StreamSupport;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.common.Throwables2;
 

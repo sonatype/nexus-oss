@@ -17,10 +17,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 
+import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Tag;
