@@ -10,40 +10,57 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.entity;
+package org.sonatype.nexus.orient.entity;
+
+import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Detached {@link EntityMetadata}.
+ * Entity identifier.
  *
  * @since 3.0
  */
-public class DetachedEntityMetadata
-  implements EntityMetadata
+public class EntityId
+  implements Serializable
 {
-  private final EntityId id;
+  private static final long serialVersionUID = 1L;
 
-  private final EntityVersion version;
+  private final String value;
 
-  public DetachedEntityMetadata(final EntityId id, final EntityVersion version) {
-    this.id = checkNotNull(id);
-    this.version = checkNotNull(version);
+  public EntityId(final String value) {
+    this.value = checkNotNull(value);
   }
 
-  public EntityId getId() {
-    return id;
+  public String getValue() {
+    return value;
   }
 
-  public EntityVersion getVersion() {
-    return version;
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EntityId entityId = (EntityId) o;
+
+    if (!value.equals(entityId.value)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return value.hashCode();
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "id=" + id +
-        ", version=" + version +
-        '}';
+    return value;
   }
 }

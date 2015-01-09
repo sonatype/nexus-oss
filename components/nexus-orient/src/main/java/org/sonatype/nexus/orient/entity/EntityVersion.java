@@ -10,25 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.entity;
+package org.sonatype.nexus.orient.entity;
 
 import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Entity identifier.
+ * Entity version.
  *
  * @since 3.0
  */
-public class EntityId
+public class EntityVersion
   implements Serializable
 {
   private static final long serialVersionUID = 1L;
 
   private final String value;
 
-  public EntityId(final String value) {
+  public EntityVersion(final String value) {
     this.value = checkNotNull(value);
   }
 
@@ -45,9 +45,9 @@ public class EntityId
       return false;
     }
 
-    EntityId entityId = (EntityId) o;
+    EntityVersion that = (EntityVersion) o;
 
-    if (!value.equals(entityId.value)) {
+    if (!value.equals(that.value)) {
       return false;
     }
 

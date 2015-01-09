@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import org.sonatype.nexus.repository.entity.Entity;
+import org.sonatype.nexus.orient.entity.Entity;
 
 /**
  * Component entity.

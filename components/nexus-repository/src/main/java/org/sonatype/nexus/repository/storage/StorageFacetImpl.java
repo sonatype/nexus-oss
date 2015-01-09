@@ -22,8 +22,8 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.orient.DatabaseInstance;
+import org.sonatype.nexus.orient.entity.EntityId;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.entity.EntityId;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Predicate;
