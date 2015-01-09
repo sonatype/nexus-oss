@@ -160,17 +160,19 @@ extends DirectComponentSupport
         privilege.repositoryTargetName = targetRegistry.getRepositoryTarget(value)?.name
       }
       else if (key == 'repositoryId' || key == 'repositoryGroupId') {
-        privilege.repositoryId = value
-        if (value && value != '*' && !value.allWhitespace) {
-          try {
-            privilege.repositoryName = repositoryRegistry.getRepository(value).name
+        if (!privilege.repositoryId) { // check not already mapped
+          privilege.repositoryId = value
+          if (value && value != '*' && !value.allWhitespace) {
+            try {
+              privilege.repositoryName = repositoryRegistry.getRepository(value).name
+            }
+            catch (NoSuchRepositoryException e) {
+              privilege.repositoryName = value
+            }
           }
-          catch (NoSuchRepositoryException e) {
-            privilege.repositoryName = value
+          else {
+            privilege.repositoryName = 'All repositories'
           }
-        }
-        else {
-          privilege.repositoryName = 'All repositories'
         }
       }
     }
