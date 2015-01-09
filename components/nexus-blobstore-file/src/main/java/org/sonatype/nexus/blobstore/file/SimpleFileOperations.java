@@ -46,7 +46,7 @@ public class SimpleFileOperations
     // Ensure path exists for new blob
     Path dir = path.getParent();
     checkNotNull(dir, "Null parent for path: %s", path);
-    DirectoryHelper.mkdir(dir);
+    DirSupport.mkdir(dir);
 
     final MetricsInputStream input = new MetricsInputStream(data);
     try {

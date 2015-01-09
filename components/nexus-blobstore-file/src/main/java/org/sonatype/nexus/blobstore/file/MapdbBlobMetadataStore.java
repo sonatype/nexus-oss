@@ -91,7 +91,7 @@ public class MapdbBlobMetadataStore
 
   @Override
   protected void doStart() throws Exception {
-    DirectoryHelper.mkdir(file.getParentFile());
+    DirSupport.mkdir(file.getParentFile());
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
         .makeTxMaker();
