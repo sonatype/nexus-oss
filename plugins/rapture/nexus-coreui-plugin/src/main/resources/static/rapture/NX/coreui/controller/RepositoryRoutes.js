@@ -125,7 +125,6 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_ROUTING_CREATE_TITLE'));
     me.loadCreateWizard(1, true, null);
-    //Ext.widget('nx-coreui-repositoryroute-add');
   },
 
   /**

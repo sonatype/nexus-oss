@@ -96,8 +96,18 @@ Ext.define('NX.view.drilldown.Drilldown', {
         {
           xtype: 'nx-drilldown-item',
           items: [
-            me.masters[i],
-            (i > 0 ? me.createWizard[i - 1] : undefined)
+            {
+              xtype: 'container',
+              layout: 'fit',
+              itemId: 'browse' + i,
+              items: me.masters[i]
+            },
+            {
+              xtype: 'container',
+              layout: 'fit',
+              itemId: 'create' + i,
+              items: (i > 0 ? me.createWizard[i - 1] : undefined)
+            }
           ]
         }
       );
@@ -283,14 +293,13 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   showCreateWizard: function (index, animate, cmp) {
     var me = this,
-      item = me.query('nx-drilldown-item')[index];
+      item = me.query('nx-drilldown-item')[index],
+      container = item.down('#create' + index);
 
     // Load the component (if specified)
     if (cmp) {
-      if (item.items.items[1]) {
-        item.remove(item.items.items[1], true);
-      }
-      item.add(cmp);
+      container.removeAll();
+      container.add(cmp);
     }
 
     // Show the proper card
