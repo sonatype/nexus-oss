@@ -231,7 +231,33 @@ Ext.define('NX.view.drilldown.Drilldown', {
       container = me.down('container');
 
     container.setSize(owner.getWidth() * container.items.length, owner.getHeight());
-    me.showChild(me.currentIndex, false);
+    me.slidePanels(me.currentIndex, false);
+  },
+
+  /**
+   * Slide the drilldown to reveal the specified panel
+   */
+  slidePanels: function (index, animate) {
+    var me = this,
+      item = me.query('nx-drilldown-item')[index];
+
+    if (item.el) {
+
+      // Hack to suppress resize events until the animation is complete
+      if (animate) {
+        me.ownerCt.suspendEvents(false);
+        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
+      }
+
+      // Show the requested panel
+      var left = item.el.getLeft() - me.el.getLeft();
+      me.el.first().move('l', left, animate);
+      me.currentIndex = index;
+
+      // Update the breadcrumb
+      me.refreshBreadcrumb();
+      me.resizeBreadcrumb();
+    }
   },
 
   /**
@@ -244,23 +270,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
     var me = this,
       item = me.query('nx-drilldown-item')[index];
 
-    if (item.el) {
-
-      // Hack to prevent resize events until the animation is complete
-      if (animate) {
-        me.ownerCt.suspendEvents(false);
-        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
-      }
-
-      // Show the requested panel
-      item.getLayout().setActiveItem(0); // And proper card
-      var left = item.el.getLeft() - me.el.getLeft();
-      me.el.first().move('l', left, animate);
-      me.currentIndex = index;
-
-      me.refreshBreadcrumb();
-      me.resizeBreadcrumb();
-    }
+    // Show the proper card
+    item.getLayout().setActiveItem(0);
+    me.slidePanels(index, animate);
   },
 
   /**
@@ -274,31 +286,17 @@ Ext.define('NX.view.drilldown.Drilldown', {
     var me = this,
       item = me.query('nx-drilldown-item')[index];
 
-    if (item.el) {
-
-      // Hack to prevent resize events until the animation is complete
-      if (animate) {
-        me.ownerCt.suspendEvents(false);
-        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
+    // Load the component (if specified)
+    if (cmp) {
+      if (item.items.items[1]) {
+        item.remove(item.items.items[1], true);
       }
-
-      // Load the component (if specified)
-      if (cmp) {
-        if (item.items.items[1]) {
-          item.remove(item.items.items[1], true);
-        }
-        item.add(cmp);
-      }
-
-      // Show the requested panel
-      item.getLayout().setActiveItem(1); // And proper card
-      var left = item.el.getLeft() - me.el.getLeft();
-      me.el.first().move('l', left, animate);
-      me.currentIndex = index;
-
-      me.refreshBreadcrumb();
-      me.resizeBreadcrumb();
+      item.add(cmp);
     }
+
+    // Show the proper card
+    item.getLayout().setActiveItem(1);
+    me.slidePanels(index, animate);
   },
 
   /**
@@ -326,7 +324,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
           ui: 'drilldown',
           text: content.currentTitle,
           handler: function() {
-            me.showChild(0, true);
+            me.slidePanels(0, true);
 
             // Set the bookmark
             var bookmark = items[0].itemBookmark;
@@ -364,11 +362,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
               handler: function() {
                 var bookmark = items[j].itemBookmark;
                 if (bookmark) {
-                  me.showChild(j, true);
                   NX.Bookmarks.bookmark(bookmark.obj, bookmark.scope);
-                } else {
-                  me.showCreateWizard(j, true, null);
                 }
+                me.slidePanels(j, true);
               }
             }
           })(i)
