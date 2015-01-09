@@ -16,7 +16,7 @@ import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
- * Tests for {@link org.sonatype.nexus.common.text.Plural}
+ * Tests for {@link Plural}
  */
 class PluralTest
   extends TestSupport

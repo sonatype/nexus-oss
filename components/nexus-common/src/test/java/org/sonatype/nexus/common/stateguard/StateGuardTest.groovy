@@ -25,7 +25,7 @@ import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.STARTED
 import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.STOPPED
 
 /**
- * Tests for {@link org.sonatype.nexus.common.stateguard.StateGuard}.
+ * Tests for {@link StateGuard}.
  */
 class StateGuardTest
     extends TestSupport
