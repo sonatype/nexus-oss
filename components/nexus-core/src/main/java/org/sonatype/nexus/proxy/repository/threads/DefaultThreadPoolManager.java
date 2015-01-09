@@ -22,11 +22,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.eventbus.Subscribe;

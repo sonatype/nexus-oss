@@ -22,7 +22,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.util.Inflector;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.reflection.Reflector;

@@ -34,13 +34,19 @@
     </dependency>
 
     <dependency>
-      <groupId>org.mapdb</groupId>
-      <artifactId>mapdb</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-common</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mapdb</groupId>
+      <artifactId>mapdb</artifactId>
     </dependency>
 
     <dependency>

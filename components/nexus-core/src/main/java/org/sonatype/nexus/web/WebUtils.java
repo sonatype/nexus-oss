@@ -20,8 +20,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.common.io.StreamSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 
 /**
  * Web response related utilities, that helps in ordinary tasks with HTTP servlet responses.

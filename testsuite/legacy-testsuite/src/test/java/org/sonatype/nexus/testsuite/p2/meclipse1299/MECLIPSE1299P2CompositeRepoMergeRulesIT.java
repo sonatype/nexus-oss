@@ -15,13 +15,17 @@ package org.sonatype.nexus.testsuite.p2.meclipse1299;
 import java.io.File;
 import java.net.URL;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.sonatype.nexus.testsuite.p2.AbstractNexusProxyP2IT;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasXPath;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 public class MECLIPSE1299P2CompositeRepoMergeRulesIT
@@ -30,6 +34,13 @@ public class MECLIPSE1299P2CompositeRepoMergeRulesIT
 
   public MECLIPSE1299P2CompositeRepoMergeRulesIT() {
     super("meclipse1299");
+  }
+
+  private static Document parse(final File file) throws Exception {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    factory.setNamespaceAware(true);
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    return builder.parse(file);
   }
 
   @Test
@@ -47,14 +58,23 @@ public class MECLIPSE1299P2CompositeRepoMergeRulesIT
     );
     assertThat(artifactsXmlFile, exists());
 
-    assertThat(artifactsXmlFile, contains(
-        "<mappings size=\"5\">",
-        "<rule output=\"${repoUrl}/plugins/${id}_${version}.jar\" filter=\"(&amp; (classifier=osgi.bundle))\" />",
-        "<rule output=\"${repoUrl}/binary/${id}_${version}\" filter=\"(&amp; (classifier=binary))\" />",
-        "<rule output=\"${repoUrl}/features/${id}_${version}.jar\" filter=\"(&amp; (classifier=org.eclipse.update.feature))\" />",
-        "<rule output=\"foo.bar\" filter=\"(&amp; (classifier=foo))\" />",
-        "<rule output=\"bar.foo\" filter=\"(&amp; (classifier=bar))\" />"
-    ));
-  }
+    Document doc = parse(artifactsXmlFile);
 
+    assertThat(doc, hasXPath("/repository/mappings/@size", is("5")));
+
+    assertThat(doc, hasXPath("/repository/mappings/rule[@output='${repoUrl}/plugins/${id}_${version}.jar']/@filter",
+        is("(& (classifier=osgi.bundle))")));
+
+    assertThat(doc, hasXPath("/repository/mappings/rule[@output='${repoUrl}/binary/${id}_${version}']/@filter",
+        is("(& (classifier=binary))")));
+
+    assertThat(doc, hasXPath("/repository/mappings/rule[@output='${repoUrl}/features/${id}_${version}.jar']/@filter",
+        is("(& (classifier=org.eclipse.update.feature))")));
+
+    assertThat(doc, hasXPath("/repository/mappings/rule[@output='foo.bar']/@filter",
+        is("(& (classifier=foo))")));
+
+    assertThat(doc, hasXPath("/repository/mappings/rule[@output='bar.foo']/@filter",
+        is("(& (classifier=bar))")));
+  }
 }

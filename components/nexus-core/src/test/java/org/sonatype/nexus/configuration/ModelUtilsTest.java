@@ -20,13 +20,13 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
 
+import org.sonatype.nexus.common.io.FileSupport;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelReader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelUpgrader;
 import org.sonatype.nexus.configuration.ModelUtils.CharacterModelWriter;
 import org.sonatype.nexus.configuration.ModelUtils.CorruptModelException;
 import org.sonatype.nexus.configuration.ModelUtils.Versioned;
 import org.sonatype.nexus.configuration.ModelloUtils.VersionedInFieldXmlModelloModelHelper;
-import org.sonatype.nexus.util.file.FileSupport;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -35,8 +35,10 @@ import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Test;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 /**

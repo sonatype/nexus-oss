@@ -60,33 +60,33 @@ public class ThreadPoolTaskExecutorSPI
 
   private final ConcurrentMap<String, ThreadPoolTaskInfo<?>> tasks;
 
+  private final ConcurrentMap<String, Future<?>> taskFutures;
+
   @Inject
   public ThreadPoolTaskExecutorSPI(final TaskFactory taskFactory)
   {
     this.taskFactory = checkNotNull(taskFactory);
     this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(15);
     this.tasks = Maps.newConcurrentMap();
+    this.taskFutures = Maps.newConcurrentMap();
   }
 
   private class ThreadPoolTaskInfo<T>
       implements TaskInfo<T>, Callable<T>
   {
-    private Task<T> task;
+    private final Task<T> task;
 
-    private Schedule schedule;
+    private final Schedule schedule;
 
-    private Future<T> future;
-
-    private Date runStarted;
+    private final Date runStarted;
 
     private long runDuration;
 
     private volatile EndState endState;
 
-    public void itRuns(final Task<T> task, final Schedule schedule, final Future<T> future) {
+    public ThreadPoolTaskInfo(final Task<T> task, final Schedule schedule) {
       this.task = task;
       this.schedule = schedule;
-      this.future = future;
       this.runStarted = new Date();
       this.runDuration = 0;
       this.endState = null;
@@ -162,7 +162,7 @@ public class ThreadPoolTaskExecutorSPI
         @Nullable
         @Override
         public Future getFuture() {
-          return future;
+          return taskFutures.get(getId());
         }
       };
     }
@@ -199,7 +199,11 @@ public class ThreadPoolTaskExecutorSPI
 
     @Override
     public boolean remove() {
-      return future.cancel(true);
+      final Future<?> future = taskFutures.get(getId());
+      if (future != null) {
+        return future.cancel(true);
+      }
+      return false;
     }
 
     @Override
@@ -219,6 +223,7 @@ public class ThreadPoolTaskExecutorSPI
         throw e;
       }
       finally {
+        taskFutures.remove(getId());
         tasks.remove(getId());
         this.runDuration = System.currentTimeMillis() - now;
         this.endState = endState;
@@ -241,17 +246,19 @@ public class ThreadPoolTaskExecutorSPI
     checkNotNull(taskConfiguration);
     checkArgument(schedule instanceof Now, "Only 'now' schedule is supported");
     final Task<T> task = taskFactory.createTaskInstance(taskConfiguration);
-    final ThreadPoolTaskInfo<T> taskInfo;
     if (tasks.containsKey(taskConfiguration.getId())) {
-      taskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
-      taskInfo.getCurrentState().getFuture().cancel(true);
+      final ThreadPoolTaskInfo<T> oldTaskInfo = (ThreadPoolTaskInfo<T>) tasks.get(taskConfiguration.getId());
+      if (oldTaskInfo != null) {
+        final Future<T> oldTaskFuture = oldTaskInfo.getCurrentState().getFuture();
+        if (oldTaskFuture != null) {
+          oldTaskFuture.cancel(true);
+        }
+      }
     }
-    else {
-      taskInfo = new ThreadPoolTaskInfo<>();
-    }
+    final ThreadPoolTaskInfo<T> taskInfo = new ThreadPoolTaskInfo<>(task, schedule);
     final Future<T> future = executorService.submit(taskInfo);
-    taskInfo.itRuns(task, schedule, future);
     tasks.put(task.getId(), taskInfo);
+    taskFutures.put(task.getId(), future);
     return taskInfo;
   }
 

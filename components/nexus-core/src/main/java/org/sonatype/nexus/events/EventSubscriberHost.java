@@ -23,9 +23,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.threads.NexusExecutorService;
 import org.sonatype.nexus.threads.NexusThreadFactory;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 

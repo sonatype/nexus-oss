@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.storage.remote;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.storage.remote.httpclient.HttpClientRemoteStorage;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.codehaus.plexus.util.StringUtils;
