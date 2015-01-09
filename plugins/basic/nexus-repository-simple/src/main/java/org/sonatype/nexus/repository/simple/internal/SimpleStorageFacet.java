@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.simple.SimpleContent;
@@ -25,7 +26,6 @@ import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
-import org.sonatype.nexus.repository.stateguard.Guarded;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;

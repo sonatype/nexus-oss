@@ -15,10 +15,10 @@ package org.sonatype.nexus.repository;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.sonatype.nexus.repository.stateguard.Guarded;
-import org.sonatype.nexus.repository.stateguard.StateGuard;
-import org.sonatype.nexus.repository.stateguard.StateGuardAware;
-import org.sonatype.nexus.repository.stateguard.Transitions;
+import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.common.stateguard.StateGuard;
+import org.sonatype.nexus.common.stateguard.StateGuardAware;
+import org.sonatype.nexus.common.stateguard.Transitions;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 

@@ -10,26 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.stateguard;
+package org.sonatype.nexus.common.stateguard;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.common.guice.AbstractInterceptorModule;
-
-import com.google.inject.matcher.Matchers;
+import javax.annotation.Nullable;
 
 /**
- * State guard module.
+ * Guarded state.
  *
  * @since 3.0
  */
-@Named
-public class StateGuardModule
-  extends AbstractInterceptorModule
+public interface Guard
 {
-  @Override
-  protected void configure() {
-    bindInterceptor(Matchers.any(), Matchers.annotatedWith(Guarded.class), new GuardedInterceptor());
-    bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transitions.class), new TransitionsInterceptor());
-  }
+  @Nullable
+  <V> V run(Action<V> action) throws Exception;
 }

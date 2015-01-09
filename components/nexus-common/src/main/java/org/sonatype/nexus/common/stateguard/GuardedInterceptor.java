@@ -11,7 +11,7 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.stateguard;
+package org.sonatype.nexus.common.stateguard;
 
 import java.lang.reflect.Method;
 
@@ -23,11 +23,11 @@ import org.aopalliance.intercept.MethodInvocation;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * {@link Transitions} interceptor.
+ * {@link Guarded} interceptor.
  *
  * @since 3.0
  */
-public class TransitionsInterceptor
+public class GuardedInterceptor
     extends ComponentSupport
     implements MethodInterceptor
 {
@@ -43,17 +43,14 @@ public class TransitionsInterceptor
     StateGuard states = ((StateGuardAware) target).getStateGuard();
     checkState(states != null);
 
-    Transitions config = method.getAnnotation(Transitions.class);
+    Guarded config = method.getAnnotation(Guarded.class);
     checkState(config != null);
-    Transition transition = states.transition(config.to());
-    if (config.from() != null && config.from().length != 0) {
-      transition = transition.from(config.from());
-    }
+    Guard guard = states.guard(config.by());
 
-    log.trace("Invoking: {} -> {}", transition, method);
+    log.trace("Invoking: {} -> {}", guard, method);
 
     MethodInvocationAction action = new MethodInvocationAction(invocation);
-    Object result = transition.run(action);
+    Object result = guard.run(action);
     action.maybeThrow();
     return result;
   }

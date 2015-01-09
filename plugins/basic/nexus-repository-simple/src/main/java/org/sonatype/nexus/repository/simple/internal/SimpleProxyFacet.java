@@ -19,9 +19,9 @@ import java.net.URI;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.stateguard.Guarded;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Payload;
 

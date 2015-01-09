@@ -10,17 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.stateguard;
+package org.sonatype.nexus.common.stateguard;
 
-import javax.annotation.Nonnull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.annotation.Nullable;
 
 /**
- * Exposes {@link StateGuard}.
+ * Marks a method as transitioning from states to state.
+ *
+ * Target object must implement {@link StateGuardAware}.
  *
  * @since 3.0
  */
-public interface StateGuardAware
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Transitions
 {
-  @Nonnull
-  StateGuard getStateGuard();
+  @Nullable
+  String[] from() default {};
+
+  String to();
 }

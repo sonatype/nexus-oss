@@ -10,22 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.stateguard
+package org.sonatype.nexus.common.stateguard
 
 import org.junit.Before
 import org.junit.Test
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import static org.junit.Assert.fail
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.DESTROYED
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.FAILED
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.INITIALISED
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.NEW
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STARTED
-import static org.sonatype.nexus.repository.stateguard.StateGuardTest.State.STOPPED
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.DESTROYED
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.FAILED
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.INITIALISED
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.NEW
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.STARTED
+import static org.sonatype.nexus.common.stateguard.StateGuardTest.State.STOPPED
 
 /**
- * Tests for {@link StateGuard}.
+ * Tests for {@link org.sonatype.nexus.common.stateguard.StateGuard}.
  */
 class StateGuardTest
     extends TestSupport

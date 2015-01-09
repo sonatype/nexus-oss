@@ -10,28 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.stateguard;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.sonatype.nexus.common.stateguard;
 
 import javax.annotation.Nullable;
 
+import org.aopalliance.intercept.MethodInvocation;
+
 /**
- * Marks a method as transitioning from states to state.
- *
- * Target object must implement {@link StateGuardAware}.
+ * Adapts {@link MethodInvocation} to {@link Action}.
  *
  * @since 3.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Transitions
+class MethodInvocationAction
+    implements Action<Object>
 {
-  @Nullable
-  String[] from() default {};
+  private final MethodInvocation invocation;
 
-  String to();
+  private Throwable failure;
+
+  public MethodInvocationAction(final MethodInvocation invocation) {
+    this.invocation = invocation;
+  }
+
+  @Nullable
+  @Override
+  public Object run() throws Exception {
+    try {
+      return invocation.proceed();
+    }
+    catch (Throwable throwable) {
+      failure = throwable;
+      return null;
+    }
+  }
+
+  public void maybeThrow() throws Throwable {
+    if (failure != null) {
+      throw failure;
+    }
+  }
 }

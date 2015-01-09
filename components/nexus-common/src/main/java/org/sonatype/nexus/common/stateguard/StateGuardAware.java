@@ -10,44 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+package org.sonatype.nexus.common.stateguard;
 
-package org.sonatype.nexus.repository.stateguard;
-
-import javax.annotation.Nullable;
-
-import org.aopalliance.intercept.MethodInvocation;
+import javax.annotation.Nonnull;
 
 /**
- * Adapts {@link MethodInvocation} to {@link Action}.
+ * Exposes {@link StateGuard}.
  *
  * @since 3.0
  */
-class MethodInvocationAction
-    implements Action<Object>
+public interface StateGuardAware
 {
-  private final MethodInvocation invocation;
-
-  private Throwable failure;
-
-  public MethodInvocationAction(final MethodInvocation invocation) {
-    this.invocation = invocation;
-  }
-
-  @Nullable
-  @Override
-  public Object run() throws Exception {
-    try {
-      return invocation.proceed();
-    }
-    catch (Throwable throwable) {
-      failure = throwable;
-      return null;
-    }
-  }
-
-  public void maybeThrow() throws Throwable {
-    if (failure != null) {
-      throw failure;
-    }
-  }
+  @Nonnull
+  StateGuard getStateGuard();
 }

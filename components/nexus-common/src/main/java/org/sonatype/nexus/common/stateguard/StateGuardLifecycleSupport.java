@@ -10,17 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.stateguard;
+package org.sonatype.nexus.common.stateguard;
 
 import javax.annotation.Nonnull;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
-import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.FAILED;
-import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.NEW;
-import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.STARTED;
-import static org.sonatype.nexus.repository.stateguard.StateGuardLifecycleSupport.State.STOPPED;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.FAILED;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.NEW;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
+import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STOPPED;
 
 /**
  * {@link StateGuard} implementation of {@link Lifecycle}.
