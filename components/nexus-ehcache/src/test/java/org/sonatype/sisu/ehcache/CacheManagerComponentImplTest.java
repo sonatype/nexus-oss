@@ -62,7 +62,7 @@ public class CacheManagerComponentImplTest
   }
 
   private void assertConfigurationValid() {
-    String path = underTest.getCacheManager().getDiskStorePath();
+    String path = underTest.getCacheManager().getConfiguration().getDiskStoreConfiguration().getPath();
     File file = new File(path);
 
     assertThat(file.isAbsolute(), is(true));
