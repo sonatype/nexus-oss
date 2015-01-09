@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.simple.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import javax.annotation.Nullable;
@@ -23,9 +22,8 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.simple.SimpleContent;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
-import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -127,38 +125,5 @@ public class SimpleProxyFacet
     }
 
     return content;
-  }
-
-  /**
-   * Adapts {@link HttpEntity} to {@link Payload}.
-   */
-  private static class HttpEntityPayload
-    implements Payload
-  {
-    private final HttpEntity entity;
-
-    public HttpEntityPayload(final HttpEntity entity) {
-      this.entity = entity;
-    }
-
-    @Override
-    public InputStream openInputStream() throws IOException {
-      return entity.getContent();
-    }
-
-    @Override
-    public long getSize() {
-      return entity.getContentLength();
-    }
-
-    @Nullable
-    @Override
-    public String getContentType() {
-      Header header = entity.getContentType();
-      if (header != null) {
-        return header.getValue();
-      }
-      return null;
-    }
   }
 }
