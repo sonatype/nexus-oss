@@ -29,10 +29,10 @@ import org.sonatype.eclipse.bridge.EclipseBridge;
 import org.sonatype.eclipse.bridge.EclipseInstance;
 import org.sonatype.eclipse.bridge.EclipseLocation;
 import org.sonatype.eclipse.bridge.EclipseLocationFactory;
+import org.sonatype.nexus.common.io.DirSupport;
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.nexus.util.file.DirSupport;
 
 import com.google.common.base.Strings;
 import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;

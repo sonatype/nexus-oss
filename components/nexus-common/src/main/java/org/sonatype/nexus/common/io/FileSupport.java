@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util.file;
+package org.sonatype.nexus.common.io;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,12 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.sonatype.sisu.goodies.common.SimpleFormat;
-
 import com.google.common.base.Charsets;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// FIXME: Rename to Files, or FileHelper
 
 /**
  * FS regular file related support class. Offers static helper methods for common FS related operations
@@ -153,7 +153,7 @@ public final class FileSupport
   private static void validateFile(final Path... paths) {
     for (Path path : paths) {
       checkNotNull(path, "Path must be non-null");
-      checkArgument(Files.isRegularFile(path), SimpleFormat.template("%s is not a regular file", path));
+      checkArgument(Files.isRegularFile(path), "%s is not a regular file", path);
     }
   }
 

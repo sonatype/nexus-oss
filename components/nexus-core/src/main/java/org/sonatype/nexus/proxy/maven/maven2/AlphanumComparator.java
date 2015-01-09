@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.util;
+package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.util.Comparator;
 
@@ -22,7 +22,7 @@ import java.util.Comparator;
  * class: Use the static "sort" method from the java.util.Collections class: Collections.sort(your list, new
  * AlphanumComparator());
  */
-public class AlphanumComparator
+class AlphanumComparator
     implements Comparator<String>
 {
   private final boolean isDigit(char ch) {
