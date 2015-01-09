@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.simple;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 
@@ -29,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SimpleContent
 {
+  @Nullable
   private final String type;
 
   private final byte[] bytes;
@@ -41,6 +44,7 @@ public class SimpleContent
     }
   }
 
+  @Nullable
   public String getType() {
     return type;
   }
