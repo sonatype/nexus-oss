@@ -23,6 +23,7 @@ class PluralTest
 {
   @Test
   void 'simple plural'() {
+    assert Plural.of(-1, 'dog') == '-1 dogs'
     assert Plural.of(0, 'dog') == '0 dogs'
     assert Plural.of(1, 'dog') == '1 dog'
     assert Plural.of(2, 'dog') == '2 dogs'
