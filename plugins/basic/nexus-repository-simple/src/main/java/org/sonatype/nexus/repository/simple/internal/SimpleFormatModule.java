@@ -14,8 +14,6 @@ package org.sonatype.nexus.repository.simple.internal;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.repository.stateguard.StateGuardModule;
-
 import com.google.inject.AbstractModule;
 
 /**
@@ -29,6 +27,6 @@ public class SimpleFormatModule
 {
   @Override
   protected void configure() {
-    install(new StateGuardModule());
+    // TODO
   }
 }
