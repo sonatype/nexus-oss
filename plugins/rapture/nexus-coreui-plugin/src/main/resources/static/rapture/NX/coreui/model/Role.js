@@ -23,7 +23,7 @@ Ext.define('NX.coreui.model.Role', {
     'id',
     'version',
     'source',
-    'name',
+    {name: 'name', sortType: 'asUCText'},
     'description',
     'readOnly',
     'privileges',
