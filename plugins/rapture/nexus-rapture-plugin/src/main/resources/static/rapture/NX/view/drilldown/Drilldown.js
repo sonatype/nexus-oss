@@ -95,7 +95,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
       items.push(
         {
           xtype: 'nx-drilldown-item',
-          layout: 'card',
           items: [
             me.masters[i],
             (i > 0 ? me.createWizard[i - 1] : undefined)

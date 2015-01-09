@@ -26,7 +26,7 @@ Ext.define('NX.view.drilldown.Item', {
   itemClass: null,
   itemBookmark: null,
 
-  layout: 'fit',
+  layout: 'card',
 
   /**
    * Set the name of this drilldown item (appears in the breadcrumb)

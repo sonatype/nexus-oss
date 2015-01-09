@@ -77,25 +77,33 @@ Ext.define('NX.controller.Drilldown', {
         selection: me.onSelection,
         cellclick: me.onCellClick
       };
-      componentListener[me.masters[i] + ' button[action=new]'] = {
+    }
+
+    // If there’s at least one list, add event handlers to buttons and tabs
+    if (me.masters.length > 0) {
+
+      // New button
+      componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
         afterrender: me.bindNewButton
       };
-      componentListener[me.masters[i] + ' ^ nx-drilldown-details > tabpanel'] = {
+
+      // Detail tabs
+      componentListener[me.masters[0] + ' ^ nx-drilldown nx-drilldown-details > tabpanel'] = {
         tabchange: function() {
           // Get the model for the last master
-          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1),
-            lists = me.getLists(),
-            modelId = segments[lists.length - 1],
-            model = lists[lists.length - 1].getStore().getById(modelId);
+          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
+          var lists = me.getLists();
+          var modelId = segments[lists.length - 1];
+          var model = lists[lists.length - 1].getStore().getById(modelId);
 
           // Bookmark it. The tab (if selected) will be added automatically
           me.bookmark(model);
         }
       };
 
-      // bind to a delete button if delete function defined
+      // Delete button
       if (me.deleteModel) {
-        componentListener[me.masters[i] + ' ^ nx-drilldown-details button[action=delete]'] = {
+        componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
           afterrender: me.bindDeleteButton,
           click: me.onDelete
         };
