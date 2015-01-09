@@ -27,7 +27,7 @@ public interface NpmHostedRepository
   HostedMetadataService getMetadataService();
 
   /**
-   * Recreates npm metadata from deployed tarballs. During this operation, repository becomes read only.
+   * Recreates npm metadata from deployed tarballs. During this operation, repository should be read only.
    */
   int recreateNpmMetadata();
 }
