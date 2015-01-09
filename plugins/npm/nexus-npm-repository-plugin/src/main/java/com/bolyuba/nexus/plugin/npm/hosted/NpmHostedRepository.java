@@ -25,4 +25,9 @@ public interface NpmHostedRepository
 {
   @Override
   HostedMetadataService getMetadataService();
+
+  /**
+   * Recreates npm metadata from deployed tarballs. During this operation, repository becomes read only.
+   */
+  int recreateNpmMetadata();
 }

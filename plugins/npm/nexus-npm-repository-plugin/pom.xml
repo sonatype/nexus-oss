@@ -62,6 +62,12 @@
       <version>2.3.1</version>
     </dependency>
 
+    <!-- Needed for rebuild npm metadata, to peek into tarballs -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
