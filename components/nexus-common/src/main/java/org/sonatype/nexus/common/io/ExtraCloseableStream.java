@@ -10,28 +10,36 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.util
+package org.sonatype.nexus.common.io;
 
-import org.junit.Test
-import org.sonatype.sisu.litmus.testsupport.TestSupport
+import java.io.Closeable;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Tests for {@link Plural}
+ * A decorator that gives an InputStream the ability to close an additional {@link Closeable} resource when the
+ * InputStream is closed.
+ *
+ * @since 3.0
  */
-class PluralTest
-  extends TestSupport
+public class ExtraCloseableStream
+    extends FilterInputStream
 {
-  @Test
-  void 'simple plural'() {
-    assert Plural.of(0, 'dog') == '0 dogs'
-    assert Plural.of(1, 'dog') == '1 dog'
-    assert Plural.of(2, 'dog') == '2 dogs'
+  private final Closeable needsClosing;
+
+  public ExtraCloseableStream(final InputStream in, final Closeable needsClosing) {
+    super(in);
+    this.needsClosing = needsClosing;
   }
 
-  @Test
-  void 'complex plural'() {
-    assert Plural.of(0, 'candy', 'candies') == '0 candies'
-    assert Plural.of(1, 'candy', 'candies') == '1 candy'
-    assert Plural.of(2, 'candy', 'candies') == '2 candies'
+  @Override
+  public void close() throws IOException {
+    try {
+      super.close();
+    }
+    finally {
+      needsClosing.close();
+    }
   }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.common.text.Plural;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
