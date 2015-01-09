@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo.RunState;
 import org.sonatype.nexus.scheduling.schedule.Schedule;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -48,6 +49,8 @@ public class NexusTaskFuture<T>
 
   private final JobKey jobKey;
 
+  private final String taskLogName;
+
   private final Date startedAt;
 
   private final Schedule startedBy;
@@ -64,11 +67,13 @@ public class NexusTaskFuture<T>
 
   public NexusTaskFuture(final QuartzTaskExecutorSPI quartzSupport,
                          final JobKey jobKey,
+                         final String taskLogName,
                          final Date startedAt,
                          final Schedule startedBy)
   {
     this.quartzSupport = checkNotNull(quartzSupport);
     this.jobKey = checkNotNull(jobKey);
+    this.taskLogName = checkNotNull(taskLogName);
     this.startedAt = checkNotNull(startedAt);
     this.startedBy = checkNotNull(startedBy);
     this.countDownLatch = new CountDownLatch(1);
@@ -101,14 +106,18 @@ public class NexusTaskFuture<T>
   public void setRunState(final RunState runState) {
     checkState(this.runState.ordinal() <= runState.ordinal(),
         "Illegal run state transition: %s -> %s", this.runState, runState);
-    log.debug("NX Task {} runState transition {} -> {}", jobKey.getName(), this.runState, runState);
+    log.debug("Task {} : {} runState transition {} -> {}", jobKey.getName(), taskLogName, this.runState, runState);
     this.runState = runState;
   }
 
   public void doCancel() {
     setRunState(RunState.CANCELED);
     setResult(null, new CancellationException("Task canceled"));
-    log.info("NX Task canceled {}", jobKey.getName());
+    if (log.isDebugEnabled()) {
+      log.info("Task canceled {} : {}", jobKey.getName(), taskLogName);
+    } else {
+      log.info("Task canceled {}", taskLogName);
+    }
   }
 
   // == TaskFuture
@@ -119,7 +128,11 @@ public class NexusTaskFuture<T>
     Thread jobExecutingThread = this.jobExecutingThread;
     if (!result && jobExecutingThread != null && mayInterruptIfRunning) {
       // Yell about this, as this is dangerous
-      log.info("Cancelling with interruption NX Task {}", jobKey.getName());
+      if (log.isDebugEnabled()) {
+        log.info("Task cancelling w/ interruption {} : {}", jobKey.getName(), taskLogName);
+      } else {
+        log.info("Task cancelling w/ interruption {}", taskLogName);
+      }
       jobExecutingThread.interrupt();
       result = true;
     }

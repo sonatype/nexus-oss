@@ -83,7 +83,7 @@ public class NexusTaskInfo<T>
     checkNotNull(nexusTaskState);
     checkState(State.RUNNING != state || nexusTaskFuture != null, "Running task must have future");
     if (this.state == null) {
-      log.info("NX Task {} : {} : {} ", jobKey.getName(), state, nexusTaskState.getConfiguration().getName());
+      log.info("Task {} : state={}", nexusTaskState.getConfiguration().getTaskLogName(), state);
     }
     else {
       if (this.state != state) {
@@ -93,13 +93,25 @@ public class NexusTaskInfo<T>
           // we ended running and have lastRunState available, enhance log with it
           newState = newState + " (" + nexusTaskState.getLastRunState().getEndState().name() + ")";
         }
-        log.info("NX Task {} : {} -> {} : {} ", jobKey.getName(), this.state, newState,
-            nexusTaskState.getConfiguration().getName());
+        if (log.isDebugEnabled()) {
+          log.info("Task {} : {} state change {} -> {}",
+              jobKey,
+              nexusTaskState.getConfiguration().getTaskLogName(),
+              this.state, newState);
+        }
+        else {
+          log.info("Task {} state change {} -> {}",
+              nexusTaskState.getConfiguration().getTaskLogName(),
+              this.state, newState);
+        }
       }
       else {
         // this is usually config change of waiting task
-        log.debug("NX Task {} : {} : nextRun={} : {} ", jobKey.getName(), state, nexusTaskState.getNextExecutionTime(),
-            nexusTaskState.getConfiguration().getName());
+        log.debug("Task {} : {} : state={} nextRun={}",
+            jobKey.getName(),
+            nexusTaskState.getConfiguration().getTaskLogName(),
+            state,
+            nexusTaskState.getNextExecutionTime());
       }
     }
     this.state = state;
@@ -110,7 +122,7 @@ public class NexusTaskInfo<T>
     if (!removed && state == State.DONE) {
       quartzSupport.removeTask(jobKey);
       removed = true;
-      log.debug("NX Task {} is done and removed", jobKey.getName());
+      log.debug("Task {} : {} is done and removed", jobKey.getName(), nexusTaskState.getConfiguration().getTaskLogName());
     }
   }
 
@@ -182,12 +194,13 @@ public class NexusTaskInfo<T>
   public synchronized boolean remove() {
     if (isRemovedOrDone()) {
       // already removed
-      log.debug("NX Task {} : already removed", jobKey.getName());
+      log.debug("Task {} : {} already removed", jobKey.getName(), nexusTaskState.getConfiguration().getTaskLogName());
       return true;
     }
     if (nexusTaskFuture != null && !nexusTaskFuture.cancel(false)) {
       // running and not cancelable
-      log.debug("NX Task {} : is running as is not cancelable", jobKey.getName());
+      log.debug("Task {} : {} is running as is not cancelable", jobKey.getName(),
+          nexusTaskState.getConfiguration().getTaskLogName());
       return false;
     }
     if (!NexusTaskState.hasLastRunState(nexusTaskState.getConfiguration())) {
@@ -198,11 +211,11 @@ public class NexusTaskInfo<T>
     removed = true;
     boolean result = quartzSupport.removeTask(jobKey);
     if (result) {
-      log.info("NX Task {} : removed : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
+      log.info("Task {} removed", nexusTaskState.getConfiguration().getTaskLogName());
     }
     else {
       // TODO: WTF?
-      log.info("NX Task {} : not found in QZ", jobKey.getName());
+      log.info("Task {} not found in QZ", nexusTaskState.getConfiguration().getTaskLogName());
     }
     return result;
   }
@@ -213,13 +226,14 @@ public class NexusTaskInfo<T>
     if (isRemovedOrDone()) {
       throw new TaskRemovedException("Task removed: " + jobKey);
     }
-    log.info("NX Task {} : runNow : {} ", jobKey.getName(), nexusTaskState.getConfiguration().getName());
+    log.info("Task {} runNow", nexusTaskState.getConfiguration().getTaskLogName());
     setNexusTaskState(
         State.RUNNING,
         nexusTaskState,
         new NexusTaskFuture<T>(
             quartzSupport,
             jobKey,
+            getConfiguration().getTaskLogName(),
             new Date(),
             new Now()
         )

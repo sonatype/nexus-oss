@@ -140,7 +140,8 @@ public class QuartzTaskExecutorSPI
         // this is update but old task could not be removed: ie. running a non-cancelable task
         throw new IllegalArgumentException("Task could not be updated: running and not cancelable?");
       }
-      log.info("NX Task {} : {} scheduled with key: {} ", taskConfiguration.getId(), taskConfiguration.getName(), jobKey.getName());
+      log.debug("Task {} : {} scheduled with key: {} ", taskConfiguration.getId(),
+          taskConfiguration.getTaskLogName(), jobKey.getName());
       final JobDataMap jobDataMap = new JobDataMap(taskConfiguration.asMap());
       final JobDetail jobDetail = JobBuilder.newJob(NexusTaskJobSupport.class).withIdentity(jobKey)
           .withDescription(taskConfiguration.getName()).usingJobData(jobDataMap).build();
@@ -173,8 +174,9 @@ public class QuartzTaskExecutorSPI
         return null;
       }
       checkState(!task.isRemovedOrDone(), "Done task cannot be rescheduled");
-      log.info("NX Task {} : rescheduled : {} : {} -> {} ", task.getJobKey().getName(),
-          task.getConfiguration().getName(),
+      log.debug("Task {} : {} rescheduled {} -> {} ",
+          task.getJobKey().getName(),
+          task.getConfiguration().getTaskLogName(),
           task.getSchedule(), schedule);
       final Trigger trigger = nexusScheduleConverter.toTrigger(schedule)
           .withIdentity(task.getJobKey().getName(), task.getJobKey().getGroup()).forJob(task.getJobKey()).build();
@@ -235,6 +237,7 @@ public class QuartzTaskExecutorSPI
       future = new NexusTaskFuture<>(
           this,
           jobDetail.getKey(),
+          taskConfiguration.getTaskLogName(),
           now,
           schedule
       );
@@ -263,10 +266,6 @@ public class QuartzTaskExecutorSPI
       for (JobKey jobKey : jobKeys) {
         final NexusTaskJobListener<?> nexusTaskJobListener = (NexusTaskJobListener<?>) quartzSupport.getScheduler()
             .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-        // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
-        // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
-        // but QZ did not remove job yet.
-        // checkState(nexusTaskJobListener != null, "NX task must have listener");
         if (nexusTaskJobListener != null) {
           result.put(jobKey, nexusTaskJobListener.getNexusTaskInfo());
         }
@@ -287,26 +286,6 @@ public class QuartzTaskExecutorSPI
         if (task.getId().equals(id)) {
           return (NexusTaskInfo<T>) task;
         }
-      }
-    }
-    finally {
-      Thread.currentThread().setContextClassLoader(classLoader);
-    }
-    return null;
-  }
-
-  <T> NexusTaskInfo<T> taskByKey(final JobKey jobKey) throws SchedulerException {
-    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(QuartzSupport.class.getClassLoader());
-    try {
-      final NexusTaskJobListener<T> nexusTaskJobListener = (NexusTaskJobListener<T>) quartzSupport.getScheduler()
-          .getListenerManager().getJobListener(NexusTaskJobListener.listenerName(jobKey));
-      // TODO: tasks done (their listener method jobWasExecuted was invoked) but still beeing bookeped by QZ
-      // might not have listener anymore, as NexusTaskInfo did remove their triggers and listeners
-      // but QZ did not remove job yet.
-      // checkState(nexusTaskJobListener != null, "NX task must have listener");
-      if (nexusTaskJobListener != null) {
-        return nexusTaskJobListener.getNexusTaskInfo();
       }
     }
     finally {
