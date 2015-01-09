@@ -59,6 +59,7 @@ public class RecreateMetadataWalkerProcessor
     }
     final Map<String, Object> packageJson = extractPackageJson(file);
     if (packageJson == null || !packageJson.containsKey("name") || !packageJson.containsKey("version")) {
+      log.info("Failed to extract or malformed package.json from {}", file.getRepositoryItemUid());
       return;
     }
     try {
@@ -74,7 +75,7 @@ public class RecreateMetadataWalkerProcessor
       processedFileItemCount = processedFileItemCount + 1;
     }
     catch (Exception e) {
-      log.warn("Problem processing package " + file.getPath() + " in repository " + context.getRepository().getId(), e);
+      log.warn("Problem processing package {}", file.getRepositoryItemUid(), e);
     }
   }
 
@@ -103,6 +104,7 @@ public class RecreateMetadataWalkerProcessor
     if (tarEntry == null || !"package.json".equals(tarEntry.getName()) || !tarEntry.isFile()) {
       return null;
     }
+    // TODO: some sanity check of package.json size?
     // do this in memory, as package.json is expected to be fairly small (few kb at most)
     final ByteArrayOutputStream bos = new ByteArrayOutputStream(Ints.checkedCast(tarEntry.getSize()));
     StreamSupport.copy(tarArchiveInputStream, bos, StreamSupport.BUFFER_SIZE);
