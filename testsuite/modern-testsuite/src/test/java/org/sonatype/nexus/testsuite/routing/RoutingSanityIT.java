@@ -23,8 +23,7 @@ import org.sonatype.nexus.client.core.subsystem.routing.Status.Outcome;
 import org.sonatype.sisu.litmus.testsupport.group.External;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.InputSupplier;
+import com.google.common.io.ByteSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -132,24 +131,19 @@ public class RoutingSanityIT
     try (final InputStream nexusPrefixFile = getPrefixFileFrom(centralStatus.getPublishedUrl());
          final InputStream centralPrefixFile =
              getPrefixFileFrom("http://repo1.maven.org/maven2/.meta/prefixes.txt");) {
-      ByteStreams.equal(new InputSupplier<InputStream>()
-                        {
-                          @Override
-                          public InputStream getInput()
-                              throws IOException
-                          {
-                            return nexusPrefixFile;
-                          }
-                        }, new InputSupplier<InputStream>()
-                        {
-                          @Override
-                          public InputStream getInput()
-                              throws IOException
-                          {
-                            return centralPrefixFile;
-                          }
-                        }
-      );
+      new ByteSource()
+      {
+        @Override
+        public InputStream openStream() {
+          return nexusPrefixFile;
+        }
+      }.contentEquals(new ByteSource()
+      {
+        @Override
+        public InputStream openStream() {
+          return centralPrefixFile;
+        }
+      });
     }
   }
 }
