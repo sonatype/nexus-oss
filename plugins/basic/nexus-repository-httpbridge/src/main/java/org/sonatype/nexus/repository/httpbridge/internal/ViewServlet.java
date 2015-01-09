@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.httpbridge.internal;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.DefaultHttpResponseSender;
 import org.sonatype.nexus.repository.httpbridge.HttpResponseSender;
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.ViewFacet;
@@ -112,9 +114,17 @@ public class ViewServlet
   {
     // resolve repository for request
     RepositoryPath path = path(httpRequest);
+    if (path == null) {
+      send(HttpResponses.notFound("Repository not found"), httpResponse);
+      return;
+    }
     log.debug("Parsed path: {}", path);
 
     Repository repo = repository(path.getRepositoryName());
+    if (repo == null) {
+      send(HttpResponses.notFound("Repository not found"), httpResponse);
+      return;
+    }
     log.debug("Repository: {}", repo);
 
     // dispatch request and send response
@@ -127,24 +137,32 @@ public class ViewServlet
     sender.send(response, httpResponse);
   }
 
+  private void send(final Response response, final HttpServletResponse httpResponse)
+      throws ServletException, IOException
+  {
+    defaultHttpResponseSender.send(response, httpResponse);
+  }
+
   /**
-   * Parse repository path.
+   * @return a parsed repository path, or {@code null} if parsing was impossible.
    */
+  @Nullable
   private RepositoryPath path(final HttpServletRequest httpRequest) {
     String pathInfo = httpRequest.getPathInfo();
-    RepositoryPath path = RepositoryPath.parse(httpRequest.getPathInfo());
-    checkState(path != null, "Unable parse repository path from: %s", pathInfo);
+    RepositoryPath path = RepositoryPath.parse(pathInfo);
+    if (path == null) {
+      log.debug("Unable to parse repository path from: {}", pathInfo);
+    }
     return path;
   }
 
   /**
-   * Find repository for given request.
+   * @return the named repository or {@code null}
    */
+  @Nullable
   private Repository repository(final String name) {
     log.debug("Looking for repository: {}", name);
-    Repository repo = repositoryManager.get(name);
-    checkState(repo != null, "No repository with name: %s", name);
-    return repo;
+    return repositoryManager.get(name);
   }
 
   /**
