@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.config;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 @Named
 @Singleton
 public class ConfigurationEntityAdapter
-  extends EntityAdapter<Configuration>
+    extends EntityAdapter<Configuration>
 {
   private static final String DB_CLASS = new OClassNameBuilder()
       .prefix("repository")
@@ -73,7 +74,13 @@ public class ConfigurationEntityAdapter
   protected void readFields(final ODocument document, final Configuration entity) {
     String recipeName = document.field(P_RECIPE_NAME, OType.STRING);
     String repositoryName = document.field(P_REPOSITORY_NAME, OType.STRING);
-    Map<String,Map<String,Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
+    Map<String, Map<String, Object>> attributes = document.field(P_ATTRIBUTES, OType.EMBEDDEDMAP);
+
+    // deeply copy attributes to divorce from document
+    // FIXME: pre-rc2 detach is broken, so we are forced to copy to divorce
+    if (attributes != null) {
+      attributes = copy(attributes);
+    }
 
     entity.setRecipeName(recipeName);
     entity.setRepositoryName(repositoryName);
