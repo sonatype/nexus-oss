@@ -14,7 +14,6 @@ package org.sonatype.nexus.common.text;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -32,7 +31,6 @@ public class Plural
                                      final @Nullable String plural)
   {
     checkNotNull(buff);
-    checkArgument(value >= 0);
     checkNotNull(singular);
     buff.append(value).append(" ");
     if (value == 1) {

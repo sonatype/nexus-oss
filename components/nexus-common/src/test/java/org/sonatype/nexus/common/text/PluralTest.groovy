@@ -30,6 +30,7 @@ class PluralTest
 
   @Test
   void 'complex plural'() {
+    assert Plural.of(-1, 'candy', 'candies') == '-1 candies'
     assert Plural.of(0, 'candy', 'candies') == '0 candies'
     assert Plural.of(1, 'candy', 'candies') == '1 candy'
     assert Plural.of(2, 'candy', 'candies') == '2 candies'
