@@ -23,7 +23,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.FacetSupport.State.DESTROYED;
 import static org.sonatype.nexus.repository.FacetSupport.State.FAILED;
 import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
@@ -48,8 +47,7 @@ public abstract class FacetSupport
   }
 
   protected EventBus getEventBus() {
-    checkState(eventBus != null);
-    return eventBus;
+    return checkNotNull(eventBus);
   }
 
   private Repository repository;
