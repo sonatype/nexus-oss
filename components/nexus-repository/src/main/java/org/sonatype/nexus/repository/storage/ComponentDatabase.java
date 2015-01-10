@@ -22,12 +22,15 @@ import org.sonatype.nexus.orient.DatabaseManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Shared {@code component} database components.
+ */
 public class ComponentDatabase
 {
-  public static final String NAME = "componentdb";
+  public static final String NAME = "component";
 
   /**
-   * Shared {@code componentdb} database instance provider.
+   * Shared {@code component} database instance provider.
    *
    * @since 3.0
    */
