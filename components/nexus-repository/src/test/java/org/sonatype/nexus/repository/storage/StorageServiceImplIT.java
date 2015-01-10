@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
@@ -41,8 +42,8 @@ import static org.sonatype.nexus.repository.storage.StorageService.V_COMPONENT;
  * Integration tests for {@link StorageServiceImpl}.
  */
 public class StorageServiceImplIT
-    extends TestSupport {
-
+    extends TestSupport
+{
   @Rule
   public DatabaseInstanceRule database = new DatabaseInstanceRule("test");
 
@@ -50,7 +51,8 @@ public class StorageServiceImplIT
 
   @Before
   public void setUp() throws Exception {
-    underTest = new StorageServiceImpl(mock(EventBus.class), mock(BlobStore.class), Providers.of(database.getInstance()));
+    underTest = new StorageServiceImpl(mock(EventBus.class), mock(BlobStore.class),
+        Providers.of(database.getInstance()));
     underTest.start();
   }
 
