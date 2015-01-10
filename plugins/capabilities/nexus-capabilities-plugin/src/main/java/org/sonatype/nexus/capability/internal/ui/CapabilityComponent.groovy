@@ -199,7 +199,7 @@ extends DirectComponentSupport
     capabilityRegistry.disable(capabilityIdentity(id))
   }
 
-  private static CapabilityXO asCapability(final CapabilityReference reference) {
+  static CapabilityXO asCapability(final CapabilityReference reference) {
     CapabilityDescriptor descriptor = reference.context().descriptor()
     Capability capability = reference.capability()
 

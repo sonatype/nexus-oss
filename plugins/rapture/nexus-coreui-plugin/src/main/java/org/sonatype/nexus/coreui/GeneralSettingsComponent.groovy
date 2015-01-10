@@ -75,7 +75,7 @@ extends DirectComponentSupport
     return read()
   }
 
-  private static validate(final GeneralSettingsXO generalSettingsXO) {
+  static validate(final GeneralSettingsXO generalSettingsXO) {
     def validations = new ValidationResponse()
     if (!StringUtils.isBlank(generalSettingsXO.baseUrl)) {
       try {

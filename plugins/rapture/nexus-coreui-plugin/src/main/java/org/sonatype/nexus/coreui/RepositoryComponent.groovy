@@ -938,7 +938,7 @@ extends DirectComponentSupport
     return null
   }
 
-  private static Predicate<Repository> hasAnyOfContentClasses(final String[] contentClasses) {
+  static Predicate<Repository> hasAnyOfContentClasses(final String[] contentClasses) {
     if (contentClasses) {
       List<Predicate<Repository>> predicates = []
       contentClasses.each { String contentClass ->
@@ -961,7 +961,7 @@ extends DirectComponentSupport
     return null
   }
 
-  private static Predicate<Repository> hasNoneOfContentClasses(final String[] contentClasses) {
+  static Predicate<Repository> hasNoneOfContentClasses(final String[] contentClasses) {
     if (contentClasses) {
       List<Predicate<Repository>> predicates = []
       contentClasses.each { String contentClass ->

@@ -293,7 +293,7 @@ extends DirectComponentSupport
     securitySystem.deleteUser(id, source)
   }
 
-  private static asUserXO(final User user) {
+  static asUserXO(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
         version: user.version,
@@ -328,7 +328,7 @@ extends DirectComponentSupport
     return subject.principal == userId
   }
 
-  private static String validateEmail(final String email) {
+  static String validateEmail(final String email) {
     if (email) {
       try {
         new Address(email)

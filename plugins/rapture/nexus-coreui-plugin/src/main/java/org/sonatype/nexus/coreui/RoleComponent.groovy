@@ -170,7 +170,7 @@ extends DirectComponentSupport
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
-  private static RoleXO asRoleXO(Role input) {
+  static RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
         version: input.version,

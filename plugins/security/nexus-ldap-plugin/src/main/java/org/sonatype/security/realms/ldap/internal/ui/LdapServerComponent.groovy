@@ -286,7 +286,7 @@ extends DirectComponentSupport
     )
   }
 
-  private static String asLdapServerUrl(final CConnectionInfo connectionInfo) {
+  static String asLdapServerUrl(final CConnectionInfo connectionInfo) {
     return new LdapURL(
         connectionInfo.getProtocol(),
         connectionInfo.getHost(),
@@ -295,7 +295,7 @@ extends DirectComponentSupport
     ).toString()
   }
 
-  private static LdapSchemaTemplateXO asLdapSchemaTemplateXO(final LdapSchemaTemplate template) {
+  static LdapSchemaTemplateXO asLdapSchemaTemplateXO(final LdapSchemaTemplate template) {
     CUserAndGroupAuthConfiguration userAndGroupConfig = template.userAndGroupAuthConfig
     return new LdapSchemaTemplateXO(
         name: template.name,
@@ -321,7 +321,7 @@ extends DirectComponentSupport
     )
   }
 
-  private static CLdapServerConfiguration asCLdapServerConfiguration(final LdapServerXO ldapServerXO, final String authPassword) {
+  static CLdapServerConfiguration asCLdapServerConfiguration(final LdapServerXO ldapServerXO, final String authPassword) {
     return new CLdapServerConfiguration(
         id: ldapServerXO.id,
         name: ldapServerXO.name,
@@ -401,7 +401,7 @@ extends DirectComponentSupport
     return ldapContextFactory
   }
 
-  private static String buildReason(final String userMessage, Throwable t) {
+  static String buildReason(final String userMessage, Throwable t) {
     String message = "${userMessage}: ${t.message}"
 
     while (t != t.cause && t.cause) {

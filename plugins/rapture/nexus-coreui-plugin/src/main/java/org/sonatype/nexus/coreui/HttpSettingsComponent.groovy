@@ -123,7 +123,7 @@ extends DirectComponentSupport
     return read()
   }
 
-  private static fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
+  static fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
     def enabled = false, hostname = null, port = null, username = null, ntlmHost = null, ntlmDomain = null
     if (settings) {
       enabled = settings.enabled
@@ -146,7 +146,7 @@ extends DirectComponentSupport
     return [enabled, hostname, port, username, ntlmHost, ntlmDomain]
   }
 
-  private static toRemoteHttpProxySettings(final Boolean enabled,
+  static toRemoteHttpProxySettings(final Boolean enabled,
                                            final String hostname,
                                            final Integer port,
                                            final Boolean auth,
@@ -173,7 +173,7 @@ extends DirectComponentSupport
     return null
   }
 
-  def static String getPassword(Password password, RemoteAuthenticationSettings settings) {
+  static String getPassword(Password password, RemoteAuthenticationSettings settings) {
     if (password?.valid) {
       return password.value
     }

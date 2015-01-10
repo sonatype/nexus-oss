@@ -130,7 +130,7 @@ extends DirectComponentSupport
     nexusConfiguration.saveConfiguration()
   }
 
-  private static RepositoryTargetXO asRepositoryTarget(Target input) {
+   static RepositoryTargetXO asRepositoryTarget(Target input) {
     return new RepositoryTargetXO(
         id: input.id,
         name: input.name,

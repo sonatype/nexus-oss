@@ -104,7 +104,7 @@ extends DirectComponentSupport
     }
   }
 
-  private static ArtifactStoreRequest createRequest(final FileItem file,
+  static ArtifactStoreRequest createRequest(final FileItem file,
                                                     final MavenRepository mavenRepository,
                                                     final UploadContext uploadContext,
                                                     final RequestContext requestContext,
@@ -137,7 +137,7 @@ extends DirectComponentSupport
     return result
   }
 
-  private static UploadContext createUploadContext(final Map<String, String> params,
+  static UploadContext createUploadContext(final Map<String, String> params,
                                                    final Map<String, FileItem> files)
   {
     UploadContext context = new UploadContext(
@@ -188,7 +188,7 @@ extends DirectComponentSupport
     return context
   }
 
-  private static RequestContext createRequestContext(final HttpServletRequest request) {
+  static RequestContext createRequestContext(final HttpServletRequest request) {
     RequestContext context = new RequestContext(
         userId: SecurityUtils.subject?.principal as String,
         userAgent: request.getHeader('user-agent'),
@@ -234,7 +234,7 @@ extends DirectComponentSupport
     }
   }
 
-  private static isPom(final FileItem file, final Map<String, String> params) {
+  static isPom(final FileItem file, final Map<String, String> params) {
     def extension = params["${file.fieldName}.extension"]
     def classifier = params["${file.fieldName}.classifier"]
     return extension == 'pom' && StringUtils.isEmpty(classifier)

@@ -403,7 +403,7 @@ class TaskComponent
     return new Manual()
   }
 
-  private static void validateState(final TaskInfo<?> task) {
+  static void validateState(final TaskInfo<?> task) {
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');
