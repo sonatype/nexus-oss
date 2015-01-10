@@ -23,8 +23,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   itemId: 'nx-drilldown',
 
   requires: [
-    'NX.Icons',
-    'NX.view.drilldown.Panel'
+    'NX.Icons'
   ],
 
   /**
