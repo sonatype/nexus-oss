@@ -20,11 +20,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
 import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
@@ -41,13 +41,11 @@ public class StorageFacetImpl
   private Object bucketId;
 
   @Inject
-  public StorageFacetImpl(EventBus eventBus,
-                          StorageService delegate) {
-    installDependencies(eventBus); // TODO: whose responsibility is it to call this?
-    this.delegate = delegate;
+  public StorageFacetImpl(final StorageService delegate) {
+    this.delegate = checkNotNull(delegate);
   }
 
-  private Vertex bucket(OrientGraph graph) {
+  private Vertex bucket(final OrientGraph graph) {
     synchronized (this) {
       if (bucketId == null) {
         bucketId = getOrCreateBucket(graph).getId();
@@ -56,7 +54,7 @@ public class StorageFacetImpl
     return delegate.findVertex(graph, bucketId, null);
   }
 
-  private Vertex getOrCreateBucket(OrientGraph graph) {
+  private Vertex getOrCreateBucket(final OrientGraph graph) {
     String repositoryName = getRepository().getName();
     Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
     if (bucket == null) {
