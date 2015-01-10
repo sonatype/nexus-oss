@@ -222,9 +222,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
     if (me.ownerCt) {
       me.relayEvents(me.ownerCt, ['resize'], 'owner');
       me.on({
-        ownerresize: me.syncSizeToOwner
+        ownerresize: me.syncSizeToOwner,
+        afterrender: me.syncSizeToOwner
       });
-      me.syncSizeToOwner();
     }
 
     me.callParent(arguments);
