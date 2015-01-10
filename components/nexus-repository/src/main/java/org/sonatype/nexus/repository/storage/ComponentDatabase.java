@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Shared {@code component} database components.
+ *
+ * @since 3.0
  */
 public class ComponentDatabase
 {
@@ -31,8 +33,6 @@ public class ComponentDatabase
 
   /**
    * Shared {@code component} database instance provider.
-   *
-   * @since 3.0
    */
   @Named(NAME)
   @Singleton
