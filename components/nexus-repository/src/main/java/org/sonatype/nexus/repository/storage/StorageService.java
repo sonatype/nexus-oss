@@ -12,15 +12,88 @@
  */
 package org.sonatype.nexus.repository.storage;
 
+import java.io.InputStream;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+
 /**
- * Storage service.
+ * Storage service, providing component and asset storage for all repositories.
  *
  * @since 3.0
  */
 public interface StorageService
   extends Lifecycle
 {
-  // TODO:
+  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
+
+  static String E_HAS_LABEL = "has_label";
+
+  static String E_OWNS_ASSET = "owns_asset";
+
+  static String E_OWNS_COMPONENT = "owns_component";
+
+  static String E_PART_OF_COMPONENT = "part_of_component";
+
+  static String P_BLOB_REF = "blob_ref";
+
+  static String P_CONTENT_TYPE = "content_type";
+
+  static String P_PATH = "path";
+
+  static String P_REPOSITORY_NAME = "repository_name";
+
+  static String V_ASSET = "asset";
+
+  static String V_COMPONENT = "component";
+
+  static String V_LABEL = "label";
+
+  static String V_BUCKET = "bucket";
+
+  OrientGraph getGraphTx();
+
+  Iterable<Vertex> browseAssetsOwnedBy(OrientGraph graph, Vertex bucket);
+
+  Iterable<Vertex> browseComponentsOwnedBy(OrientGraph graph, Vertex bucket);
+
+  Iterable<Vertex> browseVertices(OrientGraph graph, @Nullable String className);
+
+  @Nullable
+  Vertex findAssetOwnedBy(OrientGraph graph, Object vertexId, Vertex bucket);
+
+  @Nullable
+  Vertex findComponentOwnedBy(OrientGraph graph, Object vertexId, Vertex bucket);
+
+  @Nullable
+  Vertex findVertex(OrientGraph graph, Object vertexId, @Nullable String className);
+
+  @Nullable
+  Vertex findAssetWithPropertyOwnedBy(OrientGraph graph, String propName, Object propValue, Vertex bucket);
+
+  @Nullable
+  Vertex findComponentWithPropertyOwnedBy(OrientGraph graph, String propName, Object propValue, Vertex bucket);
+
+  @Nullable
+  Vertex findVertexWithProperty(OrientGraph graph, String propName, Object propValue, @Nullable String className);
+
+  Vertex createAssetOwnedBy(OrientGraph graph, Vertex bucket);
+
+  Vertex createComponentOwnedBy(OrientGraph graph, Vertex bucket);
+
+  Vertex createVertex(OrientGraph graph, String className);
+
+  void deleteVertex(OrientGraph graph, Vertex vertex);
+
+  BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
+
+  @Nullable
+  org.sonatype.nexus.blobstore.api.Blob getBlob(BlobRef blobRef);
+
+  boolean deleteBlob(BlobRef blobRef);
 }

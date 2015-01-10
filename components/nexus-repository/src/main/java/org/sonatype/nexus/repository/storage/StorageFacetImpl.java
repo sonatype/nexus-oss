@@ -18,24 +18,15 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
-import org.sonatype.nexus.blobstore.api.BlobStore;
-import org.sonatype.nexus.orient.DatabaseInstance;
-import org.sonatype.nexus.orient.entity.EntityId;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
-import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
-import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
+
+import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
+import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -45,155 +36,103 @@ public class StorageFacetImpl
   extends FacetSupport
   implements StorageFacet
 {
-  private final BlobStore blobStore;
+  private final StorageService delegate;
 
-  private final Provider<DatabaseInstance> databaseInstanceProvider;
+  private Object bucketId;
 
   @Inject
   public StorageFacetImpl(EventBus eventBus,
-                          BlobStore blobStore,
-                          @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
-    // TODO: whose responsibility is it to call this?
-    installDependencies(eventBus);
-
-    this.blobStore = blobStore;
-    this.databaseInstanceProvider = databaseInstanceProvider;
-
-    // initialize schema if needed
-    final OrientGraphNoTx graph = new CheckedOrientGraphNoTx(databaseInstanceProvider.get().acquire());
-    try {
-      initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>() {
-        @SuppressWarnings("unchecked")
-        @Override
-        public boolean apply(final OrientVertexType type) {
-          type.createProperty(P_PATH, OType.STRING);
-          graph.createKeyIndex(P_PATH, Vertex.class, new Parameter("class", V_ASSET));
-          return true;
-        }
-      });
-      initVertexType(graph, V_BUCKET, null);
-      initVertexType(graph, V_COMPONENT, null);
-      initVertexType(graph, V_LABEL, null);
-
-      initEdgeType(graph, E_CONTAINS_COMPONENTS_WITH_LABEL, null);
-      initEdgeType(graph, E_HAS_LABEL, null);
-      initEdgeType(graph, E_OWNS_ASSET, null);
-      initEdgeType(graph, E_OWNS_COMPONENT, null);
-      initEdgeType(graph, E_PART_OF_COMPONENT, null);
-    }
-    finally {
-      graph.shutdown();
-    }
+                          StorageService delegate) {
+    installDependencies(eventBus); // TODO: whose responsibility is it to call this?
+    this.delegate = delegate;
   }
 
-  private void initVertexType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
-    if (graph.getVertexType(name) == null) {
-      OrientVertexType type = graph.createVertexType(name);
-      if (predicate != null) {
-        predicate.apply(type);
+  private Vertex bucket(OrientGraph graph) {
+    synchronized (this) {
+      if (bucketId == null) {
+        bucketId = getOrCreateBucket(graph).getId();
       }
     }
+    return delegate.findVertex(graph, bucketId, null);
   }
 
-  private void initEdgeType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
-    if (graph.getEdgeType(name) == null) {
-      OrientEdgeType type = graph.createEdgeType(name);
-      if (predicate != null) {
-        predicate.apply(type);
-      }
+  private Vertex getOrCreateBucket(OrientGraph graph) {
+    String repositoryName = getRepository().getName();
+    Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
+    if (bucket == null) {
+      bucket = delegate.createVertex(graph, V_BUCKET);
+      bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
     }
-  }
-
-  private static class CheckedOrientGraphNoTx extends OrientGraphNoTx {
-    public CheckedOrientGraphNoTx(ODatabaseDocumentTx doc) {
-      super(doc);
-      checkForGraphSchema(doc);
-    }
+    return bucket;
   }
 
   @Override
   public OrientGraph getGraphTx() {
-    ODatabaseDocumentTx documentTx = databaseInstanceProvider.get().acquire();
-    return new OrientGraph(documentTx);
+    return delegate.getGraphTx();
   }
 
   @Override
   public Iterable<Vertex> browseAssets(final OrientGraph graph) {
-    return graph.getVerticesOfClass(V_ASSET);
-  }
-
-  @Override
-  public Iterable<Vertex> browseBuckets(final OrientGraph graph) {
-    return graph.getVerticesOfClass(V_BUCKET);
+    return delegate.browseAssetsOwnedBy(graph, bucket(graph));
   }
 
   @Override
   public Iterable<Vertex> browseComponents(final OrientGraph graph) {
-    return graph.getVerticesOfClass(V_COMPONENT);
-  }
-
-  @Override
-  public Iterable<Vertex> browseLabels(final OrientGraph graph) {
-    return graph.getVerticesOfClass(V_LABEL);
+    return delegate.browseComponentsOwnedBy(graph, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findById(final OrientGraph graph, final Object id) {
-    if (id instanceof EntityId) {
-      EntityId entityId = (EntityId) id;
-      return graph.getVertex(entityId.getValue());
-    }
-    else {
-      return graph.getVertex(id);
-    }
+  public Vertex findAsset(final OrientGraph graph, final Object vertexId) {
+    return delegate.findAssetOwnedBy(graph, vertexId, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findByPath(final OrientGraph graph, final String path) {
-    return Iterables.getFirst(graph.getVertices(V_ASSET + "." + P_PATH, path), null);
+  public Vertex findAssetWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+    return delegate.findAssetWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
+  }
+
+  @Nullable
+  @Override
+  public Vertex findComponent(final OrientGraph graph, final Object vertexId) {
+    return delegate.findComponentOwnedBy(graph, vertexId, bucket(graph));
+  }
+
+  @Nullable
+  @Override
+  public Vertex findComponentWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+    return delegate.findComponentWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
   }
 
   @Override
   public Vertex createAsset(final OrientGraph graph) {
-    return graph.addVertex(V_ASSET, (String) null);
-  }
-
-  @Override
-  public Vertex createBucket(final OrientGraph graph) {
-    return graph.addVertex(V_BUCKET, (String) null);
+    return delegate.createAssetOwnedBy(graph, bucket(graph));
   }
 
   @Override
   public Vertex createComponent(final OrientGraph graph) {
-    return graph.addVertex(V_COMPONENT, (String) null);
+    return delegate.createComponentOwnedBy(graph, bucket(graph));
   }
 
   @Override
-  public Vertex createLabel(final OrientGraph graph) {
-    return graph.addVertex(V_LABEL, (String) null);
+  public void deleteVertex(final OrientGraph graph, final Vertex vertex) {
+    delegate.deleteVertex(graph, vertex);
   }
 
   @Override
-  public void delete(final OrientGraph graph, final Vertex vertex) {
-    graph.removeVertex(vertex);
-  }
-
-  @Override
-  public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
-    org.sonatype.nexus.blobstore.api.Blob blob = blobStore.create(inputStream, headers);
-    return new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
+  public BlobRef createBlob(final InputStream inputStream, final Map<String, String> headers) {
+    return delegate.createBlob(inputStream, headers);
   }
 
   @Nullable
   @Override
   public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
-    return blobStore.get(blobRef.getBlobId());
+    return delegate.getBlob(blobRef);
   }
 
   @Override
   public boolean deleteBlob(final BlobRef blobRef) {
-    return blobStore.delete(blobRef.getBlobId());
+    return delegate.deleteBlob(blobRef);
   }
 }

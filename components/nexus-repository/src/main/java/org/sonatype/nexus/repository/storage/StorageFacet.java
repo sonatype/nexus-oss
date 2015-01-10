@@ -23,7 +23,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
- * Storage {@link Facet}.
+ * Storage {@link Facet}, providing component and asset storage for a repository.
  *
  * @since 3.0
  */
@@ -31,105 +31,59 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 public interface StorageFacet
   extends Facet
 {
-  static String E_CONTAINS_COMPONENTS_WITH_LABEL = "contains_components_with_label";
-
-  static String E_HAS_LABEL = "has_label";
-
-  static String E_OWNS_ASSET = "owns_asset";
-
-  static String E_OWNS_COMPONENT = "owns_component";
-
-  static String E_PART_OF_COMPONENT = "part_of_component";
-
-  static String P_BLOB_REF = "blob_ref";
-
-  static String P_CONTENT_TYPE = "content_type";
-
-  static String P_PATH = "path";
-
-  static String V_ASSET = "asset";
-
-  static String V_COMPONENT = "component";
-
-  static String V_LABEL = "label";
-
-  static String V_BUCKET = "bucket";
-
   /**
    * Gets a transaction for working with the graph.
    */
   OrientGraph getGraphTx();
 
-  // Browse Vertices
-
   /**
-   * Gets all asset vertices.
+   * Gets all assets owned by the repository.
    */
   Iterable<Vertex> browseAssets(OrientGraph graph);
 
   /**
-   * Gets all bucket vertices.
-   */
-  Iterable<Vertex> browseBuckets(OrientGraph graph);
-
-  /**
-   * Gets all component vertices.
+   * Gets all components owned by the repository.
    */
   Iterable<Vertex> browseComponents(OrientGraph graph);
 
   /**
-   * Gets all label vertices.
-   */
-  Iterable<Vertex> browseLabels(OrientGraph graph);
-
-  // Read Vertices
-
-  /**
-   * Gets a vertex with a given id, or {@code null}.
-   *
-   * The id may be a {@code String}, {@code ODocument}, {@code OIdentifiable}, or {@code EntityId}.
+   * Gets an asset by id, or {@code null} if not found.
    */
   @Nullable
-  Vertex findById(OrientGraph graph, Object id);
+  Vertex findAsset(OrientGraph graph, Object vertexId);
 
   /**
-   * Gets a vertex representing an asset with a given path, or {@code null}.
+   * Gets an asset by some other identifying property, or {@code null} if not found.
    */
   @Nullable
-  Vertex findByPath(OrientGraph graph, String path);
-
-  // Edit Vertices (edits can be done directly on Vertex objects, followed by calling graph.commit())
-
-  // Add Vertices
+  Vertex findAssetWithProperty(OrientGraph graph, String propName, Object propValue);
 
   /**
-   * Creates a new asset vertex.
+   * Gets a component by id, or {@code null} if not found.
+   */
+  @Nullable
+  Vertex findComponent(OrientGraph graph, Object vertexId);
+
+  /**
+   * Gets a component by some other identifying property, or {@code null} if not found.
+   */
+  @Nullable
+  Vertex findComponentWithProperty(OrientGraph graph, String propName, Object propValue);
+
+  /**
+   * Creates a new asset.
    */
   Vertex createAsset(OrientGraph graph);
 
   /**
-   * Creates a new bucket vertex.
-   */
-  Vertex createBucket(OrientGraph graph);
-
-  /**
-   * Creates a new component vertex.
+   * Creates a new component.
    */
   Vertex createComponent(OrientGraph graph);
 
   /**
-   * Creates a new label vertex.
+   * Deletes an existing vertex.
    */
-  Vertex createLabel(OrientGraph graph);
-
-  // Delete Assets and Components
-
-  /**
-   * Removes a vertex from the graph.
-   */
-  void delete(OrientGraph graph, Vertex vertex);
-
-  // Create, Read, and Update Blobs
+  void deleteVertex(OrientGraph graph, Vertex vertex);
 
   /**
    * Creates a new Blob.

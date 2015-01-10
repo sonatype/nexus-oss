@@ -31,6 +31,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sonatype.nexus.repository.storage.StorageService.P_PATH;
 
 /**
  * A {@link RawStorageFacet} that persists to a {@link StorageFacet}.
@@ -56,7 +57,7 @@ public class RawStorageFacetImpl
     {
       @Override
       public Object execute(final OrientGraph graph, final StorageFacet storage) {
-        final Vertex asset = storage.findByPath(graph, path);
+        final Vertex asset = storage.findAssetWithProperty(graph, P_PATH, path);
         if (asset == null) {
           return null;
         }
@@ -100,7 +101,7 @@ public class RawStorageFacetImpl
     {
       @Override
       public Object execute(final OrientGraph graph, final StorageFacet storage) {
-        final Vertex asset = storage.findByPath(graph, path);
+        final Vertex asset = storage.findAssetWithProperty(graph, P_PATH, path);
         if (asset == null) {
           return false;
         }
@@ -111,7 +112,7 @@ public class RawStorageFacetImpl
           log.warn("Deleted asset {} referenced missing blob {}", path, blobRef);
         }
 
-        storage.delete(graph, asset);
+        storage.deleteVertex(graph, asset);
 
         return true;
       }
