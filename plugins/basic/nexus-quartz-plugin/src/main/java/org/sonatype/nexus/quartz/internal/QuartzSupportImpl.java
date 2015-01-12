@@ -348,7 +348,7 @@ public class QuartzSupportImpl
       return scheduler.interrupt(jobKey);
     }
     catch (UnableToInterruptJobException e) {
-      log.info("Unable to interrupt job with key {}", jobKey, e);
+      log.debug("Unable to interrupt job with key {}", jobKey, e);
     }
     return false;
   }

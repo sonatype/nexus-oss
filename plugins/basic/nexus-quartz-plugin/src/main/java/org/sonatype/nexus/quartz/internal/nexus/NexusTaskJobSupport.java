@@ -127,26 +127,26 @@ public class NexusTaskJobSupport<T>
         }
       }
       catch (TaskInterruptedException e) {
-        log.debug("NX Task {}:{} canceled:", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
+        log.debug("Task {} : {} canceled:", taskConfiguration.getId(), taskConfiguration.getTaskLogName(), e);
         if (!nexusTaskInfo.getNexusTaskFuture().isCancelled()) {
           nexusTaskInfo.getNexusTaskFuture().doCancel();
           eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
         }
       }
       catch (InterruptedException e) {
-        log.debug("NX Task {}:{} interrupted:", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
+        log.debug("Task {} : {} interrupted:", taskConfiguration.getId(), taskConfiguration.getTaskLogName(), e);
         // this is non-cancelable task being interrupted, do the paperwork in this case
         // same as would be done for cancelable tasks in case of #interrupt()
         nexusTaskInfo.getNexusTaskFuture().doCancel();
         eventBus.post(new TaskEventCanceled<>(nexusTaskInfo));
       }
       catch (Exception e) {
-        log.warn("Task execution failure: {}:{}", taskConfiguration.getTypeId(), taskConfiguration.getId(), e);
+        log.warn("Task {} : {} execution failure", taskConfiguration.getId(), taskConfiguration.getTaskLogName(), e);
         ex = e;
       }
     }
     catch (Exception e) {
-      log.warn("Task instantiation failure: {}", context.getJobDetail().getKey(), e);
+      log.warn("Task {} instantiation failure", context.getJobDetail().getKey(), e);
       ex = e;
     }
     if (ex != null) {
@@ -199,6 +199,7 @@ public class NexusTaskJobSupport<T>
         return;
       }
       else {
+        log.info("Task {} not cancelable", nexusTask.taskConfiguration().getTaskLogName());
         throw new UnableToInterruptJobException("Task " + nexusTask + " not Cancellable");
       }
     }

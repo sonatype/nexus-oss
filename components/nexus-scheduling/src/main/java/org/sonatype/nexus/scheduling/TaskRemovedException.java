@@ -22,11 +22,11 @@ public class TaskRemovedException
 {
   public TaskRemovedException(String taskId)
   {
-    super(String.format("NX task '%s' does not exists", taskId));
+    super(String.format("Task '%s' does not exists", taskId));
   }
 
   public TaskRemovedException(String taskId, Throwable cause)
   {
-    super(String.format("NX task '%s' does not exists", taskId), cause);
+    super(String.format("Task '%s' does not exists", taskId), cause);
   }
 }

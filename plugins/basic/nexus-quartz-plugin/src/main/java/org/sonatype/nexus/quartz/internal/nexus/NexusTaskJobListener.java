@@ -116,7 +116,7 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobToBeExecuted(final JobExecutionContext context) {
-    log.trace("Job {} jobToBeExecuted", jobKey.getName());
+    log.trace("Job {} : {} jobToBeExecuted", jobKey.getName(), nexusTaskInfo.getConfiguration().getTaskLogName());
     // get current trigger, which in this method SHOULD be job's trigger.
     // Still, in some circumstances (that I cannot imagine right now, except to have concurrency bug)
     // the NX Task's Trigger might be missing. Still, we don't want to throw in this listener
@@ -126,8 +126,10 @@ public class NexusTaskJobListener<T>
 
     NexusTaskFuture<T> future = nexusTaskInfo.getNexusTaskFuture();
     if (future == null) {
-      log.trace("Job {} has no future, creating it", jobKey.getName());
-      future = new NexusTaskFuture<>(quartzSupport, jobKey, context.getFireTime(),
+      log.trace("Job {} : {} has no future, creating it", jobKey.getName(),
+          nexusTaskInfo.getConfiguration().getTaskLogName());
+      future = new NexusTaskFuture<>(quartzSupport, jobKey, nexusTaskInfo.getConfiguration().getTaskLogName(),
+          context.getFireTime(),
           nexusScheduleConverter.toSchedule(context.getTrigger()));
       // set the future on taskinfo
       nexusTaskInfo.setNexusTaskState(
@@ -147,7 +149,7 @@ public class NexusTaskJobListener<T>
 
   @Override
   public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
-    log.trace("Job {} jobWasExecuted", jobKey.getName());
+    log.trace("Job {} : {} jobWasExecuted", jobKey.getName(), nexusTaskInfo.getConfiguration().getTaskLogName());
     final NexusTaskFuture<T> future = (NexusTaskFuture<T>) context.get(NexusTaskFuture.FUTURE_KEY);
     // on Executed, the taskInfo might be removed or even replaced, so use the one we started with
     // DO NOT TOUCH the listener's instance
@@ -169,7 +171,8 @@ public class NexusTaskJobListener<T>
         endState,
         future.getStartedAt(),
         System.currentTimeMillis() - future.getStartedAt().getTime());
-    log.trace("Job {} lastRunState={}", jobKey.getName(), endState);
+    log.trace("Job {} : {} lastRunState={}", jobKey.getName(), nexusTaskInfo.getConfiguration().getTaskLogName(),
+        endState);
 
     Trigger currentTrigger = getCurrentTrigger(context);
 
