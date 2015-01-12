@@ -53,10 +53,10 @@ Ext.define('NX.view.drilldown.Drilldown', {
       maxCount;
 
     // Normalize list of masters and create wizards
-    if (me.masters && !Ext.isArray(me.masters)) {
-      me.masters = [me.masters];
-    } else {
+    if (!me.masters) {
       me.masters = [];
+    } else if (!Ext.isArray(me.masters)) {
+      me.masters = [me.masters];
     }
     me.createWizard = Ext.isArray(me.createWizard) ? me.createWizard : [me.createWizard];
 
