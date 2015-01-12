@@ -20,13 +20,13 @@
 Ext.define('NX.coreui.model.Role', {
   extend: 'Ext.data.Model',
   fields: [
-    'id',
-    'version',
-    'source',
-    {name: 'name', sortType: 'asUCText'},
-    'description',
-    'readOnly',
-    'privileges',
-    'roles'
+    {name: 'id', type: 'string', sortType: 'asUCText'},
+    {name: 'version', type: 'string', sortType: 'asUCText'},
+    {name: 'source', type: 'string', sortType: 'asUCText'},
+    {name: 'name', type: 'string', sortType: 'asUCText'},
+    {name: 'description', type: 'string', sortType: 'asUCText'},
+    {name: 'readOnly', type: 'boolean', defaultValue: false},
+    {name: 'privileges', type: 'auto'},
+    {name: 'roles', type: 'auto'}
   ]
 });
