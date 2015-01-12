@@ -56,8 +56,7 @@ public class NpmHostedMetadataRebuildTask
       for (NpmHostedRepository repository : repositories) {
         TaskUtil.checkInterruption();
         try {
-          int fileItemCount = repository.recreateNpmMetadata();
-          logger.info("Recreated {} item in {}", fileItemCount, repository.getId());
+          repository.recreateNpmMetadata();
         }
         catch (Exception e) {
           logger.info("Hosted npm repository error during rebuilding metadata of {}", repository, e);

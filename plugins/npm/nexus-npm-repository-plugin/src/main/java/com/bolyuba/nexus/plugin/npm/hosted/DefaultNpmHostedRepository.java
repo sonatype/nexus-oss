@@ -97,14 +97,16 @@ public class DefaultNpmHostedRepository
   }
 
   @Override
-  public int recreateNpmMetadata() {
+  public boolean recreateNpmMetadata() {
     final DefaultWalkerContext context = new DefaultWalkerContext(this,
         new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), new DefaultStoreWalkerFilter());
-    final RecreateMetadataWalkerProcessor recreateMetadataWalkerProcessor = new RecreateMetadataWalkerProcessor(
-        getMetadataService());
-    context.getProcessors().add(recreateMetadataWalkerProcessor);
+    final RecreateMetadataWalkerProcessor processor =
+        new RecreateMetadataWalkerProcessor(getMetadataService());
+    context.getProcessors().add(processor);
     getWalker().walk(context);
-    return recreateMetadataWalkerProcessor.getProcessedFileItemCount();
+    log.info("Recreated npm metadata on {} (packageRoots={}/packageVersions={})", this,
+        processor.getProcessedPackages(), processor.getProcessedPackageVersions());
+    return processor.getProcessedPackages() > 0;
   }
 
   @Override
