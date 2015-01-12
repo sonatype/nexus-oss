@@ -67,6 +67,7 @@ public class RecreateMetadataWalkerProcessor
           Maps.<String, Object>newHashMap());
       final Map<String, Object> rootRaw = packageRoot.getRaw();
       liftAttributes(packageJson, rootRaw);
+      // TODO: dist-tags, but how? Would need ordering by version or publish date?
       rootRaw.put("x-nexus-rebuilt", new Date());
       final Map<String, Object> versions = Maps.newHashMap();
       versions.put((String) packageJson.get("version"), packageJson);
