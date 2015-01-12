@@ -44,8 +44,6 @@ Ext.define('NX.view.AddWindow', {
       }
     }
 
-    //me.maxHeight = Ext.getBody().getViewSize().height - 100;
-
     me.callParent(arguments);
   }
 
