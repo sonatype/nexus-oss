@@ -128,14 +128,21 @@ public class DefaultTaskScheduler
       taskConfiguration.setCreated(now);
     }
     taskConfiguration.setUpdated(now);
-    return getScheduler().scheduleTask(taskConfiguration, schedule);
+    final TaskInfo<T> taskInfo = getScheduler().scheduleTask(taskConfiguration, schedule);
+    log.info("Task {} scheduled: {}", taskInfo.getConfiguration().getTaskLogName(), taskInfo.getSchedule().getType());
+    return taskInfo;
   }
 
   @Override
   public <T> TaskInfo<T> rescheduleTask(final String id, final Schedule schedule) {
     checkNotNull(id);
     checkNotNull(schedule);
-    return getScheduler().rescheduleTask(id, schedule);
+    final TaskInfo<T> taskInfo =  getScheduler().rescheduleTask(id, schedule);
+    if (taskInfo != null) {
+      log.info("Task {} rescheduled: {}", taskInfo.getConfiguration().getTaskLogName(),
+          taskInfo.getSchedule().getType());
+    }
+    return taskInfo;
   }
 
   /**
@@ -146,7 +153,7 @@ public class DefaultTaskScheduler
   {
     log.debug("Creating task configuration for task descriptor: {}", taskDescriptor.getId());
     final TaskConfiguration taskConfiguration = new TaskConfiguration();
-    taskConfiguration.setId(generateId(taskDescriptor.getType().getName(), taskConfiguration));
+    taskConfiguration.setId(generateId());
     taskConfiguration.setTypeId(taskDescriptor.getId());
     taskConfiguration.setTypeName(taskDescriptor.getName());
     taskConfiguration.setName(taskDescriptor.getName());
@@ -157,10 +164,9 @@ public class DefaultTaskScheduler
   /**
    * Creates a unique ID for the task.
    */
-  private String generateId(final String taskFQCName,
-                            final TaskConfiguration taskConfiguration)
+  private String generateId()
   {
-    // TODO: call into quartz for this? Must not clash with existing persisted job IDs!
+    // TODO: revisit some possible alternative?
     return UUID.randomUUID().toString();
   }
 

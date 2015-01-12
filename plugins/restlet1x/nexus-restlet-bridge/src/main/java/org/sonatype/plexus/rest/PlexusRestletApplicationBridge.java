@@ -52,6 +52,11 @@ import org.slf4j.Logger;
 public abstract class PlexusRestletApplicationBridge
     extends Application
 {
+  static {
+    // avoid potential stackoverflow in Restlet by using Noelios' classloader
+    org.restlet.util.Engine.setUserClassLoader(Engine.class.getClassLoader());
+  }
+
   /**
    * Key to store JSON driver driven XStream
    */
@@ -214,15 +219,8 @@ public abstract class PlexusRestletApplicationBridge
   protected final void recreateRoot(boolean isStarted) {
     // reboot?
     if (root != null) {
-      // create a new root router (force TCCL to avoid potential StackOverflow)
-      final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-      Thread.currentThread().setContextClassLoader(Engine.class.getClassLoader());
-      try {
-        rootRouter = new Router(getContext());
-      }
-      finally {
-        Thread.currentThread().setContextClassLoader(tccl);
-      }
+      // create a new root router
+      rootRouter = new Router(getContext());
 
       applicationRouter = initializeRouter(rootRouter, isStarted);
 
