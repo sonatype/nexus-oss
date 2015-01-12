@@ -120,7 +120,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           submitted: me.onSettingsSubmitted
         },
         'nx-coreui-repository-selecttemplate': {
-          selectionchange: me.showAddRepositoryPanel
+          cellclick: me.showAddRepositoryPanel
         }
       }
     });
@@ -178,9 +178,9 @@ Ext.define('NX.coreui.controller.Repositories', {
   /**
    * @private
    */
-  showAddRepositoryPanel: function(selectionModel, selected) {
+  showAddRepositoryPanel: function(list, td, cellIndex, model) {
     var me = this,
-      template = Ext.apply({}, selected[0].data),
+      template = Ext.apply({}, model.data),
       cmpClass = me.findComponent('add', template, false),
       feature = me.getFeature();
 
