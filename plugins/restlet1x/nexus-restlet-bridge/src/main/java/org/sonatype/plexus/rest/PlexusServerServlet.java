@@ -18,6 +18,7 @@ import java.util.Enumeration;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import com.noelios.restlet.Engine;
 import com.noelios.restlet.ext.servlet.ServerServlet;
 import com.noelios.restlet.ext.servlet.ServletContextAdapter;
 import org.eclipse.sisu.inject.BeanLocator;
@@ -28,6 +29,11 @@ import org.restlet.service.TaskService;
 public class PlexusServerServlet
     extends ServerServlet
 {
+  static {
+    // avoid potential stackoverflow in Restlet by using Noelios' classloader
+    org.restlet.util.Engine.setUserClassLoader(Engine.class.getClassLoader());
+  }
+
   private static final long serialVersionUID = 2636935931764462049L;
 
   @Override
