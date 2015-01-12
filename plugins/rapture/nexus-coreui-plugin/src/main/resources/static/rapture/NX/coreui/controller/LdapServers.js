@@ -182,7 +182,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
+    feature.setItemName(1, NX.I18n.get('ADMIN_LDAP_CREATE_TITLE'));
     me.loadCreateWizard(1, true, null);
   },
 
