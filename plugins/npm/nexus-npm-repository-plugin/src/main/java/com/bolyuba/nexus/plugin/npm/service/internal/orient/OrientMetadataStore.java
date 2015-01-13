@@ -140,7 +140,7 @@ public class OrientMetadataStore
       {
         @Override
         public void onMessage(final String msg) {
-          log.info("Backup: {}", msg);
+          log.debug("Backup: {}", msg);
         }
       }, 9, 1024 * 1024);
       log.info("Finished npm DB backup to {}", backupFile.getAbsolutePath());
