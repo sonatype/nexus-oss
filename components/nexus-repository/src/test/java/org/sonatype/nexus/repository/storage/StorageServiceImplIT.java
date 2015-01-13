@@ -105,10 +105,10 @@ public class StorageServiceImplIT
       checkSize(underTest.browseVertices(graph, V_ASSET), 1);
       checkSize(underTest.browseVertices(graph, V_COMPONENT), 1);
       checkSize(underTest.browseVertices(graph, V_ASSET), 1);
-      checkSize(underTest.browseAssetsOwnedBy(graph, bucket1), 1);
-      checkSize(underTest.browseAssetsOwnedBy(graph, bucket2), 0);
-      checkSize(underTest.browseComponentsOwnedBy(graph, bucket1), 0);
-      checkSize(underTest.browseComponentsOwnedBy(graph, bucket2), 1);
+      checkSize(underTest.browseAssetsOwnedBy(bucket1), 1);
+      checkSize(underTest.browseAssetsOwnedBy(bucket2), 0);
+      checkSize(underTest.browseComponentsOwnedBy(bucket1), 0);
+      checkSize(underTest.browseComponentsOwnedBy(bucket2), 1);
 
       assertNotNull(underTest.findVertex(graph, asset.getId(), V_ASSET));
       assertNotNull(underTest.findVertex(graph, component.getId(), V_COMPONENT));

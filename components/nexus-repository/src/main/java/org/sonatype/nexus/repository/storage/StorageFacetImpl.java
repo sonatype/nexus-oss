@@ -70,13 +70,13 @@ public class StorageFacetImpl
   }
 
   @Override
-  public Iterable<Vertex> browseAssets(final OrientGraph graph) {
-    return delegate.browseAssetsOwnedBy(graph, bucket(graph));
+  public Iterable<Vertex> browseAssets(OrientGraph graph) {
+    return delegate.browseAssetsOwnedBy(bucket(graph));
   }
 
   @Override
-  public Iterable<Vertex> browseComponents(final OrientGraph graph) {
-    return delegate.browseComponentsOwnedBy(graph, bucket(graph));
+  public Iterable<Vertex> browseComponents(OrientGraph graph) {
+    return delegate.browseComponentsOwnedBy(bucket(graph));
   }
 
   @Nullable

@@ -58,9 +58,9 @@ public interface StorageService
 
   OrientGraph getGraphTx();
 
-  Iterable<Vertex> browseAssetsOwnedBy(OrientGraph graph, Vertex bucket);
+  Iterable<Vertex> browseAssetsOwnedBy(Vertex bucket);
 
-  Iterable<Vertex> browseComponentsOwnedBy(OrientGraph graph, Vertex bucket);
+  Iterable<Vertex> browseComponentsOwnedBy(Vertex bucket);
 
   Iterable<Vertex> browseVertices(OrientGraph graph, @Nullable String className);
 

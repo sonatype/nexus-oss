@@ -139,8 +139,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Iterable<Vertex> browseAssetsOwnedBy(final OrientGraph graph, final Vertex bucket) {
-    checkNotNull(graph);
+  public Iterable<Vertex> browseAssetsOwnedBy(final Vertex bucket) {
     checkNotNull(bucket);
 
     return bucket.getVertices(Direction.OUT, E_OWNS_ASSET);
@@ -148,8 +147,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Iterable<Vertex> browseComponentsOwnedBy(final OrientGraph graph, final Vertex bucket) {
-    checkNotNull(graph);
+  public Iterable<Vertex> browseComponentsOwnedBy(final Vertex bucket) {
     checkNotNull(bucket);
 
     return bucket.getVertices(Direction.OUT, E_OWNS_COMPONENT);
