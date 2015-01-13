@@ -44,13 +44,25 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
       editableCondition: NX.Conditions.isPermitted('security:ldapconfig', 'create'),
           editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
           items: {
-        xtype: 'tabpanel',
+            xtype: 'tabpanel',
             ui: 'light',
             items: [
-          { xtype: 'nx-coreui-ldapserver-connection-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB') },
-          { xtype: 'nx-coreui-ldapserver-backup-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB') },
-          { xtype: 'nx-coreui-ldapserver-userandgroup-fieldset', title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB') }
-        ]
+              {
+                xtype: 'nx-coreui-ldapserver-connection-fieldset',
+                title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'),
+                ui: 'inset'
+              },
+              {
+                xtype: 'nx-coreui-ldapserver-backup-fieldset',
+                title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'),
+                ui: 'inset'
+              },
+              {
+                xtype: 'nx-coreui-ldapserver-userandgroup-fieldset',
+                title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'),
+                ui: 'inset'
+              }
+            ]
       },
 
       buttons: [

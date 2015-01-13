@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 

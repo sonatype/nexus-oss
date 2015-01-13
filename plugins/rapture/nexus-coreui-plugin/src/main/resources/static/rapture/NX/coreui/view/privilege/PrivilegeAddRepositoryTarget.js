@@ -27,6 +27,7 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.coreui.model.Reference',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'name',
 

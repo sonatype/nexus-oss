@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
     'NX.Icons',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'server',
 
@@ -41,7 +42,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
         {
           xtype: 'textfield',
           fieldLabel: NX.I18n.get('ADMIN_SSL_LOAD_HELP'),
-          anchor: '100%',
           name: 'server',
           itemId: 'server'
         }

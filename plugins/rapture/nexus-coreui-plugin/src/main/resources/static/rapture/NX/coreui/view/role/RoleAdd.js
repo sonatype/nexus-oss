@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'id',
 

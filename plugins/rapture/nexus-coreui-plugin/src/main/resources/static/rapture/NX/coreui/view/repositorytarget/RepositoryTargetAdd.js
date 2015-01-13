@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'name',
 

@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
     'NX.Icons',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'pem',
 
@@ -39,7 +40,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
       items: [
         {
           xtype: 'textareafield',
-          anchor: '100%',
           name: 'pem',
           itemId: 'pem'
         }

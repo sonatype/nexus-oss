@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.repositoryroute.RepositoryRouteAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   defaultFocus: 'pattern',
 

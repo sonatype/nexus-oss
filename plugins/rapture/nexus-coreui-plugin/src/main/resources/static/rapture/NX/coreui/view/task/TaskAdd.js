@@ -54,6 +54,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
           {
             xtype: 'panel',
             title: 'Settings',
+            ui: 'inset',
             defaults: {
               xtype: 'textfield',
               allowBlank: false
@@ -99,6 +100,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
           {
             xtype: 'panel',
             title: NX.I18n.get('ADMIN_TASKS_CREATE_SCHEDULE'),
+            ui: 'inset',
             items: { xtype: 'nx-coreui-task-schedulefieldset' }
           }
         ]

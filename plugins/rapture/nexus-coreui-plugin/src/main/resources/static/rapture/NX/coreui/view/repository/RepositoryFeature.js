@@ -42,7 +42,21 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
   ],
 
   createWizard: [
-    { xtype: 'nx-coreui-repository-selecttemplate' },
-    { xtype: 'panel' }
+    {
+      xtype: 'panel',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
+      items: [
+        { xtype: 'nx-drilldown-actions' },
+        {
+          xtype: 'nx-coreui-repository-selecttemplate',
+          flex: 1
+        }
+      ]
+    },
+    { xtype: 'panel' } // Hint about the length of the wizard
   ]
 });

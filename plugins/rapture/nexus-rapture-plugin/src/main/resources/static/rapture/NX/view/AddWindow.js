@@ -23,7 +23,6 @@ Ext.define('NX.view.AddWindow', {
   requires: [
     'NX.I18n'
   ],
-  ui: 'inset',
 
   layout: {
     type: 'vbox',
