@@ -23,12 +23,11 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.BlobRef;
+import org.sonatype.nexus.repository.storage.GraphTx;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageService.P_PATH;
@@ -56,7 +55,7 @@ public class RawStorageFacetImpl
     return (RawContent) inTx(new GraphOperation()
     {
       @Override
-      public Object execute(final OrientGraph graph, final StorageFacet storage) {
+      public Object execute(final GraphTx graph, final StorageFacet storage) {
         final Vertex asset = storage.findAssetWithProperty(graph, P_PATH, path);
         if (asset == null) {
           return null;
@@ -78,7 +77,7 @@ public class RawStorageFacetImpl
     inTx(new GraphOperation()
     {
       @Override
-      public Object execute(final OrientGraph graph, final StorageFacet storage) throws IOException {
+      public Object execute(final GraphTx graph, final StorageFacet storage) throws IOException {
 
         final Vertex asset = storage.createAsset(graph);
 
@@ -100,7 +99,7 @@ public class RawStorageFacetImpl
     return (boolean) inTx(new GraphOperation()
     {
       @Override
-      public Object execute(final OrientGraph graph, final StorageFacet storage) {
+      public Object execute(final GraphTx graph, final StorageFacet storage) {
         final Vertex asset = storage.findAssetWithProperty(graph, P_PATH, path);
         if (asset == null) {
           return false;
@@ -121,23 +120,15 @@ public class RawStorageFacetImpl
 
   private static interface GraphOperation
   {
-    Object execute(OrientGraph graph, final StorageFacet storage) throws IOException;
+    Object execute(GraphTx graph, final StorageFacet storage) throws IOException;
   }
 
   private Object inTx(GraphOperation operation) throws IOException {
     final StorageFacet storage = getStorage();
-    final OrientGraph graph = storage.getGraphTx();
-    try {
+    try (GraphTx graph = storage.getGraphTx()) {
       final Object result = operation.execute(graph, storage);
       graph.commit();
       return result;
-    }
-    catch (IOException | RuntimeException e) {
-      graph.rollback();
-      return Throwables.propagate(e);
-    }
-    finally {
-      graph.shutdown();
     }
   }
 

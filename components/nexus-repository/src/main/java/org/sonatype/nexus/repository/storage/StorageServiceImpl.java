@@ -38,7 +38,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphNoTx;
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
 
@@ -74,7 +73,7 @@ public class StorageServiceImpl
   @Override
   protected void doStart() throws Exception {
     // initialize schema if needed
-    final OrientGraphNoTx graph = new CheckedOrientGraphNoTx(databaseInstanceProvider.get().acquire());
+    final CheckedGraphNoTx graph = new CheckedGraphNoTx(databaseInstanceProvider.get().acquire());
     try {
       initVertexType(graph, V_ASSET, new Predicate<OrientVertexType>() {
         @SuppressWarnings("unchecked")
@@ -100,14 +99,14 @@ public class StorageServiceImpl
     }
   }
 
-  private static class CheckedOrientGraphNoTx extends OrientGraphNoTx {
-    public CheckedOrientGraphNoTx(ODatabaseDocumentTx doc) {
-      super(doc);
-      checkForGraphSchema(doc);
+  private static class CheckedGraphNoTx extends OrientGraphNoTx {
+    public CheckedGraphNoTx(ODatabaseDocumentTx db) {
+      super(db);
+      checkForGraphSchema(db);
     }
   }
 
-  private void initVertexType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
+  private void initVertexType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientVertexType> predicate) {
     if (graph.getVertexType(name) == null) {
       OrientVertexType type = graph.createVertexType(name);
       if (predicate != null) {
@@ -116,7 +115,7 @@ public class StorageServiceImpl
     }
   }
 
-  private void initEdgeType(OrientGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
+  private void initEdgeType(CheckedGraphNoTx graph, String name, @Nullable Predicate<OrientEdgeType> predicate) {
     if (graph.getEdgeType(name) == null) {
       OrientEdgeType type = graph.createEdgeType(name);
       if (predicate != null) {
@@ -132,9 +131,9 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public OrientGraph getGraphTx() {
+  public GraphTx getGraphTx() {
     ODatabaseDocumentTx documentTx = databaseInstanceProvider.get().acquire();
-    return new OrientGraph(documentTx);
+    return new GraphTx(documentTx);
   }
 
   @Override
@@ -155,7 +154,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Iterable<Vertex> browseVertices(final OrientGraph graph, @Nullable final String className) {
+  public Iterable<Vertex> browseVertices(final GraphTx graph, @Nullable final String className) {
     checkNotNull(graph);
 
     if (className == null) {
@@ -169,7 +168,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findAssetOwnedBy(final OrientGraph graph, final Object vertexId, final Vertex bucket) {
+  public Vertex findAssetOwnedBy(final GraphTx graph, final Object vertexId, final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(vertexId);
     checkNotNull(bucket);
@@ -181,7 +180,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findComponentOwnedBy(final OrientGraph graph, final Object vertexId, final Vertex bucket) {
+  public Vertex findComponentOwnedBy(final GraphTx graph, final Object vertexId, final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(vertexId);
     checkNotNull(bucket);
@@ -201,7 +200,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findVertex(final OrientGraph graph, final Object vertexId, @Nullable final String className) {
+  public Vertex findVertex(final GraphTx graph, final Object vertexId, @Nullable final String className) {
     checkNotNull(graph);
     checkNotNull(vertexId);
 
@@ -219,7 +218,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findAssetWithPropertyOwnedBy(final OrientGraph graph, final String propName, final Object propValue,
+  public Vertex findAssetWithPropertyOwnedBy(final GraphTx graph, final String propName, final Object propValue,
                                              final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(propName);
@@ -232,7 +231,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findComponentWithPropertyOwnedBy(final OrientGraph graph, final String propName, final Object propValue,
+  public Vertex findComponentWithPropertyOwnedBy(final GraphTx graph, final String propName, final Object propValue,
                                                  final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(propName);
@@ -243,7 +242,7 @@ public class StorageServiceImpl
   }
 
   @SuppressWarnings("unchecked")
-  private Vertex findWithPropertyOwnedBy(OrientGraph graph, String className, String propName, Object propValue,
+  private Vertex findWithPropertyOwnedBy(GraphTx graph, String className, String propName, Object propValue,
                                          String edgeLabel, Vertex bucket) {
     Map<String, Object> parameters = ImmutableMap.of("propValue", propValue, "bucket", bucket);
     String query = String.format("select from %s where %s = :propValue and in('%s') contains :bucket",
@@ -255,7 +254,7 @@ public class StorageServiceImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public Vertex findVertexWithProperty(final OrientGraph graph, final String propName, final Object propValue,
+  public Vertex findVertexWithProperty(final GraphTx graph, final String propName, final Object propValue,
                                        @Nullable final String className)
   {
     checkNotNull(graph);
@@ -275,7 +274,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Vertex createAssetOwnedBy(final OrientGraph graph, final Vertex bucket) {
+  public Vertex createAssetOwnedBy(final GraphTx graph, final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(bucket);
 
@@ -286,7 +285,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Vertex createComponentOwnedBy(final OrientGraph graph, final Vertex bucket) {
+  public Vertex createComponentOwnedBy(final GraphTx graph, final Vertex bucket) {
     checkNotNull(graph);
     checkNotNull(bucket);
 
@@ -297,7 +296,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public Vertex createVertex(final OrientGraph graph, final String className) {
+  public Vertex createVertex(final GraphTx graph, final String className) {
     checkNotNull(graph);
     checkNotNull(className);
 
@@ -306,7 +305,7 @@ public class StorageServiceImpl
 
   @Override
   @Guarded(by=STARTED)
-  public void deleteVertex(final OrientGraph graph, final Vertex vertex) {
+  public void deleteVertex(final GraphTx graph, final Vertex vertex) {
     checkNotNull(graph);
     checkNotNull(vertex);
 

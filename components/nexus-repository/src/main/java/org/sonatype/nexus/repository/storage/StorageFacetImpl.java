@@ -22,7 +22,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.repository.FacetSupport;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
@@ -45,7 +44,7 @@ public class StorageFacetImpl
     this.delegate = checkNotNull(delegate);
   }
 
-  private Vertex bucket(final OrientGraph graph) {
+  private Vertex bucket(final GraphTx graph) {
     synchronized (this) {
       if (bucketId == null) {
         bucketId = getOrCreateBucket(graph).getId();
@@ -54,7 +53,7 @@ public class StorageFacetImpl
     return delegate.findVertex(graph, bucketId, null);
   }
 
-  private Vertex getOrCreateBucket(final OrientGraph graph) {
+  private Vertex getOrCreateBucket(final GraphTx graph) {
     String repositoryName = getRepository().getName();
     Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
     if (bucket == null) {
@@ -65,56 +64,56 @@ public class StorageFacetImpl
   }
 
   @Override
-  public OrientGraph getGraphTx() {
+  public GraphTx getGraphTx() {
     return delegate.getGraphTx();
   }
 
   @Override
-  public Iterable<Vertex> browseAssets(OrientGraph graph) {
+  public Iterable<Vertex> browseAssets(GraphTx graph) {
     return delegate.browseAssetsOwnedBy(bucket(graph));
   }
 
   @Override
-  public Iterable<Vertex> browseComponents(OrientGraph graph) {
+  public Iterable<Vertex> browseComponents(GraphTx graph) {
     return delegate.browseComponentsOwnedBy(bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findAsset(final OrientGraph graph, final Object vertexId) {
+  public Vertex findAsset(final GraphTx graph, final Object vertexId) {
     return delegate.findAssetOwnedBy(graph, vertexId, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findAssetWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+  public Vertex findAssetWithProperty(final GraphTx graph, final String propName, final Object propValue) {
     return delegate.findAssetWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findComponent(final OrientGraph graph, final Object vertexId) {
+  public Vertex findComponent(final GraphTx graph, final Object vertexId) {
     return delegate.findComponentOwnedBy(graph, vertexId, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findComponentWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+  public Vertex findComponentWithProperty(final GraphTx graph, final String propName, final Object propValue) {
     return delegate.findComponentWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
   }
 
   @Override
-  public Vertex createAsset(final OrientGraph graph) {
+  public Vertex createAsset(final GraphTx graph) {
     return delegate.createAssetOwnedBy(graph, bucket(graph));
   }
 
   @Override
-  public Vertex createComponent(final OrientGraph graph) {
+  public Vertex createComponent(final GraphTx graph) {
     return delegate.createComponentOwnedBy(graph, bucket(graph));
   }
 
   @Override
-  public void deleteVertex(final OrientGraph graph, final Vertex vertex) {
+  public void deleteVertex(final GraphTx graph, final Vertex vertex) {
     delegate.deleteVertex(graph, vertex);
   }
 

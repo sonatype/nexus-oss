@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import org.sonatype.nexus.repository.Facet;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
  * Storage {@link Facet}, providing component and asset storage for a repository.
@@ -34,56 +33,56 @@ public interface StorageFacet
   /**
    * Gets a transaction for working with the graph.
    */
-  OrientGraph getGraphTx();
+  GraphTx getGraphTx();
 
   /**
    * Gets all assets owned by the repository.
    */
-  Iterable<Vertex> browseAssets(OrientGraph graph);
+  Iterable<Vertex> browseAssets(GraphTx graph);
 
   /**
    * Gets all components owned by the repository.
    */
-  Iterable<Vertex> browseComponents(OrientGraph graph);
+  Iterable<Vertex> browseComponents(GraphTx graph);
 
   /**
    * Gets an asset by id, or {@code null} if not found.
    */
   @Nullable
-  Vertex findAsset(OrientGraph graph, Object vertexId);
+  Vertex findAsset(GraphTx graph, Object vertexId);
 
   /**
    * Gets an asset by some other identifying property, or {@code null} if not found.
    */
   @Nullable
-  Vertex findAssetWithProperty(OrientGraph graph, String propName, Object propValue);
+  Vertex findAssetWithProperty(GraphTx graph, String propName, Object propValue);
 
   /**
    * Gets a component by id, or {@code null} if not found.
    */
   @Nullable
-  Vertex findComponent(OrientGraph graph, Object vertexId);
+  Vertex findComponent(GraphTx graph, Object vertexId);
 
   /**
    * Gets a component by some other identifying property, or {@code null} if not found.
    */
   @Nullable
-  Vertex findComponentWithProperty(OrientGraph graph, String propName, Object propValue);
+  Vertex findComponentWithProperty(GraphTx graph, String propName, Object propValue);
 
   /**
    * Creates a new asset.
    */
-  Vertex createAsset(OrientGraph graph);
+  Vertex createAsset(GraphTx graph);
 
   /**
    * Creates a new component.
    */
-  Vertex createComponent(OrientGraph graph);
+  Vertex createComponent(GraphTx graph);
 
   /**
    * Deletes an existing vertex.
    */
-  void deleteVertex(OrientGraph graph, Vertex vertex);
+  void deleteVertex(GraphTx graph, Vertex vertex);
 
   /**
    * Creates a new Blob.
