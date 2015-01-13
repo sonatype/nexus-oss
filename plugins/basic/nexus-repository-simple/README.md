@@ -25,21 +25,21 @@
 
 ## Hosted
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/README.md
-    curl -v --upload-file ./README.md http://localhost:8081/repository/test1/no-type-README.md
-    curl -v -X GET http://localhost:8081/repository/test1/
-    curl -v -X GET http://localhost:8081/repository/test1/index.html
-    curl -v -X GET http://localhost:8081/repository/test1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test1/no-type-README.md
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/README.md
+    curl -v --upload-file ./README.md http://localhost:8081/repository/simplehosted1/no-type-README.md
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/index.html
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/no-type-README.md
 
 ## Group
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/A.md
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test2/B.md
-    curl -v -X GET http://localhost:8081/repository/testgroup1/
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/A.md
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted2/B.md
+    curl -v -X GET http://localhost:8081/repository/simplegroup1/
 
 ## Proxy
 
-    curl -v -X GET http://localhost:8081/repository/testproxy1/4.12/junit-4.12.pom
-    curl -v -X GET http://localhost:8081/repository/testproxy1/maven-metadata.xml
+    curl -v -X GET http://localhost:8081/repository/simpleproxy1/4.12/junit-4.12.pom
+    curl -v -X GET http://localhost:8081/repository/simpleproxy1/maven-metadata.xml
