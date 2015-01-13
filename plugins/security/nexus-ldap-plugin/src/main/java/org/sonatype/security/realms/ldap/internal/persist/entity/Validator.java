@@ -20,6 +20,11 @@ import com.google.common.base.Strings;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * LDAP Server configuration validator.
+ *
+ * @since 3.0
+ */
 @Singleton
 @Named
 public final class Validator

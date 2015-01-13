@@ -14,6 +14,11 @@ package org.sonatype.security.realms.ldap.internal.persist.entity;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * LDAP Server configuration.
+ *
+ * @since 3.0
+ */
 public final class LdapConfiguration
 {
   /**

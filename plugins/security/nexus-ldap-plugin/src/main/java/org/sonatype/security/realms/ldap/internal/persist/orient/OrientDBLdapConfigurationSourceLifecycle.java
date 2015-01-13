@@ -24,6 +24,11 @@ import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Manages the {@link OrientDBLdapConfigurationSource} lifecycle.
+ *
+ * @since 3.0
+ */
 @Singleton
 @Named
 public class OrientDBLdapConfigurationSourceLifecycle

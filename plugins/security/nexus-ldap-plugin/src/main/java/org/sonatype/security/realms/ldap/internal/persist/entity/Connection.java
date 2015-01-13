@@ -19,6 +19,11 @@ import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * LDAP Server connection configuration.
+ *
+ * @since 3.0
+ */
 public final class Connection
 {
   public enum Protocol
