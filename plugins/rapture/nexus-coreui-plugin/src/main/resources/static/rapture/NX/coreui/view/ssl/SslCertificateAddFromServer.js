@@ -48,10 +48,10 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
       ],
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_SSL_LOAD_SUBMIT_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
         { text: NX.I18n.get('ADMIN_SSL_LOAD_CANCEL_BUTTON'), handler: function () {
-          this.up('window').close();
-        }}
+          this.up('nx-drilldown').showChild(0, true);
+        }},
+        { text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'primary' }
       ]
     };
 

@@ -46,10 +46,10 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
       ],
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_SSL_PASTE_SUBMIT_BUTTON'), action: 'load', formBind: true, ui: 'primary' },
         { text: NX.I18n.get('ADMIN_SSL_PASTE_CANCEL_BUTTON'), handler: function () {
-          this.up('window').close();
-        }}
+          this.up('nx-drilldown').showChild(0, true);
+        }},
+        { text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'), action: 'load', formBind: true, ui: 'primary' }
       ]
     };
 

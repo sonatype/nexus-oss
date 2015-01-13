@@ -42,7 +42,14 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         return NX.I18n.get('ADMIN_USERS_CREATE_SUCCESS') + data['userId'];
       },
       editableCondition: NX.Conditions.isPermitted('security:users', 'create'),
-      editableMarker: NX.I18n.get('ADMIN_USERS_CREATE_ERROR')
+      editableMarker: NX.I18n.get('ADMIN_USERS_CREATE_ERROR'),
+
+      buttons: [
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }},
+        { text: NX.I18n.get('ADMIN_USERS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' }
+      ]
     };
 
     me.callParent(arguments);
