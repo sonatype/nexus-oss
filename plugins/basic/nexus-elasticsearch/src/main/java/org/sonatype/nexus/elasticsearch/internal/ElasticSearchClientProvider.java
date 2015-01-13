@@ -22,7 +22,6 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 
-import groovy.lang.Singleton;
 import org.eclipse.sisu.EagerSingleton;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -33,7 +32,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 @Named
 @EagerSingleton
-public class ElasticSearchServer
+public class ElasticSearchClientProvider
     extends StateGuardLifecycleSupport
     implements Provider<Client>
 {
@@ -43,7 +42,7 @@ public class ElasticSearchServer
   private Node node;
 
   @Inject
-  public ElasticSearchServer(final ApplicationDirectories applicationDirectories) {
+  public ElasticSearchClientProvider(final ApplicationDirectories applicationDirectories) {
     this.applicationDirectories = checkNotNull(applicationDirectories);
   }
 
