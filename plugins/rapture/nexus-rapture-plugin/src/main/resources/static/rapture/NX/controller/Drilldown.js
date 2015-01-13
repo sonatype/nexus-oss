@@ -61,6 +61,9 @@ Ext.define('NX.controller.Drilldown', {
     });
   },
 
+  /**
+   * @private
+   */
   init: function () {
     var me = this,
         componentListener = {};
@@ -131,6 +134,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Return references to all of the master views
    */
   getLists: function() {
@@ -148,6 +152,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
@@ -161,6 +166,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
    * Prompts a reset/reload of the first list in the drilldown
    *
    * @param cb Call this once the store has loaded
@@ -173,6 +179,10 @@ Ext.define('NX.controller.Drilldown', {
     lists[0].getStore().load(cb);
   },
 
+  /**
+   * @public
+   * @param modelId
+   */
   loadStoreAndSelect: function (modelId) {
     var me = this,
       lists = me.getLists(),
@@ -192,6 +202,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Once all lists have loaded, navigate to the current bookmark
    */
   onStoreLoad: function () {
@@ -213,6 +224,9 @@ Ext.define('NX.controller.Drilldown', {
     me.navigateTo(NX.Bookmarks.getBookmark());
   },
 
+  /**
+   * @public
+   */
   reselect: function () {
     var me = this,
         lists = me.getLists();
@@ -222,6 +236,9 @@ Ext.define('NX.controller.Drilldown', {
     }
   },
 
+  /**
+   * @private
+   */
   refreshList: function () {
     var me = this,
         lists = me.getLists();
@@ -232,6 +249,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * When a list item is clicked, display the new view and update the bookmark
    */
   onCellClick: function(list, td, cellIndex, model) {
@@ -242,6 +260,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * A model changed, focus on the new row and update the name of the related drilldown
    */
   onModelChanged: function (model) {
@@ -262,6 +281,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
    * Make the detail view appear, update models and bookmarks
    */
   loadView: function (list, model, animate) {
@@ -293,6 +313,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
    * Make the create wizard appear
    *
    * @param index The zero-based step in the create wizard
@@ -313,6 +334,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Bookmark specified model / selected tab.
    */
   bookmark: function (model) {
@@ -410,6 +432,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Once a model is loaded, call this to display the related view, selecting any tabs as needed
    */
   dataLoadedCallback: function(list, modelId, tabId) {
@@ -428,7 +451,11 @@ Ext.define('NX.controller.Drilldown', {
     }
   },
 
-  // FIXME: wire this to work with multiple list views
+  /**
+   * @private
+   *
+   * FIXME: wire this to work with multiple list views
+   */
   onDelete: function () {
     var me = this,
         selection = me.getLists()[0].getSelectionModel().getSelection(),
