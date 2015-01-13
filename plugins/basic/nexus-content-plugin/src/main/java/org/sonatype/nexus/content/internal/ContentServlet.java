@@ -521,7 +521,7 @@ public class ContentServlet
           response.setHeader("Content-Range", "bytes */" + file.getLength());
           return;
         }
-        final long bodySize = range.upperEndpoint() - range.lowerEndpoint();
+        final long bodySize = 1 + range.upperEndpoint() - range.lowerEndpoint();
         response.setStatus(SC_PARTIAL_CONTENT);
         response.setHeader("Content-Length", String.valueOf(bodySize));
         response.setHeader("Content-Range",
@@ -638,7 +638,7 @@ public class ContentServlet
           }
           else if (rangeValue.endsWith("-")) {
             return Collections.singletonList(Range.closed(
-                Long.parseLong(rangeValue.substring(0, rangeValue.length() - 1)), contentLength));
+                Long.parseLong(rangeValue.substring(0, rangeValue.length() - 1)), contentLength - 1));
           }
           else if (rangeValue.contains("-")) {
             final String[] parts = rangeValue.split("-");
@@ -670,6 +670,6 @@ public class ContentServlet
    * Returns {@code true} if the {@link Range} is applicable to file (file full closed range encloses passed in range).
    */
   protected boolean isRequestedRangeSatisfiable(final StorageFileItem file, final Range<Long> range) {
-    return Range.closed(0L, file.getLength()).encloses(range);
+    return Range.closed(0L, file.getLength() - 1).encloses(range);
   }
 }
