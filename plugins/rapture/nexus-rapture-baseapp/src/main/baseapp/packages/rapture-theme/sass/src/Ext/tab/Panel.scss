@@ -30,12 +30,15 @@
 
   $ui-background-color: $color-light-smoke,
   $ui-background-color-over: $color-gainsboro,
-  $ui-background-color-active: $color-gray,
+  $ui-background-color-active: $color-cerulean-blue,
   $ui-background-color-disabled: $color-white,
   
   $ui-margin: 0 2px,
   $ui-padding: 5px 12px,
   $ui-text-padding: 0,
+  $ui-font-size: $font-size-body,
+  $ui-font-weight: $font-weight-body,
+  $ui-font-weight-over: $font-weight-body,
   $ui-border-color: $color-light-smoke,
   $ui-border-color-over: $color-smoke,
   $ui-border-color-active: $color-light-gray,
