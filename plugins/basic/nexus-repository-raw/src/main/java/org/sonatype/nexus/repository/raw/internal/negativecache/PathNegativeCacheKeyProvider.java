@@ -10,34 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal;
+package org.sonatype.nexus.repository.raw.internal.negativecache;
 
-import org.sonatype.nexus.repository.httpbridge.HttpResponses;
+import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Request;
-import org.sonatype.nexus.repository.view.Response;
 
 /**
- * This handler sets up the context to contain a request for a remote resource.
+ * A {@link NegativeCacheKeyProvider} facet that considers the path (only) to be the cache key.
  *
  * @since 3.0
  */
-public class RawRemoteRequestHandler
-    implements Handler
+public class PathNegativeCacheKeyProvider
+    extends FacetSupport
+    implements NegativeCacheKeyProvider
 {
   @Override
-  public Response handle(final Context context) throws Exception {
-
-    final Request request = context.getRequest();
-
-    if (!"GET".equals(request.getAction())) {
-      return HttpResponses.methodNotAllowed(request.getAction(), "GET");
-    }
-
-    Object remoteRequest = new Object();
-    context.getAttributes().set("remoteRequest", remoteRequest);
-
-    return context.proceed();
+  public NegativeCacheKey cacheKey(final Context context) {
+    return new NegativeCacheKey(context.getRequest().getPath());
   }
 }

@@ -10,18 +10,19 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal;
+package org.sonatype.nexus.repository.raw.internal.negativecache;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Context;
 
 /**
- * TODO: This is ridiculous, and this should be migrated into a more fully featured facet that can retrieve remote
- * content.
+ * Computes a cache key from
  *
  * @since 3.0
  */
-public interface RawRemoteSourceFacet
+@Facet.Exposed
+public interface NegativeCacheKeyProvider
     extends Facet
 {
-  String getRemoteUrlBase();
+  NegativeCacheKey cacheKey(Context context);
 }

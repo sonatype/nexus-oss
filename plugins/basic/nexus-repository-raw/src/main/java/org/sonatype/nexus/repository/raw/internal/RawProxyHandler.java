@@ -15,17 +15,14 @@ package org.sonatype.nexus.repository.raw.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.Request;
+import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
  * A handler that retargets the context Request to the remote HTTP resource contained by the repository's {@link
@@ -35,30 +32,22 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Named
 @Singleton
-public class RawRemoteFetchHandler
+public class RawProxyHandler
+    extends ComponentSupport
     implements Handler
 {
   @Override
   public Response handle(final Context context) throws Exception {
-    final Request request = context.getRequest();
+    final RawStorageFacet storage = context.getRepository().facet(RawStorageFacet.class);
+    final String path = context.getRequest().getPath();
+    final RawContent rawContent = storage.get(path);
 
-    checkArgument(request.getAction().equals("GET"), "%s can only retarget GET requests", getClass().getSimpleName());
+    if (rawContent == null) {
+      return HttpResponses.notFound(path);
+    }
 
-    final HttpClientFacet httpFacet = context.getRepository().facet(HttpClientFacet.class);
+    final Payload payload = RawContentPayloadMarshaller.toPayload(rawContent);
 
-    // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
-
-    final RawRemoteSourceFacet facet = context.getRepository().facet(RawRemoteSourceFacet.class);
-
-    final String remoteUrlBase = facet.getRemoteUrlBase();
-
-    final HttpGet httpGet = new HttpGet(remoteUrlBase + request.getPath());
-
-    final HttpClient httpClient = httpFacet.getHttpClient();
-
-    // TODO: Actually wire this up.
-    final HttpResponse execute = httpClient.execute(httpGet);
-
-    return null;
+    return HttpResponses.ok(payload);
   }
 }
