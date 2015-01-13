@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.sonatype.sisu.goodies.common.SimpleFormat;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -155,6 +157,15 @@ public final class TaskConfiguration
               && entry.getValue() instanceof String,
           "Invalid entry in map: %s", configuration);
     }
+  }
+
+  /**
+   * Returns assembled string to be used for logging and other (non-UI) purposes. Never returns {@code null} or
+   * empty strung, result should be used as-is, as it contents might change in future.
+   */
+  public String getTaskLogName() {
+    final String name = Strings.isNullOrEmpty(getName()) ? getTypeName() : getName();
+    return SimpleFormat.format("'%s' [%s]", name, getTypeId());
   }
 
   /**
