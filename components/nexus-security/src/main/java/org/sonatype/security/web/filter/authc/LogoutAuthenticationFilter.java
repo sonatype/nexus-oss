@@ -53,14 +53,16 @@ public class LogoutAuthenticationFilter
   }
 
   /**
-   * Ensures a logout request by always:
+   * Signs-out the detected {@link HttpSession} and {@link Subject} in the request.
+   *
+   * This implementation:
    *
    * <ul>
-   * <li>invalidating any existing session cookie</li>
-   * <li>signs out the current Subject using {@link Subject#logout}</li>
+   * <li>invalidates the existing request session using {@link HttpSession#invalidate}</li>
+   * <li>signs-out the current Subject using {@link Subject#logout}</li>
    * </ul>
    *
-   * @return always true to allow further handling of response content
+   * @return true always to allow further handling of response content
    */
   @Override
   public boolean preHandle(ServletRequest request, ServletResponse response)
