@@ -333,10 +333,10 @@ public class LdapServer
         .get(directoryService.getRegistries());
 
     for (String schemaClass : configuration.getAdditionalSchemas()) {
-      log.debug("Adding schema class: " + schemaClass);
+      log.debug("Adding schema class: {}", schemaClass);
       Schema schema = (Schema) Class.forName(schemaClass, true, getClass().getClassLoader()).newInstance();
       schemaLoader.load(schema, directoryService.getRegistries(), true);
-      log.debug("Schema '" + schema.getSchemaName() + " added to LDAP Server.");
+      log.debug("Schema '{}' added to LDAP server", schema.getSchemaName());
     }
   }
 
