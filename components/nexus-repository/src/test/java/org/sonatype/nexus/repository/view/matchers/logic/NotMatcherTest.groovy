@@ -13,10 +13,13 @@
 package org.sonatype.nexus.repository.view.matchers.logic
 
 import org.junit.Test
+import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Request
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
 import org.sonatype.sisu.litmus.testsupport.TestSupport
+
+import static org.mockito.Mockito.mock
 
 /**
  * Tests for {@link NotMatcher}.
@@ -25,7 +28,7 @@ class NotMatcherTest
   extends TestSupport
 {
   private Context context(String path) {
-    return new Context(new Request(path))
+    return new Context(mock(Repository.class), new Request(path))
   }
 
   @Test
