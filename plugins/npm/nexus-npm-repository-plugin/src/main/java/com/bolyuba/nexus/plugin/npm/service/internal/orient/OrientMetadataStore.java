@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.util.file.DirSupport;
-import org.sonatype.sisu.goodies.common.Iso8601Date;
 import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
@@ -150,10 +150,10 @@ public class OrientMetadataStore
   private File createBackupFile() throws IOException {
     DirSupport.mkdir(backupDirectory);
     int counter = 1;
+    final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss.SSS").format(new Date());
     File backupFile;
     do {
-      final String backupFileName = SimpleFormat
-          .format("npmdb-backup-%s-%s.zip", Iso8601Date.format(new Date()), counter++);
+      final String backupFileName = SimpleFormat.format("npmdb-backup-%s-%s.zip", timestamp, counter++);
       backupFile = new File(backupDirectory, backupFileName);
     }
     while (backupFile.exists());
