@@ -24,6 +24,11 @@ import com.bolyuba.nexus.plugin.npm.service.internal.orient.OrientMetadataStore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * NX Task that backs up NPM MetadataStore.
+ *
+ * @since 2.11
+ */
 @Named(NpmDbBackupTaskDescriptor.ID)
 @Singleton
 public class NpmDbBackupTask

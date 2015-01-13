@@ -17,6 +17,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
+/**
+ * NX Task that backs up NPM MetadataStore.
+ *
+ * @since 2.11
+ */
 @Named(NpmDbBackupTaskDescriptor.ID)
 @Singleton
 public class NpmDbBackupTaskDescriptor

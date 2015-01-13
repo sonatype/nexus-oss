@@ -129,6 +129,8 @@ public class OrientMetadataStore
 
   /**
    * Performs DB backup, during which database is "frozen" for data modification attempts.
+   *
+   * @since 2.11
    */
   public void backupDatabase() throws IOException {
     try (final ODatabaseDocumentTx db = db()) {
@@ -147,6 +149,11 @@ public class OrientMetadataStore
     }
   }
 
+  /**
+   * Creates a unique file for backup. It's guaranteed that file does not exists.
+   *
+   * @since 2.11
+   */
   private File createBackupFile() throws IOException {
     DirSupport.mkdir(backupDirectory);
     int counter = 1;

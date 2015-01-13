@@ -42,6 +42,11 @@ import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Processor that rebuilds/updates npm metadata from data extracted from tarballs.
+ *
+ * @since 2.11
+ */
 public class RecreateMetadataWalkerProcessor
     extends AbstractWalkerProcessor
 {
@@ -130,7 +135,7 @@ public class RecreateMetadataWalkerProcessor
     }
 
     // ie. all processPackageJson failed?
-    if (((Map<String, Object>)rootJson.get("versions")).isEmpty()) {
+    if (((Map<String, Object>) rootJson.get("versions")).isEmpty()) {
       return;
     }
 

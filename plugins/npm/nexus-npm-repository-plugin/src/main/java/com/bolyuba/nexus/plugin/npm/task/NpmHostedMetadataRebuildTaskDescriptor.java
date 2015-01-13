@@ -23,6 +23,11 @@ import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * NX Task that rebuilds NPM MetadataStore for hosted repositories.
+ *
+ * @since 2.11
+ */
 @Named(NpmHostedMetadataRebuildTaskDescriptor.ID)
 @Singleton
 public class NpmHostedMetadataRebuildTaskDescriptor

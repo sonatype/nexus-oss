@@ -28,6 +28,8 @@ public interface NpmHostedRepository
 
   /**
    * Recreates npm metadata from deployed tarballs. During this operation, repository should be read only.
+   *
+   * @since 2.11
    */
   boolean recreateNpmMetadata();
 }

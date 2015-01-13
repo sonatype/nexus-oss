@@ -33,6 +33,11 @@ import com.google.common.collect.Lists;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * NX Task that rebuilds NPM MetadataStore for hosted repositories.
+ *
+ * @since 2.11
+ */
 @Named(NpmHostedMetadataRebuildTaskDescriptor.ID)
 @Singleton
 public class NpmHostedMetadataRebuildTask
