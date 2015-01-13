@@ -155,6 +155,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-common</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>base-configuration</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -515,6 +521,14 @@
               <version>1.0</version>
             </signature>
           </configuration>
+          <dependencies>
+            <!-- MANIMALSNIFFER-51 -->
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm-all</artifactId>
+              <version>5.0.3</version>
+            </dependency>
+          </dependencies>
         </plugin>
 
         <!--
@@ -696,7 +710,6 @@
               <id>httpclient</id>
               <id>maven-model</id>
               <id>maven-model-builder</id>
-              <id>orientdb-graphdb</id>
               <id>xmlpull</id>
               <id>xpp3_min</id>
               <id>shiro-guice</id>

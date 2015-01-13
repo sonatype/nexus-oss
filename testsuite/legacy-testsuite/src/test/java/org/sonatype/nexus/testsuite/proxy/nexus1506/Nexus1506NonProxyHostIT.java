@@ -22,6 +22,9 @@ import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
+
 public class Nexus1506NonProxyHostIT
     extends AbstractNexusIntegrationTest
 {
@@ -44,8 +47,7 @@ public class Nexus1506NonProxyHostIT
     Assert.assertEquals(2, settings.getRemoteProxySettings().getNonProxyHosts().size());
 
     CRemoteProxySettings proxySettings = getNexusConfigUtil().getNexusConfig().getRemoteProxySettings();
-    Assert.assertEquals(proxySettings.getNonProxyHosts().get(0), "foo");
-    Assert.assertEquals(proxySettings.getNonProxyHosts().get(1), "bar");
+    assertThat(proxySettings.getNonProxyHosts(), containsInAnyOrder("foo", "bar"));
     Assert.assertEquals(2, proxySettings.getNonProxyHosts().size());
   }
 

@@ -26,6 +26,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -55,9 +56,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Ve
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
-import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
-import org.sonatype.nexus.util.io.StreamSupport;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -236,12 +235,13 @@ public class M2Repository
     if (M2ArtifactRecognizer.isMetadata(item.getPath())) {
       return isOld(getMetadataMaxAge(), item);
     }
-    if (M2ArtifactRecognizer.isSnapshot(item.getPath())) {
-      return isOld(getArtifactMaxAge(), item);
-    }
 
     // we are using Gav to test the path
     final Gav gav = getGavCalculator().pathToGav(item.getPath());
+
+    if (gav != null && gav.isSnapshot()) {
+      return isOld(getArtifactMaxAge(), item);
+    }
 
     if (gav == null) {
       // this is not an artifact, it is just any "file"
@@ -285,9 +285,11 @@ public class M2Repository
   {
     // allow updating of metadata
     // we also need to allow updating snapshots
-    if (!M2ArtifactRecognizer.isMetadata(request.getRequestPath())
-        && !M2ArtifactRecognizer.isSnapshot(request.getRequestPath())) {
-      super.enforceWritePolicy(request, action);
+    if (!M2ArtifactRecognizer.isMetadata(request.getRequestPath())) {
+      Gav gav = getGavCalculator().pathToGav(request.getRequestPath());
+      if (gav == null || !gav.isSnapshot()) {
+        super.enforceWritePolicy(request, action);
+      }
     }
   }
 

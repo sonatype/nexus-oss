@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.proxy.item.uid;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
@@ -24,13 +25,15 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class IsItemAttributeMetacontentAttribute
     implements Attribute<Boolean>
 {
+  // HACK: Allow this attribute function to be disabled
+  private static final boolean disabled = SystemPropertiesHelper.getBoolean(
+      IsItemAttributeMetacontentAttribute.class.getName() + ".disabled", false);
+
   public Boolean getValueFor(RepositoryItemUid subject) {
-    // /.nexus/attributes
-    if (subject.getPath() != null) {
+    if (!disabled && subject.getPath() != null) {
       return subject.getPath().startsWith("/.nexus/attributes");
     }
-    else {
-      return false;
-    }
+
+    return false;
   }
 }

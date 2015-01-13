@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.nexus.common.io.DirSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

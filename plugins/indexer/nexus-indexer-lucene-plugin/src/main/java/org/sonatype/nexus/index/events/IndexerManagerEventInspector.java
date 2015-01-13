@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.events.Asynchronous;
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -25,7 +25,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -82,19 +81,17 @@ public class IndexerManagerEventInspector
     }
   }
 
-  private void inspectForIndexerManager(final Event<?> evt) {
-    RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-    Repository repository = ievt.getRepository();
+  private void inspectForIndexerManager(final RepositoryItemEvent event) {
+    Repository repository = event.getRepository();
 
     // should we sync at all
     if (repository != null && repository.isIndexable()) {
       try {
-        if (ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore) {
-          getIndexerManager().addItemToIndex(repository, ievt.getItem());
+        if (event instanceof RepositoryItemEventCache || event instanceof RepositoryItemEventStore) {
+          getIndexerManager().addItemToIndex(repository, event.getItem());
         }
-        else if (ievt instanceof RepositoryItemEventDelete) {
-          getIndexerManager().removeItemFromIndex(repository, ievt.getItem());
+        else if (event instanceof RepositoryItemEventDelete) {
+          getIndexerManager().removeItemFromIndex(repository, event.getItem());
         }
       }
       catch (Exception e) // TODO be more specific
@@ -103,5 +100,4 @@ public class IndexerManagerEventInspector
       }
     }
   }
-
 }

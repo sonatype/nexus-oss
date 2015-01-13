@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.events.AbstractEvent;
 import org.sonatype.nexus.proxy.targets.Target;
 import org.sonatype.nexus.proxy.targets.TargetRegistry;
 
@@ -22,22 +21,21 @@ import org.sonatype.nexus.proxy.targets.TargetRegistry;
  * @author velo
  */
 public abstract class TargetRegistryEvent
-    extends AbstractEvent<TargetRegistry>
 {
+  private final TargetRegistry targetRegistry;
 
   private final Target target;
 
-  public Target getTarget() {
-    return target;
-  }
-
   public TargetRegistryEvent(final TargetRegistry targetRegistry, final Target target) {
-    super(targetRegistry);
+    this.targetRegistry = targetRegistry;
     this.target = target;
   }
 
   public TargetRegistry getTargetRegistry() {
-    return getEventSender();
+    return targetRegistry;
   }
 
+  public Target getTarget() {
+    return target;
+  }
 }

@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.events.Event;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.plugins.p2.repository.UpdateSiteProxyRepository;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
@@ -39,8 +38,7 @@ public class RepositoryUpdateMirrorEventListener
   private final TaskScheduler scheduler;
 
   @Inject
-  public RepositoryUpdateMirrorEventListener(final TaskScheduler scheduler)
-  {
+  public RepositoryUpdateMirrorEventListener(final TaskScheduler scheduler) {
     this.scheduler = checkNotNull(scheduler);
   }
 
@@ -56,13 +54,10 @@ public class RepositoryUpdateMirrorEventListener
     inspect(e);
   }
 
-  protected void inspect(final Event<?> evt) {
-    final UpdateSiteProxyRepository updateSite =
-        ((RepositoryEvent) evt).getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
+  private void inspect(final RepositoryEvent event) {
+    final UpdateSiteProxyRepository updateSite = event.getRepository().adaptToFacet(UpdateSiteProxyRepository.class);
 
-    if (updateSite != null
-        && (evt instanceof RepositoryEventExpireNotFoundCaches ||
-        ((RepositoryConfigurationUpdatedEvent) evt).isRemoteUrlChanged())) {
+    if (updateSite != null && (event instanceof RepositoryEventExpireNotFoundCaches || ((RepositoryConfigurationUpdatedEvent) event).isRemoteUrlChanged())) {
       UpdateSiteMirrorTask.submit(scheduler, updateSite, false);
       log.debug("Submitted UpdateSiteMirrorTask for {}", updateSite);
     }

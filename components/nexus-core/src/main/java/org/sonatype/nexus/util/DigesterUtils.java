@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+// TODO: Update to use Guava's Hasher helpers and remove this ancient helper.
+
 /**
  * A util class to calculate various digests on Strings. Usaful for some simple password management.
  *
