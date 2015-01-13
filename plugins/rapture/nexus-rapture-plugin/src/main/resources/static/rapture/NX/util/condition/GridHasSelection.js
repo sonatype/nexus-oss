@@ -38,6 +38,7 @@ Ext.define('NX.util.condition.GridHasSelection', {
 
     if (!me.bounded) {
       components[me.grid] = {
+        cellclick: function(list, td, cellIndex, model) { me.evaluate(list, model) },
         selection: me.evaluate,
         destroy: me.evaluate
       };

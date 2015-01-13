@@ -46,6 +46,8 @@ Ext.define('NX.coreui.controller.Loggers', {
   init: function () {
     var me = this;
 
+    me.callParent();
+
     me.getApplication().getIconController().addIcons({
       'logger-default': {
         file: 'book.png',
@@ -172,7 +174,7 @@ Ext.define('NX.coreui.controller.Loggers', {
           function () {
             model.set('level', values.level);
             me.getList().getSelectionModel().select(store.indexOf(model), 1);
-            win.close();
+            me.loadView(null, null, true);
           }
       );
     }
@@ -180,7 +182,7 @@ Ext.define('NX.coreui.controller.Loggers', {
       model = me.getLoggerModel().create(values);
       store.addSorted(model);
       me.getList().getSelectionModel().select(store.indexOf(model), 1);
-      win.close();
+      me.loadView(null, null, true);
     }
   },
 

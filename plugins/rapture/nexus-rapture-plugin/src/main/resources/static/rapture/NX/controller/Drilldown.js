@@ -42,6 +42,9 @@ Ext.define('NX.controller.Drilldown', {
 
   getDescription: Ext.emptyFn,
 
+  // List of xtypes
+  masters: null,
+
   /**
    * @cfg {Function} optional function to be called on delete
    */
@@ -69,7 +72,9 @@ Ext.define('NX.controller.Drilldown', {
         componentListener = {};
 
     // Normalize lists into an array
-    if (!Ext.isArray(me.masters)) {
+    if (!me.masters) {
+      me.masters = [];
+    } else if (!Ext.isArray(me.masters)) {
       me.masters = [me.masters];
     }
 

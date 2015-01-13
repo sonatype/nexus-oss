@@ -678,7 +678,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Admin -> Support -> Logging -> Log Viewer
     ADMIN_LOG_VIEWER_TITLE: 'Log Viewer',
     ADMIN_LOG_VIEWER_SUBTITLE: 'View the current log contents',
-    ADMIN_LOG_VIEWER_MARK_TITLE: 'Mark log',
+    ADMIN_LOG_VIEWER_MARK_TITLE: 'Mark Log',
     ADMIN_LOG_VIEWER_MARK_ERROR: 'You do not have permission to mark the log',
     ADMIN_LOG_VIEWER_MARK_MESSAGE: 'Log message',
     ADMIN_LOG_VIEWER_MARK_SUCCESS: 'Log has been marked',
