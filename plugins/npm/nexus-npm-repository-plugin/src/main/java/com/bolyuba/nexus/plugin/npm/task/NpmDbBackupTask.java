@@ -12,14 +12,16 @@
  */
 package com.bolyuba.nexus.plugin.npm.task;
 
-import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
+import com.bolyuba.nexus.plugin.npm.NpmRepository;
 import com.bolyuba.nexus.plugin.npm.service.internal.orient.OrientMetadataStore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,24 +34,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Named(NpmDbBackupTaskDescriptor.ID)
 @Singleton
 public class NpmDbBackupTask
-    extends AbstractNexusRepositoriesTask<Void>
+    extends NpmTaskSupport<NpmRepository>
 {
   private final OrientMetadataStore orientMetadataStore;
 
   @Inject
-  public NpmDbBackupTask(final OrientMetadataStore orientMetadataStore) {
+  public NpmDbBackupTask(final NexusConfiguration nexusConfiguration, final OrientMetadataStore orientMetadataStore) {
+    super(nexusConfiguration);
     this.orientMetadataStore = checkNotNull(orientMetadataStore);
   }
 
   @Override
-  protected Void doRun() throws Exception {
+  protected void doExecute(final List<NpmRepository> repositories) throws Exception {
+    final List<RepositoryWritePolicy> writePolicies = setWritePolicyReadOnly(repositories);
     try {
       orientMetadataStore.backupDatabase();
     }
-    catch (IOException e) {
-      logger.warn("Error during npm DB backup", e);
+    finally {
+      resetWritePolicy(repositories, writePolicies);
     }
-    return null;
+  }
+
+  @Override
+  protected List<NpmRepository> getAffectedRepositories() {
+    return getRepositoryRegistry().getRepositoriesWithFacet(NpmRepository.class);
   }
 
   @Override
