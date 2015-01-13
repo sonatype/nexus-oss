@@ -39,6 +39,7 @@ import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
 import com.google.inject.Binder;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.sisu.space.BeanScanning;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -166,6 +167,11 @@ public abstract class NexusITSupport
    */
   public NexusITSupport(@Nullable final String nexusBundleCoordinates) {
     this.nexusBundleCoordinates = nexusBundleCoordinates;
+  }
+
+  @Override
+  public BeanScanning scanning() {
+    return BeanScanning.INDEX;
   }
 
   /**
