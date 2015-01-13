@@ -20,8 +20,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.net.HttpHeaders;
 import org.apache.shiro.web.servlet.AdviceFilter;
+
+import static com.google.common.net.HttpHeaders.SET_COOKIE;
 
 /**
  * Cookie munging filter.
@@ -34,8 +35,6 @@ public class CookieFilter
     extends AdviceFilter
 {
   private static final String SECURE_FLAG = "; Secure";
-
-  private static final String SET_COOKIE = HttpHeaders.SET_COOKIE;
 
   @Override
   protected boolean preHandle(final ServletRequest request, final ServletResponse response) throws Exception {
