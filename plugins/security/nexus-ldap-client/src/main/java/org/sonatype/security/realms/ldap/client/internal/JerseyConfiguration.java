@@ -34,7 +34,9 @@ import org.apache.commons.codec.binary.Base64;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An LDAP configurations.
+ * An LDAP configuration entity.
+ *
+ * @since 3.0
  */
 public class JerseyConfiguration
     extends EntitySupport<Configuration, ConfigurationXO>

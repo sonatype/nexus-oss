@@ -14,18 +14,41 @@ package org.sonatype.security.realms.ldap.client;
 
 import java.util.List;
 
+import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
+
 /**
- * An LDAP configurations.
+ * An LDAP server configurations. One can have multiple LDAP servers configured and ordered. This will mean that NX
+ * will reach to LDAP servers to perform queries in specific order. First LDAP entity being added causes that
+ * LDAP realm gets activated. Similarly, last LDAP entity being deleted deactivates the LDAP realm too.
+ *
+ * @since 3.0
  */
 public interface LdapConfigurations
 {
+  /**
+   * Returns all LDAP existing configuration entities, or empty list. Never {@code null}.
+   */
   List<Configuration> get();
 
+  /**
+   * Returns LDAP configuration entity by it's ID or throws (for example {@link NexusClientNotFoundException} for
+   * nonexistent ID).
+   */
   Configuration get(String id);
 
+  /**
+   * Creates an LDAP configuration entity. After setting it one must save it. First LDAP entity being saved causes that
+   * LDAP realm gets activated. Similarly, last entity being deleted deactivates the LDAP realm too.
+   */
   Configuration create();
 
+  /**
+   * Sets the entity order based on passed entity ID list.
+   */
   void order(List<String> ids);
 
+  /**
+   * Clears LDAP caches.
+   */
   void clearCaches();
 }

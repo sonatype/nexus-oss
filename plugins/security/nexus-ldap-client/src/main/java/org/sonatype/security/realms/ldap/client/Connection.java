@@ -17,6 +17,11 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * LDAP Server connection configuration.
+ *
+ * @sinnce 3.0
+ */
 public final class Connection
 {
   public enum Protocol

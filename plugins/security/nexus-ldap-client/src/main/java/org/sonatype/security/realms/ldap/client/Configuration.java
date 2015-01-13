@@ -15,16 +15,30 @@ package org.sonatype.security.realms.ldap.client;
 import org.sonatype.nexus.client.core.subsystem.Entity;
 
 /**
- * An LDAP configuration.
+ * An LDAP server configuration.
+ *
+ * @since 3.0
  */
 public interface Configuration
     extends Entity<Configuration>
 {
+  /**
+   * Entity descriptive name.
+   */
   String getName();
 
+  /**
+   * Entity descriptive name.
+   */
   Configuration setName(String name);
 
+  /**
+   * Entity's connection.
+   */
   Connection getConnection();
 
+  /**
+   * Entity's mapping.
+   */
   Mapping getMapping();
 }

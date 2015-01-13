@@ -21,6 +21,11 @@ import org.sonatype.nexus.client.core.spi.SubsystemFactory;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.security.realms.ldap.client.LdapConfigurations;
 
+/**
+ * LDAP subsystem factory.
+ *
+ * @since 3.0
+ */
 @Named
 @Singleton
 public class JerseyLdapConfigurationsFactory

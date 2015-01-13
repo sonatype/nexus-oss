@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An LDAP configurations.
+ *
+ * @since 3.0
  */
 public class JerseyLdapConfigurations
     extends SubsystemSupport<JerseyNexusClient>

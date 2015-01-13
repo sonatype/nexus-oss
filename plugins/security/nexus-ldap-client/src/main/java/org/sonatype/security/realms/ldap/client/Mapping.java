@@ -12,6 +12,11 @@
  */
 package org.sonatype.security.realms.ldap.client;
 
+/**
+ * LDAP server user and group mapping configuration.
+ *
+ * @since 3.0
+ */
 public final class Mapping
 {
   /**
