@@ -150,10 +150,10 @@ public class OrientMetadataStore
   private File createBackupFile() throws IOException {
     DirSupport.mkdir(backupDirectory);
     int counter = 1;
-    final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss.SSS").format(new Date());
+    final String timestamp = new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
     File backupFile;
     do {
-      final String backupFileName = SimpleFormat.format("npmdb-backup-%s-%s.zip", timestamp, counter++);
+      final String backupFileName = SimpleFormat.format("nexus-npm-db-backup-%s-%s.zip", timestamp, counter++);
       backupFile = new File(backupDirectory, backupFileName);
     }
     while (backupFile.exists());
