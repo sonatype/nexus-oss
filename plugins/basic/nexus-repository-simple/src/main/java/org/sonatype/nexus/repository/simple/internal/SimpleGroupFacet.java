@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
-import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 
 import com.google.common.collect.Lists;
@@ -48,9 +47,10 @@ import static org.sonatype.nexus.repository.util.TypeTokens.COLLECTION_STRING;
  * @since 3.0
  */
 @Named
+@Facet.Exposed
 public class SimpleGroupFacet
     extends FacetSupport
-    implements SimpleContentsFacet
+    implements SimpleIndexHtmlContents
 {
   public static final String CONFIG_KEY = "group";
 
@@ -75,7 +75,6 @@ public class SimpleGroupFacet
   @Override
   protected void doStart() throws Exception {
     indexHtml = getRepository().facet(SimpleIndexHtmlFacet.class);
-
     // TODO: Validate members are compatible?
   }
 
@@ -92,7 +91,8 @@ public class SimpleGroupFacet
   /**
    * Return list of member repositories.
    */
-  private List<Repository> members() {
+  @Guarded(by=STARTED)
+  public List<Repository> members() {
     List<Repository> members = Lists.newArrayListWithCapacity(memberNames.size());
     for (String name : memberNames) {
       Repository repository = repositoryManager.get(name);
@@ -106,45 +106,9 @@ public class SimpleGroupFacet
     return members;
   }
 
-  /**
-   * Find content in members, first non-null content wins.
-   */
-  @Nullable
-  @Override
-  @Guarded(by=STARTED)
-  public SimpleContent get(final String name) {
-    checkNotNull(name);
-
-    // TODO: Should this really be going through the repository's view?
-    // TODO: ... and thus need the Request and likely should move this logic to handler?
-    for (Repository repository : members()) {
-      SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
-      SimpleContent content = contents.get(name);
-      if (content != null) {
-        return content;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Group is read-only.
-   */
-  @Nullable
-  @Override
-  public SimpleContent put(final String name, final SimpleContent content) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Group is read-only.
-   */
-  @Nullable
-  @Override
-  public SimpleContent delete(final String name) {
-    throw new UnsupportedOperationException();
-  }
+  //
+  // SimpleIndexHtmlContents
+  //
 
   /**
    * Returns a union of all member repositories contents.
@@ -158,7 +122,7 @@ public class SimpleGroupFacet
     Map<String, SimpleContent> union = Maps.newHashMap();
 
     for (Repository repository : members()) {
-      SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
+      SimpleIndexHtmlContents contents = repository.facet(SimpleIndexHtmlContents.class);
       for (Map.Entry<String, SimpleContent> entry : contents.entries()) {
         // only add new content if named entry does not already exist
         if (!union.containsKey(entry.getKey())) {

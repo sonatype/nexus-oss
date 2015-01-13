@@ -24,7 +24,6 @@ import org.sonatype.nexus.repository.simple.SimpleContentCreatedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentDeletedEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentEvent;
 import org.sonatype.nexus.repository.simple.SimpleContentUpdatedEvent;
-import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.sisu.goodies.template.TemplateEngine;
 import org.sonatype.sisu.goodies.template.TemplateParameters;
 
@@ -71,7 +70,7 @@ public class SimpleIndexHtmlFacet
 
     // maybe generate index.html
     if (html == null) {
-      SimpleContentsFacet contents = getRepository().facet(SimpleContentsFacet.class);
+      SimpleIndexHtmlContents contents = getRepository().facet(SimpleIndexHtmlContents.class);
 
       html = templateEngine.render(this, template, new TemplateParameters()
           .set("repository", getRepository())

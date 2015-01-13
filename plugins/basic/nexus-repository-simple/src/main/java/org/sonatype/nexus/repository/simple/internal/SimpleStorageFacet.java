@@ -42,7 +42,7 @@ import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 @Facet.Exposed
 public class SimpleStorageFacet
     extends FacetSupport
-    implements SimpleContentsFacet
+    implements SimpleContentsFacet, SimpleIndexHtmlContents
 {
   private final Map<String, SimpleContent> store = Maps.newConcurrentMap();
 
@@ -99,6 +99,10 @@ public class SimpleStorageFacet
     }
     return prev;
   }
+
+  //
+  // SimpleIndexHtmlContents
+  //
 
   @Override
   @Guarded(by=STARTED)

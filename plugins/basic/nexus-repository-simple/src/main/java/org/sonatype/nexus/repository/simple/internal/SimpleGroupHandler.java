@@ -46,15 +46,19 @@ public class SimpleGroupHandler
     Repository repository = context.getRequest().getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
-    SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
+    SimpleGroupFacet group = repository.facet(SimpleGroupFacet.class);
 
     switch (method) {
       case GET: {
-        SimpleContent content = contents.get(name);
-        if (content == null) {
-          return HttpResponses.notFound(name);
+        for (Repository member : group.members()) {
+          // FIXME: Should dispatch
+          SimpleContentsFacet contents = member.facet(SimpleContentsFacet.class);
+          SimpleContent content = contents.get(name);
+          if (content != null) {
+            HttpResponses.ok(content.toPayload());
+          }
         }
-        return HttpResponses.ok(content.toPayload());
+        return HttpResponses.notFound(name);
       }
 
       default:
