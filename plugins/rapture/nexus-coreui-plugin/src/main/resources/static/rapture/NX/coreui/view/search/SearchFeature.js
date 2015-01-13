@@ -74,6 +74,9 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
           xtype: 'nx-coreui-search-result-details'
         },
         {
+          xtype: 'nx-drilldown-actions'
+        },
+        {
           xtype: 'nx-coreui-search-result-version-list',
           flex: 1
         }
