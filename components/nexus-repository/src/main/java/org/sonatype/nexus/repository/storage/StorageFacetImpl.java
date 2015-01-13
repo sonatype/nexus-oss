@@ -25,7 +25,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import com.tinkerpop.blueprints.Vertex;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
 import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
