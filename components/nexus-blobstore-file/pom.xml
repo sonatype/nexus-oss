@@ -39,12 +39,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.mapdb</groupId>
       <artifactId>mapdb</artifactId>
     </dependency>
