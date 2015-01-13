@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Lists;
@@ -43,13 +44,14 @@ public class Router
   /**
    * Dispatch request to matching route.
    */
-  public Response dispatch(final Request request) throws Exception {
+  public Response dispatch(final Repository repository, final Request request) throws Exception {
+    checkNotNull(repository);
     checkNotNull(request);
 
     logRequest(request);
 
     // Find route and start context
-    Context context = new Context(request);
+    Context context = new Context(repository, request);
     Route route = findRoute(context);
     Response response = context.start(route);
 

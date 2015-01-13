@@ -44,11 +44,11 @@ public class RawRemoteFetchHandler
 
     checkArgument(request.getAction().equals("GET"), "%s can only retarget GET requests", getClass().getSimpleName());
 
-    final HttpClientFacet httpFacet = request.getRepository().facet(HttpClientFacet.class);
+    final HttpClientFacet httpFacet = context.getRepository().facet(HttpClientFacet.class);
 
     // TODO: Map more fields of the request. Presumably the cache handler, higher in the stack, should add an 'if modified since' header to the request
 
-    final RawRemoteSourceFacet facet = context.getRequest().getRepository().facet(RawRemoteSourceFacet.class);
+    final RawRemoteSourceFacet facet = context.getRepository().facet(RawRemoteSourceFacet.class);
 
     final String remoteUrlBase = facet.getRemoteUrlBase();
 

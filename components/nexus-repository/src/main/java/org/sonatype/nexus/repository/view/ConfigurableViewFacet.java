@@ -40,6 +40,6 @@ public class ConfigurableViewFacet
   @Override
   public Response dispatch(final Request request) throws Exception {
     checkState(router != null, "Router not configured");
-    return router.dispatch(request);
+    return router.dispatch(getRepository(), request);
   }
 }

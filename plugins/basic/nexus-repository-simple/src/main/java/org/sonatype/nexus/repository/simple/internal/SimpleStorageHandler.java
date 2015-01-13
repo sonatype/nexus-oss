@@ -44,7 +44,7 @@ public class SimpleStorageHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     String name = ContextHelper.contentName(context);
     String method = context.getRequest().getAction();
-    Repository repository = context.getRequest().getRepository();
+    Repository repository = context.getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     SimpleStorageFacet storage = repository.facet(SimpleStorageFacet.class);

@@ -42,7 +42,7 @@ public class SimpleIndexHtmlHandler
   @Override
   public Response handle(final @Nonnull Context context) throws Exception {
     String method = context.getRequest().getAction();
-    Repository repository = context.getRequest().getRepository();
+    Repository repository = context.getRepository();
     log.debug("{} repository '{}' index.html", method, repository.getName());
 
     switch (method) {

@@ -16,7 +16,6 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.view.Request;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,11 +28,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HttpRequest
   extends Request
 {
-  public HttpRequest(final HttpServletRequest httpServletRequest, final Repository repository, final String path) {
+  public HttpRequest(final HttpServletRequest httpServletRequest, final String path) {
     checkNotNull(httpServletRequest);
 
-    // decode http-servlet-request into normalized request bits
-    this.repository = checkNotNull(repository);
     this.action = httpServletRequest.getMethod();
     this.path = checkNotNull(path);
     this.parameters = new HttpParameters(httpServletRequest);

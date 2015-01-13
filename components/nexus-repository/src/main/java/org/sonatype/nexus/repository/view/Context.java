@@ -16,6 +16,7 @@ import java.util.ListIterator;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.util.AttributesMap;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
@@ -45,16 +46,25 @@ public class Context
 
   private final Attributes attributes = new Attributes();
 
+  private final Repository repository;
+
   private final Request request;
 
   private ListIterator<Handler> handlers;
 
-  public Context(final Request request) {
+  public Context(final Repository repository,
+                 final Request request)
+  {
+    this.repository = checkNotNull(repository);
     this.request = checkNotNull(request);
   }
 
   public AttributesMap getAttributes() {
     return attributes;
+  }
+
+  public Repository getRepository() {
+    return repository;
   }
 
   public Request getRequest() {

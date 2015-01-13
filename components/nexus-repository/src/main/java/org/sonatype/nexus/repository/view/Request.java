@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.view;
 
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.util.AttributesMap;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,8 +39,6 @@ public class Request
 
   private final Attributes attributes = new Attributes();
 
-  protected Repository repository;
-
   protected String action;
 
   protected String path;
@@ -66,10 +63,6 @@ public class Request
   }
 
   // TODO: Add setters and sanity conditions, and/or introduce a builder to be used for direct api usage?
-
-  public Repository getRepository() {
-    return repository;
-  }
 
   // FIXME: Sort out 'action' or 'method'
 

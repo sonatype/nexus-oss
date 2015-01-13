@@ -18,11 +18,10 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
-import org.sonatype.nexus.repository.simple.SimpleContent;
-import org.sonatype.nexus.repository.simple.SimpleContentsFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
+import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
@@ -43,7 +42,7 @@ public class SimpleGroupHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     String name = ContextHelper.contentName(context);
     String method = context.getRequest().getAction();
-    Repository repository = context.getRequest().getRepository();
+    Repository repository = context.getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     SimpleGroupFacet group = repository.facet(SimpleGroupFacet.class);
@@ -51,11 +50,11 @@ public class SimpleGroupHandler
     switch (method) {
       case GET: {
         for (Repository member : group.members()) {
-          // FIXME: Should dispatch
-          SimpleContentsFacet contents = member.facet(SimpleContentsFacet.class);
-          SimpleContent content = contents.get(name);
-          if (content != null) {
-            HttpResponses.ok(content.toPayload());
+          log.trace("Trying member: {}", member);
+          ViewFacet view = member.facet(ViewFacet.class);
+          Response response = view.dispatch(context.getRequest());
+          if (response.getStatus().getCode() == 200) {
+            return response;
           }
         }
         return HttpResponses.notFound(name);

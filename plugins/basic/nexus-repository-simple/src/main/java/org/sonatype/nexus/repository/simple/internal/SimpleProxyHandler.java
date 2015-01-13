@@ -43,7 +43,7 @@ public class SimpleProxyHandler
   public Response handle(final @Nonnull Context context) throws Exception {
     String name = ContextHelper.contentName(context);
     String method = context.getRequest().getAction();
-    Repository repository = context.getRequest().getRepository();
+    Repository repository = context.getRepository();
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     SimpleContentsFacet contents = repository.facet(SimpleContentsFacet.class);
