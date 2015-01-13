@@ -153,11 +153,9 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
         win = form.up('nx-coreui-repositorytarget-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStore(function() { me.loadView(0, null, false); });
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 
