@@ -12,11 +12,6 @@
  */
 package org.sonatype.nexus.web.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +22,8 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableCollection;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,13 +54,12 @@ public class CookieFilterTest
   @Mock
   private ServletResponse notInstanceOfHttpServletResponse;
 
+
   @Test
   public void ifRequestIsSecureSetSecureCookieAttributeWhenMissing() throws Exception {
     when(request.isSecure()).thenReturn(true);
-
-    List<String> data = Arrays.asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE, COOKIE_4_SECURE);
-    final Collection<String> cookies = Collections.unmodifiableCollection(data);
-    when(response.getHeaders("Set-Cookie")).thenReturn(cookies);
+    when(response.getHeaders("Set-Cookie")).thenReturn(
+        unmodifiableCollection(asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE, COOKIE_4_SECURE)));
 
     CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, response, filterChain);
@@ -77,10 +73,8 @@ public class CookieFilterTest
   @Test
   public void ifRequestIsNotSecureDoNotChangeCookieAttributes() throws Exception {
     when(request.isSecure()).thenReturn(false);
-
-    List<String> data = Arrays.asList(COOKIE_1_INSECURE, COOKIE_3_SECURE);
-    final Collection<String> cookies = Collections.unmodifiableCollection(data);
-    when(response.getHeaders("Set-Cookie")).thenReturn(cookies);
+    when(response.getHeaders("Set-Cookie"))
+        .thenReturn(unmodifiableCollection(asList(COOKIE_1_INSECURE, COOKIE_3_SECURE)));
 
     CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, response, filterChain);
