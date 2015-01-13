@@ -44,23 +44,23 @@ public class StorageFacetImpl
     this.delegate = checkNotNull(delegate);
   }
 
-  private Vertex bucket(final GraphTx graph) {
-    synchronized (this) {
-      if (bucketId == null) {
-        bucketId = getOrCreateBucket(graph).getId();
+  @Override
+  protected void doStart() throws Exception {
+    // determine the bucket id for the repository, creating the bucket if needed
+    try (GraphTx graph = delegate.getGraphTx()) {
+      String repositoryName = getRepository().getName();
+      Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
+      if (bucket == null) {
+        bucket = delegate.createVertex(graph, V_BUCKET);
+        bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
+        graph.commit();
       }
+      bucketId = bucket.getId();
     }
-    return delegate.findVertex(graph, bucketId, null);
   }
 
-  private Vertex getOrCreateBucket(final GraphTx graph) {
-    String repositoryName = getRepository().getName();
-    Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
-    if (bucket == null) {
-      bucket = delegate.createVertex(graph, V_BUCKET);
-      bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
-    }
-    return bucket;
+  private Vertex bucket(final GraphTx graph) {
+    return delegate.findVertex(graph, bucketId, null);
   }
 
   @Override

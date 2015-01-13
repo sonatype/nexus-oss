@@ -84,7 +84,16 @@ public class StorageServiceImpl
           return true;
         }
       });
-      initVertexType(graph, V_BUCKET, null);
+      initVertexType(graph, V_BUCKET, new Predicate<OrientVertexType>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean apply(final OrientVertexType type) {
+          type.createProperty(P_REPOSITORY_NAME, OType.STRING);
+          graph.createKeyIndex(P_REPOSITORY_NAME, Vertex.class, new Parameter("type", "UNIQUE"),
+              new Parameter("class", V_BUCKET));
+          return true;
+        }
+      });
       initVertexType(graph, V_COMPONENT, null);
       initVertexType(graph, V_LABEL, null);
 
