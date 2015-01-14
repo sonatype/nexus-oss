@@ -56,7 +56,7 @@ public class ContentRangeIT
   public void validRangesBeginning() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     // get 1st word
-    content().downloadRange(location, bos, Range.closed(0L, 10L));
+    content().downloadRange(location, bos, Range.closed(0L, 9L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo("0123456789"));
   }
@@ -65,7 +65,7 @@ public class ContentRangeIT
   public void validRangesBeginningShiftedNine() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     // get 1st word
-    content().downloadRange(location, bos, Range.closed(1L, 10L));
+    content().downloadRange(location, bos, Range.closed(1L, 9L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo("123456789"));
   }
@@ -74,7 +74,7 @@ public class ContentRangeIT
   public void validRangesBeginningShiftedTen() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     // get 1st word
-    content().downloadRange(location, bos, Range.closed(1L, 11L));
+    content().downloadRange(location, bos, Range.closed(1L, 10L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo("1234567890"));
   }
@@ -83,16 +83,25 @@ public class ContentRangeIT
   public void validRangesMiddle() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     // get middle
-    content().downloadRange(location, bos, Range.closed(45L, 55L));
+    content().downloadRange(location, bos, Range.closed(45L, 54L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo("5678901234"));
+  }
+
+  @Test
+  public void validRangesMiddleOneByte() throws IOException {
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    // get middle
+    content().downloadRange(location, bos, Range.closed(48L, 48L));
+    final String data = new String(bos.toByteArray(), CHARSET);
+    assertThat(data, equalTo("8"));
   }
 
   @Test
   public void validRangesEnd() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     // get last word
-    content().downloadRange(location, bos, Range.closed(90L, 100L));
+    content().downloadRange(location, bos, Range.closed(90L, 99L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo("0123456789"));
   }
@@ -100,7 +109,7 @@ public class ContentRangeIT
   @Test
   public void validRangesSameAsActualContent() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    content().downloadRange(location, bos, Range.closed(0L, 100L));
+    content().downloadRange(location, bos, Range.closed(0L, 99L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo(TEST_DATA));
   }
@@ -108,7 +117,7 @@ public class ContentRangeIT
   @Test
   public void invalidRangesNegativeIsIgnoredAndFullFileReturned() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    content().downloadRange(location, bos, Range.closed(-100L, 100L));
+    content().downloadRange(location, bos, Range.closed(-1L, 99L));
     final String data = new String(bos.toByteArray(), CHARSET);
     assertThat(data, equalTo(TEST_DATA));
   }
