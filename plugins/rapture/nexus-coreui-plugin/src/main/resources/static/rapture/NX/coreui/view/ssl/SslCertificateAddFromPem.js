@@ -41,7 +41,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
         {
           xtype: 'textareafield',
           name: 'pem',
-          itemId: 'pem'
+          itemId: 'pem',
+          rows: 16
         }
       ],
 

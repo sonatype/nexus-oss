@@ -169,14 +169,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByPem: function (button) {
     var me = this,
-        win = button.up('window'),
+        win = button.up('nx-coreui-sslcertificate-add-from-pem'),
         pem = button.up('form').getForm().getFieldValues().pem;
 
     win.getEl().mask('Loading certificate...');
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        win.close();
         me.showCertificateDetails(response.data);
       }
     });

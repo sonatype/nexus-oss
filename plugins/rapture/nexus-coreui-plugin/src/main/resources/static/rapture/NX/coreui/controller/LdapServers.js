@@ -202,7 +202,7 @@ Ext.define('NX.coreui.controller.LdapServers', {
         win = form.up('nx-coreui-ldapserver-add');
 
     if (win) {
-      me.loadStore(function() { me.loadView(0, null, false); });
+      me.loadStoreAndSelect(action.result.data.id, false);
     } else {
       me.loadStore(Ext.emptyFn);
     }

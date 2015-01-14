@@ -404,12 +404,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.create(values, function(response) {
       if (Ext.isObject(response)) {
         if (response.success) {
-          win.close();
           NX.Messages.add({
             text: 'Capability created: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id);
+          me.loadStoreAndSelect(response.data.id, false);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);

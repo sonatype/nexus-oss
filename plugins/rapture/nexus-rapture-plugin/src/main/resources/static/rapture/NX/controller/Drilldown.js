@@ -186,9 +186,10 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @public
-   * @param modelId
+   * @param modelId The model to bookmark and/or navigate to
+   * @param navigate Navigate to the model, or just select it?
    */
-  loadStoreAndSelect: function (modelId) {
+  loadStoreAndSelect: function (modelId, navigate) {
     var me = this,
       lists = me.getLists(),
       model;
@@ -199,7 +200,11 @@ Ext.define('NX.controller.Drilldown', {
         model = lists[i].getStore().getById(modelId);
         if (model) {
           me.bookmark(model);
-          me.navigateTo(NX.Bookmarks.getBookmark());
+          if (navigate) {
+            me.navigateTo(NX.Bookmarks.getBookmark());
+          } else {
+            me.onModelChanged(model);
+          }
           break;
         }
       }

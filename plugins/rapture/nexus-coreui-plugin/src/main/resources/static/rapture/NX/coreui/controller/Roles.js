@@ -263,7 +263,7 @@ Ext.define('NX.coreui.controller.Roles', {
         win = form.up('nx-coreui-role-add');
 
     if (win) {
-      me.loadStore(function() { me.loadView(0, null, false); });
+      me.loadStoreAndSelect(action.result.data.id, false);
     } else {
       me.loadStore(Ext.emptyFn);
     }
