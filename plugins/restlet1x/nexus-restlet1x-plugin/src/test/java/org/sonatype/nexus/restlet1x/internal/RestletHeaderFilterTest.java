@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.restlet1x.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.noelios.restlet.Engine;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -44,24 +43,26 @@ public class RestletHeaderFilterTest
   @Mock
   private ServletResponse notInstanceOfHttpServletResponse;
 
+  private RestletHeaderFilter filter;
+
+  @Before
+  public void setUp() throws Exception {
+    this.filter = new RestletHeaderFilter();
+  }
 
   @Test
   public void noServerHeader() throws Exception {
     when(response.getHeaders("Server")).thenReturn(Collections.EMPTY_LIST);
 
-    RestletHeaderFilter filter = new RestletHeaderFilter();
-    filter.preHandle(request,response);
+    filter.preHandle(request, response);
 
     verify(response).setHeader("Server", Engine.VERSION_HEADER);
   }
 
   @Test
   public void oneServerHeader() throws Exception {
-    List<String> data = Arrays.asList("special/5.0.0");
-    final Collection<String> serverHeaders = Collections.unmodifiableCollection(data);
-    when(response.getHeaders("Server")).thenReturn(serverHeaders);
+    when(response.getHeaders("Server")).thenReturn(asList("special/5.0.0"));
 
-    RestletHeaderFilter filter = new RestletHeaderFilter();
     filter.preHandle(request, response);
 
     verify(response).setHeader("Server", "special/5.0.0 " + Engine.VERSION_HEADER);
@@ -69,19 +70,15 @@ public class RestletHeaderFilterTest
 
   @Test
   public void multipleServerHeaders() throws Exception {
-    List<String> data = Arrays.asList("special/5.0.0", "server2/v1");
-    final Collection<String> serverHeaders = Collections.unmodifiableCollection(data);
-    when(response.getHeaders("Server")).thenReturn(serverHeaders);
+    when(response.getHeaders("Server")).thenReturn(asList("special/5.0.0", "server2/v1"));
 
-    RestletHeaderFilter filter = new RestletHeaderFilter();
-    filter.preHandle(request,response);
+    filter.preHandle(request, response);
 
     verify(response).setHeader("Server", "special/5.0.0 server2/v1 " + Engine.VERSION_HEADER);
   }
 
   @Test
   public void ifNotInstanceOfHttpServletResponseDoNotProcessResponse() throws Exception {
-    RestletHeaderFilter filter = new RestletHeaderFilter();
     filter.preHandle(request, notInstanceOfHttpServletResponse);
 
     verifyZeroInteractions(response);
