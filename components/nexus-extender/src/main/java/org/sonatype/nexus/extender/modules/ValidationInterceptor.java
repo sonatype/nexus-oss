@@ -25,6 +25,7 @@ import org.sonatype.nexus.validation.Validate;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.hibernate.validator.HibernateValidator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,7 +45,7 @@ public class ValidationInterceptor
 
     final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
       final Validate validate = mi.getMethod().getAnnotation(Validate.class);
 
       validateParameters(mi.getThis(), mi.getMethod(), mi.getArguments(), validate.groups());

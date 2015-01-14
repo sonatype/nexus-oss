@@ -693,7 +693,8 @@
               <!--
               Need special wrapping/fragments
               -->
-              <id>hibernate-validator</id>
+              <id>javax.el</id>
+              <id>validation-api</id>
               <id>httpcore</id>
               <id>httpclient</id>
               <id>maven-model</id>
