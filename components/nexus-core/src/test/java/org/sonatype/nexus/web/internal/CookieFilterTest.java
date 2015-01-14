@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableCollection;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,14 +54,19 @@ public class CookieFilterTest
   @Mock
   private ServletResponse notInstanceOfHttpServletResponse;
 
+  private CookieFilter cookieFilter;
+
+  @Before
+  public void setUp() throws Exception {
+    this.cookieFilter = new CookieFilter();
+  }
 
   @Test
   public void ifRequestIsSecureSetSecureCookieAttributeWhenMissing() throws Exception {
     when(request.isSecure()).thenReturn(true);
-    when(response.getHeaders("Set-Cookie")).thenReturn(
-        unmodifiableCollection(asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE, COOKIE_4_SECURE)));
+    when(response.getHeaders("Set-Cookie")).thenReturn(asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE,
+        COOKIE_4_SECURE));
 
-    CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, response, filterChain);
 
     verify(response).setHeader("Set-Cookie", COOKIE_1_INSECURE + "; Secure");
@@ -74,9 +79,8 @@ public class CookieFilterTest
   public void ifRequestIsNotSecureDoNotChangeCookieAttributes() throws Exception {
     when(request.isSecure()).thenReturn(false);
     when(response.getHeaders("Set-Cookie"))
-        .thenReturn(unmodifiableCollection(asList(COOKIE_1_INSECURE, COOKIE_3_SECURE)));
+        .thenReturn(asList(COOKIE_1_INSECURE, COOKIE_3_SECURE));
 
-    CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, response, filterChain);
 
     verifyZeroInteractions(response);
@@ -84,7 +88,6 @@ public class CookieFilterTest
 
   @Test
   public void ifNotInstanceOfHttpServletResponseDoNotProcessResponse() throws Exception {
-    CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, notInstanceOfHttpServletResponse, filterChain);
 
     verifyZeroInteractions(response);
@@ -94,7 +97,6 @@ public class CookieFilterTest
   public void ifNoCookieHeadersDoNotChangeTheResponse() throws Exception {
     when(request.isSecure()).thenReturn(true);
 
-    CookieFilter cookieFilter = new CookieFilter();
     cookieFilter.doFilter(request, response, filterChain);
 
     verify(response, times(0)).setHeader(anyString(), anyString());
