@@ -117,7 +117,6 @@ public class JerseyConfiguration
   @Override
   protected ConfigurationXO createSettings(final String id) {
     final ConfigurationXO data = new ConfigurationXO();
-    data.name = null;
     data.connection = new Connection();
     data.mapping = new Mapping();
     return data;
