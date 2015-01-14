@@ -45,6 +45,8 @@ public class RawHostedRecipe
 
   private final Provider<ConfigurableViewFacet> viewFacet;
 
+  private final Provider<RawIndexFacet> rawIndexFacet;
+
   private final TimingHandler timingHandler;
 
   private final RawStorageHandler rawStorageHandler;
@@ -53,6 +55,7 @@ public class RawHostedRecipe
   public RawHostedRecipe(final Type type, final Format format,
                          final Provider<ConfigurableViewFacet> viewFacet,
                          final Provider<InMemoryRawStorageFacet> rawStorageFacet,
+                         final Provider<RawIndexFacet> rawIndexFacet,
                          final TimingHandler timingHandler,
                          final RawStorageHandler rawStorageHandler)
   {
@@ -61,12 +64,14 @@ public class RawHostedRecipe
     this.rawStorageFacet = checkNotNull(rawStorageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.rawStorageHandler = checkNotNull(rawStorageHandler);
+    this.rawIndexFacet = checkNotNull(rawIndexFacet);
   }
 
   @Override
   public void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(rawStorageFacet.get());
     repository.attach(configure(viewFacet.get()));
+    repository.attach(rawIndexFacet.get());
   }
 
   /**
