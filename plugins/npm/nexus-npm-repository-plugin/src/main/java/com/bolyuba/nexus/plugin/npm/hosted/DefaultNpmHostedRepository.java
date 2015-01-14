@@ -105,8 +105,8 @@ public class DefaultNpmHostedRepository
     context.getProcessors().add(processor);
     getWalker().walk(context);
     log.info("Recreated npm metadata on {} (packageRoots={}/packageVersions={})", this,
-        processor.getProcessedPackages(), processor.getProcessedPackageVersions());
-    return processor.getProcessedPackages() > 0;
+        processor.getPackageRoots(), processor.getPackageVersions());
+    return processor.getPackageRoots() > 0;
   }
 
   @Override

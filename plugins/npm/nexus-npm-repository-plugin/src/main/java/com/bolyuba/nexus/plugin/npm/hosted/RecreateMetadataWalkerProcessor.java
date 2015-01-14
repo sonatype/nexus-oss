@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.zip.GZIPInputStream;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -50,30 +51,32 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class RecreateMetadataWalkerProcessor
     extends AbstractWalkerProcessor
 {
+  private static final int MAX_PACKAGE_JSON_FILE_SIZE = 1_000_000;
+
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   private final ObjectMapper objectMapper;
 
   private final HostedMetadataService hostedMetadataService;
 
-  private int processedPackages;
+  private int packageRoots;
 
-  private int processedPackageVersions;
+  private int packageVersions;
 
   public RecreateMetadataWalkerProcessor(final HostedMetadataService hostedMetadataService)
   {
     this.objectMapper = new ObjectMapper();
     this.hostedMetadataService = hostedMetadataService;
-    this.processedPackages = 0;
-    this.processedPackageVersions = 0;
+    this.packageRoots = 0;
+    this.packageVersions = 0;
   }
 
-  public int getProcessedPackages() {
-    return processedPackages;
+  public int getPackageRoots() {
+    return packageRoots;
   }
 
-  public int getProcessedPackageVersions() {
-    return processedPackageVersions;
+  public int getPackageVersions() {
+    return packageVersions;
   }
 
   @Override
@@ -86,7 +89,7 @@ public class RecreateMetadataWalkerProcessor
   public void onCollectionExit(final WalkerContext context, final StorageCollectionItem coll)
       throws Exception
   {
-    final TreeMap<Version, Map<String, Object>> packages = Maps.newTreeMap();
+    final TreeMap<Version, Map<String, Object>> versions = Maps.newTreeMap();
 
     // collect all the possible tarballs
     final Collection<StorageItem> files = coll.list();
@@ -100,14 +103,21 @@ public class RecreateMetadataWalkerProcessor
         continue;
       }
       try {
-        final Map<String, Object> packageJson = extractPackageJson((StorageFileItem) file);
-        if (packageJson == null || !packageJson.containsKey("name") || !packageJson.containsKey("version")) {
-          // not found in tarball, not containing needed elements, just skip it but this time log it
-          log.info("Not found or malformed package.json from {}", file.getRepositoryItemUid());
+        final Map<String, Object> packageVersionJson = extractPackageJson((StorageFileItem) file);
+        if (packageVersionJson == null) {
+          // not found in tarball, just skip it but this time log it
+          log.info("Not found package.json in {}", file.getRepositoryItemUid());
           continue;
         }
-        final Version version = Version.parse(String.valueOf(packageJson.get("version")));
-        packages.put(version, packageJson);
+        if (!packageVersionJson.containsKey("name") ||
+            !packageVersionJson.containsKey("version")) {
+          // not containing needed elements, just skip it but this time log it
+          log.info("Malformed package.json in {}", file.getRepositoryItemUid());
+
+          continue;
+        }
+        final Version version = Version.parse(String.valueOf(packageVersionJson.get("version")));
+        versions.put(version, packageVersionJson);
       }
       catch (Exception e) {
         log.info("Failed to extract or malformed package.json from {}", file.getRepositoryItemUid());
@@ -115,7 +125,7 @@ public class RecreateMetadataWalkerProcessor
     }
 
     // ie. dir empty or all extract failed?
-    if (packages.isEmpty()) {
+    if (versions.isEmpty()) {
       return;
     }
 
@@ -125,9 +135,9 @@ public class RecreateMetadataWalkerProcessor
     rootJson.put("versions", Maps.<String, Object>newHashMap());
     rootJson.put("x-nx-rebuilt", new Date());
 
-    for (Version version : packages.keySet()) {
+    for (Version version : versions.keySet()) {
       try {
-        processPackageJson(rootJson, packages.get(version));
+        processPackageJson(rootJson, versions.get(version));
       }
       catch (IllegalArgumentException e) {
         log.info("Failed to process package.json from {} version {}", coll.getPath(), version, e);
@@ -139,7 +149,7 @@ public class RecreateMetadataWalkerProcessor
       return;
     }
 
-    final Map<String, Object> lastPackage = packages.get(packages.lastKey());
+    final Map<String, Object> lastPackage = versions.get(versions.lastKey());
     final String lastVersion = String.valueOf(lastPackage.get("version"));
     final Map<String, Object> distTags = (Map<String, Object>) rootJson.get("dist-tags");
     distTags.remove(lastVersion);
@@ -147,29 +157,39 @@ public class RecreateMetadataWalkerProcessor
 
     final PackageRoot packageRoot = new PackageRoot(context.getRepository().getId(), rootJson);
     hostedMetadataService.consumePackageRoot(packageRoot);
-    processedPackages = processedPackages + 1;
-    processedPackageVersions = processedPackageVersions + packages.size();
+    packageRoots = packageRoots + 1;
+    packageVersions = packageVersions + versions.size();
   }
 
   private Map<String, Object> extractPackageJson(final StorageFileItem file) throws IOException {
-    TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(file.getInputStream());
-    TarArchiveEntry tarEntry = tarArchiveInputStream.getNextTarEntry();
-    while (tarEntry != null && !"package.json".equals(tarEntry.getName())) {
-      tarEntry = tarArchiveInputStream.getNextTarEntry();
-    }
-    if (tarEntry == null || !"package.json".equals(tarEntry.getName()) || !tarEntry.isFile()) {
-      return null;
-    }
-    // TODO: some sanity check of package.json size? If so, for how much (as they grow as package gets "older")
-    checkArgument(tarEntry.getSize() < 100000, "Too large package.json: %s bytes", tarEntry.getSize());
-    // do this in memory, as package.json is expected to be fairly small (few kb at most)
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream(Ints.checkedCast(tarEntry.getSize()));
-    StreamSupport.copy(tarArchiveInputStream, bos, StreamSupport.BUFFER_SIZE);
+    try (final GZIPInputStream gzipInputStream = new GZIPInputStream(file.getInputStream())) {
+      log.debug("Examining TAR file");
+      final TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
+      TarArchiveEntry tarEntry;
+      do {
+        tarEntry = tarArchiveInputStream.getNextTarEntry();
+        if (tarEntry != null) {
+          log.debug("{}", tarEntry.getName());
+        }
+      }
+      while (tarEntry != null && !"package.json".equals(tarEntry.getName()));
+      // checks we do silently: tarball has no package json
+      if (tarEntry == null || !"package.json".equals(tarEntry.getName())) {
+        return null;
+      }
+      // checks might come from corrupted data, so we do want to report these
+      checkArgument(tarEntry.isFile(), "Tar content package.json not a file?");
+      checkArgument(tarEntry.getSize() < MAX_PACKAGE_JSON_FILE_SIZE, "Too large package.json: %s bytes",
+          tarEntry.getSize());
+      // do this in memory, as package.json is expected to be fairly small (few kb at most)
+      final ByteArrayOutputStream bos = new ByteArrayOutputStream(Ints.checkedCast(tarEntry.getSize()));
+      StreamSupport.copy(tarArchiveInputStream, bos, StreamSupport.BUFFER_SIZE);
 
-    // read JSON into a map
-    final Map<String, Object> packageJson = objectMapper
-        .readValue(bos.toByteArray(), new TypeReference<HashMap<String, Object>>() { });
-    return packageJson;
+      // read JSON into a map
+      final Map<String, Object> packageJson = objectMapper
+          .readValue(bos.toByteArray(), new TypeReference<HashMap<String, Object>>() { });
+      return packageJson;
+    }
   }
 
   private void processPackageJson(final Map<String, Object> rootJson, final Map<String, Object> packageJson)
