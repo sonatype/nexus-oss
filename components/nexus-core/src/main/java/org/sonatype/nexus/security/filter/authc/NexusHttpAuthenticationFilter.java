@@ -223,21 +223,6 @@ public class NexusHttpAuthenticationFilter
     }
   }
 
-  @Override
-  protected boolean isRememberMe(ServletRequest request) {
-    if (request.getAttribute(ANONYMOUS_LOGIN) == null) {
-      // it is not an anonymous login
-      // return true;
-      // NEXUS-607: fix for cookies, when sent from client. They will expire once
-      // and we are not sending them anymore.
-      return false;
-    }
-    else {
-      // it is anon login. no rembemberMe
-      return false;
-    }
-  }
-
   /**
    * TODO: consider moving this to a new filter, and chain them together
    */

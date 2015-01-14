@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite;
 
 import java.io.FileInputStream;
+import java.net.URL;
 import java.security.KeyStore;
 
 import javax.annotation.Nullable;
@@ -28,14 +29,16 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -51,8 +54,6 @@ public abstract class NexusHttpsITSupport
     extends NexusRunningParametrizedITSupport
 {
 
-  private CookieStore cookieStore = new BasicCookieStore();
-
   public NexusHttpsITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
   }
@@ -62,8 +63,35 @@ public abstract class NexusHttpsITSupport
     return super.configureNexus(config).enableHttps(RANDOM_PORT, testData().resolveFile("keystore.jks"), "changeit");
   }
 
-  protected String getSecureUrl() {
-    return String.format("https://%s:%s/nexus/", nexus().getConfiguration().getHostName(), nexus().getSslPort());
+  protected HttpClientBuilder clientBuilder() throws Exception {
+    HttpClientBuilder builder = HttpClients.custom();
+    builder.setDefaultRequestConfig(requestConfig());
+    builder.setDefaultCredentialsProvider(credentialsProvider());
+    builder.setSSLSocketFactory(sslSocketFactory());
+    return builder;
+  }
+
+  protected RequestConfig requestConfig() {
+    return RequestConfig.custom()
+        .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+        .build();
+  }
+
+  protected CredentialsProvider credentialsProvider() {
+    String hostname = nexus().getConfiguration().getHostName();
+    AuthScope scope = new AuthScope(hostname, -1);
+    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(scope, credentials());
+    return credentialsProvider;
+  }
+
+  protected Credentials credentials() {
+    return new UsernamePasswordCredentials("admin", "admin123");
+  }
+
+  protected SSLConnectionSocketFactory sslSocketFactory() throws Exception {
+    SSLContext context = SSLContexts.custom().loadTrustMaterial(trustStore(), new TrustSelfSignedStrategy()).build();
+    return new SSLConnectionSocketFactory(context, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
   }
 
   protected KeyStore trustStore() throws Exception {
@@ -74,52 +102,46 @@ public abstract class NexusHttpsITSupport
     return trustStore;
   }
 
-  protected SSLConnectionSocketFactory sslSocketFactory() throws Exception {
-    SSLContext context = SSLContexts.custom().loadTrustMaterial(trustStore(), new TrustSelfSignedStrategy()).build();
-    return new SSLConnectionSocketFactory(context, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-  }
-
-  protected Credentials credentials() {
-    return new UsernamePasswordCredentials("admin", "admin123");
-  }
-
-  protected CredentialsProvider credentialsProvider() {
-    String hostname = nexus().getConfiguration().getHostName();
-    AuthScope scope = new AuthScope(hostname, nexus().getSslPort(), "https");
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(scope, credentials());
-    return credentialsProvider;
-  }
-
-  protected HttpClientBuilder clientBuilder() throws Exception {
-    HttpClientBuilder builder = HttpClients.custom();
-    builder.setDefaultCookieStore(cookieStore);
-    builder.setDefaultCredentialsProvider(credentialsProvider());
-    builder.setSSLSocketFactory(sslSocketFactory());
-    return builder;
-  }
-
-  protected AuthCache basicAuthCache() {
-    String hostname = nexus().getConfiguration().getHostName();
-    HttpHost host = new HttpHost(hostname, nexus().getSslPort(), "https");
-    AuthCache authCache = new BasicAuthCache();
-    authCache.put(host, new BasicScheme());
-    return authCache;
-  }
-
   protected HttpClientContext clientContext() {
     HttpClientContext context = HttpClientContext.create();
     context.setAuthCache(basicAuthCache());
     return context;
   }
 
+  protected AuthCache basicAuthCache() {
+    String hostname = nexus().getConfiguration().getHostName();
+    AuthCache authCache = new BasicAuthCache();
+    HttpHost hostHttp = new HttpHost(hostname, nexus().getPort(), "http");
+    HttpHost hostHttps = new HttpHost(hostname, nexus().getSslPort(), "https");
+    authCache.put(hostHttp, new BasicScheme());
+    authCache.put(hostHttps, new BasicScheme());
+    return authCache;
+  }
+
   @Nullable
-  protected Cookie getSessionCookie() {
+  protected Cookie getSessionCookie(CookieStore cookieStore) {
     for (Cookie cookie : cookieStore.getCookies()) {
-      if ("JSESSIONID".equals(cookie.getName())) {
+      if ("NXSESSIONID".equals(cookie.getName())) {
         return cookie;
       }
     }
     return null;
   }
+
+  /**
+   * @return CookieOrigin suitable for validating cookies from the Nexus URL
+   */
+  public static CookieOrigin cookieOrigin(final URL nexusUrl) {
+    return new CookieOrigin(nexusUrl.getHost(), nexusUrl.getPort(),
+        expectedCookiePath(nexusUrl), nexusUrl.getProtocol().equals("https"));
+  }
+
+  /**
+   * @return the expected cookie path value of our session cookie from the provided Nexus origin base URL
+   */
+  public static String expectedCookiePath(final URL nexusUrl) {
+    return nexusUrl.getPath().substring(0, nexusUrl.getPath().length() - 1);
+  }
+
+
 }

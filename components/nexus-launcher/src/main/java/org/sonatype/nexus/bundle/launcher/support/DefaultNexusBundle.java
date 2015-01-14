@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -54,6 +55,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.apache.tools.ant.taskdefs.condition.Os;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,6 +122,11 @@ public class DefaultNexusBundle
    * SSL port if HTTPS support is enabled, otherwise -1.
    */
   private int sslPort;
+
+  /**
+   * Secure URL or null
+   */
+  private URL secureUrl;
 
   @Inject
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
@@ -224,6 +231,28 @@ public class DefaultNexusBundle
   }
 
   /**
+   * Gets the configured context path for this bundle.
+   * <p/>
+   * The default context path if not explicitly configured is "/" + {@link #getName}.
+   *
+   * @return webapp context path where this bundle is rooted always starting with a slash
+   */
+  protected @NotNull String getContextPath() {
+    return getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
+  }
+
+  @Override
+  protected String composeApplicationURL() {
+    return String.format("http://%s:%s%s/", getConfiguration().getHostName(), getPort(), getContextPath());
+  }
+
+  @Override
+  public URL getSecureUrl() {
+    return this.secureUrl;
+  }
+
+
+  /**
    * Additionally <br/>
    * - configures Nexus/Jetty port<br/>
    * - installs command monitor<br/>
@@ -250,6 +279,11 @@ public class DefaultNexusBundle
     }
     else {
       sslPort = getConfiguration().getSslPort();
+    }
+
+    if (getSslPort() > 0) {
+      this.secureUrl = new URL(
+          String.format("https://%s:%s%s/", getConfiguration().getHostName(), getSslPort(), getContextPath()));
     }
 
     configureJSW(strategy);
@@ -686,6 +720,9 @@ public class DefaultNexusBundle
 
       nexusProperties.setProperty("application-port", String.valueOf(getPort()));
       nexusProperties.setProperty("application-port-ssl", String.valueOf(getSslPort()));
+      if (getConfiguration().getContextPath() != null) {
+        nexusProperties.setProperty("nexus-webapp-context-path", getConfiguration().getContextPath());
+      }
 
       final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
       if (!systemProperties.isEmpty()) {

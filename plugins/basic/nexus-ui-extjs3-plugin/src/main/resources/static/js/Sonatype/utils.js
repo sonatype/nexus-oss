@@ -802,7 +802,6 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
             },
             failure : function(response, options) {
               Ext.namespace('Sonatype.utils').refreshTask.stop();
-              Ext.namespace('Sonatype.utils').clearCookie('JSESSIONID');
               if (activeWindow)
               {
                 activeWindow.getEl().unmask();
@@ -818,7 +817,6 @@ define('Sonatype/utils',['../extjs', 'Nexus/config', 'Nexus/util/Format', 'Sonat
                   method : 'GET',
                   url : Sonatype.config.repos.urls.logout,
                   callback : function(options, success, response) {
-                    ns.clearCookie('JSESSIONID');
                     Sonatype.view.justLoggedOut = true;
                   }
                 });
