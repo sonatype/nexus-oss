@@ -23,6 +23,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
 import org.sonatype.nexus.orient.DatabaseInstance;
@@ -57,16 +58,17 @@ public class StorageServiceImpl
 {
   private final EventBus eventBus;
 
-  private final BlobStore blobStore;
+  private final BlobStoreManager blobStoreManager;
 
   private final Provider<DatabaseInstance> databaseInstanceProvider;
 
   @Inject
   public StorageServiceImpl(final EventBus eventBus,
-                            final BlobStore blobStore,
-                            @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider) {
+                            final BlobStoreManager blobStoreManager,
+                            @Named(ComponentDatabase.NAME) Provider<DatabaseInstance> databaseInstanceProvider)
+  {
     this.eventBus = checkNotNull(eventBus);
-    this.blobStore = checkNotNull(blobStore);
+    this.blobStoreManager = checkNotNull(blobStoreManager);
     this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
   }
 
@@ -321,13 +323,17 @@ public class StorageServiceImpl
     graph.removeVertex(vertex);
   }
 
+  private BlobStore blobStore() {
+    return blobStoreManager.get("default");
+  }
+
   @Override
   @Guarded(by=STARTED)
   public BlobRef createBlob(final InputStream inputStream, Map<String, String> headers) {
     checkNotNull(inputStream);
     checkNotNull(headers);
 
-    org.sonatype.nexus.blobstore.api.Blob blob = blobStore.create(inputStream, headers);
+    org.sonatype.nexus.blobstore.api.Blob blob = blobStore().create(inputStream, headers);
     return new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
   }
 
@@ -337,7 +343,7 @@ public class StorageServiceImpl
   public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
     checkNotNull(blobRef);
 
-    return blobStore.get(blobRef.getBlobId());
+    return blobStore().get(blobRef.getBlobId());
   }
 
   @Override
@@ -345,6 +351,6 @@ public class StorageServiceImpl
   public boolean deleteBlob(final BlobRef blobRef) {
     checkNotNull(blobRef);
 
-    return blobStore.delete(blobRef.getBlobId());
+    return blobStore().delete(blobRef.getBlobId());
   }
 }

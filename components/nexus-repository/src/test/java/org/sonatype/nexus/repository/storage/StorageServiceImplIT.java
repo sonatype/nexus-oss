@@ -14,6 +14,7 @@
 package org.sonatype.nexus.repository.storage;
 
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
 import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -49,8 +50,11 @@ public class StorageServiceImplIT
 
   @Before
   public void setUp() throws Exception {
-    underTest = new StorageServiceImpl(mock(EventBus.class), mock(BlobStore.class),
-        Providers.of(database.getInstance()));
+    underTest = new StorageServiceImpl(
+        mock(EventBus.class),
+        mock(BlobStoreManager.class),
+        Providers.of(database.getInstance())
+    );
     underTest.start();
   }
 

@@ -10,21 +10,29 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.storage;
+package org.sonatype.nexus.internal.blobstore;
 
-import javax.annotation.Nullable;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.log.LogConfigurationCustomizer;
+
+import static org.sonatype.nexus.log.LoggerLevel.DEFAULT;
+import static org.sonatype.nexus.log.LoggerLevel.TRACE;
 
 /**
- * TODO: No doubt this will find its way into another module at some point.
+ * Blob-store {@link LogConfigurationCustomizer}.
  *
  * @since 3.0
  */
-public interface BlobStoreManager
+@Named
+@Singleton
+public class LogConfigurationCustomizerImpl
+    implements LogConfigurationCustomizer
 {
-  BlobStore getStore(String storeName);
-
-  // TODO: Extend this interface to include blob store management features, such as declaring them.
-
+  @Override
+  public void customize(final Configuration config) {
+    // HACK: TRACE for testing, change to DEFAULT later
+    config.setLoggerLevel("org.sonatype.nexus.blobstore", TRACE);
+  }
 }
