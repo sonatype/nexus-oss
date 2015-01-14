@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.Facet;
 
 import com.tinkerpop.blueprints.Vertex;

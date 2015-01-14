@@ -20,10 +20,10 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.storage.BlobRef;
-import org.sonatype.nexus.repository.storage.GraphTx;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import com.google.common.collect.ImmutableMap;

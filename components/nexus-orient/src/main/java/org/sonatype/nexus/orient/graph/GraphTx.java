@@ -10,7 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.storage;
+
+package org.sonatype.nexus.orient.graph;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
@@ -20,16 +21,17 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
  *
  * @since 3.0
  */
-public class GraphTx extends OrientGraph
+public class GraphTx
+    extends OrientGraph
     implements AutoCloseable
 {
-    public GraphTx(final ODatabaseDocumentTx db) {
-        super(db);
-    }
+  public GraphTx(final ODatabaseDocumentTx db) {
+    super(db);
+  }
 
-    @Override
-    public void close() {
-        database.rollback(); // no-op if no changes have occurred since last commit
-        shutdown();
-    }
+  @Override
+  public void close() {
+    database.rollback(); // no-op if no changes have occurred since last commit
+    shutdown();
+  }
 }
