@@ -91,7 +91,7 @@ public class CookieFilterTest
   }
 
   @Test
-  public void doNotChangeTheResponseIfNoCookieHeaders() throws Exception {
+  public void ifNoCookieHeadersDoNotChangeTheResponse() throws Exception {
     when(request.isSecure()).thenReturn(true);
 
     CookieFilter cookieFilter = new CookieFilter();
