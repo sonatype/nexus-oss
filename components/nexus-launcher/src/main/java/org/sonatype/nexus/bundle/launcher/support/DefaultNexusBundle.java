@@ -55,6 +55,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.apache.tools.ant.taskdefs.condition.Os;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,11 +230,20 @@ public class DefaultNexusBundle
     }
   }
 
+  /**
+   * Gets the configured context path for this bundle.
+   * <p/>
+   * The default context path if not explicitly configured is "/" + {@link #getName}.
+   *
+   * @return webapp context path where this bundle is rooted always starting with a slash
+   */
+  protected @NotNull String getContextPath() {
+    return getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
+  }
+
   @Override
   protected String composeApplicationURL() {
-    final String contextPath =
-        getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
-    return String.format("http://%s:%s%s/", getConfiguration().getHostName(), getPort(), contextPath);
+    return String.format("http://%s:%s%s/", getConfiguration().getHostName(), getPort(), getContextPath());
   }
 
   @Override
@@ -272,10 +282,8 @@ public class DefaultNexusBundle
     }
 
     if (getSslPort() > 0) {
-      final String contextPath =
-          getConfiguration().getContextPath() == null ? "/" + getName() : getConfiguration().getContextPath();
       this.secureUrl = new URL(
-          String.format("https://%s:%s%s/", getConfiguration().getHostName(), getSslPort(), contextPath));
+          String.format("https://%s:%s%s/", getConfiguration().getHostName(), getSslPort(), getContextPath()));
     }
 
     configureJSW(strategy);
