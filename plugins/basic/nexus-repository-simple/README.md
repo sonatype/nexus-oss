@@ -15,31 +15,31 @@
 # Configure Repositories
 
     orient:connect plocal:../sonatype-work/nexus/db/config admin admin
-    orient:insert into repository_configuration SET repository_name=\'test1\', recipe_name=\'simple-hosted\'
-    orient:insert into repository_configuration SET repository_name=\'test2\', recipe_name=\'simple-hosted\'
-    orient:insert into repository_configuration SET repository_name=\'testgroup1\', recipe_name=\'simple-group\', attributes={\'group\': { \'memberNames\': [\'test1\', \'test2\'] }}
-    orient:insert into repository_configuration SET repository_name=\'testproxy1\', recipe_name=\'simple-proxy\', attributes={\'proxy\': { \'remoteUrl\': \'http://repo1.maven.org/maven2/junit/junit\' }}
+    orient:insert 'into repository_configuration SET repository_name="simplehosted1", recipe_name="simple-hosted"'
+    orient:insert 'into repository_configuration SET repository_name="simplehosted2", recipe_name="simple-hosted"'
+    orient:insert 'into repository_configuration SET repository_name="simpleproxy1", recipe_name="simple-proxy", attributes={"proxy": { "remoteUrl": "http://repo1.maven.org/maven2/junit/junit" }}'
+    orient:insert 'into repository_configuration SET repository_name="simplegroup1", recipe_name="simple-group", attributes={"group": { "memberNames": ["simplehosted1", "simplehosted2", "simpleproxy1"] }}'
     system:shutdown --force --reboot
 
 # Interact
 
 ## Hosted
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/README.md
-    curl -v --upload-file ./README.md http://localhost:8081/repository/test1/no-type-README.md
-    curl -v -X GET http://localhost:8081/repository/test1/
-    curl -v -X GET http://localhost:8081/repository/test1/index.html
-    curl -v -X GET http://localhost:8081/repository/test1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test1/README.md
-    curl -v -X DELETE http://localhost:8081/repository/test1/no-type-README.md
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/README.md
+    curl -v --upload-file ./README.md http://localhost:8081/repository/simplehosted1/no-type-README.md
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/index.html
+    curl -v -X GET http://localhost:8081/repository/simplehosted1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/README.md
+    curl -v -X DELETE http://localhost:8081/repository/simplehosted1/no-type-README.md
 
 ## Group
 
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test1/A.md
-    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/test2/B.md
-    curl -v -X GET http://localhost:8081/repository/testgroup1/
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted1/A.md
+    curl -v -H 'Content-Type: text/plain' --upload-file ./README.md http://localhost:8081/repository/simplehosted2/B.md
+    curl -v -X GET http://localhost:8081/repository/simplegroup1/
 
 ## Proxy
 
-    curl -v -X GET http://localhost:8081/repository/testproxy1/4.12/junit-4.12.pom
-    curl -v -X GET http://localhost:8081/repository/testproxy1/maven-metadata.xml
+    curl -v -X GET http://localhost:8081/repository/simpleproxy1/4.12/junit-4.12.pom
+    curl -v -X GET http://localhost:8081/repository/simpleproxy1/maven-metadata.xml

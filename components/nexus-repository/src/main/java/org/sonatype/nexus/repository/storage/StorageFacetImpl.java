@@ -19,12 +19,13 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageService.P_REPOSITORY_NAME;
 import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
@@ -45,91 +46,104 @@ public class StorageFacetImpl
     this.delegate = checkNotNull(delegate);
   }
 
-  private Vertex bucket(final OrientGraph graph) {
-    synchronized (this) {
-      if (bucketId == null) {
-        bucketId = getOrCreateBucket(graph).getId();
+  @Override
+  protected void doStart() throws Exception {
+    // determine the bucket id for the repository, creating the bucket if needed
+    try (GraphTx graph = delegate.getGraphTx()) {
+      String repositoryName = getRepository().getName();
+      Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
+      if (bucket == null) {
+        bucket = delegate.createVertex(graph, V_BUCKET);
+        bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
+        graph.commit();
       }
+      bucketId = bucket.getId();
     }
+  }
+
+  private Vertex bucket(final GraphTx graph) {
     return delegate.findVertex(graph, bucketId, null);
   }
 
-  private Vertex getOrCreateBucket(final OrientGraph graph) {
-    String repositoryName = getRepository().getName();
-    Vertex bucket = delegate.findVertexWithProperty(graph, P_REPOSITORY_NAME, repositoryName, V_BUCKET);
-    if (bucket == null) {
-      bucket = delegate.createVertex(graph, V_BUCKET);
-      bucket.setProperty(P_REPOSITORY_NAME, repositoryName);
-    }
-    return bucket;
-  }
-
   @Override
-  public OrientGraph getGraphTx() {
+  @Guarded(by=STARTED)
+  public GraphTx getGraphTx() {
     return delegate.getGraphTx();
   }
 
   @Override
-  public Iterable<Vertex> browseAssets(final OrientGraph graph) {
-    return delegate.browseAssetsOwnedBy(graph, bucket(graph));
+  @Guarded(by=STARTED)
+  public Iterable<Vertex> browseAssets(GraphTx graph) {
+    return delegate.browseAssetsOwnedBy(bucket(graph));
   }
 
   @Override
-  public Iterable<Vertex> browseComponents(final OrientGraph graph) {
-    return delegate.browseComponentsOwnedBy(graph, bucket(graph));
+  @Guarded(by=STARTED)
+  public Iterable<Vertex> browseComponents(GraphTx graph) {
+    return delegate.browseComponentsOwnedBy(bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findAsset(final OrientGraph graph, final Object vertexId) {
+  @Guarded(by=STARTED)
+  public Vertex findAsset(final GraphTx graph, final Object vertexId) {
     return delegate.findAssetOwnedBy(graph, vertexId, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findAssetWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+  @Guarded(by=STARTED)
+  public Vertex findAssetWithProperty(final GraphTx graph, final String propName, final Object propValue) {
     return delegate.findAssetWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findComponent(final OrientGraph graph, final Object vertexId) {
+  @Guarded(by=STARTED)
+  public Vertex findComponent(final GraphTx graph, final Object vertexId) {
     return delegate.findComponentOwnedBy(graph, vertexId, bucket(graph));
   }
 
   @Nullable
   @Override
-  public Vertex findComponentWithProperty(final OrientGraph graph, final String propName, final Object propValue) {
+  @Guarded(by=STARTED)
+  public Vertex findComponentWithProperty(final GraphTx graph, final String propName, final Object propValue) {
     return delegate.findComponentWithPropertyOwnedBy(graph, propName, propValue, bucket(graph));
   }
 
   @Override
-  public Vertex createAsset(final OrientGraph graph) {
+  @Guarded(by=STARTED)
+  public Vertex createAsset(final GraphTx graph) {
     return delegate.createAssetOwnedBy(graph, bucket(graph));
   }
 
   @Override
-  public Vertex createComponent(final OrientGraph graph) {
+  @Guarded(by=STARTED)
+  public Vertex createComponent(final GraphTx graph) {
     return delegate.createComponentOwnedBy(graph, bucket(graph));
   }
 
   @Override
-  public void deleteVertex(final OrientGraph graph, final Vertex vertex) {
+  @Guarded(by=STARTED)
+  public void deleteVertex(final GraphTx graph, final Vertex vertex) {
     delegate.deleteVertex(graph, vertex);
   }
 
   @Override
+  @Guarded(by=STARTED)
   public BlobRef createBlob(final InputStream inputStream, final Map<String, String> headers) {
     return delegate.createBlob(inputStream, headers);
   }
 
   @Nullable
   @Override
+  @Guarded(by=STARTED)
   public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
     return delegate.getBlob(blobRef);
   }
 
   @Override
+  @Guarded(by=STARTED)
   public boolean deleteBlob(final BlobRef blobRef) {
     return delegate.deleteBlob(blobRef);
   }

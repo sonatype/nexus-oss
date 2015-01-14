@@ -10,8 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.component.services.internal.storage;
-
+package org.sonatype.nexus.internal.repository;
 
 import java.nio.file.Path;
 
@@ -26,41 +25,37 @@ import org.sonatype.nexus.blobstore.file.FileBlobStore;
 import org.sonatype.nexus.blobstore.file.MapdbBlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.SimpleFileOperations;
 import org.sonatype.nexus.blobstore.file.VolumeChapterLocationStrategy;
-import org.sonatype.nexus.component.services.storage.ComponentStore;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Provides {@link BlobStore} instance for {@link ComponentStore}.
- *
- * TODO: Replace this with something that gets a BlobStoreManager or similar that can provide the right instance(s).
+ * Temporary {@link BlobStore} provider.
  *
  * @since 3.0
  */
-@Named(ComponentBlobStoreProvider.NAME)
+@Named(TemporaryBlobStoreProvider.NAME)
 @Singleton
-class ComponentBlobStoreProvider
-    implements Provider<BlobStore>
+public class TemporaryBlobStoreProvider
+  implements Provider<BlobStore>
 {
-  public static final String NAME = "componentBlobs";
+  public static final String BLOBS = "blobs";
 
-  private final ApplicationDirectories appDirs;
+  public static final String NAME = "temp";
 
-  private BlobMetadataStore metadataStore;
+  private final ApplicationDirectories directories;
 
   @Inject
-  public ComponentBlobStoreProvider(final ApplicationDirectories appDirs) {
-    this.appDirs = appDirs;
+  public TemporaryBlobStoreProvider(final ApplicationDirectories directories) {
+    this.directories = checkNotNull(directories);
   }
 
   @Override
   public BlobStore get() {
-    final Path root = appDirs.getWorkDirectory(NAME).toPath();
-
+    Path root = directories.getWorkDirectory(BLOBS).toPath().resolve(NAME);
     Path content = root.resolve("content");
     Path metadata = root.resolve("metadata");
-
-    this.metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
-
+    BlobMetadataStore metadataStore = MapdbBlobMetadataStore.create(metadata.toFile());
     return new FileBlobStore(content, new VolumeChapterLocationStrategy(), new SimpleFileOperations(), metadataStore);
   }
 }

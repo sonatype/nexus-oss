@@ -18,11 +18,9 @@ import org.sonatype.nexus.orient.DatabaseInstanceRule;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterators;
 import com.google.inject.util.Providers;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -63,22 +61,15 @@ public class StorageServiceImplIT
 
   @Test
   public void initialState() {
-    OrientGraph graph = underTest.getGraphTx();
-    try {
+    try (GraphTx graph = underTest.getGraphTx()) {
       checkSize(underTest.browseVertices(graph, null), 0);
-    }
-    finally {
-      graph.shutdown();
     }
   }
 
   @Test
   public void roundTripTest() {
-    OrientGraph graph = underTest.getGraphTx();
-    try {
-      //
+    try (GraphTx graph = underTest.getGraphTx()) {
       // NOTE: A transaction is automatically started.
-      //
 
       // Make two buckets and verify state with browse and find
       Vertex bucket1 = underTest.createVertex(graph, V_BUCKET);
@@ -105,10 +96,10 @@ public class StorageServiceImplIT
       checkSize(underTest.browseVertices(graph, V_ASSET), 1);
       checkSize(underTest.browseVertices(graph, V_COMPONENT), 1);
       checkSize(underTest.browseVertices(graph, V_ASSET), 1);
-      checkSize(underTest.browseAssetsOwnedBy(graph, bucket1), 1);
-      checkSize(underTest.browseAssetsOwnedBy(graph, bucket2), 0);
-      checkSize(underTest.browseComponentsOwnedBy(graph, bucket1), 0);
-      checkSize(underTest.browseComponentsOwnedBy(graph, bucket2), 1);
+      checkSize(underTest.browseAssetsOwnedBy(bucket1), 1);
+      checkSize(underTest.browseAssetsOwnedBy(bucket2), 0);
+      checkSize(underTest.browseComponentsOwnedBy(bucket1), 0);
+      checkSize(underTest.browseComponentsOwnedBy(bucket2), 1);
 
       assertNotNull(underTest.findVertex(graph, asset.getId(), V_ASSET));
       assertNotNull(underTest.findVertex(graph, component.getId(), V_COMPONENT));
@@ -138,20 +129,9 @@ public class StorageServiceImplIT
       assertNull(underTest.findVertex(graph, asset.getId(), V_ASSET));
       assertNull(underTest.findVertex(graph, component.getId(), V_COMPONENT));
 
-      //
       // NOTE: It doesn't matter for this test, but you should commit when finished with one or more writes
-      //
+      //       If you don't, your changes will be automatically rolled back.
       graph.commit();
-    }
-    catch (Throwable t) {
-      //
-      // NOTE: If something bad happens, you should usually roll back the transaction
-      //
-      graph.rollback();
-      Throwables.propagate(t);
-    }
-    finally {
-      graph.shutdown();
     }
   }
 

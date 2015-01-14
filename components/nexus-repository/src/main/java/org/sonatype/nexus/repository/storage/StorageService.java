@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 /**
  * Storage service, providing component and asset storage for all repositories.
@@ -56,39 +55,39 @@ public interface StorageService
 
   static String V_BUCKET = "bucket";
 
-  OrientGraph getGraphTx();
+  GraphTx getGraphTx();
 
-  Iterable<Vertex> browseAssetsOwnedBy(OrientGraph graph, Vertex bucket);
+  Iterable<Vertex> browseAssetsOwnedBy(Vertex bucket);
 
-  Iterable<Vertex> browseComponentsOwnedBy(OrientGraph graph, Vertex bucket);
+  Iterable<Vertex> browseComponentsOwnedBy(Vertex bucket);
 
-  Iterable<Vertex> browseVertices(OrientGraph graph, @Nullable String className);
-
-  @Nullable
-  Vertex findAssetOwnedBy(OrientGraph graph, Object vertexId, Vertex bucket);
+  Iterable<Vertex> browseVertices(GraphTx graph, @Nullable String className);
 
   @Nullable
-  Vertex findComponentOwnedBy(OrientGraph graph, Object vertexId, Vertex bucket);
+  Vertex findAssetOwnedBy(GraphTx graph, Object vertexId, Vertex bucket);
 
   @Nullable
-  Vertex findVertex(OrientGraph graph, Object vertexId, @Nullable String className);
+  Vertex findComponentOwnedBy(GraphTx graph, Object vertexId, Vertex bucket);
 
   @Nullable
-  Vertex findAssetWithPropertyOwnedBy(OrientGraph graph, String propName, Object propValue, Vertex bucket);
+  Vertex findVertex(GraphTx graph, Object vertexId, @Nullable String className);
 
   @Nullable
-  Vertex findComponentWithPropertyOwnedBy(OrientGraph graph, String propName, Object propValue, Vertex bucket);
+  Vertex findAssetWithPropertyOwnedBy(GraphTx graph, String propName, Object propValue, Vertex bucket);
 
   @Nullable
-  Vertex findVertexWithProperty(OrientGraph graph, String propName, Object propValue, @Nullable String className);
+  Vertex findComponentWithPropertyOwnedBy(GraphTx graph, String propName, Object propValue, Vertex bucket);
 
-  Vertex createAssetOwnedBy(OrientGraph graph, Vertex bucket);
+  @Nullable
+  Vertex findVertexWithProperty(GraphTx graph, String propName, Object propValue, @Nullable String className);
 
-  Vertex createComponentOwnedBy(OrientGraph graph, Vertex bucket);
+  Vertex createAssetOwnedBy(GraphTx graph, Vertex bucket);
 
-  Vertex createVertex(OrientGraph graph, String className);
+  Vertex createComponentOwnedBy(GraphTx graph, Vertex bucket);
 
-  void deleteVertex(OrientGraph graph, Vertex vertex);
+  Vertex createVertex(GraphTx graph, String className);
+
+  void deleteVertex(GraphTx graph, Vertex vertex);
 
   BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
 
