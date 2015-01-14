@@ -75,6 +75,8 @@ public class BlobStoreManagerImpl
         log.debug("Failed to stop blob-store: {}", name, e);
       }
     }
+
+    stores.clear();
   }
 
   @Override
