@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -100,11 +101,13 @@ public class DefaultLinkPersister
   protected byte[] getLinkPrefixBytes(final ContentLocator locator)
       throws IOException
   {
-    if (locator != null && locator.getLength() > LINK_PREFIX_BYTES.length) {
+    if (locator != null) {
       try (final DataInputStream dis = new DataInputStream(locator.getContent())) {
         final byte[] buf = new byte[LINK_PREFIX_BYTES.length];
         dis.readFully(buf);
         return buf;
+      } catch (EOFException e) {
+        // content locator has less bytes, neglect it
       }
     }
     return null;
