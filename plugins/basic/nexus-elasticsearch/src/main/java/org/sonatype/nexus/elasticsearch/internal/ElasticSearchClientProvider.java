@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
@@ -31,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 @Named
-@EagerSingleton
+@Singleton
 public class ElasticSearchClientProvider
     extends StateGuardLifecycleSupport
     implements Provider<Client>
@@ -66,12 +67,18 @@ public class ElasticSearchClientProvider
     return node.client();
   }
 
-  @Override
-  @PostConstruct
-  public void start() throws Exception { super.start(); }
+  @Named
+  @EagerSingleton
+  static class Booter {
 
-  @Override
-  @PreDestroy
-  public void stop() throws Exception { super.stop(); }
+    @Inject
+    ElasticSearchClientProvider provider;
+
+    @PostConstruct
+    void start() throws Exception { provider.start(); }
+
+    @PreDestroy
+    void stop() throws Exception { provider.stop(); }
+  }
 
 }
