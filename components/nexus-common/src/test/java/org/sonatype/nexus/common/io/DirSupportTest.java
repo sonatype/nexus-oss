@@ -40,6 +40,9 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirec
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isEmptyDirectory;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isFile;
 
+/**
+ * Tests for {@link DirSupport}.
+ */
 public class DirSupportTest
     extends TestSupport
 {

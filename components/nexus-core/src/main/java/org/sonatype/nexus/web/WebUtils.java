@@ -16,17 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.common.io.StreamSupport;
 import org.sonatype.nexus.common.property.SystemPropertiesHelper;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Web response related utilities, that helps in ordinary tasks with HTTP servlet responses.
@@ -44,13 +40,6 @@ public class WebUtils
   private static final int BUFFER_SIZE = SystemPropertiesHelper
       .getInteger(WebUtils.class.getName() + ".BUFFER_SIZE", -1);
 
-  private final String serverString;
-
-  @Inject
-  public WebUtils(final Provider<SystemStatus> systemStatusProvider) {
-    this.serverString = "Nexus/" + checkNotNull(systemStatusProvider).get().getVersion();
-  }
-
   /**
    * Sends 302 Temporary redirect to client. To be used when client MUST NOT cache the redirection.
    */
@@ -58,17 +47,6 @@ public class WebUtils
     response.setStatus(HttpServletResponse.SC_FOUND);
     response.addHeader("Location", url);
     response.flushBuffer();
-  }
-
-  /**
-   * Equips the response with standard headers like "Server".
-   */
-  public void equipResponseWithStandardHeaders(final HttpServletResponse response) {
-    response.setHeader("Server", serverString);
-    // NEXUS-6569 Add X-Frame-Options header
-    response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    // NEXUS-5023 disable IE for sniffing into response content
-    response.setHeader("X-Content-Type-Options", "nosniff");
   }
 
   /**

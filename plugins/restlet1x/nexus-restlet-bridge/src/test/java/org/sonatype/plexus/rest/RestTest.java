@@ -26,7 +26,7 @@ public class RestTest
   protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
     super.customizeContainerConfiguration(configuration);
     configuration.setAutoWiring(true);
-    configuration.setClassPathScanning(PlexusConstants.SCANNING_CACHE);
+    configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
   }
 
   public void testRest()

@@ -18,9 +18,9 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.internal.orient.OrientModule;
 import org.sonatype.nexus.web.internal.BaseUrlHolderFilter;
-import org.sonatype.nexus.web.internal.CommonHeadersFilter;
 import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
+import org.sonatype.nexus.web.internal.StandardHttpResponseHeadersFilter;
 import org.sonatype.nexus.web.metrics.MetricsModule;
 import org.sonatype.security.web.guice.SecurityWebModule;
 
@@ -66,11 +66,11 @@ public class NexusServletModule
       protected void configureServlets() {
         bind(BaseUrlHolderFilter.class);
         bind(ErrorPageFilter.class);
-        bind(CommonHeadersFilter.class);
+        bind(StandardHttpResponseHeadersFilter.class);
 
         filter("/*").through(BaseUrlHolderFilter.class);
         filter("/*").through(ErrorPageFilter.class);
-        filter("/*").through(CommonHeadersFilter.class);
+        filter("/*").through(StandardHttpResponseHeadersFilter.class);
 
         bind(ErrorPageServlet.class);
 
