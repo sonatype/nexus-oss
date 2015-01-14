@@ -156,6 +156,58 @@ public class DefaultFSLocalRepositoryStorageLinkcheckTest
     subject.storeItem(repository, file);
   }
 
+  @Test(expected = UnsupportedStorageOperationException.class)
+  public void storeLinkWithoutLinkApiReusableContentUnknownLength() throws Exception {
+    final DefaultStorageFileItem file = new DefaultStorageFileItem(repository, new ResourceStoreRequest("/link/path"),
+        true, true, new StringContentLocator("LINK to test:/some/path"){
+      @Override
+      public long getLength() { return -1; }
+    });
+    subject.storeItem(repository, file);
+  }
+
+  @Test(expected = UnsupportedStorageOperationException.class)
+  public void storeLinkWithoutLinkApiNonReusableContentUnknownLength() throws Exception {
+    final DefaultStorageFileItem file = new DefaultStorageFileItem(repository, new ResourceStoreRequest("/link/path"),
+        true, true, new StringContentLocator("LINK to test:/some/path")
+    {
+      @Override
+      public boolean isReusable() {
+        return false;
+      }
+
+      @Override
+      public long getLength() { return -1; }
+    });
+    subject.storeItem(repository, file);
+  }
+
+  @Test
+  public void storeNonLinkWithoutLinkApiReusableContentUnknownLengthOneByte() throws Exception {
+    final DefaultStorageFileItem file = new DefaultStorageFileItem(repository, new ResourceStoreRequest("/link/path"),
+        true, true, new StringContentLocator("b"){
+      @Override
+      public long getLength() { return -1; }
+    });
+    subject.storeItem(repository, file);
+  }
+
+  @Test
+  public void storeNonLinkWithoutLinkApiNonReusableContentUnknownLengthOneByte() throws Exception {
+    final DefaultStorageFileItem file = new DefaultStorageFileItem(repository, new ResourceStoreRequest("/link/path"),
+        true, true, new StringContentLocator("b")
+    {
+      @Override
+      public boolean isReusable() {
+        return false;
+      }
+
+      @Override
+      public long getLength() { return -1; }
+    });
+    subject.storeItem(repository, file);
+  }
+
   @Test
   public void retrieveExistingLinkProper() throws Exception {
     // link has no relevant attributes
