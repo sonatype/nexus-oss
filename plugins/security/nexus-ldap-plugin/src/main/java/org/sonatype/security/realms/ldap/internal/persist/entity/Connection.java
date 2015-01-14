@@ -18,6 +18,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * LDAP Server connection configuration.
@@ -54,7 +55,7 @@ public final class Connection
     }
 
     public void setProtocol(final Protocol protocol) {
-      checkArgument(protocol != null, "protocol null");
+      checkNotNull(protocol, "protocol null");
       this.protocol = protocol;
     }
 
@@ -73,6 +74,7 @@ public final class Connection
 
     public void setPort(final int port) {
       checkArgument(port > 0, "Invalid LDAP port: %s", port);
+      checkArgument(port < 65536, "Invalid LDAP port: %s", port);
       this.port = port;
     }
 

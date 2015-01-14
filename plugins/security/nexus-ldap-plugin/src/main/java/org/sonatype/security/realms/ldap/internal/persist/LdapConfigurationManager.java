@@ -27,35 +27,47 @@ public interface LdapConfigurationManager
   void clearCache();
 
   /**
-   * Lists defined LDAP server configurations.
+   * Lists defined LDAP server configurations. If none defined, empty list returned.
    */
   List<LdapConfiguration> listLdapServerConfigurations();
 
   /**
    * Returns LDAP server configuration by it's ID, never {@code null}. If not found, exception will be thrown.
+   *
+   * @throws LdapServerNotFoundException if configuration with given ID does not exists.
    */
   LdapConfiguration getLdapServerConfiguration(String id) throws LdapServerNotFoundException;
 
   /**
-   * Creates LDAP server configuration with new ID that is returned. The realm might get activated,
+   * Creates LDAP server configuration with new ID assigned that is returned. The realm might get activated,
    * if the added server is very first in the configuration.
+   *
+   * @throws IllegalArgumentException if configuration contains invalid settings.
    */
   String addLdapServerConfiguration(LdapConfiguration ldapServerConfiguration)
       throws IllegalArgumentException;
 
   /**
-   * Updates LDAP server configuration. If not found, exception will be thrown.
+   * Updates LDAP server configuration. If not found, or configuration is invalid, exception will be thrown.
+   *
+   * @throws LdapServerNotFoundException if configuration with given ID does not exists.
+   * @throws IllegalArgumentException    if configuration contains invalid settings.
    */
   void updateLdapServerConfiguration(LdapConfiguration ldapServerConfiguration)
       throws IllegalArgumentException, LdapServerNotFoundException;
 
   /**
    * Deletes the LDAP server configuration. If not found, exception will be thrown.
+   *
+   * @throws LdapServerNotFoundException if configuration with given ID does not exists.
    */
   void deleteLdapServerConfiguration(String id) throws LdapServerNotFoundException;
 
   /**
    * Sets LDAP server order. The parameter is ordered list of IDs of existing LDAP server configurations.
+   *
+   * @throws IllegalArgumentException if the passed order is wrong in any way that it contains non-existent IDs, or
+   *                                  does not contains existent IDs.
    */
   void setServerOrder(List<String> orderdServerIds) throws IllegalArgumentException;
 }

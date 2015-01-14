@@ -22,8 +22,7 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfigurati
 public interface LdapConfigurationSource
 {
   /**
-   * Loads all the configuration entries as a modifiable list with undefined order. Modifications to the list are not
-   * affecting actual underlying source (ie. is not persisted).
+   * Loads all the configuration entries with undefined order.
    */
   List<LdapConfiguration> loadAll();
 

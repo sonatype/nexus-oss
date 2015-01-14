@@ -233,30 +233,35 @@ public abstract class AbstractLdapPlexusResource
   protected Connection toLdapModel(LdapConnectionInfoDTO from)
       throws ResourceException
   {
-    final Connection to = new Connection();
-    to.setSearchBase(from.getSearchBase());
-    to.setSystemUsername(from.getSystemUsername());
-    to.setSystemPassword(from.getSystemPassword());
-    to.setAuthScheme(from.getAuthScheme());
-    final Host host = new Host(
-        Protocol.valueOf(from.getProtocol()),
-        from.getHost(),
-        from.getPort()
-    );
-    to.setHost(host);
-    if (!Strings.isNullOrEmpty(from.getBackupMirrorHost())) {
-      final Host backupHost = new Host(
-          Protocol.valueOf(from.getBackupMirrorProtocol()),
-          from.getBackupMirrorHost(),
-          from.getBackupMirrorPort()
+    try {
+      final Connection to = new Connection();
+      to.setSearchBase(from.getSearchBase());
+      to.setSystemUsername(from.getSystemUsername());
+      to.setSystemPassword(from.getSystemPassword());
+      to.setAuthScheme(from.getAuthScheme());
+      final Host host = new Host(
+          Protocol.valueOf(from.getProtocol()),
+          from.getHost(),
+          from.getPort()
       );
-      to.setBackupHost(backupHost);
+      to.setHost(host);
+      if (!Strings.isNullOrEmpty(from.getBackupMirrorHost())) {
+        final Host backupHost = new Host(
+            Protocol.valueOf(from.getBackupMirrorProtocol()),
+            from.getBackupMirrorHost(),
+            from.getBackupMirrorPort()
+        );
+        to.setBackupHost(backupHost);
+      }
+      to.setSaslRealm(from.getRealm());
+      to.setConnectionTimeout(from.getConnectionTimeout());
+      to.setConnectionRetryDelay(from.getConnectionRetryDelay());
+      to.setCacheTimeout(from.getCacheTimeout());
+      return decode(to);
     }
-    to.setSaslRealm(from.getRealm());
-    to.setConnectionTimeout(from.getConnectionTimeout());
-    to.setConnectionRetryDelay(from.getConnectionRetryDelay());
-    to.setCacheTimeout(from.getCacheTimeout());
-    return decode(to);
+    catch (NullPointerException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   protected LdapContextFactory buildDefaultLdapContextFactory(final String ldapServerId,

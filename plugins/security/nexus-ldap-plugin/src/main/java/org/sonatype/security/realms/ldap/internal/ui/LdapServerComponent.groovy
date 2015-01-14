@@ -255,7 +255,7 @@ extends DirectComponentSupport
         searchBase: connectionInfo.searchBase,
 
         authScheme: connectionInfo.authScheme,
-        authRealm: connectionInfo.realm,
+        authRealm: connectionInfo.saslRealm,
         authUsername: connectionInfo.systemUsername,
         authPassword: connectionInfo.systemPassword ? Password.fakePassword() : null,
 
@@ -333,7 +333,7 @@ extends DirectComponentSupport
             searchBase: ldapServerXO.searchBase,
 
             authScheme: ldapServerXO.authScheme,
-            realm: ldapServerXO.authRealm,
+            saslRealm: ldapServerXO.authRealm,
             systemUsername: ldapServerXO.authUsername,
             systemPassword: ldapServerXO.authPassword?.valueIfValid ?: authPassword,
 

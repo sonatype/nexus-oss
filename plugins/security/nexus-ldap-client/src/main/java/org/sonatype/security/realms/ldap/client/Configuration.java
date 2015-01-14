@@ -15,7 +15,7 @@ package org.sonatype.security.realms.ldap.client;
 import org.sonatype.nexus.client.core.subsystem.Entity;
 
 /**
- * An LDAP server configuration.
+ * A LDAP server configuration.
  *
  * @since 3.0
  */

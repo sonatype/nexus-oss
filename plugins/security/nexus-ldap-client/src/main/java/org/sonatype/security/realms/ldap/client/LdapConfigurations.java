@@ -17,9 +17,9 @@ import java.util.List;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 
 /**
- * An LDAP server configurations. One can have multiple LDAP servers configured and ordered. This will mean that NX
- * will reach to LDAP servers to perform queries in specific order. First LDAP entity being added causes that
- * LDAP realm gets activated. Similarly, last LDAP entity being deleted deactivates the LDAP realm too.
+ * A collection of LDAP server configurations. One can have multiple LDAP servers configured and ordered. This will
+ * mean that NX will reach to LDAP servers to perform queries in specific order. First LDAP entity being added causes
+ * that LDAP realm gets activated. Similarly, last LDAP entity being deleted deactivates the LDAP realm too.
  *
  * @since 3.0
  */

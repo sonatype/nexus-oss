@@ -33,6 +33,7 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -92,7 +93,7 @@ public class DefaultLdapConfigurationManager
     final LinkedHashMap<String, LdapConfiguration> configuration = getConfiguration();
     final Set<String> newOrder = Sets.newHashSet(orderdServerIds);
     final Set<String> configIds = configuration.keySet();
-    checkArgument(newOrder.equals(configIds), "Bad ordering: %s (existing IDs %s)", newOrder, configIds);
+    checkArgument(newOrder.equals(configIds), "ID ordering mismatch (the new and existing should differ in order only):  new=%s, existing=%s)", orderdServerIds, configIds);
 
     for (LdapConfiguration config : configuration.values()) {
       config.setOrder(orderdServerIds.indexOf(config.getId()));
@@ -212,7 +213,7 @@ public class DefaultLdapConfigurationManager
     if (!cachePrimed) {
       try {
         cache.clear();
-        final List<LdapConfiguration> ldapConfigurations = configurationSource.loadAll();
+        final List<LdapConfiguration> ldapConfigurations = Lists.newArrayList(configurationSource.loadAll());
         Collections.sort(ldapConfigurations, new Comparator<LdapConfiguration>()
         {
           @Override

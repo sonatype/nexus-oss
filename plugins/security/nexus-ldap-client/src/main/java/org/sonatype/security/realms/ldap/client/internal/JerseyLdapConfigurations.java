@@ -18,6 +18,7 @@ import org.sonatype.nexus.client.core.spi.SubsystemSupport;
 import org.sonatype.nexus.client.rest.jersey.JerseyNexusClient;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerListEntryDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerListResponse;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerOrderRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
 import org.sonatype.security.realms.ldap.api.dto.XStreamInitalizer;
 import org.sonatype.security.realms.ldap.client.Configuration;
@@ -30,7 +31,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An LDAP configurations.
+ * A collection of LDAP server configurations.
  *
  * @since 3.0
  */
@@ -86,7 +87,17 @@ public class JerseyLdapConfigurations
   @Override
   public void order(final List<String> ids) {
     checkNotNull(ids);
-    throw new IllegalArgumentException("not implemented");
+    try {
+      final LdapServerOrderRequest request = new LdapServerOrderRequest();
+      request.getData().addAll(ids);
+      getNexusClient().serviceResource("ldap/server_order").put(request);
+    }
+    catch (UniformInterfaceException e) {
+      throw getNexusClient().convert(e);
+    }
+    catch (ClientHandlerException e) {
+      throw getNexusClient().convert(e);
+    }
   }
 
   @Override
