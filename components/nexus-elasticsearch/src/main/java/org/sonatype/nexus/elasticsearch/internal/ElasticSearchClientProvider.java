@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.elasticsearch.internal;
 
+import java.io.File;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -21,7 +23,6 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
-import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 
 import org.eclipse.sisu.EagerSingleton;
 import org.elasticsearch.client.Client;
@@ -38,22 +39,20 @@ public class ElasticSearchClientProvider
     implements Provider<Client>
 {
 
-  private final ApplicationDirectories applicationDirectories;
+  private final File appDir;
 
   private Node node;
 
   @Inject
-  public ElasticSearchClientProvider(final ApplicationDirectories applicationDirectories) {
-    this.applicationDirectories = checkNotNull(applicationDirectories);
+  public ElasticSearchClientProvider(final @Named("${nexus-app}") File appDir) {
+    this.appDir = checkNotNull(appDir);
   }
 
-  public void doStart() {
+  public void doStart() throws Exception {
+    File config = new File(appDir, "etc/elasticsearch.yml");
     ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder()
         .classLoader(Node.class.getClassLoader())
-        .put("cluster.name", "NEXUS") // we probably want to have a cluster / nexus instance
-        .put("http.enabled", false)
-        .put("path.data", applicationDirectories.getAppDirectory("elasticsearch"));
-
+        .loadFromUrl(config.toURI().toURL());
     node = nodeBuilder().settings(builder).node();
     node.client().admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
   }
@@ -69,7 +68,8 @@ public class ElasticSearchClientProvider
 
   @Named
   @EagerSingleton
-  static class Booter {
+  static class Booter
+  {
 
     @Inject
     ElasticSearchClientProvider provider;

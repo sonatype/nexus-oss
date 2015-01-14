@@ -39,6 +39,7 @@
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
+    <module>nexus-elasticsearch</module>
     <module>nexus-extender</module>
     <module>nexus-httpclient-api</module>
     <module>nexus-scheduling</module>
