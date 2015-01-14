@@ -10,9 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.blobstore.api;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -29,6 +32,8 @@ public class BlobRef
   private final String store;
 
   private final String blob;
+
+  public static final Pattern BLOB_REF_PATTERN = Pattern.compile("([^@]+)@([^:]+):(.*)");
 
   public BlobRef(final String node, final String store, final String blob) {
     this.node = checkNotNull(node);
@@ -52,6 +57,13 @@ public class BlobRef
     return new BlobId(getBlob());
   }
 
+  public static BlobRef parse(final String spec) {
+    final Matcher matcher = BLOB_REF_PATTERN.matcher(spec);
+    checkArgument(matcher.matches(), "Not a valid blob reference");
+
+    return new BlobRef(matcher.group(2), matcher.group(1), matcher.group(3));
+  }
+
   /**
    * @return the blob ref encoded as a string, using the syntax {@code store@node:blob-id}
    */
@@ -59,8 +71,35 @@ public class BlobRef
     return String.format("%s@%s:%s", getStore(), getNode(), getBlob());
   }
 
-  public static BlobRef parse(final String spec) {
-    // FIXME: parse it out
-    throw new RuntimeException("Not implemented");
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    BlobRef blobRef = (BlobRef) o;
+
+    if (!blob.equals(blobRef.blob)) {
+      return false;
+    }
+    if (!node.equals(blobRef.node)) {
+      return false;
+    }
+    if (!store.equals(blobRef.store)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = node.hashCode();
+    result = 31 * result + store.hashCode();
+    result = 31 * result + blob.hashCode();
+    return result;
   }
 }
