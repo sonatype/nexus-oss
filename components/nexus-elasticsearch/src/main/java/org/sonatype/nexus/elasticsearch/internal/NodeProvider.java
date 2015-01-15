@@ -10,75 +10,84 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.elasticsearch.internal;
 
 import java.io.File;
+import java.net.URL;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.stateguard.Guarded;
-import org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.eclipse.sisu.EagerSingleton;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
+/**
+ * ElasticSearch {@link Node} provider.
+ *
+ * @since 3.0
+ */
 @Named
 @Singleton
-public class ElasticSearchClientProvider
-    extends StateGuardLifecycleSupport
-    implements Provider<Client>
+public class NodeProvider
+    extends ComponentSupport
+    implements Provider<Node>
 {
-
   private final File appDir;
 
   private Node node;
 
   @Inject
-  public ElasticSearchClientProvider(final @Named("${nexus-app}") File appDir) {
+  public NodeProvider(final @Named("${nexus-app}") File appDir) {
     this.appDir = checkNotNull(appDir);
   }
 
-  public void doStart() throws Exception {
-    File config = new File(appDir, "etc/elasticsearch.yml");
+  @Override
+  public Node get() {
+    if (node == null) {
+      try {
+        Node node = create();
+
+        log.debug("Waiting for green-status");
+        node.client().admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
+
+        this.node = node;
+      }
+      catch (Exception e) {
+        log.warn("Failed to create node", e);
+      }
+    }
+    return node;
+  }
+
+  private Node create() throws Exception {
+    File file = new File(appDir, "etc/elasticsearch.yml");
+    checkState(file.exists(), "Missing configuration: %s", file);
+    URL url = file.toURI().toURL();
+    log.info("Creating node with config: {}", url);
+
     ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder()
         .classLoader(Node.class.getClassLoader())
-        .loadFromUrl(config.toURI().toURL());
-    node = nodeBuilder().settings(builder).node();
-    node.client().admin().cluster().prepareHealth().setWaitForGreenStatus().execute().actionGet();
+        .loadFromUrl(url);
+
+    return nodeBuilder().settings(builder).node();
   }
 
-  public void doStop() {
-    node.close();
+  @PreDestroy
+  public void shutdown() {
+    if (node != null) {
+      log.debug("Shutting down");
+      node.close();
+      node = null;
+    }
   }
-
-  @Guarded(by = State.STARTED)
-  public Client get() {
-    return node.client();
-  }
-
-  @Named
-  @EagerSingleton
-  static class Booter
-  {
-
-    @Inject
-    ElasticSearchClientProvider provider;
-
-    @PostConstruct
-    void start() throws Exception { provider.start(); }
-
-    @PreDestroy
-    void stop() throws Exception { provider.stop(); }
-  }
-
 }
