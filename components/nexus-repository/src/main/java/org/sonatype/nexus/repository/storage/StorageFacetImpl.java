@@ -34,6 +34,8 @@ import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
 /**
  * Default {@link StorageFacet} implementation.
+ *
+ * @since 3.0
  */
 @Named
 public class StorageFacetImpl
