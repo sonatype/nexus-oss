@@ -17,6 +17,8 @@ import java.io.IOException;
 import org.sonatype.nexus.repository.Facet;
 
 /**
+ * Search index facet.
+ *
  * @since 3.0
  */
 @Facet.Exposed
