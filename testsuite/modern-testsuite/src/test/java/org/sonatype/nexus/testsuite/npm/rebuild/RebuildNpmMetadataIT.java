@@ -51,9 +51,9 @@ public class RebuildNpmMetadataIT
     scheduler.run("NpmHostedMetadataRebuildTask", null);
     scheduler.waitForAllTasksToStop();
 
+    final File localDirectory = util.createTempDir();
     // download package root of commonjs
     {
-      final File localDirectory = util.createTempDir();
       final File packageRootFile = new File(localDirectory, "commonjs.json");
       content().download(Location.repositoryLocation(testMethodName(), "commonjs"), packageRootFile);
       assertThat(packageRootFile, exists());
@@ -66,7 +66,6 @@ public class RebuildNpmMetadataIT
 
     // download package root of uppercase
     {
-      final File localDirectory = util.createTempDir();
       final File packageRootFile = new File(localDirectory, "uppercase.json");
       content().download(Location.repositoryLocation(testMethodName(), "uppercase"), packageRootFile);
       assertThat(packageRootFile, exists());
