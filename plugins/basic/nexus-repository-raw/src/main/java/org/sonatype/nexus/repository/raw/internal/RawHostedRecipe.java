@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
+import org.sonatype.nexus.repository.storage.StorageFacetImpl;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
@@ -40,13 +41,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RawHostedRecipe
     extends RecipeSupport
 {
-  // TODO: For now, we use an in-memory raw storage facet
-  private final Provider<InMemoryRawStorageFacet> rawStorageFacet;
-
   private final Provider<ConfigurableViewFacet> viewFacet;
 
   private final Provider<RawIndexFacet> rawIndexFacet;
 
+  private final Provider<RawStorageFacetImpl> rawStorageFacet;
+
+  private final Provider<StorageFacetImpl> storageFacet;
+  
   private final TimingHandler timingHandler;
 
   private final RawStorageHandler rawStorageHandler;
@@ -54,14 +56,17 @@ public class RawHostedRecipe
   @Inject
   public RawHostedRecipe(final Type type, final Format format,
                          final Provider<ConfigurableViewFacet> viewFacet,
-                         final Provider<InMemoryRawStorageFacet> rawStorageFacet,
                          final Provider<RawIndexFacet> rawIndexFacet,
+                         final Provider<RawStorageFacetImpl> rawStorageFacet,
+                         final Provider<StorageFacetImpl> storageFacet,
                          final TimingHandler timingHandler,
                          final RawStorageHandler rawStorageHandler)
   {
     super(type, format);
+
     this.viewFacet = checkNotNull(viewFacet);
     this.rawStorageFacet = checkNotNull(rawStorageFacet);
+    this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
     this.rawStorageHandler = checkNotNull(rawStorageHandler);
     this.rawIndexFacet = checkNotNull(rawIndexFacet);
@@ -69,9 +74,10 @@ public class RawHostedRecipe
 
   @Override
   public void apply(@Nonnull final Repository repository) throws Exception {
-    repository.attach(rawStorageFacet.get());
     repository.attach(configure(viewFacet.get()));
     repository.attach(rawIndexFacet.get());
+    repository.attach(rawStorageFacet.get());
+    repository.attach(storageFacet.get());
   }
 
   /**
