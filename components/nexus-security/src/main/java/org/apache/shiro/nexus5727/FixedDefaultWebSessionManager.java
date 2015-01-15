@@ -36,15 +36,20 @@ import org.slf4j.LoggerFactory;
 public class FixedDefaultWebSessionManager
     extends DefaultWebSessionManager
 {
+  /**
+   * Default HTTP session cookie name that Nexus uses - NXSESSIONID
+   */
+  public static final String DEFAULT_NEXUS_SESSION_COOKIE_NAME = "NXSESSIONID";
+
   private static final Logger log = LoggerFactory.getLogger(FixedDefaultWebSessionManager.class);
 
   @Inject
   public void configureProperties(
       final @Named("${shiro.globalSessionTimeout:-" + DEFAULT_GLOBAL_SESSION_TIMEOUT + "}") long globalSessionTimeout,
-      final @Named("${shiro.secureSessionCookies:-false}") boolean secureSessionCookies)
+      final @Named("${nexus.sessionCookieName:-" + DEFAULT_NEXUS_SESSION_COOKIE_NAME + "}") String sessionCookieName)
   {
     setGlobalSessionTimeout(globalSessionTimeout);
-    getSessionIdCookie().setSecure(secureSessionCookies);
+    getSessionIdCookie().setName(sessionCookieName);
   }
 
   @Inject

@@ -28,6 +28,14 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 public class NexusWebSecurityManager
     extends DefaultWebSecurityManager
 {
+
+  /**
+   * Constructor which disables all RememberMe functionality.
+   */
+  public NexusWebSecurityManager() {
+    this.setRememberMeManager(null);
+  }
+
   /**
    * After login set the userId MDC attribute.
    */
