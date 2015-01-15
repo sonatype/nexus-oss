@@ -19,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 
 import com.bolyuba.nexus.plugin.npm.NpmRepository;
 import com.bolyuba.nexus.plugin.npm.service.internal.orient.OrientMetadataStore;
@@ -46,13 +45,7 @@ public class NpmDbBackupTask
 
   @Override
   protected void doExecute(final List<NpmRepository> repositories) throws Exception {
-    final List<RepositoryWritePolicy> writePolicies = setWritePolicyReadOnly(repositories);
-    try {
-      orientMetadataStore.backupDatabase();
-    }
-    finally {
-      resetWritePolicy(repositories, writePolicies);
-    }
+    orientMetadataStore.backupDatabase();
   }
 
   @Override
