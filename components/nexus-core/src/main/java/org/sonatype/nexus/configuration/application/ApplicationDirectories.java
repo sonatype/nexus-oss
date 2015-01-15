@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
  */
 public interface ApplicationDirectories
 {
+  // TODO: Add nio path equivalents
+
   /**
    * Installation directory.
    *

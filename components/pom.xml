@@ -36,9 +36,6 @@
     <module>nexus-bootstrap</module>
     <module>nexus-client-core</module>
     <module>nexus-commands</module>
-    <module>nexus-component-model</module>
-    <module>nexus-component-services</module>
-    <module>nexus-component-source</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>
     <module>nexus-ehcache</module>
@@ -53,6 +50,7 @@
     <module>nexus-orient</module>
     <module>nexus-oss-edition</module>
     <module>nexus-plugin-api</module>
+    <module>nexus-repository</module>
     <module>nexus-repository-metadata-api</module>
     <module>nexus-repository-metadata-model</module>
     <module>nexus-security</module>

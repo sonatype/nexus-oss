@@ -19,9 +19,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.sonatype.nexus.blobstore.file.FileOperations.StreamMetrics;
-import org.sonatype.nexus.orient.Hex;
 
 import com.google.common.base.Throwables;
+import com.google.common.io.BaseEncoding;
 import com.google.common.io.CountingInputStream;
 
 /**
@@ -46,8 +46,10 @@ public class MetricsInputStream
     this.countingInputStream = countingStream;
   }
 
+  private static final BaseEncoding HEX = BaseEncoding.base16().lowerCase();
+
   public String getMessageDigest() {
-    return Hex.encode(messageDigest.digest());
+    return HEX.encode(messageDigest.digest());
   }
 
   public long getSize() {

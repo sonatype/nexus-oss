@@ -286,7 +286,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-componentviews-plugin</artifactId>
+      <artifactId>nexus-repository-httpbridge</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -295,7 +295,16 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-rawcontent-plugin</artifactId>
+      <artifactId>nexus-repository-raw</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-repository-simple</artifactId>
       <version>${nexus.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -435,8 +444,9 @@
             <feature>nexus-rapture-plugin</feature>
             <feature>nexus-extdirect-plugin</feature>
             <feature>nexus-coreui-plugin</feature>
-            <feature>nexus-componentviews-plugin</feature>
-            <feature>nexus-rawcontent-plugin</feature>
+            <feature>nexus-repository-httpbridge</feature>
+            <feature>nexus-repository-raw</feature>
+            <feature>nexus-repository-simple</feature>
           </installedFeatures>
         </configuration>
       </plugin>

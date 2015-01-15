@@ -77,14 +77,6 @@
       <artifactId>orientdb-server</artifactId>
     </dependency>
 
-    <!--
-    NOTE: Not using object-api this is not recommended for usage by orient support.
-    -->
-    <!--<dependency>-->
-      <!--<groupId>com.orientechnologies</groupId>-->
-      <!--<artifactId>orientdb-object</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-graphdb</artifactId>
@@ -96,8 +88,15 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -109,12 +108,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
