@@ -53,7 +53,7 @@ public class BlobRef
   }
 
   /**
-   * @return the blob ref encoded as a string, using the syntax <store>@<node>:<blob>
+   * @return the blob ref encoded as a string, using the syntax {@code store@node:blob-id}
    */
   public String toString() {
     return String.format("%s@%s:%s", getStore(), getNode(), getBlob());
