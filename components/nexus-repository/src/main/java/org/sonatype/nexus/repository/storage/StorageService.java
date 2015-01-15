@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
@@ -94,7 +95,7 @@ public interface StorageService
   BlobRef createBlob(InputStream inputStream, Map<String, String> headers);
 
   @Nullable
-  org.sonatype.nexus.blobstore.api.Blob getBlob(BlobRef blobRef);
+  Blob getBlob(BlobRef blobRef);
 
   boolean deleteBlob(BlobRef blobRef);
 }

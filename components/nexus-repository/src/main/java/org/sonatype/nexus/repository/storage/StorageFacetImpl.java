@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.orient.graph.GraphTx;
@@ -140,7 +141,7 @@ public class StorageFacetImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
+  public Blob getBlob(final BlobRef blobRef) {
     return delegate.getBlob(blobRef);
   }
 

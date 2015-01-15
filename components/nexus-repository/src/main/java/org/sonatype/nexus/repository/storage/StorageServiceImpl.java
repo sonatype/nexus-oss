@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
@@ -335,14 +336,14 @@ public class StorageServiceImpl
     checkNotNull(inputStream);
     checkNotNull(headers);
 
-    org.sonatype.nexus.blobstore.api.Blob blob = blobStore().create(inputStream, headers);
+    Blob blob = blobStore().create(inputStream, headers);
     return new BlobRef("NODE", "STORE", blob.getId().asUniqueString());
   }
 
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
+  public Blob getBlob(final BlobRef blobRef) {
     checkNotNull(blobRef);
 
     return blobStore().get(blobRef.getBlobId());
