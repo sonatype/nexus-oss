@@ -46,10 +46,10 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
       editableMarker: NX.I18n.get('ADMIN_TARGETS_CREATE_ERROR'),
 
       buttons: [
+        { text: NX.I18n.get('ADMIN_TARGETS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
         { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
-        }},
-        { text: NX.I18n.get('ADMIN_TARGETS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' }
+        }}
       ]
     };
 
