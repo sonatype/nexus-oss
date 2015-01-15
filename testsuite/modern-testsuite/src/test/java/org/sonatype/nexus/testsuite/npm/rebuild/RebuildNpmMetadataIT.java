@@ -54,27 +54,27 @@ public class RebuildNpmMetadataIT
     // download package root of commonjs
     {
       final File localDirectory = util.createTempDir();
-      final File commonjsPackageRootFile = new File(localDirectory, "commonjs.json");
-      content().download(Location.repositoryLocation(testMethodName(), "commonjs"), commonjsPackageRootFile);
-      assertThat(commonjsPackageRootFile, exists());
-      final String commonjsPackageRoot = Files.toString(commonjsPackageRootFile, Charsets.UTF_8);
+      final File packageRootFile = new File(localDirectory, "commonjs.json");
+      content().download(Location.repositoryLocation(testMethodName(), "commonjs"), packageRootFile);
+      assertThat(packageRootFile, exists());
+      final String packageRootString = Files.toString(packageRootFile, Charsets.UTF_8);
 
-      assertThat(commonjsPackageRoot, containsString("commonjs"));
-      assertThat(commonjsPackageRoot, containsString("0.0.1"));
-      assertThat(commonjsPackageRoot, containsString("x-nx-rebuilt"));
+      assertThat(packageRootString, containsString("commonjs"));
+      assertThat(packageRootString, containsString("0.0.1"));
+      assertThat(packageRootString, containsString("x-nx-rebuilt"));
     }
 
     // download package root of uppercase
     {
       final File localDirectory = util.createTempDir();
-      final File commonjsPackageRootFile = new File(localDirectory, "uppercase.json");
-      content().download(Location.repositoryLocation(testMethodName(), "uppercase"), commonjsPackageRootFile);
-      assertThat(commonjsPackageRootFile, exists());
-      final String commonjsPackageRoot = Files.toString(commonjsPackageRootFile, Charsets.UTF_8);
+      final File packageRootFile = new File(localDirectory, "uppercase.json");
+      content().download(Location.repositoryLocation(testMethodName(), "uppercase"), packageRootFile);
+      assertThat(packageRootFile, exists());
+      final String packageRootString = Files.toString(packageRootFile, Charsets.UTF_8);
 
-      assertThat(commonjsPackageRoot, containsString("uppercase"));
-      assertThat(commonjsPackageRoot, containsString("0.1.1"));
-      assertThat(commonjsPackageRoot, containsString("x-nx-rebuilt"));
+      assertThat(packageRootString, containsString("uppercase"));
+      assertThat(packageRootString, containsString("0.1.1"));
+      assertThat(packageRootString, containsString("x-nx-rebuilt"));
     }
   }
 }
