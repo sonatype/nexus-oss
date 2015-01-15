@@ -30,7 +30,6 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.storage.ORecordMetadata;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -126,14 +125,14 @@ public class OrientCapabilityStorage
     ORID rid = convertId(id);
 
     try (ODatabaseDocumentTx db = openDb()) {
-      // if we can't get the metadata, then abort
-      ORecordMetadata md = db.getRecordMetadata(rid);
-      if (md == null) {
+      // if we can't load the record, then abort
+      ODocument doc = db.getRecord(rid);
+      if (doc == null) {
         log.debug("Unable to delete item with RID: {}", rid);
         return false;
       }
       // else delete the record
-      db.delete(rid);
+      db.delete(doc);
     }
 
     log.debug("Deleted item with RID: {}", rid);
