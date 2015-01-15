@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.storage.Component;
 
 /**
  * ???
@@ -23,9 +22,9 @@ import org.sonatype.nexus.repository.storage.Component;
 public interface SearchFacet
   extends Facet
 {
-  void index(Component component);
+  void index(Object vertexId);
 
-  void deindex(Component component);
+  void deindex(Object vertexId);
 
   void reindex();
 }

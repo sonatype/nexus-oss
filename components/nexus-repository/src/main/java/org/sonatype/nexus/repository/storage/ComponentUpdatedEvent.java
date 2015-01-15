@@ -20,7 +20,7 @@ package org.sonatype.nexus.repository.storage;
 public class ComponentUpdatedEvent
   extends ComponentEvent
 {
-  public ComponentUpdatedEvent(final Component component) {
-    super(component);
+  public ComponentUpdatedEvent(final Object vertexId) {
+    super(vertexId);
   }
 }

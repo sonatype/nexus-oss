@@ -12,14 +12,29 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import org.sonatype.nexus.orient.entity.Entity;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Asset entity.
+ * Vertex event.
  *
  * @since 3.0
  */
-public class Asset
-  extends Entity
+public abstract class VertexEvent
 {
+  private final Object vertexId;
+
+  public VertexEvent(final Object vertexId) {
+    this.vertexId = checkNotNull(vertexId);
+  }
+
+  public Object getVertexId() {
+    return vertexId;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "vertexId=" + vertexId +
+        '}';
+  }
 }
