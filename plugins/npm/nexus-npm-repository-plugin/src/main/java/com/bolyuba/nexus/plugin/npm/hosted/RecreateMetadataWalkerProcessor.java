@@ -108,16 +108,10 @@ public class RecreateMetadataWalkerProcessor
       try {
         final StorageFileItem file = (StorageFileItem) item;
         final Map<String, Object> versionJson = extractPackageJson(file);
-        if (versionJson == null) {
-          // not found in tarball, just skip it but this time log it
-          log.info("Not found package.json in {}", file.getRepositoryItemUid());
-          continue;
-        }
         if (!versionJson.containsKey("name") ||
             !versionJson.containsKey("version")) {
           // not containing needed elements, just skip it but this time log it
           log.info("Malformed package.json in {}", file.getRepositoryItemUid());
-
           continue;
         }
         final Version version = Version.parse(String.valueOf(versionJson.get("version")));
@@ -128,7 +122,7 @@ public class RecreateMetadataWalkerProcessor
         versions.put(version, versionJson);
       }
       catch (Exception e) {
-        log.info("Failed to extract or malformed package.json from {}", item.getRepositoryItemUid());
+        log.info("Failed to extract or malformed package.json from {}", item.getRepositoryItemUid(), e);
       }
     }
 
@@ -189,10 +183,8 @@ public class RecreateMetadataWalkerProcessor
         log.debug("tarEntry={}, name={}", tarEntry.getName(), tarEntryName);
       }
       while (tarEntryName != null && !PACKAGE_JSON_PATH.equals(tarEntryName));
-      if (tarEntryName == null) {
-        return null;
-      }
       // checks for corrupted data, we do want to report these
+      checkArgument(tarEntryName != null, "Tar does not contains %s?", PACKAGE_JSON_PATH);
       checkArgument(tarEntry.isFile(), "Tar content %s not a file?", PACKAGE_JSON_PATH);
       checkArgument(tarEntry.getSize() < MAX_PACKAGE_JSON_FILE_SIZE, "Tar content too big %s: %s bytes",
           PACKAGE_JSON_PATH, tarEntry.getSize());
@@ -208,7 +200,7 @@ public class RecreateMetadataWalkerProcessor
   private void processPackageJson(final Map<String, Object> rootJson, final Map<String, Object> packageJson)
       throws Exception
   {
-    liftAttributes(rootJson, packageJson);
+    copyAttributes(rootJson, packageJson);
     final String version = String.valueOf(packageJson.get("version"));
     final Map<String, Object> distTags = (Map<String, Object>) rootJson.get("dist-tags");
     final Map<String, Object> versions = (Map<String, Object>) rootJson.get("versions");
@@ -216,15 +208,15 @@ public class RecreateMetadataWalkerProcessor
     versions.put(version, packageJson);
   }
 
-  private void liftAttributes(final Map<String, Object> higher, final Map<String, Object> lower) {
-    liftAttributeOrEnforce(higher, lower, "name");
-    liftAttribute(higher, lower, "description");
-    liftAttribute(higher, lower, "keywords");
-    liftAttribute(higher, lower, "homepage");
+  private void copyAttributes(final Map<String, Object> higher, final Map<String, Object> lower) {
+    copyAttributeOrEnforce(higher, lower, "name");
+    copyAttribute(higher, lower, "description");
+    copyAttribute(higher, lower, "keywords");
+    copyAttribute(higher, lower, "homepage");
     // TODO: figure out what else?
   }
 
-  private void liftAttributeOrEnforce(final Map<String, Object> higher, final Map<String, Object> lower,
+  private void copyAttributeOrEnforce(final Map<String, Object> higher, final Map<String, Object> lower,
                                       final String attributeKey)
   {
     if (higher.containsKey(attributeKey) && lower.containsKey(attributeKey)) {
@@ -237,11 +229,11 @@ public class RecreateMetadataWalkerProcessor
       );
     }
     else {
-      liftAttribute(higher, lower, attributeKey);
+      copyAttribute(higher, lower, attributeKey);
     }
   }
 
-  private void liftAttribute(final Map<String, Object> higher, final Map<String, Object> lower,
+  private void copyAttribute(final Map<String, Object> higher, final Map<String, Object> lower,
                              final String attributeKey)
   {
     if (lower.containsKey(attributeKey)) {
