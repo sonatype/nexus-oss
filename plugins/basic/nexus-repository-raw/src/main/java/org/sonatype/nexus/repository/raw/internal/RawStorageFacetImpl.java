@@ -19,11 +19,11 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.storage.BlobRef;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import com.google.common.collect.ImmutableMap;
@@ -139,7 +139,7 @@ public class RawStorageFacetImpl
   private BlobRef getBlobRef(final String path, final Vertex asset) {
     String blobRefStr = asset.getProperty(BLOB_REF_PROPERTY);
     checkState(blobRefStr != null, "asset at path %s has missing blob reference", path);
-    return new BlobRef(blobRefStr);
+    return BlobRef.parse(blobRefStr);
   }
 
   private RawContent marshall(final Vertex asset, final Blob blob) {
