@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
 import org.sonatype.nexus.repository.raw.internal.negativecache.NegativeCacheFacet;
 import org.sonatype.nexus.repository.raw.internal.negativecache.NegativeCacheHandler;
 import org.sonatype.nexus.repository.raw.internal.negativecache.PathNegativeCacheKeyProvider;
+import org.sonatype.nexus.repository.raw.internal.negativecache.PlaceboNegativeCacheFacet;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
@@ -56,7 +57,7 @@ public class RawProxyRecipe
 
   private final Provider<HttpClientFacet> httpClient;
 
-  private final Provider<NegativeCacheFacet> negativeCache;
+  private final Provider<PlaceboNegativeCacheFacet> negativeCache;
 
   private final Provider<PathNegativeCacheKeyProvider> negativeCacheKeyProvider;
 
@@ -68,11 +69,10 @@ public class RawProxyRecipe
                         final TimingHandler timingHandler,
                         final Provider<ConfigurableViewFacet> viewFacet,
                         final Provider<HttpClientFacet> httpClient,
-                        final Provider<NegativeCacheFacet> negativeCache,
+                        final Provider<PlaceboNegativeCacheFacet> negativeCache,
                         final Provider<PathNegativeCacheKeyProvider> negativeCacheKeyProvider)
   {
     super(type, format);
-
 
     this.negativeCacheHandler = checkNotNull(negativeCacheHandler);
     this.rawProxyHandler = checkNotNull(rawProxyHandler);
