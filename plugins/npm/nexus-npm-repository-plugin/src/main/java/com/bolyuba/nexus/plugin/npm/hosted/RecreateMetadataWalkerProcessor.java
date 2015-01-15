@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.util.io.StreamSupport;
+import org.sonatype.sisu.goodies.common.Iso8601Date;
 
 import com.bolyuba.nexus.plugin.npm.internal.Version;
 import com.bolyuba.nexus.plugin.npm.service.HostedMetadataService;
@@ -51,6 +52,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class RecreateMetadataWalkerProcessor
     extends AbstractWalkerProcessor
 {
+  private static final String PACKAGE_JSON_PATH = "/package.json";
+
   private static final int MAX_PACKAGE_JSON_FILE_SIZE = 1_000_000;
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -92,35 +95,40 @@ public class RecreateMetadataWalkerProcessor
     final TreeMap<Version, Map<String, Object>> versions = Maps.newTreeMap();
 
     // collect all the possible tarballs
-    final Collection<StorageItem> files = coll.list();
-    for (StorageItem file : files) {
-      if (!(file instanceof StorageFileItem)) {
+    final Collection<StorageItem> items = coll.list();
+    for (StorageItem item : items) {
+      if (!(item instanceof StorageFileItem)) {
         // not a file, just skip it
         continue;
       }
-      if (!file.getName().endsWith(".tgz")) {
+      if (!item.getName().endsWith(".tgz")) {
         // not a tarball, just skip it
         continue;
       }
       try {
-        final Map<String, Object> packageVersionJson = extractPackageJson((StorageFileItem) file);
-        if (packageVersionJson == null) {
+        final StorageFileItem file = (StorageFileItem) item;
+        final Map<String, Object> versionJson = extractPackageJson(file);
+        if (versionJson == null) {
           // not found in tarball, just skip it but this time log it
           log.info("Not found package.json in {}", file.getRepositoryItemUid());
           continue;
         }
-        if (!packageVersionJson.containsKey("name") ||
-            !packageVersionJson.containsKey("version")) {
+        if (!versionJson.containsKey("name") ||
+            !versionJson.containsKey("version")) {
           // not containing needed elements, just skip it but this time log it
           log.info("Malformed package.json in {}", file.getRepositoryItemUid());
 
           continue;
         }
-        final Version version = Version.parse(String.valueOf(packageVersionJson.get("version")));
-        versions.put(version, packageVersionJson);
+        final Version version = Version.parse(String.valueOf(versionJson.get("version")));
+        final Map<String, Object> dist = Maps.newHashMap();
+        dist.put("tarball", "generated-on-request"); // We lost original value, but does not matter as is NX hosted
+        dist.put("shasum", file.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY));
+        versionJson.put("dist", dist);
+        versions.put(version, versionJson);
       }
       catch (Exception e) {
-        log.info("Failed to extract or malformed package.json from {}", file.getRepositoryItemUid());
+        log.info("Failed to extract or malformed package.json from {}", item.getRepositoryItemUid());
       }
     }
 
@@ -133,7 +141,7 @@ public class RecreateMetadataWalkerProcessor
     final Map<String, Object> rootJson = Maps.newHashMap();
     rootJson.put("dist-tags", Maps.<String, Object>newHashMap());
     rootJson.put("versions", Maps.<String, Object>newHashMap());
-    rootJson.put("x-nx-rebuilt", new Date());
+    rootJson.put("x-nx-rebuilt", Iso8601Date.format(new Date()));
 
     for (Version version : versions.keySet()) {
       try {
@@ -166,26 +174,31 @@ public class RecreateMetadataWalkerProcessor
       log.debug("Examining TAR file");
       final TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(gzipInputStream);
       TarArchiveEntry tarEntry;
+      // npm uses tar option "--strip-components=1", so we need to strip first path element to have proper names
+      String tarEntryName;
       do {
         tarEntry = tarArchiveInputStream.getNextTarEntry();
+        tarEntryName = null;
         if (tarEntry != null) {
-          log.debug("{}", tarEntry.getName());
+          // tar entry names are "pathelem1/pathelem2/.../filename"
+          int indexOfSlash = tarEntry.getName().indexOf("/");
+          if (indexOfSlash > 0) {
+            tarEntryName = tarEntry.getName().substring(indexOfSlash);
+          }
         }
+        log.debug("tarEntry={}, name={}", tarEntry.getName(), tarEntryName);
       }
-      while (tarEntry != null && !"package.json".equals(tarEntry.getName()));
-      // checks we do silently: tarball has no package json
-      if (tarEntry == null || !"package.json".equals(tarEntry.getName())) {
+      while (tarEntryName != null && !PACKAGE_JSON_PATH.equals(tarEntryName));
+      if (tarEntryName == null) {
         return null;
       }
-      // checks might come from corrupted data, so we do want to report these
-      checkArgument(tarEntry.isFile(), "Tar content package.json not a file?");
-      checkArgument(tarEntry.getSize() < MAX_PACKAGE_JSON_FILE_SIZE, "Too large package.json: %s bytes",
-          tarEntry.getSize());
+      // checks for corrupted data, we do want to report these
+      checkArgument(tarEntry.isFile(), "Tar content %s not a file?", PACKAGE_JSON_PATH);
+      checkArgument(tarEntry.getSize() < MAX_PACKAGE_JSON_FILE_SIZE, "Tar content too big %s: %s bytes",
+          PACKAGE_JSON_PATH, tarEntry.getSize());
       // do this in memory, as package.json is expected to be fairly small (few kb at most)
       final ByteArrayOutputStream bos = new ByteArrayOutputStream(Ints.checkedCast(tarEntry.getSize()));
       StreamSupport.copy(tarArchiveInputStream, bos, StreamSupport.BUFFER_SIZE);
-
-      // read JSON into a map
       final Map<String, Object> packageJson = objectMapper
           .readValue(bos.toByteArray(), new TypeReference<HashMap<String, Object>>() { });
       return packageJson;
