@@ -46,6 +46,8 @@ public class NodeProvider
 
   private Node node;
 
+  // FIXME: Replace with ApplicationDirectories once we we have access to that class
+
   @Inject
   public NodeProvider(final @Named("${nexus-app}") File appDir) {
     this.appDir = checkNotNull(appDir);
