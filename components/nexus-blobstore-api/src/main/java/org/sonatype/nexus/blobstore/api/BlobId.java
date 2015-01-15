@@ -36,7 +36,7 @@ public class BlobId
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "[" + id + "]";
+    return id;
   }
 
   @Override
