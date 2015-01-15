@@ -188,7 +188,7 @@ Ext.define('NX.coreui.controller.Privileges', {
         win = form.up('nx-coreui-privilege-add-repositorytarget');
 
     if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
+      me.loadStoreAndSelect(action.result.data[0].id, false);
       Ext.Array.each(action.result.data, function (privilege) {
         NX.Messages.add({
           text: 'Privilege created: ' + privilege.name,

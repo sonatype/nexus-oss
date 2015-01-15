@@ -456,7 +456,7 @@ Ext.define('NX.coreui.controller.Users', {
         win = form.up('nx-coreui-user-add');
 
     if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
+      me.loadStoreAndSelect(action.result.data.userId, false);
     } else {
       me.loadStore(Ext.emptyFn);
     }
