@@ -24,6 +24,8 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static org.sonatype.nexus.repository.httpbridge.HttpMethods.GET;
+
 /**
  * A handler that retargets the context Request to the remote HTTP resource contained by the repository's {@link
  * HttpClientFacet}.
@@ -38,10 +40,13 @@ public class RawProxyHandler
 {
   @Override
   public Response handle(final Context context) throws Exception {
-    final RawStorageFacet storage = context.getRepository().facet(RawStorageFacet.class);
-    final String path = context.getRequest().getPath();
-    final RawContent rawContent = storage.get(path);
+    String method = context.getRequest().getAction();
+    if (!GET.equals(method)) {
+      return HttpResponses.methodNotAllowed(method, GET);
+    }
 
+    final String path = context.getRequest().getPath();
+    final RawContent rawContent = storage(context).get(path);
     if (rawContent == null) {
       return HttpResponses.notFound(path);
     }
@@ -49,5 +54,9 @@ public class RawProxyHandler
     final Payload payload = RawContentPayloadMarshaller.toPayload(rawContent);
 
     return HttpResponses.ok(payload);
+  }
+
+  private RawStorageFacet storage(final Context context) {
+    return context.getRepository().facet(RawStorageFacet.class);
   }
 }
