@@ -42,6 +42,9 @@ Ext.define('NX.controller.Drilldown', {
 
   getDescription: Ext.emptyFn,
 
+  // List of xtypes
+  masters: null,
+
   /**
    * @cfg {Function} optional function to be called on delete
    */
@@ -61,12 +64,17 @@ Ext.define('NX.controller.Drilldown', {
     });
   },
 
+  /**
+   * @private
+   */
   init: function () {
     var me = this,
         componentListener = {};
 
     // Normalize lists into an array
-    if (!Ext.isArray(me.masters)) {
+    if (!me.masters) {
+      me.masters = [];
+    } else if (!Ext.isArray(me.masters)) {
       me.masters = [me.masters];
     }
 
@@ -77,25 +85,33 @@ Ext.define('NX.controller.Drilldown', {
         selection: me.onSelection,
         cellclick: me.onCellClick
       };
-      componentListener[me.masters[i] + ' button[action=new]'] = {
+    }
+
+    // If there’s at least one list, add event handlers to buttons and tabs
+    if (me.masters.length > 0) {
+
+      // New button
+      componentListener[me.masters[0] + ' ^ nx-drilldown button[action=new]'] = {
         afterrender: me.bindNewButton
       };
-      componentListener[me.masters[i] + ' ^ nx-drilldown-panel nx-drilldown-details > tabpanel'] = {
+
+      // Detail tabs
+      componentListener[me.masters[0] + ' ^ nx-drilldown nx-drilldown-details > tabpanel'] = {
         tabchange: function() {
           // Get the model for the last master
-          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1),
-            lists = me.getLists(),
-            modelId = segments[lists.length - 1],
-            model = lists[lists.length - 1].getStore().getById(modelId);
+          var segments = NX.Bookmarks.getBookmark().getSegments().slice(1);
+          var lists = me.getLists();
+          var modelId = segments[lists.length - 1];
+          var model = lists[lists.length - 1].getStore().getById(modelId);
 
           // Bookmark it. The tab (if selected) will be added automatically
           me.bookmark(model);
         }
       };
 
-      // bind to a delete button if delete function defined
+      // Delete button
       if (me.deleteModel) {
-        componentListener[me.masters[i] + ' ^ nx-drilldown-panel nx-drilldown-details button[action=delete]'] = {
+        componentListener[me.masters[0] + ' ^ nx-drilldown button[action=delete]'] = {
           afterrender: me.bindDeleteButton,
           click: me.onDelete
         };
@@ -123,6 +139,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Return references to all of the master views
    */
   getLists: function() {
@@ -140,6 +157,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
@@ -153,6 +171,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
    * Prompts a reset/reload of the first list in the drilldown
    *
    * @param cb Call this once the store has loaded
@@ -165,7 +184,12 @@ Ext.define('NX.controller.Drilldown', {
     lists[0].getStore().load(cb);
   },
 
-  loadStoreAndSelect: function (modelId) {
+  /**
+   * @public
+   * @param modelId The model to bookmark and/or navigate to
+   * @param navigate Navigate to the model, or just select it?
+   */
+  loadStoreAndSelect: function (modelId, navigate) {
     var me = this,
       lists = me.getLists(),
       model;
@@ -176,7 +200,11 @@ Ext.define('NX.controller.Drilldown', {
         model = lists[i].getStore().getById(modelId);
         if (model) {
           me.bookmark(model);
-          me.navigateTo(NX.Bookmarks.getBookmark());
+          if (navigate) {
+            me.navigateTo(NX.Bookmarks.getBookmark());
+          } else {
+            me.onModelChanged(model);
+          }
           break;
         }
       }
@@ -184,6 +212,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Once all lists have loaded, navigate to the current bookmark
    */
   onStoreLoad: function () {
@@ -205,6 +234,9 @@ Ext.define('NX.controller.Drilldown', {
     me.navigateTo(NX.Bookmarks.getBookmark());
   },
 
+  /**
+   * @public
+   */
   reselect: function () {
     var me = this,
         lists = me.getLists();
@@ -214,6 +246,9 @@ Ext.define('NX.controller.Drilldown', {
     }
   },
 
+  /**
+   * @private
+   */
   refreshList: function () {
     var me = this,
         lists = me.getLists();
@@ -224,6 +259,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * When a list item is clicked, display the new view and update the bookmark
    */
   onCellClick: function(list, td, cellIndex, model) {
@@ -234,6 +270,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * A model changed, focus on the new row and update the name of the related drilldown
    */
   onModelChanged: function (model) {
@@ -254,6 +291,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
    * Make the detail view appear, update models and bookmarks
    */
   loadView: function (list, model, animate) {
@@ -285,6 +323,28 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @public
+   * Make the create wizard appear
+   *
+   * @param index The zero-based step in the create wizard
+   * @param animate Whether to animate the panel into view
+   * @param cmp An optional component to load
+   */
+  loadCreateWizard: function (index, animate, cmp) {
+    var me = this,
+      feature = me.getFeature();
+
+    // Reset all non-root bookmarks
+    for (var i = 1; i <= index; ++i) {
+      feature.setItemBookmark(i, null);
+    }
+
+    // Show the specified step in the wizard
+    feature.showCreateWizard(index, animate, cmp);
+  },
+
+  /**
+   * @private
    * Bookmark specified model / selected tab.
    */
   bookmark: function (model) {
@@ -382,6 +442,7 @@ Ext.define('NX.controller.Drilldown', {
   },
 
   /**
+   * @private
    * Once a model is loaded, call this to display the related view, selecting any tabs as needed
    */
   dataLoadedCallback: function(list, modelId, tabId) {
@@ -400,7 +461,11 @@ Ext.define('NX.controller.Drilldown', {
     }
   },
 
-  // FIXME: wire this to work with multiple list views
+  /**
+   * @private
+   *
+   * FIXME: wire this to work with multiple list views
+   */
   onDelete: function () {
     var me = this,
         selection = me.getLists()[0].getSelectionModel().getSelection(),

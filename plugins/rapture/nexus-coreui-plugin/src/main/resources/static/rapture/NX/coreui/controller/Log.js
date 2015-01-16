@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Log', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.controller.Drilldown',
   mixins: {
     logAware: 'NX.LogAware'
   },
@@ -34,24 +34,25 @@ Ext.define('NX.coreui.controller.Log', {
 
   views: [
     'logging.LogViewer',
-    'logging.LogMark'
+    'logging.LogMark',
+    'logging.LogFeature'
   ],
   refs: [
-    {
-      ref: 'log',
-      selector: 'nx-coreui-log-viewer'
-    }
+    { ref: 'feature', selector: 'nx-coreui-log-feature' },
+    { ref: 'list', selector: 'nx-coreui-log-viewer' }
   ],
 
   init: function () {
     var me = this;
+
+    me.callParent();
 
     me.getApplication().getFeaturesController().registerFeature({
       mode: 'admin',
       path: '/Support/Logging/Log Viewer',
       text: NX.I18n.get('ADMIN_LOG_VIEWER_TITLE'),
       description: NX.I18n.get('ADMIN_LOG_VIEWER_SUBTITLE'),
-      view: { xtype: 'nx-coreui-log-viewer' },
+      view: { xtype: 'nx-coreui-log-feature' },
       iconConfig: {
         file: 'script_text.png',
         variants: ['x16', 'x32']
@@ -97,15 +98,21 @@ Ext.define('NX.coreui.controller.Log', {
    * Shows mark log window.
    */
   showMarkWindow: function () {
-    Ext.widget({ xtype: 'nx-coreui-log-mark' });
+    var me = this,
+      feature = me.getFeature();
+
+    feature.setItemName(1, NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'));
+    me.loadCreateWizard(1, true, null);
   },
 
   /**
    * @private
    */
   onLogMarked: function (form) {
+    var me = this;
+
     this.retrieveLog();
-    form.up('window').close();
+    me.loadView(null, null, true);
   },
 
   /**
@@ -178,7 +185,7 @@ Ext.define('NX.coreui.controller.Log', {
    */
   retrieveLog: function () {
     var me = this,
-        logPanel = me.getLog(),
+        logPanel = me.getList(),
         size;
 
     if (logPanel) {
@@ -218,7 +225,7 @@ Ext.define('NX.coreui.controller.Log', {
    */
   showLog: function (text) {
     var me = this,
-        textarea = me.getLog().down('textarea');
+        textarea = me.getList().down('textarea');
 
     textarea.setValue(text);
     // scroll to the bottom

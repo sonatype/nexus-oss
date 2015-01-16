@@ -16788,7 +16788,7 @@
 /* line 312, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light .x-tab-inner {
   font-size: 13px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #006bbf;
   line-height: 16px;
@@ -16899,11 +16899,12 @@
 /* line 547, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-active {
   border-color: #cbcbcb;
-  background-color: gray;
+  background-color: #2476c3;
 }
 /* line 553, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-active .x-tab-inner {
   color: white;
+  font-weight: bold;
 }
 /* line 568, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-active .x-tab-glyph {
@@ -16911,19 +16912,19 @@
 }
 /* line 575, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-ie8m .x-tab-light-active .x-tab-glyph {
-  color: #626262;
+  color: #345d83;
 }
 
 /* line 583, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-top-active,
 .x-tab-light-left-active,
 .x-tab-light-right-active {
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid #2476c3;
 }
 
 /* line 596, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-bottom-active {
-  border-top: 1px solid gray;
+  border-top: 1px solid #2476c3;
 }
 
 /* line 609, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -16933,6 +16934,7 @@
 /* line 622, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-disabled .x-tab-inner {
   color: #333333;
+  font-weight: bold;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
   opacity: 0.3;
 }
@@ -17059,7 +17061,7 @@
 .x-tab-light-top-active .x-frame-mc,
 .x-tab-light-left-active .x-frame-mc,
 .x-tab-light-right-active .x-frame-mc {
-  background-color: gray;
+  background-color: #2476c3;
 }
 
 /* line 780, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -17078,7 +17080,7 @@
 }
 /* line 787, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
 .x-tab-light-bottom-active .x-frame-mc {
-  background-color: gray;
+  background-color: #2476c3;
 }
 
 /* line 804, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/tab/Tab.scss */
@@ -17480,28 +17482,28 @@
 
 /*</if slicer>*/
 /* */
-/* line 71, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 74, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-body-light-top {
   padding-left: 5px;
 }
 
-/* line 76, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 79, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-bar-strip-light-top {
   border-bottom: 1px solid white;
 }
 
-/* line 82, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 85, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top,
 .x-tab-light-top-disabled {
   border-bottom: 1px solid #f4f4f4;
 }
 
-/* line 86, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 89, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-active {
   border-bottom: 1px solid #cbcbcb;
 }
 
-/* line 90, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+/* line 93, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
 .x-tab-light-top-over {
   border-bottom: 1px solid #ebebeb;
 }

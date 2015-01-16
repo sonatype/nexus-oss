@@ -121,12 +121,6 @@ Ext.define('NX.coreui.controller.Tasks', {
         'nx-coreui-task-add combo[name=typeId]': {
           select: me.changeTaskType
         }
-      },
-      store: {
-        '#TaskType': {
-          load: me.onTaskTypeLoad,
-          datachanged: me.onTaskTypeLoad
-        }
       }
     });
   },
@@ -222,9 +216,27 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    */
   showAddWindow: function() {
-    Ext.widget('nx-coreui-task-add', {
-      taskTypeStore: this.getTaskTypeStore()
-    });
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.widget({
+      xtype: 'panel',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
+      items: [
+        { xtype: 'nx-drilldown-actions' },
+        {
+          xtype: 'nx-coreui-task-add',
+          taskTypeStore: this.getTaskTypeStore(),
+          flex: 1
+        }
+      ]
+    }));
   },
 
   /**
@@ -233,11 +245,11 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @combo {Ext.form.field.ComboBox} combobox task type combobox
    */
   changeTaskType: function(combobox) {
-    var win = combobox.up('window'),
+    var form = combobox.up('nx-settingsform'),
         taskTypeModel;
 
     taskTypeModel = this.getTaskTypeStore().getById(combobox.value);
-    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
+    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
   },
 
   /**
@@ -255,26 +267,15 @@ Ext.define('NX.coreui.controller.Tasks', {
 
   /**
    * @private
-   * When task type store re-loads, reselect current selected task if any.
-   */
-  onTaskTypeLoad: function() {
-    var me = this;
-    me.reselect();
-  },
-
-  /**
-   * @private
    */
   onSettingsSubmitted: function(form, action) {
     var me = this,
         win = form.up('nx-coreui-task-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStoreAndSelect(action.result.data.id, false);
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 

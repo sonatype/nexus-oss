@@ -26,7 +26,7 @@ Ext.define('NX.view.drilldown.Item', {
   itemClass: null,
   itemBookmark: null,
 
-  layout: 'fit',
+  layout: 'card',
 
   /**
    * Set the name of this drilldown item (appears in the breadcrumb)
@@ -46,9 +46,6 @@ Ext.define('NX.view.drilldown.Item', {
    * Set the page to load when the breadcrumb segment associated with this drilldown item is clicked
    */
   setItemBookmark: function(bookmark, scope) {
-    this.itemBookmark = {
-      obj: bookmark,
-      scope: scope
-    };
+    this.itemBookmark = (bookmark ? { obj: bookmark, scope: scope } : null);
   }
 });

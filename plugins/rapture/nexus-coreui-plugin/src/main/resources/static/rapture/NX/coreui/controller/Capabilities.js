@@ -110,10 +110,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
       store: {
         '#Capability': {
           load: me.onCapabilityLoad
-        },
-        '#CapabilityType': {
-          load: me.onCapabilityTypeLoad,
-          datachanged: me.onCapabilityTypeLoad
         }
       },
       component: {
@@ -251,9 +247,12 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    */
   showAddWindow: function() {
-    Ext.widget('nx-coreui-capability-add', {
-      capabilityTypeStore: this.getCapabilityTypeStore()
-    });
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-capability-add', { capabilityTypeStore: this.getCapabilityTypeStore() }));
   },
 
   /**
@@ -262,12 +261,12 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @combo {Ext.form.field.ComboBox} combobox capability type combobox
    */
   changeCapabilityType: function(combobox) {
-    var win = combobox.up('window'),
+    var form = combobox.up('nx-settingsform'),
         capabilityTypeModel;
 
     capabilityTypeModel = this.getCapabilityTypeStore().getById(combobox.value);
-    win.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
-    win.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
+    form.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
+    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
   },
 
   /**
@@ -281,15 +280,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
     if (list) {
       me.getCapabilityTypeStore().load();
     }
-  },
-
-  /**
-   * @private
-   * When capability type store re-loads, reselect current selected capability if any.
-   */
-  onCapabilityTypeLoad: function() {
-    var me = this;
-    me.reselect();
   },
 
   /**
@@ -414,12 +404,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
     NX.direct.capability_Capability.create(values, function(response) {
       if (Ext.isObject(response)) {
         if (response.success) {
-          win.close();
           NX.Messages.add({
             text: 'Capability created: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
             type: 'success'
           });
-          me.loadStoreAndSelect(response.data.id);
+          me.loadStoreAndSelect(response.data.id, false);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);

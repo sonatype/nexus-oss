@@ -23,8 +23,7 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
   requires: [
     'NX.I18n'
   ],
-
-  title: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TITLE'),
+  ui: 'inset',
 
   /**
    * @override
@@ -76,6 +75,13 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
         {
           xtype: 'nx-coreui-formfield-settingsfieldset'
         }
+      ],
+
+      buttons: [
+        { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
       ],
 
       getValues: function () {

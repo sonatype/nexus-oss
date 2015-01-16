@@ -178,7 +178,12 @@ Ext.define('NX.coreui.controller.LdapServers', {
    * @private
    */
   showAddWindow: function() {
-    Ext.widget('nx-coreui-ldapserver-add');
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_LDAP_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, null);
   },
 
   /**
@@ -197,11 +202,9 @@ Ext.define('NX.coreui.controller.LdapServers', {
         win = form.up('nx-coreui-ldapserver-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStoreAndSelect(action.result.data.id, false);
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 

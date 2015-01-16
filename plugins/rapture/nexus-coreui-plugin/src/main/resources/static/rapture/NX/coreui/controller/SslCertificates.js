@@ -130,14 +130,24 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    * @private
    */
   showAddWindowFromServer: function () {
-    Ext.widget('nx-coreui-sslcertificate-add-from-server');
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_SSL_LOAD_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-server'));
   },
 
   /**
    * @private
    */
   showAddWindowFromPem: function () {
-    Ext.widget('nx-coreui-sslcertificate-add-from-pem');
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_SSL_PASTE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-pem'));
   },
 
   /**
@@ -146,11 +156,17 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   showCertificateDetails: function (certificate) {
     var me = this,
-        window = Ext.widget('nx-coreui-sslcertificate-details-window'),
-        form = window.down('form'),
-        model = me.getSslCertificateModel().create(certificate);
+      feature = me.getFeature(),
+      window = Ext.widget('nx-coreui-sslcertificate-details-window'),
+      form = window.down('form'),
+      model = me.getSslCertificateModel().create(certificate);
 
+    // Load the certificate
     form.loadRecord(model);
+
+    // Show the second panel in the create wiard, and set the breadcrumb
+    feature.setItemName(2, NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'));
+    me.loadCreateWizard(2, true, window);
   },
 
   /**
@@ -159,14 +175,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByPem: function (button) {
     var me = this,
-        win = button.up('window'),
+        win = button.up('nx-coreui-sslcertificate-add-from-pem'),
         pem = button.up('form').getForm().getFieldValues().pem;
 
     win.getEl().mask('Loading certificate...');
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        win.close();
         me.showCertificateDetails(response.data);
       }
     });
@@ -178,7 +193,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   loadCertificateByServer: function (button) {
     var me = this,
-        win = button.up('window'),
+        win = button.up('nx-coreui-sslcertificate-add-from-server'),
         server = button.up('form').getForm().getFieldValues()['server'],
         parsed = me.parseHostAndPort(server),
         protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
@@ -187,7 +202,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
-        win.close();
         me.showCertificateDetails(response.data);
       }
     });
@@ -225,15 +239,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   create: function (button) {
     var me = this,
-        win = button.up('window'),
         form = button.up('form'),
         model = form.getRecord(),
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.create({ value: model.get('pem') }, function (response) {
       if (Ext.isObject(response) && response.success) {
-        win.close();
-        me.loadStore();
+        me.loadStoreAndSelect(model.internalId, false);
         NX.Messages.add({ text: 'SSL Certificate created: ' + description, type: 'success' });
       }
     });
@@ -245,15 +257,13 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   remove: function (button) {
     var me = this,
-        win = button.up('window'),
         form = button.up('form'),
         model = form.getRecord(),
         description = me.getDescription(model);
 
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
-        win.close();
-        me.loadStore();
+        me.loadStore(Ext.emptyFn);
         NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
       }
     });

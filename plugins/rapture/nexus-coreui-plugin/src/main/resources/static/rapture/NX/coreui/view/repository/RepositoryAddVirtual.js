@@ -24,8 +24,6 @@ Ext.define('NX.coreui.view.repository.RepositoryAddVirtual', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_VIRTUAL_TITLE'),
-
   initComponent: function() {
     var me = this;
 

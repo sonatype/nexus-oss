@@ -23,8 +23,8 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
   requires: [
     'NX.I18n'
   ],
+  ui: 'inset',
 
-  title: NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'),
   defaultFocus: 'name',
 
   items: {
@@ -53,6 +53,12 @@ Ext.define('NX.coreui.view.logging.LoggerAdd', {
         ],
         queryMode: 'local'
       }
+    ],
+    buttons: [
+      { text: NX.I18n.get('ADMIN_LOGGING_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+        this.up('nx-drilldown').showChild(0, true);
+      }}
     ]
   }
 

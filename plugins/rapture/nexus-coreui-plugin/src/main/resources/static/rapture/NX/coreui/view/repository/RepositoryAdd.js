@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
   editableMarker: NX.I18n.get('ADMIN_REPOSITORIES_CREATE_ERROR'),
 
@@ -33,6 +34,13 @@ Ext.define('NX.coreui.view.repository.RepositoryAdd', {
     var me = this;
 
     me.editableCondition = NX.Conditions.isPermitted('nexus:repositories', 'create');
+
+    me.items.buttons = [
+      { text: NX.I18n.get('ADMIN_REPOSITORIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+      { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+        this.up('nx-drilldown').showChild(0, true);
+      }}
+    ];
 
     me.callParent(arguments);
 

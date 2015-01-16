@@ -139,20 +139,30 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    */
   showAddWindowRole: function() {
-    Ext.widget('nx-coreui-role-add');
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add'));
   },
 
   /**
    * @private
    */
   showAddWindowMapping: function(menuItem) {
-    var me = this;
+    var me = this,
+      feature = me.getFeature();
+
     me.getRoleBySourceStore().load({
       params: {
         source: menuItem.source
       }
     });
-    Ext.widget('nx-coreui-role-add', { source: menuItem.source });
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add', { source: menuItem.source }));
   },
 
   /**
@@ -253,11 +263,9 @@ Ext.define('NX.coreui.controller.Roles', {
         win = form.up('nx-coreui-role-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStoreAndSelect(action.result.data.id, false);
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 

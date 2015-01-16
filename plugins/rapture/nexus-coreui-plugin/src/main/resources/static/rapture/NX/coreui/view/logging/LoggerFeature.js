@@ -13,26 +13,20 @@
 /*global Ext, NX*/
 
 /**
- * Repository target feature panel.
+ * Capability feature panel.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetFeature', {
+Ext.define('NX.coreui.view.logging.LoggerFeature', {
   extend: 'NX.view.drilldown.Drilldown',
-  alias: 'widget.nx-coreui-repositorytarget-feature',
+  alias: 'widget.nx-coreui-logging-feature',
   requires: [
     'NX.I18n'
   ],
 
-  iconName: 'target-default',
+  iconName: 'logger-default',
 
-  masters: { xtype: 'nx-coreui-repositorytarget-list' },
+  detail: { xtype: 'nx-coreui-logger-list' },
 
-  tabs: { xtype: 'nx-coreui-repositorytarget-settings' },
-
-  actions: [
-    { xtype: 'button', text: NX.I18n.get('ADMIN_TARGETS_DETAILS_DELETE_BUTTON'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
-  ],
-
-  createWizard: { xtype: 'nx-coreui-repositorytarget-add' }
+  createWizard: { xtype: 'nx-coreui-logger-add' }
 });

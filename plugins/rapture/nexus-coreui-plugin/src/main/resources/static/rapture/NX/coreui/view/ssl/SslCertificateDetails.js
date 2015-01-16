@@ -24,8 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
     'NX.util.DateFormat',
     'NX.I18n'
   ],
-
-  title: 'Summary',
+  ui: 'inset',
 
   buttons: undefined,
 
@@ -37,31 +36,72 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
 
     me.items = [
       {
-        xtype: 'fieldset',
+        xtype: 'panel',
+        ui: 'subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_SECTION'),
-        items: [
-          { xtype: 'displayfield', name: 'subjectCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_NAME') },
-          { xtype: 'displayfield', name: 'subjectOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_ORGANIZATION') },
-          { xtype: 'displayfield', name: 'subjectOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_UNIT') }
-        ]
+        items: {
+          xtype: 'fieldset',
+          margin: 0,
+          padding: 0,
+          defaults: {
+            xtype: 'displayfield',
+            labelAlign: 'left'
+          },
+          items: [
+            { name: 'subjectCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_NAME') },
+            { name: 'subjectOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_ORGANIZATION') },
+            { name: 'subjectOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_UNIT') }
+          ]
+        }
       },
       {
-        xtype: 'fieldset',
+        xtype: 'panel',
+        ui: 'subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_SECTION'),
-        items: [
-          { xtype: 'displayfield', name: 'issuerCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_NAME') },
-          { xtype: 'displayfield', name: 'issuerOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_ORGANIZATION') },
-          { xtype: 'displayfield', name: 'issuerOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_UNIT') }
-        ]
+        items: {
+          xtype: 'fieldset',
+          margin: 0,
+          padding: 0,
+          defaults: {
+            xtype: 'displayfield',
+            labelAlign: 'left'
+          },
+          items: [
+            { name: 'issuerCommonName', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_NAME') },
+            { name: 'issuerOrganization', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_ORGANIZATION') },
+            { name: 'issuerOrganizationalUnit', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_UNIT') }
+          ]
+        }
       },
       {
-        xtype: 'fieldset',
+        xtype: 'panel',
+        ui: 'subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_SECTION'),
-        items: [
-          { xtype: 'displayfield', name: 'issuedOn', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_ISSUED'), renderer: NX.util.DateFormat.timestampRenderer() },
-          { xtype: 'displayfield', name: 'expiresOn', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_VALID'), renderer: NX.util.DateFormat.timestampRenderer() },
-          { xtype: 'displayfield', name: 'fingerprint', fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_FINGERPRINT') }
-        ]
+        items: {
+          xtype: 'fieldset',
+          margin: 0,
+          padding: '0 0 10px 0',
+          defaults: {
+            xtype: 'displayfield',
+            labelAlign: 'left'
+          },
+          items: [
+            {
+              name: 'issuedOn',
+              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_ISSUED'),
+              renderer: NX.util.DateFormat.timestampRenderer()
+            },
+            {
+              name: 'expiresOn',
+              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_VALID'),
+              renderer: NX.util.DateFormat.timestampRenderer()
+            },
+            {
+              name: 'fingerprint',
+              fieldLabel: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_FINGERPRINT')
+            }
+          ]
+        }
       }
     ];
 

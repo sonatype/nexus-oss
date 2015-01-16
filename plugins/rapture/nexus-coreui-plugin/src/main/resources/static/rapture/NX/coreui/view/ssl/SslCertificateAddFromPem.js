@@ -24,8 +24,8 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
     'NX.Icons',
     'NX.I18n'
   ],
+  ui: 'inset',
 
-  title: NX.I18n.get('ADMIN_SSL_PASTE_TITLE'),
   defaultFocus: 'pem',
 
   /**
@@ -40,17 +40,17 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromPem', {
       items: [
         {
           xtype: 'textareafield',
-          anchor: '100%',
           name: 'pem',
-          itemId: 'pem'
+          itemId: 'pem',
+          rows: 16
         }
       ],
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_SSL_PASTE_SUBMIT_BUTTON'), action: 'load', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_LIST_NEW_BUTTON'), action: 'load', formBind: true, ui: 'primary' },
         { text: NX.I18n.get('ADMIN_SSL_PASTE_CANCEL_BUTTON'), handler: function () {
-          this.up('window').close();
-        }}
+          this.up('nx-drilldown').showChild(0, true);
+        }},
       ]
     };
 

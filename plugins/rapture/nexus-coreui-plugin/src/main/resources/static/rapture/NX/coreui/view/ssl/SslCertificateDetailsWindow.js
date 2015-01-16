@@ -25,8 +25,6 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_SSL_DETAILS_TITLE'),
-
   items: {
     xtype: 'nx-coreui-sslcertificate-details',
     buttons: [

@@ -124,7 +124,12 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
    * @private
    */
   showAddWindow: function() {
-    Ext.widget('nx-coreui-repositorytarget-add');
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_TARGETS_CREATE_TITLE'));
+    me.loadCreateWizard(1, true, null);
   },
 
   /**
@@ -148,11 +153,9 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
         win = form.up('nx-coreui-repositorytarget-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStoreAndSelect(action.result.data.id, false);
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 
