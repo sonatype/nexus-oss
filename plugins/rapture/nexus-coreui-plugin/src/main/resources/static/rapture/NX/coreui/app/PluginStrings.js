@@ -284,6 +284,14 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_REPOSITORIES_ROUTING_UPDATE_SUCCESS: 'Routing repository settings $action',
     ADMIN_REPOSITORIES_ROUTING_PREFIX_LINK: 'View prefix file',
 
+    // Admin -> Repository -> Repository CMA
+    ADMIN_REPOSITORIES_CMA_CREATE_TITLE: 'Create repository',
+    ADMIN_REPOSITORIES_CMA_CREATE_SUCCESS: 'Repository created: ',
+    ADMIN_REPOSITORIES_CMA_SETTINGS_RECIPE: 'Recipe',
+    ADMIN_REPOSITORIES_CMA_SETTINGS_RECIPE_PLACEHOLDER: 'Select a recipe',
+    ADMIN_REPOSITORIES_CMA_SETTINGS_ATTRIBUTES: 'Attributes',
+    ADMIN_REPOSITORIES_CMA_LIST_EMPTY_STATE: 'No repositories defined',
+
     // Admin -> Repository -> Routing
     ADMIN_ROUTING_TITLE: 'Routing',
     ADMIN_ROUTING_SUBTITLE: 'Manage repository routes',
