@@ -21,8 +21,10 @@ import javax.servlet.ServletResponse;
 
 import org.sonatype.nexus.content.ContentRestrictedToken;
 import org.sonatype.nexus.content.ContentRestrictionConstituent;
+import org.sonatype.nexus.security.filter.authc.AuthenticationTokenFactory;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
+import com.google.common.base.Throwables;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
@@ -39,9 +41,14 @@ public class ContentAuthenticationFilter
 {
   private final List<ContentRestrictionConstituent> constituents;
 
+  private List<AuthenticationTokenFactory> factories;
+
   @Inject
-  public ContentAuthenticationFilter(final @Nullable List<ContentRestrictionConstituent> constituents) {
+  public ContentAuthenticationFilter(final @Nullable List<ContentRestrictionConstituent> constituents,
+                                     final @Nullable List<AuthenticationTokenFactory> factories)
+  {
     this.constituents = constituents;
+    this.factories = factories;
     setApplicationName("Sonatype Nexus Repository Manager");
   }
 
@@ -72,7 +79,57 @@ public class ContentAuthenticationFilter
       return new ContentRestrictedToken(basis, request);
     }
     else {
+      AuthenticationToken token = createAuthenticationToken(request, response);
+      if (token != null) {
+        return token;
+      }
       return super.createToken(request, response);
     }
+  }
+
+  @Override
+  protected boolean isAccessAllowed(final ServletRequest request, final ServletResponse response,
+                                    final Object mappedValue)
+  {
+    if (!isRestricted(request) && isLoginAttempt(request, response)) {
+      try {
+        return executeLogin(request, response) && super.isAccessAllowed(request, response, mappedValue);
+      }
+      catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
+    }
+    return super.isAccessAllowed(request, response, mappedValue);
+  }
+
+  @Override
+  protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
+    if (isRestricted(request)) {
+      return super.isLoginAttempt(request, response);
+    }
+    AuthenticationToken token = createAuthenticationToken(request, response);
+    return token != null || super.isLoginAttempt(request, response);
+  }
+
+  private AuthenticationToken createAuthenticationToken(ServletRequest request, ServletResponse response) {
+    if (factories != null) {
+      for (AuthenticationTokenFactory factory : factories) {
+        try {
+          AuthenticationToken token = factory.createToken(request, response);
+          if (token != null) {
+            getLogger().debug("Token '{}' created by {}", token, factory);
+            return token;
+          }
+        }
+        catch (Exception e) {
+          getLogger().warn(
+              "Factory {} failed to create an authentication token {}/{}",
+              factory, e.getClass().getName(), e.getMessage(),
+              getLogger().isDebugEnabled() ? e : null
+          );
+        }
+      }
+    }
+    return null;
   }
 }
