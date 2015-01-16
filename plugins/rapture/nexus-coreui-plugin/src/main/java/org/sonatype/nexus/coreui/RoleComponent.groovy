@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -170,6 +171,7 @@ extends DirectComponentSupport
     securitySystem.getAuthorizationManager(DEFAULT_SOURCE).deleteRole(id)
   }
 
+  @PackageScope
   static RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
