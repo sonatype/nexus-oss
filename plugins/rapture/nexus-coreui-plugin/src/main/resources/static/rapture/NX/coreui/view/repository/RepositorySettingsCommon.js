@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsCommon', {
         if (/^[a-zA-Z0-9_\-\.]+$/.test(value)) {
           return true;
         }
-        return NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_NAME_ERROR');
+        return NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_ID_ERROR');
       }
     },
     {

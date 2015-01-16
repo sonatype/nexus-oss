@@ -74,7 +74,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_DIALOG_INFO_TITLE: 'Information',
     GLOBAL_DIALOG_ERROR_TITLE: 'Error',
     GLOBAL_DIALOG_ERROR_FAILED: 'Operation failed',
-    GLOBAL_DIALOG_ADD_SUBMIT_BUTTON: 'Add',
+    GLOBAL_DIALOG_ADD_SUBMIT_BUTTON: 'Create',
     GLOBAL_DIALOG_ADD_CANCEL_BUTTON: 'Cancel',
     GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON: 'Save',
     GLOBAL_DIALOG_ORDER_CANCEL_BUTTON: 'Cancel',
@@ -92,9 +92,6 @@ Ext.define('NX.app.PluginStrings', {
     // Settings form
     GLOBAL_SETTINGS_LOADING: 'Loading',
     GLOBAL_SETTINGS_SAVING: 'Saving',
-
-    // Drilldown
-    GLOBAL_DRILLDOWN_GO_BACK: 'Go back to {0}',
 
     // Browse -> Welcome
     BROWSE_WELCOME_TITLE: 'Welcome',

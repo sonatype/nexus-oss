@@ -74,6 +74,9 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
           xtype: 'nx-coreui-search-result-details'
         },
         {
+          xtype: 'nx-drilldown-actions'
+        },
+        {
           xtype: 'nx-coreui-search-result-version-list',
           flex: 1
         }
@@ -82,8 +85,24 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   ],
 
   detail: {
-    xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
-    header: false
+    xtype: 'panel',
+
+    layout: {
+      type: 'vbox',
+      align: 'stretch',
+      pack: 'start'
+    },
+
+    items: [
+      {
+        xtype: 'nx-drilldown-actions'
+      },
+      {
+        xtype: 'nx-coreui-repositorybrowse-storagefilecontainer',
+        header: false,
+        flex: 1
+      }
+    ]
   },
 
   initComponent: function() {

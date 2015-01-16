@@ -114,13 +114,13 @@ Ext.define('NX.coreui.controller.Repositories', {
           click: me.navigateToBrowseMode
         },
         'nx-coreui-repository-list button[action=new]': {
-          click: me.showSelectTemplateWindow
+          click: me.showSelectTemplatePanel
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.onSettingsSubmitted
         },
-        'nx-coreui-repository-selecttemplate grid': {
-          selectionchange: me.showAddWindow
+        'nx-coreui-repository-selecttemplate': {
+          cellclick: me.showAddRepositoryPanel
         }
       }
     });
@@ -160,6 +160,34 @@ Ext.define('NX.coreui.controller.Repositories', {
       settingsPanel.loadRecord(model);
 
       Ext.resumeLayouts(true);
+    }
+  },
+
+  /**
+   * @private
+   */
+  showSelectTemplatePanel: function() {
+    var me = this,
+      feature = me.getFeature();
+
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(1, NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'));
+    me.loadCreateWizard(1, true, null);
+  },
+
+  /**
+   * @private
+   */
+  showAddRepositoryPanel: function(list, td, cellIndex, model) {
+    var me = this,
+      template = Ext.apply({}, model.data),
+      cmpClass = me.findComponent('add', template, false),
+      feature = me.getFeature();
+
+    if (cmpClass) {
+      // Show the second panel in the create wizard, and set the breadcrumb
+      feature.setItemName(2, NX.I18n.format('ADMIN_REPOSITORIES_CREATE_TITLE', template.providerName));
+      me.loadCreateWizard(2, true, cmpClass.create({ template: template }));
     }
   },
 
@@ -273,27 +301,6 @@ Ext.define('NX.coreui.controller.Repositories', {
 
   /**
    * @private
-   */
-  showSelectTemplateWindow: function() {
-    Ext.widget('nx-coreui-repository-selecttemplate');
-  },
-
-  /**
-   * @private
-   */
-  showAddWindow: function(selectionModel, selected) {
-    var me = this,
-        template = Ext.apply({}, selected[0].data),
-        cmpClass = me.findComponent('add', template, false);
-
-    me.getSelectTemplate().close();
-    if (cmpClass) {
-      cmpClass.create({ template: template });
-    }
-  },
-
-  /**
-   * @private
    * Finds a component specific to action / template.
    * @return {Ext.Class|*} class specific to action / template or undefined if none found
    */
@@ -322,11 +329,9 @@ Ext.define('NX.coreui.controller.Repositories', {
         win = form.up('nx-coreui-repository-add');
 
     if (win) {
-      win.close();
-      me.loadStoreAndSelect(action.result.data.id);
-    }
-    else {
-      me.loadStore();
+      me.loadStoreAndSelect(action.result.data.id, false);
+    } else {
+      me.loadStore(Ext.emptyFn);
     }
   },
 

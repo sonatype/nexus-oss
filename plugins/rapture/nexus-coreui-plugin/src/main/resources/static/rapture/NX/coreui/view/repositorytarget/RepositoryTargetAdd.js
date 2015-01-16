@@ -24,8 +24,8 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
-  title: NX.I18n.get('ADMIN_TARGETS_CREATE_TITLE'),
   defaultFocus: 'name',
 
   /**
@@ -43,7 +43,14 @@ Ext.define('NX.coreui.view.repositorytarget.RepositoryTargetAdd', {
         return NX.I18n.get('ADMIN_TARGETS_CREATE_SUCCESS') + data['name'];
       },
       editableCondition: NX.Conditions.isPermitted('nexus:targets', 'create'),
-      editableMarker: NX.I18n.get('ADMIN_TARGETS_CREATE_ERROR')
+      editableMarker: NX.I18n.get('ADMIN_TARGETS_CREATE_ERROR'),
+
+      buttons: [
+        { text: NX.I18n.get('ADMIN_TARGETS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
+      ]
     };
 
     me.callParent();

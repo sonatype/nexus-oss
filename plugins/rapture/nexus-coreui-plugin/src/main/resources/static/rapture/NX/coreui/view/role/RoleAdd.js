@@ -24,8 +24,8 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'inset',
 
-  title: NX.I18n.get('ADMIN_ROLES_CREATE_TITLE'),
   defaultFocus: 'id',
 
   initComponent: function() {
@@ -41,7 +41,14 @@ Ext.define('NX.coreui.view.role.RoleAdd', {
       },
       editableCondition: NX.Conditions.isPermitted('security:roles', 'create'),
       editableMarker: NX.I18n.get('ADMIN_ROLES_CREATE_ERROR'),
-      source: me.source
+      source: me.source,
+
+      buttons: [
+        { text: NX.I18n.get('ADMIN_ROLES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
+      ]
     };
 
     me.callParent(arguments);

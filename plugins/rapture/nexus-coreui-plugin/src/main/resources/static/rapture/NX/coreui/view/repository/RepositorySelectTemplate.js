@@ -18,44 +18,24 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.repository.RepositorySelectTemplate', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.drilldown.Master',
   alias: 'widget.nx-coreui-repository-selecttemplate',
   requires: [
     'NX.I18n'
   ],
 
-  title: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TITLE'),
-
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  height: 510,
-  width: 340,
-
-  items: [
+  store: 'RepositoryTemplate',
+  columns: [
     {
-      xtype: 'grid',
-      store: 'RepositoryTemplate',
-      columns: [
-        {
-          xtype: 'nx-iconcolumn',
-          width: 36,
-          iconVariant: 'x16',
-          iconName: function() {
-            return 'repository-default';
-          }
-        },
-        { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_PROVIDER_COLUMN'), dataIndex: 'providerName', flex: 2 },
-        { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TYPE_COLUMN'), dataIndex: 'type', flex: 1 }
-      ]
-    }
-  ],
-
-  buttons: [
-    { text: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_CANCEL_BUTTON'), handler: function () {
-      this.up('window').close();
-    }}
+      xtype: 'nx-iconcolumn',
+      width: 36,
+      iconVariant: 'x16',
+      iconName: function() {
+        return 'repository-default';
+      }
+    },
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_PROVIDER_COLUMN'), dataIndex: 'providerName', flex: 2 },
+    { header: NX.I18n.get('ADMIN_REPOSITORIES_SELECT_TYPE_COLUMN'), dataIndex: 'type', flex: 1 }
   ]
 
 });

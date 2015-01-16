@@ -42,5 +42,7 @@ Ext.define('NX.coreui.view.user.UserFeature', {
         { text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_ITEM'), glyph: 'xf084@FontAwesome' /* fa-key */, action: 'setpassword' }
       ]
     }
-  ]
+  ],
+
+  createWizard: { xtype: 'nx-coreui-user-add' }
 });

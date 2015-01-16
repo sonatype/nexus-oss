@@ -27,8 +27,8 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
     'NX.coreui.model.Reference',
     'NX.I18n'
   ],
+  ui: 'inset',
 
-  title: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'),
   defaultFocus: 'name',
 
   initComponent: function () {
@@ -51,15 +51,22 @@ Ext.define('NX.coreui.view.privilege.PrivilegeAddRepositoryTarget', {
       editableCondition: NX.Conditions.isPermitted('security:privileges', 'create'),
       editableMarker: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_ERROR'),
 
+      buttons: [
+        { text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
+          this.up('nx-drilldown').showChild(0, true);
+        }}
+      ],
+
       items: [
         {
           name: 'name',
           itemId: 'name',
-          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME'),
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_NAME')
         },
         {
           name: 'description',
-          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION'),
+          fieldLabel: NX.I18n.get('ADMIN_PRIVILEGES_CREATE_DESCRIPTION')
         },
         {
           xtype: 'combo',

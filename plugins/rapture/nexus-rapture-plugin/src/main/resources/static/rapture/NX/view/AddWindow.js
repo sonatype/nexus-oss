@@ -18,18 +18,19 @@
  * @since 3.0
  */
 Ext.define('NX.view.AddWindow', {
-  extend: 'Ext.window.Window',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-addwindow',
   requires: [
     'NX.I18n'
   ],
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 630,
-  minWidth: 630,
+  layout: {
+    type: 'vbox',
+    align: 'stretch',
+    pack: 'start'
+  },
+
+  autoScroll: true,
 
   /**
    * @override
@@ -42,13 +43,11 @@ Ext.define('NX.view.AddWindow', {
         me.items.buttons = [
           { text: NX.I18n.get('GLOBAL_DIALOG_ADD_SUBMIT_BUTTON'), action: 'add', formBind: true, ui: 'primary', bindToEnter:  me.items.settingsFormSubmitOnEnter },
           { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
-            this.up('window').close();
+            this.up('nx-drilldown').showChild(0, true);
           }}
         ];
       }
     }
-
-    me.maxHeight = Ext.getBody().getViewSize().height - 100;
 
     me.callParent(arguments);
   }
