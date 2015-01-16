@@ -24,9 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @since 3.0
  */
-public class ProxyFacet
+public class ProxyFacetImpl
     extends FacetSupport
-    implements PayloadSource
+    implements ProxyFacet
 {
   public static final String CONFIG_KEY = "proxy";
 
