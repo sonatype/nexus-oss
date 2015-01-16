@@ -19,6 +19,8 @@ import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Converts between {@link Payload} and {@link RawContent}
  *
@@ -49,6 +51,7 @@ public class RawContentPayloadMarshaller
   }
 
   public static Payload toPayload(RawContent content) throws IOException {
+    checkNotNull(content);
     return new StreamPayload(content.openInputStream(), content.getSize(), content.getContentType());
   }
 }
