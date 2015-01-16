@@ -13,13 +13,13 @@
 package org.sonatype.security.realms.ldap.internal.persist.orient;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.component.services.id.EntityIdFactory;
 import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationSource;
 import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
@@ -46,17 +46,13 @@ public class OrientDBLdapConfigurationSource
 {
   private final Provider<DatabaseInstance> databaseInstance;
 
-  private final EntityIdFactory entityIdFactory;
-
   private final LdapConfigurationEntityAdapter entityAdapter;
 
   @Inject
   public OrientDBLdapConfigurationSource(final @Named("config") Provider<DatabaseInstance> databaseInstance,
-                                         final EntityIdFactory entityIdFactory,
                                          final LdapConfigurationEntityAdapter entityAdapter)
   {
     this.databaseInstance = checkNotNull(databaseInstance);
-    this.entityIdFactory = checkNotNull(entityIdFactory);
     this.entityAdapter = checkNotNull(entityAdapter);
   }
 
@@ -101,7 +97,7 @@ public class OrientDBLdapConfigurationSource
       try (ODatabaseDocumentTx db = openDb()) {
         db.begin();
         try {
-          ldapConfiguration.setId(entityIdFactory.newId().asUniqueString());
+          ldapConfiguration.setId(UUID.randomUUID().toString());
           entityAdapter.add(db, ldapConfiguration);
           return ldapConfiguration.getId();
         }
