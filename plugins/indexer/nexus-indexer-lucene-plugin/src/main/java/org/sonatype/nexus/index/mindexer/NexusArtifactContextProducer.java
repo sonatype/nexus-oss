@@ -57,7 +57,6 @@ public class NexusArtifactContextProducer
   public NexusArtifactContextProducer(final RepositoryRegistry repositoryRegistry) {
     this.log = LoggerFactory.getLogger(getClass());
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
-    log.info("NexusArtifactContextProducer created");
   }
 
   @Override
@@ -79,7 +78,7 @@ public class NexusArtifactContextProducer
         if (item instanceof StorageFileItem) {
           final String sha1 = item.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
           if (!Strings.isNullOrEmpty(sha1)) {
-            log.info("ArtifactContext of {} enhanced with sha1={}", itemPath, sha1);
+            log.debug("ArtifactContext of {} enhanced with sha1={}", itemPath, sha1);
             ac.getArtifactInfo().sha1 = sha1;
           }
         }
