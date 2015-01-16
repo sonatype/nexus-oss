@@ -23746,7 +23746,7 @@ a.x-color-picker-item:hover {
  * @class Ext.button.Button
  */
 /**
- * ui: 'drilldown'
+ * ui: 'nx-drilldown'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-drilldown-large {
@@ -24232,7 +24232,7 @@ a.x-color-picker-item:hover {
 /*</if slicer>*/
 /* */
 /* line 46, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.x-btn-ux-drilldown-large {
+.x-btn-nx-drilldown-large {
   padding: 0 !important;
 }
 

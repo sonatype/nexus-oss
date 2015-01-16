@@ -270,11 +270,11 @@
 /*</if slicer>*/
 /* */
 /* line 87, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.x-btn-ux-drilldown-medium {
+.x-btn-nx-drilldown-medium {
   padding: 0 2px 0 6px;
 }
 /* line 90, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.x-btn-ux-drilldown-medium .x-btn-inner {
+.x-btn-nx-drilldown-medium .x-btn-inner {
   text-overflow: ellipsis;
 }
 
@@ -767,7 +767,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'default'
+ * ui: 'nx-default'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-default-small {
@@ -1284,7 +1284,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'plain'
+ * ui: 'nx-plain'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-plain-small {
@@ -1801,7 +1801,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'primary'
+ * ui: 'nx-primary'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-primary-small {
@@ -2309,7 +2309,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'danger'
+ * ui: 'nx-danger'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-danger-small {
@@ -2817,7 +2817,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'warning'
+ * ui: 'nx-warning'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-warning-small {
@@ -3325,7 +3325,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'success'
+ * ui: 'nx-success'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-success-small {
@@ -3833,7 +3833,7 @@
 /*</if slicer>*/
 /* */
 /**
- * ui: 'header'
+ * ui: 'nx-header'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-header-toolbar-medium {
