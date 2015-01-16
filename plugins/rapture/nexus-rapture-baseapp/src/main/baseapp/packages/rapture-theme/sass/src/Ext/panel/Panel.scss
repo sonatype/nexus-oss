@@ -110,18 +110,6 @@
 }
 
 /**
- * ui: 'drilldown-tabs'
- */
-/*@include extjs-panel-ui(
-  $ui: 'drilldown-tabs',
-
-  $ui-header-color: $color-night-rider,
-  $ui-header-background-color: $color-white,
-  $ui-header-font-size: 16px,
-  $ui-header-line-height: 20px
-);*/
-
-/**
  * ui: 'nx-messages'
  */
 @include extjs-panel-ui(
@@ -161,19 +149,7 @@
     margin-bottom: 20px;
   }
 
-  .category {
-    /*padding-bottom: 2em;
-    border-bottom: 1px $color-gainsboro solid;
-
-    .category-title {
-      text-transform: uppercase;
-      padding-bottom: 1em;
-      font-size: $font-size-h3;
-    }*/
-  }
-
-  .nx-section-header/*,
-  .column-header*/ {
+  .nx-section-header {
     font-size: $font-size-h5;
     padding-bottom: 5px;
     text-transform: uppercase;
