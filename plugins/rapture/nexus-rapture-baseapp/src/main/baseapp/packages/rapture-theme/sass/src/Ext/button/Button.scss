@@ -134,11 +134,14 @@
 );
 
 /**
- * ui: 'nx-default'
+ * ui: 'default'
+ *
+ * This is not namespaced, because 'default' is the theme a component
+ * receives when 'ui' is not set.
  */
 
 @include extjs-button-small-ui(
-  $ui: 'nx-default',
+  $ui: 'default',
 
   $background-gradient: $color-white $color-light-gainsboro,
   $background-gradient-over: $color-light-gray $color-silver,
