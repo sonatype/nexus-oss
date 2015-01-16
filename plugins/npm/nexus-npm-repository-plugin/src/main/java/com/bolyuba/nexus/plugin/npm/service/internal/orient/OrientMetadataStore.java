@@ -13,6 +13,11 @@
 package com.bolyuba.nexus.plugin.npm.service.internal.orient;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +30,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.configuration.application.ApplicationDirectories;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
+import org.sonatype.nexus.util.file.DirSupport;
+import org.sonatype.sisu.goodies.common.SimpleFormat;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 
 import com.bolyuba.nexus.plugin.npm.NpmRepository;
@@ -35,6 +42,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -58,7 +66,11 @@ public class OrientMetadataStore
 {
   private static final String DB_LOCATION = "db/npm";
 
+  private static final String BACKUP_LOCATION = "backup/npm";
+
   private final File databaseDirectory;
+
+  private final File backupDirectory;
 
   private final Map<Class<?>, EntityHandler<?>> entityHandlers;
 
@@ -71,10 +83,13 @@ public class OrientMetadataStore
   @Inject
   public OrientMetadataStore(final ApplicationDirectories applicationDirectories,
                              final @Named("${nexus.npm.poolMinSize:-1}") int poolMinSize,
-                             final @Named("${nexus.npm.poolMaxSize:-100}") int poolMaxSize) {
+                             final @Named("${nexus.npm.poolMaxSize:-100}") int poolMaxSize)
+  {
     checkArgument(poolMinSize >= 1, "Pool min size must be greater or equal to 1");
-    checkArgument(poolMaxSize >= poolMinSize, "Pool max size must be greater or equal to poolMinSize (%s)", poolMinSize);
+    checkArgument(poolMaxSize >= poolMinSize, "Pool max size must be greater or equal to poolMinSize (%s)",
+        poolMinSize);
     this.databaseDirectory = applicationDirectories.getWorkDirectory(DB_LOCATION);
+    this.backupDirectory = applicationDirectories.getWorkDirectory(BACKUP_LOCATION);
     this.entityHandlers = Maps.newHashMap();
     this.poolMinSize = poolMinSize;
     this.poolMaxSize = poolMaxSize;
@@ -110,6 +125,46 @@ public class OrientMetadataStore
     log.info("Closing pool: {}", pool);
     pool.close();
     pool = null;
+  }
+
+  /**
+   * Performs DB backup, during which database is "frozen" for data modification attempts.
+   *
+   * @since 2.11
+   */
+  public void backupDatabase() throws IOException {
+    try (final ODatabaseDocumentTx db = db()) {
+      final File backupFile = createBackupFile();
+      log.info("Started npm DB backup to {} (all DB write operations are frozen)",
+          backupFile.getAbsolutePath());
+      final OutputStream outputStream = new FileOutputStream(backupFile);
+      db.backup(outputStream, null, null, new OCommandOutputListener()
+      {
+        @Override
+        public void onMessage(final String msg) {
+          log.debug("Backup: {}", msg);
+        }
+      }, 9, 1024 * 1024);
+      log.info("Finished npm DB backup to {}", backupFile.getAbsolutePath());
+    }
+  }
+
+  /**
+   * Creates a unique file for backup. It's guaranteed that file does not exists.
+   *
+   * @since 2.11
+   */
+  private File createBackupFile() throws IOException {
+    DirSupport.mkdir(backupDirectory);
+    int counter = 1;
+    final String timestamp = new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
+    File backupFile;
+    do {
+      final String backupFileName = SimpleFormat.format("nexus-npm-db-backup-%s-%s.zip", timestamp, counter++);
+      backupFile = new File(backupDirectory, backupFileName);
+    }
+    while (backupFile.exists());
+    return backupFile;
   }
 
   /**

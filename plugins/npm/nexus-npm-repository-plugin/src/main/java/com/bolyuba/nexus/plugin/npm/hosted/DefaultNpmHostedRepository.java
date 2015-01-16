@@ -43,6 +43,8 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.walker.DefaultStoreWalkerFilter;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 
 import com.bolyuba.nexus.plugin.npm.NpmContentClass;
 import com.bolyuba.nexus.plugin.npm.NpmRepository;
@@ -92,6 +94,19 @@ public class DefaultNpmHostedRepository
     this.contentClass = checkNotNull(contentClass);
     this.configurator = checkNotNull(configurator);
     this.repositoryKind = new DefaultRepositoryKind(NpmHostedRepository.class, null);
+  }
+
+  @Override
+  public boolean recreateNpmMetadata() {
+    final DefaultWalkerContext context = new DefaultWalkerContext(this,
+        new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT), new DefaultStoreWalkerFilter());
+    final RecreateMetadataWalkerProcessor processor =
+        new RecreateMetadataWalkerProcessor(getMetadataService());
+    context.getProcessors().add(processor);
+    getWalker().walk(context);
+    log.info("Recreated npm metadata on {} (packageRoots={}/packageVersions={})", this,
+        processor.getPackageRoots(), processor.getPackageVersions());
+    return processor.getPackageRoots() > 0;
   }
 
   @Override

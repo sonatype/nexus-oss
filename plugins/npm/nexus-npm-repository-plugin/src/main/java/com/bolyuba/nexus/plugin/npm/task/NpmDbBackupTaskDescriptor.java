@@ -10,27 +10,32 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.bolyuba.nexus.plugin.npm.hosted;
+package com.bolyuba.nexus.plugin.npm.task;
 
-import org.sonatype.nexus.proxy.repository.HostedRepository;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import com.bolyuba.nexus.plugin.npm.NpmRepository;
-import com.bolyuba.nexus.plugin.npm.service.HostedMetadataService;
+import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 
 /**
- * @author Georgy Bolyuba (georgy@bolyuba.com)
+ * NX Task that backs up NPM MetadataStore.
+ *
+ * @since 2.11
  */
-public interface NpmHostedRepository
-    extends NpmRepository, HostedRepository
+@Named(NpmDbBackupTaskDescriptor.ID)
+@Singleton
+public class NpmDbBackupTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
-  @Override
-  HostedMetadataService getMetadataService();
+  public static final String ID = "NpmDbBackupTask";
 
-  /**
-   * Recreates npm metadata from deployed tarballs. During this operation, repository should be read only.
-   *
-   * @since 2.11
-   * @return {@code true} if npm DB changed, there were packages processed, {@code false} otherwise.
-   */
-  boolean recreateNpmMetadata();
+  @Override
+  public String getId() {
+    return ID;
+  }
+
+  @Override
+  public String getName() {
+    return "Backup npm metadata database";
+  }
 }
