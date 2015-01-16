@@ -9,7 +9,7 @@
 */
 
 @include extjs-panel-ui(
-  $ui: 'subsection',
+  $ui: 'nx-subsection',
 
   $ui-header-color: $color-night-rider,
   $ui-header-font-size: $font-size-h4,
@@ -18,7 +18,7 @@
 );
 
 @include extjs-panel-ui(
-  $ui: 'subsection-framed',
+  $ui: 'nx-subsection-framed',
 
   $ui-header-color: $color-night-rider,
   $ui-padding: 10px !important,
@@ -27,13 +27,13 @@
   $ui-header-line-height: 22px
 );
 
-.x-panel-subsection {
+.x-panel-nx-subsection {
 
   .x-panel-header {
     padding: 10px 0 10px 0 !important;
   }
 }
 
-.x-panel-subsection-framed {
+.x-panel-nx-subsection-framed {
   border: 1px $color-night-rider solid;
 }

@@ -23746,15 +23746,15 @@ a.x-color-picker-item:hover {
  * @class Ext.button.Button
  */
 /**
- * ui: 'drilldown'
+ * ui: 'nx-drilldown'
  */
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large {
+.x-btn-nx-drilldown-large {
   border-color: transparent;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large {
+.x-btn-nx-drilldown-large {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -23768,20 +23768,20 @@ a.x-color-picker-item:hover {
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-mc {
-  background-image: url(images/btn/btn-drilldown-large-fbg.gif);
+.x-btn-nx-drilldown-large-mc {
+  background-image: url(images/btn/btn-nx-drilldown-large-fbg.gif);
   background-position: 0 top;
   background-color: transparent;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nlg .x-btn-drilldown-large {
-  background-image: url(images/btn/btn-drilldown-large-bg.gif);
+.x-nlg .x-btn-nx-drilldown-large {
+  background-image: url(images/btn/btn-nx-drilldown-large-bg.gif);
   background-position: 0 top;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nbr .x-btn-drilldown-large {
+.x-nbr .x-btn-nx-drilldown-large {
   padding: 0 !important;
   border-width: 0 !important;
   -webkit-border-radius: 0px;
@@ -23794,115 +23794,115 @@ a.x-color-picker-item:hover {
 }
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-frameInfo {
+.x-btn-nx-drilldown-large-frameInfo {
   font-family: th-3-3-3-3-0-0-0-0-3-3-3-3;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tl {
+.x-btn-nx-drilldown-large-tl {
   background-position: 0 -6px;
 }
 
 /* line 319, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tr {
+.x-btn-nx-drilldown-large-tr {
   background-position: right -9px;
 }
 
 /* line 323, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-bl {
+.x-btn-nx-drilldown-large-bl {
   background-position: 0 -12px;
 }
 
 /* line 327, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-br {
+.x-btn-nx-drilldown-large-br {
   background-position: right -15px;
 }
 
 /* line 331, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-ml {
+.x-btn-nx-drilldown-large-ml {
   background-position: 0 top;
 }
 
 /* line 335, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-mr {
+.x-btn-nx-drilldown-large-mr {
   background-position: right top;
 }
 
 /* line 339, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tc {
+.x-btn-nx-drilldown-large-tc {
   background-position: 0 0;
 }
 
 /* line 343, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-bc {
+.x-btn-nx-drilldown-large-bc {
   background-position: 0 -3px;
 }
 
 /* line 350, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tr,
-.x-btn-drilldown-large-br,
-.x-btn-drilldown-large-mr {
+.x-btn-nx-drilldown-large-tr,
+.x-btn-nx-drilldown-large-br,
+.x-btn-nx-drilldown-large-mr {
   padding-right: 3px;
 }
 
 /* line 356, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tl,
-.x-btn-drilldown-large-bl,
-.x-btn-drilldown-large-ml {
+.x-btn-nx-drilldown-large-tl,
+.x-btn-nx-drilldown-large-bl,
+.x-btn-nx-drilldown-large-ml {
   padding-left: 3px;
 }
 
 /* line 360, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tc {
+.x-btn-nx-drilldown-large-tc {
   height: 3px;
 }
 
 /* line 363, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-bc {
+.x-btn-nx-drilldown-large-bc {
   height: 3px;
 }
 
 /* line 374, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-tl,
-.x-btn-drilldown-large-bl,
-.x-btn-drilldown-large-tr,
-.x-btn-drilldown-large-br,
-.x-btn-drilldown-large-tc,
-.x-btn-drilldown-large-bc,
-.x-btn-drilldown-large-ml,
-.x-btn-drilldown-large-mr {
+.x-btn-nx-drilldown-large-tl,
+.x-btn-nx-drilldown-large-bl,
+.x-btn-nx-drilldown-large-tr,
+.x-btn-nx-drilldown-large-br,
+.x-btn-nx-drilldown-large-tc,
+.x-btn-nx-drilldown-large-bc,
+.x-btn-nx-drilldown-large-ml,
+.x-btn-nx-drilldown-large-mr {
   zoom: 1;
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-ml,
-.x-btn-drilldown-large-mr {
+.x-btn-nx-drilldown-large-ml,
+.x-btn-nx-drilldown-large-mr {
   zoom: 1;
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-large-mc {
+.x-btn-nx-drilldown-large-mc {
   padding: 0px 0px 0px 0px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-strict .x-ie7 .x-btn-drilldown-large-tl,
-.x-strict .x-ie7 .x-btn-drilldown-large-bl {
+.x-strict .x-ie7 .x-btn-nx-drilldown-large-tl,
+.x-strict .x-ie7 .x-btn-nx-drilldown-large-bl {
   position: relative;
   right: 0;
 }
 
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-large:after {
+.x-btn-nx-drilldown-large:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-large-fbg.gif), bg:url(images/btn/btn-drilldown-large-bg.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-nx-drilldown-large-fbg.gif), bg:url(images/btn/btn-nx-drilldown-large-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-inner {
+.x-btn-nx-drilldown-large .x-btn-inner {
   font-size: 26px;
   font-weight: bold;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -23910,339 +23910,339 @@ a.x-color-picker-item:hover {
   padding: 0 0;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-arrow {
-  background-image: url(images/button/drilldown-large-arrow.png);
+.x-btn-nx-drilldown-large .x-btn-arrow {
+  background-image: url(images/button/nx-drilldown-large-arrow.png);
 }
 /* line 278, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-arrow-right {
+.x-btn-nx-drilldown-large .x-btn-arrow-right {
   padding-right: 36px;
 }
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-arrow-bottom {
+.x-btn-nx-drilldown-large .x-btn-arrow-bottom {
   padding-bottom: 32px;
 }
 /* line 293, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-glyph {
+.x-btn-nx-drilldown-large .x-btn-glyph {
   font-size: 32px;
   line-height: 32px;
   color: white;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie8m .x-btn-drilldown-large .x-btn-glyph {
+.x-ie8m .x-btn-nx-drilldown-large .x-btn-glyph {
   color: white;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-disabled {
+.x-btn-nx-drilldown-large-disabled {
   background-image: none;
   background-color: transparent;
 }
 /* line 328, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-disabled .x-btn-inner {
+.x-btn-nx-drilldown-large-disabled .x-btn-inner {
   color: #333333;
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon .x-btn-button,
-.x-btn-drilldown-large-noicon .x-btn-button {
+.x-btn-nx-drilldown-large-icon .x-btn-button,
+.x-btn-nx-drilldown-large-noicon .x-btn-button {
   height: 32px;
 }
 /* line 350, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon .x-btn-inner,
-.x-btn-drilldown-large-noicon .x-btn-inner {
+.x-btn-nx-drilldown-large-icon .x-btn-inner,
+.x-btn-nx-drilldown-large-noicon .x-btn-inner {
   line-height: 32px;
 }
 
 /* line 360, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon .x-btn-arrow-right .x-btn-inner,
-.x-btn-drilldown-large-noicon .x-btn-arrow-right .x-btn-inner,
-.x-btn-drilldown-large-icon-text-left .x-btn-arrow-right .x-btn-inner {
+.x-btn-nx-drilldown-large-icon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-large-noicon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-large-icon-text-left .x-btn-arrow-right .x-btn-inner {
   padding-right: 0;
 }
 
 /* line 375, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon .x-btn-inner {
+.x-btn-nx-drilldown-large-icon .x-btn-inner {
   width: 32px;
   padding: 0;
 }
 /* line 381, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon .x-btn-icon-el {
+.x-btn-nx-drilldown-large-icon .x-btn-icon-el {
   width: 32px;
   height: 32px;
 }
 
 /* line 388, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-left .x-btn-button {
+.x-btn-nx-drilldown-large-icon-text-left .x-btn-button {
   height: 32px;
 }
 /* line 393, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-left .x-btn-inner {
+.x-btn-nx-drilldown-large-icon-text-left .x-btn-inner {
   line-height: 32px;
   padding-left: 37px;
 }
 /* line 409, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-left .x-btn-icon-el {
+.x-btn-nx-drilldown-large-icon-text-left .x-btn-icon-el {
   width: 32px;
   right: auto;
 }
 /* line 415, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-drilldown-large-icon-text-left .x-btn-icon-el, .x-quirks .x-ie .x-btn-drilldown-large-icon-text-left .x-btn-icon-el {
+.x-ie6 .x-btn-nx-drilldown-large-icon-text-left .x-btn-icon-el, .x-quirks .x-ie .x-btn-nx-drilldown-large-icon-text-left .x-btn-icon-el {
   height: 32px;
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-right .x-btn-button {
+.x-btn-nx-drilldown-large-icon-text-right .x-btn-button {
   height: 32px;
 }
 /* line 435, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-right .x-btn-inner {
+.x-btn-nx-drilldown-large-icon-text-right .x-btn-inner {
   line-height: 32px;
   padding-right: 37px;
 }
 /* line 447, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-right .x-btn-icon-el {
+.x-btn-nx-drilldown-large-icon-text-right .x-btn-icon-el {
   width: 32px;
   left: auto;
 }
 /* line 453, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-drilldown-large-icon-text-right .x-btn-icon-el, .x-quirks .x-ie .x-btn-drilldown-large-icon-text-right .x-btn-icon-el {
+.x-ie6 .x-btn-nx-drilldown-large-icon-text-right .x-btn-icon-el, .x-quirks .x-ie .x-btn-nx-drilldown-large-icon-text-right .x-btn-icon-el {
   height: 32px;
 }
 
 /* line 468, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-top .x-btn-inner {
+.x-btn-nx-drilldown-large-icon-text-top .x-btn-inner {
   padding-top: 37px;
 }
 /* line 472, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-top .x-btn-icon-el {
+.x-btn-nx-drilldown-large-icon-text-top .x-btn-icon-el {
   height: 32px;
   bottom: auto;
 }
 /* line 480, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-drilldown-large-icon-text-top .x-btn-icon-el, .x-quirks .x-ie .x-btn-drilldown-large-icon-text-top .x-btn-icon-el {
+.x-ie6 .x-btn-nx-drilldown-large-icon-text-top .x-btn-icon-el, .x-quirks .x-ie .x-btn-nx-drilldown-large-icon-text-top .x-btn-icon-el {
   width: 100%;
 }
 
 /* line 488, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-bottom .x-btn-inner {
+.x-btn-nx-drilldown-large-icon-text-bottom .x-btn-inner {
   padding-bottom: 37px;
 }
 /* line 492, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-icon-text-bottom .x-btn-icon-el {
+.x-btn-nx-drilldown-large-icon-text-bottom .x-btn-icon-el {
   height: 32px;
   top: auto;
 }
 /* line 500, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie6 .x-btn-drilldown-large-icon-text-bottom .x-btn-icon-el, .x-quirks .x-ie .x-btn-drilldown-large-icon-text-bottom .x-btn-icon-el {
+.x-ie6 .x-btn-nx-drilldown-large-icon-text-bottom .x-btn-icon-el, .x-quirks .x-ie .x-btn-nx-drilldown-large-icon-text-bottom .x-btn-icon-el {
   width: 100%;
 }
 
 /* line 507, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-focus {
+.x-btn-nx-drilldown-large-focus {
   background-image: none;
   background-color: transparent;
 }
 /* line 515, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-focus .x-btn-inner {
+.x-btn-nx-drilldown-large-focus .x-btn-inner {
   color: #0f4976;
 }
 
 /* line 531, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-over {
+.x-btn-nx-drilldown-large-over {
   background-image: none;
   background-color: transparent;
 }
 /* line 539, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-over .x-btn-inner {
+.x-btn-nx-drilldown-large-over .x-btn-inner {
   color: #0f4976;
 }
 
 /* line 556, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-menu-active,
-.x-btn-drilldown-large-pressed {
+.x-btn-nx-drilldown-large-menu-active,
+.x-btn-nx-drilldown-large-pressed {
   background-image: none;
   background-color: transparent;
 }
 /* line 564, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-menu-active .x-btn-inner,
-.x-btn-drilldown-large-pressed .x-btn-inner {
+.x-btn-nx-drilldown-large-menu-active .x-btn-inner,
+.x-btn-nx-drilldown-large-pressed .x-btn-inner {
   color: #96caee;
 }
 
 /* line 588, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-focus .x-frame-tl,
-.x-btn-drilldown-large-focus .x-frame-bl,
-.x-btn-drilldown-large-focus .x-frame-tr,
-.x-btn-drilldown-large-focus .x-frame-br,
-.x-btn-drilldown-large-focus .x-frame-tc,
-.x-btn-drilldown-large-focus .x-frame-bc {
-  background-image: url(images/btn/btn-drilldown-large-focus-corners.gif);
+.x-btn-nx-drilldown-large-focus .x-frame-tl,
+.x-btn-nx-drilldown-large-focus .x-frame-bl,
+.x-btn-nx-drilldown-large-focus .x-frame-tr,
+.x-btn-nx-drilldown-large-focus .x-frame-br,
+.x-btn-nx-drilldown-large-focus .x-frame-tc,
+.x-btn-nx-drilldown-large-focus .x-frame-bc {
+  background-image: url(images/btn/btn-nx-drilldown-large-focus-corners.gif);
 }
 /* line 592, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-focus .x-frame-ml,
-.x-btn-drilldown-large-focus .x-frame-mr {
-  background-image: url(images/btn/btn-drilldown-large-focus-sides.gif);
+.x-btn-nx-drilldown-large-focus .x-frame-ml,
+.x-btn-nx-drilldown-large-focus .x-frame-mr {
+  background-image: url(images/btn/btn-nx-drilldown-large-focus-sides.gif);
 }
 /* line 595, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-focus .x-frame-mc {
+.x-btn-nx-drilldown-large-focus .x-frame-mc {
   background-color: transparent;
-  background-image: url(images/btn/btn-drilldown-large-focus-fbg.gif);
+  background-image: url(images/btn/btn-nx-drilldown-large-focus-fbg.gif);
 }
 
 /* line 610, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-over .x-frame-tl,
-.x-btn-drilldown-large-over .x-frame-bl,
-.x-btn-drilldown-large-over .x-frame-tr,
-.x-btn-drilldown-large-over .x-frame-br,
-.x-btn-drilldown-large-over .x-frame-tc,
-.x-btn-drilldown-large-over .x-frame-bc {
-  background-image: url(images/btn/btn-drilldown-large-over-corners.gif);
+.x-btn-nx-drilldown-large-over .x-frame-tl,
+.x-btn-nx-drilldown-large-over .x-frame-bl,
+.x-btn-nx-drilldown-large-over .x-frame-tr,
+.x-btn-nx-drilldown-large-over .x-frame-br,
+.x-btn-nx-drilldown-large-over .x-frame-tc,
+.x-btn-nx-drilldown-large-over .x-frame-bc {
+  background-image: url(images/btn/btn-nx-drilldown-large-over-corners.gif);
 }
 /* line 614, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-over .x-frame-ml,
-.x-btn-drilldown-large-over .x-frame-mr {
-  background-image: url(images/btn/btn-drilldown-large-over-sides.gif);
+.x-btn-nx-drilldown-large-over .x-frame-ml,
+.x-btn-nx-drilldown-large-over .x-frame-mr {
+  background-image: url(images/btn/btn-nx-drilldown-large-over-sides.gif);
 }
 /* line 617, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-over .x-frame-mc {
+.x-btn-nx-drilldown-large-over .x-frame-mc {
   background-color: transparent;
-  background-image: url(images/btn/btn-drilldown-large-over-fbg.gif);
+  background-image: url(images/btn/btn-nx-drilldown-large-over-fbg.gif);
 }
 
 /* line 633, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-menu-active .x-frame-tl,
-.x-btn-drilldown-large-menu-active .x-frame-bl,
-.x-btn-drilldown-large-menu-active .x-frame-tr,
-.x-btn-drilldown-large-menu-active .x-frame-br,
-.x-btn-drilldown-large-menu-active .x-frame-tc,
-.x-btn-drilldown-large-menu-active .x-frame-bc,
-.x-btn-drilldown-large-pressed .x-frame-tl,
-.x-btn-drilldown-large-pressed .x-frame-bl,
-.x-btn-drilldown-large-pressed .x-frame-tr,
-.x-btn-drilldown-large-pressed .x-frame-br,
-.x-btn-drilldown-large-pressed .x-frame-tc,
-.x-btn-drilldown-large-pressed .x-frame-bc {
-  background-image: url(images/btn/btn-drilldown-large-pressed-corners.gif);
+.x-btn-nx-drilldown-large-menu-active .x-frame-tl,
+.x-btn-nx-drilldown-large-menu-active .x-frame-bl,
+.x-btn-nx-drilldown-large-menu-active .x-frame-tr,
+.x-btn-nx-drilldown-large-menu-active .x-frame-br,
+.x-btn-nx-drilldown-large-menu-active .x-frame-tc,
+.x-btn-nx-drilldown-large-menu-active .x-frame-bc,
+.x-btn-nx-drilldown-large-pressed .x-frame-tl,
+.x-btn-nx-drilldown-large-pressed .x-frame-bl,
+.x-btn-nx-drilldown-large-pressed .x-frame-tr,
+.x-btn-nx-drilldown-large-pressed .x-frame-br,
+.x-btn-nx-drilldown-large-pressed .x-frame-tc,
+.x-btn-nx-drilldown-large-pressed .x-frame-bc {
+  background-image: url(images/btn/btn-nx-drilldown-large-pressed-corners.gif);
 }
 /* line 637, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-menu-active .x-frame-ml,
-.x-btn-drilldown-large-menu-active .x-frame-mr,
-.x-btn-drilldown-large-pressed .x-frame-ml,
-.x-btn-drilldown-large-pressed .x-frame-mr {
-  background-image: url(images/btn/btn-drilldown-large-pressed-sides.gif);
+.x-btn-nx-drilldown-large-menu-active .x-frame-ml,
+.x-btn-nx-drilldown-large-menu-active .x-frame-mr,
+.x-btn-nx-drilldown-large-pressed .x-frame-ml,
+.x-btn-nx-drilldown-large-pressed .x-frame-mr {
+  background-image: url(images/btn/btn-nx-drilldown-large-pressed-sides.gif);
 }
 /* line 640, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-menu-active .x-frame-mc,
-.x-btn-drilldown-large-pressed .x-frame-mc {
+.x-btn-nx-drilldown-large-menu-active .x-frame-mc,
+.x-btn-nx-drilldown-large-pressed .x-frame-mc {
   background-color: transparent;
-  background-image: url(images/btn/btn-drilldown-large-pressed-fbg.gif);
+  background-image: url(images/btn/btn-nx-drilldown-large-pressed-fbg.gif);
 }
 
 /* line 655, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-disabled .x-frame-tl,
-.x-btn-drilldown-large-disabled .x-frame-bl,
-.x-btn-drilldown-large-disabled .x-frame-tr,
-.x-btn-drilldown-large-disabled .x-frame-br,
-.x-btn-drilldown-large-disabled .x-frame-tc,
-.x-btn-drilldown-large-disabled .x-frame-bc {
-  background-image: url(images/btn/btn-drilldown-large-disabled-corners.gif);
+.x-btn-nx-drilldown-large-disabled .x-frame-tl,
+.x-btn-nx-drilldown-large-disabled .x-frame-bl,
+.x-btn-nx-drilldown-large-disabled .x-frame-tr,
+.x-btn-nx-drilldown-large-disabled .x-frame-br,
+.x-btn-nx-drilldown-large-disabled .x-frame-tc,
+.x-btn-nx-drilldown-large-disabled .x-frame-bc {
+  background-image: url(images/btn/btn-nx-drilldown-large-disabled-corners.gif);
 }
 /* line 659, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-disabled .x-frame-ml,
-.x-btn-drilldown-large-disabled .x-frame-mr {
-  background-image: url(images/btn/btn-drilldown-large-disabled-sides.gif);
+.x-btn-nx-drilldown-large-disabled .x-frame-ml,
+.x-btn-nx-drilldown-large-disabled .x-frame-mr {
+  background-image: url(images/btn/btn-nx-drilldown-large-disabled-sides.gif);
 }
 /* line 662, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large-disabled .x-frame-mc {
+.x-btn-nx-drilldown-large-disabled .x-frame-mc {
   background-color: transparent;
-  background-image: url(images/btn/btn-drilldown-large-disabled-fbg.gif);
+  background-image: url(images/btn/btn-nx-drilldown-large-disabled-fbg.gif);
 }
 
 /* line 674, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-drilldown-large-focus {
-  background-image: url(images/btn/btn-drilldown-large-focus-bg.gif);
+.x-nlg .x-btn-nx-drilldown-large-focus {
+  background-image: url(images/btn/btn-nx-drilldown-large-focus-bg.gif);
 }
 
 /* line 682, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-drilldown-large-over {
-  background-image: url(images/btn/btn-drilldown-large-over-bg.gif);
+.x-nlg .x-btn-nx-drilldown-large-over {
+  background-image: url(images/btn/btn-nx-drilldown-large-over-bg.gif);
 }
 
 /* line 691, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-drilldown-large-menu-active,
-.x-nlg .x-btn-drilldown-large-pressed {
-  background-image: url(images/btn/btn-drilldown-large-pressed-bg.gif);
+.x-nlg .x-btn-nx-drilldown-large-menu-active,
+.x-nlg .x-btn-nx-drilldown-large-pressed {
+  background-image: url(images/btn/btn-nx-drilldown-large-pressed-bg.gif);
 }
 
 /* line 699, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nlg .x-btn-drilldown-large-disabled {
-  background-image: url(images/btn/btn-drilldown-large-disabled-bg.gif);
+.x-nlg .x-btn-nx-drilldown-large-disabled {
+  background-image: url(images/btn/btn-nx-drilldown-large-disabled-bg.gif);
 }
 
 /* line 707, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-nbr .x-btn-drilldown-large {
+.x-nbr .x-btn-nx-drilldown-large {
   background-image: none;
 }
 
 /* line 722, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-split-right {
-  background-image: url(images/button/drilldown-large-s-arrow.png);
+.x-btn-nx-drilldown-large .x-btn-split-right {
+  background-image: url(images/button/nx-drilldown-large-s-arrow.png);
   padding-right: 38px;
 }
 /* line 735, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-large .x-btn-split-bottom {
-  background-image: url(images/button/drilldown-large-s-arrow-b.png);
+.x-btn-nx-drilldown-large .x-btn-split-bottom {
+  background-image: url(images/button/nx-drilldown-large-s-arrow-b.png);
   padding-bottom: 34px;
 }
 
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-large-focus:after {
+.x-btn-nx-drilldown-large-focus:after {
   display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-drilldown-large-focus-corners.gif), sides:url(images/btn/btn-drilldown-large-focus-sides.gif), frame-bg:url(images/btn/btn-drilldown-large-focus-fbg.gif), bg:url(images/btn/btn-drilldown-large-focus-bg.gif)";
+  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-nx-drilldown-large-focus-corners.gif), sides:url(images/btn/btn-nx-drilldown-large-focus-sides.gif), frame-bg:url(images/btn/btn-nx-drilldown-large-focus-fbg.gif), bg:url(images/btn/btn-nx-drilldown-large-focus-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-large-over:after {
+.x-btn-nx-drilldown-large-over:after {
   display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-drilldown-large-over-corners.gif), sides:url(images/btn/btn-drilldown-large-over-sides.gif), frame-bg:url(images/btn/btn-drilldown-large-over-fbg.gif), bg:url(images/btn/btn-drilldown-large-over-bg.gif)";
+  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-nx-drilldown-large-over-corners.gif), sides:url(images/btn/btn-nx-drilldown-large-over-sides.gif), frame-bg:url(images/btn/btn-nx-drilldown-large-over-fbg.gif), bg:url(images/btn/btn-nx-drilldown-large-over-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-large-pressed:after {
+.x-btn-nx-drilldown-large-pressed:after {
   display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-drilldown-large-pressed-corners.gif), sides:url(images/btn/btn-drilldown-large-pressed-sides.gif), frame-bg:url(images/btn/btn-drilldown-large-pressed-fbg.gif), bg:url(images/btn/btn-drilldown-large-pressed-bg.gif)";
+  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-nx-drilldown-large-pressed-corners.gif), sides:url(images/btn/btn-nx-drilldown-large-pressed-sides.gif), frame-bg:url(images/btn/btn-nx-drilldown-large-pressed-fbg.gif), bg:url(images/btn/btn-nx-drilldown-large-pressed-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-large-disabled:after {
+.x-btn-nx-drilldown-large-disabled:after {
   display: none;
-  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-drilldown-large-disabled-corners.gif), sides:url(images/btn/btn-drilldown-large-disabled-sides.gif), frame-bg:url(images/btn/btn-drilldown-large-disabled-fbg.gif), bg:url(images/btn/btn-drilldown-large-disabled-bg.gif)";
+  content: "x-slicer:stretch:bottom, corners:url(images/btn/btn-nx-drilldown-large-disabled-corners.gif), sides:url(images/btn/btn-nx-drilldown-large-disabled-sides.gif), frame-bg:url(images/btn/btn-nx-drilldown-large-disabled-fbg.gif), bg:url(images/btn/btn-nx-drilldown-large-disabled-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /* line 46, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
-.x-btn-drilldown-large {
+.x-btn-nx-drilldown-large {
   padding: 0 !important;
 }
 
 /* line 255, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium {
+.x-btn-nx-drilldown-medium {
   border-color: transparent;
 }
 
 /* line 137, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium {
+.x-btn-nx-drilldown-medium {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -24256,20 +24256,20 @@ a.x-color-picker-item:hover {
 }
 
 /* line 187, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-mc {
-  background-image: url(images/btn/btn-drilldown-medium-fbg.gif);
+.x-btn-nx-drilldown-medium-mc {
+  background-image: url(images/btn/btn-nx-drilldown-medium-fbg.gif);
   background-position: 0 top;
   background-color: transparent;
 }
 
 /* line 212, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nlg .x-btn-drilldown-medium {
-  background-image: url(images/btn/btn-drilldown-medium-bg.gif);
+.x-nlg .x-btn-nx-drilldown-medium {
+  background-image: url(images/btn/btn-nx-drilldown-medium-bg.gif);
   background-position: 0 top;
 }
 
 /* line 234, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-nbr .x-btn-drilldown-medium {
+.x-nbr .x-btn-nx-drilldown-medium {
   padding: 0 !important;
   border-width: 0 !important;
   -webkit-border-radius: 0px;
@@ -24282,115 +24282,115 @@ a.x-color-picker-item:hover {
 }
 
 /* line 249, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-frameInfo {
+.x-btn-nx-drilldown-medium-frameInfo {
   font-family: th-3-3-3-3-0-0-0-0-3-3-3-3;
 }
 
 /* line 315, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tl {
+.x-btn-nx-drilldown-medium-tl {
   background-position: 0 -6px;
 }
 
 /* line 319, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tr {
+.x-btn-nx-drilldown-medium-tr {
   background-position: right -9px;
 }
 
 /* line 323, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-bl {
+.x-btn-nx-drilldown-medium-bl {
   background-position: 0 -12px;
 }
 
 /* line 327, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-br {
+.x-btn-nx-drilldown-medium-br {
   background-position: right -15px;
 }
 
 /* line 331, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-ml {
+.x-btn-nx-drilldown-medium-ml {
   background-position: 0 top;
 }
 
 /* line 335, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-mr {
+.x-btn-nx-drilldown-medium-mr {
   background-position: right top;
 }
 
 /* line 339, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tc {
+.x-btn-nx-drilldown-medium-tc {
   background-position: 0 0;
 }
 
 /* line 343, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-bc {
+.x-btn-nx-drilldown-medium-bc {
   background-position: 0 -3px;
 }
 
 /* line 350, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tr,
-.x-btn-drilldown-medium-br,
-.x-btn-drilldown-medium-mr {
+.x-btn-nx-drilldown-medium-tr,
+.x-btn-nx-drilldown-medium-br,
+.x-btn-nx-drilldown-medium-mr {
   padding-right: 3px;
 }
 
 /* line 356, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tl,
-.x-btn-drilldown-medium-bl,
-.x-btn-drilldown-medium-ml {
+.x-btn-nx-drilldown-medium-tl,
+.x-btn-nx-drilldown-medium-bl,
+.x-btn-nx-drilldown-medium-ml {
   padding-left: 3px;
 }
 
 /* line 360, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tc {
+.x-btn-nx-drilldown-medium-tc {
   height: 3px;
 }
 
 /* line 363, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-bc {
+.x-btn-nx-drilldown-medium-bc {
   height: 3px;
 }
 
 /* line 374, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-tl,
-.x-btn-drilldown-medium-bl,
-.x-btn-drilldown-medium-tr,
-.x-btn-drilldown-medium-br,
-.x-btn-drilldown-medium-tc,
-.x-btn-drilldown-medium-bc,
-.x-btn-drilldown-medium-ml,
-.x-btn-drilldown-medium-mr {
+.x-btn-nx-drilldown-medium-tl,
+.x-btn-nx-drilldown-medium-bl,
+.x-btn-nx-drilldown-medium-tr,
+.x-btn-nx-drilldown-medium-br,
+.x-btn-nx-drilldown-medium-tc,
+.x-btn-nx-drilldown-medium-bc,
+.x-btn-nx-drilldown-medium-ml,
+.x-btn-nx-drilldown-medium-mr {
   zoom: 1;
 }
 
 /* line 418, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-ml,
-.x-btn-drilldown-medium-mr {
+.x-btn-nx-drilldown-medium-ml,
+.x-btn-nx-drilldown-medium-mr {
   zoom: 1;
 }
 
 /* line 430, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-btn-drilldown-medium-mc {
+.x-btn-nx-drilldown-medium-mc {
   padding: 0px 0px 0px 0px;
 }
 
 /* line 439, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/frame.scss */
-.x-strict .x-ie7 .x-btn-drilldown-medium-tl,
-.x-strict .x-ie7 .x-btn-drilldown-medium-bl {
+.x-strict .x-ie7 .x-btn-nx-drilldown-medium-tl,
+.x-strict .x-ie7 .x-btn-nx-drilldown-medium-bl {
   position: relative;
   right: 0;
 }
 
 /*<if slicer>*/
 /* line 78, ../../../baseapp/ext/packages/ext-theme-base/sass/etc/mixins/slicer.scss */
-.x-btn-drilldown-medium:after {
+.x-btn-nx-drilldown-medium:after {
   display: none;
-  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-drilldown-medium-fbg.gif), bg:url(images/btn/btn-drilldown-medium-bg.gif)";
+  content: "x-slicer:stretch:bottom, frame-bg:url(images/btn/btn-nx-drilldown-medium-fbg.gif), bg:url(images/btn/btn-nx-drilldown-medium-bg.gif)";
 }
 
 /*</if slicer>*/
 /* */
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium .x-btn-inner {
+.x-btn-nx-drilldown-medium .x-btn-inner {
   font-size: 18px;
   font-weight: bold;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -24398,52 +24398,52 @@ a.x-color-picker-item:hover {
   padding: 0 0;
 }
 /* line 270, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium .x-btn-arrow {
-  background-image: url(images/button/drilldown-medium-arrow.png);
+.x-btn-nx-drilldown-medium .x-btn-arrow {
+  background-image: url(images/button/nx-drilldown-medium-arrow.png);
 }
 /* line 278, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium .x-btn-arrow-right {
+.x-btn-nx-drilldown-medium .x-btn-arrow-right {
   padding-right: 30px;
 }
 /* line 289, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium .x-btn-arrow-bottom {
+.x-btn-nx-drilldown-medium .x-btn-arrow-bottom {
   padding-bottom: 26px;
 }
 /* line 293, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium .x-btn-glyph {
+.x-btn-nx-drilldown-medium .x-btn-glyph {
   font-size: 24px;
   line-height: 24px;
   color: white;
 }
 /* line 313, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-ie8m .x-btn-drilldown-medium .x-btn-glyph {
+.x-ie8m .x-btn-nx-drilldown-medium .x-btn-glyph {
   color: white;
 }
 
 /* line 320, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium-disabled {
+.x-btn-nx-drilldown-medium-disabled {
   background-image: none;
   background-color: transparent;
 }
 /* line 328, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium-disabled .x-btn-inner {
+.x-btn-nx-drilldown-medium-disabled .x-btn-inner {
   color: #333333;
 }
 
 /* line 346, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium-icon .x-btn-button,
-.x-btn-drilldown-medium-noicon .x-btn-button {
+.x-btn-nx-drilldown-medium-icon .x-btn-button,
+.x-btn-nx-drilldown-medium-noicon .x-btn-button {
   height: 24px;
 }
 /* line 350, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium-icon .x-btn-inner,
-.x-btn-drilldown-medium-noicon .x-btn-inner {
+.x-btn-nx-drilldown-medium-icon .x-btn-inner,
+.x-btn-nx-drilldown-medium-noicon .x-btn-inner {
   line-height: 24px;
 }
 
 /* line 360, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
-.x-btn-drilldown-medium-icon .x-btn-arrow-right .x-btn-inner,
-.x-btn-drilldown-medium-noicon .x-btn-arrow-right .x-btn-inner,
-.x-btn-drilldown-medium-icon-text-left .x-btn-arrow-right .x-btn-inner {
+.x-btn-nx-drilldown-medium-icon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-medium-noicon .x-btn-arrow-right .x-btn-inner,
+.x-btn-nx-drilldown-medium-icon-text-left .x-btn-arrow-right .x-btn-inner {
   padding-right: 0;
 }

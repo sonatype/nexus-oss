@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
     'NX.util.DateFormat',
     'NX.I18n'
   ],
-  ui: 'inset',
+  ui: 'nx-inset',
 
   buttons: undefined,
 
@@ -37,7 +37,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
     me.items = [
       {
         xtype: 'panel',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_SUBJECT_SECTION'),
         items: {
           xtype: 'fieldset',
@@ -56,7 +56,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
       },
       {
         xtype: 'panel',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_ISSUER_SECTION'),
         items: {
           xtype: 'fieldset',
@@ -75,7 +75,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetails', {
       },
       {
         xtype: 'panel',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         title: NX.I18n.get('ADMIN_SSL_SUMMARY_CERTIFICATE_SECTION'),
         items: {
           xtype: 'fieldset',

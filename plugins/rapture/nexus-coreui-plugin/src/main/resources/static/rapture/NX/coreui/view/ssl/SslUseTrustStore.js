@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.ssl.SslUseTrustStore', {
         {
           xtype: 'button',
           text: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_CERTIFICATE_BUTTON'),
-          ui: 'plain',
+          ui: 'nx-plain',
           action: 'showcertificate',
           glyph: 'xf0a3@FontAwesome' /* fa-certificate */,
           margin: '0 0 0 5'

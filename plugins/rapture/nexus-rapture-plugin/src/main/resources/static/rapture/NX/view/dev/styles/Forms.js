@@ -43,7 +43,7 @@ Ext.define('NX.view.dev.styles.Forms', {
           { xtype: 'radio', boxLabel: 'Radio Button', checked: true, fieldLabel: null, helpText: null }
         ],
         buttons: [
-          { text: 'Submit', ui: 'primary' },
+          { text: 'Submit', ui: 'nx-primary' },
           { text: 'Discard' }
         ]
       },

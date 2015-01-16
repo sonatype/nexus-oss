@@ -81,7 +81,7 @@ Ext.define('NX.coreui.view.system.VerifySMTPConnection', {
             action: 'verify',
             formBind: true,
             bindToEnter: true,
-            ui: 'primary',
+            ui: 'nx-primary',
             glyph: 'xf003@FontAwesome' /* fa-envelope-o */
           },
           {

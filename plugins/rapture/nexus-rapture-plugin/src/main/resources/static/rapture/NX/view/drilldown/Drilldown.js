@@ -72,7 +72,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
       me.masters.push(
         {
           xtype: 'nx-drilldown-details',
-          ui: 'drilldown-tabs',
+          ui: 'nx-drilldown-tabs',
           header: false,
           plain: true,
 
@@ -328,7 +328,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         {
           xtype: 'button',
           scale: 'large',
-          ui: 'drilldown',
+          ui: 'nx-drilldown',
           text: content.currentTitle,
           handler: function() {
             me.slidePanels(0, true);
@@ -348,14 +348,14 @@ Ext.define('NX.view.drilldown.Drilldown', {
           // Separator
           {
             xtype: 'label',
-            cls: 'breadcrumb-separator',
+            cls: 'nx-breadcrumb-separator',
             text: '/'
           },
           {
             xtype: 'image',
             height: 16,
             width: 16,
-            cls: 'breadcrumb-icon ' + items[i].itemClass
+            cls: 'nx-breadcrumb-icon ' + items[i].itemClass
           },
 
           // Create a closure within a closure to decouple 'i' from the current context
@@ -363,7 +363,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
             return {
               xtype: 'button',
               scale: 'medium',
-              ui: 'drilldown',
+              ui: 'nx-drilldown',
               disabled: (i === me.currentIndex ? true : false), // Disabled if it’s the last item in the breadcrumb
               text: items[j].itemName,
               handler: function() {

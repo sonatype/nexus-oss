@@ -175,14 +175,14 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
             + '" style="margin-left:10px">&nbsp;' + statusModel.get('licenseIssueCount') + '</div>';
       }
       else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
-        var classes = "x-btn x-unselectable x-btn-primary-small x-btn-primary-toolbar-small-disabled";
+        var classes = "x-btn x-unselectable x-btn-nx-primary-small x-btn-nx-primary-toolbar-small-disabled";
         var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
         var button = '<a class="' + classes + '" hidefocus="on" unselectable="on">' + text + '</a>';
         return button;
       }
     }
     else if (me.getHealthCheckRepositoryStatusStore().loaded) {
-      var classes = "x-btn x-unselectable x-btn-plain-small x-btn-default-toolbar-small-disabled";
+      var classes = "x-btn x-unselectable x-btn-nx-plain-small x-btn-nx-plain-toolbar-small-disabled";
       var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
       var button = '<a class="' + classes + '" disabled="true" hidefocus="on" unselectable="on">' + text + '</a>';
       return button;

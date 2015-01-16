@@ -5,26 +5,26 @@
 /**
  * cls: 'product-name'
  */
-.product-name {
+/*.product-name {
   color: $color-white;
   font-size: 20px;
   font-weight: 200;
-}
+}*/
 
 /**
  * cls: 'product-version'
  */
-.product-version {
+/*.product-version {
   color: $color-white;
   font-size: 10px;
   letter-spacing: 1px;
   top: 15px !important;
-}
+}*/
 
 /**
  * cls: 'feature-name'
  */
-.feature-name {
+.nx-feature-name {
   font-size: $font-size-h2;
   font-weight: $font-weight-h2;
 }
@@ -32,7 +32,7 @@
 /**
  * cls: 'feature-description'
  */
-.feature-description {
+.nx-feature-description {
   font-size: $font-size-body;
   font-weight: $font-weight-body;
   top: 12px !important;
@@ -42,7 +42,7 @@
 /**
  * cls: 'breadcrumb-separator'
  */
-.breadcrumb-separator {
+.nx-breadcrumb-separator {
   font-size: $font-size-h4;
   top: 7px !important;
   color: $color-gray;
@@ -52,7 +52,7 @@
 /**
  * cls: 'breadcrumb-icon'
  */
-.breadcrumb-icon {
+.nx-breadcrumb-icon {
   top: 9px !important;
   margin-left: 13px;
 }

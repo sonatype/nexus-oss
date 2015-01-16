@@ -88,7 +88,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         itemId: 'publishStatusForm',
         title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_PUBLISH_SECTION'),
         hidden: true,
-        ui: 'subsection',
+        ui: 'nx-subsection',
 
         margin: 10,
 
@@ -125,7 +125,7 @@ Ext.define('NX.coreui.view.routing.RoutingProxyRepositorySettings', {
         itemId: 'discoveryStatusForm',
         title: NX.I18n.get('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SECTION'),
         hidden: true,
-        ui: 'subsection',
+        ui: 'nx-subsection',
 
         margin: 10,
 

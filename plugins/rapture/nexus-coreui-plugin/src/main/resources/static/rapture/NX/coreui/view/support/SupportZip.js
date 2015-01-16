@@ -119,7 +119,7 @@ Ext.define('NX.coreui.view.support.SupportZip', {
           formBind: true,
           glyph: 'xf019@FontAwesome' /* fa-download */,
           action: 'save',
-          ui: 'primary'
+          ui: 'nx-primary'
         }
       ]
     };

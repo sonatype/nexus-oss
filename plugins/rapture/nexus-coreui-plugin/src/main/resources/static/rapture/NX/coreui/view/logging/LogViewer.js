@@ -28,7 +28,7 @@ Ext.define('NX.coreui.view.logging.LogViewer', {
 
   items: {
     xtype: 'textarea',
-    cls: 'log-viewer-field',
+    cls: 'nx-log-viewer-field',
     readOnly: true,
     hideLabel: true,
     emptyText: NX.I18n.get('ADMIN_LOG_VIEWER_EMPTY_STATE'),

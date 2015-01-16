@@ -69,7 +69,7 @@ Ext.define('NX.view.AboutWindow', {
       },
       {
         xtype: 'tabpanel',
-        ui: 'light',
+        ui: 'nx-light',
         flex: 1,
         items: [
           {
@@ -87,7 +87,7 @@ Ext.define('NX.view.AboutWindow', {
     ];
 
     me.buttons = [
-      { text: 'Close', action: 'close', ui: 'primary', handler: function () { me.close(); }}
+      { text: 'Close', action: 'close', ui: 'nx-primary', handler: function () { me.close(); }}
     ];
     me.buttonAlign = 'left';
 

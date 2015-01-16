@@ -64,8 +64,8 @@ Ext.define('NX.view.dev.styles.Header', {
           ' ', ' ', // 2x pad
           {
             xtype: 'button',
-            ui: 'header',
-            cls: 'modebutton',
+            ui: 'nx-header',
+            cls: 'nx-modebutton',
             toggleGroup: 'examplemode',
             title: 'Browse',
             tooltip: 'Browse server contents',
@@ -73,8 +73,8 @@ Ext.define('NX.view.dev.styles.Header', {
           },
           {
             xtype: 'button',
-            ui: 'header',
-            cls: 'modebutton',
+            ui: 'nx-header',
+            cls: 'nx-modebutton',
             toggleGroup: 'examplemode',
             title: 'Administration',
             tooltip: 'Server administration and configuration',
@@ -83,7 +83,7 @@ Ext.define('NX.view.dev.styles.Header', {
           ' ',
           {
             xtype: 'nx-searchbox',
-            cls: 'quicksearch',
+            cls: 'nx-quicksearch',
             width: 200,
             emptyText: 'Search…',
             inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
@@ -91,26 +91,26 @@ Ext.define('NX.view.dev.styles.Header', {
           '->',
           //{
           //  xtype: 'button',
-          //  ui: 'header',
+          //  ui: 'nx-header',
           //  glyph: 'xf0f3@FontAwesome',
           //  tooltip: 'Toggle messages display'
           //},
           {
             xtype: 'button',
-            ui: 'header',
+            ui: 'nx-header',
             tooltip: 'Refresh current view and data',
             glyph: 'xf021@FontAwesome' // fa-refresh
           },
           {
             xtype: 'button',
-            ui: 'header',
+            ui: 'nx-header',
             text: 'Sign In',
             tooltip: 'Have an account?',
             glyph: 'xf090@FontAwesome'
           },
           {
             xtype: 'nx-header-mode',
-            ui: 'header',
+            ui: 'nx-header',
             hidden: true,
             mode: 'user',
             title: 'User',
@@ -122,14 +122,14 @@ Ext.define('NX.view.dev.styles.Header', {
           },
           {
             xtype: 'button',
-            ui: 'header',
+            ui: 'nx-header',
             tooltip: "Sign out",
             hidden: true,
             glyph: 'xf08b@FontAwesome'
           },
           {
             xtype: 'button',
-            ui: 'header',
+            ui: 'nx-header',
             tooltip: 'Help',
             glyph: 'xf059@FontAwesome', // fa-question-circle
             arrowCls: '', // hide the menu button arrow

@@ -54,7 +54,7 @@ Ext.define('NX.view.ChangeOrderWindow', {
       },
       buttonAlign: 'left',
       buttons: [
-        { text: NX.I18n.get('GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON'), action: 'save', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('GLOBAL_DIALOG_ORDER_SUBMIT_BUTTON'), action: 'save', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('GLOBAL_DIALOG_ORDER_CANCEL_BUTTON'), handler: function () {
           this.up('window').close();
         }}

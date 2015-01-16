@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.repositorybrowse.StorageFileContainer', {
     'NX.Icons'
   ],
 
-  ui: 'light',
+  ui: 'nx-light',
   title: 'fun',
   autoHideTabHeader: false,
 

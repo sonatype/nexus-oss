@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
     'NX.Conditions',
     'NX.I18n'
   ],
-  ui: 'inset',
+  ui: 'nx-inset',
 
   defaultFocus: 'message',
 
@@ -45,7 +45,7 @@ Ext.define('NX.coreui.view.logging.LogMark', {
       }
     ],
     buttons: [
-      { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+      { text: NX.I18n.get('ADMIN_LOG_VIEWER_MARK_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
       { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
         this.up('nx-drilldown').showChild(0, true);
       }}

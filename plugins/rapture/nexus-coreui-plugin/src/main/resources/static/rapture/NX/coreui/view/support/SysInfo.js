@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
     'Ext.XTemplate',
     'NX.I18n'
   ],
-  ui: 'inset',
+  ui: 'nx-inset',
 
   layout: 'fit',
   autoScroll: true,

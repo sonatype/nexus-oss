@@ -168,7 +168,7 @@ Ext.define('NX.controller.Message', {
 
     // show transient message notification
     me.getView('message.Notification').create({
-      ui: 'message-' + message.type,
+      ui: 'nx-message-' + message.type,
       iconCls: NX.Icons.cls('message-' + message.type, 'x16'),
       title: Ext.String.capitalize(message.type),
       html: message.text

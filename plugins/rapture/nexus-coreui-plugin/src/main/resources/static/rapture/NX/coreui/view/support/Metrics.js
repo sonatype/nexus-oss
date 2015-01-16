@@ -26,7 +26,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
     'Ext.data.ArrayStore',
     'NX.I18n'
   ],
-  ui: 'inset',
+  ui: 'nx-inset',
 
   autoScroll: true,
   layout: {
@@ -73,7 +73,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
           xtype: 'panel',
           title: NX.I18n.get('ADMIN_METRICS_USAGE_SECTION'),
           frame: true,
-          ui: 'subsection',
+          ui: 'nx-subsection',
           height: 240,
           width: 300,
           layout: 'fit',
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
           xtype: 'panel',
           title: NX.I18n.get('ADMIN_METRICS_DISTRIBUTION_SECTION'),
           frame: true,
-          ui: 'subsection',
+          ui: 'nx-subsection',
           height: 240,
           width: 300,
           layout: 'fit',
@@ -167,7 +167,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
       xtype: 'panel',
       title: NX.I18n.get('ADMIN_METRICS_STATES_SECTION'),
       frame: true,
-      ui: 'subsection',
+      ui: 'nx-subsection',
       height: 240,
       width: 300,
 

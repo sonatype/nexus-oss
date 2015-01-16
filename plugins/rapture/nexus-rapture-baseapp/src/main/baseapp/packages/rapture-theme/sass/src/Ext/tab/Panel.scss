@@ -7,7 +7,7 @@
  */
 
 @include extjs-panel-ui(
-  $ui: 'light',
+  $ui: 'nx-light',
 
   $ui-header-color: $color-night-rider,
   $ui-header-background-color: $color-light-smoke,
@@ -26,7 +26,7 @@
 );
 
 @include extjs-tab-ui(
-  $ui: 'light',
+  $ui: 'nx-light',
 
   $ui-background-color: $color-light-smoke,
   $ui-background-color-over: $color-gainsboro,
@@ -54,7 +54,7 @@
 );
 
 @include extjs-tab-bar-ui(
-  $ui: 'light',
+  $ui: 'nx-light',
 
   // 2px so we can color border top and bottom, less than 2x will show background of header
   $ui-strip-height: 2px,
@@ -71,25 +71,25 @@
 // FIXME: Only apply for top, right and left tabs need additional tweaks
 
 // add few pixel to keep tabs separated from surrounding container
-.x-tab-bar-body-light-top {
+.x-tab-bar-body-nx-light-top {
   padding-left: 5px;
 }
 
 // Set bottom border of tab-strip
-.x-tab-bar-strip-light-top {
+.x-tab-bar-strip-nx-light-top {
   border-bottom: 1px solid $color-white;
 }
 
 // Override default treatment of the bottom borders
-.x-tab-light-top,
-.x-tab-light-top-disabled {
+.x-tab-nx-light-top,
+.x-tab-nx-light-top-disabled {
   border-bottom: 1px solid $color-light-smoke;
 }
 
-.x-tab-light-top-active {
+.x-tab-nx-light-top-active {
   border-bottom: 1px solid $color-light-gray;
 }
 
-.x-tab-light-top-over {
+.x-tab-nx-light-top-over {
   border-bottom: 1px solid $color-smoke;
 }

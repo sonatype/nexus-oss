@@ -57,7 +57,7 @@ Ext.define('NX.coreui.view.role.RoleTree', {
       xtype: 'treepanel',
       itemId: 'roleTree',
       title: NX.I18n.get('ADMIN_ROLES_ROLE_TREE'),
-      ui: 'treepanel',
+      ui: 'nx-treepanel',
       rootVisible: false,
       lines: false,
       store: me.store,

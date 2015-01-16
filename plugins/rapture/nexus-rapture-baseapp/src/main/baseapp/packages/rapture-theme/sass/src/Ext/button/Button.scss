@@ -3,11 +3,11 @@
  */
 
 /**
- * ui: 'drilldown'
+ * ui: 'nx-drilldown'
  */
 
 @include extjs-button-large-ui(
-  $ui: 'drilldown',
+  $ui: 'nx-drilldown',
 
   $text-padding: 0,
 
@@ -43,12 +43,12 @@
   $inner-opacity-disabled: 1
 );
 
-.x-btn-drilldown-large {
+.x-btn-nx-drilldown-large {
   padding: 0 !important;
 }
 
 @include extjs-button-medium-ui(
-  $ui: 'drilldown',
+  $ui: 'nx-drilldown',
 
   $text-padding: 0,
 
@@ -84,7 +84,7 @@
   $inner-opacity-disabled: 1
 );
 
-.x-btn-drilldown-medium {
+.x-btn-nx-drilldown-medium {
   padding: 0 2px 0 6px;
 
   .x-btn-inner {
@@ -92,12 +92,12 @@
   }
 }
 
-.feature-content .x-panel-header .x-btn-drilldown-medium {
+.nx-feature-content .x-panel-header .x-btn-nx-drilldown-medium {
   top: 7px !important;
 }
 
 @include extjs-button-toolbar-small-ui(
-  $ui: 'drilldown',
+  $ui: 'nx-drilldown',
 
   $text-padding: 0,
 
@@ -121,8 +121,6 @@
   $background-color-pressed: transparent,
   $background-color-disabled: transparent,
 
-  //$border-width: 0,
-
   $border-color: transparent,
   $border-color-over: transparent,
   $border-color-focus: transparent,
@@ -137,6 +135,9 @@
 
 /**
  * ui: 'default'
+ *
+ * This is not namespaced, because 'default' is the theme a component
+ * receives when 'ui' is not set.
  */
 
 @include extjs-button-small-ui(
@@ -159,11 +160,11 @@
 );
 
 /**
- * ui: 'plain'
+ * ui: 'nx-plain'
  */
 
 @include extjs-button-small-ui(
-  $ui: 'plain',
+  $ui: 'nx-plain',
 
   $border-color: $color-gainsboro,
   $border-color-over: $color-gainsboro,
@@ -187,11 +188,11 @@
 );
 
 /**
- * ui: 'primary'
+ * ui: 'nx-primary'
  */
 
 @include extjs-button-small-ui(
-  $ui: 'primary',
+  $ui: 'nx-primary',
 
   $background-gradient: $color-denim $color-light-cobalt,
   $background-gradient-over: $color-dark-denim $color-smalt,
@@ -201,11 +202,11 @@
 );
 
 /**
- * ui: 'danger'
+ * ui: 'nx-danger'
  */
 
 @include extjs-button-small-ui(
-  $ui: 'danger',
+  $ui: 'nx-danger',
 
   $background-gradient: $color-light-cerise $color-brick-red,
   $background-gradient-over: $color-old-rose $color-fire-brick,
@@ -215,11 +216,11 @@
 );
 
 /**
- * ui: 'warning'
+ * ui: 'nx-warning'
  */
 
 @include extjs-button-small-ui(
-  $ui: 'warning',
+  $ui: 'nx-warning',
 
   $background-gradient: $color-sea-buckthorn $color-tahiti-gold,
   $background-gradient-over: $color-zest $color-rich-gold,
@@ -229,11 +230,11 @@
 );
 
 /**
- * ui: 'success'
+ * ui: 'nx-success'
  */
 
 @include extjs-button-small-ui(
-  $ui: 'success',
+  $ui: 'nx-success',
 
   $background-gradient: $color-elf-green $color-dark-pigment-green,
   $background-gradient-over: $color-salem $color-jewel,
@@ -243,11 +244,11 @@
 );
 
 /**
- * ui: 'header'
+ * ui: 'nx-header'
  */
 
 @include extjs-button-toolbar-medium-ui(
-  $ui: 'header',
+  $ui: 'nx-header',
 
   $background-color: transparent,
   $background-color-over: $color-salem,
@@ -273,7 +274,7 @@
   $glyph-opacity: 1
 );
 
-.x-btn-header-toolbar-medium {
+.x-btn-nx-header-toolbar-medium {
   height: 39px;
   border-radius: 0;
   padding: 3px 6px;
@@ -287,8 +288,8 @@
  * cls: 'modebutton'
  */
 
-.modebutton:hover,
-.modebutton:focus {
+.nx-modebutton:hover,
+.nx-modebutton:focus {
   background-color: $color-gainsboro;
 
   .x-btn-inner {
@@ -300,7 +301,7 @@
   }
 }
 
-.modebutton.x-pressed {
+.nx-modebutton.x-pressed {
   background-color: $color-navy-blue;
 
   .x-btn-inner {

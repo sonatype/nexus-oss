@@ -110,7 +110,7 @@ Ext.define('NX.coreui.view.support.FileCreated', {
               action: 'download',
               formBind: true,
               bindToEnter: true,
-              ui: 'primary',
+              ui: 'nx-primary',
               glyph: 'xf023@FontAwesome' /* fa-lock */
             },
             {

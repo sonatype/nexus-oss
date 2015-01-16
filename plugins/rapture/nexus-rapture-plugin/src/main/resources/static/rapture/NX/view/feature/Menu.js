@@ -22,7 +22,7 @@ Ext.define('NX.view.feature.Menu', {
   alias: 'widget.nx-feature-menu',
 
   width: 220,
-  ui: 'feature-menu',
+  ui: 'nx-feature-menu',
 
   stateful: true,
   stateId: 'nx-feature-menu',

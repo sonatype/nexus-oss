@@ -39,7 +39,7 @@ Ext.define('NX.view.dev.styles.Buttons', {
         '<table>',
         '<tpl for=".">',
         '<tr>',
-        '<td><div class="color {.}"></div></td>',
+        '<td><div class="nx-color {.}"></div></td>',
         '<td><div style="padding: 0 10px 0 0">$color-{.}</div></td>',
         '</tr>',
         '</tpl>',
@@ -95,12 +95,12 @@ Ext.define('NX.view.dev.styles.Buttons', {
     }
 
     me.items = [
-      buttonStyle('default', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
-      buttonStyle('plain', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
-      buttonStyle('primary', ['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue']),
-      buttonStyle('danger', ['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red']),
-      buttonStyle('warning', ['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet']),
-      buttonStyle('success', ['elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'])
+      buttonStyle('nx-default', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
+      buttonStyle('nx-plain', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
+      buttonStyle('nx-primary', ['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue']),
+      buttonStyle('nx-danger', ['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red']),
+      buttonStyle('nx-warning', ['sea-buckthorn', 'tahiti-gold', 'zest', 'rich-gold', 'afghan-tan', 'russet']),
+      buttonStyle('nx-success', ['elf-green', 'dark-pigment-green', 'salem', 'jewel', 'fun-green', 'dark-jewel'])
     ];
 
     me.callParent();

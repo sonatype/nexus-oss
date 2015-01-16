@@ -45,28 +45,28 @@ Ext.define('NX.coreui.view.ldap.LdapServerAdd', {
           editableMarker: NX.I18n.get('ADMIN_LDAP_CREATE_ERROR'),
           items: {
             xtype: 'tabpanel',
-            ui: 'light',
+            ui: 'nx-light',
             items: [
               {
                 xtype: 'nx-coreui-ldapserver-connection-fieldset',
                 title: NX.I18n.get('ADMIN_LDAP_DETAILS_CONNECTION_TAB'),
-                ui: 'inset'
+                ui: 'nx-inset'
               },
               {
                 xtype: 'nx-coreui-ldapserver-backup-fieldset',
                 title: NX.I18n.get('ADMIN_LDAP_DETAILS_BACKUP_TAB'),
-                ui: 'inset'
+                ui: 'nx-inset'
               },
               {
                 xtype: 'nx-coreui-ldapserver-userandgroup-fieldset',
                 title: NX.I18n.get('ADMIN_LDAP_DETAILS_GROUP_TAB'),
-                ui: 'inset'
+                ui: 'nx-inset'
               }
             ]
       },
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_LDAP_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
