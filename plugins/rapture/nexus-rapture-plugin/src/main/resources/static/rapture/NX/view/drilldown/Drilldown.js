@@ -315,10 +315,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
   showCreateWizard: function (index, animate, cmp) {
     var me = this,
       items = me.padItems(index), // Pad the drilldown
-      createContainer = me.down('#create' + index);
+      createContainer;
 
     // Add a component to the specified drilldown item (if specified)
     if (cmp) {
+      createContainer = me.down('#create' + index);
       createContainer.removeAll();
       createContainer.add(cmp);
     }
