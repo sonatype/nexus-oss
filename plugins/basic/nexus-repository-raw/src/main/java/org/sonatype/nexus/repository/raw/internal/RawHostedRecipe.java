@@ -23,7 +23,9 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpbridge.HttpHandlers;
+import org.sonatype.nexus.repository.raw.RawFormat;
 import org.sonatype.nexus.repository.storage.StorageFacetImpl;
+import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
 import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
@@ -48,13 +50,14 @@ public class RawHostedRecipe
   private final Provider<RawStorageFacetImpl> rawStorageFacet;
 
   private final Provider<StorageFacetImpl> storageFacet;
-  
+
   private final TimingHandler timingHandler;
 
   private final RawStorageHandler rawStorageHandler;
 
   @Inject
-  public RawHostedRecipe(final Type type, final Format format,
+  public RawHostedRecipe(@Named(HostedType.NAME) final Type type,
+                         @Named(RawFormat.NAME) final Format format,
                          final Provider<ConfigurableViewFacet> viewFacet,
                          final Provider<RawIndexFacet> rawIndexFacet,
                          final Provider<RawStorageFacetImpl> rawStorageFacet,
