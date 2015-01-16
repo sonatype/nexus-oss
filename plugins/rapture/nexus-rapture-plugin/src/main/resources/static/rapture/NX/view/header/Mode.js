@@ -22,7 +22,7 @@ Ext.define('NX.view.header.Mode', {
   alias: 'widget.nx-header-mode',
 
   toggleGroup: 'mode',
-  cls: 'modebutton',
+  cls: 'nx-modebutton',
 
   /**
    * @cfg mode Mode name

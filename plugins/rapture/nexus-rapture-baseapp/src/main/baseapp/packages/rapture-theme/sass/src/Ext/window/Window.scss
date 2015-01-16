@@ -3,7 +3,7 @@
  */
 
 @include extjs-window-ui(
-  $ui: 'message-default',
+  $ui: 'nx-message-default',
 
   $ui-padding: 10px,
   $ui-header-line-height: 15px,
@@ -12,7 +12,7 @@
 );
 
 @include extjs-window-ui(
-  $ui: 'message-primary',
+  $ui: 'nx-message-primary',
 
   $ui-padding: 10px,
   $ui-header-line-height: 15px,
@@ -24,7 +24,7 @@
 );
 
 @include extjs-window-ui(
-  $ui: 'message-danger',
+  $ui: 'nx-message-danger',
 
   $ui-padding: 10px,
   $ui-header-line-height: 15px,
@@ -36,7 +36,7 @@
 );
 
 @include extjs-window-ui(
-  $ui: 'message-warning',
+  $ui: 'nx-message-warning',
 
   $ui-padding: 10px,
   $ui-header-line-height: 15px,
@@ -48,7 +48,7 @@
 );
 
 @include extjs-window-ui(
-  $ui: 'message-success',
+  $ui: 'nx-message-success',
 
   $ui-padding: 10px,
   $ui-header-line-height: 15px,

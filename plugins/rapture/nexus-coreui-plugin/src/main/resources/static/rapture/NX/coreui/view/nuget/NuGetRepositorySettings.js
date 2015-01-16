@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
       {
         xtype: 'form',
         title: 'Package Source',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         cls: 'no-border',
 
         items: [
@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
       {
         xtype: 'form',
         title: 'API Key',
-        ui: 'subsection',
+        ui: 'nx-subsection',
 
         items: [
           {
@@ -75,7 +75,7 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
         buttonAlign: 'left',
         buttons: [
           { text: 'Access API Key', action: 'access', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true },
-          { text: 'Reset API Key', action: 'reset', ui: 'danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
+          { text: 'Reset API Key', action: 'reset', ui: 'nx-danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
         ]
       }
     ];

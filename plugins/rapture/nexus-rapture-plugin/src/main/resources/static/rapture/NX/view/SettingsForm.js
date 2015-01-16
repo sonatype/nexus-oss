@@ -79,7 +79,7 @@ Ext.define('NX.view.SettingsForm', {
   buttonAlign: 'left',
 
   buttons: [
-    { text: NX.I18n.get('GLOBAL_BUTTON_SAVE'), formBind: true, action: 'save', ui: 'primary', bindToEnter: false },
+    { text: NX.I18n.get('GLOBAL_BUTTON_SAVE'), formBind: true, action: 'save', ui: 'nx-primary', bindToEnter: false },
     { text: NX.I18n.get('GLOBAL_BUTTON_DISCARD'),
       handler: function () {
         var form = this.up('form'),

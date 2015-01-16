@@ -40,7 +40,7 @@ Ext.define('NX.coreui.view.support.SupportRequest', {
         text: NX.I18n.get('ADMIN_SUPPORT_REQUEST_BUTTON'),
         glyph: 'xf08e@FontAwesome' /* fa-external-link */,
         action: 'makerequest',
-        ui: 'primary',
+        ui: 'nx-primary',
       }
     ]
   }
