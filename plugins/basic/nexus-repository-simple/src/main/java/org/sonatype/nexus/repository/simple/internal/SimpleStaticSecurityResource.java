@@ -10,7 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.security;
+package org.sonatype.nexus.repository.simple.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.security.model.Configuration;
@@ -20,19 +24,20 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.privilege;
 
-// FIXME: Rename, this is not just privs, but any security configuration?
-
 /**
- * Helper to build {@code repository-format} permissions for a given format.
+ * ???
  *
  * @since 3.0
  */
-public class RepositoryFormatPrivilegesSupport
+@Named
+@Singleton
+public class SimpleStaticSecurityResource
     implements StaticSecurityResource
 {
   private final Format format;
 
-  public RepositoryFormatPrivilegesSupport(final Format format) {
+  @Inject
+  public SimpleStaticSecurityResource(final @Named(SimpleFormat.NAME) Format format) {
     this.format = checkNotNull(format);
   }
 

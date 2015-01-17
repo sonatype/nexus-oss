@@ -23,6 +23,8 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 import com.google.common.base.Strings;
 
+// TODO: Move to proper module
+
 /**
  * Support for {@link PrivilegeDescriptor} implementations.
  *

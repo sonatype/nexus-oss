@@ -25,6 +25,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// TODO: Move to proper module
+
 /**
  * Mutable {@link DynamicSecurityResource}.
  *

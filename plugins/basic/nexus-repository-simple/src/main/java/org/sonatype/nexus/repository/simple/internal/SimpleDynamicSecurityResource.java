@@ -10,29 +10,25 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Format;
-import org.sonatype.nexus.repository.security.RepositoryFormatPrivilegesSupport;
-
-// FIXME: Rename, this is not just privs, but any security configuration
+import org.sonatype.nexus.repository.security.MutableDynamicSecurityResource;
 
 /**
- * Adds {@code simple} format {@code repository-format} privileges.
+ * ???
  *
  * @since 3.0
+ *
+ * @see SimpleSecurityFacet
  */
 @Named
 @Singleton
-public class SimpleFormatPrivileges
-  extends RepositoryFormatPrivilegesSupport
+public class SimpleDynamicSecurityResource
+    extends MutableDynamicSecurityResource
 {
-  @Inject
-  public SimpleFormatPrivileges(final @Named(SimpleFormat.NAME) Format format) {
-    super(format);
-  }
+  // empty
 }

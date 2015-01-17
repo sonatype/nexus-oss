@@ -34,11 +34,11 @@ import static org.sonatype.nexus.repository.security.RepositoryInstancePrivilege
 public class SimpleSecurityFacet
     extends FacetSupport
 {
-  private final SimpleDynamicPrivileges dynamicPrivileges;
+  private final SimpleDynamicSecurityResource dynamicSecurityResource;
 
   @Inject
-  public SimpleSecurityFacet(final SimpleDynamicPrivileges dynamicPrivileges) {
-    this.dynamicPrivileges = checkNotNull(dynamicPrivileges);
+  public SimpleSecurityFacet(final SimpleDynamicSecurityResource dynamicSecurityResource) {
+    this.dynamicSecurityResource = checkNotNull(dynamicSecurityResource);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class SimpleSecurityFacet
     final String repositoryName = getRepository().getName();
 
     // add repository-instance privileges
-    dynamicPrivileges.apply(new Mutator()
+    dynamicSecurityResource.apply(new Mutator()
     {
       @Override
       public void apply(final SecurityModelConfiguration model) {
@@ -64,7 +64,7 @@ public class SimpleSecurityFacet
     final String repositoryName = getRepository().getName();
 
     // remove repository-instance privilege
-    dynamicPrivileges.apply(new Mutator()
+    dynamicSecurityResource.apply(new Mutator()
     {
       @Override
       public void apply(final SecurityModelConfiguration model) {
