@@ -11,33 +11,27 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 
-package org.sonatype.nexus.repository.simple.internal;
+package org.sonatype.nexus.repository.security;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.common.concurrent.Locks;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
+import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// TODO: Unify with static security
-// TODO: Expose as helper, this may be generally useful
-
 /**
- * Manages dynamic {@code repository-instance} permissions for {@code simple} format.
+ * Mutable {@link DynamicSecurityResource}.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class DynamicSecurityResourceImpl
+public class MutableDynamicSecurityResource
+    extends ComponentSupport
     implements DynamicSecurityResource
 {
   private final SecurityModelConfiguration model = new Configuration();
@@ -63,17 +57,17 @@ public class DynamicSecurityResourceImpl
     }
   }
 
-  public static interface Customizer
+  public static interface Mutator
   {
     void apply(SecurityModelConfiguration model);
   }
 
-  public void apply(final Customizer customizer) {
-    checkNotNull(customizer);
+  public void apply(final Mutator mutator) {
+    checkNotNull(mutator);
 
     Lock lock = Locks.write(readWriteLock);
     try {
-      customizer.apply(model);
+      mutator.apply(model);
       dirty = true;
     }
     finally {

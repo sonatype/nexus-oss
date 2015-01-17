@@ -17,11 +17,12 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.simple.internal.DynamicSecurityResourceImpl.Customizer;
-import org.sonatype.security.model.CPrivilege;
+import org.sonatype.nexus.repository.security.MutableDynamicSecurityResource.Mutator;
 import org.sonatype.security.model.SecurityModelConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.security.RepositoryInstancePrivilegeDescriptor.id;
+import static org.sonatype.nexus.repository.security.RepositoryInstancePrivilegeDescriptor.privilege;
 
 /**
  * Simple security facet.
@@ -33,69 +34,45 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleSecurityFacet
     extends FacetSupport
 {
-  private final DynamicSecurityResourceImpl dynamicSecurityResource;
+  private final SimpleDynamicPrivileges dynamicPrivileges;
 
   @Inject
-  public SimpleSecurityFacet(final DynamicSecurityResourceImpl dynamicSecurityResource) {
-    this.dynamicSecurityResource = checkNotNull(dynamicSecurityResource);
-  }
-
-  private String prefix() {
-    return "nexus:repository-instance:" + getRepository().getName();
-  }
-
-  private String name(final String prefix, final String method) {
-    return prefix + ":" + method;
-  }
-
-  private String id(final String prefix, final String method) {
-    return name(prefix, method).replaceAll(":", "-");
+  public SimpleSecurityFacet(final SimpleDynamicPrivileges dynamicPrivileges) {
+    this.dynamicPrivileges = checkNotNull(dynamicPrivileges);
   }
 
   @Override
   protected void doStart() throws Exception {
-    final String prefix = prefix();
+    final String repositoryName = getRepository().getName();
 
-    log.trace("Adding privileges for: {}", prefix);
-    dynamicSecurityResource.apply(new Customizer()
+    // add repository-instance privileges
+    dynamicPrivileges.apply(new Mutator()
     {
       @Override
       public void apply(final SecurityModelConfiguration model) {
-        model.addPrivilege(privilege(prefix, "browse"));
-        model.addPrivilege(privilege(prefix, "read"));
-        model.addPrivilege(privilege(prefix, "edit"));
-        model.addPrivilege(privilege(prefix, "add"));
-        model.addPrivilege(privilege(prefix, "delete"));
+        model.addPrivilege(privilege(repositoryName, "browse"));
+        model.addPrivilege(privilege(repositoryName, "read"));
+        model.addPrivilege(privilege(repositoryName, "edit"));
+        model.addPrivilege(privilege(repositoryName, "add"));
+        model.addPrivilege(privilege(repositoryName, "delete"));
       }
     });
   }
 
-  private CPrivilege privilege(final String prefix, final String method) {
-    String name = name(prefix, method);
-    CPrivilege privilege = new CPrivilege();
-    privilege.setType("method");
-    privilege.setId(id(prefix, method));
-    privilege.setName(name);
-    privilege.setDescription(name);
-    privilege.setProperty("method", method);
-    privilege.setProperty("permission", prefix);
-    return privilege;
-  }
-
   @Override
   protected void doStop() throws Exception {
-    final String prefix = prefix();
+    final String repositoryName = getRepository().getName();
 
-    log.trace("Removing privileges for: {}", prefix);
-    dynamicSecurityResource.apply(new Customizer()
+    // remove repository-instance privilege
+    dynamicPrivileges.apply(new Mutator()
     {
       @Override
       public void apply(final SecurityModelConfiguration model) {
-        model.removePrivilege(id(prefix, "browse"));
-        model.removePrivilege(id(prefix, "read"));
-        model.removePrivilege(id(prefix, "edit"));
-        model.removePrivilege(id(prefix, "add"));
-        model.removePrivilege(id(prefix, "delete"));
+        model.removePrivilege(id(repositoryName, "browse"));
+        model.removePrivilege(id(repositoryName, "read"));
+        model.removePrivilege(id(repositoryName, "edit"));
+        model.removePrivilege(id(repositoryName, "add"));
+        model.removePrivilege(id(repositoryName, "delete"));
       }
     });
   }
