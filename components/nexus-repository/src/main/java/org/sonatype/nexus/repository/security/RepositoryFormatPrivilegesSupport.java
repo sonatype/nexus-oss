@@ -20,6 +20,8 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.privilege;
 
+// FIXME: Rename, this is not just privs, but any security configuration?
+
 /**
  * Helper to build {@code repository-format} permissions for a given format.
  *
@@ -33,6 +35,11 @@ public class RepositoryFormatPrivilegesSupport
   public RepositoryFormatPrivilegesSupport(final Format format) {
     this.format = checkNotNull(format);
   }
+
+  // TODO: Do we add any roles by default?
+  // TODO: Could potentially make this a default service, change to dynamic
+  // TODO: ... and then each format doesn't need this boiler-plate,
+  // TODO: ... but side effect is they can't change the defaults
 
   @Override
   public SecurityModelConfiguration getConfiguration() {

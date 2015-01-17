@@ -19,6 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.security.RepositoryFormatPrivilegesSupport;
 
+// FIXME: Rename, this is not just privs, but any security configuration
+
 /**
  * Adds {@code simple} format {@code repository-format} privileges.
  *
