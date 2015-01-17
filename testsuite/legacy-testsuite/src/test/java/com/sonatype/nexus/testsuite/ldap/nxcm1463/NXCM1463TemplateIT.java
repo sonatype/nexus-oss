@@ -25,7 +25,7 @@ public class NXCM1463TemplateIT
     extends AbstractLdapIT
 {
 
-  protected boolean isStartLdapServer() {
+  protected boolean shouldStartLdapServer() {
     return false;
   }
 

@@ -12,16 +12,12 @@
  */
 package org.sonatype.security.realms.ldap.internal.connector.dao;
 
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
-import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 
-import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -37,25 +33,10 @@ public class DynamicGroupsIT
   public void testUserManagerWithDynamicGroups()
       throws Exception
   {
-    Map<String, Object> env = Maps.newHashMap();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
-    // configuration.setGroupBaseDn( "ou=groups" );
-    // configuration.setGroupObjectClass( "groupOfUniqueNames" );
-    // configuration.setGroupMemberAttribute( "uniqueMember" );
     configuration.setUserRealNameAttribute("cn");
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(true);
@@ -97,15 +78,7 @@ public class DynamicGroupsIT
   public void testUserManagerWithDynamicGroupsDisabled()
       throws Exception
   {
-    Map<String, Object> env = Maps.newHashMap();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
@@ -143,25 +116,10 @@ public class DynamicGroupsIT
   public void testGroupManagerWithDynamicGroups()
       throws Exception
   {
-    Map<String, Object> env = Maps.newHashMap();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
-    // configuration.setGroupBaseDn( "ou=groups" );
-    // configuration.setGroupObjectClass( "groupOfUniqueNames" );
-    // configuration.setGroupMemberAttribute( "uniqueMember" );
     configuration.setUserRealNameAttribute("cn");
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(true);
@@ -198,15 +156,7 @@ public class DynamicGroupsIT
   public void testGroupManagerWithDynamicGroupsDisabled()
       throws Exception
   {
-    Map<String, Object> env = Maps.newHashMap();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");

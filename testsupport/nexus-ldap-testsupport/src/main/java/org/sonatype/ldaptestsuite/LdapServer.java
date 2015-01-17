@@ -16,11 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -30,6 +25,8 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+
+import org.sonatype.nexus.common.io.DirSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -103,7 +100,12 @@ public class LdapServer
 
   public LdapServer start() {
     if (this.configuration.isDeleteOnStart()) {
-      deleteWorkingDirectory();
+      try {
+        DirSupport.deleteIfExists(configuration.getWorkingDirectory().toPath());
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
     }
     this.configuration.getWorkingDirectory().mkdirs();
     if (this.port < 1) {
@@ -253,28 +255,6 @@ public class LdapServer
   }
 
   // ==
-
-  private void deleteWorkingDirectory() {
-    try {
-      Files.walkFileTree(configuration.getWorkingDirectory().toPath(), new SimpleFileVisitor<Path>()
-      {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          Files.delete(dir);
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
-  }
 
   private void maySetupSaslMechanisms() {
     // only do this if sasl is configured

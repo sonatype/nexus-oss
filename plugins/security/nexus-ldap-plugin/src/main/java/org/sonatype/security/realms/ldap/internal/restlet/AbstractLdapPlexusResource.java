@@ -260,7 +260,7 @@ public abstract class AbstractLdapPlexusResource
       return decode(to);
     }
     catch (NullPointerException e) {
-      throw new IllegalArgumentException(e);
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e);
     }
   }
 

@@ -40,7 +40,7 @@ public class LdapUserManagerNotConfiguredIT
     final UserManager userManager = lookup(UserManager.class, "LDAP");
     try {
       userManager.getUser("cstamas");
-      fail("Expected UserNotFoundTransientException");
+      fail("Expected UserNotFoundException");
     }
     catch (UserNotFoundException e) {
       // OSS LDAP did throw transient when not configured, but Pro does not, it thrown only on error

@@ -12,16 +12,10 @@
  */
 package org.sonatype.security.realms.ldap.internal.connector.dao;
 
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.sonatype.security.realms.ldap.internal.LdapITSupport;
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
-import com.google.common.collect.Maps;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -35,19 +29,7 @@ public class LdapUserDAOIT
   public void testSimple()
       throws Exception
   {
-    Map<String, Object> env = Maps.newHashMap();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + ldapServers.get("default").getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");

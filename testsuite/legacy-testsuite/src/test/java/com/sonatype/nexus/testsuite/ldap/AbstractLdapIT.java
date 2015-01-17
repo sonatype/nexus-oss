@@ -61,13 +61,17 @@ public abstract class AbstractLdapIT
   @Before
   public void beforeLdapTests() throws Exception {
     ldapServer = new LdapServer(ldapServerConfiguration());
-    if (isStartLdapServer()) {
+    if (shouldStartLdapServer()) {
       ldapServer.start();
     }
     safeCreateLdapClientConfiguration();
   }
 
-  protected boolean isStartLdapServer() {
+  /**
+   * Override this method if you don't want to have LDAP server started by method {@link #beforeLdapTests()}, but you
+   * want to manage it manually (or test don't need LDAP server at all to be running).
+   */
+  protected boolean shouldStartLdapServer() {
     return true;
   }
 
@@ -100,9 +104,10 @@ public abstract class AbstractLdapIT
     connection.setSystemUsername("uid=admin,ou=system");
     connection.setSystemPassword("secret");
     connection.setAuthScheme("simple");
-    if (isStartLdapServer()) {
+    if (shouldStartLdapServer()) {
       connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
-    } else {
+    }
+    else {
       // ldap not started yet, dummy port
       connection.setHost(new Host(Protocol.ldap, "localhost", 1234));
     }
@@ -204,7 +209,7 @@ public abstract class AbstractLdapIT
     connInfo.setHost("localhost");
 
     // using fixed port if ldap server is not to be started to be able to plug external server instance for debugging
-    connInfo.setPort(isStartLdapServer() ? this.getLdapServer().getPort() : 10389);
+    connInfo.setPort(shouldStartLdapServer() ? this.getLdapServer().getPort() : 10389);
 
     connInfo.setProtocol("ldap");
     // connInfo.setRealm( "" );

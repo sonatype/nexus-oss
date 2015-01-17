@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.ldaptestsuite.LdapServerConfiguration;
@@ -163,14 +164,13 @@ public abstract class LdapTestSupport
   protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
     final LinkedHashMap<String, LdapConfiguration> result = Maps.newLinkedHashMap();
     // default implementation creates entries for all defined LDAP servers
-    int order = 0;
-    for (String name : ldapServers.keySet()) {
-      final LdapServer ldapServer = ldapServers.get(name);
+    int order = 1;
+    for (Entry<String, LdapServer> entry : ldapServers.entrySet()) {
       order++;
-
-      final LdapConfiguration ldapConfiguration = createLdapClientConfigurationForServer(name, order, ldapServer);
+      final LdapConfiguration ldapConfiguration = createLdapClientConfigurationForServer(
+          entry.getKey(), order, entry.getValue());
       if (ldapConfiguration != null) {
-        result.put(name, ldapConfiguration);
+        result.put(entry.getKey(), ldapConfiguration);
       }
     }
     return result;
@@ -194,7 +194,6 @@ public abstract class LdapTestSupport
     final Mapping mapping = new Mapping();
     mapping.setGroupBaseDn("ou=groups");
     mapping.setGroupIdAttribute("cn");
-    // mapping.setGroupMemberAttribute("groupMemberAttribute");
     mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
     mapping.setGroupObjectClass("organizationalRole");
     mapping.setLdapGroupsAsRoles(true);

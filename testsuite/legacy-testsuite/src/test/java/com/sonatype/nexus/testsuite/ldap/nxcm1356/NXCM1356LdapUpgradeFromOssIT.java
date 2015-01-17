@@ -41,7 +41,7 @@ public class NXCM1356LdapUpgradeFromOssIT
         "LdapRealm");
   }
 
-  protected boolean isStartLdapServer() {
+  protected boolean shouldStartLdapServer() {
     return false;
   }
 }

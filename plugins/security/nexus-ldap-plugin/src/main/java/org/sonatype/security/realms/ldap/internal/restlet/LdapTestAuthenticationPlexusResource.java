@@ -55,14 +55,18 @@ public class LdapTestAuthenticationPlexusResource
 
   private final LdapConfigurationManager ldapConfigurationManager;
 
+  private final Validator validator;
+
   @Inject
   public LdapTestAuthenticationPlexusResource(final TrustStore trustStore,
                                               final LdapConnectionTester ldapConnectionTester,
-                                              final LdapConfigurationManager ldapConfigurationManager)
+                                              final LdapConfigurationManager ldapConfigurationManager,
+                                              final Validator validator)
   {
     super(trustStore);
     this.ldapConnectionTester = checkNotNull(ldapConnectionTester);
     this.ldapConfigurationManager = checkNotNull(ldapConfigurationManager);
+    this.validator = checkNotNull(validator);
     this.setModifiable(true);
   }
 
@@ -106,7 +110,7 @@ public class LdapTestAuthenticationPlexusResource
     }
     replaceFakePassword(connectionInfo, ldapServerId, ldapConfigurationManager);
 
-    new Validator().validate(connectionInfo);
+    validator.validate(connectionInfo);
 
     try {
       LdapContextFactory ldapContextFactory = this.buildDefaultLdapContextFactory(ldapServerId, connectionInfo);
