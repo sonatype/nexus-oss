@@ -12,8 +12,11 @@
  */
 package org.sonatype.nexus.common.concurrent;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+
+import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,18 +27,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Locks
 {
+  /**
+   * Returns locked lock.
+   *
+   * Uses {@link Lock#tryLock} with timeout of 60 seconds to avoid potential deadlocks.
+   */
   public static Lock lock(final Lock lock) {
     checkNotNull(lock);
-    // TODO: consider tryLock with default times?
-    lock.lock();
+    try {
+      lock.tryLock(60, TimeUnit.SECONDS);
+    }
+    catch (InterruptedException e) {
+      throw Throwables.propagate(e);
+    }
     return lock;
   }
 
+  /**
+   * Returns locked read-lock.
+   */
   public static Lock read(final ReadWriteLock readWriteLock) {
     checkNotNull(readWriteLock);
     return lock(readWriteLock.readLock());
   }
 
+  /**
+   * Returns locked write-lock.
+   */
   public static Lock write(final ReadWriteLock readWriteLock) {
     checkNotNull(readWriteLock);
     return lock(readWriteLock.writeLock());
