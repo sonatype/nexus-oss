@@ -28,6 +28,7 @@ import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 // TODO: Unify with static security
+// TODO: Expose as helper, this may be generally useful
 
 /**
  * Manages dynamic {@code repository-instance} permissions for {@code simple} format.
