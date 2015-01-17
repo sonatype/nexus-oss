@@ -92,6 +92,7 @@ public class DefaultLdapConfigurationManager
     checkNotNull(orderdServerIds);
     final LinkedHashMap<String, LdapConfiguration> configuration = getConfiguration();
     final Set<String> newOrder = Sets.newHashSet(orderdServerIds);
+    checkArgument(newOrder.size() == orderdServerIds.size(), "Duplicate keys provided: %s", orderdServerIds);
     final Set<String> configIds = configuration.keySet();
     checkArgument(newOrder.equals(configIds), "ID ordering mismatch (the new and existing should differ in order only):  new=%s, existing=%s)", orderdServerIds, configIds);
 
@@ -125,10 +126,15 @@ public class DefaultLdapConfigurationManager
   {
     checkNotNull(ldapServerConfiguration);
     validator.validate(ldapServerConfiguration);
+    ldapServerConfiguration.setOrder(Integer.MAX_VALUE); // should be last
     final LinkedHashMap<String, LdapConfiguration> config = getConfiguration();
+    final List<String> existingIds = Lists.newArrayList(config.keySet()); // preserve it, as clearCache clears this
     final boolean firstEntry = config.isEmpty();
     configurationSource.create(ldapServerConfiguration);
     clearCache();
+    // adjust order that will get rid of MAX_VALUE
+    existingIds.add(ldapServerConfiguration.getId());
+    setServerOrder(existingIds);
     if (firstEntry) {
       mayActivateLdapRealm();
     }
