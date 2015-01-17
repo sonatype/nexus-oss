@@ -20,6 +20,8 @@ import org.sonatype.security.realms.tools.StaticSecurityResource
 import javax.inject.Named
 import javax.inject.Singleton
 
+// TODO: Unify with dynamic security
+
 /**
  * Adds static {@code repository-format} permissions for {@code simple} format.
  *

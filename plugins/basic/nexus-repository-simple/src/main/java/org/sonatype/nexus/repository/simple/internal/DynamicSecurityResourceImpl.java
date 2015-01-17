@@ -20,11 +20,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.concurrent.Locks;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.DynamicSecurityResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+// TODO: Unify with static security
 
 /**
  * Manages dynamic {@code repository-instance} permissions for {@code simple} format.
@@ -49,8 +52,7 @@ public class DynamicSecurityResourceImpl
 
   @Override
   public SecurityModelConfiguration getConfiguration() {
-    Lock lock = readWriteLock.readLock();
-    lock.lock();
+    Lock lock = Locks.read(readWriteLock);
     try {
       dirty = false;
       return model;
@@ -67,8 +69,8 @@ public class DynamicSecurityResourceImpl
 
   public void apply(final Customizer customizer) {
     checkNotNull(customizer);
-    Lock lock = readWriteLock.writeLock();
-    lock.lock();
+
+    Lock lock = Locks.write(readWriteLock);
     try {
       customizer.apply(model);
       dirty = true;
