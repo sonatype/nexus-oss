@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
 import javax.inject.Inject;
@@ -17,11 +18,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
+import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.id;
 import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.privilege;
 
 /**
@@ -41,20 +44,59 @@ public class SimpleStaticSecurityResource
     this.format = checkNotNull(format);
   }
 
-  // TODO: Do we add any roles by default?
-  // TODO: Could potentially make this a default service, change to dynamic
-  // TODO: ... and then each format doesn't need this boiler-plate,
-  // TODO: ... but side effect is they can't change the defaults
-
   @Override
   public SecurityModelConfiguration getConfiguration() {
     String formatName = format.getValue();
-    Configuration configuration = new Configuration();
-    configuration.addPrivilege(privilege(formatName, "browse"));
-    configuration.addPrivilege(privilege(formatName, "read"));
-    configuration.addPrivilege(privilege(formatName, "edit"));
-    configuration.addPrivilege(privilege(formatName, "add"));
-    configuration.addPrivilege(privilege(formatName, "delete"));
-    return configuration;
+    Configuration model = new Configuration();
+
+    // add repository-format privileges
+    model.addPrivilege(privilege(formatName, "browse"));
+    model.addPrivilege(privilege(formatName, "read"));
+    model.addPrivilege(privilege(formatName, "edit"));
+    model.addPrivilege(privilege(formatName, "add"));
+    model.addPrivilege(privilege(formatName, "delete"));
+
+    // add repository-format 'admin' role
+    {
+      CRole role = new CRole();
+      String id = String.format("repository-format-%s-admin", formatName);
+      role.setId(id);
+      role.setName(id);
+      role.setDescription(id);
+      role.addPrivilege(id(formatName, "browse"));
+      role.addPrivilege(id(formatName, "read"));
+      role.addPrivilege(id(formatName, "edit"));
+      role.addPrivilege(id(formatName, "add"));
+      role.addPrivilege(id(formatName, "delete"));
+      model.addRole(role);
+    }
+
+    // add repository-format 'readonly' role
+    {
+      CRole role = new CRole();
+      String id = String.format("repository-format-%s-readonly", formatName);
+      role.setId(id);
+      role.setName(id);
+      role.setDescription(id);
+      role.addPrivilege(id(formatName, "browse"));
+      role.addPrivilege(id(formatName, "read"));
+      model.addRole(role);
+    }
+
+    // add repository-format 'deployer' role
+    {
+      CRole role = new CRole();
+      String id = String.format("repository-format-%s-deployer", formatName);
+      role.setId(id);
+      role.setName(id);
+      role.setDescription(id);
+      role.addPrivilege(id(formatName, "browse"));
+      role.addPrivilege(id(formatName, "read"));
+      role.addPrivilege(id(formatName, "edit"));
+      role.addPrivilege(id(formatName, "add"));
+      model.addRole(role);
+    }
+
+    return model;
   }
 }
