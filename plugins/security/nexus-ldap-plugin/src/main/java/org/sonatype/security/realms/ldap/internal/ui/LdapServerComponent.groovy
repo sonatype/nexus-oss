@@ -138,7 +138,7 @@ extends DirectComponentSupport
   LdapServerXO update(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
     LdapConfiguration existing = ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id)
     if (existing) {
-      ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connectionInfo.systemPassword))
+      ldapConfigurationManager.updateLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), existing.connection.systemPassword))
       trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, ldapServerXO.id, ldapServerXO.useTrustStore)
       return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id))
     }
@@ -264,9 +264,9 @@ extends DirectComponentSupport
         cacheTimeout: connectionInfo.cacheTimeout,
 
         backupMirrorEnabled: connectionInfo.backupHost != null,
-        backupMirrorProtocol: connectionInfo.backupHost.protocol.name(),
-        backupMirrorHost: connectionInfo.backupHost.hostName,
-        backupMirrorPort: connectionInfo.backupHost.port,
+        backupMirrorProtocol: connectionInfo.backupHost?.protocol?.name(),
+        backupMirrorHost: connectionInfo.backupHost?.hostName,
+        backupMirrorPort: connectionInfo.backupHost?.port,
 
         userBaseDn: userAndGroupConfig.userBaseDn,
         userSubtree: userAndGroupConfig.userSubtree,
