@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,6 +47,8 @@ public class DefaultWastebasket
     extends ComponentSupport
     implements Wastebasket
 {
+  private static final String DEFAULT_DELETE_OPERATION_KEY = DefaultWastebasket.class.getName() + ".defaultDeleteOperation";
+
   private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
   protected static final long ALL = -1L;
@@ -56,6 +59,8 @@ public class DefaultWastebasket
 
   private final RepositoryRegistry repositoryRegistry;
 
+  private DeleteOperation deleteOperation;
+
   @Inject
   public DefaultWastebasket(final ApplicationConfiguration applicationConfiguration,
                             final Walker walker,
@@ -64,6 +69,20 @@ public class DefaultWastebasket
     this.applicationConfiguration = applicationConfiguration;
     this.walker = walker;
     this.repositoryRegistry = repositoryRegistry;
+    this.deleteOperation = getDefaultDeleteOperation();
+  }
+
+  protected DeleteOperation getDefaultDeleteOperation() {
+    final String defaultOperationString = SystemPropertiesHelper.getString(
+        DEFAULT_DELETE_OPERATION_KEY, DeleteOperation.MOVE_TO_TRASH.name());
+    try {
+      return DeleteOperation.valueOf(defaultOperationString);
+    }
+    catch (Exception e) {
+      // report and ignore
+      log.warn("Bad value {}={}", DEFAULT_DELETE_OPERATION_KEY, defaultOperationString, e);
+      return DeleteOperation.MOVE_TO_TRASH;
+    }
   }
 
   protected ApplicationConfiguration getApplicationConfiguration() {
@@ -84,8 +103,6 @@ public class DefaultWastebasket
   }
 
   // ==
-
-  private DeleteOperation deleteOperation = DeleteOperation.MOVE_TO_TRASH;
 
   // ==============================
   // Wastebasket iface
