@@ -199,9 +199,8 @@ Ext.define('NX.controller.Drilldown', {
       for (var i = 0; i < lists.length; ++i) {
         model = lists[i].getStore().getById(modelId);
         if (model) {
-          me.bookmark(model);
           if (navigate) {
-            me.navigateTo(NX.Bookmarks.getBookmark());
+            me.reselect();
           } else {
             me.onModelChanged(model);
           }
@@ -231,7 +230,7 @@ Ext.define('NX.controller.Drilldown', {
       }
     }
 
-    me.navigateTo(NX.Bookmarks.getBookmark());
+    me.reselect();
   },
 
   /**
@@ -266,7 +265,6 @@ Ext.define('NX.controller.Drilldown', {
     var me = this;
 
     me.loadView(list, model, true);
-    me.bookmark(model);
   },
 
   /**
@@ -302,6 +300,7 @@ Ext.define('NX.controller.Drilldown', {
     // No model specified, go to the root view
     if (!model) {
       feature.showChild(0, animate);
+      me.bookmark(null);
     }
 
     // Model specified, find the associated list and show that
@@ -317,6 +316,7 @@ Ext.define('NX.controller.Drilldown', {
 
         // Show the next view in line
         feature.showChild(i + 1, animate);
+        me.bookmark(model);
         break;
       }
     }
@@ -362,7 +362,8 @@ Ext.define('NX.controller.Drilldown', {
 
     // Find all parent models and add them to the bookmark array
     for (index = 0; index < lists.length; ++index) {
-      if (!lists[index].getView().getNode(model)) {
+      //if (model && lists[index].getView().getNode(model)) {
+      if ((tabs && bookmark.length > 2) || (!tabs && bookmark.length > 1)) {
         segments.push(bookmark.shift());
       } else {
         // All done adding parents
@@ -447,12 +448,15 @@ Ext.define('NX.controller.Drilldown', {
    */
   dataLoadedCallback: function(list, modelId, tabId) {
     var me = this,
-      feature = this.getFeature();
+      feature = this.getFeature(),
+      model;
 
-    if (list && list.isVisible()) {
+    if (list && list.isVisible() && !list.getStore().isLoading()) {
       // Show the referenced view
       modelId = decodeURIComponent(modelId);
-      me.loadView(list.getView(), list.getStore().getById(modelId), false);
+      model = list.getStore().getById(modelId);
+
+      me.loadView(list.getView(), model, false);
 
       // Is a tab specified?
       if (tabId) {
@@ -475,7 +479,9 @@ Ext.define('NX.controller.Drilldown', {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
         me.deleteModel(selection[0]);
-        me.bookmark(null);
+
+        // Reset the bookmark
+        NX.Bookmarks.bookmark(NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)));
       }, {scope: me});
     }
   },
