@@ -25,7 +25,7 @@ Ext.define('NX.view.message.Panel', {
   ],
 
   border: false,
-  ui: 'messages',
+  ui: 'nx-messages',
   width: 200,
   stateful: true,
   stateId: 'nx-message-panel',

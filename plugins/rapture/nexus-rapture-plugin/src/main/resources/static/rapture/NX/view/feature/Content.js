@@ -22,8 +22,8 @@ Ext.define('NX.view.feature.Content', {
   alias: 'widget.nx-feature-content',
 
   itemId: 'feature-content',
-  ui: 'feature-content',
-  cls: 'feature-content',
+  ui: 'nx-feature-content',
+  cls: 'nx-feature-content',
   layout: 'fit',
 
   header: {
@@ -41,12 +41,12 @@ Ext.define('NX.view.feature.Content', {
         items: [
           {
             xtype: 'label',
-            cls: 'feature-name',
+            cls: 'nx-feature-name',
             itemId: 'title'
           },
           {
             xtype: 'label',
-            cls: 'feature-description',
+            cls: 'nx-feature-description',
             itemId: 'description'
           }
         ]

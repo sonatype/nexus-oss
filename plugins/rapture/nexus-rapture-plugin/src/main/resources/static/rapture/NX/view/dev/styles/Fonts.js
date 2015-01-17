@@ -37,7 +37,7 @@ Ext.define('NX.view.dev.styles.Fonts', {
 
     var faceExampleTpl = Ext.create('Ext.XTemplate',
         '<div>',
-        '<span class="section-header">{text}</span>',
+        '<span class="nx-section-header">{text}</span>',
         '<p class="{clz}">',
         'Trusted applications at the speed of deployment<br/>',
         'abcdefghijklmnopqrstuvwxyz<br/>',
@@ -90,48 +90,48 @@ Ext.define('NX.view.dev.styles.Fonts', {
       {
         xtype: 'panel',
         title: 'Faces',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         layout: {
           type: 'hbox',
           defaultMargins: {top: 0, right: 20, bottom: 0, left: 0}
         },
         items: [
-          faceExample('Proxima Nova Regular', 'proxima-nova-regular'),
-          faceExample('Proxima Nova Bold', 'proxima-nova-bold'),
-          faceExample('Courier New', 'courier-new-regular')
+          faceExample('Proxima Nova Regular', 'nx-proxima-nova-regular'),
+          faceExample('Proxima Nova Bold', 'nx-proxima-nova-bold'),
+          faceExample('Courier New', 'nx-courier-new-regular')
         ]
       },
       {
         xtype: 'panel',
         title: 'Styles',
-        ui: 'subsection',
+        ui: 'nx-subsection',
         items: [
           me.html(tableTemplate.apply({
             thead: theadTemplate.apply(['Name', 'Description', 'Font & Weight', 'Use Cases', 'Pixels', 'Sample']),
             tbody: tbodyTemplate.apply({
               'h1': [
-                'Header', 'Proxima Nova Light', 'Logo', '20', { text: 'Sonatype Nexus', clz: 'sample-h1' }
+                'Header', 'Proxima Nova Light', 'Logo', '20', { text: 'Sonatype Nexus', clz: 'nx-sample-h1' }
               ],
               'h2': [
-                'Header', 'Proxima Nova Bold', 'Page Title', '26', { text: 'Development', clz: 'sample-h2' }
+                'Header', 'Proxima Nova Bold', 'Page Title', '26', { text: 'Development', clz: 'nx-sample-h2' }
               ],
               'h3': [
-                'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', clz: 'sample-h3' }
+                'Header', 'Proxima Nova Bold', 'Header', '22', { text: 'Development', clz: 'nx-sample-h3' }
               ],
               'h4': [
-                'Header', 'Proxima Nova Bold', 'Sub-Header', '18', { text: 'Development', clz: 'sample-h4' }
+                'Header', 'Proxima Nova Bold', 'Sub-Header', '18', { text: 'Development', clz: 'nx-sample-h4' }
               ],
               'h5': [
-                'Header', 'Proxima Nova Bold', 'Sub-Header', '13', { text: 'Development', clz: 'sample-h5' }
+                'Header', 'Proxima Nova Bold', 'Sub-Header', '13', { text: 'Development', clz: 'nx-sample-h5' }
               ],
               'p/ul/ol': [
-                'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { text: 'Development', clz: 'sample-body' }
+                'Body', 'Proxima Nova Regular', 'Body text, lists, default size', '13', { text: 'Development', clz: 'nx-sample-body' }
               ],
               'code': [
-                'Code', 'Courier New Regular', 'Code examples', '13', { text: 'Development', clz: 'sample-code' }
+                'Code', 'Courier New Regular', 'Code examples', '13', { text: 'Development', clz: 'nx-sample-code' }
               ],
               'utility': [
-                'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { text: 'Development', clz: 'sample-utility' }
+                'Small Text', 'Proxima Nova Regular', 'Labels, Side-Nav', '10', { text: 'Development', clz: 'nx-sample-utility' }
               ]
             })
           }))

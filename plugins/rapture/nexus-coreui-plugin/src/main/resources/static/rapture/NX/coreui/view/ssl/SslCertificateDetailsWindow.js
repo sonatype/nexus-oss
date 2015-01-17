@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
               action: 'remove',
               formBind: true,
               disabled: true,
-              ui: 'primary',
+              ui: 'nx-primary',
               glyph: 'xf056@FontAwesome' /* fa-minus-circle */
             });
             button = tbar.down('button[action=remove]');
@@ -74,7 +74,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
               action: 'add',
               formBind: true,
               disabled: true,
-              ui: 'primary',
+              ui: 'nx-primary',
               glyph: 'xf055@FontAwesome' /* fa-plus-circle */
             });
             button = tbar.down('button[action=add]');
