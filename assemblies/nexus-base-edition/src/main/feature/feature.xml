@@ -30,7 +30,7 @@
     -->
     <bundle>wrap:${mvn:shiro-guice}$overwrite=merge&amp;Import-Package=*</bundle>
     <bundle>wrap:${mvn:xstream}$overwrite=merge&amp;-exportcontents=*&amp;DynamicImport-Package=*</bundle>
-    <bundle>wrap:${mvn:orientdb-graphdb}$overwrite=merge&amp;Import-Package=com.tinkerpop.*;resolution:=optional,*</bundle>
+    <bundle>wrap:${mvn:orientdb-graphdb}$overwrite=merge&amp;Fragment-Host=com.orientechnologies.orientdb-core&amp;Import-Package=com.tinkerpop.*;resolution:=optional,*</bundle>
     <!--
     Install nexus-specific shell commands
     -->
