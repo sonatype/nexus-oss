@@ -48,6 +48,8 @@ public class SimpleProxyRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + ProxyType.NAME;
 
+  private final Provider<SimpleSecurityFacet> securityFacet;
+
   private final Provider<ConfigurableViewFacet> viewFacet;
 
   private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
@@ -65,6 +67,7 @@ public class SimpleProxyRecipe
   @Inject
   public SimpleProxyRecipe(final @Named(ProxyType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
+                           final Provider<SimpleSecurityFacet> securityFacet,
                            final Provider<ConfigurableViewFacet> viewFacet,
                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
@@ -74,6 +77,7 @@ public class SimpleProxyRecipe
                            final SimpleProxyHandler proxyHandler)
   {
     super(type, format);
+    this.securityFacet = checkNotNull(securityFacet);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
@@ -85,6 +89,7 @@ public class SimpleProxyRecipe
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
     repository.attach(indexHtmlFacet.get());
     repository.attach(httpClientFacet.get());
