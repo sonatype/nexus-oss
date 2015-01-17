@@ -73,8 +73,7 @@ public final class Connection
     }
 
     public void setPort(final int port) {
-      checkArgument(port > 0, "Invalid LDAP port: %s", port);
-      checkArgument(port < 65536, "Invalid LDAP port: %s", port);
+      checkArgument(port > 0 && port < 65536, "Invalid LDAP port: %s", port);
       this.port = port;
     }
 
