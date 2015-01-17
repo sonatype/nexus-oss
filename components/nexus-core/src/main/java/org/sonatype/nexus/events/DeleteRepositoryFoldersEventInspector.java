@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -36,6 +37,10 @@ public class DeleteRepositoryFoldersEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
+  // flag whether removed repositories are moved to global trash or deleted permanently
+  private final boolean deletePermanently = SystemPropertiesHelper
+      .getBoolean(DeleteRepositoryFoldersEventInspector.class.getName() + ".deletePermanently", false);
+
   private final NexusScheduler nexusScheduler;
 
   @Inject
@@ -53,6 +58,7 @@ public class DeleteRepositoryFoldersEventInspector
       DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance(DeleteRepositoryFoldersTask.class);
 
       task.setRepository(repository);
+      task.setDeleteForever(deletePermanently);
 
       nexusScheduler.submit("Deleting repository folder for repository \"" + repository.getName() + "\" (id="
           + repository.getId() + ").", task);
