@@ -47,9 +47,9 @@ public class RepositoryInstancePrivilegeDescriptor
 
   @Override
   protected String formatPermission(final CPrivilege privilege) {
-    String format = readProperty(privilege, P_REPOSITORY, "*");
+    String repositoryName = readProperty(privilege, P_REPOSITORY, "*");
     String actions = readProperty(privilege, P_ACTIONS, "*");
-    return String.format("nexus:%s:%s:%s", TYPE, format, actions);
+    return permission(repositoryName, actions);
   }
 
   //
@@ -60,11 +60,15 @@ public class RepositoryInstancePrivilegeDescriptor
     return String.format("%s-%s-%s", TYPE, repositoryName, actions);
   }
 
+  public static String permission(final String repositoryName, final String actions) {
+    return String.format("nexus:%s:%s:%s", TYPE, repositoryName, actions);
+  }
+
   public static CPrivilege privilege(final String repositoryName, final String actions) {
     CPrivilege privilege = new CPrivilege();
     privilege.setType(TYPE);
     privilege.setId(id(repositoryName, actions));
-    privilege.setName(String.format("nexus:%s:%s:%s", TYPE, repositoryName, actions));
+    privilege.setName(permission(repositoryName, actions));
     privilege.setDescription(String.format("Grants '%s' repository instance actions: %s", repositoryName, actions));
     privilege.setProperty(P_REPOSITORY, repositoryName);
     privilege.setProperty(P_ACTIONS, actions);
