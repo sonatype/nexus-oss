@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.sonatype.nexus.repository.view.Payload;
 
+import org.joda.time.DateTime;
+
 /**
  * HTTP request payload adapts {@link HttpServletRequest} body-content to {@link Payload}.
  *
@@ -34,10 +36,15 @@ public class HttpRequestPayload
 
   private final long size;
 
+  private final DateTime lastModified;
+
   public HttpRequestPayload(final HttpServletRequest request) {
     this.request = request;
     this.contentType = request.getContentType();
     this.size = request.getContentLength();
+
+    final long lastModifiedHeader = request.getDateHeader("Last-Modified");
+    this.lastModified = lastModifiedHeader == -1 ? null : new DateTime(lastModifiedHeader);
   }
 
   @Nullable
@@ -51,6 +58,12 @@ public class HttpRequestPayload
     return size;
   }
 
+  @Nullable
+  @Override
+  public DateTime getLastModified() {
+    return lastModified;
+  }
+
   @Override
   public InputStream openInputStream() throws IOException {
     return request.getInputStream();
@@ -61,6 +74,7 @@ public class HttpRequestPayload
     return getClass().getSimpleName() + "{" +
         "contentType='" + contentType + '\'' +
         ", size=" + size +
+        ", lastModified=" + lastModified +
         '}';
   }
 }

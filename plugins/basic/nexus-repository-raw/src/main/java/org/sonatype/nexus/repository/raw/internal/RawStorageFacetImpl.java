@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 
 import com.google.common.collect.ImmutableMap;
 import com.tinkerpop.blueprints.Vertex;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.storage.StorageService.P_PATH;
@@ -41,9 +43,11 @@ public class RawStorageFacetImpl
     extends FacetSupport
     implements RawStorageFacet
 {
-  public static final String CONTENT_TYPE_PROPERTY = "content_type";
+  private static final String CONTENT_TYPE_PROPERTY = "content_type";
 
-  public static final String BLOB_REF_PROPERTY = "blob_ref";
+  private static final String BLOB_REF_PROPERTY = "blob_ref";
+
+  private static final String LAST_MODIFIED_PROPERTY = "last_modified";
 
   @Inject
   public RawStorageFacetImpl() {
@@ -73,8 +77,8 @@ public class RawStorageFacetImpl
 
   @Nullable
   @Override
-  public void put(final String path, final RawContent content) throws IOException {
-    inTx(new GraphOperation()
+  public RawContent put(final String path, final RawContent content) throws IOException {
+    return (RawContent) inTx(new GraphOperation()
     {
       @Override
       public Object execute(final GraphTx graph, final StorageFacet storage) throws IOException {
@@ -89,7 +93,11 @@ public class RawStorageFacetImpl
 
         asset.setProperty(BLOB_REF_PROPERTY, blobRef.toString());
         asset.setProperty(CONTENT_TYPE_PROPERTY, content.getContentType());
-        return null;
+
+        final DateTime lastModified = content.getLastModified();
+        asset.setProperty(LAST_MODIFIED_PROPERTY, lastModified == null ? null : new Date(lastModified.getMillis()));
+
+        return marshall(asset, storage.getBlob(blobRef));
       }
     });
   }
@@ -145,6 +153,9 @@ public class RawStorageFacetImpl
   private RawContent marshall(final Vertex asset, final Blob blob) {
     final String contentType = asset.getProperty(CONTENT_TYPE_PROPERTY);
 
+    final Date date = asset.getProperty(LAST_MODIFIED_PROPERTY);
+    final DateTime lastModiifed = date == null ? null : new DateTime(date.getTime());
+
     return new RawContent()
     {
       @Override
@@ -160,6 +171,11 @@ public class RawStorageFacetImpl
       @Override
       public InputStream openInputStream() {
         return blob.getInputStream();
+      }
+
+      @Override
+      public DateTime getLastModified() {
+        return lastModiifed;
       }
     };
   }

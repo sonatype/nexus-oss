@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.raw;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.joda.time.DateTime;
+
 /**
  * @since 3.0
  */
@@ -25,4 +27,6 @@ public interface RawContent
   long getSize();
 
   InputStream openInputStream() throws IOException;
+
+  DateTime getLastModified();
 }

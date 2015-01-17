@@ -19,6 +19,8 @@ import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.StreamPayload;
 
+import org.joda.time.DateTime;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -47,11 +49,19 @@ public class RawContentPayloadMarshaller
       public InputStream openInputStream() throws IOException {
         return payload.openInputStream();
       }
+
+      @Override
+      public DateTime getLastModified() {
+        return payload.getLastModified();
+      }
     };
   }
 
   public static Payload toPayload(RawContent content) throws IOException {
     checkNotNull(content);
-    return new StreamPayload(content.openInputStream(), content.getSize(), content.getContentType());
+    return new StreamPayload(content.openInputStream(),
+        content.getSize(),
+        content.getContentType(),
+        content.getLastModified());
   }
 }

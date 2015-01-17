@@ -82,11 +82,14 @@ public class ProxyFacetImpl
 
     Payload content = localStorage.get(locator);
 
-    if (content == null) {
+    if (content == null || isStale(content)) {
       try {
-        content = fetch(locator);
-        if (content != null) {
-          localStorage.put(locator, content);
+        final Payload remote = fetch(locator);
+        if (remote != null) {
+
+          // TODO: Introduce content validation.. perhaps content's type not matching path's implied type.
+
+          content = localStorage.put(locator, remote);
         }
       }
       catch (IOException e) {
@@ -114,7 +117,7 @@ public class ProxyFacetImpl
       HttpEntity entity = response.getEntity();
       try {
         log.debug("Entity: {}", entity);
-        payload = new HttpEntityPayload(entity);
+        payload = new HttpEntityPayload(response, entity);
       }
       finally {
         EntityUtils.consume(entity);
@@ -122,5 +125,9 @@ public class ProxyFacetImpl
     }
 
     return payload;
+  }
+
+  private boolean isStale(Payload payload) {
+    throw new IllegalStateException("not implemented");
   }
 }

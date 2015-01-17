@@ -79,7 +79,7 @@ public class SimpleProxyFacet
   }
 
   @Nullable
-  @Guarded(by=STARTED)
+  @Guarded(by = STARTED)
   public SimpleContent get(final String name) {
     checkNotNull(name);
 
@@ -117,7 +117,7 @@ public class SimpleProxyFacet
       HttpEntity entity = response.getEntity();
       try {
         log.debug("Entity: {}", entity);
-        content = new SimpleContent(new HttpEntityPayload(entity));
+        content = new SimpleContent(new HttpEntityPayload(response, entity));
       }
       finally {
         EntityUtils.consume(entity);

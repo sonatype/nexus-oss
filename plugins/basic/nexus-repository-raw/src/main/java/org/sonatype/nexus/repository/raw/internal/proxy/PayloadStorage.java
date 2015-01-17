@@ -25,7 +25,7 @@ public interface PayloadStorage
 {
   Payload get(Locator locator) throws IOException;
 
-  void put(Locator locator, Payload payload) throws IOException;
+  Payload put(Locator locator, Payload payload) throws IOException;
 
   boolean delete(Locator locator);
 }

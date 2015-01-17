@@ -36,4 +36,7 @@ public interface Payload
 
   @Nullable
   String getContentType();
+
+  @Nullable
+  DateTime getLastModified();
 }

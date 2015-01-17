@@ -18,6 +18,7 @@ import java.io.InputStream;
 import org.sonatype.nexus.repository.view.Payload;
 
 import com.google.common.io.ByteStreams;
+import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,12 +32,15 @@ public class RawContentImpl
 
   private final byte[] bytes;
 
+  private final DateTime lastModified;
+
   public RawContentImpl(final Payload payload) throws IOException {
     checkNotNull(payload);
     this.type = payload.getContentType();
     try (InputStream input = checkNotNull(payload.openInputStream())) {
       this.bytes = ByteStreams.toByteArray(input);
     }
+    this.lastModified = payload.getLastModified();
   }
 
   @Override
@@ -50,6 +54,11 @@ public class RawContentImpl
   }
 
   @Override
+  public DateTime getLastModified() {
+    return lastModified;
+  }
+
+  @Override
   public InputStream openInputStream() {
     return null;
   }
@@ -59,6 +68,7 @@ public class RawContentImpl
     return getClass().getSimpleName() + "{" +
         "type='" + type + '\'' +
         ", size=" + bytes.length +
+        ", lastModified=" + lastModified +
         '}';
   }
 }

@@ -21,6 +21,9 @@ import org.sonatype.nexus.repository.raw.internal.proxy.Locator;
 import org.sonatype.nexus.repository.raw.internal.proxy.PayloadStorage;
 import org.sonatype.nexus.repository.view.Payload;
 
+import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toContent;
+import static org.sonatype.nexus.repository.raw.internal.RawContentPayloadMarshaller.toPayload;
+
 /**
  * @since 3.0
  */
@@ -38,18 +41,16 @@ public class RawPayloadStorage
       return null;
     }
 
-    // TODO: Respect the time-to-live of proxy storage
-
-    return RawContentPayloadMarshaller.toPayload(rawContent);
+    return toPayload(rawContent);
   }
 
   @Override
-  public void put(final Locator locator, final Payload payload) throws IOException {
+  public Payload put(final Locator locator, final Payload payload) throws IOException {
     final RawLocator rawLocator = (RawLocator) locator;
 
-    // TODO: Record time of creation
+    final RawContent put = storage().put(rawLocator.path(), toContent(payload));
 
-    storage().put(rawLocator.path(), RawContentPayloadMarshaller.toContent(payload));
+    return toPayload(put);
   }
 
   @Override
