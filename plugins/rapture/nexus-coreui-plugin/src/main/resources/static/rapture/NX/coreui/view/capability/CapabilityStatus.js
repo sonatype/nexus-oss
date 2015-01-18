@@ -18,8 +18,9 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.capability.CapabilityStatus', {
-  extend: 'NX.view.SettingsPanel',
+  extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-status',
+  ui: 'inset',
   requires: [
     'NX.I18n'
   ],
