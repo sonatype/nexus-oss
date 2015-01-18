@@ -56,7 +56,7 @@ public class SimpleSecurityHandler
   }
 
   /**
-   * Returns permission to verify permission to invoke.
+   * Returns permission to verify permitted to proceed.
    */
   private String permission(final Context context) {
     String action = action(context.getRequest());
