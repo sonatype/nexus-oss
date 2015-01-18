@@ -23,6 +23,11 @@ import org.sonatype.nexus.repository.security.MutableDynamicSecurityResource.Mut
 import org.sonatype.security.model.SecurityModelConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.security.BreadActions.ADD;
+import static org.sonatype.nexus.repository.security.BreadActions.BROWSE;
+import static org.sonatype.nexus.repository.security.BreadActions.DELETE;
+import static org.sonatype.nexus.repository.security.BreadActions.EDIT;
+import static org.sonatype.nexus.repository.security.BreadActions.READ;
 import static org.sonatype.nexus.repository.security.RepositoryInstancePrivilegeDescriptor.id;
 import static org.sonatype.nexus.repository.security.RepositoryInstancePrivilegeDescriptor.privilege;
 
@@ -52,36 +57,36 @@ public class SimpleSecurityFacet
       @Override
       public void apply(final SecurityModelConfiguration model) {
         // add repository-instance privileges
-        model.addPrivilege(privilege(repositoryName, "browse"));
-        model.addPrivilege(privilege(repositoryName, "read"));
-        model.addPrivilege(privilege(repositoryName, "edit"));
-        model.addPrivilege(privilege(repositoryName, "add"));
-        model.addPrivilege(privilege(repositoryName, "delete"));
+        model.addPrivilege(privilege(repositoryName, BROWSE));
+        model.addPrivilege(privilege(repositoryName, READ));
+        model.addPrivilege(privilege(repositoryName, EDIT));
+        model.addPrivilege(privilege(repositoryName, ADD));
+        model.addPrivilege(privilege(repositoryName, DELETE));
 
         // add repository-instance 'admin' role
         model.addRole(new CRoleBuilder()
             .id(String.format("repository-instance-%s-admin", repositoryName))
-            .privilege(id(repositoryName, "browse"))
-            .privilege(id(repositoryName, "read"))
-            .privilege(id(repositoryName, "edit"))
-            .privilege(id(repositoryName, "add"))
-            .privilege(id(repositoryName, "delete"))
+            .privilege(id(repositoryName, BROWSE))
+            .privilege(id(repositoryName, READ))
+            .privilege(id(repositoryName, EDIT))
+            .privilege(id(repositoryName, ADD))
+            .privilege(id(repositoryName, DELETE))
             .create());
 
         // add repository-instance 'readonly' role
         model.addRole(new CRoleBuilder()
             .id(String.format("repository-instance-%s-readonly", repositoryName))
-            .privilege(id(repositoryName, "browse"))
-            .privilege(id(repositoryName, "read"))
+            .privilege(id(repositoryName, BROWSE))
+            .privilege(id(repositoryName, READ))
             .create());
 
         // add repository-instance 'deployer' role
         model.addRole(new CRoleBuilder()
             .id(String.format("repository-instance-%s-deployer", repositoryName))
-            .privilege(id(repositoryName, "browse"))
-            .privilege(id(repositoryName, "read"))
-            .privilege(id(repositoryName, "edit"))
-            .privilege(id(repositoryName, "add"))
+            .privilege(id(repositoryName, BROWSE))
+            .privilege(id(repositoryName, READ))
+            .privilege(id(repositoryName, EDIT))
+            .privilege(id(repositoryName, ADD))
             .create());
       }
     });
@@ -96,11 +101,11 @@ public class SimpleSecurityFacet
       @Override
       public void apply(final SecurityModelConfiguration model) {
         // remove repository-instance privileges
-        model.removePrivilege(id(repositoryName, "browse"));
-        model.removePrivilege(id(repositoryName, "read"));
-        model.removePrivilege(id(repositoryName, "edit"));
-        model.removePrivilege(id(repositoryName, "add"));
-        model.removePrivilege(id(repositoryName, "delete"));
+        model.removePrivilege(id(repositoryName, BROWSE));
+        model.removePrivilege(id(repositoryName, READ));
+        model.removePrivilege(id(repositoryName, EDIT));
+        model.removePrivilege(id(repositoryName, ADD));
+        model.removePrivilege(id(repositoryName, DELETE));
 
         // remove repository-instance roles
         model.removeRole(String.format("repository-instance-%s-admin", repositoryName));

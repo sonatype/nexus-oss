@@ -17,9 +17,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.security.MutableDynamicSecurityResource;
+import org.sonatype.security.realms.tools.DynamicSecurityResource;
 
 /**
- * ???
+ * Simple format {@link DynamicSecurityResource}.
  *
  * @since 3.0
  *

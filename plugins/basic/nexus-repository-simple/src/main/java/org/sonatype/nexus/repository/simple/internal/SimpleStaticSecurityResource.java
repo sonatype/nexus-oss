@@ -24,11 +24,16 @@ import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.security.BreadActions.ADD;
+import static org.sonatype.nexus.repository.security.BreadActions.BROWSE;
+import static org.sonatype.nexus.repository.security.BreadActions.DELETE;
+import static org.sonatype.nexus.repository.security.BreadActions.EDIT;
+import static org.sonatype.nexus.repository.security.BreadActions.READ;
 import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.id;
 import static org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor.privilege;
 
 /**
- * ???
+ * Simple format {@link StaticSecurityResource}.
  *
  * @since 3.0
  */
@@ -50,36 +55,36 @@ public class SimpleStaticSecurityResource
     Configuration model = new Configuration();
 
     // add repository-format privileges
-    model.addPrivilege(privilege(formatName, "browse"));
-    model.addPrivilege(privilege(formatName, "read"));
-    model.addPrivilege(privilege(formatName, "edit"));
-    model.addPrivilege(privilege(formatName, "add"));
-    model.addPrivilege(privilege(formatName, "delete"));
+    model.addPrivilege(privilege(formatName, BROWSE));
+    model.addPrivilege(privilege(formatName, READ));
+    model.addPrivilege(privilege(formatName, EDIT));
+    model.addPrivilege(privilege(formatName, ADD));
+    model.addPrivilege(privilege(formatName, DELETE));
 
     // add repository-format 'admin' role
     model.addRole(new CRoleBuilder()
         .id(String.format("repository-format-%s-admin", formatName))
-        .privilege(id(formatName, "browse"))
-        .privilege(id(formatName, "read"))
-        .privilege(id(formatName, "edit"))
-        .privilege(id(formatName, "add"))
-        .privilege(id(formatName, "delete"))
+        .privilege(id(formatName, BROWSE))
+        .privilege(id(formatName, READ))
+        .privilege(id(formatName, EDIT))
+        .privilege(id(formatName, ADD))
+        .privilege(id(formatName, DELETE))
         .create());
 
     // add repository-format 'readonly' role
     model.addRole(new CRoleBuilder()
         .id(String.format("repository-format-%s-readonly", formatName))
-        .privilege(id(formatName, "browse"))
-        .privilege(id(formatName, "read"))
+        .privilege(id(formatName, BROWSE))
+        .privilege(id(formatName, READ))
         .create());
 
     // add repository-format 'deployer' role
     model.addRole(new CRoleBuilder()
         .id(String.format("repository-format-%s-deployer", formatName))
-        .privilege(id(formatName, "browse"))
-        .privilege(id(formatName, "read"))
-        .privilege(id(formatName, "edit"))
-        .privilege(id(formatName, "add"))
+        .privilege(id(formatName, BROWSE))
+        .privilege(id(formatName, READ))
+        .privilege(id(formatName, EDIT))
+        .privilege(id(formatName, ADD))
         .create());
 
     return model;
