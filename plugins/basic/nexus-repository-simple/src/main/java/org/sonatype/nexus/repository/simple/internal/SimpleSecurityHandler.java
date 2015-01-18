@@ -46,6 +46,8 @@ public class SimpleSecurityHandler
     Subject subject = SecurityUtils.getSubject();
     String perm = permission(context);
 
+    // TODO: Resolve repository-format and repository-instance permissions
+
     log.trace("Verifying subject: {} has permission: {}", subject.getPrincipal(), perm);
     if (!subject.isPermitted(perm)) {
       return HttpResponses.unauthorized();
