@@ -60,6 +60,8 @@ public class SimpleProxyRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleProxyHandler proxyHandler;
@@ -73,6 +75,7 @@ public class SimpleProxyRecipe
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
                            final TimingHandler timingHandler,
+                           final SimpleSecurityHandler securityHandler,
                            final SimpleIndexHtmlHandler indexHtmlHandler,
                            final SimpleProxyHandler proxyHandler)
   {
@@ -83,6 +86,7 @@ public class SimpleProxyRecipe
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
   }
@@ -107,12 +111,14 @@ public class SimpleProxyRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(proxyHandler)
         .create());
 

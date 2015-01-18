@@ -57,6 +57,8 @@ public class SimpleHostedRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleStorageHandler storageHandler;
@@ -69,6 +71,7 @@ public class SimpleHostedRecipe
                             final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                             final Provider<SimpleStorageFacet> storageFacet,
                             final TimingHandler timingHandler,
+                            final SimpleSecurityHandler securityHandler,
                             final SimpleIndexHtmlHandler indexHtmlHandler,
                             final SimpleStorageHandler storageHandler)
   {
@@ -78,6 +81,7 @@ public class SimpleHostedRecipe
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.storageHandler = checkNotNull(storageHandler);
   }
@@ -101,12 +105,14 @@ public class SimpleHostedRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(storageHandler)
         .create());
 

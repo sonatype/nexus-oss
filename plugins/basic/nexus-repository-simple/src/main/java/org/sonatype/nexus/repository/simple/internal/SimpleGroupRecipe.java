@@ -57,6 +57,8 @@ public class SimpleGroupRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleGroupHandler groupHandler;
@@ -69,6 +71,7 @@ public class SimpleGroupRecipe
                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<SimpleGroupFacet> groupFacet,
                            final TimingHandler timingHandler,
+                           final SimpleSecurityHandler securityHandler,
                            final SimpleIndexHtmlHandler indexHtmlHandler,
                            final SimpleGroupHandler groupHandler)
   {
@@ -78,6 +81,7 @@ public class SimpleGroupRecipe
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.groupFacet = checkNotNull(groupFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.groupHandler = checkNotNull(groupHandler);
   }
@@ -101,12 +105,14 @@ public class SimpleGroupRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(groupHandler)
         .create());
 
