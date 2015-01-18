@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.security;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
@@ -24,6 +26,7 @@ import org.sonatype.security.realms.validator.SecurityValidationContext;
 import com.google.common.base.Strings;
 
 // TODO: Move to proper module
+// NOTE: Not using existing AbstractPrivilegeDescriptor to investigate divorcing from legacy
 
 /**
  * Support for {@link PrivilegeDescriptor} implementations.
@@ -53,7 +56,9 @@ public abstract class PrivilegeDescriptorSupport
   }
 
   @Override
+  @Nullable
   public String buildPermission(final CPrivilege privilege) {
+    // FIXME: This is a poor design, this check should be done by caller?
     if (getType().equals(privilege.getType())) {
       return null;
     }
