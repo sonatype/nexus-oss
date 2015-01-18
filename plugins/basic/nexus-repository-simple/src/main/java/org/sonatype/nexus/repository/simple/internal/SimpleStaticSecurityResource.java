@@ -18,7 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
-import org.sonatype.security.model.CRole;
+import org.sonatype.nexus.repository.security.CRoleBuilder;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.SecurityModelConfiguration;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
@@ -57,45 +57,30 @@ public class SimpleStaticSecurityResource
     model.addPrivilege(privilege(formatName, "delete"));
 
     // add repository-format 'admin' role
-    {
-      CRole role = new CRole();
-      String id = String.format("repository-format-%s-admin", formatName);
-      role.setId(id);
-      role.setName(id);
-      role.setDescription(id);
-      role.addPrivilege(id(formatName, "browse"));
-      role.addPrivilege(id(formatName, "read"));
-      role.addPrivilege(id(formatName, "edit"));
-      role.addPrivilege(id(formatName, "add"));
-      role.addPrivilege(id(formatName, "delete"));
-      model.addRole(role);
-    }
+    model.addRole(new CRoleBuilder()
+        .id(String.format("repository-format-%s-admin", formatName))
+        .privilege(id(formatName, "browse"))
+        .privilege(id(formatName, "read"))
+        .privilege(id(formatName, "edit"))
+        .privilege(id(formatName, "add"))
+        .privilege(id(formatName, "delete"))
+        .create());
 
     // add repository-format 'readonly' role
-    {
-      CRole role = new CRole();
-      String id = String.format("repository-format-%s-readonly", formatName);
-      role.setId(id);
-      role.setName(id);
-      role.setDescription(id);
-      role.addPrivilege(id(formatName, "browse"));
-      role.addPrivilege(id(formatName, "read"));
-      model.addRole(role);
-    }
+    model.addRole(new CRoleBuilder()
+        .id(String.format("repository-format-%s-readonly", formatName))
+        .privilege(id(formatName, "browse"))
+        .privilege(id(formatName, "read"))
+        .create());
 
     // add repository-format 'deployer' role
-    {
-      CRole role = new CRole();
-      String id = String.format("repository-format-%s-deployer", formatName);
-      role.setId(id);
-      role.setName(id);
-      role.setDescription(id);
-      role.addPrivilege(id(formatName, "browse"));
-      role.addPrivilege(id(formatName, "read"));
-      role.addPrivilege(id(formatName, "edit"));
-      role.addPrivilege(id(formatName, "add"));
-      model.addRole(role);
-    }
+    model.addRole(new CRoleBuilder()
+        .id(String.format("repository-format-%s-readonly", formatName))
+        .privilege(id(formatName, "browse"))
+        .privilege(id(formatName, "read"))
+        .privilege(id(formatName, "edit"))
+        .privilege(id(formatName, "add"))
+        .create());
 
     return model;
   }

@@ -67,13 +67,13 @@ public class RepositoryFormatPrivilegeDescriptor
   }
 
   public static CPrivilege privilege(final String formatName, final String actions) {
-    CPrivilege privilege = new CPrivilege();
-    privilege.setType(TYPE);
-    privilege.setId(id(formatName, actions));
-    privilege.setName(permission(formatName, actions));
-    privilege.setDescription(String.format("Grants '%s' repository format actions: %s", formatName, actions));
-    privilege.setProperty(P_FORMAT, formatName);
-    privilege.setProperty(P_ACTIONS, actions);
-    return privilege;
+    return new CPrivilegeBuilder()
+        .type(TYPE)
+        .id(id(formatName, actions))
+        .name(permission(formatName, actions))
+        .description(String.format("Grants '%s' repository format actions: %s", formatName, actions))
+        .property(P_FORMAT, formatName)
+        .property(P_ACTIONS, actions)
+        .create();
   }
 }

@@ -65,13 +65,13 @@ public class RepositoryInstancePrivilegeDescriptor
   }
 
   public static CPrivilege privilege(final String repositoryName, final String actions) {
-    CPrivilege privilege = new CPrivilege();
-    privilege.setType(TYPE);
-    privilege.setId(id(repositoryName, actions));
-    privilege.setName(permission(repositoryName, actions));
-    privilege.setDescription(String.format("Grants '%s' repository instance actions: %s", repositoryName, actions));
-    privilege.setProperty(P_REPOSITORY, repositoryName);
-    privilege.setProperty(P_ACTIONS, actions);
-    return privilege;
+    return new CPrivilegeBuilder()
+        .type(TYPE)
+        .id(id(repositoryName, actions))
+        .name(permission(repositoryName, actions))
+        .description(String.format("Grants '%s' repository instance actions: %s", repositoryName, actions))
+        .property(P_REPOSITORY, repositoryName)
+        .property(P_ACTIONS, actions)
+        .create();
   }
 }

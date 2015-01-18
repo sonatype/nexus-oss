@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.repository.simple.internal;
 
 import javax.inject.Inject;
@@ -17,8 +18,8 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.security.CRoleBuilder;
 import org.sonatype.nexus.repository.security.MutableDynamicSecurityResource.Mutator;
-import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.SecurityModelConfiguration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,45 +59,30 @@ public class SimpleSecurityFacet
         model.addPrivilege(privilege(repositoryName, "delete"));
 
         // add repository-instance 'admin' role
-        {
-          CRole role = new CRole();
-          String id = String.format("repository-instance-%s-admin", repositoryName);
-          role.setId(id);
-          role.setName(id);
-          role.setDescription(id);
-          role.addPrivilege(id(repositoryName, "browse"));
-          role.addPrivilege(id(repositoryName, "read"));
-          role.addPrivilege(id(repositoryName, "edit"));
-          role.addPrivilege(id(repositoryName, "add"));
-          role.addPrivilege(id(repositoryName, "delete"));
-          model.addRole(role);
-        }
+        model.addRole(new CRoleBuilder()
+            .id(String.format("repository-instance-%s-admin", repositoryName))
+            .privilege(id(repositoryName, "browse"))
+            .privilege(id(repositoryName, "read"))
+            .privilege(id(repositoryName, "edit"))
+            .privilege(id(repositoryName, "add"))
+            .privilege(id(repositoryName, "delete"))
+            .create());
 
         // add repository-instance 'readonly' role
-        {
-          CRole role = new CRole();
-          String id = String.format("repository-instance-%s-readonly", repositoryName);
-          role.setId(id);
-          role.setName(id);
-          role.setDescription(id);
-          role.addPrivilege(id(repositoryName, "browse"));
-          role.addPrivilege(id(repositoryName, "read"));
-          model.addRole(role);
-        }
+        model.addRole(new CRoleBuilder()
+            .id(String.format("repository-instance-%s-readonly", repositoryName))
+            .privilege(id(repositoryName, "browse"))
+            .privilege(id(repositoryName, "read"))
+            .create());
 
         // add repository-instance 'deployer' role
-        {
-          CRole role = new CRole();
-          String id = String.format("repository-instance-%s-deployer", repositoryName);
-          role.setId(id);
-          role.setName(id);
-          role.setDescription(id);
-          role.addPrivilege(id(repositoryName, "browse"));
-          role.addPrivilege(id(repositoryName, "read"));
-          role.addPrivilege(id(repositoryName, "edit"));
-          role.addPrivilege(id(repositoryName, "add"));
-          model.addRole(role);
-        }
+        model.addRole(new CRoleBuilder()
+            .id(String.format("repository-instance-%s-deployer", repositoryName))
+            .privilege(id(repositoryName, "browse"))
+            .privilege(id(repositoryName, "read"))
+            .privilege(id(repositoryName, "edit"))
+            .privilege(id(repositoryName, "add"))
+            .create());
       }
     });
   }
