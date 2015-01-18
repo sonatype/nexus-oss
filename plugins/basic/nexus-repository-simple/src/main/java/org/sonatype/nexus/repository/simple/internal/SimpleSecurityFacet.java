@@ -95,7 +95,7 @@ public class SimpleSecurityFacet
     {
       @Override
       public void apply(final SecurityModelConfiguration model) {
-        // remove repository-instance privilege
+        // remove repository-instance privileges
         model.removePrivilege(id(repositoryName, "browse"));
         model.removePrivilege(id(repositoryName, "read"));
         model.removePrivilege(id(repositoryName, "edit"));

@@ -75,7 +75,7 @@ public class SimpleStaticSecurityResource
 
     // add repository-format 'deployer' role
     model.addRole(new CRoleBuilder()
-        .id(String.format("repository-format-%s-readonly", formatName))
+        .id(String.format("repository-format-%s-deployer", formatName))
         .privilege(id(formatName, "browse"))
         .privilege(id(formatName, "read"))
         .privilege(id(formatName, "edit"))
