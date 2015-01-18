@@ -12,13 +12,17 @@
  */
 package org.sonatype.nexus.repository.simple.internal;
 
+import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.httpbridge.HttpMethods;
 import org.sonatype.nexus.repository.httpbridge.HttpResponses;
 import org.sonatype.nexus.repository.security.BreadActions;
+import org.sonatype.nexus.repository.security.RepositoryFormatPrivilegeDescriptor;
 import org.sonatype.nexus.repository.security.RepositoryInstancePrivilegeDescriptor;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -43,26 +47,22 @@ public class SimpleSecurityHandler
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
+    // lookup the subject to verify permissions on
     Subject subject = SecurityUtils.getSubject();
-    String perm = permission(context);
 
-    // TODO: Resolve repository-format and repository-instance permissions
+    // determine permission action from request
+    String action = action(context.getRequest());
 
-    log.trace("Verifying subject: {} has permission: {}", subject.getPrincipal(), perm);
-    if (!subject.isPermitted(perm)) {
-      return HttpResponses.unauthorized();
+    // subject must have either format or instance permissions
+    Repository repository = context.getRepository();
+    String formatPerm = RepositoryFormatPrivilegeDescriptor.permission(repository.getFormat().getValue(), action);
+    String instancePerm = RepositoryInstancePrivilegeDescriptor.permission(repository.getName(), action);
+    if (anyPermitted(subject, formatPerm, instancePerm)) {
+      // TODO: Handle security exception
+      return context.proceed();
     }
 
-    // TODO: Handle security exception
-    return context.proceed();
-  }
-
-  /**
-   * Returns permission to verify permitted to proceed.
-   */
-  private String permission(final Context context) {
-    String action = action(context.getRequest());
-    return RepositoryInstancePrivilegeDescriptor.permission(context.getRepository().getName(), action);
+    return HttpResponses.unauthorized();
   }
 
   /**
@@ -87,5 +87,54 @@ public class SimpleSecurityHandler
     }
 
     throw new RuntimeException("Unsupported action: " + request.getAction());
+  }
+
+  /**
+   * Check if subject has ANY of the given permissions.
+   */
+  private boolean anyPermitted(final Subject subject, final String... permissions) {
+    boolean trace = log.isTraceEnabled();
+    if (trace) {
+      log.trace("Checking if subject '{}' has ANY of these permissions: {}",
+          subject.getPrincipal(), Arrays.toString(permissions));
+    }
+    for (String permission : permissions) {
+      if (subject.isPermitted(permission)) {
+        if (trace) {
+          log.trace("Subject '{}' has permission: {}", subject.getPrincipal(), permission);
+        }
+        return true;
+      }
+    }
+    if (trace) {
+      log.trace("Subject '{}' missing required permissions: {}",
+          subject.getPrincipal(), Arrays.toString(permissions));
+    }
+    return false;
+  }
+
+  /**
+   * Check if subject has ALL of the given permissions.
+   */
+  private boolean allPermitted(final Subject subject, final String... permissions) {
+    boolean trace = log.isTraceEnabled();
+    if (trace) {
+      log.trace("Checking if subject '{}' has ALL of these permissions: {}",
+          subject.getPrincipal(), Arrays.toString(permissions));
+    }
+    for (String permission : permissions) {
+      if (!subject.isPermitted(permission)) {
+        if (trace) {
+          log.trace("Subject '{}' missing permission: {}", subject.getPrincipal(), permission);
+        }
+        return false;
+      }
+    }
+
+    if (trace) {
+      log.trace("Subject '{}' has required permissions: {}",
+          subject.getPrincipal(), Arrays.toString(permissions));
+    }
+    return false;
   }
 }
