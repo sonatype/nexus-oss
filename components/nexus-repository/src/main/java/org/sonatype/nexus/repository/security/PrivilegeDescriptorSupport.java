@@ -48,11 +48,7 @@ public abstract class PrivilegeDescriptorSupport
                                               final boolean update)
   {
     // FIXME: For now ignore validation
-    ValidationResponse response = new ValidationResponse();
-    if (context != null) {
-      response.setContext(context);
-    }
-    return response;
+    return new ValidationResponse();
   }
 
   @Override
