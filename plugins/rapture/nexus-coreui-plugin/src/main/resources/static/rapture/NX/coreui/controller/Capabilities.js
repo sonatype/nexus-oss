@@ -167,7 +167,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
         capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      console.log()
       me.getFeature().setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
 
       capabilityTypeModel = me.getCapabilityTypeStore().getById(model.get('typeId'));
@@ -175,8 +174,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.eventuallyShowWarning(model);
       me.showSummary(model);
       me.showSettings(model);
-      me.showAbout(capabilityTypeModel);
       me.showStatus(model);
+      me.showAbout(capabilityTypeModel);
     }
   },
 
@@ -279,7 +278,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
         list = me.getList();
 
     if (list) {
-      me.getCapabilityTypeStore().load();
+      me.getCapabilityTypeStore().load(
+        function() {
+          me.reselect();
+        }
+      );
     }
   },
 
