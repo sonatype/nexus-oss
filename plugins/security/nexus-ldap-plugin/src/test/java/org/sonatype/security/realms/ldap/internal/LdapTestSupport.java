@@ -269,7 +269,7 @@ public abstract class LdapTestSupport
     Connection connInfo = new Connection();
     connInfo.setAuthScheme("ldap");
     connInfo.setBackupHost(new Host(Protocol.ldap, "backupHost", 11111));
-    connInfo.setCacheTimeout(30);
+    connInfo.setMaxIncidentsCount(3);
     connInfo.setConnectionRetryDelay(300);
     connInfo.setConnectionTimeout(15);
     connInfo.setHost(new Host(Protocol.ldap, "localhost", 386));

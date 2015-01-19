@@ -533,7 +533,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_LDAP_CONNECTION_PASSWORD_HELP: 'The password to bind with.',
     ADMIN_LDAP_CONNECTION_TIMEOUT: 'Connection timeout (seconds)',
     ADMIN_LDAP_CONNECTION_RETRY: 'Retry request delay (seconds)',
-    ADMIN_LDAP_CONNECTION_CACHE: 'Cache duration (seconds)',
+    ADMIN_LDAP_CONNECTION_MAX_INCIDENTS_COUNT: 'Maximum incidents count before connection blacklisted',
     ADMIN_LDAP_CONNECTION_VERIFY_BUTTON: 'Verify connection',
     ADMIN_LDAP_BACKUP_USE: 'Use backup mirror',
     ADMIN_LDAP_GROUP_TEMPLATE: 'Configuration template',

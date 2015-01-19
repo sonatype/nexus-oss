@@ -34,7 +34,7 @@ public class LdapRestTestUtils
       Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorProtocol(),
           ldapServer.getConnection().getBackupHost().getProtocol().name());
     }
-    Assert.assertEquals(dto.getConnectionInfo().getCacheTimeout(), ldapServer.getConnection().getCacheTimeout());
+    Assert.assertEquals(dto.getConnectionInfo().getMaxIncidentsCount(), ldapServer.getConnection().getMaxIncidentsCount());
     Assert.assertEquals(dto.getConnectionInfo().getConnectionRetryDelay(),
         ldapServer.getConnection().getConnectionRetryDelay());
     Assert.assertEquals(dto.getConnectionInfo().getConnectionTimeout(),

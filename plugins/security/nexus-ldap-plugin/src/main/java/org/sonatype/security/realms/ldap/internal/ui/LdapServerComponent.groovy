@@ -261,7 +261,7 @@ extends DirectComponentSupport
 
         connectionTimeout: connectionInfo.connectionTimeout,
         connectionRetryDelay: connectionInfo.connectionRetryDelay,
-        cacheTimeout: connectionInfo.cacheTimeout,
+        maxIncidentsCount: connectionInfo.maxIncidentsCount,
 
         backupMirrorEnabled: connectionInfo.backupHost != null,
         backupMirrorProtocol: connectionInfo.backupHost?.protocol?.name(),
@@ -339,7 +339,7 @@ extends DirectComponentSupport
 
             connectionTimeout: ldapServerXO.connectionTimeout,
             connectionRetryDelay: ldapServerXO.connectionRetryDelay,
-            cacheTimeout: ldapServerXO.cacheTimeout,
+            maxIncidentsCount: ldapServerXO.maxIncidentsCount,
 
             backupHost: ldapServerXO.backupMirrorEnabled ? new Host(Protocol.valueOf(ldapServerXO.backupMirrorProtocol.name()), ldapServerXO.backupMirrorHost, ldapServerXO.backupMirrorPort) : null
         ),

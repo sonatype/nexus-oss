@@ -132,14 +132,14 @@ public final class Connection
   private int connectionTimeout;
 
   /**
-   * Connection retry delay. Connection retry delay in seconds.
+   * Connection retry delay. Connection retry delay in seconds. Used by FailoverLdapConnector.
    */
   private int connectionRetryDelay;
 
   /**
-   * Cache timeout. Cache timeout in seconds.
+   * Max incidents count, before connection is blacklisted. Used by FailoverLdapConnector.
    */
-  private int cacheTimeout;
+  private int maxIncidentsCount;
 
   public String getSearchBase() {
     return searchBase;
@@ -217,11 +217,11 @@ public final class Connection
     this.connectionRetryDelay = connectionRetryDelay;
   }
 
-  public int getCacheTimeout() {
-    return cacheTimeout;
+  public int getMaxIncidentsCount() {
+    return maxIncidentsCount;
   }
 
-  public void setCacheTimeout(final int cacheTimeout) {
-    this.cacheTimeout = cacheTimeout;
+  public void setMaxIncidentsCount(final int maxIncidentsCount) {
+    this.maxIncidentsCount = maxIncidentsCount;
   }
 }

@@ -95,7 +95,7 @@ public class ServerListRestTest
     connectionDto.setBackupMirrorPort(389);
     connectionDto.setConnectionTimeout(33);
     connectionDto.setConnectionRetryDelay(44);
-    connectionDto.setCacheTimeout(55);
+    connectionDto.setCacheTimeout(30); // unused and defaulted
     userGroupDto.setEmailAddressAttribute("qasdf");
     userGroupDto.setLdapGroupsAsRoles(true);
     userGroupDto.setUserPasswordAttribute("asdf");

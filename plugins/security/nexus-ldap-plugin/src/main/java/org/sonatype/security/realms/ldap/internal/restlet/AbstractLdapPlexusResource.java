@@ -187,7 +187,7 @@ public abstract class AbstractLdapPlexusResource
         infoDto.setBackupMirrorPort(connInfo.getBackupHost().getPort());
         infoDto.setBackupMirrorProtocol(connInfo.getBackupHost().getProtocol().name());
       }
-      infoDto.setCacheTimeout(connInfo.getCacheTimeout());
+      infoDto.setMaxIncidentsCount(connInfo.getMaxIncidentsCount());
       infoDto.setConnectionRetryDelay(connInfo.getConnectionRetryDelay());
       infoDto.setConnectionTimeout(connInfo.getConnectionTimeout());
       infoDto.setHost(connInfo.getHost().getHostName());
@@ -256,7 +256,7 @@ public abstract class AbstractLdapPlexusResource
       to.setSaslRealm(from.getRealm());
       to.setConnectionTimeout(from.getConnectionTimeout());
       to.setConnectionRetryDelay(from.getConnectionRetryDelay());
-      to.setCacheTimeout(from.getCacheTimeout());
+      to.setMaxIncidentsCount(from.getMaxIncidentsCount());
       return decode(to);
     }
     catch (NullPointerException e) {

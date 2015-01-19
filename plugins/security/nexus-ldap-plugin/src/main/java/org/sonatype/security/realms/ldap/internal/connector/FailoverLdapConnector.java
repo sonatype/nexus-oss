@@ -32,22 +32,27 @@ public class FailoverLdapConnector
 
   private static Logger log = LoggerFactory.getLogger(FailoverLdapConnector.class);
 
-  private LdapConnector originalLdapManagerConnector;
+  private final LdapConnector originalLdapManagerConnector;
 
-  private LdapConnector backupLdapManagerConnector;
+  private final LdapConnector backupLdapManagerConnector;
 
-  private int retryDelay = 0;
+  private final int retryDelay;
+
+  private final int maxIncidentsCount;
 
   private long connectionFailedTime = 0;
 
   private int incidents = 0;
 
-  public FailoverLdapConnector(LdapConnector originalLdapManagerConnector,
-                               LdapConnector backupLdapManagerConnector, int retryDelay)
+  public FailoverLdapConnector(final LdapConnector originalLdapManagerConnector,
+                               final LdapConnector backupLdapManagerConnector,
+                               final int retryDelaySeconds,
+                               final int maxIncidentsCount)
   {
     this.originalLdapManagerConnector = originalLdapManagerConnector;
     this.backupLdapManagerConnector = backupLdapManagerConnector;
-    this.retryDelay = retryDelay * 1000;
+    this.retryDelay = retryDelaySeconds * 1000;
+    this.maxIncidentsCount = maxIncidentsCount;
   }
 
   @VisibleForTesting
@@ -71,17 +76,20 @@ public class FailoverLdapConnector
   boolean isOriginalConnectorValid() {
     // main connector is well
     if ((connectionFailedTime == 0)) {
+      log.debug("isOriginalConnectorValid=TRUE connectionFailedTime=={}", connectionFailedTime);
       return true;
     }
 
     // connector (maybe) recovered, reset time + incidents
     if ((this.connectionFailedTime + this.retryDelay) < System.currentTimeMillis()) {
+      log.debug("isOriginalConnectorValid=TRUE {}+{} < {}", connectionFailedTime, retryDelay, System.currentTimeMillis());
       resetFailure();
       return true;
     }
-    else if (this.incidents < 3)
+    else if (this.incidents < maxIncidentsCount)
     // connector is still below the failure threshold, do not blacklist but try again
     {
+      log.debug("isOriginalConnectorValid=TRUE {} < {}", incidents, maxIncidentsCount);
       return true;
     }
 

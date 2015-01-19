@@ -322,7 +322,8 @@ public class EnterpriseLdapManager
         ldapConnectors.add(new FailoverLdapConnector(
             originalLdapConnector,
             backupLdapConnector,
-            ldapServer.getConnection().getConnectionRetryDelay()));
+            ldapServer.getConnection().getConnectionRetryDelay(),
+            ldapServer.getConnection().getMaxIncidentsCount()));
 
       }
     }

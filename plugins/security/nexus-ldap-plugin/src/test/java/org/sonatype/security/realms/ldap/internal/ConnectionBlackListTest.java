@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
@@ -25,19 +26,20 @@ import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfigurati
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class ConnectionBlackListTest
     extends LdapTestSupport
 {
   @Override
-  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order, final LdapServer ldapServer) {
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
     final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
     ldapConfiguration.getConnection().setConnectionTimeout(1);
     ldapConfiguration.getConnection().setConnectionRetryDelay(7);
-    ldapConfiguration.getConnection().setCacheTimeout(0);
+    // important: maxIncidentCount = 1
+    ldapConfiguration.getConnection().setMaxIncidentsCount(1);
     return ldapConfiguration;
   }
 
@@ -175,7 +177,10 @@ public class ConnectionBlackListTest
       Assert.fail("Expected NoSuchLdapUserException");
     }
     catch (NoSuchLdapUserException e) {
-      // expected
+      // expected: this was thrown before NX3
+    }
+    catch (LdapDAOException e) {
+      // expected: this is thrown today after merge of OSS/Pro
     }
 
     startLdapServers();
@@ -184,7 +189,10 @@ public class ConnectionBlackListTest
       Assert.fail("Expected NoSuchLdapUserException");
     }
     catch (NoSuchLdapUserException e) {
-      // expected
+      // expected: this was thrown before NX3
+    }
+    catch (LdapDAOException e) {
+      // expected: this is thrown today after merge of OSS/Pro
     }
 
     // wait 3 more sec, then we should be good
@@ -234,6 +242,8 @@ public class ConnectionBlackListTest
 
 
     stopLdapServers();
+    Assert.assertEquals(0, ldapManager.getUsers(1).size());
+    Assert.assertEquals(0, ldapManager.getUsers(1).size());
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
 
     startLdapServers();

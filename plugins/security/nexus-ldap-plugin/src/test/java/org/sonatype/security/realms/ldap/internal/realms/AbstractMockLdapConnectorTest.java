@@ -28,7 +28,7 @@ public abstract class AbstractMockLdapConnectorTest
     extends LdapTestSupport
 {
 
-  private EnterpriseLdapManager ldapManager = null;
+  protected EnterpriseLdapManager ldapManager = null;
 
   @Before
   public void prepareConnectors()

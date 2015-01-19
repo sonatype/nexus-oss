@@ -95,7 +95,7 @@ public class LdapConfigurationEntityAdapter
       connectionType.createProperty("saslRealm", OType.STRING);
       connectionType.createProperty("connectionTimeout", OType.INTEGER).setNotNull(true);
       connectionType.createProperty("connectionRetryDelay", OType.INTEGER).setNotNull(true);
-      connectionType.createProperty("cacheTimeout", OType.INTEGER).setNotNull(true);
+      connectionType.createProperty("maxIncidentsCount", OType.INTEGER).setNotNull(true);
 
       // mapping
       OClass mappingType = schema.createClass(DB_MAPPING_CLASS);
@@ -205,7 +205,7 @@ public class LdapConfigurationEntityAdapter
     connection.setSaslRealm(document.<String>field("saslRealm", OType.STRING));
     connection.setConnectionTimeout(document.<Integer>field("connectionTimeout", OType.INTEGER));
     connection.setConnectionRetryDelay(document.<Integer>field("connectionRetryDelay", OType.INTEGER));
-    connection.setCacheTimeout(document.<Integer>field("cacheTimeout", OType.INTEGER));
+    connection.setMaxIncidentsCount(document.<Integer>field("maxIncidentsCount", OType.INTEGER));
     return connection;
   }
 
@@ -232,7 +232,7 @@ public class LdapConfigurationEntityAdapter
     document.field("saslRealm", connection.getSaslRealm());
     document.field("connectionTimeout", connection.getConnectionTimeout());
     document.field("connectionRetryDelay", connection.getConnectionRetryDelay());
-    document.field("cacheTimeout", connection.getCacheTimeout());
+    document.field("maxIncidentsCount", connection.getMaxIncidentsCount());
     return document;
   }
 
