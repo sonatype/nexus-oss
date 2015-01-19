@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.site.plugin;
 
+import java.io.InputStream;
+import java.util.Map;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,7 +22,9 @@ import javax.inject.Named;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -89,10 +94,24 @@ public class DefaultSiteRepository
   }
 
   @Override
+  public void storeItem(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
+      throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
+  {
+    // collapse any '.' or '..' segments from the path
+    request.pushRequestPath(normalize(request.getRequestPath()));
+    try {
+      super.storeItem(request, is, userAttributes);
+    }
+    finally {
+      request.popRequestPath();
+    }
+  }
+
+  @Override
   public void storeItem(boolean fromTask, StorageItem item)
       throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
   {
-    // strip the '.' from the path
+    // collapse any '.' or '..' segments from the path
     if (AbstractStorageItem.class.isAssignableFrom(item.getClass())) {
       String normalizedPath = normalize(item.getPath());
       AbstractStorageItem fileItem = (AbstractStorageItem) item;
