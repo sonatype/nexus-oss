@@ -40,9 +40,16 @@ Ext.define('NX.controller.Drilldown', {
 
   permission: undefined,
 
+  /**
+   * @override
+   * Get the human-readable name of a model
+   */
   getDescription: Ext.emptyFn,
 
-  // List of xtypes
+  /**
+   * @override
+   * An array of xtypes which represent the masters available to this drilldown
+   */
   masters: null,
 
   /**
