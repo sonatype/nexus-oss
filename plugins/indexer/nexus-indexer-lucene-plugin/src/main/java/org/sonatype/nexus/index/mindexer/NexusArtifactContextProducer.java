@@ -13,18 +13,19 @@
 package org.sonatype.nexus.index.mindexer;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.AttributeStorage;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -64,19 +65,21 @@ public class NexusArtifactContextProducer
     final ArtifactContext ac = super.getArtifactContext(context, file);
     if (ac != null && ac.getArtifactInfo().sha1 == null) {
       // special case for proxies
-      final String repositoryId = context.getRepositoryId();
       String itemPath = file.getPath();
       try {
-        final MavenProxyRepository proxyRepository = repositoryRegistry.getRepositoryWithFacet(repositoryId,
+        // NOTE: MI supports Maven2 repositories only, so if this line does not throw,
+        // we know we deal with a Maven2 proxy repository (no need to check is it Maven1)
+        final MavenProxyRepository proxyRepository = repositoryRegistry.getRepositoryWithFacet(context.getRepositoryId(),
             MavenProxyRepository.class);
         final File baseDir = getRepositoryLocalStorageFile(proxyRepository, RepositoryItemUid.PATH_ROOT);
         itemPath = itemPath.substring(baseDir.getPath().length());
         if (!itemPath.startsWith(RepositoryItemUid.PATH_SEPARATOR)) {
           itemPath = RepositoryItemUid.PATH_SEPARATOR + itemPath;
         }
-        final StorageItem item = proxyRepository.retrieveItem(new ResourceStoreRequest(itemPath, true, false));
-        if (item instanceof StorageFileItem) {
-          final String sha1 = item.getRepositoryItemAttributes().get(StorageFileItem.DIGEST_SHA1_KEY);
+        final AttributeStorage attributeStorage = proxyRepository.getAttributesHandler().getAttributeStorage();
+        final Attributes attributes = attributeStorage.getAttributes(proxyRepository.createUid(itemPath));
+        if (attributes != null) {
+          final String sha1 = attributes.get(StorageFileItem.DIGEST_SHA1_KEY);
           if (!Strings.isNullOrEmpty(sha1)) {
             log.debug("ArtifactContext of {} enhanced with sha1={}", itemPath, sha1);
             ac.getArtifactInfo().sha1 = sha1;
@@ -84,18 +87,12 @@ public class NexusArtifactContextProducer
         }
       }
       catch (NoSuchRepositoryException e) {
-        // this means repo being scanned is not a maven proxy, just ignore
-        log.debug("Repository {} is not a maven proxy", repositoryId);
+        // this means repo being scanned is not a maven2 proxy, but is hosted instead, just ignore
+        log.debug("Repository {} is not a maven proxy", context.getRepositoryId());
       }
-      catch (ItemNotFoundException e) {
-        // possible, as MI scanning does not use UID locks but scans FS directly. Ignore it.
-        log.debug("Item not found for file {} via {}:{}", file.getAbsolutePath(), repositoryId, itemPath, e);
-      }
-      catch (Exception e) {
-        // IOEx means storage problems ahead
-        // IllegalOperationException: this should not happen for reads
-        // AccessDeniedException: this should not happen as tasks are running as admin
-        log.warn("IO problem during retrieve of {}:{}", repositoryId, itemPath, e);
+      catch (IOException e) {
+        // IOEx means storage problems ahead, do report it
+        log.warn("IO problem during retrieve of {}:{}", context.getRepositoryId(), itemPath, e);
       }
     }
     return ac;
