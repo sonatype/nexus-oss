@@ -128,9 +128,9 @@ public final class Connection
   private int connectionRetryDelay;
 
   /**
-   * Cache timeout. Cache timeout in seconds.
+   * Max incidents count, before connection is blacklisted.
    */
-  private int cacheTimeout;
+  private int maxIncidentsCount;
 
   public String getSearchBase() {
     return searchBase;
@@ -206,11 +206,11 @@ public final class Connection
     this.connectionRetryDelay = connectionRetryDelay;
   }
 
-  public int getCacheTimeout() {
-    return cacheTimeout;
+  public int getMaxIncidentsCount() {
+    return maxIncidentsCount;
   }
 
-  public void setCacheTimeout(final int cacheTimeout) {
-    this.cacheTimeout = cacheTimeout;
+  public void setMaxIncidentsCount(final int maxIncidentsCount) {
+    this.maxIncidentsCount = maxIncidentsCount;
   }
 }

@@ -213,7 +213,7 @@ public class JerseyConfiguration
     connection.setSaslRealm(dtoConnection.getRealm());
     connection.setConnectionTimeout(dtoConnection.getConnectionTimeout());
     connection.setConnectionRetryDelay(dtoConnection.getConnectionRetryDelay());
-    connection.setCacheTimeout(dtoConnection.getCacheTimeout());
+    connection.setMaxIncidentsCount(dtoConnection.getMaxIncidentsCount());
     result.connection = connection;
 
     final Mapping mapping = new Mapping();
@@ -250,7 +250,7 @@ public class JerseyConfiguration
       infoDto.setBackupMirrorPort(connInfo.getBackupHost().getPort());
       infoDto.setBackupMirrorProtocol(connInfo.getBackupHost().getProtocol().name());
     }
-    infoDto.setCacheTimeout(connInfo.getCacheTimeout());
+    infoDto.setMaxIncidentsCount(connInfo.getMaxIncidentsCount());
     infoDto.setConnectionRetryDelay(connInfo.getConnectionRetryDelay());
     infoDto.setConnectionTimeout(connInfo.getConnectionTimeout());
     infoDto.setHost(connInfo.getHost().getHostName());
