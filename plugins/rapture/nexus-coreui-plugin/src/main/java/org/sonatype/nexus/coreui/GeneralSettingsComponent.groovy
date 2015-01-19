@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
@@ -75,7 +76,8 @@ extends DirectComponentSupport
     return read()
   }
 
-  private static validate(final GeneralSettingsXO generalSettingsXO) {
+  @PackageScope
+  static validate(final GeneralSettingsXO generalSettingsXO) {
     def validations = new ValidationResponse()
     if (!StringUtils.isBlank(generalSettingsXO.baseUrl)) {
       try {

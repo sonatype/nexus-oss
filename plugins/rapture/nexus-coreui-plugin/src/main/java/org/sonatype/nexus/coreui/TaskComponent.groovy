@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.coreui
 
+import groovy.transform.PackageScope
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -212,6 +214,7 @@ class TaskComponent
     nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(false)
   }
 
+  @PackageScope
   static String getStatusDescription(final CurrentState<?> currentState) {
     switch (currentState.state) {
       case State.WAITING:
@@ -232,6 +235,7 @@ class TaskComponent
     }
   }
 
+  @PackageScope
   static String getSchedule(final Schedule schedule) {
     if (schedule instanceof Manual) {
       return 'manual'
@@ -262,15 +266,16 @@ class TaskComponent
     }
   }
 
+  @PackageScope
   static Date getNextRun(final TaskInfo<?> task) {
     return task.currentState.nextRun;
   }
 
+  @PackageScope
   static String getLastRunResult(final TaskInfo<?> task) {
     String lastRunResult = null
 
     if (task.lastRunState != null) {
-      lastRunResult = null;
       switch (task.lastRunState.endState) {
         case EndState.OK:
           lastRunResult = "Ok";
@@ -308,6 +313,7 @@ class TaskComponent
     return lastRunResult
   }
 
+  @PackageScope
   TaskXO asTaskXO(final TaskInfo<?> task) {
     def result = new TaskXO(
         id: task.id,
@@ -353,6 +359,7 @@ class TaskComponent
     result
   }
 
+  @PackageScope
   static Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
       try {
@@ -403,7 +410,8 @@ class TaskComponent
     return new Manual()
   }
 
-  private static void validateState(final TaskInfo<?> task) {
+  @PackageScope
+  static void validateState(final TaskInfo<?> task) {
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');

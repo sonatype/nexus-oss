@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import groovy.transform.PackageScope
 import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.scheduling.TaskConfiguration
 
@@ -99,6 +100,8 @@ extends DirectComponentSupport
 
   private static final TRUST_STORE_TYPE = 'repository'
 
+  private static final Pattern BRACKETS_PATTERN = Pattern.compile("(.*)( \\(.*\\))")
+
   @Inject
   @Named("protected")
   RepositoryRegistry protectedRepositoryRegistry
@@ -135,7 +138,7 @@ extends DirectComponentSupport
   @Inject
   Validator validator
 
-  def typesToClass = [
+  Map typesToClass = [
       'proxy': ProxyRepository.class,
       'hosted': HostedRepository.class,
       'shadow': ShadowRepository.class,
@@ -431,7 +434,8 @@ extends DirectComponentSupport
     }
   }
 
-  def RepositoryXO create(RepositoryXO repositoryXO, Closure... createClosures) {
+  @PackageScope
+  RepositoryXO create(RepositoryXO repositoryXO, Closure... createClosures) {
     def template = templateManager.templates.getTemplateById(repositoryXO.template) as RepositoryTemplate
     CRepository configuration = template.configurableRepository.getCurrentConfiguration(true)
     createClosures.each { createClosure ->
@@ -441,7 +445,8 @@ extends DirectComponentSupport
     return asRepositoryXO(created, readTemplates(null))
   }
 
-  def <T extends Repository> RepositoryXO update(RepositoryXO repositoryXO, Class<T> repoType, Closure... updateClosures) {
+  @PackageScope
+  <T extends Repository> RepositoryXO update(RepositoryXO repositoryXO, Class<T> repoType, Closure... updateClosures) {
     if (repositoryXO.id) {
       T updated = protectedRepositoryRegistry.getRepositoryWithFacet(repositoryXO.id, repoType)
       updateClosures.each { updateClosure ->
@@ -453,7 +458,8 @@ extends DirectComponentSupport
     throw new IllegalArgumentException('Missing id for repository to be updated')
   }
 
-  def static doCreate = { CRepository repo, RepositoryXO repositoryXO ->
+  @PackageScope
+  static Closure doCreate = { CRepository repo, RepositoryXO repositoryXO ->
     repo.with {
       id = repositoryXO.id
       name = repositoryXO.name
@@ -473,7 +479,8 @@ extends DirectComponentSupport
     }
   }
 
-  def static doUpdate = { Repository repo, RepositoryXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdate = { Repository repo, RepositoryXO repositoryXO ->
     repo.with {
       name = repositoryXO.name
       browseable = repositoryXO.browseable
@@ -487,34 +494,41 @@ extends DirectComponentSupport
     }
   }
 
-  def static doCreateGroup = { CRepository repo, RepositoryGroupXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateGroup = { CRepository repo, RepositoryGroupXO repositoryXO ->
     M2GroupRepositoryConfiguration exConf = new M2GroupRepositoryConfiguration(
         repo.externalConfiguration as Xpp3Dom
     )
     exConf.memberRepositoryIds = repositoryXO.memberRepositoryIds
   }
 
-  def static doUpdateGroup = { GroupRepository repo, RepositoryGroupXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateGroup = { GroupRepository repo, RepositoryGroupXO repositoryXO ->
     repo.memberRepositoryIds = repositoryXO.memberRepositoryIds
   }
 
-  def static doCreateHosted = { CRepository repo, RepositoryHostedXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateHosted = { CRepository repo, RepositoryHostedXO repositoryXO ->
     repo.writePolicy = repositoryXO.writePolicy
   }
 
-  def static doUpdateHosted = { HostedRepository repo, RepositoryHostedXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateHosted = { HostedRepository repo, RepositoryHostedXO repositoryXO ->
     repo.writePolicy = repositoryXO.writePolicy
   }
 
-  def static doCreateHostedMaven = { CRepository repo, RepositoryHostedMavenXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateHostedMaven = { CRepository repo, RepositoryHostedMavenXO repositoryXO ->
     repo.indexable = repositoryXO.indexable
   }
 
-  def static doUpdateHostedMaven = { MavenHostedRepository repo, RepositoryHostedMavenXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateHostedMaven = { MavenHostedRepository repo, RepositoryHostedMavenXO repositoryXO ->
     repo.indexable = repositoryXO.indexable
   }
 
-  def doCreateProxy = { CRepository repo, RepositoryProxyXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateProxy = { CRepository repo, RepositoryProxyXO repositoryXO ->
     M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(
         repo.externalConfiguration as Xpp3Dom
     )
@@ -551,7 +565,8 @@ extends DirectComponentSupport
     }
   }
 
-  def doUpdateProxy = { ProxyRepository repo, RepositoryProxyXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateProxy = { ProxyRepository repo, RepositoryProxyXO repositoryXO ->
     if (repositoryXO.authEnabled) {
       validator.validate(repositoryXO, RepositoryProxyXO.Authentication)
     }
@@ -603,7 +618,8 @@ extends DirectComponentSupport
     }
   }
 
-  def static doCreateProxyMaven = { CRepository repo, RepositoryProxyMavenXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateProxyMaven = { CRepository repo, RepositoryProxyMavenXO repositoryXO ->
     M2RepositoryConfiguration exConf = new M2RepositoryConfiguration(
         repo.externalConfiguration as Xpp3Dom
     )
@@ -613,14 +629,16 @@ extends DirectComponentSupport
     if (repositoryXO.metadataMaxAge != null) exConf.metadataMaxAge = repositoryXO.metadataMaxAge
   }
 
-  def static doUpdateProxyMaven = { MavenProxyRepository repo, RepositoryProxyMavenXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateProxyMaven = { MavenProxyRepository repo, RepositoryProxyMavenXO repositoryXO ->
     repo.downloadRemoteIndexes = repositoryXO.downloadRemoteIndexes
     if (repositoryXO.checksumPolicy != null) repo.checksumPolicy = repositoryXO.checksumPolicy
     if (repositoryXO.artifactMaxAge != null) repo.artifactMaxAge = repositoryXO.artifactMaxAge
     if (repositoryXO.metadataMaxAge != null) repo.metadataMaxAge = repositoryXO.metadataMaxAge
   }
 
-  def static doCreateVirtual = { CRepository repo, RepositoryVirtualXO repositoryXO ->
+  @PackageScope
+  static Closure doCreateVirtual = { CRepository repo, RepositoryVirtualXO repositoryXO ->
     // HACK: we should not use a Maven2->Maven1 config
     M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration(
         repo.externalConfiguration as Xpp3Dom
@@ -629,12 +647,14 @@ extends DirectComponentSupport
     exConf.synchronizeAtStartup = repositoryXO.synchronizeAtStartup
   }
 
-  def doUpdateVirtual = { ShadowRepository repo, RepositoryVirtualXO repositoryXO ->
+  @PackageScope
+  static Closure doUpdateVirtual = { ShadowRepository repo, RepositoryVirtualXO repositoryXO ->
     repo.synchronizeAtStartup = repositoryXO.synchronizeAtStartup
     repo.masterRepository = protectedRepositoryRegistry.getRepository(repositoryXO.shadowOf)
   }
 
-  def asRepositoryXO(Repository repo, List<RepositoryTemplateXO> templates) {
+  @PackageScope
+  static RepositoryXO asRepositoryXO(Repository repo, List<RepositoryTemplateXO> templates) {
     def RepositoryXO xo = null
     repo.adaptToFacet(MavenHostedRepository.class)?.with {
       xo = doGetMavenHosted(it, xo)
@@ -657,7 +677,8 @@ extends DirectComponentSupport
     return doGet(repo, xo, templates)
   }
 
-  def static doGetMavenHosted(MavenHostedRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetMavenHosted(MavenHostedRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryHostedMavenXO()
     if (xo instanceof RepositoryHostedMavenXO) {
       xo.with {
@@ -668,7 +689,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def static doGetHosted(HostedRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetHosted(HostedRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryHostedXO()
     if (xo instanceof RepositoryHostedXO) {
       xo.with {
@@ -678,7 +700,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def static doGetMavenProxy(MavenProxyRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetMavenProxy(MavenProxyRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryProxyMavenXO()
     if (xo instanceof RepositoryProxyMavenXO) {
       xo.with {
@@ -692,7 +715,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def doGetProxy(ProxyRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetProxy(ProxyRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryProxyXO()
     if (xo instanceof RepositoryProxyXO) {
       xo.with {
@@ -732,7 +756,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def static doGetGroup(GroupRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetGroup(GroupRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryGroupXO()
     if (xo instanceof RepositoryGroupXO) {
       xo.with {
@@ -742,7 +767,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def static doGetVirtual(ShadowRepository repo, RepositoryXO xo) {
+  @PackageScope
+  static RepositoryXO doGetVirtual(ShadowRepository repo, RepositoryXO xo) {
     if (!xo) xo = new RepositoryVirtualXO()
     if (xo instanceof RepositoryVirtualXO) {
       xo.with {
@@ -753,7 +779,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def doGet(Repository repo, RepositoryXO xo, List<RepositoryTemplateXO> templates) {
+  @PackageScope
+  static RepositoryXO doGet(Repository repo, RepositoryXO xo, List<RepositoryTemplateXO> templates) {
     if (!xo) xo = new RepositoryXO()
     if (xo instanceof RepositoryXO) {
       xo.with {
@@ -781,7 +808,8 @@ extends DirectComponentSupport
     return xo
   }
 
-  def static typeOf(Repository repository) {
+  @PackageScope
+  static String typeOf(Repository repository) {
     def kind = repository.repositoryKind
     if (kind.isFacetAvailable(ProxyRepository.class)) {
       return 'proxy'
@@ -797,10 +825,9 @@ extends DirectComponentSupport
     }
     return null
   }
-
-  private static final Pattern BRACKETS_PATTERN = Pattern.compile("(.*)( \\(.*\\))")
-
-  def static String nameOfProvider(List<RepositoryTemplateXO> templates, type, provider) {
+  
+  @PackageScope
+  static String nameOfProvider(List<RepositoryTemplateXO> templates, type, provider) {
     def template = templates.find { template -> template.type == type && template.provider == provider }
     def name = template?.providerName
     if (name) {
@@ -812,7 +839,8 @@ extends DirectComponentSupport
     return name
   }
 
-  def static String getPassword(Password password, RemoteAuthenticationSettings settings) {
+  @PackageScope
+  static String getPassword(Password password, RemoteAuthenticationSettings settings) {
     if (password?.valid) {
       return password.value
     }
@@ -822,6 +850,7 @@ extends DirectComponentSupport
     return null
   }
 
+  @PackageScope
   List<Repository> filter(final @Nullable StoreLoadParameters parameters) {
     List<Repository> repositories = protectedRepositoryRegistry.repositories
     boolean includeUserManaged = true
@@ -873,6 +902,7 @@ extends DirectComponentSupport
     return repositories
   }
 
+  @PackageScope
   Predicate<Repository> hasAnyOfFacets(@Nullable final String[] facets) {
     if (facets) {
       List<Predicate<Repository>> predicates = []
@@ -905,6 +935,7 @@ extends DirectComponentSupport
     return null
   }
 
+  @PackageScope
   Predicate<Repository> hasNoneOfFacets(@Nullable final String[] facets) {
     if (facets) {
       List<Predicate<Repository>> predicates = []
@@ -938,7 +969,8 @@ extends DirectComponentSupport
     return null
   }
 
-  private static Predicate<Repository> hasAnyOfContentClasses(final String[] contentClasses) {
+  @PackageScope
+  static Predicate<Repository> hasAnyOfContentClasses(final String[] contentClasses) {
     if (contentClasses) {
       List<Predicate<Repository>> predicates = []
       contentClasses.each { String contentClass ->
@@ -961,7 +993,8 @@ extends DirectComponentSupport
     return null
   }
 
-  private static Predicate<Repository> hasNoneOfContentClasses(final String[] contentClasses) {
+  @PackageScope
+  static Predicate<Repository> hasNoneOfContentClasses(final String[] contentClasses) {
     if (contentClasses) {
       List<Predicate<Repository>> predicates = []
       contentClasses.each { String contentClass ->

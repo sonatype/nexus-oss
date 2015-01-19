@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -130,7 +131,8 @@ extends DirectComponentSupport
     nexusConfiguration.saveConfiguration()
   }
 
-  private static RepositoryTargetXO asRepositoryTarget(Target input) {
+  @PackageScope
+  static RepositoryTargetXO asRepositoryTarget(Target input) {
     return new RepositoryTargetXO(
         id: input.id,
         name: input.name,
@@ -139,7 +141,8 @@ extends DirectComponentSupport
     )
   }
 
-  private void validate(final RepositoryTargetXO target) {
+  @PackageScope
+  void validate(final RepositoryTargetXO target) {
     def validations = new ValidationResponse()
 
     def contentClass = repositoryTypeRegistry.contentClasses[target.format]

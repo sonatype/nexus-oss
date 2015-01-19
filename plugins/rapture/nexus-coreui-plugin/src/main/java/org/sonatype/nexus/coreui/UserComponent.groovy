@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import com.google.inject.Key
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresUser
@@ -293,7 +294,8 @@ extends DirectComponentSupport
     securitySystem.deleteUser(id, source)
   }
 
-  private static asUserXO(final User user) {
+  @PackageScope
+  static UserXO asUserXO(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
         version: user.version,
@@ -328,7 +330,8 @@ extends DirectComponentSupport
     return subject.principal == userId
   }
 
-  private static String validateEmail(final String email) {
+  @PackageScope
+  static String validateEmail(final String email) {
     if (email) {
       try {
         new Address(email)

@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.Email
@@ -141,7 +142,8 @@ extends DirectComponentSupport
     }
   }
 
-  private static SmtpSettingsXO.ConnectionType getConnectionType(final NexusEmailer emailer) {
+  @PackageScope
+  static SmtpSettingsXO.ConnectionType getConnectionType(final NexusEmailer emailer) {
     if (emailer.SMTPSslEnabled) {
       return SmtpSettingsXO.ConnectionType.SSL
     }
@@ -151,7 +153,8 @@ extends DirectComponentSupport
     return SmtpSettingsXO.ConnectionType.PLAIN
   }
 
-  private static String parseReason(final EmailerException e) {
+  @PackageScope
+  static String parseReason(final EmailerException e) {
     // first let's go to the top in exception chain
     Throwable top = e
     while (top.getCause() != null) {

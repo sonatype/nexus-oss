@@ -14,6 +14,7 @@ package org.sonatype.nexus.capability.internal.ui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -199,7 +200,8 @@ extends DirectComponentSupport
     capabilityRegistry.disable(capabilityIdentity(id))
   }
 
-  private static CapabilityXO asCapability(final CapabilityReference reference) {
+  @PackageScope
+  static CapabilityXO asCapability(final CapabilityReference reference) {
     CapabilityDescriptor descriptor = reference.context().descriptor()
     Capability capability = reference.capability()
 

@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectFormPostMethod
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager
+import groovy.transform.PackageScope
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang.StringUtils
 import org.apache.maven.model.Model
@@ -104,7 +105,8 @@ extends DirectComponentSupport
     }
   }
 
-  private static ArtifactStoreRequest createRequest(final FileItem file,
+  @PackageScope
+  static ArtifactStoreRequest createRequest(final FileItem file,
                                                     final MavenRepository mavenRepository,
                                                     final UploadContext uploadContext,
                                                     final RequestContext requestContext,
@@ -137,8 +139,9 @@ extends DirectComponentSupport
     return result
   }
 
-  private static UploadContext createUploadContext(final Map<String, String> params,
-                                                   final Map<String, FileItem> files)
+  @PackageScope
+  static UploadContext createUploadContext(final Map<String, String> params,
+      final Map<String, FileItem> files)
   {
     UploadContext context = new UploadContext(
         pomAvailable: false,
@@ -188,7 +191,8 @@ extends DirectComponentSupport
     return context
   }
 
-  private static RequestContext createRequestContext(final HttpServletRequest request) {
+  @PackageScope
+  static RequestContext createRequestContext(final HttpServletRequest request) {
     RequestContext context = new RequestContext(
         userId: SecurityUtils.subject?.principal as String,
         userAgent: request.getHeader('user-agent'),
@@ -213,6 +217,7 @@ extends DirectComponentSupport
     return context
   }
 
+  @PackageScope
   static void validateRepositoryPolicy(final MavenRepository mavenRepository, final String version) {
     def validations = new ValidationResponse()
     if (Gav.isSnapshot(version)) {
@@ -234,7 +239,8 @@ extends DirectComponentSupport
     }
   }
 
-  private static isPom(final FileItem file, final Map<String, String> params) {
+  @PackageScope
+  static isPom(final FileItem file, final Map<String, String> params) {
     def extension = params["${file.fieldName}.extension"]
     def classifier = params["${file.fieldName}.classifier"]
     return extension == 'pom' && StringUtils.isEmpty(classifier)
