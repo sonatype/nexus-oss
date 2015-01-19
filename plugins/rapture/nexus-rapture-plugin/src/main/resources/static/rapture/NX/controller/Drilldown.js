@@ -388,8 +388,7 @@ Ext.define('NX.controller.Drilldown', {
 
     // Find all parent models and add them to the bookmark array
     for (index = 0; index < lists.length; ++index) {
-      //if (model && lists[index].getView().getNode(model)) {
-      if ((tabs && bookmark.length > 2) || (!tabs && bookmark.length > 1)) {
+      if (model && !lists[index].getView().getNode(model)) {
         segments.push(bookmark.shift());
       } else {
         // All done adding parents
