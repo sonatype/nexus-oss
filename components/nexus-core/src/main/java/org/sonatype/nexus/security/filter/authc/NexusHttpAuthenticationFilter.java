@@ -126,7 +126,7 @@ public class NexusHttpAuthenticationFilter
 
     // NEXUS-607: fix for cookies, when sent from client. They will expire once
     // and we are not sending them anymore.
-    boolean loggedIn = subject.isAuthenticated();
+    boolean loggedIn = subject.isAuthenticated() || subject.isRemembered();
 
     if (loggedIn) {
       return true;
