@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
@@ -123,6 +124,7 @@ extends DirectComponentSupport
     return read()
   }
 
+  @PackageScope
   static fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
     def enabled = false, hostname = null, port = null, username = null, ntlmHost = null, ntlmDomain = null
     if (settings) {
@@ -146,6 +148,7 @@ extends DirectComponentSupport
     return [enabled, hostname, port, username, ntlmHost, ntlmDomain]
   }
 
+  @PackageScope
   static toRemoteHttpProxySettings(final Boolean enabled,
                                            final String hostname,
                                            final Integer port,
@@ -173,6 +176,7 @@ extends DirectComponentSupport
     return null
   }
 
+  @PackageScope
   static String getPassword(Password password, RemoteAuthenticationSettings settings) {
     if (password?.valid) {
       return password.value

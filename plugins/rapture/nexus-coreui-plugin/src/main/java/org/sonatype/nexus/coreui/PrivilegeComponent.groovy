@@ -14,7 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
-import groovy.transform.CompileStatic
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -53,7 +53,6 @@ import javax.validation.groups.Default
 @Named
 @Singleton
 @DirectAction(action = 'coreui_Privilege')
-@CompileStatic
 class PrivilegeComponent
 extends DirectComponentSupport
 {
@@ -144,7 +143,8 @@ extends DirectComponentSupport
     authorizationManager.deletePrivilege(id)
   }
 
-  def PrivilegeXO asPrivilegeXO(Privilege input) {
+  @PackageScope
+  PrivilegeXO asPrivilegeXO(Privilege input) {
     def privilege = new PrivilegeXO(
         id: input.id,
         version: input.version,

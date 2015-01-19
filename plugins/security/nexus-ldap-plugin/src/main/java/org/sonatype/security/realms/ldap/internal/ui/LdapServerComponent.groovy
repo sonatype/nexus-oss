@@ -14,6 +14,7 @@ package org.sonatype.security.realms.ldap.internal.ui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory
 import org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey
 import com.sonatype.nexus.ssl.plugin.TrustStore
@@ -238,6 +239,7 @@ extends DirectComponentSupport
     }
   }
 
+  @PackageScope
   LdapServerXO asLdapServerXO(final CLdapServerConfiguration ldapServer) {
     CConnectionInfo connectionInfo = ldapServer.connectionInfo
     CUserAndGroupAuthConfiguration userAndGroupConfig = ldapServer.userAndGroupConfig
@@ -286,6 +288,7 @@ extends DirectComponentSupport
     )
   }
 
+  @PackageScope
   static String asLdapServerUrl(final CConnectionInfo connectionInfo) {
     return new LdapURL(
         connectionInfo.getProtocol(),
@@ -295,6 +298,7 @@ extends DirectComponentSupport
     ).toString()
   }
 
+  @PackageScope
   static LdapSchemaTemplateXO asLdapSchemaTemplateXO(final LdapSchemaTemplate template) {
     CUserAndGroupAuthConfiguration userAndGroupConfig = template.userAndGroupAuthConfig
     return new LdapSchemaTemplateXO(
@@ -321,6 +325,7 @@ extends DirectComponentSupport
     )
   }
 
+  @PackageScope
   static CLdapServerConfiguration asCLdapServerConfiguration(final LdapServerXO ldapServerXO, final String authPassword) {
     return new CLdapServerConfiguration(
         id: ldapServerXO.id,
@@ -366,6 +371,7 @@ extends DirectComponentSupport
     )
   }
 
+  @PackageScope
   LdapServerConnectionXO validate(final LdapServerConnectionXO ldapServerConnectionXO) {
     if (ldapServerConnectionXO.authScheme != 'none') {
       validator.validate(ldapServerConnectionXO, LdapServerConnectionXO.AuthScheme)
@@ -373,6 +379,7 @@ extends DirectComponentSupport
     return ldapServerConnectionXO
   }
 
+  @PackageScope
   LdapServerXO validate(final LdapServerXO ldapServerXO) {
     validate(ldapServerXO as LdapServerConnectionXO)
     if (ldapServerXO.backupMirrorEnabled) {
@@ -401,6 +408,7 @@ extends DirectComponentSupport
     return ldapContextFactory
   }
 
+  @PackageScope
   static String buildReason(final String userMessage, Throwable t) {
     String message = "${userMessage}: ${t.message}"
 

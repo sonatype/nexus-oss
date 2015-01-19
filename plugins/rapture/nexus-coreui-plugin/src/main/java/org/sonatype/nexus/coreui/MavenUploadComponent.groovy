@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectFormPostMethod
 import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager
+import groovy.transform.PackageScope
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang.StringUtils
 import org.apache.maven.model.Model
@@ -137,6 +138,7 @@ extends DirectComponentSupport
     return result
   }
 
+  @PackageScope
   static UploadContext createUploadContext(final Map<String, String> params,
                                                    final Map<String, FileItem> files)
   {
@@ -188,6 +190,7 @@ extends DirectComponentSupport
     return context
   }
 
+  @PackageScope
   static RequestContext createRequestContext(final HttpServletRequest request) {
     RequestContext context = new RequestContext(
         userId: SecurityUtils.subject?.principal as String,
@@ -213,6 +216,7 @@ extends DirectComponentSupport
     return context
   }
 
+  @PackageScope
   static void validateRepositoryPolicy(final MavenRepository mavenRepository, final String version) {
     def validations = new ValidationResponse()
     if (Gav.isSnapshot(version)) {
@@ -234,6 +238,7 @@ extends DirectComponentSupport
     }
   }
 
+  @PackageScope
   static isPom(final FileItem file, final Map<String, String> params) {
     def extension = params["${file.fieldName}.extension"]
     def classifier = params["${file.fieldName}.classifier"]
