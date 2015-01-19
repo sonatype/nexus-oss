@@ -105,6 +105,7 @@ extends DirectComponentSupport
     }
   }
 
+  @PackageScope
   static ArtifactStoreRequest createRequest(final FileItem file,
                                                     final MavenRepository mavenRepository,
                                                     final UploadContext uploadContext,
@@ -140,7 +141,7 @@ extends DirectComponentSupport
 
   @PackageScope
   static UploadContext createUploadContext(final Map<String, String> params,
-                                                   final Map<String, FileItem> files)
+      final Map<String, FileItem> files)
   {
     UploadContext context = new UploadContext(
         pomAvailable: false,
