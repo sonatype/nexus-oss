@@ -20,7 +20,7 @@ import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -207,9 +207,7 @@ public abstract class DatabaseManagerSupport
     // TODO: refine more control over how pool settings are configured per-database or globally
 
     String uri = connectionUri(name);
-    ODatabaseDocumentPool underlying = new ODatabaseDocumentPool(uri, SYSTEM_USER, SYSTEM_PASSWORD);
-    underlying.setName(String.format("%s-database-pool", name));
-    underlying.setup(1, 25);
+    OPartitionedDatabasePool underlying = new OPartitionedDatabasePool(uri, SYSTEM_USER, SYSTEM_PASSWORD, 25);
 
     // TODO: Do not allow shared pool() to be closed by users, only by ourselves
     DatabasePoolImpl pool = new DatabasePoolImpl(underlying, name);
