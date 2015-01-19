@@ -419,12 +419,14 @@ Ext.define('NX.controller.Drilldown', {
   navigateTo: function (bookmark) {
     var me = this,
         lists = me.getLists(),
+        feature = me.getFeature(),
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
 
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
-      list_ids = bookmark.getSegments().slice(1, lists.length + 1);
+      //list_ids = bookmark.getSegments().slice(1, lists.length + 1);
+      list_ids = bookmark.getSegments().slice(1);
 
       if (list_ids.length > lists.length) {
         // The last ID refers to a tab
@@ -446,15 +448,14 @@ Ext.define('NX.controller.Drilldown', {
 
           // If this is the last list, load its data and attach a callback (if necessary)
           if (index == list_ids.length - 1) {
-            me.dataLoadedCallback(lists[index], modelId, tab_id);
 
-            // If the data isn’t loaded yet, return here when it is. Only do this for sub-lists,
-            // otherwise, the load event on the first list will trigger navigateTo in an infinite loop
-            if (!lists[index].getStore().getById(modelId) && index > 0) {
-              lists[index].getStore().load({
-                scope: me,
-                callback: function () { me.dataLoadedCallback(lists[index], modelId, tab_id); }
+            // If the data isn’t loaded yet, return here when it is
+            if (!lists[index].getStore().getById(modelId)) {
+              lists[index].getStore().load(function () {
+                me.dataLoadedCallback(lists[index], modelId, tab_id);
               });
+            } else {
+              me.dataLoadedCallback(lists[index], modelId, tab_id);
             }
             break;
           }
@@ -481,12 +482,12 @@ Ext.define('NX.controller.Drilldown', {
       modelId = decodeURIComponent(modelId);
       model = list.getStore().getById(modelId);
 
-      me.loadView(list.getView(), model, false);
-
       // Is a tab specified?
       if (tabId) {
         feature.down('nx-drilldown-details').setActiveTabByBookmark(tabId);
       }
+
+      me.loadView(list.getView(), model, false);
     }
   },
 
