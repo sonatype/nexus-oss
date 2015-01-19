@@ -161,27 +161,53 @@ Ext.define('NX.controller.Drilldown', {
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
-    var me = this,
-      lists = me.getLists();
+    var me = this;/*,
+      lists = me.getLists(),
+      last = lists[lists.length - 1];*/
 
-    // Trigger navigation when the first list loads
-    lists[0].mon(lists[0].getStore(), 'load', me.onStoreLoad, me);
+    // Trigger navigation when the last list loads
+    //last.mon(last.getStore(), 'load', me.onStoreLoad, me);
 
+    // Start loading the lists
     me.loadStore(Ext.emptyFn);
   },
 
   /**
    * @public
-   * Prompts a reset/reload of the first list in the drilldown
+   * Prompts a reset/reload of the lists in the drilldown
    *
    * @param cb Call this once the store has loaded
    */
   loadStore: function (cb) {
     var me = this,
-        lists = me.getLists();
+      bookmark = NX.Bookmarks.getBookmark().getSegments();
 
-    lists[0].getStore().clearFilter();
-    lists[0].getStore().load(cb);
+    me.loadStoreAtIndex(0, bookmark, cb);
+  },
+
+  /**
+   * @public
+   * Load the list with the specified index, then load all child lists
+   *
+   * @param index The index of the load to load
+   */
+  loadStoreAtIndex: function(index, bookmark, cb) {
+    var me = this,
+      lists = me.getLists();
+
+    lists[index].getStore().clearFilter();
+    if (index < lists.length - 1 && bookmark.length) {
+      lists[index].getStore().load(function(records, operation, success) {
+        me.loadStoreAtIndex(index + 1, bookmark, cb);
+      });
+    } else {
+      lists[index].getStore().load(function(records, operation, success) {
+        if (cb) {
+          cb(records, operation, success);
+        }
+        me.onStoreLoad();
+      });
+    }
   },
 
   /**
