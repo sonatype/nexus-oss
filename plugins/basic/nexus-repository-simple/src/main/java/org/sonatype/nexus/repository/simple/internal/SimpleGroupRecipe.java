@@ -47,6 +47,8 @@ public class SimpleGroupRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + GroupType.NAME;
 
+  private final Provider<SimpleSecurityFacet> securityFacet;
+
   private final Provider<ConfigurableViewFacet> viewFacet;
 
   private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
@@ -55,6 +57,8 @@ public class SimpleGroupRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleGroupHandler groupHandler;
@@ -62,24 +66,29 @@ public class SimpleGroupRecipe
   @Inject
   public SimpleGroupRecipe(final @Named(GroupType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
+                           final Provider<SimpleSecurityFacet> securityFacet,
                            final Provider<ConfigurableViewFacet> viewFacet,
                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<SimpleGroupFacet> groupFacet,
                            final TimingHandler timingHandler,
+                           final SimpleSecurityHandler securityHandler,
                            final SimpleIndexHtmlHandler indexHtmlHandler,
                            final SimpleGroupHandler groupHandler)
   {
     super(type, format);
+    this.securityFacet = checkNotNull(securityFacet);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.groupFacet = checkNotNull(groupFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.groupHandler = checkNotNull(groupHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
     repository.attach(indexHtmlFacet.get());
     repository.attach(groupFacet.get());
@@ -96,12 +105,14 @@ public class SimpleGroupRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(groupHandler)
         .create());
 

@@ -25,10 +25,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 // TODO: Consider a builder model instead, may be easier to expose more flexibility in terms of custom responses?
 
@@ -89,6 +91,18 @@ public class HttpResponses
 
   public static Response badRequest() {
     return new Response(Status.failure(SC_BAD_REQUEST));
+  }
+
+  // Unauthorized: 401
+
+  public static Response unauthorized() {
+    return new Response(Status.failure(SC_UNAUTHORIZED));
+  }
+
+  // Forbidden: 403
+
+  public static Response forbidden() {
+    return new Response(Status.failure(SC_FORBIDDEN));
   }
 
   // Method not allowed: 405

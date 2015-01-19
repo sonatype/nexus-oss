@@ -48,6 +48,8 @@ public class SimpleProxyRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + ProxyType.NAME;
 
+  private final Provider<SimpleSecurityFacet> securityFacet;
+
   private final Provider<ConfigurableViewFacet> viewFacet;
 
   private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
@@ -58,6 +60,8 @@ public class SimpleProxyRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleProxyHandler proxyHandler;
@@ -65,26 +69,31 @@ public class SimpleProxyRecipe
   @Inject
   public SimpleProxyRecipe(final @Named(ProxyType.NAME) Type type,
                            final @Named(SimpleFormat.NAME) Format format,
+                           final Provider<SimpleSecurityFacet> securityFacet,
                            final Provider<ConfigurableViewFacet> viewFacet,
                            final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                            final Provider<HttpClientFacet> httpClientFacet,
                            final Provider<SimpleProxyFacet> proxyFacet,
                            final TimingHandler timingHandler,
+                           final SimpleSecurityHandler securityHandler,
                            final SimpleIndexHtmlHandler indexHtmlHandler,
                            final SimpleProxyHandler proxyHandler)
   {
     super(type, format);
+    this.securityFacet = checkNotNull(securityFacet);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.httpClientFacet = checkNotNull(httpClientFacet);
     this.proxyFacet = checkNotNull(proxyFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.proxyHandler = checkNotNull(proxyHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
     repository.attach(indexHtmlFacet.get());
     repository.attach(httpClientFacet.get());
@@ -102,12 +111,14 @@ public class SimpleProxyRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(proxyHandler)
         .create());
 

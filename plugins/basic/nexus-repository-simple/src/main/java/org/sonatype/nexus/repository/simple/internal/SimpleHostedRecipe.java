@@ -47,6 +47,8 @@ public class SimpleHostedRecipe
 {
   public static final String NAME = SimpleFormat.NAME + "-" + HostedType.NAME;
 
+  private final Provider<SimpleSecurityFacet> securityFacet;
+
   private final Provider<ConfigurableViewFacet> viewFacet;
 
   private final Provider<SimpleIndexHtmlFacet> indexHtmlFacet;
@@ -55,6 +57,8 @@ public class SimpleHostedRecipe
 
   private final TimingHandler timingHandler;
 
+  private final SimpleSecurityHandler securityHandler;
+
   private final SimpleIndexHtmlHandler indexHtmlHandler;
 
   private final SimpleStorageHandler storageHandler;
@@ -62,24 +66,29 @@ public class SimpleHostedRecipe
   @Inject
   public SimpleHostedRecipe(final @Named(HostedType.NAME) Type type,
                             final @Named(SimpleFormat.NAME) Format format,
+                            final Provider<SimpleSecurityFacet> securityFacet,
                             final Provider<ConfigurableViewFacet> viewFacet,
                             final Provider<SimpleIndexHtmlFacet> indexHtmlFacet,
                             final Provider<SimpleStorageFacet> storageFacet,
                             final TimingHandler timingHandler,
+                            final SimpleSecurityHandler securityHandler,
                             final SimpleIndexHtmlHandler indexHtmlHandler,
                             final SimpleStorageHandler storageHandler)
   {
     super(type, format);
+    this.securityFacet = checkNotNull(securityFacet);
     this.viewFacet = checkNotNull(viewFacet);
     this.indexHtmlFacet = checkNotNull(indexHtmlFacet);
     this.storageFacet = checkNotNull(storageFacet);
     this.timingHandler = checkNotNull(timingHandler);
+    this.securityHandler = checkNotNull(securityHandler);
     this.indexHtmlHandler = checkNotNull(indexHtmlHandler);
     this.storageHandler = checkNotNull(storageHandler);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
+    repository.attach(securityFacet.get());
     repository.attach(configure(viewFacet.get()));
     repository.attach(indexHtmlFacet.get());
     repository.attach(storageFacet.get());
@@ -96,12 +105,14 @@ public class SimpleHostedRecipe
             new LiteralMatcher("/"),
             new LiteralMatcher("/index.html")))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(indexHtmlHandler)
         .create());
 
     builder.route(new Route.Builder()
         .matcher(new TokenMatcher("/{name:.+}"))
         .handler(timingHandler)
+        .handler(securityHandler)
         .handler(storageHandler)
         .create());
 

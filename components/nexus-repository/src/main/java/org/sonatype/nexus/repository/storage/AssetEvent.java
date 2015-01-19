@@ -12,29 +12,15 @@
  */
 package org.sonatype.nexus.repository.storage;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Asset event.
  *
  * @since 3.0
  */
 public abstract class AssetEvent
+  extends VertexEvent
 {
-  private final Asset asset;
-
-  public AssetEvent(final Asset asset) {
-    this.asset = checkNotNull(asset);
-  }
-
-  public Asset getAsset() {
-    return asset;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + "{" +
-        "asset=" + asset +
-        '}';
+  public AssetEvent(final Object vertexId) {
+    super(vertexId);
   }
 }

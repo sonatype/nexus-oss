@@ -23,8 +23,13 @@ import org.sonatype.nexus.repository.RecipeSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.Type;
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet;
+import org.sonatype.nexus.repository.raw.internal.negativecache.NegativeCacheHandler;
+import org.sonatype.nexus.repository.raw.internal.negativecache.PathNegativeCacheKeyProvider;
+import org.sonatype.nexus.repository.raw.internal.negativecache.PlaceboNegativeCacheFacet;
+import org.sonatype.nexus.repository.raw.internal.proxy.ProxyFacetImpl;
+import org.sonatype.nexus.repository.raw.internal.proxy.ProxyHandler;
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet;
-import org.sonatype.nexus.repository.view.Route.Builder;
+import org.sonatype.nexus.repository.view.Route;
 import org.sonatype.nexus.repository.view.Router;
 import org.sonatype.nexus.repository.view.ViewFacet;
 import org.sonatype.nexus.repository.view.handlers.TimingHandler;
@@ -43,7 +48,9 @@ import static org.sonatype.nexus.repository.httpbridge.HttpHandlers.notFound;
 public class RawProxyRecipe
     extends RecipeSupport
 {
-  private final RawRemoteFetchHandler rawRemoteFetchHandler;
+  private final NegativeCacheHandler negativeCacheHandler;
+
+  private final ProxyHandler proxyHandler;
 
   private final TimingHandler timingHandler;
 
@@ -51,24 +58,59 @@ public class RawProxyRecipe
 
   private final Provider<HttpClientFacet> httpClient;
 
+  private final Provider<PlaceboNegativeCacheFacet> negativeCache;
+
+  private final Provider<PathNegativeCacheKeyProvider> negativeCacheKeyProvider;
+
+  private final Provider<ProxyFacetImpl> proxyFacet;
+
+  private final Provider<RawLocatorFacet> locatorFacet;
+
+  private final Provider<RawPayloadStorage> payloadStorageFacet;
+
+  private final Provider<RawStorageFacetImpl> rawStorageFacet;
+
   @Inject
   public RawProxyRecipe(final @Named("proxy") Type type,
-                        final @Named("raw") Format format, final RawRemoteFetchHandler rawRemoteFetchHandler,
+                        final @Named("raw") Format format,
+                        final NegativeCacheHandler negativeCacheHandler,
+                        final ProxyHandler proxyHandler,
                         final TimingHandler timingHandler,
-                        final Provider<ConfigurableViewFacet> viewFacet, final Provider<HttpClientFacet> httpClient)
+                        final Provider<ConfigurableViewFacet> viewFacet,
+                        final Provider<HttpClientFacet> httpClient,
+                        final Provider<PlaceboNegativeCacheFacet> negativeCache,
+                        final Provider<PathNegativeCacheKeyProvider> negativeCacheKeyProvider,
+                        final Provider<ProxyFacetImpl> proxyFacet,
+                        final Provider<RawLocatorFacet> locatorFacet,
+                        final Provider<RawPayloadStorage> payloadStorageFacet,
+                        final Provider<RawStorageFacetImpl> rawStorageFacet)
   {
     super(type, format);
 
-    this.rawRemoteFetchHandler = checkNotNull(rawRemoteFetchHandler);
+    this.negativeCacheHandler = checkNotNull(negativeCacheHandler);
+    this.proxyHandler = checkNotNull(proxyHandler);
     this.timingHandler = checkNotNull(timingHandler);
+
     this.viewFacet = checkNotNull(viewFacet);
     this.httpClient = checkNotNull(httpClient);
+    this.negativeCache = checkNotNull(negativeCache);
+    this.negativeCacheKeyProvider = checkNotNull(negativeCacheKeyProvider);
+    this.proxyFacet = checkNotNull(proxyFacet);
+    this.locatorFacet = checkNotNull(locatorFacet);
+    this.payloadStorageFacet = checkNotNull(payloadStorageFacet);
+    this.rawStorageFacet = checkNotNull(rawStorageFacet);
   }
 
   @Override
   public void apply(final @Nonnull Repository repository) throws Exception {
-    repository.attach(httpClient.get());
     repository.attach(configure(viewFacet.get()));
+    repository.attach(httpClient.get());
+    repository.attach(negativeCache.get());
+    repository.attach(negativeCacheKeyProvider.get());
+    repository.attach(proxyFacet.get());
+    repository.attach(locatorFacet.get());
+    repository.attach(payloadStorageFacet.get());
+    repository.attach(rawStorageFacet.get());
   }
 
   /**
@@ -79,13 +121,14 @@ public class RawProxyRecipe
 
     // Build the primary route of the raw proxy view
 
-    final Builder proxyRoute = new Builder();
-    proxyRoute.matcher(new AlwaysMatcher());
-    proxyRoute.handler(timingHandler);
-    // TODO: Do we have the content cached already? Is the cache up to date?
-    // Find the content remotely, or return 404
-    proxyRoute.handler(rawRemoteFetchHandler).handler(notFound());
-    router.route(proxyRoute.create());
+    router.route(new Route.Builder()
+            .matcher(new AlwaysMatcher())
+            .handler(timingHandler)
+            .handler(negativeCacheHandler)
+            .handler(proxyHandler)
+            .handler(notFound())
+            .create()
+    );
 
     // By default, return a 404
     router.defaultHandlers(notFound());

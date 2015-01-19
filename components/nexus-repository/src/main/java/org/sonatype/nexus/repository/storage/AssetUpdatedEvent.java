@@ -20,7 +20,7 @@ package org.sonatype.nexus.repository.storage;
 public class AssetUpdatedEvent
   extends AssetEvent
 {
-  public AssetUpdatedEvent(final Asset asset) {
-    super(asset);
+  public AssetUpdatedEvent(final Object vertexId) {
+    super(vertexId);
   }
 }

@@ -14,6 +14,8 @@ package org.sonatype.security.realms.privileges;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
@@ -26,6 +28,7 @@ public interface PrivilegeDescriptor
 
   List<PrivilegePropertyDescriptor> getPropertyDescriptors();
 
+  @Nullable
   String buildPermission(CPrivilege privilege);
 
   ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update);

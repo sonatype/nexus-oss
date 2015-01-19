@@ -19,7 +19,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.orient.graph.GraphTx;
 import org.sonatype.nexus.repository.FacetSupport;
 
 import com.tinkerpop.blueprints.Vertex;
@@ -31,6 +34,8 @@ import static org.sonatype.nexus.repository.storage.StorageService.V_BUCKET;
 
 /**
  * Default {@link StorageFacet} implementation.
+ *
+ * @since 3.0
  */
 @Named
 public class StorageFacetImpl
@@ -138,7 +143,7 @@ public class StorageFacetImpl
   @Nullable
   @Override
   @Guarded(by=STARTED)
-  public org.sonatype.nexus.blobstore.api.Blob getBlob(final BlobRef blobRef) {
+  public Blob getBlob(final BlobRef blobRef) {
     return delegate.getBlob(blobRef);
   }
 
