@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.upload.UploadArtifact', {
 
   buttonAlign: 'left',
   buttons: [
-    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON'), action: 'upload', ui: 'primary', formBind: true },
+    { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_UPLOAD_BUTTON'), action: 'upload', ui: 'nx-primary', formBind: true },
     { text: NX.I18n.get('BROWSE_MAVEN_ARTIFACT_DISCARD_BUTTON'), action: 'discard' }
   ]
 

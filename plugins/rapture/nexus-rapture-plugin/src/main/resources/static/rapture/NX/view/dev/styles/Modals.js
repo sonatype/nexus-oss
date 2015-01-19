@@ -84,7 +84,7 @@ Ext.define('NX.view.dev.styles.Modals', {
 
           buttonAlign: 'left',
           buttons: [
-            { text: 'Sign In', formBind: true, bindToEnter: true, ui: 'primary' },
+            { text: 'Sign In', formBind: true, bindToEnter: true, ui: 'nx-primary' },
             { text: 'Cancel', scope: me }
           ]
         }

@@ -3,10 +3,10 @@
  */
 
 /**
- * ui: 'feature-content'
+ * ui: 'nx-feature-content'
  */
 @include extjs-panel-ui(
-  $ui: 'feature-content',
+  $ui: 'nx-feature-content',
 
   $ui-header-padding: 10px 8px 6px 10px,
   $ui-header-background-color: $color-white,
@@ -17,7 +17,7 @@
   $ui-tool-background-image: $panel-light-tool-background-image
 );
 
-.x-panel-feature-content {
+.x-panel-nx-feature-content {
   background-color: $color-white;
   .x-toolbar {
     background-color: $color-white;
@@ -29,12 +29,12 @@
  */
 
 @include extjs-panel-ui(
-  $ui: 'drilldown-message',
+  $ui: 'nx-drilldown-message',
 
   $ui-header-color: $color-night-rider
 );
 
-.x-panel-drilldown-message {
+.x-panel-nx-drilldown-message {
   padding-left: 8px !important;
   padding-right: 8px !important;
 
@@ -50,14 +50,14 @@
   }
 }
 
-.x-panel-drilldown-message.nx-drilldown-warning {
+.x-panel-nx-drilldown-message.nx-drilldown-warning {
   .x-panel-header {
     border-color: rgb(242, 168, 34) !important;
     background-color: rgb(255, 251, 244);
   }
 }
 
-.x-panel-drilldown-message.nx-drilldown-info {
+.x-panel-nx-drilldown-message.nx-drilldown-info {
   .x-panel-header {
     border-color: #6FA0CF !important;
     background-color: #EEF7FF;
@@ -65,15 +65,15 @@
 }
 
 /**
- * ui: 'settings-panel'
+ * ui: 'nx-inset'
  */
 @include extjs-panel-ui(
-  $ui: 'inset',
+  $ui: 'nx-inset',
 
   $ui-padding: 12px 0 0 12px
 );
 
-.x-panel-inset {
+.x-panel-nx-inset {
   .x-panel-body {
     .x-toolbar {
       padding: 6px 0 6px 0;
@@ -82,21 +82,21 @@
 }
 
 /**
- * ui: 'feature-menu'
+ * ui: 'nx-feature-menu'
  */
 @include extjs-panel-ui(
-  $ui: 'feature-menu',
+  $ui: 'nx-feature-menu',
 
   $ui-header-padding: 4px,
   $ui-body-background-color: $color-light-smoke
 );
 
-.x-panel-feature-menu {
+.x-panel-nx-feature-menu {
   border-width: 0 2px 0 0;
   border-color: $color-light-gray;
   border-style: solid;
 
-  .x-panel-body-feature-menu {
+  .x-panel-body-nx-feature-menu {
     .x-grid-cell {
       background-color: $color-light-smoke;
     }
@@ -112,37 +112,37 @@
 /**
  * ui: 'drilldown-tabs'
  */
-@include extjs-panel-ui(
-  $ui: 'masterdetail-tabs',
+/*@include extjs-panel-ui(
+  $ui: 'drilldown-tabs',
 
   $ui-header-color: $color-night-rider,
   $ui-header-background-color: $color-white,
   $ui-header-font-size: 16px,
   $ui-header-line-height: 20px
-);
+);*/
 
 /**
- * ui: 'messages'
+ * ui: 'nx-messages'
  */
 @include extjs-panel-ui(
-  $ui: 'messages',
+  $ui: 'nx-messages',
 
   $ui-header-padding: 4px,
   $ui-header-background-color: $color-black
 );
 
 /**
- * ui: 'developer'
+ * ui: 'nx-developer'
  */
 @include extjs-panel-ui(
-  $ui: 'developer',
+  $ui: 'nx-developer',
 
   $ui-header-padding: 4px,
   $ui-header-color: $color-white,
   $ui-header-background-color: $color-smalt
 );
 
-.x-panel-developer {
+.x-panel-nx-developer {
   // Let the developer panes scroll as needed
   .x-panel-body .x-tabpanel-child .x-box-inner {
     overflow-y: auto;
@@ -152,28 +152,28 @@
    * Meta styles for the visual style sheet
    */
 
-  .hbox {
+  .nx-hbox {
     float: left;
     margin-right: 20px;
   }
 
-  .vbox {
+  .nx-vbox {
     margin-bottom: 20px;
   }
 
   .category {
-    padding-bottom: 2em;
+    /*padding-bottom: 2em;
     border-bottom: 1px $color-gainsboro solid;
 
     .category-title {
       text-transform: uppercase;
       padding-bottom: 1em;
       font-size: $font-size-h3;
-    }
+    }*/
   }
 
-  .section-header,
-  .column-header {
+  .nx-section-header/*,
+  .column-header*/ {
     font-size: $font-size-h5;
     padding-bottom: 5px;
     text-transform: uppercase;
@@ -185,7 +185,7 @@
     text-align: left;
   }
 
-  table tbody tr .color {
+  table tbody tr .nx-color {
     height: 10px;
     width: 10px;
   }
@@ -194,16 +194,16 @@
    * Visual style sheet fonts
    */
 
-  .proxima-nova-regular {
+  .nx-proxima-nova-regular {
     font-family: $font-regular;
   }
 
-  .proxima-nova-bold {
+  .nx-proxima-nova-bold {
     font-family: $font-regular;
     font-weight: bold;
   }
 
-  .courier-new-regular {
+  .nx-courier-new-regular {
     font-family: $font-monospace;
   }
 
@@ -211,43 +211,43 @@
    * Visual style sheet type styles
    */
 
-  .sample-h1 {
+  .nx-sample-h1 {
     font-size: $font-size-h1;
     font-weight: $font-weight-h1;
   }
 
-  .sample-h2 {
+  .nx-sample-h2 {
     font-size: $font-size-h2;
     font-weight: $font-weight-h2;
   }
 
-  .sample-h3 {
+  .nx-sample-h3 {
     font-size: $font-size-h3;
     font-weight: $font-weight-h3;
   }
 
-  .sample-h4 {
+  .nx-sample-h4 {
     font-size: $font-size-h4;
     font-weight: $font-weight-h4;
   }
 
-  .sample-h5 {
+  .nx-sample-h5 {
     font-size: $font-size-h5;
     font-weight: $font-weight-h5;
   }
 
-  .sample-body {
+  .nx-sample-body {
     font-size: $font-size-body;
     font-weight: $font-weight-body;
   }
 
-  .sample-code {
+  .nx-sample-code {
     font-size: $font-size-code;
     font-weight: $font-weight-code;
     font-family: $font-monospace;
   }
 
-  .sample-utility {
+  .nx-sample-utility {
     font-size: $font-size-utility;
     font-weight: $font-weight-utility;
   }
@@ -256,7 +256,7 @@
    * Visual style sheet colors
    */
 
-  .color {
+  .nx-color {
 
     border: 1px $color-gainsboro solid;
     margin: 0 3px 3px 0 !important;

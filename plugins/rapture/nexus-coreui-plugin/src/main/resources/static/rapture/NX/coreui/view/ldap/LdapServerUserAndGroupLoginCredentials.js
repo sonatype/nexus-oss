@@ -84,7 +84,7 @@ Ext.define('NX.coreui.view.ldap.LdapServerUserAndGroupLoginCredentials', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_SUBMIT_BUTTON'), action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_SUBMIT_BUTTON'), action: 'verifylogin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
           { text: NX.I18n.get('ADMIN_LDAP_CREDENTIALS_CANCEL_BUTTON'), handler: me.close, scope: me }
         ]
       }

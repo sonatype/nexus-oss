@@ -20,7 +20,7 @@
 Ext.define('NX.view.dev.styles.StyleSection', {
   extend: 'Ext.panel.Panel',
 
-  ui: 'light',
+  ui: 'nx-light',
   bodyPadding: '5px 5px 5px 5px',
 
   /**

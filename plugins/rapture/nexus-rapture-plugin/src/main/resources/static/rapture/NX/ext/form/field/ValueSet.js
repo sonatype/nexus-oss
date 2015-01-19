@@ -181,7 +181,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
               },
               scope: me
             },
-            ui: 'plain',
+            ui: 'nx-plain',
             glyph: me.glyphAddButton
           }
         ]
@@ -189,7 +189,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
       me.values = {
         xtype: 'grid',
         hideHeaders: true,
-        ui: 'borderless',
+        ui: 'nx-borderless',
         columns: [
           { text: 'Value', dataIndex: 'value', flex: 1 },
           {

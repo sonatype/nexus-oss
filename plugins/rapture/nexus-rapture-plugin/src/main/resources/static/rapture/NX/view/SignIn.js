@@ -73,7 +73,7 @@ Ext.define('NX.view.SignIn', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: NX.I18n.get('GLOBAL_SIGN_IN_SUBMIT'), action: 'signin', formBind: true, bindToEnter: true, ui: 'primary' },
+          { text: NX.I18n.get('GLOBAL_SIGN_IN_SUBMIT'), action: 'signin', formBind: true, bindToEnter: true, ui: 'nx-primary' },
           { text: NX.I18n.get('GLOBAL_SIGN_IN_CANCEL'), handler: me.close, scope: me }
         ]
       }

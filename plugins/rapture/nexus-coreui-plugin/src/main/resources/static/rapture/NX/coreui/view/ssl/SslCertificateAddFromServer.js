@@ -24,7 +24,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
     'NX.Icons',
     'NX.I18n'
   ],
-  ui: 'inset',
+  ui: 'nx-inset',
 
   defaultFocus: 'server',
 
@@ -48,7 +48,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateAddFromServer', {
       ],
 
       buttons: [
-        { text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'primary' },
+        { text: NX.I18n.get('ADMIN_SSL_LIST_LOAD_BUTTON'), action: 'load', formBind: true, bindToEnter: true, ui: 'nx-primary' },
         { text: NX.I18n.get('ADMIN_SSL_LOAD_CANCEL_BUTTON'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
