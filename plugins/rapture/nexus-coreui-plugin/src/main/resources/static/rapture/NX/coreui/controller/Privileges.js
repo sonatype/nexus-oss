@@ -38,9 +38,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     'privilege.PrivilegeTrace'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-privilege-feature' },
-    { ref: 'list', selector: 'nx-coreui-privilege-list' },
-    { ref: 'info', selector: 'nx-coreui-privilege-feature nx-info-panel' }
+    {ref: 'feature', selector: 'nx-coreui-privilege-feature'},
+    {ref: 'list', selector: 'nx-coreui-privilege-list'},
+    {ref: 'info', selector: 'nx-coreui-privilege-feature nx-info-panel'}
   ],
   icons: {
     'privilege-default': {
@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     path: '/Security/Privileges',
     text: NX.I18n.get('ADMIN_PRIVILEGES_TITLE'),
     description: NX.I18n.get('ADMIN_PRIVILEGES_SUBTITLE'),
-    view: { xtype: 'nx-coreui-privilege-feature' },
+    view: {xtype: 'nx-coreui-privilege-feature'},
     iconConfig: {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
@@ -113,19 +113,15 @@ Ext.define('NX.coreui.controller.Privileges', {
 
     if (Ext.isDefined(model)) {
       me.getFeature().setItemClass(1, NX.Icons.cls('privilege-' + model.get('type'), 'x16'));
+
       info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_ID')] = model.getId();
       info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_NAME')] = model.get('name');
       info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_DESCRIPTION')] = model.get('description');
-      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_METHOD')] = model.get('method');
-      if (model.get('permission')) {
-        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_PERMISSION')] = model.get('permission');
-      }
-      if (model.get('repositoryTargetName')) {
-        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_TARGET')] = model.get('repositoryTargetName');
-      }
-      if (model.get('repositoryName')) {
-        info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_REPOSITORY')] = model.get('repositoryName');
-      }
+      info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_PERMISSION')] = model.get('permission');
+
+      Ext.iterate(model.get('properties'), function (key, value) {
+        info[NX.I18n.format('ADMIN_PRIVILEGES_SUMMARY_PROPERTY', key)] = value;
+      });
 
       me.getInfo().showInfo(info);
     }
@@ -136,7 +132,7 @@ Ext.define('NX.coreui.controller.Privileges', {
    */
   showAddWindowRepositoryTarget: function () {
     var me = this,
-      feature = me.getFeature();
+        feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'));
@@ -144,6 +140,9 @@ Ext.define('NX.coreui.controller.Privileges', {
   },
 
   /**
+   * Updates repository-target store used in create-repository-target-privileges wizard to include compatible targets
+   * with selected repository-format.
+   *
    * @private
    */
   filterRepositoryTargets: function (repositoryIdCombo) {
@@ -194,11 +193,12 @@ Ext.define('NX.coreui.controller.Privileges', {
       me.loadStoreAndSelect(action.result.data[0].id, false);
       Ext.Array.each(action.result.data, function (privilege) {
         NX.Messages.add({
-          text: 'Privilege created: ' + privilege.name,
+          text: NX.I18n.format('ADMIN_PRIVILEGES_MESSAGE_CREATED', privilege.name),
           type: 'success'
         });
       });
-    } else {
+    }
+    else {
       me.loadStore(Ext.emptyFn);
     }
   },
@@ -210,14 +210,14 @@ Ext.define('NX.coreui.controller.Privileges', {
    * @param model privilege to be deleted
    */
   deleteModel: function (model) {
-    var me = this,
-        description = me.getDescription(model);
+    var me = this;
 
     NX.direct.coreui_Privilege.remove(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Privilege deleted: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_PRIVILEGES_MESSAGE_DELETED', model.get('name')),
+          type: 'success'
         });
       }
     });

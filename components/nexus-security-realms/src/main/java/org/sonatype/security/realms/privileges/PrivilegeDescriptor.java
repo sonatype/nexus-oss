@@ -22,6 +22,7 @@ public interface PrivilegeDescriptor
 {
   String getType();
 
+  // TODO: Remove this, UI will now show the "Type" as getType()
   String getName();
 
   List<PrivilegePropertyDescriptor> getPropertyDescriptors();

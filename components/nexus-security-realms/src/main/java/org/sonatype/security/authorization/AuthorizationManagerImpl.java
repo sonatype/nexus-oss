@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,12 +26,15 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Default {@link AuthorizationManager}.
@@ -49,14 +53,18 @@ public class AuthorizationManagerImpl
 
   private final EventBus eventBus;
 
+  private final List<PrivilegeDescriptor> privilegeDescriptors;
+
   @Inject
   public AuthorizationManagerImpl(ConfigurationManager configuration,
                                   PrivilegeInheritanceManager privInheritance,
-                                  EventBus eventBus)
+                                  EventBus eventBus,
+                                  final List<PrivilegeDescriptor> privilegeDescriptors)
   {
     this.configuration = configuration;
     this.privInheritance = privInheritance;
     this.eventBus = eventBus;
+    this.privilegeDescriptors = checkNotNull(privilegeDescriptors);
   }
 
   public String getSource() {
@@ -120,6 +128,16 @@ public class AuthorizationManagerImpl
     return secPriv;
   }
 
+  @Nullable
+  private PrivilegeDescriptor descriptor(final String type) {
+    for (PrivilegeDescriptor descriptor : privilegeDescriptors) {
+      if (type.equals(descriptor.getType())) {
+        return descriptor;
+      }
+    }
+    return null;
+  }
+
   protected Privilege toPrivilege(CPrivilege secPriv) {
     Privilege privilege = new Privilege();
     privilege.setId(secPriv.getId());
@@ -129,6 +147,12 @@ public class AuthorizationManagerImpl
     privilege.setReadOnly(secPriv.isReadOnly());
     privilege.setType(secPriv.getType());
     privilege.setProperties(Maps.newHashMap(secPriv.getProperties()));
+
+    // HACK: expose the real shiro permission string
+    PrivilegeDescriptor descriptor = descriptor(secPriv.getType());
+    if (descriptor != null) {
+      privilege.setPermission(descriptor.buildPermission(secPriv));
+    }
 
     return privilege;
   }

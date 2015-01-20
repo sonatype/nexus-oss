@@ -130,4 +130,15 @@ public class Privilege
   public void setVersion(final String version) {
     this.version = version;
   }
+
+  // HACK: expose the real shiro permission string
+  private String permission;
+
+  public String getPermission() {
+    return permission;
+  }
+
+  public void setPermission(final String permission) {
+    this.permission = permission;
+  }
 }

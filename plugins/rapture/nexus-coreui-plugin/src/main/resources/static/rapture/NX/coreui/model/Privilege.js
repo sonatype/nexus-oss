@@ -25,13 +25,8 @@ Ext.define('NX.coreui.model.Privilege', {
     'name',
     'description',
     'type',
-    'typeName',
     'readOnly',
-    'method',
-    'permission',
-    'repositoryId',
-    'repositoryName',
-    'repositoryTargetId',
-    'repositoryTargetName'
+    'properties',
+    'permission'
   ]
 });
