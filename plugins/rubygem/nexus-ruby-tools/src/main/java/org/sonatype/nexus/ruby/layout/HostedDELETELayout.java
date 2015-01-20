@@ -115,11 +115,11 @@ public class HostedDELETELayout
       delete(super.dependencyFile(spec.name()));
       // delete the gemspec.rz altogether
       delete(super.gemspecFile(file.filename()));
-      store.delete(file);
     }
     catch (IOException e) {
       file.setException(e);
     }
+    store.delete(file);
   }
 
   /**
