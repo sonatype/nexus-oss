@@ -23,17 +23,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 
-import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
-import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapGroupDAO;
@@ -42,9 +39,12 @@ import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUserDAO;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
-import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -97,8 +97,8 @@ public class EnterpriseLdapManager
     this.eventBus.register(this);
   }
 
-  public LdapUser authenticateUserTest(String userId, String password, CLdapServerConfiguration ldapServer)
-      throws AuthenticationException, InvalidConfigurationException, LdapServerNotFoundException,
+  public LdapUser authenticateUserTest(String userId, String password, LdapConfiguration ldapServer)
+      throws AuthenticationException, LdapServerNotFoundException,
              NoSuchLdapUserException
   {
     try {
@@ -119,6 +119,7 @@ public class EnterpriseLdapManager
     }
   }
 
+  @Override
   public LdapUser authenticateUser(String userId, String password)
       throws AuthenticationException
   {
@@ -128,11 +129,11 @@ public class EnterpriseLdapManager
           LdapUser ldapUser = connector.getUser(userId);
 
           // do the authentication
-          this.authenticateUser(
+          authenticateUser(
               ldapUser,
               password,
               connector,
-              this.ldapConfigurationManager.getLdapServerConfiguration(connector.getIdentifier()));
+              ldapConfigurationManager.getLdapServerConfiguration(connector.getIdentifier()));
 
           return ldapUser;
         }
@@ -150,6 +151,7 @@ public class EnterpriseLdapManager
     throw new AuthenticationException("User: " + userId + " could not be authenticated.");
   }
 
+  @Override
   public SortedSet<String> getAllGroups()
       throws LdapDAOException
   {
@@ -167,6 +169,7 @@ public class EnterpriseLdapManager
     return groupIds;
   }
 
+  @Override
   public SortedSet<LdapUser> getAllUsers()
       throws LdapDAOException
   {
@@ -183,6 +186,7 @@ public class EnterpriseLdapManager
     return users;
   }
 
+  @Override
   public String getGroupName(String groupId)
       throws LdapDAOException, NoSuchLdapGroupException
   {
@@ -200,6 +204,7 @@ public class EnterpriseLdapManager
     throw new NoSuchLdapGroupException(groupId, groupId);
   }
 
+  @Override
   public LdapUser getUser(String userId)
       throws NoSuchLdapUserException, LdapDAOException
   {
@@ -230,6 +235,7 @@ public class EnterpriseLdapManager
     }
   }
 
+  @Override
   public Set<String> getUserRoles(String userId)
       throws LdapDAOException, NoLdapUserRolesFoundException
   {
@@ -246,6 +252,7 @@ public class EnterpriseLdapManager
     throw new NoLdapUserRolesFoundException(userId);
   }
 
+  @Override
   public SortedSet<LdapUser> getUsers(int userCount)
       throws LdapDAOException
   {
@@ -271,6 +278,7 @@ public class EnterpriseLdapManager
     return users;
   }
 
+  @Override
   public SortedSet<LdapUser> searchUsers(String username, Set<String> roleIds)
       throws LdapDAOException
   {
@@ -294,82 +302,76 @@ public class EnterpriseLdapManager
   {
     if (this.ldapConnectors.isEmpty()) {
 
-      for (CLdapServerConfiguration ldapServer : this.ldapConfigurationManager.listLdapServerConfigurations()) {
+      for (LdapConfiguration ldapServer : ldapConfigurationManager.listLdapServerConfigurations()) {
         // first get the connector for the server
         LdapConnector originalLdapConnector =
-            new DefaultLdapConnector(ldapServer.getId(), this.ldapUserManager, this.ldapGroupManager,
-                this.getLdapContextFactory(ldapServer, false),
-                this.getLdapAuthConfiguration(ldapServer));
+            new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
+                getLdapContextFactory(ldapServer, false),
+                getLdapAuthConfiguration(ldapServer));
 
         LdapConnector backupLdapConnector = null;
 
         // if we have a backup mirror defined we need to include that
-        if (StringUtils.isNotEmpty(ldapServer.getConnectionInfo().getBackupMirrorHost())
-            && ldapServer.getConnectionInfo().getBackupMirrorPort() > 0
-            && StringUtils.isNotEmpty(ldapServer.getConnectionInfo().getBackupMirrorProtocol())) {
-
+        if (ldapServer.getConnection().getBackupHost() != null) {
           backupLdapConnector =
-              new DefaultLdapConnector(ldapServer.getId(), this.ldapUserManager, this.ldapGroupManager,
-                  this.getLdapContextFactory(ldapServer, true),
-                  this.getLdapAuthConfiguration(ldapServer));
+              new DefaultLdapConnector(ldapServer.getId(), ldapUserManager, ldapGroupManager,
+                  getLdapContextFactory(ldapServer, true),
+                  getLdapAuthConfiguration(ldapServer));
         }
 
-        this.ldapConnectors.add(new FailoverLdapConnector(
+        ldapConnectors.add(new FailoverLdapConnector(
             originalLdapConnector,
             backupLdapConnector,
-            ldapServer.getConnectionInfo().getConnectionRetryDelay()));
+            ldapServer.getConnection().getConnectionRetryDelay(),
+            ldapServer.getConnection().getMaxIncidentsCount()));
 
       }
     }
     return this.ldapConnectors;
   }
 
-  private LdapContextFactory getLdapContextFactory(CLdapServerConfiguration ldapServer, boolean useBackupUrl)
+  private LdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer, boolean useBackupUrl)
       throws LdapDAOException
   {
     final DefaultLdapContextFactory ldapContextFactory = LdapConnectionUtils.getLdapContextFactory(
         ldapServer, useBackupUrl
     );
     final TrustStoreKey key = ldapTrustStoreKey(ldapServer.getId() == null ? "<unknown>" : ldapServer.getId());
-    if ("ldaps".equals(ldapServer.getConnectionInfo().getProtocol())) {
+    if (Protocol.ldaps == ldapServer.getConnection().getHost().getProtocol()) {
       final SSLContext sslContext = trustStore.getSSLContextFor(key);
       if (sslContext != null) {
         log.debug(
             "{} is using a Nexus SSL Trust Store for accessing {}",
-            key, ldapServer.getConnectionInfo().getHost()
+            key, ldapServer.getConnection().getHost().getHostName()
         );
         return new SSLLdapContextFactory(sslContext, ldapContextFactory);
       }
     }
     log.debug(
         "{} is using a JVM Trust Store for accessing {}",
-        key, ldapServer.getConnectionInfo().getHost()
+        key, ldapServer.getConnection().getHost().getHostName()
     );
     return ldapContextFactory;
   }
 
-  private LdapAuthConfiguration getLdapAuthConfiguration(CLdapServerConfiguration ldapServer) {
+  private LdapAuthConfiguration getLdapAuthConfiguration(LdapConfiguration ldapServer) {
     return LdapConnectionUtils.getLdapAuthConfiguration(ldapServer);
   }
 
   private void authenticateUser(LdapUser ldapUser, String password, LdapConnector ldapConnector,
-                                CLdapServerConfiguration ldapServer)
-      throws InvalidConfigurationException, LdapServerNotFoundException, AuthenticationException, LdapDAOException
+                                LdapConfiguration ldapServer)
+      throws LdapServerNotFoundException, AuthenticationException, LdapDAOException
   {
-    if (StringUtils.isEmpty(ldapServer.getUserAndGroupConfig().getUserPasswordAttribute())) {
+    if (StringUtils.isEmpty(ldapServer.getMapping().getUserPasswordAttribute())) {
       // auth with bind
-      if (this.log.isDebugEnabled()) {
-        this.log.debug("Checking auth with bind for ldap user: " + ldapUser.getUsername());
-      }
-      this.ldapAuthenticator.authenticateUserWithBind(ldapUser, password, ldapConnector.getLdapContextFactory(),
-          ldapServer.getConnectionInfo().getAuthScheme());
+      log.debug("Checking auth with bind for ldap user: {}", ldapUser.getUsername());
+      ldapAuthenticator.authenticateUserWithBind(ldapUser, password, ldapConnector.getLdapContextFactory(),
+          ldapServer.getConnection().getAuthScheme());
     }
     else {
       // auth by checking password,
-      if (this.log.isDebugEnabled()) {
-        this.log.debug("Checking auth with attribute for ldap user: " + ldapUser.getUsername());
-      }
-      this.ldapAuthenticator.authenticateUserWithPassword(ldapUser, password);
+      log.debug("Checking auth with attribute for ldap user: {}", ldapUser.getUsername());
+      ldapAuthenticator.authenticateUserWithPassword(ldapUser, password);
     }
   }
 
@@ -377,11 +379,11 @@ public class EnterpriseLdapManager
   @Subscribe
   public void onEvent(final LdapClearCacheEvent evt) {
     // clear the connectors
-    this.ldapConnectors.clear();
+    ldapConnectors.clear();
   }
 
   @Subscribe
   public void on(final NexusStoppedEvent event) {
-    this.eventBus.unregister(this);
+    eventBus.unregister(this);
   }
 }

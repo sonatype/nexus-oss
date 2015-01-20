@@ -12,41 +12,24 @@
  */
 package org.sonatype.security.realms.ldap.internal.connector.dao;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 public class LdapUserDAOIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
-
   @Test
   public void testSimple()
       throws Exception
   {
-
-    Map<String, Object> env = new HashMap<String, Object>();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
@@ -55,25 +38,22 @@ public class LdapUserDAOIT
     configuration.setGroupMemberAttribute("uniqueMember");
     configuration.setUserRealNameAttribute("cn");
 
-    LdapUserDAO lum = (LdapUserDAO) lookup(LdapUserDAO.class.getName());
+    LdapUserDAO lum = lookup(LdapUserDAO.class);
 
     LdapUser user = lum.getUser("cstamas", initialContext, configuration);
-    assertEquals("cstamas", user.getUsername());
-    // assertEquals( "Tamas Cservenak", user.getRealName() );
-    assertEquals("cstamas123", user.getPassword());
+    assertThat(user.getUsername(), equalTo("cstamas"));
+    assertThat(user.getPassword(), equalTo("cstamas123"));
 
     user = lum.getUser("Fox, Brian", initialContext, configuration);
-    assertEquals("Fox, Brian", user.getUsername());
-    // assertEquals( "Brian Fox", user.getRealName() );
-    assertEquals("brianf123", user.getPassword());
+    assertThat(user.getUsername(), equalTo("Fox, Brian"));
+    assertThat(user.getPassword(), equalTo("brianf123"));
 
     user = lum.getUser("jvanzyl", initialContext, configuration);
-    assertEquals("jvanzyl", user.getUsername());
-    // assertEquals( "Jason Van Zyl", user.getRealName() );
-    assertEquals("jvanzyl123", user.getPassword());
+    assertThat(user.getUsername(), equalTo("jvanzyl"));
+    assertThat(user.getPassword(), equalTo("jvanzyl123"));
 
     try {
-      user = lum.getUser("intruder", initialContext, configuration);
+      lum.getUser("intruder", initialContext, configuration);
       fail();
     }
     catch (NoSuchLdapUserException e) {
@@ -82,15 +62,14 @@ public class LdapUserDAOIT
 
     configuration.setLdapFilter("description=nexus");
     // must succeed because cstamas has the attribute description set to nexus
-    user = lum.getUser("cstamas", initialContext, configuration);
+    lum.getUser("cstamas", initialContext, configuration);
     try {
       // must fail because of the ldapFilter that jvanzyl user don't have
-      user = lum.getUser("jvanzyl", initialContext, configuration);
+      lum.getUser("jvanzyl", initialContext, configuration);
       fail();
     }
     catch (NoSuchLdapUserException e) {
       // good
     }
   }
-
 }

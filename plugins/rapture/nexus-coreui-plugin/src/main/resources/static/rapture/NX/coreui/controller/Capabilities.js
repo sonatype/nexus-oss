@@ -174,8 +174,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.eventuallyShowWarning(model);
       me.showSummary(model);
       me.showSettings(model);
-      me.showAbout(capabilityTypeModel);
       me.showStatus(model);
+      me.showAbout(capabilityTypeModel);
     }
   },
 
@@ -278,7 +278,11 @@ Ext.define('NX.coreui.controller.Capabilities', {
         list = me.getList();
 
     if (list) {
-      me.getCapabilityTypeStore().load();
+      me.getCapabilityTypeStore().load(
+        function() {
+          me.reselect();
+        }
+      );
     }
   },
 

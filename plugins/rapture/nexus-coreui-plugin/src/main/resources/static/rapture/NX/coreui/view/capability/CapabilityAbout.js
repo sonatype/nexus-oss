@@ -20,7 +20,7 @@
 Ext.define('NX.coreui.view.capability.CapabilityAbout', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-about',
-  ui: 'inset',
+  ui: 'nx-inset',
 
   autoScroll: true,
   html: '',

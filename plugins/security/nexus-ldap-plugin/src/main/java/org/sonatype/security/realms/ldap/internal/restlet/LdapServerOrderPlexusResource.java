@@ -20,11 +20,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
+
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerOrderRequest;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -76,8 +75,7 @@ public class LdapServerOrderPlexusResource
   @Override
   @PUT
   public LdapServerOrderRequest doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     LdapServerOrderRequest dto = (LdapServerOrderRequest) payload;
     this.ldapConfigurationManager.setServerOrder(dto.getData());

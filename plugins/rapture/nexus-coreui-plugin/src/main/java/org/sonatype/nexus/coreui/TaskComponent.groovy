@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.coreui
 
+import groovy.transform.PackageScope
+
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -212,7 +214,8 @@ class TaskComponent
     nexusScheduler.getTaskById(id)?.currentState?.future?.cancel(false)
   }
 
-  static String getStatusDescription(final CurrentState<?> currentState) {
+  @PackageScope
+  String getStatusDescription(final CurrentState<?> currentState) {
     switch (currentState.state) {
       case State.WAITING:
         return 'Waiting'
@@ -232,7 +235,8 @@ class TaskComponent
     }
   }
 
-  static String getSchedule(final Schedule schedule) {
+  @PackageScope
+  String getSchedule(final Schedule schedule) {
     if (schedule instanceof Manual) {
       return 'manual'
     }
@@ -262,15 +266,16 @@ class TaskComponent
     }
   }
 
-  static Date getNextRun(final TaskInfo<?> task) {
+  @PackageScope
+  Date getNextRun(final TaskInfo<?> task) {
     return task.currentState.nextRun;
   }
 
-  static String getLastRunResult(final TaskInfo<?> task) {
+  @PackageScope
+  String getLastRunResult(final TaskInfo<?> task) {
     String lastRunResult = null
 
     if (task.lastRunState != null) {
-      lastRunResult = null;
       switch (task.lastRunState.endState) {
         case EndState.OK:
           lastRunResult = "Ok";
@@ -308,6 +313,7 @@ class TaskComponent
     return lastRunResult
   }
 
+  @PackageScope
   TaskXO asTaskXO(final TaskInfo<?> task) {
     def result = new TaskXO(
         id: task.id,
@@ -353,7 +359,8 @@ class TaskComponent
     result
   }
 
-  static Schedule asSchedule(final TaskXO taskXO) {
+  @PackageScope
+  Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
       try {
         return new Cron(new Date(), taskXO.cronExpression)
@@ -403,7 +410,8 @@ class TaskComponent
     return new Manual()
   }
 
-  private static void validateState(final TaskInfo<?> task) {
+  @PackageScope
+  void validateState(final TaskInfo<?> task) {
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');

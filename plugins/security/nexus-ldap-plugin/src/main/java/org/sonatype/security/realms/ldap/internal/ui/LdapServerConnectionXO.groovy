@@ -71,7 +71,7 @@ class LdapServerConnectionXO
   Integer connectionRetryDelay
 
   @Min(0L)
-  Integer cacheTimeout
+  Integer maxIncidentsCount
 
 
   public static enum Protocol {

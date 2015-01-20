@@ -17,24 +17,26 @@ import java.net.MalformedURLException;
 
 import javax.net.ssl.SSLContext;
 
-import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.plugin.TrustStore;
+
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.XStreamInitalizer;
+import org.sonatype.security.realms.ldap.internal.LdapURL;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 import org.sonatype.security.realms.ldap.internal.realms.DefaultLdapContextFactory;
-import org.sonatype.security.realms.ldap.internal.LdapURL;
+import org.sonatype.security.realms.ldap.internal.ssl.SSLLdapContextFactory;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.codec.Base64;
@@ -47,8 +49,8 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey.ldapTrustStoreKey;
 import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
+import static org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey.ldapTrustStoreKey;
 
 public abstract class AbstractLdapPlexusResource
     extends AbstractSecurityPlexusResource
@@ -63,29 +65,25 @@ public abstract class AbstractLdapPlexusResource
   }
 
   protected void doDelete(Context context, Request request, Response response)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     super.delete(context, request, response);
   }
 
   protected Object doGet(Context context, Request request, Response response, Variant variant)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     return super.get(context, request, response, variant);
   }
 
   protected Object doPost(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     return super.post(context, request, response, payload);
   }
 
   protected Object doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     return super.put(context, request, response, payload);
   }
@@ -97,8 +95,8 @@ public abstract class AbstractLdapPlexusResource
     try {
       this.doDelete(context, request, response);
     }
-    catch (InvalidConfigurationException e) {
-      this.handleInvalidConfigurationException(e);
+    catch (IllegalArgumentException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -109,9 +107,8 @@ public abstract class AbstractLdapPlexusResource
     try {
       return this.doGet(context, request, response, variant);
     }
-    catch (InvalidConfigurationException e) {
-      this.handleInvalidConfigurationException(e);
-      return null;
+    catch (IllegalArgumentException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -122,9 +119,8 @@ public abstract class AbstractLdapPlexusResource
     try {
       return this.doPost(context, request, response, payload);
     }
-    catch (InvalidConfigurationException e) {
-      this.handleInvalidConfigurationException(e);
-      return null;
+    catch (IllegalArgumentException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
@@ -135,40 +131,69 @@ public abstract class AbstractLdapPlexusResource
     try {
       return this.doPut(context, request, response, payload);
     }
-    catch (InvalidConfigurationException e) {
-      this.handleInvalidConfigurationException(e);
-      return null;
+    catch (IllegalArgumentException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", e);
     }
   }
 
-  protected CLdapServerConfiguration toLdapModel(final LdapServerConfigurationDTO dto)
-      throws ResourceException, InvalidConfigurationException
+  protected LdapConfiguration toLdapModel(final LdapServerConfigurationDTO dto)
+      throws ResourceException
   {
-    CLdapServerConfiguration config = convert(dto, new CLdapServerConfiguration());
-    config.setConnectionInfo(decode(config.getConnectionInfo()));
-    return config;
+    final LdapConfiguration result = new LdapConfiguration();
+    // this method is used in edit/create case, set ID only if we have one
+    if (!Strings.isNullOrEmpty(dto.getId())) {
+      result.setId(dto.getId());
+    }
+    if (!Strings.isNullOrEmpty(dto.getName())) {
+      result.setName(dto.getName());
+    }
+    // result.setOrder();
+    result.setConnection(toLdapModel(dto.getConnectionInfo()));
+
+    final Mapping mapping = new Mapping();
+    final LdapUserAndGroupAuthConfigurationDTO dtoMapping = dto.getUserAndGroupConfig();
+    mapping.setEmailAddressAttribute(dtoMapping.getEmailAddressAttribute());
+    mapping.setLdapGroupsAsRoles(dtoMapping.isLdapGroupsAsRoles());
+    mapping.setGroupBaseDn(dtoMapping.getGroupBaseDn());
+    mapping.setGroupIdAttribute(dtoMapping.getGroupIdAttribute());
+    mapping.setGroupMemberAttribute(dtoMapping.getGroupMemberAttribute());
+    mapping.setGroupMemberFormat(dtoMapping.getGroupMemberFormat());
+    mapping.setGroupObjectClass(dtoMapping.getGroupObjectClass());
+    mapping.setUserPasswordAttribute(dtoMapping.getUserPasswordAttribute());
+    mapping.setUserIdAttribute(dtoMapping.getUserIdAttribute());
+    mapping.setUserObjectClass(dtoMapping.getUserObjectClass());
+    mapping.setLdapFilter(dtoMapping.getLdapFilter());
+    mapping.setUserBaseDn(dtoMapping.getUserBaseDn());
+    mapping.setUserRealNameAttribute(dtoMapping.getUserRealNameAttribute());
+    mapping.setUserSubtree(dtoMapping.isUserSubtree());
+    mapping.setGroupSubtree(dtoMapping.isGroupSubtree());
+    mapping.setUserMemberOfAttribute(dtoMapping.getUserMemberOfAttribute());
+    result.setMapping(mapping);
+    return result;
   }
 
-  protected LdapServerConfigurationDTO toDto(CLdapServerConfiguration ldapServer) {
+  protected LdapServerConfigurationDTO toDto(LdapConfiguration ldapServer) {
     LdapServerConfigurationDTO dto = new LdapServerConfigurationDTO();
     dto.setId(ldapServer.getId());
     dto.setName(ldapServer.getName());
 
-    if (ldapServer.getConnectionInfo() != null) {
-      CConnectionInfo connInfo = ldapServer.getConnectionInfo();
+    if (ldapServer.getConnection() != null) {
+      Connection connInfo = ldapServer.getConnection();
 
       LdapConnectionInfoDTO infoDto = new LdapConnectionInfoDTO();
       infoDto.setAuthScheme(connInfo.getAuthScheme());
-      infoDto.setBackupMirrorHost(connInfo.getBackupMirrorHost());
-      infoDto.setBackupMirrorPort(connInfo.getBackupMirrorPort());
-      infoDto.setBackupMirrorProtocol(connInfo.getBackupMirrorProtocol());
-      infoDto.setCacheTimeout(connInfo.getCacheTimeout());
+      if (connInfo.getBackupHost() != null) {
+        infoDto.setBackupMirrorHost(connInfo.getBackupHost().getHostName());
+        infoDto.setBackupMirrorPort(connInfo.getBackupHost().getPort());
+        infoDto.setBackupMirrorProtocol(connInfo.getBackupHost().getProtocol().name());
+      }
+      infoDto.setMaxIncidentsCount(connInfo.getMaxIncidentsCount());
       infoDto.setConnectionRetryDelay(connInfo.getConnectionRetryDelay());
       infoDto.setConnectionTimeout(connInfo.getConnectionTimeout());
-      infoDto.setHost(connInfo.getHost());
-      infoDto.setPort(connInfo.getPort());
-      infoDto.setProtocol(connInfo.getProtocol());
-      infoDto.setRealm(connInfo.getRealm());
+      infoDto.setHost(connInfo.getHost().getHostName());
+      infoDto.setPort(connInfo.getHost().getPort());
+      infoDto.setProtocol(connInfo.getHost().getProtocol().name());
+      infoDto.setRealm(connInfo.getSaslRealm());
       infoDto.setSearchBase(connInfo.getSearchBase());
       infoDto.setSystemUsername(connInfo.getSystemUsername());
       if (connInfo.getSystemPassword() != null) {
@@ -177,53 +202,70 @@ public abstract class AbstractLdapPlexusResource
       dto.setConnectionInfo(encode(infoDto));
     }
 
-    if (ldapServer.getUserAndGroupConfig() != null) {
-      CUserAndGroupAuthConfiguration userGroupConf = ldapServer.getUserAndGroupConfig();
-      LdapUserAndGroupAuthConfigurationDTO userGroupDto = new LdapUserAndGroupAuthConfigurationDTO();
-      dto.setUserAndGroupConfig(userGroupDto);
-
-      userGroupDto.setEmailAddressAttribute(userGroupConf.getEmailAddressAttribute());
-      userGroupDto.setGroupBaseDn(userGroupConf.getGroupBaseDn());
-      userGroupDto.setGroupIdAttribute(userGroupConf.getGroupIdAttribute());
-      userGroupDto.setGroupMemberAttribute(userGroupConf.getGroupMemberAttribute());
-      userGroupDto.setGroupMemberFormat(userGroupConf.getGroupMemberFormat());
-      userGroupDto.setGroupObjectClass(userGroupConf.getGroupObjectClass());
-      userGroupDto.setGroupSubtree(userGroupConf.isGroupSubtree());
-      userGroupDto.setLdapGroupsAsRoles(userGroupConf.isLdapGroupsAsRoles());
-      userGroupDto.setUserBaseDn(userGroupConf.getUserBaseDn());
-      userGroupDto.setUserIdAttribute(userGroupConf.getUserIdAttribute());
-      userGroupDto.setUserMemberOfAttribute(userGroupConf.getUserMemberOfAttribute());
-      userGroupDto.setUserObjectClass(userGroupConf.getUserObjectClass());
-      userGroupDto.setUserPasswordAttribute(userGroupConf.getUserPasswordAttribute());
-      userGroupDto.setUserRealNameAttribute(userGroupConf.getUserRealNameAttribute());
-      userGroupDto.setUserSubtree(userGroupConf.isUserSubtree());
-      userGroupDto.setLdapFilter(userGroupConf.getLdapFilter());
+    if (ldapServer.getMapping() != null) {
+      dto.setUserAndGroupConfig(toDto(ldapServer.getMapping()));
     }
 
     return dto;
   }
 
-  protected LdapUserAndGroupAuthConfigurationDTO toDto(CUserAndGroupAuthConfiguration userAndGroupConfig) {
-    return this.convert(userAndGroupConfig, new LdapUserAndGroupAuthConfigurationDTO());
+  protected LdapUserAndGroupAuthConfigurationDTO toDto(Mapping mapping) {
+    final LdapUserAndGroupAuthConfigurationDTO result = new LdapUserAndGroupAuthConfigurationDTO();
+    result.setEmailAddressAttribute(mapping.getEmailAddressAttribute());
+    result.setLdapGroupsAsRoles(mapping.isLdapGroupsAsRoles());
+    result.setGroupBaseDn(mapping.getGroupBaseDn());
+    result.setGroupIdAttribute(mapping.getGroupIdAttribute());
+    result.setGroupMemberAttribute(mapping.getGroupMemberAttribute());
+    result.setGroupMemberFormat(mapping.getGroupMemberFormat());
+    result.setGroupObjectClass(mapping.getGroupObjectClass());
+    result.setUserPasswordAttribute(mapping.getUserPasswordAttribute());
+    result.setUserIdAttribute(mapping.getUserIdAttribute());
+    result.setUserObjectClass(mapping.getUserObjectClass());
+    result.setLdapFilter(mapping.getLdapFilter());
+    result.setUserBaseDn(mapping.getUserBaseDn());
+    result.setUserRealNameAttribute(mapping.getUserRealNameAttribute());
+    result.setUserSubtree(mapping.isUserSubtree());
+    result.setGroupSubtree(mapping.isGroupSubtree());
+    result.setUserMemberOfAttribute(mapping.getUserMemberOfAttribute());
+    return result;
   }
 
-  protected CConnectionInfo toLdapModel(LdapConnectionInfoDTO connectionDto)
-      throws ResourceException, InvalidConfigurationException
+  protected Connection toLdapModel(LdapConnectionInfoDTO from)
+      throws ResourceException
   {
-    return decode(convert(connectionDto, new CConnectionInfo()));
-  }
-
-  private <T, F> T convert(F from, T to) {
-    // xstream cheat ahead
-    XStream xstream = new XStream();
-    xstream.setClassLoader(this.getClass().getClassLoader());
-    String fromXml = xstream.toXML(from);
-    to = (T) xstream.fromXML(fromXml, to);
-    return to;
+    try {
+      final Connection to = new Connection();
+      to.setSearchBase(from.getSearchBase());
+      to.setSystemUsername(from.getSystemUsername());
+      to.setSystemPassword(from.getSystemPassword());
+      to.setAuthScheme(from.getAuthScheme());
+      final Host host = new Host(
+          Protocol.valueOf(from.getProtocol()),
+          from.getHost(),
+          from.getPort()
+      );
+      to.setHost(host);
+      if (!Strings.isNullOrEmpty(from.getBackupMirrorHost())) {
+        final Host backupHost = new Host(
+            Protocol.valueOf(from.getBackupMirrorProtocol()),
+            from.getBackupMirrorHost(),
+            from.getBackupMirrorPort()
+        );
+        to.setBackupHost(backupHost);
+      }
+      to.setSaslRealm(from.getRealm());
+      to.setConnectionTimeout(from.getConnectionTimeout());
+      to.setConnectionRetryDelay(from.getConnectionRetryDelay());
+      to.setMaxIncidentsCount(from.getMaxIncidentsCount());
+      return decode(to);
+    }
+    catch (NullPointerException e) {
+      throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e);
+    }
   }
 
   protected LdapContextFactory buildDefaultLdapContextFactory(final String ldapServerId,
-                                                              final CConnectionInfo connectionDto)
+                                                              final Connection connectionDto)
       throws MalformedURLException
   {
     DefaultLdapContextFactory ldapContextFactory = new DefaultLdapContextFactory();
@@ -231,12 +273,14 @@ public abstract class AbstractLdapPlexusResource
     ldapContextFactory.setSearchBase(connectionDto.getSearchBase());
     ldapContextFactory.setSystemPassword(connectionDto.getSystemPassword());
     ldapContextFactory.setSystemUsername(connectionDto.getSystemUsername());
-    ldapContextFactory.setUrl(new LdapURL(connectionDto.getProtocol(), connectionDto.getHost(), connectionDto
-        .getPort(), connectionDto.getSearchBase()).toString());
+    ldapContextFactory.setUrl(
+        new LdapURL(connectionDto.getHost().getProtocol().name(), connectionDto.getHost().getHostName(),
+            connectionDto.getHost()
+                .getPort(), connectionDto.getSearchBase()).toString());
     ldapContextFactory.setAuthentication(connectionDto.getAuthScheme());
 
     final TrustStoreKey key = ldapTrustStoreKey(ldapServerId == null ? "<unknown>" : ldapServerId);
-    if ("ldaps".equals(connectionDto.getProtocol())) {
+    if (Protocol.ldaps == connectionDto.getHost().getProtocol()) {
       final SSLContext sslContext = trustStore.getSSLContextFor(key);
       if (sslContext != null) {
         getLogger().debug(
@@ -274,10 +318,10 @@ public abstract class AbstractLdapPlexusResource
     return buffer.toString();
   }
 
-  protected CConnectionInfo replaceFakePassword(final CConnectionInfo connectionInfo,
-                                                final String ldapServerId,
-                                                final LdapConfigurationManager ldapConfigurationManager)
-      throws InvalidConfigurationException, ResourceException
+  protected Connection replaceFakePassword(final Connection connectionInfo,
+                                           final String ldapServerId,
+                                           final LdapConfigurationManager ldapConfigurationManager)
+      throws ResourceException
   {
     if (connectionInfo == null) {
       return null;
@@ -285,8 +329,8 @@ public abstract class AbstractLdapPlexusResource
     String systemPassword = connectionInfo.getSystemPassword();
     if (FAKE_PASSWORD.equals(systemPassword) && ldapServerId != null) {
       try {
-        CLdapServerConfiguration config = ldapConfigurationManager.getLdapServerConfiguration(ldapServerId);
-        connectionInfo.setSystemPassword(config.getConnectionInfo().getSystemPassword());
+        LdapConfiguration config = ldapConfigurationManager.getLdapServerConfiguration(ldapServerId);
+        connectionInfo.setSystemPassword(config.getConnection().getSystemPassword());
       }
       catch (LdapServerNotFoundException e) {
         throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, e);
@@ -317,7 +361,7 @@ public abstract class AbstractLdapPlexusResource
     }
   }
 
-  private CConnectionInfo decode(final CConnectionInfo connectionInfo) {
+  private Connection decode(final Connection connectionInfo) {
     if (connectionInfo == null) {
       return null;
     }

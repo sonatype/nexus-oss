@@ -13,9 +13,31 @@
 package org.sonatype.security.realms.ldap.internal.realms;
 
 
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+
 public class CramMd5AuthLdapSchemaIT
     extends LdapSchemaTestSupport
 {
+  @Override
+  protected LdapServerConfiguration createServerConfiguration(final String name) {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(createPartition(name))
+        .withSasl("localhost", "ldap/localhost@EXAMPLE.COM", "ou=system", "localhost")
+        .build();
+  }
 
-
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+    ldapConfiguration.getConnection().setAuthScheme("CRAM-MD5");
+    ldapConfiguration.getConnection().setSaslRealm("localhost");
+    ldapConfiguration.getConnection().setSystemUsername("admin");
+    ldapConfiguration.getConnection().setSystemPassword("secret");
+    return ldapConfiguration;
+  }
 }

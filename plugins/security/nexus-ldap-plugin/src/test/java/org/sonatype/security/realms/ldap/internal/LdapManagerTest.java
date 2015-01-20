@@ -13,30 +13,53 @@
 package org.sonatype.security.realms.ldap.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
-import com.thoughtworks.xstream.XStream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class LdapManagerTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
+  @Override
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    // reuse the "default" one, but add the two more
+    final LinkedHashMap<String, LdapServerConfiguration> result = super.createLdapServerConfigurations();
+    result.put("second", createServerConfiguration("second"));
+    result.put("backup", createServerConfiguration("backup"));
+    return result;
+  }
+
+  @Override
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    final LinkedHashMap<String, LdapConfiguration> result = super.createLdapClientConfigurations();
+
+    // backup is not default kind
+    final LdapConfiguration backup = result.get("backup");
+    backup.getMapping().setGroupMemberAttribute("uniqueMember");
+    backup.getMapping().setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    backup.getMapping().setGroupObjectClass("groupOfUniqueNames");
+    backup.getMapping().setUserMemberOfAttribute(null);
+    backup.getMapping().setUserSubtree(false);
+
+    return result;
+  }
 
   @Test
   public void testAuthenticate()
@@ -70,7 +93,8 @@ public class LdapManagerTest
     EnterpriseLdapManager ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     LdapConfigurationManager ldapConfiguration = this.lookup(LdapConfigurationManager.class);
 
-    CLdapServerConfiguration ldapServer = ldapConfiguration.getLdapServerConfiguration("default");
+    LdapConfiguration ldapServer = ldapConfiguration
+        .getLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
     ldapServer = this.clone(ldapServer);
 
     Assert.assertNotNull(ldapManager.authenticateUserTest("brianf", "brianf123", ldapServer));
@@ -91,9 +115,10 @@ public class LdapManagerTest
     EnterpriseLdapManager ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     LdapConfigurationManager ldapConfiguration = this.lookup(LdapConfigurationManager.class);
 
-    CLdapServerConfiguration ldapServer = ldapConfiguration.getLdapServerConfiguration("default");
+    LdapConfiguration ldapServer = ldapConfiguration
+        .getLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
     ldapServer = this.clone(ldapServer);
-    ldapServer.getConnectionInfo().setHost("INVALIDSERVERNAME");
+    ldapServer.getConnection().getHost().setHostName("INVALIDSERVERNAME");
 
     try {
       ldapManager.authenticateUserTest("brianf", "brianf123", ldapServer);
@@ -325,8 +350,13 @@ public class LdapManagerTest
     Assert.assertEquals(0, ldapManager.searchUsers("z", null).size());
   }
 
-  private CLdapServerConfiguration clone(CLdapServerConfiguration ldapServer) {
-    XStream xstream = new XStream();
-    return (CLdapServerConfiguration) xstream.fromXML(xstream.toXML(ldapServer));
+  private LdapConfiguration clone(final LdapConfiguration ldapServer) {
+    final ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      return objectMapper.readValue(objectMapper.writeValueAsString(ldapServer), LdapConfiguration.class);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

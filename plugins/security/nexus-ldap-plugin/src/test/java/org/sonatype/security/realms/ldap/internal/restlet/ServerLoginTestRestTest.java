@@ -12,14 +12,13 @@
  */
 package org.sonatype.security.realms.ldap.internal.restlet;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapTestCase;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
-
-import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 
 public class ServerLoginTestRestTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
 
   @Test
@@ -60,7 +59,7 @@ public class ServerLoginTestRestTest
     ldapServerLoginTestRequest.getData().getConfiguration().setConnectionInfo(connDto);
     connDto.setAuthScheme("simple");
     connDto.setHost("localhost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     connDto.setSystemPassword(encodeBase64("secret"));
     connDto.setSystemUsername(encodeBase64("uid=admin,ou=system"));
@@ -116,7 +115,7 @@ public class ServerLoginTestRestTest
     ldapServerLoginTestRequest.getData().getConfiguration().setConnectionInfo(connDto);
     connDto.setAuthScheme("simple");
     connDto.setHost("localhost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     connDto.setSystemPassword(encodeBase64("secret"));
     connDto.setSystemUsername(encodeBase64("uid=admin,ou=system"));
@@ -168,7 +167,7 @@ public class ServerLoginTestRestTest
     ldapServerLoginTestRequest.getData().getConfiguration().setConnectionInfo(connDto);
     connDto.setAuthScheme("simple");
     connDto.setHost("localhost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     connDto.setSystemPassword(encodeBase64("secret"));
     connDto.setSystemUsername(encodeBase64("uid=admin,ou=system"));
@@ -216,7 +215,7 @@ public class ServerLoginTestRestTest
     ldapServerLoginTestRequest.getData().getConfiguration().setConnectionInfo(connDto);
     connDto.setAuthScheme("none");
     connDto.setHost("localhost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     //        connDto.setSystemPassword( "secret" );
     //        connDto.setSystemUsername( "uid=admin,ou=system" );

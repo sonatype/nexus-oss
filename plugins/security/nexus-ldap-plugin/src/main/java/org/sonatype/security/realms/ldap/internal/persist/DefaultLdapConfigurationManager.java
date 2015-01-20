@@ -12,36 +12,37 @@
  */
 package org.sonatype.security.realms.ldap.internal.persist;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.security.realms.ldap.LdapPlugin;
-import org.sonatype.security.realms.ldap.internal.persist.validation.LdapConfigurationValidator;
-import org.sonatype.security.realms.ldap.internal.realms.LdapRealm;
-import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationRequest;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.realms.ldap.LdapPlugin;
 import org.sonatype.security.realms.ldap.internal.events.LdapClearCacheEvent;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Validator;
+import org.sonatype.security.realms.ldap.realms.LdapRealm;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Default implementation of {@link LdapConfigurationManager}.
+ */
 @Named
 @Singleton
 public class DefaultLdapConfigurationManager
@@ -50,135 +51,126 @@ public class DefaultLdapConfigurationManager
 {
   private final LdapConfigurationSource configurationSource;
 
-  private final LdapConfigurationValidator configurationValidator;
+  private final Validator validator;
 
   private final EventBus eventBus;
 
   private final SecuritySystem securitySystem;
 
   /**
-   * This will hold the current configuration in memory, to reload, will need to set this to null
+   * Configuration cache.
    */
-  private CLdapConfiguration ldapConfiguration = null;
+  private final LinkedHashMap<String, LdapConfiguration> cache;
+
+  private boolean cachePrimed;
 
   @Inject
   public DefaultLdapConfigurationManager(final LdapConfigurationSource configurationSource,
-                                         final LdapConfigurationValidator configurationValidator,
+                                         final Validator validator,
                                          final EventBus eventBus,
                                          final SecuritySystem securitySystem)
   {
     this.configurationSource = checkNotNull(configurationSource);
-    this.configurationValidator = checkNotNull(configurationValidator);
-    this.eventBus = eventBus;
+    this.validator = checkNotNull(validator);
+    this.eventBus = checkNotNull(eventBus);
     this.securitySystem = checkNotNull(securitySystem);
+    this.cache = Maps.newLinkedHashMap();
+    this.cachePrimed = false;
   }
 
   @Override
   public synchronized void clearCache() {
-    ldapConfiguration = null;
-    // fire event
+    cache.clear();
+    cachePrimed = false;
     eventBus.post(new LdapClearCacheEvent(this));
   }
 
   @Override
   public synchronized void setServerOrder(final List<String> orderdServerIds)
-      throws InvalidConfigurationException
+      throws IllegalArgumentException
   {
-    final List<CLdapServerConfiguration> ldapServers = getConfiguration().getServers();
-    final ValidationResponse vr = configurationValidator.validateLdapServerOrder(ldapServers, orderdServerIds);
-    if (vr.getValidationErrors().size() > 0) {
-      throw new InvalidConfigurationException(vr);
-    }
+    checkNotNull(orderdServerIds);
+    final LinkedHashMap<String, LdapConfiguration> configuration = getConfiguration();
+    final Set<String> newOrder = Sets.newHashSet(orderdServerIds);
+    checkArgument(newOrder.size() == orderdServerIds.size(), "Duplicate keys provided: %s", orderdServerIds);
+    final Set<String> configIds = configuration.keySet();
+    checkArgument(newOrder.equals(configIds), "ID ordering mismatch (the new and existing should differ in order only):  new=%s, existing=%s)", orderdServerIds, configIds);
 
-    // build a map so its easier
-    final Map<String, CLdapServerConfiguration> idToServerMap = Maps.newHashMap();
-    for (CLdapServerConfiguration ldapServer : ldapServers) {
-      idToServerMap.put(ldapServer.getId(), ldapServer);
+    for (LdapConfiguration config : configuration.values()) {
+      config.setOrder(orderdServerIds.indexOf(config.getId()));
+      configurationSource.update(config);
     }
-    // now reorder them
-    final List<CLdapServerConfiguration> newOrderedldapServers = Lists.newArrayList();
-    for (String serverId : orderdServerIds) {
-      newOrderedldapServers.add(idToServerMap.get(serverId));
-    }
-    getConfiguration().setServers(newOrderedldapServers);
-    save();
+    clearCache();
   }
 
   @Override
-  public synchronized List<CLdapServerConfiguration> listLdapServerConfigurations() {
-    return ImmutableList.copyOf(getConfiguration().getServers());
+  public synchronized List<LdapConfiguration> listLdapServerConfigurations() {
+    return ImmutableList.copyOf(getConfiguration().values());
   }
 
   @Override
-  public synchronized CLdapServerConfiguration getLdapServerConfiguration(final String id)
-      throws InvalidConfigurationException,
-             LdapServerNotFoundException
+  public synchronized LdapConfiguration getLdapServerConfiguration(final String id)
+      throws LdapServerNotFoundException
   {
-    for (CLdapServerConfiguration ldapServer : getConfiguration().getServers()) {
-      if (ldapServer.getId().equals(id)) {
-        return ldapServer;
-      }
+    checkNotNull(id);
+    final LdapConfiguration configuration = getConfiguration().get(id);
+    if (configuration != null) {
+      return configuration;
     }
     throw new LdapServerNotFoundException("Ldap Server: '" + id + "' was not found.");
   }
 
   @Override
-  public synchronized void addLdapServerConfiguration(final CLdapServerConfiguration ldapServerConfiguration)
-      throws InvalidConfigurationException
+  public synchronized String addLdapServerConfiguration(final LdapConfiguration ldapServerConfiguration)
+      throws IllegalArgumentException
   {
-    final ValidationResponse vr = configurationValidator
-        .validateLdapServerConfiguration(ldapServerConfiguration, false);
-    if (vr.getValidationErrors().size() > 0) {
-      throw new InvalidConfigurationException(vr);
-    }
-    final boolean wasUnconfigured = getConfiguration().getServers().isEmpty();
-    getConfiguration().addServer(ldapServerConfiguration);
-    save();
-    if (wasUnconfigured) {
+    checkNotNull(ldapServerConfiguration);
+    validator.validate(ldapServerConfiguration);
+    ldapServerConfiguration.setOrder(Integer.MAX_VALUE); // should be last
+    final LinkedHashMap<String, LdapConfiguration> config = getConfiguration();
+    final List<String> existingIds = Lists.newArrayList(config.keySet()); // preserve it, as clearCache clears this
+    final boolean firstEntry = config.isEmpty();
+    configurationSource.create(ldapServerConfiguration);
+    clearCache();
+    // adjust order that will get rid of MAX_VALUE
+    existingIds.add(ldapServerConfiguration.getId());
+    setServerOrder(existingIds);
+    if (firstEntry) {
       mayActivateLdapRealm();
     }
+    return ldapServerConfiguration.getId();
+  }
+
+
+  @Override
+  public synchronized void updateLdapServerConfiguration(final LdapConfiguration ldapServerConfiguration)
+      throws IllegalArgumentException, LdapServerNotFoundException
+  {
+    checkNotNull(ldapServerConfiguration);
+    validator.validate(ldapServerConfiguration);
+    checkArgument(ldapServerConfiguration.getId() != null, "'id' is null, cannot update");
+    final LinkedHashMap<String, LdapConfiguration> config = getConfiguration();
+    if (!config.containsKey(ldapServerConfiguration.getId())) {
+      throw new LdapServerNotFoundException("Ldap Server: '" + ldapServerConfiguration.getId() + "' was not found.");
+    }
+    configurationSource.update(ldapServerConfiguration);
+    clearCache();
   }
 
   @Override
-  public synchronized void updateLdapServerConfiguration(final CLdapServerConfiguration ldapServerConfiguration)
-      throws InvalidConfigurationException,
-             LdapServerNotFoundException
+  public synchronized void deleteLdapServerConfiguration(final String id)
+      throws LdapServerNotFoundException
   {
-    final ValidationResponse vr = configurationValidator
-        .validateLdapServerConfiguration(ldapServerConfiguration, true);
-    if (vr.getValidationErrors().size() > 0) {
-      throw new InvalidConfigurationException(vr);
-    }
-
-    // this list is ordered so we need to replace the old one
-    final CLdapConfiguration ldapConfiguration = getConfiguration();
-    for (int ii = 0; ii < ldapConfiguration.getServers().size(); ii++) {
-      CLdapServerConfiguration ldapServer = ldapConfiguration.getServers().get(ii);
-      if (ldapServer.getId().equals(ldapServerConfiguration.getId())) {
-        ldapConfiguration.getServers().remove(ii);
-        ldapConfiguration.getServers().add(ii, ldapServerConfiguration);
+    checkNotNull(id);
+    final LinkedHashMap<String, LdapConfiguration> config = getConfiguration();
+    final boolean lastEntry = config.size() == 1;
+    if (config.containsKey(id)) {
+      configurationSource.delete(id);
+      clearCache();
+      if (lastEntry) {
+        mayDeactivateLdapRealm();
       }
-    }
-    save();
-  }
-
-  @Override
-  public synchronized void deleteLdapServerConfiguration(String id)
-      throws InvalidConfigurationException,
-             LdapServerNotFoundException
-  {
-    final boolean lastEntry = getConfiguration().getServers().size() == 1;
-    for (Iterator<CLdapServerConfiguration> iter = getConfiguration().getServers().iterator(); iter
-        .hasNext(); ) {
-      CLdapServerConfiguration ldapServer = iter.next();
-      if (ldapServer.getId().equals(id)) {
-        iter.remove();
-        save();
-        if (lastEntry) {
-          mayDeactivateLdapRealm();
-        }
-        return;
-      }
+      return;
     }
     throw new LdapServerNotFoundException("Ldap Server: '" + id + "' was not found.");
   }
@@ -188,11 +180,16 @@ public class DefaultLdapConfigurationManager
    *
    * @since 2.7.0
    */
-  private void mayActivateLdapRealm() throws InvalidConfigurationException {
-    final List<String> activeRealms = securitySystem.getRealms();
-    if (!activeRealms.contains(LdapPlugin.REALM_NAME)) {
-      activeRealms.add(LdapPlugin.REALM_NAME);
-      securitySystem.setRealms(activeRealms);
+  private void mayActivateLdapRealm() {
+    try {
+      final List<String> activeRealms = securitySystem.getRealms();
+      if (!activeRealms.contains(LdapPlugin.REALM_NAME)) {
+        activeRealms.add(LdapPlugin.REALM_NAME);
+        securitySystem.setRealms(activeRealms);
+      }
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
     }
   }
 
@@ -201,43 +198,47 @@ public class DefaultLdapConfigurationManager
    *
    * @since 2.7.0
    */
-  private void mayDeactivateLdapRealm() throws InvalidConfigurationException {
-    final List<String> activeRealms = securitySystem.getRealms();
-    if (activeRealms.contains(LdapPlugin.REALM_NAME)) {
-      activeRealms.remove(LdapPlugin.REALM_NAME);
-      securitySystem.setRealms(activeRealms);
-    }
-  }
-
-  private CLdapConfiguration getConfiguration() {
-    if (ldapConfiguration == null) {
-      try {
-        final CLdapConfiguration config = configurationSource.load();
-        final ValidationResponse vr = configurationValidator
-            .validateModel(new ValidationRequest<CLdapConfiguration>(config));
-        if (vr.getValidationErrors().size() > 0) {
-          throw new InvalidConfigurationException(vr);
-        }
-        ldapConfiguration = config;
-      }
-      catch (ConfigurationException e) {
-        log.error("Invalid LDAP Configuration", e);
-      }
-      catch (IOException e) {
-        log.error("IOException while retrieving LDAP configuration file", e);
-      }
-    }
-    return ldapConfiguration;
-  }
-
-  private void save() {
+  private void mayDeactivateLdapRealm() {
     try {
-      configurationSource.save(ldapConfiguration);
+      final List<String> activeRealms = securitySystem.getRealms();
+      if (activeRealms.contains(LdapPlugin.REALM_NAME)) {
+        activeRealms.remove(LdapPlugin.REALM_NAME);
+        securitySystem.setRealms(activeRealms);
+      }
     }
-    catch (IOException e) {
-      log.error("IOException while storing LDAP configuration file", e);
+    catch (Exception e) {
+      throw Throwables.propagate(e);
     }
-    // fire clear cache event
-    eventBus.post(new LdapClearCacheEvent(this));
+  }
+
+  /**
+   * Primes the cache if not primed and returns it, so to say "lazily" loads. Should be called only from synchronized
+   * method.
+   */
+  private LinkedHashMap<String, LdapConfiguration> getConfiguration() {
+    if (!cachePrimed) {
+      try {
+        cache.clear();
+        final List<LdapConfiguration> ldapConfigurations = Lists.newArrayList(configurationSource.loadAll());
+        Collections.sort(ldapConfigurations, new Comparator<LdapConfiguration>()
+        {
+          @Override
+          public int compare(final LdapConfiguration o1, final LdapConfiguration o2) {
+            return o1.getOrder() - o2.getOrder();
+          }
+        });
+        for (LdapConfiguration ldapConfiguration : ldapConfigurations) {
+          cache.put(ldapConfiguration.getId(), ldapConfiguration);
+        }
+      }
+      catch (Exception e) {
+        log.warn("Cannot retrieve LDAP configuration", e);
+        throw Throwables.propagate(e);
+      }
+      finally {
+        cachePrimed = true;
+      }
+    }
+    return cache;
   }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 import com.thoughtworks.xstream.XStream;
 import org.apache.commons.io.IOUtils;
@@ -29,7 +29,6 @@ import org.apache.commons.io.IOUtils;
 public class DefaultLdapSchemaTemplateManager
     implements LdapSchemaTemplateManager
 {
-
   private static final String TEMPLATES_RESOURCE = "/META-INF/templates/ldap-templates.xml";
 
   private List<LdapSchemaTemplate> templates = null;
@@ -42,7 +41,7 @@ public class DefaultLdapSchemaTemplateManager
 
       xstream.aliasType("templates", ArrayList.class);
       xstream.aliasType("template", LdapSchemaTemplate.class);
-      xstream.aliasType("userAndGroupConfig", CUserAndGroupAuthConfiguration.class);
+      xstream.aliasType("userAndGroupConfig", Mapping.class);
 
       InputStream stream = null;
       try {

@@ -19,10 +19,9 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -71,8 +70,7 @@ public class LdapClearCachePlexusResource
   @Override
   @DELETE
   protected void doDelete(Context context, Request request, Response response)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     this.ldapConfigurationManager.clearCache();
   }

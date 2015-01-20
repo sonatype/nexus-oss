@@ -35,12 +35,16 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
       iconVariant: 'x16',
       iconNamePrefix: 'privilege-'
     },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'typeName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_COLUMN'), dataIndex: 'repositoryTargetName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_REPOSITORY_COLUMN'), dataIndex: 'repositoryName', flex: 1 },
-    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_METHOD_COLUMN'), dataIndex: 'method', flex: 1 }
+
+    // NOTE: Not including ID here as for user-created privileges these are random strings
+
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NAME_COLUMN'), dataIndex: 'name', flex: 2 },
+
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_DESCRIPTION_COLUMN'), dataIndex: 'description', flex: 4 },
+
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TYPE_COLUMN'), dataIndex: 'type', flex: 1 },
+
+    { header: NX.I18n.get('ADMIN_PRIVILEGES_LIST_PERMISSION_COLUMN'), dataIndex: 'permission', flex: 2 }
   ],
 
   viewConfig: {
@@ -59,10 +63,18 @@ Ext.define('NX.coreui.view.privilege.PrivilegeList', {
     var me = this;
 
     me.tbar = [
-      { xtype: 'button', text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NEW_BUTTON'), glyph: 'xf055@FontAwesome' /* fa-plus-circle */, action: 'new', disabled: true,
+      {
+        xtype: 'button',
+        text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_NEW_BUTTON'),
+        glyph: 'xf055@FontAwesome' /* fa-plus-circle */,
+        action: 'new',
+        disabled: true,
         menu: [
-          { text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_ITEM'), action: 'newrepositorytarget', iconCls: NX.Icons.cls('privilege-target',
-              'x16') }
+          {
+            text: NX.I18n.get('ADMIN_PRIVILEGES_LIST_TARGET_ITEM'),
+            action: 'newrepositorytarget',
+            iconCls: NX.Icons.cls('privilege-target', 'x16')
+          }
         ]
       }
     ];

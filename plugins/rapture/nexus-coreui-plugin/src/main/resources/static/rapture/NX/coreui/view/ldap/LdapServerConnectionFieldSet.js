@@ -150,9 +150,9 @@ Ext.define('NX.coreui.view.ldap.LdapServerConnectionFieldSet', {
     },
     {
       xtype: 'numberfield',
-      name: 'cacheTimeout',
-      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_CACHE'),
-      value: 600
+      name: 'maxIncidentsCount',
+      fieldLabel: NX.I18n.get('ADMIN_LDAP_CONNECTION_MAX_INCIDENTS_COUNT'),
+      value: 3
     }
   ],
 

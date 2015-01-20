@@ -12,15 +12,32 @@
  */
 package org.sonatype.security.realms.ldap.internal.persist;
 
-import java.io.IOException;
+import java.util.List;
 
-import com.sonatype.security.ldap.realms.persist.model.CLdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
-import org.sonatype.configuration.ConfigurationException;
-
+/**
+ * Actual persistence mechanism of {@link LdapConfiguration}.
+ */
 public interface LdapConfigurationSource
 {
-  CLdapConfiguration load() throws ConfigurationException, IOException;
+  /**
+   * Loads all the configuration entries with undefined order.
+   */
+  List<LdapConfiguration> loadAll();
 
-  void save(CLdapConfiguration configuration) throws IOException;
+  /**
+   * Creates a new entry, with newly assigned ID that is returned.
+   */
+  String create(LdapConfiguration ldapConfiguration);
+
+  /**
+   * Updates existing entry. Returns {@code true} if entry found and updated.
+   */
+  boolean update(LdapConfiguration ldapConfiguration);
+
+  /**
+   * Deletes existing entry. Returns {@code true} if entry found and deleted.
+   */
+  boolean delete(String id);
 }

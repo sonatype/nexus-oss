@@ -17,31 +17,41 @@ import java.util.TreeSet;
 
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 import org.sonatype.security.realms.ldap.internal.realms.LdapManager;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class ConnectionBlackListTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+    ldapConfiguration.getConnection().setConnectionTimeout(1);
+    ldapConfiguration.getConnection().setConnectionRetryDelay(7);
+    // important: maxIncidentCount = 1
+    ldapConfiguration.getConnection().setMaxIncidentsCount(1);
+    return ldapConfiguration;
+  }
 
   @Test
   public void testAuthenticate()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     Assert.assertNotNull(ldapManager.authenticateUser("brianf", "brianf123"));
 
-    ldapServer.stop();
+    stopLdapServers();
 
     try {
       ldapManager.authenticateUser("brianf", "brianf123");
@@ -51,7 +61,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    ldapServer.start();
+    startLdapServers();
 
     try {
       ldapManager.authenticateUser("brianf", "brianf123");
@@ -70,8 +80,7 @@ public class ConnectionBlackListTest
   public void testGetAllGroups()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     SortedSet<String> expectedGroups = new TreeSet<String>();
     // from the default
@@ -82,11 +91,11 @@ public class ConnectionBlackListTest
     SortedSet<String> actualGroups = ldapManager.getAllGroups();
     Assert.assertEquals(expectedGroups, actualGroups);
 
-    ldapServer.stop();
+    stopLdapServers();
 
     Assert.assertEquals(0, ldapManager.getAllGroups().size());
 
-    ldapServer.start();
+    startLdapServers();
 
     Assert.assertEquals(0, ldapManager.getAllGroups().size());
 
@@ -101,15 +110,14 @@ public class ConnectionBlackListTest
   public void testGetAllUsers()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     Assert.assertEquals(3, ldapManager.getAllUsers().size());
 
-    ldapServer.stop();
+    stopLdapServers();
     Assert.assertEquals(0, ldapManager.getAllUsers().size());
 
-    ldapServer.start();
+    startLdapServers();
     Assert.assertEquals(0, ldapManager.getAllUsers().size());
 
     // wait 3 more sec, then we should be good
@@ -121,12 +129,11 @@ public class ConnectionBlackListTest
   public void testGetGroupName()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     Assert.assertEquals("releases", ldapManager.getGroupName("releases"));
 
-    ldapServer.stop();
+    stopLdapServers();
 
     try {
       ldapManager.getGroupName("releases");
@@ -136,7 +143,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    ldapServer.start();
+    startLdapServers();
 
     try {
       ldapManager.getGroupName("releases");
@@ -155,8 +162,7 @@ public class ConnectionBlackListTest
   public void testGetUser()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     LdapUser brianf = ldapManager.getUser("brianf");
     Assert.assertNotNull(brianf);
@@ -165,41 +171,44 @@ public class ConnectionBlackListTest
     Assert.assertEquals("Brian Fox", brianf.getRealName());
     Assert.assertEquals(2, brianf.getMembership().size());
 
-    ldapServer.stop();
+    stopLdapServers();
     try {
       ldapManager.getUser("brianf");
       Assert.fail("Expected NoSuchLdapUserException");
     }
     catch (NoSuchLdapUserException e) {
-      // expected
+      // expected: this was thrown before NX3
+    }
+    catch (LdapDAOException e) {
+      // expected: this is thrown today after merge of OSS/Pro
     }
 
-    ldapServer.start();
+    startLdapServers();
     try {
       ldapManager.getUser("brianf");
       Assert.fail("Expected NoSuchLdapUserException");
     }
     catch (NoSuchLdapUserException e) {
-      // expected
+      // expected: this was thrown before NX3
     }
-
+    catch (LdapDAOException e) {
+      // expected: this is thrown today after merge of OSS/Pro
+    }
 
     // wait 3 more sec, then we should be good
     Thread.sleep(7 * 1000);
     Assert.assertNotNull(ldapManager.getUser("brianf"));
-
   }
 
   @Test
   public void testGetUserRoles()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     Assert.assertEquals(2, ldapManager.getUserRoles("brianf").size());
 
-    ldapServer.stop();
+    stopLdapServers();
     try {
       ldapManager.getUserRoles("brianf");
       Assert.fail("Expected LdapDAOException");
@@ -208,7 +217,7 @@ public class ConnectionBlackListTest
       // expected
     }
 
-    ldapServer.start();
+    startLdapServers();
     try {
       ldapManager.getUserRoles("brianf");
       Assert.fail("Expected LdapDAOException");
@@ -226,51 +235,41 @@ public class ConnectionBlackListTest
   public void testGetUsers()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     // exact number
     Assert.assertEquals(1, ldapManager.getUsers(1).size());
 
 
-    ldapServer.stop();
+    stopLdapServers();
+    Assert.assertEquals(0, ldapManager.getUsers(1).size());
+    Assert.assertEquals(0, ldapManager.getUsers(1).size());
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
 
-    ldapServer.start();
+    startLdapServers();
     Assert.assertEquals(0, ldapManager.getUsers(1).size());
 
     // wait 3 more sec, then we should be good
     Thread.sleep(7 * 1000);
     Assert.assertEquals(1, ldapManager.getUsers(1).size());
-
   }
 
   @Test
   public void testSearchUsers()
       throws Exception
   {
-    LdapManager ldapManager = this.lookup(LdapManager.class);
-    LdapServer ldapServer = this.getLdapServer("default");
+    LdapManager ldapManager = lookup(LdapManager.class);
 
     Assert.assertEquals(3, ldapManager.searchUsers("", null).size());
 
-    ldapServer.stop();
+    stopLdapServers();
     Assert.assertEquals(0, ldapManager.searchUsers("", null).size());
 
-    ldapServer.start();
+    startLdapServers();
     Assert.assertEquals(0, ldapManager.searchUsers("", null).size());
 
     // wait 3 more sec, then we should be good
     Thread.sleep(7 * 1000);
     Assert.assertEquals(3, ldapManager.searchUsers("", null).size());
   }
-
-  @Override
-  public void tearDown()
-      throws Exception
-  {
-    super.tearDown();
-  }
-
-
 }

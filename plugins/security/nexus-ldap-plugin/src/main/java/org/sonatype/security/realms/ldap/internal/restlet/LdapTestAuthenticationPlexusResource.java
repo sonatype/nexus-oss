@@ -22,16 +22,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
-import org.sonatype.security.realms.ldap.api.dto.LdapAuthenticationTestRequest;
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import org.sonatype.security.realms.ldap.internal.persist.validation.LdapConfigurationValidator;
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.realms.ldap.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Validator;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.restlet.Context;
@@ -53,22 +51,22 @@ public class LdapTestAuthenticationPlexusResource
     extends AbstractLdapPlexusResource
 {
 
-  private final LdapConfigurationValidator configurationValidator;
-
   private final LdapConnectionTester ldapConnectionTester;
 
   private final LdapConfigurationManager ldapConfigurationManager;
 
+  private final Validator validator;
+
   @Inject
   public LdapTestAuthenticationPlexusResource(final TrustStore trustStore,
-                                              final LdapConfigurationValidator configurationValidator,
                                               final LdapConnectionTester ldapConnectionTester,
-                                              final LdapConfigurationManager ldapConfigurationManager)
+                                              final LdapConfigurationManager ldapConfigurationManager,
+                                              final Validator validator)
   {
     super(trustStore);
-    this.configurationValidator = checkNotNull(configurationValidator);
     this.ldapConnectionTester = checkNotNull(ldapConnectionTester);
     this.ldapConfigurationManager = checkNotNull(ldapConfigurationManager);
+    this.validator = checkNotNull(validator);
     this.setModifiable(true);
   }
 
@@ -100,26 +98,19 @@ public class LdapTestAuthenticationPlexusResource
 
   @Override
   protected Object doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
 
     LdapAuthenticationTestRequest authRequest = (LdapAuthenticationTestRequest) payload;
 
-    CConnectionInfo connectionInfo = this.toLdapModel(authRequest.getData());
+    Connection connectionInfo = this.toLdapModel(authRequest.getData());
     String ldapServerId = null;
     if (request.getResourceRef() != null) {
       ldapServerId = request.getResourceRef().getQueryAsForm().getFirstValue("ldapServerId");
     }
     replaceFakePassword(connectionInfo, ldapServerId, ldapConfigurationManager);
 
-    ValidationResponse validationResponse = this.configurationValidator.validateConnectionInfo(
-        null,
-        connectionInfo);
-    // if the info is not valid throw
-    if (!validationResponse.isValid()) {
-      throw new InvalidConfigurationException(validationResponse);
-    }
+    validator.validate(connectionInfo);
 
     try {
       LdapContextFactory ldapContextFactory = this.buildDefaultLdapContextFactory(ldapServerId, connectionInfo);

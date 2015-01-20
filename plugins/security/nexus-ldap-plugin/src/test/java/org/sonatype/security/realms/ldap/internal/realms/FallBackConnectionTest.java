@@ -12,23 +12,27 @@
  */
 package org.sonatype.security.realms.ldap.internal.realms;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.FailoverLdapConnector;
-
-import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoLdapUserRolesFoundException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
-import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Host;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection.Protocol;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
+import com.google.common.collect.Maps;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Test has not been run in a while, disabled in old surefire config")
 public class FallBackConnectionTest
     extends AbstractMockLdapConnectorTest
 {
@@ -37,14 +41,66 @@ public class FallBackConnectionTest
 
   private MockLdapConnector backupConnector = null;
 
-  protected List<LdapConnector> getLdapConnectors() {
-    List<LdapConnector> connectors = new ArrayList<LdapConnector>();
-    this.mainConnector = this.buildMainMockServer("backup");
-    this.backupConnector = this.buildBackupMockServer("backup");
-    LdapConnector fallBackConnector = new FailoverLdapConnector(mainConnector, backupConnector, 2);
-    connectors.add(fallBackConnector);
+  @Override
+  protected LinkedHashMap<String, LdapServerConfiguration> createLdapServerConfigurations() {
+    // no real servers used in this test
+    return Maps.newLinkedHashMap();
+  }
 
-    return connectors;
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    final LinkedHashMap<String, LdapConfiguration> result = Maps.newLinkedHashMap();
+    // create a dumb config as connectors must correspond to config (even if not used)
+    final LdapConfiguration ldapConfiguration = new LdapConfiguration();
+    ldapConfiguration.setId("unused"); // create will override it anyway
+    ldapConfiguration.setName("unused");
+    ldapConfiguration.setOrder(1);
+    Connection connection = new Connection();
+    connection.setSearchBase("o=sonatype");
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("secret");
+    connection.setAuthScheme("simple");
+    connection.setHost(new Host(Protocol.ldap, "localhost", 12345));
+    ldapConfiguration.setConnection(connection);
+
+    final Mapping mapping = new Mapping();
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
+    mapping.setGroupObjectClass("organizationalRole");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserRealNameAttribute("sn");
+    mapping.setUserSubtree(true);
+    ldapConfiguration.setMapping(mapping);
+    // put it as "main"
+    result.put("main", ldapConfiguration);
+    return result;
+  }
+
+  /**
+   * Here we need to reuse the ID of the one client connection we created above.
+   */
+  @Override
+  protected void resetLdapConnectors() throws Exception {
+    final List<LdapConnector> connectors = ldapManager.getLdapConnectors();
+    final String id = connectors.get(0).getIdentifier();
+    connectors.clear();
+    this.mainConnector = this.buildMainMockServer(id);
+    this.backupConnector = this.buildBackupMockServer(id);
+    // important: maxIncidentCount = 1
+    LdapConnector fallBackConnector = new FailoverLdapConnector(mainConnector, backupConnector, 2, 1);
+    connectors.add(fallBackConnector);
+  }
+
+  @Override
+  protected List<LdapConnector> getLdapConnectors() {
+    // nop, unused, all done in resetLdapConnectors()
+    return null;
   }
 
   @Test

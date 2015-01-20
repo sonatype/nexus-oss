@@ -14,15 +14,20 @@ package org.sonatype.security.realms.ldap.internal.connector.dao;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
  * Tests for LdapAuthConfiguration
  */
 public class LdapAuthConfigurationTest
+    extends TestSupport
 {
-
   @Test
   public void testGetUserAttributes() {
     LdapAuthConfiguration ldapAuthConfiguration = new LdapAuthConfiguration();
@@ -35,16 +40,15 @@ public class LdapAuthConfigurationTest
     ldapAuthConfiguration.setWebsiteAttribute(null);
 
     String[] userAttributes = ldapAuthConfiguration.getUserAttributes();
-    Assert.assertEquals("Actual result: " + Arrays.asList(userAttributes), 1, userAttributes.length);
+    assertThat(Arrays.asList(userAttributes), hasSize(1));
     //only non null attributes should be added to the list
-    Assert.assertEquals("emailAddressAttribute", userAttributes[0]);
+    assertThat("emailAddressAttribute", equalTo(userAttributes[0]));
 
     // set a few more then check the count
     ldapAuthConfiguration.setPasswordAttribute("passwordAttribute");
     ldapAuthConfiguration.setUserIdAttribute("userIdAttribute");
 
     userAttributes = ldapAuthConfiguration.getUserAttributes();
-    Assert.assertEquals("Actual result: " + Arrays.asList(userAttributes), 3, userAttributes.length);
-
+    assertThat(Arrays.asList(userAttributes), hasSize(3));
   }
 }

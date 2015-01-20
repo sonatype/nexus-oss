@@ -129,7 +129,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_TARGETS_CREATE_TITLE'));
-    me.loadCreateWizard(1, true, null);
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-repositorytarget-add'));
   },
 
   /**

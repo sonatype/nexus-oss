@@ -51,7 +51,7 @@ public class NEXUS4062LdapActivatedWhenConfiguredIT
    * No need for local LDAP server.
    */
   @Override
-  protected boolean isStartServer() {
+  protected boolean shouldStartLdapServer() {
     return false;
   }
 

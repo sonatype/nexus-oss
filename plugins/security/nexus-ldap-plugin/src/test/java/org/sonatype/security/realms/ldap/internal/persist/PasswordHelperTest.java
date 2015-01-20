@@ -12,15 +12,12 @@
  */
 package org.sonatype.security.realms.ldap.internal.persist;
 
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
 import org.junit.Test;
 
 public class PasswordHelperTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
 
   @Test

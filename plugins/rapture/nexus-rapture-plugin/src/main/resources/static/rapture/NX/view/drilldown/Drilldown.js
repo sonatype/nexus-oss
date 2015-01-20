@@ -35,9 +35,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
     xtype: 'nx-info-panel'
   },
 
-  // List of masters to use when creating a new object
-  createWizard: null,
-
   // List of masters to use (xtype objects)
   masters: null,
 
@@ -49,19 +46,14 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   initComponent: function () {
     var me = this,
-      items = [],
-      maxCount;
+      items = [];
 
-    // Normalize list of masters and create wizards
+    // Normalize the list of masters
     if (!me.masters) {
       me.masters = [];
     } else if (!Ext.isArray(me.masters)) {
       me.masters = [me.masters];
     }
-    me.createWizard = Ext.isArray(me.createWizard) ? me.createWizard : [me.createWizard];
-
-    // How many panels do we need?
-    maxCount = (me.masters.length > me.createWizard.length ? me.masters.length : me.createWizard.length) + 1;
 
     // Add the detail panel to the masters array
     if (me.detail) {
@@ -90,26 +82,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
     }
 
     // Stack all panels onto the items array
-    for (var i = 0; i < maxCount; ++i) {
-      items.push(
-        {
-          xtype: 'nx-drilldown-item',
-          items: [
-            {
-              xtype: 'container',
-              layout: 'fit',
-              itemId: 'browse' + i,
-              items: me.masters[i]
-            },
-            {
-              xtype: 'container',
-              layout: 'fit',
-              itemId: 'create' + i,
-              items: (i > 0 ? me.createWizard[i - 1] : undefined)
-            }
-          ]
-        }
-      );
+    for (var i = 0; i < me.masters.length; ++i) {
+      items.push(me.createDrilldownItem(i, me.masters[i], undefined));
     }
 
     // Initialize this component’s items
@@ -129,44 +103,66 @@ Ext.define('NX.view.drilldown.Drilldown', {
     };
 
     me.callParent(arguments);
-
-    if (Ext.isDefined(me.iconName)) {
-      me.setDefaultIconName(me.iconName);
-    }
   },
 
   /**
-   * Shorthand to assign the same icon to all drilldown items, scaled appropriately.
+   * @private
+   * Create a new drilldown item
    */
-  setDefaultIconName: function (iconName) {
-    var items = this.query('nx-drilldown-item');
-    for (var i = 0; i < items.length; ++i) {
-      items[i].setItemClass(NX.Icons.cls(iconName) + (i === 0 ? '-x32' : '-x16'));
+  createDrilldownItem: function(index, browsePanel, createPanel) {
+    var me = this;
+
+    return {
+      xtype: 'nx-drilldown-item',
+      itemClass: NX.Icons.cls(me.iconName) + (index === 0 ? '-x32' : '-x16'),
+      items: [
+        {
+          xtype: 'container',
+          layout: 'fit',
+          itemId: 'browse' + index,
+          items: browsePanel
+        },
+        {
+          xtype: 'container',
+          layout: 'fit',
+          itemId: 'create' + index,
+          items: createPanel
+        }
+      ]
     }
   },
 
   /**
+   * @public
    * Set the name of the referenced drilldown item
    */
   setItemName: function (index, text) {
-    var me = this;
-    me.query('nx-drilldown-item')[index].setItemName(text);
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemName(text);
   },
 
   /**
+   * @public
    * Set the icon class of the referenced drilldown item
    */
   setItemClass: function (index, cls) {
-    var me = this;
-    me.query('nx-drilldown-item')[index].setItemClass(cls);
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemClass(cls);
   },
 
   /**
+   * @public
    * Set the bookmark of the breadcrumb segment associated with the referenced drilldown item
    */
   setItemBookmark: function (index, bookmark, scope) {
-    var me = this;
-    me.query('nx-drilldown-item')[index].setItemBookmark(bookmark, scope);
+    var me = this,
+      items = me.padItems(index);
+
+    items[index].setItemBookmark(bookmark, scope);
   },
 
   showInfo: function (message) {
@@ -193,7 +189,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   addTab: function (tab) {
     var me = this;
     if (!me.detail) {
-      this.down('nx-drilldown-details').addTab(tab);
+      me.down('nx-drilldown-details').addTab(tab);
     }
   },
 
@@ -205,7 +201,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   removeTab: function (tab) {
     var me = this;
     if (!me.detail) {
-      this.down('nx-drilldown-details').removeTab(tab);
+      me.down('nx-drilldown-details').removeTab(tab);
     }
   },
 
@@ -283,6 +279,32 @@ Ext.define('NX.view.drilldown.Drilldown', {
     me.slidePanels(index, animate);
   },
 
+
+  /**
+   * @private
+   * Pad the number of items in this drilldown to the specified index
+   */
+  padItems: function (index) {
+    var me = this,
+      items = me.query('nx-drilldown-item'),
+      itemContainer;
+
+    // Create new drilldown items (if needed)
+    if (index > items.length - 1) {
+      itemContainer = me.down('container');
+
+      // Create empty panels if index > items.length
+      for (var i = items.length; i <= index; ++i) {
+        itemContainer.add(me.createDrilldownItem(i, undefined, undefined));
+      }
+
+      // Resize the panel
+      me.syncSizeToOwner();
+    }
+
+    return me.query('nx-drilldown-item');
+  },
+
   /**
    * Shift this panel to display the referenced step in the create wizard
    *
@@ -292,17 +314,18 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   showCreateWizard: function (index, animate, cmp) {
     var me = this,
-      item = me.query('nx-drilldown-item')[index],
-      container = item.down('#create' + index);
+      items = me.padItems(index), // Pad the drilldown
+      createContainer;
 
-    // Load the component (if specified)
+    // Add a component to the specified drilldown item (if specified)
     if (cmp) {
-      container.removeAll();
-      container.add(cmp);
+      createContainer = me.down('#create' + index);
+      createContainer.removeAll();
+      createContainer.add(cmp);
     }
 
     // Show the proper card
-    item.getLayout().setActiveItem(1);
+    items[index].getLayout().setActiveItem(1);
     me.slidePanels(index, animate);
   },
 

@@ -143,7 +143,7 @@ Ext.define('NX.coreui.controller.Loggers', {
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_LOGGING_CREATE_TITLE'));
-    me.loadCreateWizard(1, true, null);
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-logger-add'));
   },
 
   /**

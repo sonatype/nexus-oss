@@ -12,90 +12,146 @@
  */
 package com.sonatype.nexus.testsuite.ldap;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import java.util.List;
 
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.ldaptestsuite.Partition;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.client.rest.NexusClientFactory;
+import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
+import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.XStreamInitalizer;
-
-import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.security.realms.ldap.client.Configuration;
+import org.sonatype.security.realms.ldap.client.Connection;
+import org.sonatype.security.realms.ldap.client.Connection.Host;
+import org.sonatype.security.realms.ldap.client.Connection.Protocol;
+import org.sonatype.security.realms.ldap.client.LdapConfigurations;
+import org.sonatype.security.realms.ldap.client.Mapping;
 
 import com.google.common.base.Throwables;
 import com.thoughtworks.xstream.XStream;
 import org.apache.shiro.codec.Base64;
-import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.restlet.data.Response;
 
 import static org.apache.shiro.codec.CodecSupport.PREFERRED_ENCODING;
+import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 
 public abstract class AbstractLdapIT
     extends AbstractNexusIntegrationTest
 {
-  public final String LDIF_DIR = "../../ldif_dir";
-
-  private static LdapServer ldapServer;
+  private LdapServer ldapServer;
 
   @BeforeClass
   public static void setSecurity() {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
   }
 
-  @Override
-  protected void copyConfigFiles() throws IOException {
-    super.copyConfigFiles();
-
-    HashMap<String, String> map = new HashMap<String, String>();
-
-    // at this point the ldapServer should be running (if we have one)
-    if (this.isStartServer()) {
-      this.copyConfigFile("test.ldif", LDIF_DIR);
-
-      try {
-        ldapServer = TestContainer.getInstance().getPlexusContainer().lookup(LdapServer.class);
-        if (!ldapServer.isStarted()) {
-          ldapServer.start();
-        }
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-        Assert.fail("Could not start or lookup ldap server ");
-      }
-
-      map.put("port", Integer.toString(ldapServer.getPort()));
+  @Before
+  public void beforeLdapTests() throws Exception {
+    ldapServer = new LdapServer(ldapServerConfiguration());
+    if (shouldStartLdapServer()) {
+      ldapServer.start();
     }
-    else {
-      map.put("port", Integer.toString(12345));
-    }
-
-    // copy ldap.xml to work dir
-    this.copyConfigFile("ldap.xml", map, WORK_CONF_DIR);
+    safeCreateLdapClientConfiguration();
   }
 
-  protected static boolean deleteLdapConfig() {
-    File ldapConfig = new File(WORK_CONF_DIR, "ldap.xml");
-    if (ldapConfig.exists()) {
-      return ldapConfig.delete();
-    }
+  /**
+   * Override this method if you don't want to have LDAP server started by method {@link #beforeLdapTests()}, but you
+   * want to manage it manually (or test don't need LDAP server at all to be running).
+   */
+  protected boolean shouldStartLdapServer() {
     return true;
   }
 
-  @AfterClass
-  public static void afterLdapTests()
+  protected LdapServerConfiguration ldapServerConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(Partition.builder()
+                .withNameAndSuffix("sonatype", "o=sonatype")
+                .withRootEntryClasses("top", "organization")
+                .withIndexedAttributes("objectClass", "o")
+                .withLdifFile(util.resolveFile("src/test/it-resources/default-config/test.ldif"))
+                .build()
+        )
+        .build();
+  }
+
+  protected void safeCreateLdapClientConfiguration() throws Exception {
+    final List<Configuration> configurations = getLdapClient().get();
+    for (Configuration configuration : configurations) {
+      configuration.remove();
+    }
+    createLdapClientConfiguration();
+  }
+
+  protected void createLdapClientConfiguration() throws Exception {
+    final Configuration configuration = getLdapClient().create();
+    configuration.setName(getTestId());
+    final Connection connection = configuration.getConnection();
+    connection.setSearchBase("o=sonatype");
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("secret");
+    connection.setAuthScheme("simple");
+    if (shouldStartLdapServer()) {
+      connection.setHost(new Host(Protocol.ldap, "localhost", ldapServer.getPort()));
+    }
+    else {
+      // ldap not started yet, dummy port
+      connection.setHost(new Host(Protocol.ldap, "localhost", 1234));
+    }
+    final Mapping mapping = configuration.getMapping();
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setGroupMemberAttribute("uniqueMember");
+    mapping.setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    mapping.setGroupObjectClass("groupOfUniqueNames");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserRealNameAttribute("sn");
+    configuration.save();
+  }
+
+  @After
+  public void afterLdapTests()
       throws Exception
   {
-    if (ldapServer != null) {
+    if (ldapServer != null && ldapServer.isStarted()) {
       ldapServer.stop();
     }
     ldapServer = null;
+  }
+
+  protected NexusClient getNexusClient()
+      throws Exception
+  {
+    final NexusClientFactory nexusClientFactory = TestContainer
+        .getInstance().getPlexusContainer().lookup(JerseyNexusClientFactory.class);
+    return nexusClientFactory.createFor(
+        baseUrlFrom(getBaseNexusUrl()),
+        new UsernamePasswordAuthenticationInfo("admin", "admin123")
+    );
+  }
+
+  protected LdapConfigurations getLdapClient()
+      throws Exception
+  {
+    return getNexusClient().getSubsystem(LdapConfigurations.class);
   }
 
   @Override
@@ -122,10 +178,6 @@ public abstract class AbstractLdapIT
   @SuppressWarnings("unchecked")
   protected <T> T getFromResponse(Class<T> clazz, XStream xstream, String responseText) {
     return (T) xstream.fromXML(responseText);
-  }
-
-  protected boolean isStartServer() {
-    return true;
   }
 
   protected LdapServerRequest getDefaultServerRequest() {
@@ -157,7 +209,7 @@ public abstract class AbstractLdapIT
     connInfo.setHost("localhost");
 
     // using fixed port if ldap server is not to be started to be able to plug external server instance for debugging
-    connInfo.setPort(isStartServer() ? this.getLdapServer().getPort() : 10389);
+    connInfo.setPort(shouldStartLdapServer() ? this.getLdapServer().getPort() : 10389);
 
     connInfo.setProtocol("ldap");
     // connInfo.setRealm( "" );
