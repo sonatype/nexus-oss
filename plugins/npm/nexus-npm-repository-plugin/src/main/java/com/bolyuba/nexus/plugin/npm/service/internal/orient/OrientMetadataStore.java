@@ -44,7 +44,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -74,24 +74,18 @@ public class OrientMetadataStore
 
   private final Map<Class<?>, EntityHandler<?>> entityHandlers;
 
-  private final int poolMinSize;
-
   private final int poolMaxSize;
 
-  private ODatabaseDocumentPool pool;
+  private OPartitionedDatabasePool pool;
 
   @Inject
   public OrientMetadataStore(final ApplicationDirectories applicationDirectories,
-                             final @Named("${nexus.npm.poolMinSize:-1}") int poolMinSize,
                              final @Named("${nexus.npm.poolMaxSize:-100}") int poolMaxSize)
   {
-    checkArgument(poolMinSize >= 1, "Pool min size must be greater or equal to 1");
-    checkArgument(poolMaxSize >= poolMinSize, "Pool max size must be greater or equal to poolMinSize (%s)",
-        poolMinSize);
+    checkArgument(poolMaxSize >= 1, "Pool max size must be greater or equal to 1");
     this.databaseDirectory = applicationDirectories.getWorkDirectory(DB_LOCATION);
     this.backupDirectory = applicationDirectories.getWorkDirectory(BACKUP_LOCATION);
     this.entityHandlers = Maps.newHashMap();
-    this.poolMinSize = poolMinSize;
     this.poolMaxSize = poolMaxSize;
   }
 
@@ -114,10 +108,8 @@ public class OrientMetadataStore
       registerHandler(new PackageRootHandler(db));
     }
 
-    pool = new ODatabaseDocumentPool(dbUri, "admin", "admin");
-    pool.setName("npm-database-pool");
-    pool.setup(poolMinSize, poolMaxSize);
-    log.info("Created pool (minSize={}, maxSize={}): {}", poolMinSize, poolMaxSize, pool);
+    pool = new OPartitionedDatabasePool(dbUri, "admin", "admin", poolMaxSize);
+    log.info("Created pool (maxSize={}): {}", poolMaxSize, pool);
   }
 
   @Override
