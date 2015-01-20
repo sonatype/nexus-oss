@@ -4325,35 +4325,81 @@
 }
 
 /**
+ * ui: 'nx-header'
+ *
+ * TODO: This is temporary. Delete this.
+ */
+/*@include extjs-button-medium-ui(
+  $ui: 'nx-header',
+
+  $background-color: transparent,
+  $background-color-over: $color-salem,
+  $background-color-focus: $color-salem,
+  $background-color-pressed: $color-jewel,
+  $background-color-disabled: transparent,
+
+  $color: $color-white,
+  $color-over: $color-white,
+  $color-focus: $color-white,
+  $color-pressed: $color-white,
+  $color-disabled: $color-white,
+
+  $border-width: 0,
+
+  $background-gradient: transparent,
+  $background-gradient-over: transparent,
+  $background-gradient-focus: transparent,
+  $background-gradient-pressed: transparent,
+  $background-gradient-disabled: transparent,
+
+  $glyph-color: $color-white,
+  $glyph-opacity: 1
+);
+
+.x-btn-nx-header-medium {
+  height: 39px;
+  border-radius: 0;
+  padding: 3px 6px;
+
+  .x-btn-wrap {
+    margin-top: 4px;
+  }
+}*/
+/**
  * cls: 'modebutton'
  */
-/* line 292, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 335, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover,
 .nx-modebutton:focus {
   background-color: #dddddd;
 }
-/* line 295, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 338, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover .x-btn-inner,
 .nx-modebutton:focus .x-btn-inner {
   color: #006bbf;
 }
-/* line 299, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 342, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover .x-btn-glyph,
 .nx-modebutton:focus .x-btn-glyph {
   color: #006bbf;
 }
 
-/* line 304, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 347, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed {
   background-color: #006bbf;
 }
-/* line 307, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 350, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed .x-btn-inner {
   color: white;
 }
-/* line 311, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 354, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed .x-btn-glyph {
   color: white;
+}
+
+/* line 359, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.nx-modebutton.x-pressed + .nx-caret {
+  border-bottom: 5px solid white !important;
 }
 
 /**

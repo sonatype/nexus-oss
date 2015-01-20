@@ -335,13 +335,13 @@ Ext.define('NX.controller.User', {
     if (signInButton) {
       if (user) {
         signInButton.hide();
-        userButton.setText(user.id);
+        //userButton.setText(user.id);
         userButton.show();
         signOutButton.show();
       }
       else {
         signInButton.show();
-        userButton.setText('Not signed in');
+        //userButton.setText('Not signed in');
         userButton.hide();
         signOutButton.hide();
       }

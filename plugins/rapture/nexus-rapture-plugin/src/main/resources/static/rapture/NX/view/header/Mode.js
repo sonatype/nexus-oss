@@ -24,6 +24,12 @@ Ext.define('NX.view.header.Mode', {
   toggleGroup: 'mode',
   cls: 'nx-modebutton',
 
+  padding: '6px 0 0 0',
+  style: {
+    fontSize: '24px',
+    color: '#FFFFFF'
+  },
+
   /**
    * @cfg mode Mode name
    */
@@ -37,5 +43,4 @@ Ext.define('NX.view.header.Mode', {
    * @cfg collapseMenu If menu should be collapsed automatically when mode is selected (default true)
    */
   collapseMenu: true
-
 });
