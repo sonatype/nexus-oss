@@ -63,7 +63,6 @@ public abstract class NexusHttpsITSupport
 {
 
   protected static final String DEFAULT_SESSION_COOKIE_NAME = "NXSESSIONID";
-  protected static final String DEFAULT_REMEMBER_ME_COOKIE_NAME = "rememberMe";
 
   public NexusHttpsITSupport(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
@@ -141,18 +140,8 @@ public abstract class NexusHttpsITSupport
 
   @Nullable
   protected Header getSessionCookieHeader(@NotNull Header[] headers) {
-    for (Header header : headers ){
-      if(header.getValue().startsWith(DEFAULT_SESSION_COOKIE_NAME+"=")){
-        return header;
-      }
-    }
-    return null;
-  }
-
-  @Nullable
-  protected Header getRememberMeCookieHeader(@NotNull Header[] headers) {
-    for (Header header : headers ){
-      if(header.getValue().startsWith(DEFAULT_REMEMBER_ME_COOKIE_NAME+"=")){
+    for (Header header : headers) {
+      if (header.getValue().startsWith(DEFAULT_SESSION_COOKIE_NAME + "=")) {
         return header;
       }
     }

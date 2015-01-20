@@ -31,6 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link CookieFilter}.
+ */
 public class CookieFilterTest
     extends TestSupport
 {

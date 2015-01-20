@@ -30,7 +30,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
@@ -43,7 +45,10 @@ import org.apache.http.impl.cookie.BrowserCompatSpecFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.HttpHeaders.SET_COOKIE;
+import static com.google.common.net.HttpHeaders.USER_AGENT;
+import static com.google.common.net.HttpHeaders.X_REQUESTED_WITH;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -59,6 +64,15 @@ import static org.hamcrest.Matchers.nullValue;
 public class SimpleSessionCookieIT
     extends NexusHttpsITSupport
 {
+
+  private static final String LEGACY_LOGIN_PATH = "service/local/authentication/login";
+
+  private static final String LEGACY_LOGOUT_PATH = "service/local/authentication/logout";
+
+  private static final String EXTDIRECT_PATH = "service/extdirect";
+
+  private static final String TYPICAL_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36";
+
 
   public SimpleSessionCookieIT(final String nexusBundleCoordinates) {
     super(nexusBundleCoordinates);
@@ -124,21 +138,39 @@ public class SimpleSessionCookieIT
   }
 
   @Test
-  public void defaultSessionCookieSpecUsingHttps() throws Exception {
-    exerciseCookieSpec(nexus().getSecureUrl());
+  public void sessionCookieSpecUsingHttpWithLegacyResources() throws Exception {
+    exerciseCookieSpec(nexus().getUrl(), true);
   }
 
   @Test
-  public void defaultSessionCookieSpecUsingHttp() throws Exception {
-    exerciseCookieSpec(nexus().getUrl());
+  public void sessionCookieSpecUsingHttpsWithLegacyResources() throws Exception {
+    exerciseCookieSpec(nexus().getSecureUrl(), true);
+  }
+
+  @Test
+  public void sessionCookieSpecUsingHttpWithModernResources() throws Exception {
+    exerciseCookieSpec(nexus().getUrl(), false);
+  }
+
+  @Test
+  public void sessionCookieSpecUsingHttpsWithModernResources() throws Exception {
+    exerciseCookieSpec(nexus().getSecureUrl(), false);
+  }
+
+  private HttpRequestBase withCommonBrowserHeaders(HttpRequestBase req) {
+    req.setHeader(USER_AGENT, TYPICAL_BROWSER_USER_AGENT);
+    req.setHeader("X-Nexus-UI", "true");
+    req.setHeader(X_REQUESTED_WITH, "XMLHttpRequest");
+    return req;
   }
 
   /**
    * Validate Nexus Cookies during Sign-in and Sign-out
    *
-   * @param nexusUrl the base Nexus URL to validate against
+   * @param nexusUrl           the base Nexus URL to validate against
+   * @param useLegacyResources true to use legacy resources where available, false to use modern resources
    */
-  private void exerciseCookieSpec(final URL nexusUrl) throws Exception {
+  private void exerciseCookieSpec(final URL nexusUrl, boolean useLegacyResources) throws Exception {
 
     // handle cookies like a browser to aid validation
     final CookieSpec spec = new BrowserCompatSpecFactory().create(null);
@@ -152,8 +184,9 @@ public class SimpleSessionCookieIT
 
       // 1. login with credentials and get session cookie
       // Set-Cookie: NXSESSIONID=98a766bc-bc33-4b3c-9d9f-d3bb85b0cf00; Path=/; Secure; HttpOnly
-      HttpGet loginGet = new HttpGet(nexusUrl.toExternalForm() + "service/local/authentication/login");
-      try (CloseableHttpResponse response = client.execute(loginGet, clientContext())) {
+      HttpRequestBase loginRequest = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGIN_PATH);
+      withCommonBrowserHeaders(loginRequest);
+      try (CloseableHttpResponse response = client.execute(loginRequest, clientContext())) {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
         assertThat("login cookie should have been stored in the cookie store", cookieStore.getCookies(),
             hasSize(1));
@@ -161,8 +194,6 @@ public class SimpleSessionCookieIT
 
         Header[] setCookieHeaders = response.getHeaders(SET_COOKIE);
         Header sessionCookieHeader = getSessionCookieHeader(setCookieHeaders);
-        // FIXME add validation for rememberMe Cookie when fully implemented
-        Header rememberMeCookieHeader = getRememberMeCookieHeader(setCookieHeaders);
 
         List<Cookie> sessionCookies = spec.parse(sessionCookieHeader, cookieOrigin);
         loginCookie = (SetCookie) sessionCookies.get(0);
@@ -189,10 +220,22 @@ public class SimpleSessionCookieIT
       HttpClientContext logoutContext = HttpClientContext.create();
       logoutContext.setCookieStore(cookieStore);
 
+      HttpRequestBase logoutRequest;
+      if (useLegacyResources) {
+        logoutRequest = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGOUT_PATH);
+      }
+      else {
+        HttpPost logout = new HttpPost(nexusUrl.toExternalForm() + EXTDIRECT_PATH);
+        logout.setEntity(new StringEntity(
+            new ExtDirectTransactionBuilder().withAction("rapture_Security").withMethod("signOut").toJson()));
+        logout.setHeader(CONTENT_TYPE, "application/json");
+        logoutRequest = logout;
+      }
+      withCommonBrowserHeaders(logoutRequest);
+
       // 2. Logout, sending valid session cookie, no credentials
       // Set-Cookie: NXSESSIONID=deleteMe; Path=/; Max-Age=0; Expires=Sun, 28-Dec-2014 15:59:11 GMT
-      HttpGet logoutGet = new HttpGet(nexusUrl.toExternalForm() + "service/local/authentication/logout");
-      try (CloseableHttpResponse response = client.execute(logoutGet, logoutContext)) {
+      try (CloseableHttpResponse response = client.execute(logoutRequest, logoutContext)) {
         assertThat(response.getStatusLine().getStatusCode(), is(200));
 
         // can't use client CookieStore to examine logout cookie, because the Expires header will prevent it from being
@@ -222,13 +265,14 @@ public class SimpleSessionCookieIT
       }
 
       // 3. Access a protected resource again using our original login cookie, no credentials, to verify session is dead
-      HttpGet loginFailedGet = new HttpGet(nexusUrl.toExternalForm() + "service/local/authentication/login");
+      HttpGet loginFailedGet = new HttpGet(nexusUrl.toExternalForm() + LEGACY_LOGIN_PATH);
       cookieStore.addCookie(loginCookie);
       try (CloseableHttpResponse response = client.execute(loginFailedGet, HttpClientContext.create())) {
         assertThat("expected dead login session cookie to not authenticate", response.getStatusLine().getStatusCode(),
             is(401));
         Header[] setCookieHeaders = response.getHeaders(SET_COOKIE);
-        assertThat("expecting no session cookie since login was unsuccessful", getSessionCookieHeader(setCookieHeaders), nullValue());
+        assertThat("expecting no session cookie since login was unsuccessful", getSessionCookieHeader(setCookieHeaders),
+            nullValue());
         assertThat("expecting no cookies since login was unsuccessful", setCookieHeaders, arrayWithSize(0));
       }
     }
@@ -242,7 +286,7 @@ public class SimpleSessionCookieIT
   {
     assertThat(serverCookie, notNullValue());
     assertThat("cookie value must be present", serverCookie.getValue(), notNullValue());
-    assertThat("cookie name mismatch", serverCookie.getName(), equalTo("NXSESSIONID"));
+    assertThat("cookie name mismatch", serverCookie.getName(), equalTo(DEFAULT_SESSION_COOKIE_NAME));
     assertThat("not expecting to get ports since they are generally ignored", serverCookie.getPorts(), nullValue());
     assertThat("session cookie does not currently set the domain leaving it to the Browser to do the right thing",
         headerText, not(containsString("; Domain=")));

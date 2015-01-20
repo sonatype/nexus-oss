@@ -38,9 +38,12 @@ public class CookieFilter
 
   @Override
   protected boolean preHandle(final ServletRequest request, final ServletResponse response) throws Exception {
-    // session cookies are expected to be set already by another filter
     filterCookies(request, response);
     return true;
+  }
+
+  @Override protected void postHandle(final ServletRequest request, final ServletResponse response) throws Exception {
+    filterCookies(request,response);
   }
 
   /**
