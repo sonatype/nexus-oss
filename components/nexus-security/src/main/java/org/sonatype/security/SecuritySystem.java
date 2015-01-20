@@ -154,15 +154,6 @@ public interface SecuritySystem
   // *********************
 
   /**
-   * Adds a new User to the system. The users password will be generated.<BR/>
-   * Note: User.source must be set to specify where the user will be created.
-   *
-   * @param user User to be created.
-   * @return The User that was just created.
-   */
-  User addUser(User user) throws NoSuchUserManagerException, InvalidConfigurationException;
-
-  /**
    * Adds a new User to the system.<BR/>
    * Note: User.source must be set to specify where the user will be created.
    *
@@ -179,8 +170,7 @@ public interface SecuritySystem
    * @param sourceId the Id of the source to get the user from.
    * @return The user
    */
-  User getUser(String userId, String sourceId)
-      throws UserNotFoundException, NoSuchUserManagerException;
+  User getUser(String userId, String sourceId) throws UserNotFoundException, NoSuchUserManagerException;
 
   /**
    * Get a User by id. This will search all sources (in order) looking for it. The first one found will be returned.
@@ -249,32 +239,6 @@ public interface SecuritySystem
    * Searches for Users by criteria.
    */
   Set<User> searchUsers(UserSearchCriteria criteria);
-
-  // *********************
-  // * forget / change password
-  // *********************
-
-  /**
-   * Generate a new user password and will email it to the user.
-   *
-   * @param userId the user Id of the user
-   * @param email  email address of the user
-   */
-  void forgotPassword(String userId, String email) throws UserNotFoundException, InvalidConfigurationException;
-
-  /**
-   * Sends an email to a user to recover his/her password.
-   *
-   * @param email The email address of the user.
-   */
-  void forgotUsername(String email) throws UserNotFoundException;
-
-  /**
-   * Generate a new user password and will email it to the user.
-   *
-   * @param userId the user Id of the user
-   */
-  void resetPassword(String userId) throws UserNotFoundException, InvalidConfigurationException;
 
   /**
    * Updates a users password.

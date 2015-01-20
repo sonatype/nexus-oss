@@ -40,7 +40,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 @Typed(SecurityConfigurationValidator.class)
 @Named("default")
-public class DefaultConfigurationValidator
+public class DefaultSecurityConfigurationValidator
     extends ComponentSupport
     implements SecurityConfigurationValidator
 {
@@ -51,8 +51,8 @@ public class DefaultConfigurationValidator
   private final List<PrivilegeDescriptor> privilegeDescriptors;
 
   @Inject
-  public DefaultConfigurationValidator(final List<PrivilegeDescriptor> privilegeDescriptors,
-                                       final ConfigurationIdGenerator idGenerator)
+  public DefaultSecurityConfigurationValidator(final List<PrivilegeDescriptor> privilegeDescriptors,
+                                               final ConfigurationIdGenerator idGenerator)
   {
     this.privilegeDescriptors = privilegeDescriptors;
     this.idGenerator = idGenerator;

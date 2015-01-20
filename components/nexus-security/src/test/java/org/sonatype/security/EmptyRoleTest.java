@@ -58,7 +58,7 @@ public class EmptyRoleTest
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
-    securitySystem.addUser(user);
+    securitySystem.addUser(user, "test123");
 
     Set<RoleIdentifier> emptyRoleSet = Collections.emptySet();
     user.setRoles(emptyRoleSet);
@@ -96,9 +96,9 @@ public class EmptyRoleTest
     // this should work fine
     authManager.addRole(emptyRole);
 
-    Role normalRole =
-        new Role("normalRole-" + Math.random(), "NormalRole", "Normal Role", "default", false,
+    Role normalRole = new Role("normalRole-" + Math.random(), "NormalRole", "Normal Role", "default", false,
             new HashSet<String>(), new HashSet<String>());
+
     normalRole.addPrivilege(this.createTestPriv());
     authManager.addRole(normalRole);
 
@@ -131,11 +131,10 @@ public class EmptyRoleTest
     user.setRoles(Collections.singleton(new RoleIdentifier(emptyRole.getSource(), emptyRole.getRoleId())));
 
     // create the user, this user only has an empty role
-    securitySystem.addUser(user);
+    securitySystem.addUser(user, "test123");
 
-    Set<User> userSearchResult =
-        securitySystem.searchUsers(new UserSearchCriteria(null, Collections.singleton(emptyRole.getRoleId()),
-            null));
+    Set<User> userSearchResult = securitySystem.searchUsers(
+        new UserSearchCriteria(null, Collections.singleton(emptyRole.getRoleId()), null));
     // this should contain a single result
     Assert.assertEquals(1, userSearchResult.size());
     Assert.assertEquals(user.getUserId(), userSearchResult.iterator().next().getUserId());

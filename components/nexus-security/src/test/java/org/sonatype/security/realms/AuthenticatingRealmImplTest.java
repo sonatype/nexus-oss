@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.security.realms;
 
 import java.util.HashSet;
@@ -21,8 +22,9 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.usermanagement.PasswordGenerator;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -35,12 +37,9 @@ import static org.hamcrest.Matchers.is;
 public class AuthenticatingRealmImplTest
     extends AbstractSecurityTestCase
 {
-
   private AuthenticatingRealmImpl realm;
 
   private DefaultConfigurationManager configurationManager;
-
-  private PasswordGenerator passwordGenerator;
 
   private PasswordService passwordService;
 
@@ -51,10 +50,7 @@ public class AuthenticatingRealmImplTest
     super.setUp();
 
     realm = (AuthenticatingRealmImpl) lookup(Realm.class, "NexusAuthenticatingRealm");
-
     configurationManager = lookup(DefaultConfigurationManager.class);
-
-    passwordGenerator = lookup(PasswordGenerator.class, "default");
     passwordService = lookup(PasswordService.class, "default");
   }
 
@@ -62,11 +58,8 @@ public class AuthenticatingRealmImplTest
     buildTestAuthenticationConfig(CUser.STATUS_ACTIVE);
 
     UsernamePasswordToken upToken = new UsernamePasswordToken("username", "password");
-
     AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
-
     String password = new String((char[]) ai.getCredentials());
-
     assertThat(this.passwordService.passwordsMatch("password", password), is(true));
   }
 
@@ -89,12 +82,10 @@ public class AuthenticatingRealmImplTest
     configurationManager.createUser(user, clearPassword, roles);
 
     UsernamePasswordToken upToken = new UsernamePasswordToken("testCreateWithPassowrdEmailUserId", clearPassword);
-
     AuthenticationInfo ai = realm.getAuthenticationInfo(upToken);
-
     String password = new String((char[]) ai.getCredentials());
 
-    assertThat(this.passwordService.passwordsMatch(clearPassword, password), is(true));
+    assertThat(passwordService.passwordsMatch(clearPassword, password), is(true));
   }
 
   public void testFailedAuthentication() throws Exception {
@@ -114,7 +105,6 @@ public class AuthenticatingRealmImplTest
 
   public void testDisabledAuthentication() throws Exception {
     buildTestAuthenticationConfig(CUser.STATUS_DISABLED);
-
     UsernamePasswordToken upToken = new UsernamePasswordToken("username", "password");
 
     try {
@@ -137,8 +127,8 @@ public class AuthenticatingRealmImplTest
     CUser updatedUser = this.configurationManager.readUser(username);
     String hash = new String((char[]) ai.getCredentials());
 
-    assertThat(this.passwordService.passwordsMatch(password, hash), is(true));
-    assertThat(this.passwordService.passwordsMatch(password, updatedUser.getPassword()), is(true));
+    assertThat(passwordService.passwordsMatch(password, hash), is(true));
+    assertThat(passwordService.passwordsMatch(password, updatedUser.getPassword()), is(true));
   }
 
   private void buildTestAuthenticationConfig(String status) throws InvalidConfigurationException {
@@ -178,15 +168,15 @@ public class AuthenticatingRealmImplTest
     configurationManager.createUser(testUser, roles);
   }
 
-  private void buildLegacyTestAuthenticationConfig(String password) throws InvalidConfigurationException {
-    buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, this.legacyHashPassword(password));
-  }
-
   private String hashPassword(String password) {
-    return this.passwordService.encryptPassword(password);
+    return passwordService.encryptPassword(password);
   }
 
   private String legacyHashPassword(String password) {
-    return this.passwordGenerator.hashPassword(password);
+    return Hashing.sha1().hashString(password, Charsets.UTF_8).toString();
+  }
+
+  private void buildLegacyTestAuthenticationConfig(String password) throws InvalidConfigurationException {
+    buildTestAuthenticationConfig(CUser.STATUS_ACTIVE, legacyHashPassword(password));
   }
 }
