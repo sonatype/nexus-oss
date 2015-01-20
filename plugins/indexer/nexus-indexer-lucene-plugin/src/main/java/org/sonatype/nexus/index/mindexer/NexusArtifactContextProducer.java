@@ -15,6 +15,7 @@ package org.sonatype.nexus.index.mindexer;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,13 +51,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NexusArtifactContextProducer
     extends DefaultArtifactContextProducer
 {
-  private final Logger log;
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private final RepositoryRegistry repositoryRegistry;
 
   @Inject
   public NexusArtifactContextProducer(final RepositoryRegistry repositoryRegistry) {
-    this.log = LoggerFactory.getLogger(getClass());
     this.repositoryRegistry = checkNotNull(repositoryRegistry);
   }
 
@@ -69,20 +69,22 @@ public class NexusArtifactContextProducer
       try {
         // NOTE: MI supports Maven2 repositories only, so if this line does not throw,
         // we know we deal with a Maven2 proxy repository (no need to check is it Maven1)
-        final MavenProxyRepository proxyRepository = repositoryRegistry.getRepositoryWithFacet(context.getRepositoryId(),
-            MavenProxyRepository.class);
+        final MavenProxyRepository proxyRepository = repositoryRegistry
+            .getRepositoryWithFacet(context.getRepositoryId(), MavenProxyRepository.class);
         final File baseDir = getRepositoryLocalStorageFile(proxyRepository, RepositoryItemUid.PATH_ROOT);
-        itemPath = itemPath.substring(baseDir.getPath().length());
-        if (!itemPath.startsWith(RepositoryItemUid.PATH_SEPARATOR)) {
-          itemPath = RepositoryItemUid.PATH_SEPARATOR + itemPath;
-        }
-        final AttributeStorage attributeStorage = proxyRepository.getAttributesHandler().getAttributeStorage();
-        final Attributes attributes = attributeStorage.getAttributes(proxyRepository.createUid(itemPath));
-        if (attributes != null) {
-          final String sha1 = attributes.get(StorageFileItem.DIGEST_SHA1_KEY);
-          if (!Strings.isNullOrEmpty(sha1)) {
-            log.debug("ArtifactContext of {} enhanced with sha1={}", itemPath, sha1);
-            ac.getArtifactInfo().sha1 = sha1;
+        if (baseDir != null) {
+          itemPath = itemPath.substring(baseDir.getPath().length());
+          if (!itemPath.startsWith(RepositoryItemUid.PATH_SEPARATOR)) {
+            itemPath = RepositoryItemUid.PATH_SEPARATOR + itemPath;
+          }
+          final AttributeStorage attributeStorage = proxyRepository.getAttributesHandler().getAttributeStorage();
+          final Attributes attributes = attributeStorage.getAttributes(proxyRepository.createUid(itemPath));
+          if (attributes != null) {
+            final String sha1 = attributes.get(StorageFileItem.DIGEST_SHA1_KEY);
+            if (!Strings.isNullOrEmpty(sha1)) {
+              log.debug("ArtifactContext of {} enhanced with sha1={}", itemPath, sha1);
+              ac.getArtifactInfo().sha1 = sha1;
+            }
           }
         }
       }
@@ -98,6 +100,7 @@ public class NexusArtifactContextProducer
     return ac;
   }
 
+  @Nullable
   private File getRepositoryLocalStorageFile(final Repository repository, final String path) {
     if (repository.getLocalUrl() != null && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage) {
       try {
