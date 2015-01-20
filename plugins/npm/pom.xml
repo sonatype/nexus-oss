@@ -54,7 +54,7 @@
   </repositories>
 
   <properties>
-    <orientdb.version>1.7.10</orientdb.version>
+    <orientdb.version>2.0</orientdb.version>
 
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
@@ -67,12 +67,6 @@
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>com.orientechnologies</groupId>
-        <artifactId>orient-commons</artifactId>
-        <version>${orientdb.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>com.orientechnologies</groupId>
