@@ -40,9 +40,16 @@ Ext.define('NX.controller.Drilldown', {
 
   permission: undefined,
 
+  /**
+   * @protected
+   * Get the human-readable name of a model
+   */
   getDescription: Ext.emptyFn,
 
-  // List of xtypes
+  /**
+   * @override
+   * An array of xtypes which represent the masters available to this drilldown
+   */
   masters: null,
 
   /**
@@ -161,27 +168,53 @@ Ext.define('NX.controller.Drilldown', {
    * Whenever the first list loads, trigger a navigation event
    */
   onAfterRender: function () {
-    var me = this,
-      lists = me.getLists();
+    var me = this;/*,
+      lists = me.getLists(),
+      last = lists[lists.length - 1];*/
 
-    // Trigger navigation when the first list loads
-    lists[0].mon(lists[0].getStore(), 'load', me.onStoreLoad, me);
+    // Trigger navigation when the last list loads
+    //last.mon(last.getStore(), 'load', me.onStoreLoad, me);
 
+    // Start loading the lists
     me.loadStore(Ext.emptyFn);
   },
 
   /**
    * @public
-   * Prompts a reset/reload of the first list in the drilldown
+   * Prompts a reset/reload of the lists in the drilldown
    *
    * @param cb Call this once the store has loaded
    */
   loadStore: function (cb) {
     var me = this,
-        lists = me.getLists();
+      bookmark = NX.Bookmarks.getBookmark().getSegments();
 
-    lists[0].getStore().clearFilter();
-    lists[0].getStore().load(cb);
+    me.loadStoreAtIndex(0, bookmark, cb);
+  },
+
+  /**
+   * @public
+   * Load the list with the specified index, then load all child lists
+   *
+   * @param index The index of the load to load
+   */
+  loadStoreAtIndex: function(index, bookmark, cb) {
+    var me = this,
+      lists = me.getLists();
+
+    lists[index].getStore().clearFilter();
+    if (index < lists.length - 1 && bookmark.length) {
+      lists[index].getStore().load(function(records, operation, success) {
+        me.loadStoreAtIndex(index + 1, bookmark, cb);
+      });
+    } else {
+      lists[index].getStore().load(function(records, operation, success) {
+        if (cb) {
+          cb(records, operation, success);
+        }
+        me.onStoreLoad();
+      });
+    }
   },
 
   /**
@@ -199,9 +232,8 @@ Ext.define('NX.controller.Drilldown', {
       for (var i = 0; i < lists.length; ++i) {
         model = lists[i].getStore().getById(modelId);
         if (model) {
-          me.bookmark(model);
           if (navigate) {
-            me.navigateTo(NX.Bookmarks.getBookmark());
+            me.reselect();
           } else {
             me.onModelChanged(model);
           }
@@ -231,7 +263,7 @@ Ext.define('NX.controller.Drilldown', {
       }
     }
 
-    me.navigateTo(NX.Bookmarks.getBookmark());
+    me.reselect();
   },
 
   /**
@@ -266,7 +298,6 @@ Ext.define('NX.controller.Drilldown', {
     var me = this;
 
     me.loadView(list, model, true);
-    me.bookmark(model);
   },
 
   /**
@@ -302,6 +333,7 @@ Ext.define('NX.controller.Drilldown', {
     // No model specified, go to the root view
     if (!model) {
       feature.showChild(0, animate);
+      me.bookmark(null);
     }
 
     // Model specified, find the associated list and show that
@@ -317,6 +349,7 @@ Ext.define('NX.controller.Drilldown', {
 
         // Show the next view in line
         feature.showChild(i + 1, animate);
+        me.bookmark(model);
         break;
       }
     }
@@ -362,7 +395,7 @@ Ext.define('NX.controller.Drilldown', {
 
     // Find all parent models and add them to the bookmark array
     for (index = 0; index < lists.length; ++index) {
-      if (!lists[index].getView().getNode(model)) {
+      if (model && !lists[index].getView().getNode(model)) {
         segments.push(bookmark.shift());
       } else {
         // All done adding parents
@@ -393,12 +426,14 @@ Ext.define('NX.controller.Drilldown', {
   navigateTo: function (bookmark) {
     var me = this,
         lists = me.getLists(),
+        feature = me.getFeature(),
         list_ids, tab_id = null, model, modelId, index;
 
     if (lists.length && bookmark) {
 
       me.logDebug('Navigate to: ' + bookmark.getSegments().join(':'));
-      list_ids = bookmark.getSegments().slice(1, lists.length + 1);
+      //list_ids = bookmark.getSegments().slice(1, lists.length + 1);
+      list_ids = bookmark.getSegments().slice(1);
 
       if (list_ids.length > lists.length) {
         // The last ID refers to a tab
@@ -420,15 +455,14 @@ Ext.define('NX.controller.Drilldown', {
 
           // If this is the last list, load its data and attach a callback (if necessary)
           if (index == list_ids.length - 1) {
-            me.dataLoadedCallback(lists[index], modelId, tab_id);
 
-            // If the data isn’t loaded yet, return here when it is. Only do this for sub-lists,
-            // otherwise, the load event on the first list will trigger navigateTo in an infinite loop
-            if (!lists[index].getStore().getById(modelId) && index > 0) {
-              lists[index].getStore().load({
-                scope: me,
-                callback: function () { me.dataLoadedCallback(lists[index], modelId, tab_id); }
+            // If the data isn’t loaded yet, return here when it is
+            if (!lists[index].getStore().getById(modelId)) {
+              lists[index].getStore().load(function () {
+                me.dataLoadedCallback(lists[index], modelId, tab_id);
               });
+            } else {
+              me.dataLoadedCallback(lists[index], modelId, tab_id);
             }
             break;
           }
@@ -447,17 +481,20 @@ Ext.define('NX.controller.Drilldown', {
    */
   dataLoadedCallback: function(list, modelId, tabId) {
     var me = this,
-      feature = this.getFeature();
+      feature = this.getFeature(),
+      model;
 
-    if (list && list.isVisible()) {
+    if (list && list.isVisible() && !list.getStore().isLoading()) {
       // Show the referenced view
       modelId = decodeURIComponent(modelId);
-      me.loadView(list.getView(), list.getStore().getById(modelId), false);
+      model = list.getStore().getById(modelId);
 
       // Is a tab specified?
       if (tabId) {
         feature.down('nx-drilldown-details').setActiveTabByBookmark(tabId);
       }
+
+      me.loadView(list.getView(), model, false);
     }
   },
 
@@ -475,7 +512,9 @@ Ext.define('NX.controller.Drilldown', {
       description = me.getDescription(selection[0]);
       NX.Dialogs.askConfirmation('Confirm deletion?', description, function () {
         me.deleteModel(selection[0]);
-        me.bookmark(null);
+
+        // Reset the bookmark
+        NX.Bookmarks.bookmark(NX.Bookmarks.fromToken(NX.Bookmarks.getBookmark().getSegment(0)));
       }, {scope: me});
     }
   },

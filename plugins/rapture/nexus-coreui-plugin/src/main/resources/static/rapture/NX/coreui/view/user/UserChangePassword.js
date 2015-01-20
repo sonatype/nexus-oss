@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.user.UserChangePassword', {
-  extend: 'NX.view.AddWindow',
+  extend: 'Ext.window.Window',
   alias: 'widget.nx-coreui-user-changepassword',
   requires: [
     'NX.Conditions',
@@ -27,6 +27,13 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
 
   title: NX.I18n.get('ADMIN_USERS_PASSWORD_TITLE'),
   defaultFocus: 'password',
+
+  layout: 'fit',
+  autoShow: true,
+  modal: true,
+  constrain: true,
+  width: 630,
+  minWidth: 630,
 
   /**
    * @cfg userId to change password for
@@ -43,13 +50,14 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
       xtype: 'nx-settingsform',
       editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
+      ui: 'nx-inset',
 
       items: [
         {
           xtype: 'nx-password',
           name: 'password',
           itemId: 'password',
-          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW'),
+          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW')
         },
         {
           xtype: 'nx-password',
@@ -69,6 +77,8 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
         }}
       ]
     };
+
+    me.maxHeight = Ext.getBody().getViewSize().height - 100;
 
     me.callParent();
   }

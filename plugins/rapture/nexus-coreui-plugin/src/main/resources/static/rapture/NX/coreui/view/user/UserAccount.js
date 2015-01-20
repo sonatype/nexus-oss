@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.user.UserAccount', {
             itemId: 'userId',
             readOnly: true,
             fieldLabel: NX.I18n.get('USER_ACCOUNT_ID'),
-            helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP'),
+            helpText: NX.I18n.get('USER_ACCOUNT_ID_HELP')
           },
           {
             name: 'firstName',

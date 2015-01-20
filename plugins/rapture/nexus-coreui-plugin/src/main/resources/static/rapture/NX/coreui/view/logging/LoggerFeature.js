@@ -26,7 +26,5 @@ Ext.define('NX.coreui.view.logging.LoggerFeature', {
 
   iconName: 'logger-default',
 
-  detail: { xtype: 'nx-coreui-logger-list' },
-
-  createWizard: { xtype: 'nx-coreui-logger-add' }
+  detail: { xtype: 'nx-coreui-logger-list' }
 });

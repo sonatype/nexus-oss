@@ -102,7 +102,7 @@ Ext.define('NX.coreui.controller.Log', {
       feature = me.getFeature();
 
     feature.setItemName(1, NX.I18n.get('ADMIN_LOG_VIEWER_MARK_TITLE'));
-    me.loadCreateWizard(1, true, null);
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-log-mark'));
   },
 
   /**

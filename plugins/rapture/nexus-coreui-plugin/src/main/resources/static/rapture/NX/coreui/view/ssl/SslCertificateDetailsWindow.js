@@ -30,7 +30,7 @@ Ext.define('NX.coreui.view.ssl.SslCertificateDetailsWindow', {
     buttons: [
       { text: NX.I18n.get('ADMIN_SSL_DETAILS_CANCEL_BUTTON'),
         handler: function () {
-          this.up('window').close();
+          this.up('nx-drilldown').showChild(0, true);
         }
       }
     ]
