@@ -100,6 +100,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     });
   },
 
+  /**
+   * @override
+   */
   getDescription: function (model) {
     return model.get('name');
   },

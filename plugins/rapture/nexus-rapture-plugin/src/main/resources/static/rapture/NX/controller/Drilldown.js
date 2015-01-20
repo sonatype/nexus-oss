@@ -41,7 +41,7 @@ Ext.define('NX.controller.Drilldown', {
   permission: undefined,
 
   /**
-   * @override
+   * @protected
    * Get the human-readable name of a model
    */
   getDescription: Ext.emptyFn,

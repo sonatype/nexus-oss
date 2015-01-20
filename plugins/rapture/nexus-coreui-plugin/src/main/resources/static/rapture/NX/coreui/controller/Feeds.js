@@ -98,6 +98,9 @@ Ext.define('NX.coreui.controller.Feeds', {
     });
   },
 
+  /**
+   * @override
+   */
   getDescription: function(model) {
     return model.get('name');
   },

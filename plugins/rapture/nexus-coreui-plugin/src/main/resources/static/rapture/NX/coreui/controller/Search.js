@@ -270,6 +270,9 @@ Ext.define('NX.coreui.controller.Search', {
     me.getSearchResultStore().filter();
   },
 
+  /**
+   * @override
+   */
   getDescription: function(model) {
     return model.getId();
   },
