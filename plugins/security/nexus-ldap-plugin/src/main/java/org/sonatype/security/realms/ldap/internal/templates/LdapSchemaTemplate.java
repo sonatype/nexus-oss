@@ -12,19 +12,19 @@
  */
 package org.sonatype.security.realms.ldap.internal.templates;
 
-import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 public class LdapSchemaTemplate
 {
-  private CUserAndGroupAuthConfiguration userAndGroupConfig;
+  private Mapping userAndGroupConfig;
 
   private String name;
 
-  public CUserAndGroupAuthConfiguration getUserAndGroupAuthConfig() {
+  public Mapping getUserAndGroupAuthConfig() {
     return userAndGroupConfig;
   }
 
-  public void setUserAndGroupAuthConfig(CUserAndGroupAuthConfiguration userAndGroupConfig) {
+  public void setUserAndGroupAuthConfig(Mapping userAndGroupConfig) {
     this.userAndGroupConfig = userAndGroupConfig;
   }
 

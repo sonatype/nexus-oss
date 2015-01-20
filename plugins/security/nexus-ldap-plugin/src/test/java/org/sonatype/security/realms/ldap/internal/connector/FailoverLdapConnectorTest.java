@@ -35,7 +35,7 @@ public class FailoverLdapConnectorTest
 
   @Test
   public void blacklistWithNoBackup() {
-    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, null, 10);
+    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, null, 10, 3);
 
     assertThat(underTest.isOriginalConnectorValid(), is(true));
 
@@ -50,7 +50,7 @@ public class FailoverLdapConnectorTest
 
   @Test
   public void blacklistConnectorOnFailure() {
-    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10);
+    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10, 3);
 
     assertThat(underTest.isOriginalConnectorValid(), is(true));
 
@@ -69,7 +69,7 @@ public class FailoverLdapConnectorTest
 
   @Test
   public void recoverConnectorAfterDelay() {
-    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10);
+    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10, 3);
 
     assertThat(underTest.isOriginalConnectorValid(), is(true));
 
@@ -88,7 +88,7 @@ public class FailoverLdapConnectorTest
 
   @Test
   public void resetIncidentsAfterDelay() {
-    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10);
+    final FailoverLdapConnector underTest = new FailoverLdapConnector(original, backup, 10, 3);
 
     assertThat(underTest.isOriginalConnectorValid(), is(true));
 

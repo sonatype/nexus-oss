@@ -12,8 +12,28 @@
  */
 package org.sonatype.security.realms.ldap.internal.realms;
 
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
+
 public class UserHasGroupLdapSchemaIT
     extends LdapSchemaTestSupport
 {
+  @Override
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
+
+    // adjust it, ITs by default uses different groups
+    final Mapping mapping = ldapConfiguration.getMapping();
+    mapping.setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setUserSubtree(false);
+
+    return ldapConfiguration;
+  }
 
 }

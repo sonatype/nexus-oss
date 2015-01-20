@@ -15,7 +15,6 @@ package org.sonatype.security.realms.ldap.internal.restlet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapTestCase;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
@@ -24,6 +23,7 @@ import org.sonatype.security.realms.ldap.api.dto.LdapUserDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserListResponse;
 
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import org.junit.Assert;
@@ -35,7 +35,7 @@ import org.restlet.resource.ResourceException;
 
 @Category(Slow.class)
 public class UserGroupMappingRestTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
 
   @Test
@@ -61,7 +61,7 @@ public class UserGroupMappingRestTest
     ldapServerRequest.getData().setConnectionInfo(connDto);
     connDto.setAuthScheme("simple");
     connDto.setHost("localhost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     connDto.setSystemPassword(encodeBase64("secret"));
     connDto.setSystemUsername(encodeBase64("uid=admin,ou=system"));
@@ -142,7 +142,7 @@ public class UserGroupMappingRestTest
     ldapServerRequest.getData().setConnectionInfo(connDto);
     connDto.setAuthScheme("simple");
     connDto.setHost("invalidHost");
-    connDto.setPort(this.getLdapServer("default").getPort());
+    connDto.setPort(ldapServers.get("default").getPort());
     connDto.setProtocol("ldap");
     connDto.setSystemPassword(encodeBase64("secret"));
     connDto.setSystemUsername(encodeBase64("uid=admin,ou=system"));

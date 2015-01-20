@@ -12,8 +12,8 @@
  */
 package org.sonatype.security.realms.ldap.internal.realms;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapTestCase;
 import org.sonatype.security.realms.ldap.LdapPlugin;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -21,7 +21,7 @@ import org.apache.shiro.realm.Realm;
 import org.junit.Test;
 
 public class EnterpriseLdapRealmTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
 
   @Test

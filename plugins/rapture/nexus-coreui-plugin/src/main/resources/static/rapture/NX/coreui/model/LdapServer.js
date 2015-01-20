@@ -43,7 +43,7 @@ Ext.define('NX.coreui.model.LdapServer', {
 
     'connectionTimeout',
     'connectionRetryDelay',
-    'cacheTimeout',
+    'maxIncidentsCount',
 
     'userBaseDn',
     'userSubtree',

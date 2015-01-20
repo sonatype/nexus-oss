@@ -15,19 +15,25 @@ package org.sonatype.security.realms.ldap.internal.realms;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.security.realms.ldap.LdapPlugin;
 
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapGroupException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.NoSuchLdapUserException;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.context.Context;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public abstract class LdapSchemaTestSupport
-    extends LdapTestSupport
+    extends LdapITSupport
 {
 
   private LdapManager ldapManager;
@@ -44,24 +50,26 @@ public abstract class LdapSchemaTestSupport
   private Realm realm;
 
   @Override
-  protected void customizeContext(Context context) {
-    super.customizeContext(context);
+  protected LdapConfiguration createLdapClientConfigurationForServer(final String name, final int order,
+                                                                     final LdapServer ldapServer)
+  {
+    final LdapConfiguration ldapConfiguration = super.createLdapClientConfigurationForServer(name, order, ldapServer);
 
-    String classname = this.getClass().getName();
-    context.put("test-path", getBasedir() + "/target/test-classes/" + classname.replace('.', '/'));
+    // adjust it, ITs by default uses different groups
+    final Mapping mapping = ldapConfiguration.getMapping();
+    mapping.setGroupMemberFormat("uid=${username},ou=people,o=sonatype");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setUserSubtree(false);
+
+    return ldapConfiguration;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment#setUp()
-   */
-  @Override
-  public void setUp()
+  @Before
+  public void prepare()
       throws Exception
   {
-    super.setUp();
-    this.ldapManager = this.lookup(LdapManager.class);
-    this.realm = this.lookup(Realm.class, LdapPlugin.REALM_NAME);
+    this.ldapManager = lookup(LdapManager.class);
+    this.realm = lookup(Realm.class, LdapPlugin.REALM_NAME);
   }
 
   @Test

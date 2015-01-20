@@ -19,6 +19,14 @@ import java.util.List;
 import com.sonatype.nexus.ssl.client.Certificates;
 import com.sonatype.nexus.ssl.client.TrustStore;
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
+
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.ldaptestsuite.Partition;
+import org.sonatype.nexus.client.core.NexusClient;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.plexus.rest.resource.error.ErrorMessage;
+import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.realms.ldap.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerListEntryDTO;
@@ -26,16 +34,11 @@ import org.sonatype.security.realms.ldap.api.dto.LdapServerListResponse;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
-
-import org.sonatype.nexus.client.core.NexusClient;
-import org.sonatype.nexus.client.rest.NexusClientFactory;
-import org.sonatype.nexus.client.rest.UsernamePasswordAuthenticationInfo;
-import org.sonatype.nexus.client.rest.jersey.JerseyNexusClientFactory;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.resource.error.ErrorMessage;
-import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.realms.ldap.client.Configuration;
+import org.sonatype.security.realms.ldap.client.Connection;
+import org.sonatype.security.realms.ldap.client.Connection.Host;
+import org.sonatype.security.realms.ldap.client.Connection.Protocol;
+import org.sonatype.security.realms.ldap.client.Mapping;
 import org.sonatype.security.realms.ldap.internal.LdapURL;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -48,14 +51,13 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 
-import static org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey.ldapTrustStoreKey;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
+import static org.sonatype.security.realms.ldap.api.dto.LdapTrustStoreKey.ldapTrustStoreKey;
 
 /**
  * ITs related to enhanced SSL support.
@@ -65,6 +67,47 @@ import static org.sonatype.nexus.client.rest.BaseUrl.baseUrlFrom;
 public class NXCM5055NexusTrustStoreIT
     extends AbstractLdapIT
 {
+  @Override
+  protected LdapServerConfiguration ldapServerConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(Partition.builder()
+                .withNameAndSuffix("sonatype", "o=sonatype")
+                .withRootEntryClasses("top", "organization")
+                .withIndexedAttributes("objectClass", "o")
+                .withLdifFile(util.resolveFile("src/test/it-resources/default-config/test.ldif"))
+                .build()
+        )
+        .withSSL() // this IT needs SSL
+        .build();
+  }
+
+  @Override
+  protected void createLdapClientConfiguration() throws Exception {
+    final Configuration configuration = getLdapClient().create();
+    configuration.setName(getTestId());
+    final Connection connection = configuration.getConnection();
+    connection.setSearchBase("o=sonatype");
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("secret");
+    connection.setAuthScheme("simple");
+    connection.setHost(new Host(Protocol.ldaps, "localhost", getLdapServer().getPort())); // SSL
+    final Mapping mapping = configuration.getMapping();
+
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setGroupMemberFormat("cn=${username},ou=groups,o=sonatype");
+    mapping.setGroupObjectClass("organizationalRole");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserRealNameAttribute("sn");
+    configuration.save();
+  }
 
   /**
    * Verify that an SSL LDAP server with a self signed certificate can be accessed once the self signed certificate
@@ -453,16 +496,4 @@ public class NXCM5055NexusTrustStoreIT
       RequestFacade.releaseResponse(response);
     }
   }
-
-  private NexusClient getNexusClient()
-      throws Exception
-  {
-    final NexusClientFactory nexusClientFactory = TestContainer
-        .getInstance().getPlexusContainer().lookup(JerseyNexusClientFactory.class);
-    return nexusClientFactory.createFor(
-        baseUrlFrom(getBaseNexusUrl()),
-        new UsernamePasswordAuthenticationInfo("admin", "admin123")
-    );
-  }
-
 }

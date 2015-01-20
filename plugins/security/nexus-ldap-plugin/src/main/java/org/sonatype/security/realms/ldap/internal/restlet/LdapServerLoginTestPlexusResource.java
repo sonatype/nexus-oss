@@ -20,14 +20,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
-import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
-import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.realms.EnterpriseLdapManager;
 
 import org.apache.shiro.codec.Base64;
 import org.codehaus.plexus.util.StringUtils;
@@ -93,8 +92,7 @@ public class LdapServerLoginTestPlexusResource
   }
 
   protected Object doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     if (payload == null) {
       throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Missing payload");
@@ -122,11 +120,11 @@ public class LdapServerLoginTestPlexusResource
     }
 
     // get the ldap model object
-    CLdapServerConfiguration ldapServer = toLdapModel(ldapServerLoginTestRequest.getData().getConfiguration());
+    LdapConfiguration ldapServer = toLdapModel(ldapServerLoginTestRequest.getData().getConfiguration());
     if (ldapServer.getId() == null && request.getResourceRef() != null) {
       ldapServer.setId(request.getResourceRef().getQueryAsForm().getFirstValue("ldapServerId"));
     }
-    replaceFakePassword(ldapServer.getConnectionInfo(), ldapServer.getId(), ldapConfigurationManager);
+    replaceFakePassword(ldapServer.getConnection(), ldapServer.getId(), ldapConfigurationManager);
 
     // try the login
     try {

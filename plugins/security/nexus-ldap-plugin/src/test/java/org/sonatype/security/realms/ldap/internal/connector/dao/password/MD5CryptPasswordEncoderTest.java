@@ -15,8 +15,11 @@ package org.sonatype.security.realms.ldap.internal.connector.dao.password;
 import org.sonatype.security.realms.ldap.internal.connector.dao.password.hash.MD5Crypt;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import junit.framework.Assert;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 public class MD5CryptPasswordEncoderTest
     extends TestSupport
@@ -25,23 +28,13 @@ public class MD5CryptPasswordEncoderTest
   public void testEncryptAndVerify()
       throws Exception
   {
-    PasswordEncoder encoder = new MD5CryptPasswordEncoder();
-
+    final PasswordEncoder encoder = new MD5CryptPasswordEncoder();
     String crypted = encoder.encodePassword("test", null);
-
-    // System.out.println( "Crypted password: \'" + crypted + "\'" );
-
     int lastIdx = crypted.lastIndexOf('$');
     int firstIdx = crypted.indexOf('$');
-
     String salt = crypted.substring(firstIdx + "$1$".length(), lastIdx);
-
     String check = "{CRYPT}" + new MD5Crypt().crypt("test", salt);
-
-    // System.out.println( "Check value: \'" + check + "\'" );
-
-    Assert.assertEquals(check, crypted);
-
-    Assert.assertTrue(encoder.isPasswordValid(crypted, "test", null));
+    assertThat(check, equalTo(crypted));
+    assertThat(encoder.isPasswordValid(crypted, "test", null), is(true));
   }
 }

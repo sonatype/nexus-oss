@@ -12,26 +12,28 @@
  */
 package com.sonatype.nexus.testsuite.ldap.nxcm2974;
 
-import java.io.File;
-
 import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
+
+import org.sonatype.ldaptestsuite.LdapServerConfiguration;
+import org.sonatype.ldaptestsuite.Partition;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerLoginTestRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserAndGroupAuthConfigurationDTO;
+import org.sonatype.security.realms.ldap.client.Configuration;
+import org.sonatype.security.realms.ldap.client.Connection;
+import org.sonatype.security.realms.ldap.client.Connection.Host;
+import org.sonatype.security.realms.ldap.client.Connection.Protocol;
+import org.sonatype.security.realms.ldap.client.Mapping;
 
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.resource.StringRepresentation;
 
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
@@ -39,6 +41,47 @@ import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusC
 public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
     extends AbstractLdapIT
 {
+  @Override
+  protected LdapServerConfiguration ldapServerConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(Partition.builder()
+                .withNameAndSuffix("more&more", "o=more&more") // amps in suffix and name
+                .withRootEntryClasses("top", "organization")
+                .withIndexedAttributes("objectClass", "o")
+                .withLdifFile(util.resolveFile(
+                    "src/test/it-resources/com/sonatype/nexus/testsuite/ldap/nxcm2974/test-config/test.ldif"))
+                .build()
+        )
+        .build();
+  }
+
+  @Override
+  protected void createLdapClientConfiguration() throws Exception {
+    final Configuration configuration = getLdapClient().create();
+    configuration.setName(getTestId());
+    final Connection connection = configuration.getConnection();
+    connection.setSearchBase("o=more&more"); // amps
+    connection.setSystemUsername("uid=admin,ou=system");
+    connection.setSystemPassword("secret");
+    connection.setAuthScheme("simple");
+    connection.setHost(new Host(Protocol.ldap, "localhost", getLdapServer().getPort()));
+    final Mapping mapping = configuration.getMapping();
+
+    mapping.setEmailAddressAttribute("mail");
+    mapping.setLdapGroupsAsRoles(true);
+    mapping.setGroupBaseDn("ou=groups");
+    mapping.setGroupIdAttribute("cn");
+    mapping.setUserMemberOfAttribute("businesscategory");
+    mapping.setGroupMemberFormat("cn=${username},ou=groups,o=more&amp;more");
+    mapping.setGroupObjectClass("organizationalRole");
+    mapping.setUserPasswordAttribute("userPassword");
+    mapping.setUserIdAttribute("uid");
+    mapping.setUserObjectClass("inetOrgPerson");
+    mapping.setUserBaseDn("ou=people");
+    mapping.setUserRealNameAttribute("sn");
+    configuration.save();
+  }
 
   @Test
   public void testSave()
@@ -64,12 +107,6 @@ public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
 
     // &amp; is expected because response format is XML
     assertThat(responseText, containsString("more&amp;more"));
-
-    // test for correct ldap config
-    File ldapConfigFile = new File(NexusConfigUtil.getNexusFile().getParentFile(), "ldap.xml");
-    assertThat("cannot find ldap config", ldapConfigFile.exists());
-    assertThat(FileUtils.readFileToString(ldapConfigFile),
-        allOf(containsString("L&amp;L"), containsString("more&amp;more")));
   }
 
   @Test

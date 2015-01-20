@@ -26,16 +26,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
+
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerListEntryDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerListResponse;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
+import org.sonatype.security.realms.ldap.internal.LdapURL;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.security.realms.ldap.internal.LdapURL;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -92,7 +91,7 @@ public class LdapServerListPlexusResource
 
     LdapServerListResponse listResponse = new LdapServerListResponse();
     List<LdapServerListEntryDTO> entries = new ArrayList<LdapServerListEntryDTO>();
-    for (CLdapServerConfiguration ldapServer : this.ldapConfigurationManager.listLdapServerConfigurations()) {
+    for (LdapConfiguration ldapServer : this.ldapConfigurationManager.listLdapServerConfigurations()) {
       entries.add(this.toListEntry(request, ldapServer));
     }
 
@@ -106,8 +105,7 @@ public class LdapServerListPlexusResource
   @Override
   @POST
   public LdapServerRequest doPost(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     LdapServerRequest ldapServerRequest = (LdapServerRequest) payload;
     if (payload == null) {
@@ -118,7 +116,7 @@ public class LdapServerListPlexusResource
       throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Payload is empty");
     }
 
-    CLdapServerConfiguration ldapServer = this.toLdapModel(ldapServerRequest.getData());
+    LdapConfiguration ldapServer = this.toLdapModel(ldapServerRequest.getData());
     this.ldapConfigurationManager.addLdapServerConfiguration(ldapServer);
 
     try {
@@ -138,16 +136,16 @@ public class LdapServerListPlexusResource
     }
   }
 
-  private LdapServerListEntryDTO toListEntry(Request request, CLdapServerConfiguration ldapServer) {
+  private LdapServerListEntryDTO toListEntry(Request request, LdapConfiguration ldapServer) {
     LdapServerListEntryDTO listEntry = new LdapServerListEntryDTO();
     listEntry.setId(ldapServer.getId());
     listEntry.setName(ldapServer.getName());
     listEntry.setUrl(this.createChildReference(request, ldapServer.getId()).toString());
 
     try {
-      listEntry.setLdapUrl(new LdapURL(ldapServer.getConnectionInfo().getProtocol(), ldapServer
-          .getConnectionInfo().getHost(), ldapServer.getConnectionInfo().getPort(), ldapServer
-          .getConnectionInfo().getSearchBase()).toString());
+      listEntry.setLdapUrl(new LdapURL(ldapServer.getConnection().getHost().getProtocol().name(), ldapServer
+          .getConnection().getHost().getHostName(), ldapServer.getConnection().getHost().getPort(), ldapServer
+          .getConnection().getSearchBase()).toString());
     }
     catch (MalformedURLException e) {
       this.getLogger().warn("Ldap Server has invalid URL", e);

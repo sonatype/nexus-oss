@@ -12,31 +12,19 @@
  */
 package org.sonatype.ldaptestsuite;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
+import org.junit.After;
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLdapTestEnvironment
-    extends PlexusTestCase
+    extends TestSupport
 {
-  /**
-   * The logger.
-   */
-  private Logger logger;
+  protected Logger log = LoggerFactory.getLogger(getClass());
 
-  /**
-   * The ldap server.
-   */
   private LdapServer ldapServer;
-
-  /**
-   * Gets the logger.
-   *
-   * @return the logger
-   */
-  public Logger getLogger() {
-    return logger;
-  }
 
   /**
    * Gets the ldap server.
@@ -47,34 +35,20 @@ public abstract class AbstractLdapTestEnvironment
     return ldapServer;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.codehaus.plexus.PlexusTestCase#setUp()
-   */
-  public void setUp()
+  @Before
+  public void startLdap()
       throws Exception
   {
-    super.setUp();
-
-    LoggerManager loggerManager = (LoggerManager) lookup(LoggerManager.ROLE);
-
-    logger = loggerManager.getLoggerForComponent(this.getClass().toString());
-
-    ldapServer = (LdapServer) lookup(LdapServer.ROLE);
+    this.ldapServer = new LdapServer(buildConfiguration()).start();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.codehaus.plexus.PlexusTestCase#tearDown()
-   */
-  public void tearDown()
+  protected abstract LdapServerConfiguration buildConfiguration();
+
+  @After
+  public void stopLdap()
       throws Exception
   {
     ldapServer.stop();
     ldapServer = null;
-
-    super.tearDown();
   }
 }

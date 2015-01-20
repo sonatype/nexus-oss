@@ -12,11 +12,10 @@
  */
 package org.sonatype.security.realms.ldap.internal.restlet;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapTestCase;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.ldap.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapConnectionInfoDTO;
-
-import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.sisu.litmus.testsupport.group.Slow;
 
 import org.junit.Assert;
@@ -28,7 +27,7 @@ import org.restlet.resource.ResourceException;
 
 @Category(Slow.class)
 public class ServerConnectionRestTest
-    extends AbstractLdapTestCase
+    extends LdapTestSupport
 {
 
   @Test
@@ -51,7 +50,7 @@ public class ServerConnectionRestTest
 
     dto.setAuthScheme("simple");
     dto.setHost("localhost");
-    dto.setPort(this.getLdapServer("default").getPort());
+    dto.setPort(ldapServers.get("default").getPort());
     dto.setProtocol("ldap");
     dto.setSystemPassword(encodeBase64("secret"));
     dto.setSystemUsername(encodeBase64("uid=admin,ou=system"));
@@ -77,7 +76,7 @@ public class ServerConnectionRestTest
 
     dto.setAuthScheme("simple");
     dto.setHost("invalidHost");
-    dto.setPort(this.getLdapServer("default").getPort());
+    dto.setPort(ldapServers.get("default").getPort());
     dto.setProtocol("ldap");
     dto.setSystemPassword(encodeBase64("secret"));
     dto.setSystemUsername(encodeBase64("uid=admin,ou=system"));

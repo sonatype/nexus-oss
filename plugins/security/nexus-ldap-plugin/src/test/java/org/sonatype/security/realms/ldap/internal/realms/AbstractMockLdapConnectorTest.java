@@ -12,54 +12,28 @@
  */
 package org.sonatype.security.realms.ldap.internal.realms;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
 import org.sonatype.security.realms.ldap.internal.MockLdapConnector;
-import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 import org.sonatype.security.realms.ldap.internal.connector.LdapConnector;
+import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
 
-import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.junit.Before;
 
 public abstract class AbstractMockLdapConnectorTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
 
-  private EnterpriseLdapManager ldapManager = null;
+  protected EnterpriseLdapManager ldapManager = null;
 
-  public void setUp()
+  @Before
+  public void prepareConnectors()
       throws Exception
   {
-    super.setUp();
-
-    String filename = "ldap.xml";
-    String resourcePath = this.getClass().getName().replace('.', '/');
-    resourcePath += "-" + filename;
-
-    if (ClassLoader.getSystemResource(resourcePath) == null) {
-      resourcePath = "defaults/" + filename;
-    }
-
-    getConfHomeDir().mkdirs();
-    Map<String, Object> interpolationMap = new HashMap<String, Object>();
-    interpolationMap.put("default-ldap-port", "12345");
-
-    try (InterpolationFilterReader reader = new InterpolationFilterReader(new InputStreamReader(
-        ClassLoader.getSystemResourceAsStream(resourcePath)), interpolationMap);
-         OutputStream out = new FileOutputStream(new File(getConfHomeDir(), "ldap.xml"));) {
-      IOUtils.copy(reader, out);
-    }
-
     this.ldapManager = (EnterpriseLdapManager) this.lookup(LdapManager.class);
     this.resetLdapConnectors();
   }

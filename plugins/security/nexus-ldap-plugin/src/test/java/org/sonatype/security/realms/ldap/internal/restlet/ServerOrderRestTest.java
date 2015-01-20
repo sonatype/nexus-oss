@@ -15,11 +15,10 @@ package org.sonatype.security.realms.ldap.internal.restlet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerOrderRequest;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,31 +41,31 @@ public class ServerOrderRestTest
       throws Exception
   {
     LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
-    ldapConfigurationManager.deleteLdapServerConfiguration("default");
+    ldapConfigurationManager.deleteLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
 
     // add 2 ldapServers
-    CLdapServerConfiguration ldapServer1 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer1 = new LdapConfiguration();
     ldapServer1.setName("testSuccess1");
-    ldapServer1.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer1.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer1.setConnection(this.buildConnectionInfo());
+    ldapServer1.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer1);
 
-    CLdapServerConfiguration ldapServer2 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer2 = new LdapConfiguration();
     ldapServer2.setName("testSuccess2");
-    ldapServer2.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer2.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer2.setConnection(this.buildConnectionInfo());
+    ldapServer2.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer2);
 
-    CLdapServerConfiguration ldapServer3 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer3 = new LdapConfiguration();
     ldapServer3.setName("testSuccess3");
-    ldapServer3.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer3.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer3.setConnection(this.buildConnectionInfo());
+    ldapServer3.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer3);
 
-    CLdapServerConfiguration ldapServer4 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer4 = new LdapConfiguration();
     ldapServer4.setName("testSuccess4");
-    ldapServer4.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer4.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer4.setConnection(this.buildConnectionInfo());
+    ldapServer4.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer4);
 
     // the order at this point is 1, 2, 3, 4
@@ -85,7 +84,7 @@ public class ServerOrderRestTest
     Assert.assertEquals(newOrder, resultNewOrder);
 
     // check for the same order as above
-    List<CLdapServerConfiguration> ldapServers = ldapConfigurationManager.listLdapServerConfigurations();
+    List<LdapConfiguration> ldapServers = ldapConfigurationManager.listLdapServerConfigurations();
     Assert.assertEquals(ldapServers.get(0).getId(), ldapServer3.getId());
     Assert.assertEquals(ldapServers.get(1).getId(), ldapServer1.getId());
     Assert.assertEquals(ldapServers.get(2).getId(), ldapServer4.getId());
@@ -98,31 +97,31 @@ public class ServerOrderRestTest
       throws Exception
   {
     LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
-    ldapConfigurationManager.deleteLdapServerConfiguration("default");
+    ldapConfigurationManager.deleteLdapServerConfiguration(ldapClientConfigurations.get("default").getId());
 
     // add 2 ldapServers
-    CLdapServerConfiguration ldapServer1 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer1 = new LdapConfiguration();
     ldapServer1.setName("testSuccess1");
-    ldapServer1.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer1.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer1.setConnection(this.buildConnectionInfo());
+    ldapServer1.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer1);
 
-    CLdapServerConfiguration ldapServer2 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer2 = new LdapConfiguration();
     ldapServer2.setName("testSuccess2");
-    ldapServer2.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer2.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer2.setConnection(this.buildConnectionInfo());
+    ldapServer2.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer2);
 
-    CLdapServerConfiguration ldapServer3 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer3 = new LdapConfiguration();
     ldapServer3.setName("testSuccess3");
-    ldapServer3.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer3.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer3.setConnection(this.buildConnectionInfo());
+    ldapServer3.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer3);
 
-    CLdapServerConfiguration ldapServer4 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer4 = new LdapConfiguration();
     ldapServer4.setName("testSuccess4");
-    ldapServer4.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer4.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer4.setConnection(this.buildConnectionInfo());
+    ldapServer4.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer4);
 
     // the order at this point is 1, 2, 3, 4

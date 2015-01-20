@@ -12,7 +12,6 @@
  */
 package org.sonatype.ldaptestsuite;
 
-import java.io.File;
 import java.util.Hashtable;
 
 import javax.naming.Context;
@@ -23,18 +22,34 @@ import javax.naming.directory.DirContext;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.apache.directory.server.constants.ServerDNConstants;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LdapTestEnvironmentTest
     extends AbstractLdapTestEnvironment
 {
+  @Override
+  protected LdapServerConfiguration buildConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withPartitions(
+            Partition.builder()
+                .withNameAndSuffix("sonatype", "o=sonatype")
+                .withIndexedAttributes("objectClass", "o")
+                .withRootEntryClasses("top", "organization")
+                .withLdifFile(util.resolveFile("src/test/resources/sonatype.ldif")).build())
+        .build();
+  }
 
-  /**
-   * Test that the partition has been correctly created
-   */
-  public void testPartition() throws Exception {
+  @Test
+  public void smoke() throws Exception {
     Hashtable<String, String> env = new Hashtable<String, String>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + 12345 + "/o=sonatype");
+    env.put(Context.PROVIDER_URL, "ldap://localhost:" + getLdapServer().getPort() + "/o=sonatype");
     env.put(Context.SECURITY_PRINCIPAL, ServerDNConstants.ADMIN_SYSTEM_DN);
     env.put(Context.SECURITY_CREDENTIALS, "secret");
     env.put(Context.SECURITY_AUTHENTICATION, "simple");
@@ -44,25 +59,16 @@ public class LdapTestEnvironmentTest
 
     // We should be able to read it
     DirContext appRoot = (DirContext) initialContext.lookup("");
-    assertNotNull(appRoot);
+    assertThat(appRoot, notNullValue());
 
     // Let's get the entry associated to the top level
     Attributes attributes = appRoot.getAttributes("");
-    assertNotNull(attributes);
-    assertEquals("sonatype", (attributes.get("o")).get());
+    assertThat(attributes, notNullValue());
+    assertThat((String) attributes.get("o").get(), equalTo("sonatype"));
 
     Attribute attribute = attributes.get("objectClass");
-    assertNotNull(attribute);
-    assertTrue(attribute.contains("top"));
-    assertTrue(attribute.contains("organization"));
-    // Ok, everything is fine
+    assertThat(attribute, notNullValue());
+    assertThat(attribute.contains("top"), is(true));
+    assertThat(attribute.contains("organization"), is(true));
   }
-
-
-  public void testStop() throws Exception {
-    // stopping seems to lock file on windows
-    this.getLdapServer().stop();
-    this.getLdapServer().doDelete(new File("target/apache-ds/"));
-  }
-
 }

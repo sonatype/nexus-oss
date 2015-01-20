@@ -16,16 +16,15 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-import com.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
-
+import org.sonatype.security.realms.ldap.internal.LdapURL;
+import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapAuthConfiguration;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapGroupDAO;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUserDAO;
-import org.sonatype.security.realms.ldap.internal.connector.DefaultLdapConnector;
-import org.sonatype.security.realms.ldap.internal.LdapURL;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Mapping;
 
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.util.StringUtils;
@@ -36,7 +35,7 @@ public class LdapConnectionUtils
 {
   private static Logger logger = LoggerFactory.getLogger(LdapConnectionUtils.class);
 
-  public static DefaultLdapContextFactory getLdapContextFactory(CLdapServerConfiguration ldapServer,
+  public static DefaultLdapContextFactory getLdapContextFactory(LdapConfiguration ldapServer,
                                                                 boolean useBackupUrl)
       throws LdapDAOException
   {
@@ -46,16 +45,17 @@ public class LdapConnectionUtils
       throw new LdapDAOException("Ldap connection is not configured.");
     }
 
-    CConnectionInfo connInfo = ldapServer.getConnectionInfo();
+    Connection connInfo = ldapServer.getConnection();
 
     String url;
     try {
       if (useBackupUrl) {
-        url = new LdapURL(connInfo.getBackupMirrorProtocol(), connInfo.getBackupMirrorHost(), connInfo
-            .getBackupMirrorPort(), connInfo.getSearchBase()).toString();
+        url = new LdapURL(connInfo.getBackupHost().getProtocol().name(), connInfo.getBackupHost().getHostName(),
+            connInfo.getBackupHost().getPort(), connInfo.getSearchBase()).toString();
       }
       else {
-        url = new LdapURL(connInfo.getProtocol(), connInfo.getHost(), connInfo.getPort(), connInfo
+        url = new LdapURL(connInfo.getHost().getProtocol().name(), connInfo.getHost().getHostName(),
+            connInfo.getHost().getPort(), connInfo
             .getSearchBase()).toString();
       }
     }
@@ -75,19 +75,19 @@ public class LdapConnectionUtils
     // get the timeout
     Map<String, String> connectionProperties = new HashMap<String, String>();
     connectionProperties.put("com.sun.jndi.ldap.connect.timeout",
-        Integer.toString(ldapServer.getConnectionInfo().getConnectionTimeout() * 1000));
+        Integer.toString(ldapServer.getConnection().getConnectionTimeout() * 1000));
 
     // and the realm
-    if (connInfo.getRealm() != null) {
-      connectionProperties.put("java.naming.security.sasl.realm", connInfo.getRealm());
+    if (connInfo.getSaslRealm() != null) {
+      connectionProperties.put("java.naming.security.sasl.realm", connInfo.getSaslRealm());
     }
     defaultLdapContextFactory.setAdditionalEnvironment(connectionProperties);
 
     return defaultLdapContextFactory;
   }
 
-  public static LdapAuthConfiguration getLdapAuthConfiguration(CLdapServerConfiguration ldapServer) {
-    CUserAndGroupAuthConfiguration userAndGroupsConf = ldapServer.getUserAndGroupConfig();
+  public static LdapAuthConfiguration getLdapAuthConfiguration(LdapConfiguration ldapServer) {
+    Mapping userAndGroupsConf = ldapServer.getMapping();
     LdapAuthConfiguration authConfig = new LdapAuthConfiguration();
 
     authConfig.setEmailAddressAttribute(userAndGroupsConf.getEmailAddressAttribute());
@@ -110,7 +110,7 @@ public class LdapConnectionUtils
     return authConfig;
   }
 
-  public static void testUserAuthentication(CLdapServerConfiguration ldapServer, LdapUserDAO ldapUserDAO,
+  public static void testUserAuthentication(LdapConfiguration ldapServer, LdapUserDAO ldapUserDAO,
                                             LdapGroupDAO ldapGroupDAO) throws LdapDAOException
   {
     LdapContextFactory contextFactory = getLdapContextFactory(ldapServer, false);

@@ -104,9 +104,14 @@ public class LdapConnectionInfoDTO
   private int connectionRetryDelay = 0;
 
   /**
-   * Cache timeout.  Cache timeout in seconds.
+   * Cache timeout.  Cache timeout in seconds. UNUSED: since switch to EhCache, this is unused value.
    */
-  private int cacheTimeout = 0;
+  private int cacheTimeout = CACHE_TIMEOUT_DEFAULT;
+
+  /**
+   * Count of max incidents before blacklisting a connection.
+   */
+  private int maxIncidentsCount = 3;
 
 
   //-----------/
@@ -349,6 +354,13 @@ public class LdapConnectionInfoDTO
     this.systemUsername = systemUsername;
   } //-- void setSystemUsername( String )
 
+  public int getMaxIncidentsCount() {
+    return maxIncidentsCount;
+  }
+
+  public void setMaxIncidentsCount(final int maxIncidentsCount) {
+    this.maxIncidentsCount = maxIncidentsCount;
+  }
 
   public static final int CACHE_TIMEOUT_DEFAULT = 30;
 

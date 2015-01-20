@@ -17,17 +17,18 @@ import com.sonatype.nexus.testsuite.ldap.AbstractLdapIT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
+import org.junit.Before;
+
 import static java.util.Arrays.asList;
 
 public class NXCM1356ITSupport
     extends AbstractLdapIT
 {
 
-  @Override
-  protected void prepareSecurity() throws Exception {
-    super.prepareSecurity();
+  @Before
+  public void activateRealms() throws Exception {
     GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-    settings.setSecurityRealms(asList("LdapAuthenticatingRealm", "NexusAuthenticatingRealm", "NexusAuthorizingRealm"));
+    settings.setSecurityRealms(asList("LdapRealm", "NexusAuthenticatingRealm", "NexusAuthorizingRealm"));
     SettingsMessageUtil.save(settings);
   }
 

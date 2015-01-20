@@ -13,59 +13,102 @@
 package org.sonatype.ldaptestsuite;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Partition
 {
+  private final String name;
 
-  private String name;
+  private final String suffix;
 
-  private String suffix;
+  private final List<String> indexedAttributes;
 
-  private List<String> indexedAttributes;
+  private final List<String> rootEntryClasses;
 
-  private List<String> rootEntryClasses;
+  private final File ldifFile;
 
-  private File ldifFile;
+  public Partition(final String name,
+                   final String suffix,
+                   final List<String> indexedAttributes,
+                   final List<String> rootEntryClasses,
+                   final File ldifFile)
+  {
+    this.name = checkNotNull(name);
+    this.suffix = checkNotNull(suffix);
+    this.indexedAttributes = indexedAttributes;
+    this.rootEntryClasses = rootEntryClasses;
+    this.ldifFile = checkNotNull(ldifFile);
+    checkArgument(this.ldifFile.isFile(), "The LDIF file %s is missing", this.ldifFile);
+  }
 
   public String getName() {
     return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public String getSuffix() {
     return suffix;
   }
 
-  public void setSuffix(String suffix) {
-    this.suffix = suffix;
-  }
-
   public List<String> getIndexedAttributes() {
     return indexedAttributes;
-  }
-
-  public void setIndexedAttributes(List<String> indexedAttributes) {
-    this.indexedAttributes = indexedAttributes;
   }
 
   public List<String> getRootEntryClasses() {
     return rootEntryClasses;
   }
 
-  public void setRootEntryClasses(List<String> rootClasses) {
-    this.rootEntryClasses = rootClasses;
-  }
-
   public File getLdifFile() {
     return ldifFile;
   }
 
-  public void setLdifFile(File ldifFile) {
-    this.ldifFile = ldifFile;
+  public static Builder builder() {
+    return new Builder();
   }
 
+  // ==
+
+  public static class Builder
+  {
+    private String name;
+
+    private String suffix;
+
+    private List<String> indexedAttributes = Lists.newArrayList();
+
+    private List<String> rootEntryClasses = Lists.newArrayList();
+
+    private File ldifFile;
+
+    public Partition build() {
+      return new Partition(name, suffix, indexedAttributes, rootEntryClasses, ldifFile);
+    }
+
+    public Builder withNameAndSuffix(final String name, final String suffix) {
+      this.name = checkNotNull(name);
+      this.suffix = checkNotNull(suffix);
+      return this;
+    }
+
+    public Builder withIndexedAttributes(final String... attributes) {
+      indexedAttributes.addAll(Arrays.asList(attributes));
+      return this;
+    }
+
+    public Builder withRootEntryClasses(final String... classes) {
+      rootEntryClasses.addAll(Arrays.asList(classes));
+      return this;
+    }
+
+    public Builder withLdifFile(final File file) {
+      this.ldifFile = checkNotNull(file);
+      checkArgument(ldifFile.isFile(), "LDIF file %s not found", ldifFile.getAbsoluteFile());
+      return this;
+    }
+  }
 }

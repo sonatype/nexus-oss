@@ -35,7 +35,7 @@ public class NXCM1356ServerListIT
     extends NXCM1356ITSupport
 {
 
-  protected boolean isStartServer() {
+  protected boolean shouldStartLdapServer() {
     return false;
   }
 

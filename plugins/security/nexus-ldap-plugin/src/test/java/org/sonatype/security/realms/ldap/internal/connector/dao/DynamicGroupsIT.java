@@ -12,81 +12,61 @@
  */
 package org.sonatype.security.realms.ldap.internal.connector.dao;
 
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
-import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
-import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.LdapITSupport;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DynamicGroupsIT
-    extends LdapTestSupport
+    extends LdapITSupport
 {
-
   @Test
   public void testUserManagerWithDynamicGroups()
       throws Exception
   {
-
-    Map<String, Object> env = new HashMap<String, Object>();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
-    // configuration.setGroupBaseDn( "ou=groups" );
-    // configuration.setGroupObjectClass( "groupOfUniqueNames" );
-    // configuration.setGroupMemberAttribute( "uniqueMember" );
     configuration.setUserRealNameAttribute("cn");
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(true);
 
-    LdapUserDAO lum = (LdapUserDAO) lookup(LdapUserDAO.class.getName());
+    LdapUserDAO lum = lookup(LdapUserDAO.class);
 
     LdapUser user = lum.getUser("cstamas", initialContext, configuration);
-    assertEquals("cstamas", user.getUsername());
-    // assertEquals( "Tamas Cservenak", user.getRealName() );
-    assertEquals("cstamas123", user.getPassword());
-    assertEquals(2, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("cstamas"));
+    assertThat(user.getPassword(), equalTo("cstamas123"));
+    assertThat(user.getMembership(), hasSize(2));
     assertTrue(user.getMembership().contains("public"));
     assertTrue(user.getMembership().contains("snapshots"));
 
     user = lum.getUser("brianf", initialContext, configuration);
-    assertEquals("brianf", user.getUsername());
-    // assertEquals( "Brian Fox", user.getRealName() );
-    assertEquals("brianf123", user.getPassword());
-    assertEquals(2, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("brianf"));
+    assertThat(user.getPassword(), equalTo("brianf123"));
+    assertThat(user.getMembership(), hasSize(2));
     assertTrue(user.getMembership().contains("public"));
     assertTrue(user.getMembership().contains("releases"));
 
     user = lum.getUser("jvanzyl", initialContext, configuration);
-    assertEquals("jvanzyl", user.getUsername());
-    // assertEquals( "Jason Van Zyl", user.getRealName() );
-    assertEquals("jvanzyl123", user.getPassword());
-    assertEquals(3, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("jvanzyl"));
+    assertThat(user.getPassword(), equalTo("jvanzyl123"));
+    assertThat(user.getMembership(), hasSize(3));
     assertTrue(user.getMembership().contains("public"));
     assertTrue(user.getMembership().contains("releases"));
     assertTrue(user.getMembership().contains("snapshots"));
 
     try {
-      user = lum.getUser("intruder", initialContext, configuration);
+      lum.getUser("intruder", initialContext, configuration);
       fail();
     }
     catch (NoSuchLdapUserException e) {
@@ -94,19 +74,11 @@ public class DynamicGroupsIT
     }
   }
 
+  @Test
   public void testUserManagerWithDynamicGroupsDisabled()
       throws Exception
   {
-
-    Map<String, Object> env = new HashMap<String, Object>();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
@@ -114,28 +86,25 @@ public class DynamicGroupsIT
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(false);
 
-    LdapUserDAO lum = (LdapUserDAO) lookup(LdapUserDAO.class.getName());
+    LdapUserDAO lum = lookup(LdapUserDAO.class);
 
     LdapUser user = lum.getUser("cstamas", initialContext, configuration);
-    assertEquals("cstamas", user.getUsername());
-    // assertEquals( "Tamas Cservenak", user.getRealName() );
-    assertEquals("cstamas123", user.getPassword());
-    assertEquals(0, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("cstamas"));
+    assertThat(user.getPassword(), equalTo("cstamas123"));
+    assertThat(user.getMembership(), hasSize(0));
 
     user = lum.getUser("brianf", initialContext, configuration);
-    assertEquals("brianf", user.getUsername());
-    // assertEquals( "Brian Fox", user.getRealName() );
-    assertEquals("brianf123", user.getPassword());
-    assertEquals(0, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("brianf"));
+    assertThat(user.getPassword(), equalTo("brianf123"));
+    assertThat(user.getMembership(), hasSize(0));
 
     user = lum.getUser("jvanzyl", initialContext, configuration);
-    assertEquals("jvanzyl", user.getUsername());
-    // assertEquals( "Jason Van Zyl", user.getRealName() );
-    assertEquals("jvanzyl123", user.getPassword());
-    assertEquals(0, user.getMembership().size());
+    assertThat(user.getUsername(), equalTo("jvanzyl"));
+    assertThat(user.getPassword(), equalTo("jvanzyl123"));
+    assertThat(user.getMembership(), hasSize(0));
 
     try {
-      user = lum.getUser("intruder", initialContext, configuration);
+      lum.getUser("intruder", initialContext, configuration);
       fail();
     }
     catch (NoSuchLdapUserException e) {
@@ -143,48 +112,33 @@ public class DynamicGroupsIT
     }
   }
 
+  @Test
   public void testGroupManagerWithDynamicGroups()
       throws Exception
   {
-
-    Map<String, Object> env = new HashMap<String, Object>();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    // if want to use explicitly ApacheDS and not the Sun supplied ones
-    // env.put( Context.PROVIDER_URL, "o=sonatype" );
-    // env.put( Context.INITIAL_CONTEXT_FACTORY, "org.apache.directory.server.jndi.ServerContextFactory" );
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
-    // configuration.setGroupBaseDn( "ou=groups" );
-    // configuration.setGroupObjectClass( "groupOfUniqueNames" );
-    // configuration.setGroupMemberAttribute( "uniqueMember" );
     configuration.setUserRealNameAttribute("cn");
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(true);
 
-    LdapGroupDAO lgm = (LdapGroupDAO) lookup(LdapGroupDAO.class.getName());
+    LdapGroupDAO lgm = lookup(LdapGroupDAO.class);
 
     Set<String> groups = lgm.getGroupMembership("cstamas", initialContext, configuration);
 
-    assertEquals(2, groups.size());
+    assertThat(groups, hasSize(2));
     assertTrue(groups.contains("public"));
     assertTrue(groups.contains("snapshots"));
 
     groups = lgm.getGroupMembership("brianf", initialContext, configuration);
-    assertEquals(2, groups.size());
+    assertThat(groups, hasSize(2));
     assertTrue(groups.contains("public"));
     assertTrue(groups.contains("releases"));
 
     groups = lgm.getGroupMembership("jvanzyl", initialContext, configuration);
-    assertEquals(3, groups.size());
+    assertThat(groups, hasSize(3));
     assertTrue(groups.contains("public"));
     assertTrue(groups.contains("releases"));
     assertTrue(groups.contains("snapshots"));
@@ -198,19 +152,11 @@ public class DynamicGroupsIT
     }
   }
 
+  @Test
   public void testGroupManagerWithDynamicGroupsDisabled()
       throws Exception
   {
-
-    Map<String, Object> env = new HashMap<String, Object>();
-    // Create a new context pointing to the overseas partition
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype");
-    env.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-    env.put(Context.SECURITY_CREDENTIALS, "secret");
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-
-    InitialLdapContext initialContext = new InitialLdapContext(new Hashtable<String, Object>(env), null);
+    InitialLdapContext initialContext = new InitialLdapContext(initialLdapEnvironment(), null);
 
     LdapAuthConfiguration configuration = new LdapAuthConfiguration();
     configuration.setUserBaseDn("ou=people");
@@ -218,7 +164,7 @@ public class DynamicGroupsIT
     configuration.setUserMemberOfAttribute("businesscategory");
     configuration.setLdapGroupsAsRoles(false);
 
-    LdapGroupDAO lgm = (LdapGroupDAO) lookup(LdapGroupDAO.class.getName());
+    LdapGroupDAO lgm = lookup(LdapGroupDAO.class);
 
     try {
       lgm.getGroupMembership("cstamas", initialContext, configuration);

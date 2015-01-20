@@ -13,25 +13,32 @@
 package org.sonatype.security.realms.ldap.internal.persist;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.sonatype.security.realms.ldap.internal.AbstractLdapConfigurationTest;
-import com.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
+import org.sonatype.security.realms.ldap.internal.LdapTestSupport;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Connection;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
+import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class LdapConfigurationManagerTest
-    extends AbstractLdapConfigurationTest
+    extends LdapTestSupport
 {
+  @Override
+  protected LinkedHashMap<String, LdapConfiguration> createLdapClientConfigurations() {
+    return Maps.newLinkedHashMap();
+  }
 
   @Test
   public void testGetConfig()
       throws Exception
   {
     LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
-    List<CLdapServerConfiguration> ldapServers = ldapConfigManager.listLdapServerConfigurations();
+    List<LdapConfiguration> ldapServers = ldapConfigManager.listLdapServerConfigurations();
     Assert.assertNotNull(ldapServers);
     Assert.assertEquals(0, ldapServers.size());
   }
@@ -56,18 +63,15 @@ public class LdapConfigurationManagerTest
   {
     LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
 
-    String id = "testAddAndGetServer";
+    LdapConfiguration serverConfig = new LdapConfiguration();
+    serverConfig.setName("testAddAndGetServer-name");
 
-    CLdapServerConfiguration serverConfig = new CLdapServerConfiguration();
-    serverConfig.setId(id);
-    serverConfig.setName(id + "-name");
+    Connection connInfo = this.buildConnectionInfo();
+    serverConfig.setConnection(connInfo);
+    serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
-    CConnectionInfo connInfo = this.buildConnectionInfo();
-    serverConfig.setConnectionInfo(connInfo);
-    serverConfig.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
-
-    ldapConfigManager.addLdapServerConfiguration(serverConfig);
-    CLdapServerConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
+    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
+    LdapConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
     Assert.assertNotNull(result);
 
     // compare the results
@@ -80,39 +84,36 @@ public class LdapConfigurationManagerTest
   {
     LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
 
-    String id = "testUpdateServer";
+    LdapConfiguration serverConfig = new LdapConfiguration();
+    serverConfig.setName("testUpdateServer-name");
 
-    CLdapServerConfiguration serverConfig = new CLdapServerConfiguration();
-    serverConfig.setId(id);
-    serverConfig.setName(id + "-name");
-
-    serverConfig.setConnectionInfo(this.buildConnectionInfo());
-    serverConfig.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    serverConfig.setConnection(this.buildConnectionInfo());
+    serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
     // add the server
-    ldapConfigManager.addLdapServerConfiguration(serverConfig);
+    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
 
     // NOT the same instance!
-    serverConfig = new CLdapServerConfiguration();
+    serverConfig = new LdapConfiguration();
     serverConfig.setId(id);
     serverConfig.setName(id + "-name");
 
-    serverConfig.setConnectionInfo(this.buildConnectionInfo());
-    serverConfig.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    serverConfig.setConnection(this.buildConnectionInfo());
+    serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
     serverConfig.setName(id + "newName");
-    serverConfig.getConnectionInfo().setBackupMirrorHost("newbackupMirrorHost");
-    serverConfig.getUserAndGroupConfig().setUserBaseDn("newuserBaseDn");
+    serverConfig.getConnection().setAuthScheme("newScheme");
+    serverConfig.getMapping().setUserBaseDn("newuserBaseDn");
     // save the updated one
     ldapConfigManager.updateLdapServerConfiguration(serverConfig);
 
     // get the config
-    CLdapServerConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
+    LdapConfiguration result = ldapConfigManager.getLdapServerConfiguration(id);
 
     // manual check a couple things
     Assert.assertEquals(id + "newName", result.getName());
-    Assert.assertEquals("newbackupMirrorHost", result.getConnectionInfo().getBackupMirrorHost());
-    Assert.assertEquals("newuserBaseDn", result.getUserAndGroupConfig().getUserBaseDn());
+    Assert.assertEquals("newScheme", result.getConnection().getAuthScheme());
+    Assert.assertEquals("newuserBaseDn", result.getMapping().getUserBaseDn());
 
     // compare the results
     this.compareConfiguration(serverConfig, result);
@@ -128,17 +129,14 @@ public class LdapConfigurationManagerTest
   {
     LdapConfigurationManager ldapConfigManager = this.lookup(LdapConfigurationManager.class);
 
-    String id = "testDeleteServer";
+    LdapConfiguration serverConfig = new LdapConfiguration();
+    serverConfig.setName("testDeleteServer-name");
 
-    CLdapServerConfiguration serverConfig = new CLdapServerConfiguration();
-    serverConfig.setId(id);
-    serverConfig.setName(id + "-name");
+    Connection connInfo = this.buildConnectionInfo();
+    serverConfig.setConnection(connInfo);
+    serverConfig.setMapping(this.buildUserAndGroupAuthConfiguration());
 
-    CConnectionInfo connInfo = this.buildConnectionInfo();
-    serverConfig.setConnectionInfo(connInfo);
-    serverConfig.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
-
-    ldapConfigManager.addLdapServerConfiguration(serverConfig);
+    final String id = ldapConfigManager.addLdapServerConfiguration(serverConfig);
     ldapConfigManager.deleteLdapServerConfiguration(id);
 
     try {
@@ -171,33 +169,33 @@ public class LdapConfigurationManagerTest
     LdapConfigurationManager ldapConfigurationManager = this.lookup(LdapConfigurationManager.class);
 
     // add 2 ldapServers
-    CLdapServerConfiguration ldapServer1 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer1 = new LdapConfiguration();
     ldapServer1.setName("testSuccess1");
-    ldapServer1.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer1.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer1.setConnection(this.buildConnectionInfo());
+    ldapServer1.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer1);
 
-    CLdapServerConfiguration ldapServer2 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer2 = new LdapConfiguration();
     ldapServer2.setName("testSuccess2");
-    ldapServer2.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer2.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer2.setConnection(this.buildConnectionInfo());
+    ldapServer2.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer2);
 
-    CLdapServerConfiguration ldapServer3 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer3 = new LdapConfiguration();
     ldapServer3.setName("testSuccess3");
-    ldapServer3.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer3.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer3.setConnection(this.buildConnectionInfo());
+    ldapServer3.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer3);
 
-    CLdapServerConfiguration ldapServer4 = new CLdapServerConfiguration();
+    LdapConfiguration ldapServer4 = new LdapConfiguration();
     ldapServer4.setName("testSuccess4");
-    ldapServer4.setConnectionInfo(this.buildConnectionInfo());
-    ldapServer4.setUserAndGroupConfig(this.buildUserAndGroupAuthConfiguration());
+    ldapServer4.setConnection(this.buildConnectionInfo());
+    ldapServer4.setMapping(this.buildUserAndGroupAuthConfiguration());
     ldapConfigurationManager.addLdapServerConfiguration(ldapServer4);
 
     // the order at this point is 1, 2, 3, 4
     // we will change it to 3, 1, 4, 2
-    List<String> newOrder = new ArrayList<String>();
+    List<String> newOrder = new ArrayList<>();
     newOrder.add(ldapServer3.getId());
     newOrder.add(ldapServer1.getId());
     newOrder.add(ldapServer4.getId());
@@ -206,7 +204,7 @@ public class LdapConfigurationManagerTest
     ldapConfigurationManager.setServerOrder(newOrder);
 
     // check for the same order as above
-    List<CLdapServerConfiguration> ldapServers = ldapConfigurationManager.listLdapServerConfigurations();
+    List<LdapConfiguration> ldapServers = ldapConfigurationManager.listLdapServerConfigurations();
     Assert.assertEquals(ldapServers.get(0).getId(), ldapServer3.getId());
     Assert.assertEquals(ldapServers.get(1).getId(), ldapServer1.getId());
     Assert.assertEquals(ldapServers.get(2).getId(), ldapServer4.getId());

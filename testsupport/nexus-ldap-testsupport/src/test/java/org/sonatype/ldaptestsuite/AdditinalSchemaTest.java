@@ -14,21 +14,34 @@ package org.sonatype.ldaptestsuite;
 
 import java.util.Map;
 
-import junit.framework.Assert;
 import org.apache.directory.server.schema.bootstrap.Schema;
+import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
 
 public class AdditinalSchemaTest
     extends AbstractLdapTestEnvironment
 {
-
-
-  public void testSchema() {
-
-    Map<String, Schema> schemas = this.getLdapServer().directoryService.getRegistries().getLoadedSchemas();
-
-    Assert.assertNotNull(schemas.get("nis"));
-    Assert.assertFalse(schemas.get("nis").isDisabled());
-
+  @Override
+  protected LdapServerConfiguration buildConfiguration() {
+    return LdapServerConfiguration.builder()
+        .withWorkingDirectory(util.createTempDir())
+        .withAdditionalSchemas("org.apache.directory.server.schema.bootstrap.NisSchema")
+        .withPartitions(
+            Partition.builder()
+                .withNameAndSuffix("sonatype", "o=sonatype")
+                .withIndexedAttributes("objectClass", "o")
+                .withRootEntryClasses("top", "organization")
+                .withLdifFile(util.resolveFile("src/test/resources/nis.ldif")).build())
+        .build();
   }
 
+  @Test
+  public void additionalSchemas() {
+    Map<String, Schema> schemas = getLdapServer().getDirectoryService().getRegistries().getLoadedSchemas();
+    assertThat(schemas, hasKey("nis"));
+    assertThat(schemas.get("nis").isDisabled(), is(false));
+  }
 }

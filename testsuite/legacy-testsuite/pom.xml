@@ -143,6 +143,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-ldap-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!--
     Additional plugin/helper features
     -->

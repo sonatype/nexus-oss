@@ -13,9 +13,7 @@
 package org.sonatype.security.realms.ldap.internal.restlet;
 
 import org.sonatype.security.realms.ldap.api.dto.LdapServerConfigurationDTO;
-import org.sonatype.security.realms.ldap.internal.restlet.AbstractLdapPlexusResource;
-
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
 import org.apache.shiro.codec.Base64;
 import org.junit.Assert;
@@ -23,29 +21,32 @@ import org.junit.Assert;
 public class LdapRestTestUtils
 {
 
-  public static void compare(LdapServerConfigurationDTO dto, CLdapServerConfiguration ldapServer) {
+  public static void compare(LdapServerConfigurationDTO dto, LdapConfiguration ldapServer) {
     Assert.assertEquals(dto.getId(), ldapServer.getId());
     Assert.assertEquals(dto.getName(), ldapServer.getName());
 
-    Assert.assertEquals(dto.getConnectionInfo().getAuthScheme(), ldapServer.getConnectionInfo().getAuthScheme());
-    Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorHost(),
-        ldapServer.getConnectionInfo().getBackupMirrorHost());
-    Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorPort(),
-        ldapServer.getConnectionInfo().getBackupMirrorPort());
-    Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorProtocol(),
-        ldapServer.getConnectionInfo().getBackupMirrorProtocol());
-    Assert.assertEquals(dto.getConnectionInfo().getCacheTimeout(), ldapServer.getConnectionInfo().getCacheTimeout());
+    Assert.assertEquals(dto.getConnectionInfo().getAuthScheme(), ldapServer.getConnection().getAuthScheme());
+    if (dto.getConnectionInfo().getBackupMirrorHost() != null) {
+      Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorHost(),
+          ldapServer.getConnection().getBackupHost().getHostName());
+      Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorPort(),
+          ldapServer.getConnection().getBackupHost().getPort());
+      Assert.assertEquals(dto.getConnectionInfo().getBackupMirrorProtocol(),
+          ldapServer.getConnection().getBackupHost().getProtocol().name());
+    }
+    Assert.assertEquals(dto.getConnectionInfo().getMaxIncidentsCount(), ldapServer.getConnection().getMaxIncidentsCount());
     Assert.assertEquals(dto.getConnectionInfo().getConnectionRetryDelay(),
-        ldapServer.getConnectionInfo().getConnectionRetryDelay());
+        ldapServer.getConnection().getConnectionRetryDelay());
     Assert.assertEquals(dto.getConnectionInfo().getConnectionTimeout(),
-        ldapServer.getConnectionInfo().getConnectionTimeout());
-    Assert.assertEquals(dto.getConnectionInfo().getHost(), ldapServer.getConnectionInfo().getHost());
-    Assert.assertEquals(dto.getConnectionInfo().getPort(), ldapServer.getConnectionInfo().getPort());
-    Assert.assertEquals(dto.getConnectionInfo().getProtocol(), ldapServer.getConnectionInfo().getProtocol());
-    Assert.assertEquals(dto.getConnectionInfo().getRealm(), ldapServer.getConnectionInfo().getRealm());
-    Assert.assertEquals(dto.getConnectionInfo().getSearchBase(), ldapServer.getConnectionInfo().getSearchBase());
+        ldapServer.getConnection().getConnectionTimeout());
+    Assert.assertEquals(dto.getConnectionInfo().getHost(), ldapServer.getConnection().getHost().getHostName());
+    Assert.assertEquals(dto.getConnectionInfo().getPort(), ldapServer.getConnection().getHost().getPort());
+    Assert.assertEquals(dto.getConnectionInfo().getProtocol(),
+        ldapServer.getConnection().getHost().getProtocol().name());
+    Assert.assertEquals(dto.getConnectionInfo().getRealm(), ldapServer.getConnection().getSaslRealm());
+    Assert.assertEquals(dto.getConnectionInfo().getSearchBase(), ldapServer.getConnection().getSearchBase());
     Assert.assertEquals(
-        ldapServer.getConnectionInfo().getSystemUsername(),
+        ldapServer.getConnection().getSystemUsername(),
         Base64.decodeToString(dto.getConnectionInfo().getSystemUsername())
     );
     Assert.assertEquals(
@@ -54,29 +55,29 @@ public class LdapRestTestUtils
     );
 
     Assert.assertEquals(dto.getUserAndGroupConfig().getEmailAddressAttribute(),
-        ldapServer.getUserAndGroupConfig().getEmailAddressAttribute());
+        ldapServer.getMapping().getEmailAddressAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getGroupBaseDn(),
-        ldapServer.getUserAndGroupConfig().getGroupBaseDn());
+        ldapServer.getMapping().getGroupBaseDn());
     Assert.assertEquals(dto.getUserAndGroupConfig().getGroupIdAttribute(),
-        ldapServer.getUserAndGroupConfig().getGroupIdAttribute());
+        ldapServer.getMapping().getGroupIdAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getGroupMemberAttribute(),
-        ldapServer.getUserAndGroupConfig().getGroupMemberAttribute());
+        ldapServer.getMapping().getGroupMemberAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getGroupMemberFormat(),
-        ldapServer.getUserAndGroupConfig().getGroupMemberFormat());
+        ldapServer.getMapping().getGroupMemberFormat());
     Assert.assertEquals(dto.getUserAndGroupConfig().getGroupObjectClass(),
-        ldapServer.getUserAndGroupConfig().getGroupObjectClass());
+        ldapServer.getMapping().getGroupObjectClass());
     Assert
-        .assertEquals(dto.getUserAndGroupConfig().getUserBaseDn(), ldapServer.getUserAndGroupConfig().getUserBaseDn());
+        .assertEquals(dto.getUserAndGroupConfig().getUserBaseDn(), ldapServer.getMapping().getUserBaseDn());
     Assert.assertEquals(dto.getUserAndGroupConfig().getUserIdAttribute(),
-        ldapServer.getUserAndGroupConfig().getUserIdAttribute());
+        ldapServer.getMapping().getUserIdAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getUserMemberOfAttribute(),
-        ldapServer.getUserAndGroupConfig().getUserMemberOfAttribute());
+        ldapServer.getMapping().getUserMemberOfAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getUserObjectClass(),
-        ldapServer.getUserAndGroupConfig().getUserObjectClass());
+        ldapServer.getMapping().getUserObjectClass());
     Assert.assertEquals(dto.getUserAndGroupConfig().getUserPasswordAttribute(),
-        ldapServer.getUserAndGroupConfig().getUserPasswordAttribute());
+        ldapServer.getMapping().getUserPasswordAttribute());
     Assert.assertEquals(dto.getUserAndGroupConfig().getUserRealNameAttribute(),
-        ldapServer.getUserAndGroupConfig().getUserRealNameAttribute());
+        ldapServer.getMapping().getUserRealNameAttribute());
   }
 
 }

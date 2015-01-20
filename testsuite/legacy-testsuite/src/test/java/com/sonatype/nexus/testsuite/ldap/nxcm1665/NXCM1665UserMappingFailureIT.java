@@ -57,7 +57,7 @@ public class NXCM1665UserMappingFailureIT
     assertThat(errorMessage.getMsg().toLowerCase(Locale.US), Matchers.containsString("connect"));
   }
 
-  protected boolean isStartServer() {
+  protected boolean shouldStartLdapServer() {
     return false;
   }
 }

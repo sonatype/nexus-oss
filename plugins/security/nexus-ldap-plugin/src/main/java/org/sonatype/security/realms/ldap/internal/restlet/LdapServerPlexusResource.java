@@ -23,13 +23,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
+
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
 import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -97,7 +96,7 @@ public class LdapServerPlexusResource
 
   @Override
   protected Object doGet(Context context, Request request, Response response, Variant variant)
-      throws ResourceException, InvalidConfigurationException
+      throws ResourceException
   {
     try {
       String serverId = this.getServerId(request);
@@ -109,7 +108,7 @@ public class LdapServerPlexusResource
   }
 
   private LdapServerRequest getLdapServerRequest(Request request, String serverId)
-      throws InvalidConfigurationException, LdapServerNotFoundException
+      throws LdapServerNotFoundException
   {
 
     LdapServerRequest ldapRequest = new LdapServerRequest();
@@ -135,7 +134,7 @@ public class LdapServerPlexusResource
 
   @Override
   protected Object doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException, InvalidConfigurationException
+      throws ResourceException
   {
     LdapServerRequest ldapServerRequest = (LdapServerRequest) payload;
     if (payload == null) {
@@ -148,9 +147,9 @@ public class LdapServerPlexusResource
 
     String serverId = this.getServerId(request);
 
-    CLdapServerConfiguration ldapServer = this.toLdapModel(ldapServerRequest.getData());
+    LdapConfiguration ldapServer = this.toLdapModel(ldapServerRequest.getData());
     ldapServer.setId(serverId);
-    replaceFakePassword(ldapServer.getConnectionInfo(), ldapServer.getId(), ldapConfigurationManager);
+    replaceFakePassword(ldapServer.getConnection(), ldapServer.getId(), ldapConfigurationManager);
 
     try {
       this.ldapConfigurationManager.updateLdapServerConfiguration(ldapServer);
@@ -182,7 +181,7 @@ public class LdapServerPlexusResource
 
   @Override
   protected void doDelete(Context context, Request request, Response response)
-      throws ResourceException, InvalidConfigurationException
+      throws ResourceException
   {
     String serverId = this.getServerId(request);
     try {

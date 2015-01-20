@@ -14,13 +14,11 @@ package org.sonatype.security.realms.ldap.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.capability.ValidationResult;
 import org.sonatype.nexus.capability.Validator;
 import org.sonatype.nexus.capability.support.validator.DefaultValidationResult;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.LdapServerNotFoundException;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -71,9 +69,6 @@ public class LdapServerExistsValidator
       }
       catch (LdapServerNotFoundException e) {
         return new DefaultValidationResult().add(key, messages.invalidValue(serverId));
-      }
-      catch (InvalidConfigurationException ignore) {
-        //ignore as we do not expect an invalid configuration on get
       }
     }
     return ValidationResult.VALID;

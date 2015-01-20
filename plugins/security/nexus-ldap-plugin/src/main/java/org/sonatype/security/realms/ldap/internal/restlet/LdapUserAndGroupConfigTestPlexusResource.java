@@ -25,21 +25,19 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 import com.sonatype.nexus.ssl.plugin.TrustStore;
-import org.sonatype.security.realms.ldap.internal.realms.LdapConnectionUtils;
+
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.realms.ldap.api.dto.LdapServerRequest;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserDTO;
 import org.sonatype.security.realms.ldap.api.dto.LdapUserListResponse;
-import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
-import org.sonatype.security.realms.ldap.internal.persist.validation.LdapConfigurationValidator;
-import com.sonatype.security.ldap.realms.persist.model.CLdapServerConfiguration;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationResponse;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
-import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapConnectionTester;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapDAOException;
 import org.sonatype.security.realms.ldap.internal.connector.dao.LdapUser;
+import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationManager;
+import org.sonatype.security.realms.ldap.internal.persist.entity.LdapConfiguration;
+import org.sonatype.security.realms.ldap.internal.persist.entity.Validator;
+import org.sonatype.security.realms.ldap.internal.realms.LdapConnectionUtils;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -57,20 +55,16 @@ public class LdapUserAndGroupConfigTestPlexusResource
     extends AbstractLdapPlexusResource
 {
 
-  private final LdapConfigurationValidator configurationValidator;
-
   private final LdapConnectionTester ldapConnectionTester;
 
   private final LdapConfigurationManager ldapConfigurationManager;
 
   @Inject
   public LdapUserAndGroupConfigTestPlexusResource(final TrustStore trustStore,
-                                                  final LdapConfigurationValidator configurationValidator,
                                                   final LdapConnectionTester ldapConnectionTester,
                                                   final LdapConfigurationManager ldapConfigurationManager)
   {
     super(trustStore);
-    this.configurationValidator = checkNotNull(configurationValidator);
     this.ldapConnectionTester = checkNotNull(ldapConnectionTester);
     this.ldapConfigurationManager = checkNotNull(ldapConfigurationManager);
     this.setModifiable(true);
@@ -104,8 +98,7 @@ public class LdapUserAndGroupConfigTestPlexusResource
 
   @Override
   protected Object doPut(Context context, Request request, Response response, Object payload)
-      throws ResourceException,
-             InvalidConfigurationException
+      throws ResourceException
   {
     LdapServerRequest ldapServerRequest = (LdapServerRequest) payload;
     if (payload == null) {
@@ -117,27 +110,21 @@ public class LdapUserAndGroupConfigTestPlexusResource
     }
 
     // get the ldap model object
-    CLdapServerConfiguration ldapServer = toLdapModel(ldapServerRequest.getData());
+    LdapConfiguration ldapServer = toLdapModel(ldapServerRequest.getData());
     if (ldapServer.getId() == null && request.getResourceRef() != null) {
       ldapServer.setId(request.getResourceRef().getQueryAsForm().getFirstValue("ldapServerId"));
     }
-    replaceFakePassword(ldapServer.getConnectionInfo(), ldapServer.getId(), ldapConfigurationManager);
+    replaceFakePassword(ldapServer.getConnection(), ldapServer.getId(), ldapConfigurationManager);
 
     // validate it
-    ValidationResponse validationResponse = this.configurationValidator.validateLdapServerConfiguration(
-        ldapServer,
-        false);
-    // if the info is not valid throw
-    if (!validationResponse.isValid()) {
-      throw new InvalidConfigurationException(validationResponse);
-    }
+    new Validator().validate(ldapServer);
 
     // its valid, now we need to deal with getting the users
     LdapUserListResponse result = new LdapUserListResponse();
     try {
       // get the users
       SortedSet<LdapUser> ldapUsers = ldapConnectionTester.testUserAndGroupMapping(
-          buildDefaultLdapContextFactory(ldapServer.getId(), ldapServer.getConnectionInfo()),
+          buildDefaultLdapContextFactory(ldapServer.getId(), ldapServer.getConnection()),
           LdapConnectionUtils.getLdapAuthConfiguration(ldapServer),
           20
       );
