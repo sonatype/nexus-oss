@@ -58,7 +58,8 @@ public class AuthorizationManagerImpl
   @Inject
   public AuthorizationManagerImpl(final ConfigurationManager configuration,
                                   final PrivilegeInheritanceManager privInheritance,
-                                  final EventBus eventBus)
+                                  final EventBus eventBus,
+                                  final List<PrivilegeDescriptor> privilegeDescriptors)
   {
     this.configuration = configuration;
     this.privInheritance = privInheritance;
