@@ -100,6 +100,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     });
   },
 
+  /**
+   * @override
+   */
   getDescription: function (model) {
     return model.get('name');
   },
@@ -137,7 +140,7 @@ Ext.define('NX.coreui.controller.Privileges', {
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'));
-    me.loadCreateWizard(1, true, null);
+    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-privilege-add-repositorytarget'));
   },
 
   /**

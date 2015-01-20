@@ -121,6 +121,9 @@ Ext.define('NX.coreui.controller.Roles', {
     });
   },
 
+  /**
+   * @override
+   */
   getDescription: function(model) {
     return model.get('name');
   },

@@ -14,6 +14,7 @@ package org.sonatype.nexus.coreui
 
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
+import groovy.transform.PackageScope
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
@@ -104,20 +105,22 @@ extends DirectComponentSupport
     }
     def manager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
     List<PrivilegeXO> created = []
-    ['create', 'read', 'update', 'delete'].each { method ->
-      created << manager.addPrivilege(
-          new Privilege(
-              id: Long.toHexString(System.nanoTime()),
-              name: privilegeXO.name ? "${privilegeXO.name} - (${method})" : null,
-              description: privilegeXO.description,
-              type: TargetPrivilegeDescriptor.TYPE,
-              readOnly: false,
-              properties: [
-                  (ApplicationPrivilegeMethodPropertyDescriptor.ID): method,
-                  (TargetPrivilegeRepositoryTargetPropertyDescriptor.ID): privilegeXO.repositoryTargetId,
-                  (TargetPrivilegeRepositoryPropertyDescriptor.ID): repositoryId,
-                  (TargetPrivilegeGroupPropertyDescriptor.ID): groupId
-              ]
+    ['create', 'read', 'update', 'delete'].each { String method ->
+      created << asPrivilegeXO(
+          manager.addPrivilege(
+              new Privilege(
+                  id: Long.toHexString(System.nanoTime()),
+                  name: privilegeXO.name ? "${privilegeXO.name} - (${method})" : null,
+                  description: privilegeXO.description,
+                  type: TargetPrivilegeDescriptor.TYPE,
+                  readOnly: false,
+                  properties: [
+                      (ApplicationPrivilegeMethodPropertyDescriptor.ID)     : method,
+                      (TargetPrivilegeRepositoryTargetPropertyDescriptor.ID): privilegeXO.repositoryTargetId,
+                      (TargetPrivilegeRepositoryPropertyDescriptor.ID)      : repositoryId,
+                      (TargetPrivilegeGroupPropertyDescriptor.ID)           : groupId
+                  ]
+              )
           )
       )
     }
@@ -140,7 +143,8 @@ extends DirectComponentSupport
     authorizationManager.deletePrivilege(id)
   }
 
-  def PrivilegeXO asPrivilegeXO(Privilege input) {
+  @PackageScope
+  PrivilegeXO asPrivilegeXO(Privilege input) {
     def privilege = new PrivilegeXO(
         id: input.id,
         version: input.version,
@@ -154,7 +158,7 @@ extends DirectComponentSupport
         method: input.getPrivilegeProperty('method'),
         permission: input.getPrivilegeProperty('permission')
     )
-    input.properties.each { key, value ->
+    input.properties.each { String key, String value ->
       if (key == 'repositoryTargetId') {
         privilege.repositoryTargetId = value
         privilege.repositoryTargetName = targetRegistry.getRepositoryTarget(value)?.name
@@ -162,7 +166,7 @@ extends DirectComponentSupport
       else if (key == 'repositoryId' || key == 'repositoryGroupId') {
         if (!privilege.repositoryId) { // check not already mapped
           privilege.repositoryId = value
-          if (value && value != '*' && !value.allWhitespace) {
+          if (value && value != '*' && !value.isAllWhitespace()) {
             try {
               privilege.repositoryName = repositoryRegistry.getRepository(value).name
             }

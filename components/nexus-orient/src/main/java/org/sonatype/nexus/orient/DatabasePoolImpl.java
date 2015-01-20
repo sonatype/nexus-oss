@@ -15,7 +15,7 @@ package org.sonatype.nexus.orient;
 import org.sonatype.sisu.goodies.lifecycle.LifecycleSupport;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycles;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,9 +31,9 @@ public class DatabasePoolImpl
 {
   private final String name;
 
-  private final ODatabaseDocumentPool delegate;
+  private final OPartitionedDatabasePool delegate;
 
-  public DatabasePoolImpl(final ODatabaseDocumentPool pool, final String name) {
+  public DatabasePoolImpl(final OPartitionedDatabasePool pool, final String name) {
     this.delegate = checkNotNull(pool);
     this.name = checkNotNull(name);
   }

@@ -26,7 +26,5 @@ Ext.define('NX.coreui.view.logging.LogFeature', {
 
   iconName: 'feature-admin-support-logging-logviewer',
 
-  detail: { xtype: 'nx-coreui-log-viewer' },
-
-  createWizard: { xtype: 'nx-coreui-log-mark' }
+  detail: { xtype: 'nx-coreui-log-viewer' }
 });

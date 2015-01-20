@@ -91,6 +91,25 @@ public class SiteRepositoryIT
   }
 
   /**
+   * Verify that a build with dotted site path can deploy to a maven site repository.
+   *
+   * @throws Exception unexpected
+   */
+  @Test
+  public void dottedSiteDeployViaMaven()
+      throws Exception
+  {
+    final String repositoryId = repositoryIdForTest();
+
+    repositories().create(SiteRepository.class, repositoryId).save();
+
+    final File builtProjectHome = executeMaven("site-2", repositoryId, "site", "site:deploy");
+    final File indexHtml = downloadFromSite(repositoryId, "site-2/index.html");
+
+    assertThat(indexHtml, matchSha1(new File(builtProjectHome, "target/site/index.html")));
+  }
+
+  /**
    * Verify that accessing a css file via a maven site repository will respond with "text/css" mime type.
    */
   @Test

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.events.Asynchronous;
 import org.sonatype.nexus.events.EventSubscriber;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -40,6 +41,10 @@ public class DeleteRepositoryFoldersEventInspector
     extends ComponentSupport
     implements EventSubscriber, Asynchronous
 {
+  // flag whether removed repositories are moved to global trash or deleted permanently
+  private final boolean deletePermanently = SystemPropertiesHelper
+      .getBoolean(DeleteRepositoryFoldersEventInspector.class.getName() + ".deletePermanently", false);
+
   private final RepositoryFolderRemover repositoryFolderRemover;
 
   @Inject
@@ -53,7 +58,7 @@ public class DeleteRepositoryFoldersEventInspector
   public void inspect(final RepositoryRegistryEventPostRemove evt) {
     final Repository repository = evt.getRepository();
     try {
-      repositoryFolderRemover.deleteRepositoryFolders(repository, false);
+      repositoryFolderRemover.deleteRepositoryFolders(repository, deletePermanently);
     }
     catch (IOException e) {
       log.warn("Unable to delete repository folders ", e);

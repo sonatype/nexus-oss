@@ -20,7 +20,7 @@
 Ext.define('NX.coreui.view.capability.CapabilityStatus', {
   extend: 'Ext.panel.Panel',
   alias: 'widget.nx-coreui-capability-status',
-  ui: 'inset',
+  ui: 'nx-inset',
   requires: [
     'NX.I18n'
   ],

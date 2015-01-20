@@ -62,6 +62,9 @@ Ext.define('NX.coreui.controller.PluginConsole', {
     }
   },
 
+  /**
+   * @override
+   */
   getDescription: function (model) {
     return model.get('name');
   },
