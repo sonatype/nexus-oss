@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link AuthorizingRealm}.
+ *
  * This realm ONLY handles authorization.
  */
 @Singleton
@@ -65,8 +66,9 @@ public class AuthorizingRealmImpl
   private final SecuritySystem securitySystem;
 
   @Inject
-  public AuthorizingRealmImpl(UserManager userManager, SecuritySystem securitySystem,
-                              Map<String, UserManager> userManagerMap)
+  public AuthorizingRealmImpl(final UserManager userManager,
+                              final SecuritySystem securitySystem,
+                              final Map<String, UserManager> userManagerMap)
   {
     this.userManager = userManager;
     this.securitySystem = securitySystem;
@@ -83,9 +85,7 @@ public class AuthorizingRealmImpl
   }
 
   @Override
-  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-      throws AuthenticationException
-  {
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     return null;
   }
 
@@ -130,10 +130,7 @@ public class AuthorizingRealmImpl
           }
         }
         catch (UserNotFoundException e) {
-          if (this.logger.isTraceEnabled()) {
-            this.logger.trace("Failed to find role mappings for user: " + username + " realm: "
-                + realmName);
-          }
+          logger.trace("Failed to find role mappings for user: {} realm: {}", username, realmName);
         }
       }
     }
@@ -156,9 +153,7 @@ public class AuthorizingRealmImpl
           + " not manged by Nexus realm.");
     }
 
-    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);
-
-    return info;
+    return new SimpleAuthorizationInfo(roles);
   }
 
   private void cleanUpRealmList(Set<String> realmNames) {

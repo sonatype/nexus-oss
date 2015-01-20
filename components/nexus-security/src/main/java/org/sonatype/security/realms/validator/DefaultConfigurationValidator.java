@@ -51,8 +51,8 @@ public class DefaultConfigurationValidator
   private final List<PrivilegeDescriptor> privilegeDescriptors;
 
   @Inject
-  public DefaultConfigurationValidator(List<PrivilegeDescriptor> privilegeDescriptors,
-                                       ConfigurationIdGenerator idGenerator)
+  public DefaultConfigurationValidator(final List<PrivilegeDescriptor> privilegeDescriptors,
+                                       final ConfigurationIdGenerator idGenerator)
   {
     this.privilegeDescriptors = privilegeDescriptors;
     this.idGenerator = idGenerator;

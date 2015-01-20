@@ -33,28 +33,28 @@ public class SecurityValidationContext
   private Map<String, String> existingRoleNameMap;
 
   public void addExistingPrivilegeIds() {
-    if (this.existingPrivilegeIds == null) {
-      this.existingPrivilegeIds = new ArrayList<String>();
+    if (existingPrivilegeIds == null) {
+      existingPrivilegeIds = new ArrayList<>();
     }
   }
 
   public void addExistingRoleIds() {
-    if (this.existingRoleIds == null) {
-      this.existingRoleIds = new ArrayList<String>();
+    if (existingRoleIds == null) {
+      existingRoleIds = new ArrayList<>();
     }
 
-    if (this.roleContainmentMap == null) {
-      this.roleContainmentMap = new HashMap<String, List<String>>();
+    if (roleContainmentMap == null) {
+      roleContainmentMap = new HashMap<>();
     }
 
-    if (this.existingRoleNameMap == null) {
-      this.existingRoleNameMap = new HashMap<String, String>();
+    if (existingRoleNameMap == null) {
+      existingRoleNameMap = new HashMap<>();
     }
   }
 
   public void addExistingUserIds() {
-    if (this.existingUserIds == null) {
-      this.existingUserIds = new ArrayList<String>();
+    if (existingUserIds == null) {
+      existingUserIds = new ArrayList<>();
     }
   }
 
@@ -77,5 +77,4 @@ public class SecurityValidationContext
   public Map<String, String> getExistingRoleNameMap() {
     return existingRoleNameMap;
   }
-
 }

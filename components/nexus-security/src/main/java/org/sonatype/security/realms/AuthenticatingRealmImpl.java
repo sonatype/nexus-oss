@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link AuthenticatingRealm}.
+ *
  * This realm ONLY handles authentication.
  */
 @Singleton
@@ -62,8 +63,8 @@ public class AuthenticatingRealmImpl
   private final int MAX_LEGACY_PASSWORD_LENGTH = 40;
 
   @Inject
-  public AuthenticatingRealmImpl(ConfigurationManager configuration,
-                                 PasswordService passwordService)
+  public AuthenticatingRealmImpl(final ConfigurationManager configuration,
+                                 final PasswordService passwordService)
   {
     this.configuration = configuration;
     this.passwordService = passwordService;
@@ -76,9 +77,7 @@ public class AuthenticatingRealmImpl
   }
 
   @Override
-  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-      throws AuthenticationException
-  {
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 
     CUser user;
@@ -106,12 +105,12 @@ public class AuthenticatingRealmImpl
       throw new DisabledAccountException("User '" + upToken.getUsername() + "' is disabled.");
     }
     else {
-      throw new AccountException("User '" + upToken.getUsername() + "' is in illegal status '"
-          + user.getStatus() + "'.");
+      throw new AccountException(
+          "User '" + upToken.getUsername() + "' is in illegal status '" + user.getStatus() + "'.");
     }
   }
 
-  /*
+  /**
    * Re-hash user password, and persist changes.
    *
    * @param user to update
@@ -140,13 +139,11 @@ public class AuthenticatingRealmImpl
     }
   }
 
-  /*
-   * Checks to see if the credentials in token match the credentials stored on
-   * user
+  /**
+   * Checks to see if the credentials in token match the credentials stored on user
    *
-   * @param token the username/password token containing the credentials to
-   * verify
-   * @param the user object containing the stored credentials
+   * @param token the username/password token containing the credentials to verify
+   * @param user object containing the stored credentials
    * @return true if credentials match, false otherwise
    */
   private boolean isValidCredentials(UsernamePasswordToken token, CUser user) {
@@ -163,7 +160,7 @@ public class AuthenticatingRealmImpl
     return credentialsValid;
   }
 
-  /*
+  /**
    * Checks to see if the specified user is a legacy user
    * A legacy user has an unsalted password
    *
@@ -175,11 +172,10 @@ public class AuthenticatingRealmImpl
     return user.getPassword().length() <= this.MAX_LEGACY_PASSWORD_LENGTH;
   }
 
-  /*
+  /**
    * Creates an authentication info object
    * using the credentials of the provided user
    *
-   * @param user
    * @return authentication info object based on user credentials
    */
   private AuthenticationInfo createAuthenticationInfo(CUser user) {

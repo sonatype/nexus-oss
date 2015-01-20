@@ -16,13 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A simple bean that represents a privilge.
- *
- * @author Brian Demers
+ * A simple bean that represents a privilege.
  */
 public class Privilege
 {
-
   /**
    * Field id
    */
@@ -53,10 +50,13 @@ public class Privilege
   private String version;
 
   public Privilege() {
-
   }
 
-  public Privilege(String id, String name, String description, String type, Map<String, String> properties,
+  public Privilege(String id,
+                   String name,
+                   String description,
+                   String type,
+                   Map<String, String> properties,
                    boolean readOnly)
   {
     this.id = id;

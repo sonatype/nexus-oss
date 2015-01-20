@@ -12,19 +12,14 @@
  */
 package org.sonatype.security.realms.privileges.application;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
-@Singleton
-@Typed(PrivilegePropertyDescriptor.class)
-@Named("ApplicationPrivilegePermissionPropertyDescriptor")
 public class ApplicationPrivilegePermissionPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
   public static final String ID = "permission";
+
+  // FIXME: This is not actually the permission, but the prefix or base of the permission
 
   public String getHelpText() {
     return "The Shiro permission string associated with this privilege";
@@ -41,5 +36,4 @@ public class ApplicationPrivilegePermissionPropertyDescriptor
   public String getType() {
     return "string";
   }
-
 }

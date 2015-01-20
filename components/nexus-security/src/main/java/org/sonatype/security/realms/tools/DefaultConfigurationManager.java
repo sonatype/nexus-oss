@@ -78,14 +78,14 @@ public class DefaultConfigurationManager
   private volatile SecurityModelConfiguration mergedConfiguration;
 
   @Inject
-  public DefaultConfigurationManager(SecurityModelConfigurationSource configurationSource,
-                                     List<StaticSecurityResource> staticResources,
-                                     List<DynamicSecurityResource> dynamicResources,
-                                     List<SecurityConfigurationModifier> configurationModifiers,
-                                     SecurityConfigurationCleaner configCleaner,
-                                     SecurityConfigurationValidator validator,
-                                     PasswordService passwordService,
-                                     EventBus eventBus)
+  public DefaultConfigurationManager(final SecurityModelConfigurationSource configurationSource,
+                                     final List<StaticSecurityResource> staticResources,
+                                     final List<DynamicSecurityResource> dynamicResources,
+                                     final List<SecurityConfigurationModifier> configurationModifiers,
+                                     final SecurityConfigurationCleaner configCleaner,
+                                     final SecurityConfigurationValidator validator,
+                                     final PasswordService passwordService,
+                                     final EventBus eventBus)
   {
     this.configurationSource = configurationSource;
     this.dynamicResources = dynamicResources;
@@ -124,9 +124,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void createPrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException
-  {
+  public void createPrivilege(CPrivilege privilege) throws InvalidConfigurationException {
     createPrivilege(privilege, initializeContext());
   }
 
@@ -149,15 +147,11 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void createRole(CRole role)
-      throws InvalidConfigurationException
-  {
+  public void createRole(CRole role) throws InvalidConfigurationException {
     createRole(role, initializeContext());
   }
 
-  private void createRole(CRole role, SecurityValidationContext context)
-      throws InvalidConfigurationException
-  {
+  private void createRole(CRole role, SecurityValidationContext context) throws InvalidConfigurationException {
     if (context == null) {
       context = initializeContext();
     }
@@ -174,16 +168,12 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void createUser(CUser user, Set<String> roles)
-      throws InvalidConfigurationException
-  {
+  public void createUser(CUser user, Set<String> roles) throws InvalidConfigurationException {
     createUser(user, null, roles, initializeContext());
   }
 
   @Override
-  public void createUser(CUser user, String password, Set<String> roles)
-      throws InvalidConfigurationException
-  {
+  public void createUser(CUser user, String password, Set<String> roles) throws InvalidConfigurationException {
     createUser(user, password, roles, initializeContext());
   }
 
@@ -211,9 +201,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void deletePrivilege(String id)
-      throws NoSuchPrivilegeException
-  {
+  public void deletePrivilege(String id) throws NoSuchPrivilegeException {
     boolean found = getDefaultConfiguration().removePrivilege(id);
     if (!found) {
       throw new NoSuchPrivilegeException(id);
@@ -222,9 +210,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void deleteRole(String id)
-      throws NoSuchRoleException
-  {
+  public void deleteRole(String id) throws NoSuchRoleException {
     boolean found = getDefaultConfiguration().removeRole(id);
     if (!found) {
       throw new NoSuchRoleException(id);
@@ -233,9 +219,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void deleteUser(String id)
-      throws UserNotFoundException
-  {
+  public void deleteUser(String id) throws UserNotFoundException {
     boolean found = getDefaultConfiguration().removeUser(id);
 
     if (!found) {
@@ -244,9 +228,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public CPrivilege readPrivilege(String id)
-      throws NoSuchPrivilegeException
-  {
+  public CPrivilege readPrivilege(String id) throws NoSuchPrivilegeException {
     CPrivilege privilege = getMergedConfiguration().getPrivilege(id);
     if (privilege != null) {
       return privilege;
@@ -261,9 +243,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public CRole readRole(String id)
-      throws NoSuchRoleException
-  {
+  public CRole readRole(String id) throws NoSuchRoleException {
     CRole role = getMergedConfiguration().getRole(id);
     if (role != null) {
       return role;
@@ -278,9 +258,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public CUser readUser(String id)
-      throws UserNotFoundException
-  {
+  public CUser readUser(String id) throws UserNotFoundException {
     CUser user = getDefaultConfiguration().getUser(id);
 
     if (user != null) {
@@ -290,9 +268,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void updatePrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException, NoSuchPrivilegeException
-  {
+  public void updatePrivilege(CPrivilege privilege) throws InvalidConfigurationException, NoSuchPrivilegeException {
     updatePrivilege(privilege, initializeContext());
   }
 
@@ -315,9 +291,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void updateRole(CRole role)
-      throws InvalidConfigurationException, NoSuchRoleException
-  {
+  public void updateRole(CRole role) throws InvalidConfigurationException, NoSuchRoleException {
     updateRole(role, initializeContext());
   }
 
@@ -340,9 +314,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void updateUser(CUser user)
-      throws InvalidConfigurationException, UserNotFoundException
-  {
+  public void updateUser(CUser user) throws InvalidConfigurationException, UserNotFoundException {
     Set<String> roles = Collections.emptySet();
     try {
       roles = readUserRoleMapping(user.getId(), UserManagerImpl.SOURCE).getRoles();
@@ -354,9 +326,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void updateUser(CUser user, Set<String> roles)
-      throws InvalidConfigurationException, UserNotFoundException
-  {
+  public void updateUser(CUser user, Set<String> roles) throws InvalidConfigurationException, UserNotFoundException {
     updateUser(user, roles, initializeContext());
   }
 
@@ -379,9 +349,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void createUserRoleMapping(CUserRoleMapping userRoleMapping)
-      throws InvalidConfigurationException
-  {
+  public void createUserRoleMapping(CUserRoleMapping userRoleMapping) throws InvalidConfigurationException {
     createUserRoleMapping(userRoleMapping, initializeContext());
   }
 
@@ -430,9 +398,7 @@ public class DefaultConfigurationManager
     }
   }
 
-  private CUserRoleMapping readCUserRoleMapping(String userId, String source)
-      throws NoSuchRoleMappingException
-  {
+  private CUserRoleMapping readCUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
     CUserRoleMapping mapping = getDefaultConfiguration().getUserRoleMapping(userId, source);
 
     if (mapping != null) {
@@ -444,9 +410,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public CUserRoleMapping readUserRoleMapping(String userId, String source)
-      throws NoSuchRoleMappingException
-  {
+  public CUserRoleMapping readUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
     return readCUserRoleMapping(userId, source);
   }
 
@@ -482,9 +446,7 @@ public class DefaultConfigurationManager
   }
 
   @Override
-  public void deleteUserRoleMapping(String userId, String source)
-      throws NoSuchRoleMappingException
-  {
+  public void deleteUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException {
     boolean found = getDefaultConfiguration().removeUserRoleMapping(userId, source);
 
     if (!found) {
@@ -696,5 +658,4 @@ public class DefaultConfigurationManager
 
     return newRole;
   }
-
 }

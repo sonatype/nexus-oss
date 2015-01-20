@@ -50,9 +50,9 @@ public class AuthorizationManagerImpl
   private final EventBus eventBus;
 
   @Inject
-  public AuthorizationManagerImpl(ConfigurationManager configuration,
-                                  PrivilegeInheritanceManager privInheritance,
-                                  EventBus eventBus)
+  public AuthorizationManagerImpl(final ConfigurationManager configuration,
+                                  final PrivilegeInheritanceManager privInheritance,
+                                  final EventBus eventBus)
   {
     this.configuration = configuration;
     this.privInheritance = privInheritance;
@@ -148,15 +148,11 @@ public class AuthorizationManagerImpl
     return roles;
   }
 
-  public Role getRole(String roleId)
-      throws NoSuchRoleException
-  {
+  public Role getRole(String roleId) throws NoSuchRoleException {
     return this.toRole(this.configuration.readRole(roleId));
   }
 
-  public Role addRole(Role role)
-      throws InvalidConfigurationException
-  {
+  public Role addRole(Role role) throws InvalidConfigurationException {
     // the roleId of the secRole might change, so we need to keep the reference
     final CRole secRole = this.toRole(role);
 
@@ -168,9 +164,7 @@ public class AuthorizationManagerImpl
     return this.toRole(secRole);
   }
 
-  public Role updateRole(Role role)
-      throws NoSuchRoleException, InvalidConfigurationException
-  {
+  public Role updateRole(Role role) throws NoSuchRoleException, InvalidConfigurationException {
     final CRole secRole = this.toRole(role);
 
     configuration.updateRole(secRole);
@@ -181,9 +175,7 @@ public class AuthorizationManagerImpl
     return this.toRole(secRole);
   }
 
-  public void deleteRole(final String roleId)
-      throws NoSuchRoleException
-  {
+  public void deleteRole(final String roleId) throws NoSuchRoleException {
     configuration.deleteRole(roleId);
 
     // notify any listeners that the config changed
@@ -205,15 +197,11 @@ public class AuthorizationManagerImpl
     return privileges;
   }
 
-  public Privilege getPrivilege(String privilegeId)
-      throws NoSuchPrivilegeException
-  {
+  public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
     return this.toPrivilege(this.configuration.readPrivilege(privilegeId));
   }
 
-  public Privilege addPrivilege(Privilege privilege)
-      throws InvalidConfigurationException
-  {
+  public Privilege addPrivilege(Privilege privilege) throws InvalidConfigurationException {
     final CPrivilege secPriv = this.toPrivilege(privilege);
     // create implies read, so we need to add logic for that
     addInheritedPrivileges(secPriv);
@@ -226,9 +214,7 @@ public class AuthorizationManagerImpl
     return this.toPrivilege(secPriv);
   }
 
-  public Privilege updatePrivilege(Privilege privilege)
-      throws NoSuchPrivilegeException, InvalidConfigurationException
-  {
+  public Privilege updatePrivilege(Privilege privilege) throws NoSuchPrivilegeException, InvalidConfigurationException {
     final CPrivilege secPriv = this.toPrivilege(privilege);
 
     configuration.updatePrivilege(secPriv);
@@ -239,9 +225,7 @@ public class AuthorizationManagerImpl
     return this.toPrivilege(secPriv);
   }
 
-  public void deletePrivilege(final String privilegeId)
-      throws NoSuchPrivilegeException
-  {
+  public void deletePrivilege(final String privilegeId) throws NoSuchPrivilegeException {
     configuration.deletePrivilege(privilegeId);
 
     // notify any listeners that the config changed
@@ -276,5 +260,4 @@ public class AuthorizationManagerImpl
   private void fireAuthorizationChangedEvent() {
     this.eventBus.post(new AuthorizationConfigurationChanged());
   }
-
 }

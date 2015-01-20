@@ -16,7 +16,5 @@ import org.sonatype.security.model.SecurityModelConfiguration;
 
 public interface SecurityConfigurationModifier
 {
-
   boolean apply(SecurityModelConfiguration configuration);
-
 }

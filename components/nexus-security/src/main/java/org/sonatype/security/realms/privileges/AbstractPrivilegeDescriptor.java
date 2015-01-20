@@ -27,8 +27,12 @@ import org.codehaus.plexus.util.StringUtils;
 public abstract class AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
-  @Inject
   private ConfigurationIdGenerator idGenerator;
+
+  @Inject
+  public void installDependencies(final ConfigurationIdGenerator idGenerator) {
+    this.idGenerator = idGenerator;
+  }
 
   public ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update) {
     ValidationResponse response = new ValidationResponse();
@@ -38,41 +42,33 @@ public abstract class AbstractPrivilegeDescriptor
     }
 
     SecurityValidationContext context = (SecurityValidationContext) response.getContext();
-
     List<String> existingIds = context.getExistingPrivilegeIds();
 
     if (existingIds == null) {
       context.addExistingPrivilegeIds();
-
       existingIds = context.getExistingPrivilegeIds();
     }
 
-    if (!update
-        && (StringUtils.isEmpty(privilege.getId()) || "0".equals(privilege.getId()) ||
-        (existingIds.contains(privilege.getId())))) {
+    if (!update && (StringUtils.isEmpty(privilege.getId()) || "0".equals(privilege.getId()) || (existingIds.contains(privilege.getId())))) {
       String newId = idGenerator.generateId();
 
-      ValidationMessage message =
-          new ValidationMessage("id", "Fixed wrong privilege ID from '" + privilege.getId() + "' to '" + newId
-              + "'");
+      ValidationMessage message = new ValidationMessage("id",
+          "Fixed wrong privilege ID from '" + privilege.getId() + "' to '" + newId + "'");
       response.addValidationWarning(message);
-
       privilege.setId(newId);
-
       response.setModified(true);
     }
 
     if (StringUtils.isEmpty(privilege.getType())) {
-      ValidationMessage message =
-          new ValidationMessage("type", "Cannot have an empty type", "Privilege cannot have an invalid type");
+      ValidationMessage message = new ValidationMessage("type",
+          "Cannot have an empty type", "Privilege cannot have an invalid type");
 
       response.addValidationError(message);
     }
 
     if (StringUtils.isEmpty(privilege.getName())) {
-      ValidationMessage message =
-          new ValidationMessage("name", "Privilege ID '" + privilege.getId() + "' requires a name.",
-              "Name is required.");
+      ValidationMessage message = new ValidationMessage("name",
+          "Privilege ID '" + privilege.getId() + "' requires a name.", "Name is required.");
       response.addValidationError(message);
     }
 

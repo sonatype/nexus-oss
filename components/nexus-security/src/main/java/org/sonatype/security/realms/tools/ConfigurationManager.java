@@ -32,13 +32,10 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * cannot be used directly in a thread-safe manner
  *
  * Direct calls to read-based ConfigurationManager methods can be called in a thread-safe manner. However, operations
- * that require multiple read-based calls should be encapsulated into an action and executed via the runRead method
- *
- * @author Brian Demers
+ * that require multiple read-based calls should be encapsulated into an action and executed via the runRead method.
  */
 public interface ConfigurationManager
 {
-
   /**
    * Retrieve all users
    */
@@ -57,102 +54,84 @@ public interface ConfigurationManager
   /**
    * Create a new user.
    */
-  void createUser(CUser user, Set<String> roles)
-      throws InvalidConfigurationException;
+  void createUser(CUser user, Set<String> roles) throws InvalidConfigurationException;
 
   /**
    * Create a new user and sets the password.
    */
-  void createUser(CUser user, String password, Set<String> roles)
-      throws InvalidConfigurationException;
+  void createUser(CUser user, String password, Set<String> roles) throws InvalidConfigurationException;
 
   /**
    * Create a new role
    */
-  void createRole(CRole role)
-      throws InvalidConfigurationException;
+  void createRole(CRole role) throws InvalidConfigurationException;
 
   /**
    * Create a new privilege
    */
-  void createPrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException;
+  void createPrivilege(CPrivilege privilege) throws InvalidConfigurationException;
 
   /**
    * Retrieve an existing user
    */
-  CUser readUser(String id)
-      throws UserNotFoundException;
+  CUser readUser(String id) throws UserNotFoundException;
 
   /**
    * Retrieve an existing role
    */
-  CRole readRole(String id)
-      throws NoSuchRoleException;
+  CRole readRole(String id) throws NoSuchRoleException;
 
   /**
    * Retrieve an existing privilege
    */
-  CPrivilege readPrivilege(String id)
-      throws NoSuchPrivilegeException;
+  CPrivilege readPrivilege(String id) throws NoSuchPrivilegeException;
 
   /**
    * Update an existing user. Roles are unchanged
    *
    * @param user to update
    */
-  public void updateUser(CUser user)
-      throws InvalidConfigurationException, UserNotFoundException;
+  void updateUser(CUser user) throws InvalidConfigurationException, UserNotFoundException;
 
   /**
    * Update an existing user and their roles
    */
-  void updateUser(CUser user, Set<String> roles)
-      throws InvalidConfigurationException, UserNotFoundException;
+  void updateUser(CUser user, Set<String> roles) throws InvalidConfigurationException, UserNotFoundException;
 
   /**
    * Update an existing role
    */
-  void updateRole(CRole role)
-      throws InvalidConfigurationException, NoSuchRoleException;
+  void updateRole(CRole role) throws InvalidConfigurationException, NoSuchRoleException;
 
-  void createUserRoleMapping(CUserRoleMapping userRoleMapping)
-      throws InvalidConfigurationException;
+  void createUserRoleMapping(CUserRoleMapping userRoleMapping) throws InvalidConfigurationException;
 
-  void updateUserRoleMapping(CUserRoleMapping userRoleMapping)
-      throws InvalidConfigurationException, NoSuchRoleMappingException;
+  void updateUserRoleMapping(CUserRoleMapping userRoleMapping) throws InvalidConfigurationException, NoSuchRoleMappingException;
 
-  CUserRoleMapping readUserRoleMapping(String userId, String source)
-      throws NoSuchRoleMappingException;
+  CUserRoleMapping readUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException;
 
   List<CUserRoleMapping> listUserRoleMappings();
 
-  void deleteUserRoleMapping(String userId, String source)
-      throws NoSuchRoleMappingException;
+  void deleteUserRoleMapping(String userId, String source) throws NoSuchRoleMappingException;
 
   /**
    * Update an existing privilege
    */
-  void updatePrivilege(CPrivilege privilege)
-      throws InvalidConfigurationException, NoSuchPrivilegeException;
+  void updatePrivilege(CPrivilege privilege) throws InvalidConfigurationException, NoSuchPrivilegeException;
 
   /**
    * Delete an existing user
    */
-  void deleteUser(String id)
-      throws UserNotFoundException;
+  void deleteUser(String id) throws UserNotFoundException;
 
   /**
    * Delete an existing role
    */
-  void deleteRole(String id)
-      throws NoSuchRoleException;
+  void deleteRole(String id) throws NoSuchRoleException;
 
   /**
    * Delete an existing privilege
    */
-  void deletePrivilege(String id)
-      throws NoSuchPrivilegeException;
+  void deletePrivilege(String id) throws NoSuchPrivilegeException;
 
   void cleanRemovedRole(String roleId);
 

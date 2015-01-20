@@ -12,13 +12,8 @@
  */
 package org.sonatype.nexus.security;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
-@Singleton
-@Named("RepositoryPropertyDescriptor")
 public class RepositoryPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {

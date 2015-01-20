@@ -30,9 +30,7 @@ import org.apache.shiro.crypto.hash.Hash;
  * details, such as password comparisons, hashing algorithm, hash iterations, salting policy, etc.
  * 
  * This class is just a wrapper around DefaultPasswordService to apply the default password policy,
- * and provide backward compatibility with legacy SHA1 and MD5 based passwords
- * 
- * @since 3.1
+ * and provide backward compatibility with legacy SHA1 and MD5 based passwords.
  */
 @Singleton
 @Typed(PasswordService.class)
@@ -69,10 +67,8 @@ public class DefaultSecurityPasswordService
   }
 
   @Override
-  public String encryptPassword(Object plaintextPassword)
-      throws IllegalArgumentException
-  {
-    return this.passwordService.encryptPassword(plaintextPassword);
+  public String encryptPassword(Object plaintextPassword) {
+    return passwordService.encryptPassword(plaintextPassword);
   }
 
   @Override
@@ -80,27 +76,17 @@ public class DefaultSecurityPasswordService
     //When hash is just a string, it could be a legacy password. Check both
     //current and legacy password services
 
-    if (this.passwordService.passwordsMatch(submittedPlaintext, encrypted)) {
-      return true;
-    }
-
-    if (this.legacyPasswordService.passwordsMatch(submittedPlaintext, encrypted)) {
-      return true;
-    }
-
-    return false;
+    return passwordService.passwordsMatch(submittedPlaintext, encrypted) ||
+        legacyPasswordService.passwordsMatch(submittedPlaintext, encrypted);
   }
 
   @Override
-  public Hash hashPassword(Object plaintext)
-      throws IllegalArgumentException
-  {
-    return this.passwordService.hashPassword(plaintext);
+  public Hash hashPassword(Object plaintext) {
+    return passwordService.hashPassword(plaintext);
   }
 
   @Override
   public boolean passwordsMatch(Object plaintext, Hash savedPasswordHash) {
-    return this.passwordService.passwordsMatch(plaintext, savedPasswordHash);
+    return passwordService.passwordsMatch(plaintext, savedPasswordHash);
   }
-
 }

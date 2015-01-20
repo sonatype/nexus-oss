@@ -16,13 +16,11 @@ import java.util.List;
 
 /**
  * Allows for an method to inherit from another. For example: 'delete' imply that a user has access to 'read'.
- *
- * @author Brian Demers
  */
 public interface PrivilegeInheritanceManager
 {
   /**
-   * Retrive a list of methods that are inherited by the requested method
+   * Retrieve a list of methods that are inherited by the requested method
    */
   List<String> getInheritedMethods(String method);
 }

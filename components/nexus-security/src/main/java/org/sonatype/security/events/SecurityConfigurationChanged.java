@@ -14,10 +14,8 @@ package org.sonatype.security.events;
 
 /**
  * An event fired when the security configuration has changed.
- *
- * @author Brian Demers
  */
 public class SecurityConfigurationChanged
 {
-
+  // empty
 }

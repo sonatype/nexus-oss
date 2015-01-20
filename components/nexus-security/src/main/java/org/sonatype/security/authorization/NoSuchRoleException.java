@@ -14,8 +14,6 @@ package org.sonatype.security.authorization;
 
 /**
  * Thrown when a Role could not be found.
- *
- * @author Brian Demers
  */
 public class NoSuchRoleException
     extends Exception
@@ -36,5 +34,4 @@ public class NoSuchRoleException
   public NoSuchRoleException(Throwable cause) {
     super(cause);
   }
-
 }

@@ -49,8 +49,8 @@ public class ConfiguredUsersUserManager
   public static final String SOURCE = "allConfigured";
 
   @Inject
-  public ConfiguredUsersUserManager(SecuritySystem securitySystem,
-                                    ConfigurationManager configuration)
+  public ConfiguredUsersUserManager(final SecuritySystem securitySystem,
+                                    final ConfigurationManager configuration)
   {
     this.securitySystem = securitySystem;
     this.configuration = configuration;
@@ -125,13 +125,10 @@ public class ConfiguredUsersUserManager
     return this.securitySystem;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.sonatype.security.usermanagement.AbstractUserManager#matchesCriteria(java.lang.String, java.lang.String,
-   * java.util.Collection, org.sonatype.security.usermanagement.UserSearchCriteria)
-   */
-  protected boolean matchesCriteria(String userId, String userSource, Collection<String> usersRoles,
-                                    UserSearchCriteria criteria)
+  protected boolean matchesCriteria(final String userId,
+                                    final String userSource,
+                                    final Collection<String> usersRoles,
+                                    final UserSearchCriteria criteria)
   {
     // basically the same as the super, but we don't want to check the source
     if (StringUtils.isNotEmpty(criteria.getUserId())
@@ -157,5 +154,4 @@ public class ConfiguredUsersUserManager
   public String getAuthenticationRealmName() {
     return null;
   }
-
 }

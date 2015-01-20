@@ -16,21 +16,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Identifies a role and what source it comes from. Its basically a just a complex key for a role.
+ * Identifies a role and what source it comes from.
  *
- * @author Brian Demers
+ * Its basically a just a complex key for a role.
  */
 public class RoleIdentifier
 {
-
   private String source;
 
   private String roleId;
 
-  /**
-   * @param source
-   * @param roleId
-   */
   public RoleIdentifier(String source, String roleId) {
     this.source = source;
     this.roleId = roleId;
@@ -110,5 +105,4 @@ public class RoleIdentifier
   public String toString() {
     return "source: " + this.source + ", roleId: " + this.roleId;
   }
-
 }

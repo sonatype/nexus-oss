@@ -60,10 +60,10 @@ public class RolePermissionResolverImpl
   private final Map<String, Collection<Permission>> permissionsCache;
 
   @Inject
-  public RolePermissionResolverImpl(ConfigurationManager configuration,
-                                    List<PrivilegeDescriptor> privilegeDescriptors,
-                                    @Named("caching") PermissionFactory permissionFactory,
-                                    EventBus eventBus)
+  public RolePermissionResolverImpl(final ConfigurationManager configuration,
+                                    final List<PrivilegeDescriptor> privilegeDescriptors,
+                                    final @Named("caching") PermissionFactory permissionFactory,
+                                    final EventBus eventBus)
   {
     this.configuration = configuration;
     this.privilegeDescriptors = privilegeDescriptors;

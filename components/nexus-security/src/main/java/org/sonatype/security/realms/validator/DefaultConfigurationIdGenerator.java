@@ -29,5 +29,4 @@ public class DefaultConfigurationIdGenerator
   public String generateId() {
     return Long.toHexString(System.nanoTime() + rand.nextInt(2008));
   }
-
 }

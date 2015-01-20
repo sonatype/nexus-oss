@@ -17,8 +17,6 @@ import org.sonatype.security.model.SecurityModelConfiguration;
 /**
  * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
  * model.
- *
- * @author Brian Demers
  */
 public interface StaticSecurityResource
 {
@@ -26,5 +24,4 @@ public interface StaticSecurityResource
    * Gets the security configuration.
    */
   SecurityModelConfiguration getConfiguration();
-
 }

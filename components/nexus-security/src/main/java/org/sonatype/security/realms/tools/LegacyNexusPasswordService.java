@@ -23,8 +23,6 @@ import org.apache.shiro.crypto.hash.format.HexFormat;
 
 /*
  * PasswordService for handling legacy passwords (SHA-1 and MD5)
- * 
- * @since 3.1
  */
 @Singleton
 @Typed(PasswordService.class)
@@ -57,9 +55,7 @@ public class LegacyNexusPasswordService
   }
 
   @Override
-  public String encryptPassword(Object plaintextPassword)
-      throws IllegalArgumentException
-  {
+  public String encryptPassword(Object plaintextPassword) {
     throw new IllegalArgumentException("Not supported");
   }
 
@@ -67,14 +63,7 @@ public class LegacyNexusPasswordService
   public boolean passwordsMatch(Object submittedPlaintext, String encrypted) {
     //Legacy passwords can be hashed with sha-1 or md5, check both
 
-    if (this.sha1PasswordService.passwordsMatch(submittedPlaintext, encrypted)) {
-      return true;
-    }
-
-    if (this.md5PasswordService.passwordsMatch(submittedPlaintext, encrypted)) {
-      return true;
-    }
-
-    return false;
+    return sha1PasswordService.passwordsMatch(submittedPlaintext, encrypted) ||
+        md5PasswordService.passwordsMatch(submittedPlaintext, encrypted);
   }
 }

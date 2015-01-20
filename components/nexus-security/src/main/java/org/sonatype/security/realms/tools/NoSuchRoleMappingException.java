@@ -14,8 +14,6 @@ package org.sonatype.security.realms.tools;
 
 /**
  * Thrown when a Role Mapping cannot be found.
- *
- * @author Brian Demers
  */
 public class NoSuchRoleMappingException
     extends Exception
@@ -36,5 +34,4 @@ public class NoSuchRoleMappingException
   public NoSuchRoleMappingException(Throwable cause) {
     super(cause);
   }
-
 }

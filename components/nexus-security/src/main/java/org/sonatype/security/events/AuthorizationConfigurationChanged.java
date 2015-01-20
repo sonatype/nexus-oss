@@ -14,10 +14,8 @@ package org.sonatype.security.events;
 
 /**
  * An event fired when the authorization configuration has changed.
- *
- * @author Brian Demers
  */
 public class AuthorizationConfigurationChanged
 {
-
+  // empty
 }

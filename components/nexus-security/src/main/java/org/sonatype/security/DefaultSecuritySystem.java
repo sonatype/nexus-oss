@@ -109,15 +109,15 @@ public class DefaultSecuritySystem
   private volatile boolean started;
 
   @Inject
-  public DefaultSecuritySystem(List<SecurityEmailer> securityEmailers,
-                               EventBus eventBus,
-                               PasswordGenerator passwordGenerator,
-                               Map<String, AuthorizationManager> authorizationManagers,
-                               Map<String, Realm> realmMap,
-                               SecurityConfigurationManager securityConfiguration,
-                               RealmSecurityManager securityManager,
-                               CacheManager cacheManager,
-                               Map<String, UserManager> userManagers)
+  public DefaultSecuritySystem(final List<SecurityEmailer> securityEmailers,
+                               final EventBus eventBus,
+                               final PasswordGenerator passwordGenerator,
+                               final Map<String, AuthorizationManager> authorizationManagers,
+                               final Map<String, Realm> realmMap,
+                               final SecurityConfigurationManager securityConfiguration,
+                               final RealmSecurityManager securityManager,
+                               final CacheManager cacheManager,
+                               final Map<String, UserManager> userManagers)
   {
     this.securityEmailers = securityEmailers;
     this.eventBus = eventBus;
@@ -134,9 +134,7 @@ public class DefaultSecuritySystem
     started = false;
   }
 
-  public Subject login(AuthenticationToken token)
-      throws AuthenticationException
-  {
+  public Subject login(AuthenticationToken token) throws AuthenticationException {
     try {
       Subject subject = this.getSubject();
       subject.login(token);
@@ -147,9 +145,7 @@ public class DefaultSecuritySystem
     }
   }
 
-  public AuthenticationInfo authenticate(AuthenticationToken token)
-      throws AuthenticationException
-  {
+  public AuthenticationInfo authenticate(AuthenticationToken token) throws AuthenticationException {
     try {
       return this.getSecurityManager().authenticate(token);
     }
@@ -189,9 +185,7 @@ public class DefaultSecuritySystem
     return this.getSecurityManager().isPermitted(principal, permissions.toArray(new String[permissions.size()]));
   }
 
-  public void checkPermission(PrincipalCollection principal, String permission)
-      throws AuthorizationException
-  {
+  public void checkPermission(PrincipalCollection principal, String permission) throws AuthorizationException {
     try {
       this.getSecurityManager().checkPermission(principal, permission);
     }
@@ -201,9 +195,7 @@ public class DefaultSecuritySystem
 
   }
 
-  public void checkPermission(PrincipalCollection principal, List<String> permissions)
-      throws AuthorizationException
-  {
+  public void checkPermission(PrincipalCollection principal, List<String> permissions) throws AuthorizationException {
     try {
       this.getSecurityManager().checkPermissions(principal, permissions.toArray(new String[permissions.size()]));
     }
@@ -226,13 +218,13 @@ public class DefaultSecuritySystem
         realms.add(this.realmMap.get(realmId));
       }
       else {
-        this.logger.debug("Failed to look up realm as a component, trying reflection");
+        logger.debug("Failed to look up realm as a component, trying reflection");
         // If that fails, will simply use reflection to load
         try {
           realms.add((Realm) getClass().getClassLoader().loadClass(realmId).newInstance());
         }
         catch (Exception e) {
-          this.logger.error("Unable to lookup security realms", e);
+          logger.error("Unable to lookup security realms", e);
         }
       }
     }
@@ -252,9 +244,7 @@ public class DefaultSecuritySystem
     return roles;
   }
 
-  public Set<Role> listRoles(String sourceId)
-      throws NoSuchAuthorizationManagerException
-  {
+  public Set<Role> listRoles(String sourceId) throws NoSuchAuthorizationManagerException {
     if (ALL_ROLES_KEY.equalsIgnoreCase(sourceId)) {
       return this.listRoles();
     }
@@ -280,15 +270,11 @@ public class DefaultSecuritySystem
   // * user management
   // *********************
 
-  public User addUser(User user)
-      throws NoSuchUserManagerException, InvalidConfigurationException
-  {
+  public User addUser(User user) throws NoSuchUserManagerException, InvalidConfigurationException {
     return this.addUser(user, this.generatePassword());
   }
 
-  public User addUser(User user, String password)
-      throws NoSuchUserManagerException, InvalidConfigurationException
-  {
+  public User addUser(User user, String password) throws NoSuchUserManagerException, InvalidConfigurationException {
     // if the password is null, generate one
     if (password == null) {
       password = this.generatePassword();
@@ -318,7 +304,7 @@ public class DefaultSecuritySystem
                   user.getRoles()));
         }
         catch (UserNotFoundException e) {
-          this.logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
+          logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
               + tmpUserManager.getSource());
         }
       }
@@ -364,7 +350,7 @@ public class DefaultSecuritySystem
                   user.getRoles()));
         }
         catch (UserNotFoundException e) {
-          this.logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
+          logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
               + tmpUserManager.getSource());
         }
       }
@@ -384,14 +370,12 @@ public class DefaultSecuritySystem
       this.deleteUser(userId, user.getSource());
     }
     catch (NoSuchUserManagerException e) {
-      this.logger.error("User manager returned user, but could not be found: " + e.getMessage(), e);
+      logger.error("User manager returned user, but could not be found: " + e.getMessage(), e);
       throw new IllegalStateException("User manager returned user, but could not be found: " + e.getMessage(), e);
     }
   }
 
-  public void deleteUser(String userId, String source)
-      throws UserNotFoundException, NoSuchUserManagerException
-  {
+  public void deleteUser(String userId, String source) throws UserNotFoundException, NoSuchUserManagerException {
     checkNotNull(userId, "User ID may not be null");
 
     Subject subject = getSubject();
@@ -419,7 +403,7 @@ public class DefaultSecuritySystem
   }
 
   public Set<RoleIdentifier> getUsersRoles(String userId, String source)
-      throws UserNotFoundException, NoSuchUserManagerException
+    throws UserNotFoundException, NoSuchUserManagerException
   {
     User user = this.getUser(userId, source);
     return user.getRoles();
@@ -444,7 +428,7 @@ public class DefaultSecuritySystem
                   roleIdentifiers));
         }
         catch (UserNotFoundException e) {
-          this.logger.debug("User '" + userId + "' is not managed by the usermanager: "
+          logger.debug("User '" + userId + "' is not managed by the usermanager: "
               + tmpUserManager.getSource());
         }
       }
@@ -529,7 +513,7 @@ public class DefaultSecuritySystem
         users.addAll(getUserManager(criteria.getSource()).searchUsers(criteria));
       }
       catch (NoSuchUserManagerException e) {
-        this.logger.warn("UserManager: " + criteria.getSource() + " was not found.", e);
+        logger.warn("UserManager: " + criteria.getSource() + " was not found.", e);
       }
     }
 
@@ -581,7 +565,6 @@ public class DefaultSecuritySystem
     orderedLocators.addAll(unOrderdLocators);
 
     return orderedLocators;
-
   }
 
   private void addOtherRolesToUser(User user) {
@@ -600,7 +583,7 @@ public class DefaultSecuritySystem
           }
         }
         catch (UserNotFoundException e) {
-          this.logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
+          logger.debug("User '" + user.getUserId() + "' is not managed by the usermanager: "
               + tmpUserManager.getSource());
         }
       }
@@ -637,7 +620,7 @@ public class DefaultSecuritySystem
       }
     }
     catch (org.apache.shiro.authc.AuthenticationException e) {
-      this.logger.debug("User failed to change password reason: " + e.getMessage(), e);
+      logger.debug("User failed to change password reason: " + e.getMessage(), e);
       throw new InvalidCredentialsException();
     }
 
@@ -656,7 +639,7 @@ public class DefaultSecuritySystem
     }
     catch (NoSuchUserManagerException e) {
       // this should NEVER happen
-      this.logger.warn("User '" + userId + "' with source: '" + user.getSource()
+      logger.warn("User '" + userId + "' with source: '" + user.getSource()
           + "' but could not find the UserManager for that source.");
     }
 
@@ -664,9 +647,7 @@ public class DefaultSecuritySystem
     eventBus.post(new UserPrincipalsExpired(userId, user.getSource()));
   }
 
-  public void forgotPassword(String userId, String email)
-      throws UserNotFoundException, InvalidConfigurationException
-  {
+  public void forgotPassword(String userId, String email) throws UserNotFoundException, InvalidConfigurationException {
     UserSearchCriteria criteria = new UserSearchCriteria();
     criteria.setEmail(email);
     criteria.setUserId(userId);
@@ -690,9 +671,7 @@ public class DefaultSecuritySystem
     resetPassword(userId);
   }
 
-  public void forgotUsername(String email)
-      throws UserNotFoundException
-  {
+  public void forgotUsername(String email) throws UserNotFoundException {
     UserSearchCriteria criteria = new UserSearchCriteria();
     criteria.setEmail(email);
 
@@ -717,9 +696,7 @@ public class DefaultSecuritySystem
 
   }
 
-  public void resetPassword(String userId)
-      throws UserNotFoundException, InvalidConfigurationException
-  {
+  public void resetPassword(String userId) throws UserNotFoundException, InvalidConfigurationException {
     String newClearTextPassword = this.generatePassword();
 
     User user = this.getUser(userId);
@@ -731,7 +708,6 @@ public class DefaultSecuritySystem
 
     // send email
     this.getSecurityEmailer().sendResetPassword(user.getEmailAddress(), newClearTextPassword);
-
   }
 
   private String generatePassword() {
@@ -745,7 +721,7 @@ public class DefaultSecuritySystem
         this.securityEmailer = i.next();
       }
       else {
-        this.logger.error("Failed to find a SecurityEmailer");
+        logger.error("Failed to find a SecurityEmailer");
         this.securityEmailer = new NullSecurityEmailer();
       }
     }
@@ -756,9 +732,7 @@ public class DefaultSecuritySystem
     return new ArrayList<String>(this.securityConfiguration.getRealms());
   }
 
-  public void setRealms(List<String> realms)
-      throws InvalidConfigurationException
-  {
+  public void setRealms(List<String> realms) throws InvalidConfigurationException {
     this.securityConfiguration.setRealms(realms);
     this.securityConfiguration.save();
 
@@ -771,9 +745,7 @@ public class DefaultSecuritySystem
     this.securityConfiguration.save();
   }
 
-  public void setAnonymousUsername(String anonymousUsername)
-      throws InvalidConfigurationException
-  {
+  public void setAnonymousUsername(String anonymousUsername) throws InvalidConfigurationException {
     User user = null;
     try {
       user = getUser(securityConfiguration.getAnonymousUsername());
@@ -793,9 +765,7 @@ public class DefaultSecuritySystem
     return this.securityConfiguration.getAnonymousPassword();
   }
 
-  public void setAnonymousPassword(String anonymousPassword)
-      throws InvalidConfigurationException
-  {
+  public void setAnonymousPassword(String anonymousPassword) throws InvalidConfigurationException {
     User user = null;
     try {
       user = getUser(securityConfiguration.getAnonymousUsername());

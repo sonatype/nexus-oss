@@ -55,9 +55,9 @@ public class UserManagerImpl
   private final PasswordService passwordService;
 
   @Inject
-  public UserManagerImpl(ConfigurationManager configuration,
-                         SecuritySystem securitySystem,
-                         PasswordService passwordService)
+  public UserManagerImpl(final ConfigurationManager configuration,
+                         final SecuritySystem securitySystem,
+                         final PasswordService passwordService)
   {
     this.configuration = configuration;
     this.securitySystem = securitySystem;
@@ -148,8 +148,7 @@ public class UserManagerImpl
   public User getUser(String userId)
       throws UserNotFoundException
   {
-    User user = toUser(configuration.readUser(userId));
-    return user;
+    return toUser(configuration.readUser(userId));
   }
 
   public String getSource() {

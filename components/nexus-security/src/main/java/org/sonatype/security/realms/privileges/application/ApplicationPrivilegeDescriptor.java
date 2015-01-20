@@ -12,11 +12,9 @@
  */
 package org.sonatype.security.realms.privileges.application;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -28,6 +26,7 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
+import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
 
 @Singleton
@@ -39,19 +38,6 @@ public class ApplicationPrivilegeDescriptor
 {
   public static final String TYPE = "method";
 
-  private final PrivilegePropertyDescriptor methodProperty;
-
-  private final PrivilegePropertyDescriptor permissionProperty;
-
-  @Inject
-  public ApplicationPrivilegeDescriptor(
-      @Named("ApplicationPrivilegeMethodPropertyDescriptor") PrivilegePropertyDescriptor methodProperty,
-      @Named("ApplicationPrivilegePermissionPropertyDescriptor") PrivilegePropertyDescriptor permissionProperty)
-  {
-    this.methodProperty = methodProperty;
-    this.permissionProperty = permissionProperty;
-  }
-
   public String getName() {
     return "Application";
   }
@@ -61,12 +47,10 @@ public class ApplicationPrivilegeDescriptor
   }
 
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
-
-    propertyDescriptors.add(methodProperty);
-    propertyDescriptors.add(permissionProperty);
-
-    return propertyDescriptors;
+    return Lists.newArrayList(
+        new ApplicationPrivilegeMethodPropertyDescriptor(),
+        new ApplicationPrivilegePermissionPropertyDescriptor()
+    );
   }
 
   public String buildPermission(CPrivilege privilege) {
