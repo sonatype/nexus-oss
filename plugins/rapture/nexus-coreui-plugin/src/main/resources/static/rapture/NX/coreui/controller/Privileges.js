@@ -38,9 +38,9 @@ Ext.define('NX.coreui.controller.Privileges', {
     'privilege.PrivilegeTrace'
   ],
   refs: [
-    { ref: 'feature', selector: 'nx-coreui-privilege-feature' },
-    { ref: 'list', selector: 'nx-coreui-privilege-list' },
-    { ref: 'info', selector: 'nx-coreui-privilege-feature nx-info-panel' }
+    {ref: 'feature', selector: 'nx-coreui-privilege-feature'},
+    {ref: 'list', selector: 'nx-coreui-privilege-list'},
+    {ref: 'info', selector: 'nx-coreui-privilege-feature nx-info-panel'}
   ],
   icons: {
     'privilege-default': {
@@ -65,7 +65,7 @@ Ext.define('NX.coreui.controller.Privileges', {
     path: '/Security/Privileges',
     text: NX.I18n.get('ADMIN_PRIVILEGES_TITLE'),
     description: NX.I18n.get('ADMIN_PRIVILEGES_SUBTITLE'),
-    view: { xtype: 'nx-coreui-privilege-feature' },
+    view: {xtype: 'nx-coreui-privilege-feature'},
     iconConfig: {
       file: 'medal_gold_1.png',
       variants: ['x16', 'x32']
@@ -92,11 +92,10 @@ Ext.define('NX.coreui.controller.Privileges', {
         },
         'nx-coreui-privilege-add-repositorytarget form': {
           submitted: me.onSettingsSubmitted
+        },
+        'nx-coreui-privilege-add-repositorytarget #repositoryId': {
+          change: me.filterRepositoryTargets
         }
-        // FIXME: What does this do?
-        //'nx-coreui-privilege-add-repositorytarget #repositoryId': {
-        //  change: me.filterRepositoryTargets
-        //}
       }
     });
   },
@@ -120,7 +119,7 @@ Ext.define('NX.coreui.controller.Privileges', {
       info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_DESCRIPTION')] = model.get('description');
       info[NX.I18n.get('ADMIN_PRIVILEGES_SUMMARY_PERMISSION')] = model.get('permission');
 
-      Ext.iterate(model.get('properties'), function(key, value) {
+      Ext.iterate(model.get('properties'), function (key, value) {
         info[NX.I18n.format('ADMIN_PRIVILEGES_SUMMARY_PROPERTY', key)] = value;
       });
 
@@ -133,31 +132,33 @@ Ext.define('NX.coreui.controller.Privileges', {
    */
   showAddWindowRepositoryTarget: function () {
     var me = this,
-      feature = me.getFeature();
+        feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
     feature.setItemName(1, NX.I18n.get('ADMIN_PRIVILEGES_CREATE_TITLE'));
     me.loadCreateWizard(1, true, null);
   },
 
-  // FIXME: What does this do?
-  ///**
-  //* @private
-  //*/
-  //filterRepositoryTargets: function (repositoryIdCombo) {
-  //  var targetCombo = repositoryIdCombo.up('form').down('#repositoryTargetId'),
-  //      repositoryId = repositoryIdCombo.getValue(),
-  //      format;
-  //
-  //  targetCombo.setValue(undefined);
-  //  if (repositoryId) {
-  //    format = repositoryIdCombo.getStore().getById(repositoryId).get('format');
-  //    targetCombo.getStore().filterByFormat(format);
-  //  }
-  //  else {
-  //    targetCombo.getStore().removeFilterByFormat();
-  //  }
-  //},
+  /**
+   * Updates repository-target store used in create-repository-target-privileges wizard to include compatible targets
+   * with selected repository-format.
+   *
+   * @private
+   */
+  filterRepositoryTargets: function (repositoryIdCombo) {
+    var targetCombo = repositoryIdCombo.up('form').down('#repositoryTargetId'),
+        repositoryId = repositoryIdCombo.getValue(),
+        format;
+
+    targetCombo.setValue(undefined);
+    if (repositoryId) {
+      format = repositoryIdCombo.getStore().getById(repositoryId).get('format');
+      targetCombo.getStore().filterByFormat(format);
+    }
+    else {
+      targetCombo.getStore().removeFilterByFormat();
+    }
+  },
 
   /**
    * @protected
@@ -196,7 +197,8 @@ Ext.define('NX.coreui.controller.Privileges', {
           type: 'success'
         });
       });
-    } else {
+    }
+    else {
       me.loadStore(Ext.emptyFn);
     }
   },
