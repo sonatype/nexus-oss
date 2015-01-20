@@ -125,7 +125,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
+  fromRemoteHttpProxySettings(final RemoteHttpProxySettings settings) {
     def enabled = false, hostname = null, port = null, username = null, ntlmHost = null, ntlmDomain = null
     if (settings) {
       enabled = settings.enabled
@@ -149,7 +149,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static toRemoteHttpProxySettings(final Boolean enabled,
+  DefaultRemoteHttpProxySettings toRemoteHttpProxySettings(final Boolean enabled,
                                            final String hostname,
                                            final Integer port,
                                            final Boolean auth,
@@ -177,7 +177,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static String getPassword(Password password, RemoteAuthenticationSettings settings) {
+  String getPassword(Password password, RemoteAuthenticationSettings settings) {
     if (password?.valid) {
       return password.value
     }

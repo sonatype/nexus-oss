@@ -143,7 +143,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static SmtpSettingsXO.ConnectionType getConnectionType(final NexusEmailer emailer) {
+  SmtpSettingsXO.ConnectionType getConnectionType(final NexusEmailer emailer) {
     if (emailer.SMTPSslEnabled) {
       return SmtpSettingsXO.ConnectionType.SSL
     }
@@ -154,7 +154,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static String parseReason(final EmailerException e) {
+  String parseReason(final EmailerException e) {
     // first let's go to the top in exception chain
     Throwable top = e
     while (top.getCause() != null) {

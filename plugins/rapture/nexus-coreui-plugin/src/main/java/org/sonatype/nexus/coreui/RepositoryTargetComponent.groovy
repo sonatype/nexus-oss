@@ -132,7 +132,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static RepositoryTargetXO asRepositoryTarget(Target input) {
+  RepositoryTargetXO asRepositoryTarget(Target input) {
     return new RepositoryTargetXO(
         id: input.id,
         name: input.name,

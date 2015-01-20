@@ -77,7 +77,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static validate(final GeneralSettingsXO generalSettingsXO) {
+  validate(final GeneralSettingsXO generalSettingsXO) {
     def validations = new ValidationResponse()
     if (!StringUtils.isBlank(generalSettingsXO.baseUrl)) {
       try {

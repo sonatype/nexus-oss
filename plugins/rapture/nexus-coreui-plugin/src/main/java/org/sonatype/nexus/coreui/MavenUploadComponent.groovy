@@ -106,7 +106,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static ArtifactStoreRequest createRequest(final FileItem file,
+  ArtifactStoreRequest createRequest(final FileItem file,
                                                     final MavenRepository mavenRepository,
                                                     final UploadContext uploadContext,
                                                     final RequestContext requestContext,
@@ -140,7 +140,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static UploadContext createUploadContext(final Map<String, String> params,
+  UploadContext createUploadContext(final Map<String, String> params,
       final Map<String, FileItem> files)
   {
     UploadContext context = new UploadContext(
@@ -192,7 +192,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static RequestContext createRequestContext(final HttpServletRequest request) {
+  RequestContext createRequestContext(final HttpServletRequest request) {
     RequestContext context = new RequestContext(
         userId: SecurityUtils.subject?.principal as String,
         userAgent: request.getHeader('user-agent'),
@@ -218,7 +218,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static void validateRepositoryPolicy(final MavenRepository mavenRepository, final String version) {
+  void validateRepositoryPolicy(final MavenRepository mavenRepository, final String version) {
     def validations = new ValidationResponse()
     if (Gav.isSnapshot(version)) {
       if (RepositoryPolicy.RELEASE == mavenRepository.repositoryPolicy) {
@@ -240,7 +240,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static isPom(final FileItem file, final Map<String, String> params) {
+  boolean isPom(final FileItem file, final Map<String, String> params) {
     def extension = params["${file.fieldName}.extension"]
     def classifier = params["${file.fieldName}.classifier"]
     return extension == 'pom' && StringUtils.isEmpty(classifier)

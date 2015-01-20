@@ -201,7 +201,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static CapabilityXO asCapability(final CapabilityReference reference) {
+  CapabilityXO asCapability(final CapabilityReference reference) {
     CapabilityDescriptor descriptor = reference.context().descriptor()
     Capability capability = reference.capability()
 

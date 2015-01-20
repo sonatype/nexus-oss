@@ -295,7 +295,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static UserXO asUserXO(final User user) {
+  UserXO asUserXO(final User user) {
     UserXO userXO = new UserXO(
         userId: user.userId,
         version: user.version,
@@ -331,7 +331,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static String validateEmail(final String email) {
+  String validateEmail(final String email) {
     if (email) {
       try {
         new Address(email)

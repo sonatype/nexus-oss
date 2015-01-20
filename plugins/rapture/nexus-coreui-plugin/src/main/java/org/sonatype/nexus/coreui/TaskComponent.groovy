@@ -215,7 +215,7 @@ class TaskComponent
   }
 
   @PackageScope
-  static String getStatusDescription(final CurrentState<?> currentState) {
+  String getStatusDescription(final CurrentState<?> currentState) {
     switch (currentState.state) {
       case State.WAITING:
         return 'Waiting'
@@ -236,7 +236,7 @@ class TaskComponent
   }
 
   @PackageScope
-  static String getSchedule(final Schedule schedule) {
+  String getSchedule(final Schedule schedule) {
     if (schedule instanceof Manual) {
       return 'manual'
     }
@@ -267,12 +267,12 @@ class TaskComponent
   }
 
   @PackageScope
-  static Date getNextRun(final TaskInfo<?> task) {
+  Date getNextRun(final TaskInfo<?> task) {
     return task.currentState.nextRun;
   }
 
   @PackageScope
-  static String getLastRunResult(final TaskInfo<?> task) {
+  String getLastRunResult(final TaskInfo<?> task) {
     String lastRunResult = null
 
     if (task.lastRunState != null) {
@@ -360,7 +360,7 @@ class TaskComponent
   }
 
   @PackageScope
-  static Schedule asSchedule(final TaskXO taskXO) {
+  Schedule asSchedule(final TaskXO taskXO) {
     if (taskXO.schedule == 'advanced') {
       try {
         return new Cron(new Date(), taskXO.cronExpression)
@@ -411,7 +411,7 @@ class TaskComponent
   }
 
   @PackageScope
-  static void validateState(final TaskInfo<?> task) {
+  void validateState(final TaskInfo<?> task) {
     State state = task.currentState.state;
     if (State.RUNNING == state) {
       throw new Exception('Task can\'t be edited while it is being executed or it is in line to be executed');

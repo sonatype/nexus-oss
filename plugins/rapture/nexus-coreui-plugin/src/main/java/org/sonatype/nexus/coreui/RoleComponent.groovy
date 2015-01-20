@@ -172,7 +172,7 @@ extends DirectComponentSupport
   }
 
   @PackageScope
-  static RoleXO asRoleXO(Role input) {
+  RoleXO asRoleXO(Role input) {
     return new RoleXO(
         id: input.roleId,
         version: input.version,
