@@ -17,13 +17,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.web.CookieFilter;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import static com.google.common.net.HttpHeaders.SET_COOKIE;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
@@ -61,28 +61,41 @@ public class CookieFilterTest
   private CookieFilter cookieFilter;
 
   @Before
-  public void setUp() throws Exception {
+  public void setupFilter() throws Exception {
     this.cookieFilter = new CookieFilter();
   }
 
-  @Test
-  public void ifRequestIsSecureSetSecureCookieAttributeWhenMissing() throws Exception {
+  private void setup(HttpServletRequest request, HttpServletResponse response) {
     when(request.isSecure()).thenReturn(true);
-    when(response.getHeaders("Set-Cookie")).thenReturn(asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE,
+    when(response.getHeaders(SET_COOKIE)).thenReturn(asList(COOKIE_1_INSECURE, COOKIE_2_INSECURE, COOKIE_3_SECURE,
         COOKIE_4_SECURE));
+  }
 
-    cookieFilter.doFilter(request, response, filterChain);
+  private void verifyResponse(HttpServletResponse response) {
+    verify(response).setHeader(SET_COOKIE, COOKIE_1_INSECURE + "; Secure");
+    verify(response).addHeader(SET_COOKIE, COOKIE_2_INSECURE + "; Secure");
+    verify(response).addHeader(SET_COOKIE, COOKIE_3_SECURE);
+    verify(response).addHeader(SET_COOKIE, COOKIE_4_SECURE);
+  }
 
-    verify(response).setHeader("Set-Cookie", COOKIE_1_INSECURE + "; Secure");
-    verify(response).addHeader("Set-Cookie", COOKIE_2_INSECURE + "; Secure");
-    verify(response).addHeader("Set-Cookie", COOKIE_3_SECURE);
-    verify(response).addHeader("Set-Cookie", COOKIE_4_SECURE);
+  @Test
+  public void ifRequestIsSecureSetSecureCookieAttributeWhenMissingBeforeProcessingFilterchain() throws Exception {
+    setup(request, response);
+    cookieFilter.preHandle(request, response);
+    verifyResponse(response);
+  }
+
+  @Test
+  public void ifRequestIsSecureSetSecureCookieAttributeWhenMissingAfterProcessingFilterchain() throws Exception {
+    setup(request, response);
+    cookieFilter.postHandle(request, response);
+    verifyResponse(response);
   }
 
   @Test
   public void ifRequestIsNotSecureDoNotChangeCookieAttributes() throws Exception {
     when(request.isSecure()).thenReturn(false);
-    when(response.getHeaders("Set-Cookie"))
+    when(response.getHeaders(SET_COOKIE))
         .thenReturn(asList(COOKIE_1_INSECURE, COOKIE_3_SECURE));
 
     cookieFilter.doFilter(request, response, filterChain);
