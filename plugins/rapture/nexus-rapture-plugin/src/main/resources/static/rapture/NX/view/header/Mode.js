@@ -13,7 +13,7 @@
 /*global Ext*/
 
 /**
- * Base class for mode buttons.
+ * Container for mode buttons. Adds a caret to the bottom of the button.
  *
  * @since 3.0
  */

@@ -89,8 +89,6 @@ Ext.define('NX.view.Main', {
 
     me.down('nx-header-panel>toolbar').add([
       ' ', ' ', // 2x pad
-      //{ xtype: 'nx-header-dashboard-mode', ui: 'nx-header' },
-      //{ xtype: 'nx-header-search-mode', ui: 'nx-header' },
       {
         xtype: 'nx-header-mode',
         items: { xtype: 'nx-header-browse-mode' }
