@@ -24,9 +24,9 @@ Ext.define('NX.view.header.SignOut', {
     'NX.I18n'
   ],
 
+  text: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
   tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT_TOOLTIP'),
-
-  hidden: true,
-  glyph: 'xf08b@FontAwesome' // fa-sign-out
+  glyph: 'xf08b@FontAwesome', // fa-sign-out
+  hidden: true
 
 });

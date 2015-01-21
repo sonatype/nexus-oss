@@ -13,29 +13,35 @@
 /*global Ext*/
 
 /**
- * Base class for mode buttons.
+ * Container for mode buttons. Adds a caret to the bottom of the button.
  *
  * @since 3.0
  */
 Ext.define('NX.view.header.Mode', {
-  extend: 'Ext.button.Button',
+  extend: 'Ext.container.Container',
   alias: 'widget.nx-header-mode',
 
-  toggleGroup: 'mode',
-  cls: 'nx-modebutton',
+  layout: 'absolute',
+  height: 39,
+  width: 39,
 
   /**
-   * @cfg mode Mode name
+   * @private
+   * Add a caret to the mode button
    */
+  initComponent: function() {
+    var me = this;
 
-  /**
-   * @cfg autoHide If button should auto hide when no features are available for selected mode (default true)
-   */
-  autoHide: true,
+    me.callParent(arguments);
 
-  /**
-   * @cfg collapseMenu If menu should be collapsed automatically when mode is selected (default true)
-   */
-  collapseMenu: true
-
+    // Add caret
+    me.add({
+      xtype: 'container',
+      cls: 'nx-caret',
+      width: 0,
+      height: 0,
+      x: 14,
+      y: 34
+    });
+  }
 });

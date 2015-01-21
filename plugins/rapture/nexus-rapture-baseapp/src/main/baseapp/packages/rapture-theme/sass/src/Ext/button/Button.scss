@@ -288,6 +288,20 @@
  * cls: 'modebutton'
  */
 
+.nx-modebutton {
+  padding: 6px 0 0 0;
+  color: $color-white;
+
+  .x-btn-glyph {
+    font-size: 24px;
+  }
+}
+
+.nx-modebutton + .nx-caret {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+
 .nx-modebutton:hover,
 .nx-modebutton:focus {
   background-color: $color-gainsboro;
@@ -311,4 +325,8 @@
   .x-btn-glyph {
     color: $color-white;
   }
+}
+
+.nx-modebutton.x-pressed + .nx-caret {
+  border-bottom: 5px solid white;
 }
