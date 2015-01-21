@@ -196,9 +196,9 @@ public class LdapConfigurationEntityAdapter
     final ODocument backupHostDocument = document.field("backupHost", OType.EMBEDDED);
     if (backupHostDocument != null) {
       final Host backupHost = new Host(
-          Protocol.valueOf(hostDocument.<String>field("protocol", OType.STRING)),
-          hostDocument.<String>field("hostName", OType.STRING),
-          hostDocument.<Integer>field("port", OType.INTEGER)
+          Protocol.valueOf(backupHostDocument.<String>field("protocol", OType.STRING)),
+          backupHostDocument.<String>field("hostName", OType.STRING),
+          backupHostDocument.<Integer>field("port", OType.INTEGER)
       );
       connection.setBackupHost(backupHost);
     }
