@@ -59,6 +59,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 @NexusStartAndStopStrategy(NexusStartAndStopStrategy.Strategy.EACH_TEST)
 public class SimpleSessionCookieIT
@@ -133,7 +134,7 @@ public class SimpleSessionCookieIT
     Header[] headers = response.getHeaders(SET_COOKIE);
     for (Header header : headers) {
       assertThat(String.format("not expecting any %s session cookie headers but got %s", SET_COOKIE, asList(headers)),
-          header.getName(), not(equalTo(DEFAULT_SESSION_COOKIE_NAME)));
+          header.getValue(), not(startsWith(DEFAULT_SESSION_COOKIE_NAME)));
     }
   }
 
