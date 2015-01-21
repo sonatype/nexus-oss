@@ -72,7 +72,7 @@ public class StatusPlexusResource
 
   @Override
   public PathProtectionDescriptor getResourceProtection() {
-    return new PathProtectionDescriptor(getResourceUri(), "authcNxBasic,perms[nexus:status]");
+    return new PathProtectionDescriptor(getResourceUri(), "authcBasic,perms[nexus:status]");
   }
 
   /**

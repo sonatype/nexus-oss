@@ -42,6 +42,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.tools.ant.taskdefs.condition.Os;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 
@@ -116,6 +117,11 @@ public class DefaultNexusBundleConfiguration
    * Optional keystore password.
    */
   private String keystorePassword;
+
+  /**
+   * Webapp context path where Nexus Bundle should be started on
+   */
+  private String contextPath;
 
   @Inject
   public DefaultNexusBundleConfiguration(final FileTaskBuilder fileTaskBuilder,
@@ -393,5 +399,17 @@ public class DefaultNexusBundleConfiguration
   @Override
   public String getKeystorePassword() {
     return keystorePassword;
+  }
+
+  @Override
+  public NexusBundleConfiguration setContextPath(final String contextPath) {
+    checkArgument(contextPath.startsWith("/"), "context path must start with forward slash");
+    this.contextPath = contextPath;
+    return this;
+  }
+
+  @Override
+  public String getContextPath() {
+    return this.contextPath;
   }
 }

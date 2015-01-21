@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.sonatype.nexus.guice.FilterChainModule;
+import org.sonatype.nexus.web.CookieFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.common.collect.Maps;
@@ -59,6 +60,7 @@ public class ExtDirectModule
 
         serve(MOUNT_POINT + "*").with(ExtDirectServlet.class, directServletConfig);
         filter(MOUNT_POINT + "*").through(SecurityFilter.class);
+        filter(MOUNT_POINT + "*").through(CookieFilter.class);
       }
     });
 

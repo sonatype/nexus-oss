@@ -134,4 +134,21 @@ public interface NexusBundleConfiguration
    * Gets the keystore password, if configured.
    */
   String getKeystorePassword();
+
+  /**
+   * @return the webapp context path starting with slash or null if not set
+   * @since 2.11.2
+   */
+  String getContextPath();
+
+  /**
+   * Set the context path where Nexus should run at.
+   *
+   * The path must start with forward slash.
+   *
+   * @param contextPath webapp context path to run at
+   * @since 2.11.2
+   */
+  NexusBundleConfiguration setContextPath(final String contextPath);
+
 }

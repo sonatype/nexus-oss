@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.web.SecurityFilter;
+import org.sonatype.nexus.web.CookieFilter;
 
 import com.google.inject.servlet.ServletModule;
 
@@ -31,6 +32,9 @@ class RestletServletModule
   protected void configureServlets() {
     serve("/service/local/*").with(RestletServlet.class, nexusRestletServletInitParams());
     filter("/service/local/*").through(SecurityFilter.class);
+    filter("/service/local/*").through(RestletHeaderFilter.class);
+    filter("/service/local/authentication/login").through(CookieFilter.class);
+    filter("/service/local/authentication/logout").through(CookieFilter.class);
   }
 
   private Map<String, String> nexusRestletServletInitParams() {

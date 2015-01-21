@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,6 +45,7 @@ import org.sonatype.sisu.goodies.common.Time;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.taskdefs.condition.Os;
+import org.jetbrains.annotations.NotNull;
 
 import static org.sonatype.nexus.bootstrap.monitor.CommandMonitorThread.LOCALHOST;
 import static org.sonatype.nexus.bundle.launcher.support.DefaultNexusBundleConfiguration.DEFAULT_START_TIMEOUT;
@@ -89,6 +91,11 @@ public class DefaultNexusBundle
    * SSL port if HTTPS support is enabled, otherwise -1.
    */
   private int sslPort;
+
+  /**
+   * Secure URL or null
+   */
+  private URL secureUrl;
 
   @Inject
   public DefaultNexusBundle(final Provider<NexusBundleConfiguration> configurationProvider,
@@ -190,6 +197,22 @@ public class DefaultNexusBundle
   }
 
   /**
+   * Gets the configured context path for this bundle.
+   * <p/>
+   * The default context path if not explicitly configured is "/".
+   *
+   * @return webapp context path where this bundle is rooted always starting with a slash
+   */
+  protected @NotNull String getContextPath() {
+    return getConfiguration().getContextPath() == null ? "/" : getConfiguration().getContextPath();
+  }
+
+  @Override
+  public URL getSecureUrl() {
+    return this.secureUrl;
+  }
+
+  /**
    * Additionally <br/>
    * - configures Nexus/Jetty port<br/>
    * - installs command monitor<br/>
@@ -216,6 +239,12 @@ public class DefaultNexusBundle
     }
     else {
       sslPort = getConfiguration().getSslPort();
+    }
+
+    if (getSslPort() > 0) {
+      this.secureUrl = new URL(
+          String.format("https://%s:%s%s/", getConfiguration().getHostName(), getSslPort(),
+              getContextPath().equals("/") ? "" : getContextPath()));
     }
 
     configureNexusProperties(strategy);
@@ -437,7 +466,8 @@ public class DefaultNexusBundle
 
   @Override
   protected String composeApplicationURL() {
-    return String.format("http://%s:%s/", getConfiguration().getHostName(), getPort());
+    return String.format("http://%s:%s%s/", getConfiguration().getHostName(), getPort(),
+        getContextPath().equals("/") ? "" : getContextPath());
   }
 
   @Override
@@ -509,6 +539,9 @@ public class DefaultNexusBundle
 
       nexusProperties.setProperty("application-port", String.valueOf(getPort()));
       nexusProperties.setProperty("application-port-ssl", String.valueOf(getSslPort()));
+      if (getConfiguration().getContextPath() != null) {
+        nexusProperties.setProperty("nexus-context-path", getConfiguration().getContextPath());
+      }
 
       final Map<String, String> systemProperties = getConfiguration().getSystemProperties();
       if (!systemProperties.isEmpty()) {
@@ -523,28 +556,28 @@ public class DefaultNexusBundle
       );
     }
 
-//TODO:KARAF customize Karaf settings for debug+JMX
-//  @Override
-//  public void configureJSW(final JSWConfig jswConfig) {
-//    // configure remote debug if requested
-//    if (getConfiguration().getDebugPort() > 0) {
-//      jswConfig.addJavaStartupParameter("-Xdebug");
-//      jswConfig.addJavaStartupParameter("-Xnoagent");
-//      jswConfig.addJavaStartupParameter(
-//          "-Xrunjdwp:transport=dt_socket,server=y,suspend="
-//              + (getConfiguration().isSuspendOnStart() ? "y" : "n")
-//              + ",address=" + getConfiguration().getDebugPort()
-//      );
-//      jswConfig.addJavaSystemProperty("java.compiler", "NONE");
-//    }
-//
-//    JMXConfiguration jmxConfig = getConfiguration().getJmxConfiguration();
-//    if (jmxConfig.getRemotePort() != null) {
-//      Map<String, String> jmxProps = jmxConfig.getSystemProperties();
-//      jmxProps.put(JMXConfiguration.PROP_COM_SUN_MANAGEMENT_JMXREMOTE_PORT, Integer.toString(getJmxRemotePort()));
-//      jswConfig.addJavaSystemProperties(jmxProps);
-//    }
-//  }
+    //TODO:KARAF customize Karaf settings for debug+JMX
+    //  @Override
+    //  public void configureJSW(final JSWConfig jswConfig) {
+    //    // configure remote debug if requested
+    //    if (getConfiguration().getDebugPort() > 0) {
+    //      jswConfig.addJavaStartupParameter("-Xdebug");
+    //      jswConfig.addJavaStartupParameter("-Xnoagent");
+    //      jswConfig.addJavaStartupParameter(
+    //          "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+    //              + (getConfiguration().isSuspendOnStart() ? "y" : "n")
+    //              + ",address=" + getConfiguration().getDebugPort()
+    //      );
+    //      jswConfig.addJavaSystemProperty("java.compiler", "NONE");
+    //    }
+    //
+    //    JMXConfiguration jmxConfig = getConfiguration().getJmxConfiguration();
+    //    if (jmxConfig.getRemotePort() != null) {
+    //      Map<String, String> jmxProps = jmxConfig.getSystemProperties();
+    //      jmxProps.put(JMXConfiguration.PROP_COM_SUN_MANAGEMENT_JMXREMOTE_PORT, Integer.toString(getJmxRemotePort()));
+    //      jswConfig.addJavaSystemProperties(jmxProps);
+    //    }
+    //  }
   }
 
 }

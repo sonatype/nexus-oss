@@ -27,6 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.sonatype.plexus.rest.PlexusServerServlet;
 import org.sonatype.sisu.goodies.common.Throwables2;
 
+import com.noelios.restlet.http.HttpServerConverter;
+import com.noelios.restlet.http.HttpServerHelper;
+import org.restlet.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -133,5 +136,20 @@ class RestletServlet
     public Enumeration getInitParameterNames() {
       return RestletServlet.super.getServletConfig().getInitParameterNames();
     }
+  }
+
+  /**
+   * Get a {@link Server} with a custom {@link HttpServerConverter}.
+   *
+   * @see NexusHttpServerConverter
+   * @param request the request to get the server for
+   * @return the {@link Server} from {@link super#getServer(HttpServletRequest)} with a custom
+   * {@link HttpServerConverter}.
+   */
+  @Override
+  public HttpServerHelper getServer(final HttpServletRequest request) {
+    final HttpServerHelper server = super.getServer(request);
+    server.setConverter(new NexusHttpServerConverter(server.getContext()));
+    return server;
   }
 }
