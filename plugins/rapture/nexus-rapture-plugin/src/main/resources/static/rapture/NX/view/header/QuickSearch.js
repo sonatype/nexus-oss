@@ -28,5 +28,5 @@ Ext.define('NX.view.header.QuickSearch', {
   cls: 'nx-quicksearch',
   width: 200,
   emptyText: NX.I18n.get('GLOBAL_HEADER_SEARCH_PLACEHOLDER'),
-  inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
+  inputAttrTpl: "data-qtip='" + NX.I18n.get('GLOBAL_HEADER_SEARCH_TOOLTIP') + "'" // field tooltip
 });
