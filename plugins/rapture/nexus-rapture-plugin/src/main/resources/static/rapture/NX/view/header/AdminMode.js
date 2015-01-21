@@ -18,17 +18,29 @@
  * @since 3.0
  */
 Ext.define('NX.view.header.AdminMode', {
-  extend: 'NX.view.header.Mode',
+  extend: 'Ext.button.Button',
   alias: 'widget.nx-header-admin-mode',
   requires: [
     'NX.I18n'
   ],
+  ui: 'nx-header',
+  cls: 'nx-modebutton',
+  anchor: '100% 100%',
 
+  /**
+   * @cfg mode Mode name
+   */
   mode: 'admin',
+  toggleGroup: 'mode',
+
+  /**
+   * @cfg autoHide If button should auto hide when no features are available for selected mode (default true)
+   */
+  autoHide: true,
+
   title: 'Administration',
   tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),
   glyph: 'xf013@FontAwesome', /* fa-gear */
 
   collapseMenu: false
-
 });

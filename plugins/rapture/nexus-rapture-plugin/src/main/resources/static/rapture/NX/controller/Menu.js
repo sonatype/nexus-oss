@@ -393,10 +393,10 @@ Ext.define('NX.controller.Menu', {
       button.toggle(false, true);
       if (button.autoHide) {
         if (visibleModes.indexOf(button.mode) > -1) {
-          button.show();
+          button.up('nx-header-mode').show();
         }
         else {
-          button.hide();
+          button.up('nx-header-mode').hide();
         }
       }
     });

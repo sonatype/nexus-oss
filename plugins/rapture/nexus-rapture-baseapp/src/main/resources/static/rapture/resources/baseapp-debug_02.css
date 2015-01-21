@@ -4368,38 +4368,54 @@
 /**
  * cls: 'modebutton'
  */
-/* line 335, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 334, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.nx-modebutton {
+  padding: 6px 0 0 0;
+  color: white;
+}
+/* line 338, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.nx-modebutton .x-btn-glyph {
+  font-size: 24px;
+}
+
+/* line 343, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+.nx-modebutton + .nx-caret {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+
+/* line 349, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover,
 .nx-modebutton:focus {
   background-color: #dddddd;
 }
-/* line 338, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 352, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover .x-btn-inner,
 .nx-modebutton:focus .x-btn-inner {
   color: #006bbf;
 }
-/* line 342, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 356, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton:hover .x-btn-glyph,
 .nx-modebutton:focus .x-btn-glyph {
   color: #006bbf;
 }
 
-/* line 347, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 361, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed {
   background-color: #006bbf;
 }
-/* line 350, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 364, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed .x-btn-inner {
   color: white;
 }
-/* line 354, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 368, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed .x-btn-glyph {
   color: white;
 }
 
-/* line 359, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
+/* line 373, ../../../baseapp/packages/rapture-theme/sass/src/Ext/button/Button.scss */
 .nx-modebutton.x-pressed + .nx-caret {
-  border-bottom: 5px solid white !important;
+  border-bottom: 5px solid white;
 }
 
 /**

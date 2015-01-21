@@ -89,95 +89,28 @@ Ext.define('NX.view.Main', {
 
     me.down('nx-header-panel>toolbar').add([
       ' ', ' ', // 2x pad
-      { xtype: 'nx-header-dashboard-mode', ui: 'nx-header' },
-      { xtype: 'nx-header-search-mode', ui: 'nx-header' },
+      //{ xtype: 'nx-header-dashboard-mode', ui: 'nx-header' },
+      //{ xtype: 'nx-header-search-mode', ui: 'nx-header' },
       {
-        xtype: 'container',
-        layout: 'absolute',
-        height: 39,
-        width: 39,
-        items: [
-          {
-            xtype: 'nx-header-browse-mode',
-            ui: 'nx-header',
-            anchor: '100% 100%'
-          },
-          {
-            xtype: 'container',
-            width: 0,
-            height: 0,
-            cls: 'nx-caret',
-            x: 14,
-            y: 34,
-            style: {
-              borderLeft: '5px solid transparent',
-              borderRight: '5px solid transparent',
-              borderBottom: '5px solid transparent'
-            }
-          }
-        ]
+        xtype: 'nx-header-mode',
+        items: { xtype: 'nx-header-browse-mode' }
       },
       {
-        xtype: 'container',
-        layout: 'absolute',
-        height: 39,
-        width: 39,
-        items: [
-          {
-            xtype: 'nx-header-admin-mode',
-            ui: 'nx-header',
-            anchor: '100% 100%'
-          },
-          {
-            xtype: 'container',
-            width: 0,
-            height: 0,
-            cls: 'nx-caret',
-            x: 14,
-            y: 34,
-            style: {
-              borderLeft: '5px solid transparent',
-              borderRight: '5px solid transparent',
-              borderBottom: '5px solid transparent'
-            }
-          }
-        ]
+        xtype: 'nx-header-mode',
+        items: { xtype: 'nx-header-admin-mode' }
       },
       {
-        xtype: 'container',
-        layout: 'absolute',
-        height: 39,
-        width: 39,
-        items: [
-          {
-            xtype: 'nx-header-user-mode',
-            ui: 'nx-header',
-            hidden: true,
-            anchor: '100% 100%'
-          },
-          {
-            xtype: 'container',
-            width: 0,
-            height: 0,
-            cls: 'nx-caret',
-            x: 14,
-            y: 34,
-            style: {
-              borderLeft: '5px solid transparent',
-              borderRight: '5px solid transparent',
-              borderBottom: '5px solid transparent'
-            }
-          }
-        ]
+        xtype: 'nx-header-mode',
+        items: { xtype: 'nx-header-user-mode' }
       },
       ' ',
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       //{ xtype: 'nx-header-messages', ui: 'nx-header' },
       { xtype: 'nx-header-refresh', ui: 'nx-header' },
+      { xtype: 'nx-header-help', ui: 'nx-header' },
       { xtype: 'nx-header-signin', ui: 'nx-header' },
-      { xtype: 'nx-header-signout', ui: 'nx-header' },
-      { xtype: 'nx-header-help', ui: 'nx-header' }
+      { xtype: 'nx-header-signout', ui: 'nx-header' }
     ]);
   }
 
