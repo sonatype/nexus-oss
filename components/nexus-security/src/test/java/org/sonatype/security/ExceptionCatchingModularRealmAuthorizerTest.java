@@ -15,6 +15,7 @@ package org.sonatype.security;
 import java.util.Collections;
 
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -29,13 +30,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ExceptionCatchingModularRealmAuthorizerTest
+  extends TestSupport
 {
   private static final AuthorizingRealm BROKEN_REALM = new AuthorizingRealm()
   {
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-        throws AuthenticationException
-    {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
       throw new RuntimeException("This realm only throws exceptions");
     }
 
@@ -46,17 +46,15 @@ public class ExceptionCatchingModularRealmAuthorizerTest
   };
 
   @Test
-  public void ignoreRuntimeException()
-      throws Exception
-  {
+  public void ignoreRuntimeException() throws Exception {
     ExceptionCatchingModularRealmAuthorizer subject =
         new ExceptionCatchingModularRealmAuthorizer(Collections.<Realm>singleton(BROKEN_REALM));
 
     Permission permission = new AllPermission();
 
-    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, ""));
-    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, permission));
-    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, new String[]{""})[0]);
-    Assert.assertFalse(subject.isPermitted((PrincipalCollection) null, Collections.singletonList(permission))[0]);
+    Assert.assertFalse(subject.isPermitted(null, ""));
+    Assert.assertFalse(subject.isPermitted(null, permission));
+    Assert.assertFalse(subject.isPermitted(null, new String[]{""})[0]);
+    Assert.assertFalse(subject.isPermitted(null, Collections.singletonList(permission))[0]);
   }
 }

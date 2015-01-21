@@ -30,14 +30,14 @@ class PrivilegeXO
   String version
 
   String name
+
   String description
+
   String type
-  String typeName
+
   Boolean readOnly
-  String method
+
+  Map<String,String> properties
+
   String permission
-  String repositoryId
-  String repositoryName
-  String repositoryTargetId
-  String repositoryTargetName
 }

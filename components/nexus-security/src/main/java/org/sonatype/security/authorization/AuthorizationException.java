@@ -20,7 +20,6 @@ package org.sonatype.security.authorization;
 public class AuthorizationException
     extends Exception
 {
-
   private static final long serialVersionUID = -2410686526069723485L;
 
   public AuthorizationException() {
@@ -37,5 +36,4 @@ public class AuthorizationException
   public AuthorizationException(String message, Throwable cause) {
     super(message, cause);
   }
-
 }

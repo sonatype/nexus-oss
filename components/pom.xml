@@ -54,7 +54,6 @@
     <module>nexus-repository-metadata-api</module>
     <module>nexus-repository-metadata-model</module>
     <module>nexus-security</module>
-    <module>nexus-security-realms</module>
     <module>nexus-supportzip-api</module>
     <module>nexus-webresources-api</module>
     <module>pax-logging-metrics</module>

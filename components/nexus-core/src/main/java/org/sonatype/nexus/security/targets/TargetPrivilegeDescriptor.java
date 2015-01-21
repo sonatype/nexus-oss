@@ -10,12 +10,11 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.security.targets;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -28,9 +27,8 @@ import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
+import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Named("TargetPrivilegeDescriptor")
@@ -40,27 +38,6 @@ public class TargetPrivilegeDescriptor
 {
   public static final String TYPE = "target";
 
-  private final PrivilegePropertyDescriptor methodProperty;
-
-  private final PrivilegePropertyDescriptor targetProperty;
-
-  private final PrivilegePropertyDescriptor repositoryProperty;
-
-  private final PrivilegePropertyDescriptor groupProperty;
-
-  @Inject
-  public TargetPrivilegeDescriptor(
-      final @Named("ApplicationPrivilegeMethodPropertyDescriptor") PrivilegePropertyDescriptor methodProperty,
-      final @Named("TargetPrivilegeRepositoryTargetPropertyDescriptor") PrivilegePropertyDescriptor targetProperty,
-      final @Named("TargetPrivilegeRepositoryPropertyDescriptor") PrivilegePropertyDescriptor repositoryProperty,
-      final @Named("TargetPrivilegeGroupPropertyDescriptor") PrivilegePropertyDescriptor groupProperty)
-  {
-    this.methodProperty = checkNotNull(methodProperty);
-    this.targetProperty = checkNotNull(targetProperty);
-    this.repositoryProperty = checkNotNull(repositoryProperty);
-    this.groupProperty = checkNotNull(groupProperty);
-  }
-
   @Override
   public String getName() {
     return "Repository Target";
@@ -68,14 +45,11 @@ public class TargetPrivilegeDescriptor
 
   @Override
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
-
-    propertyDescriptors.add(methodProperty);
-    propertyDescriptors.add(targetProperty);
-    propertyDescriptors.add(repositoryProperty);
-    propertyDescriptors.add(groupProperty);
-
-    return propertyDescriptors;
+    return Lists.newArrayList(
+        new ApplicationPrivilegeMethodPropertyDescriptor(),
+        new TargetPrivilegeRepositoryTargetPropertyDescriptor(),
+        new TargetPrivilegeRepositoryPropertyDescriptor(),
+        new TargetPrivilegeGroupPropertyDescriptor());
   }
 
   @Override
@@ -197,7 +171,6 @@ public class TargetPrivilegeDescriptor
             "Invalid method selected.");
         response.addValidationError(message);
       }
-
     }
 
     return response;

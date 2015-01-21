@@ -126,10 +126,9 @@ extends DirectComponentSupport
   @RequiresPermissions('security:ldapconfig:create')
   @Validate(groups = [Create, Default])
   LdapServerXO create(final @NotNull(message = '[ldapServerXO] may not be null') @Valid LdapServerXO ldapServerXO) {
-    ldapServerXO.id = Long.toHexString(System.nanoTime())
-    ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
-    trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, ldapServerXO.id, ldapServerXO.useTrustStore)
-    return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(ldapServerXO.id))
+    def id = ldapConfigurationManager.addLdapServerConfiguration(asCLdapServerConfiguration(validate(ldapServerXO), null))
+    trustStoreKeys?.setEnabled(LdapTrustStoreKey.TYPE, id, ldapServerXO.useTrustStore)
+    return asLdapServerXO(ldapConfigurationManager.getLdapServerConfiguration(id))
   }
 
   @DirectMethod

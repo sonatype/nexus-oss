@@ -19,7 +19,6 @@ package org.sonatype.security.events;
  */
 public class AuthenticationEvent
 {
-
   private final String userId;
 
   private final boolean successful;
@@ -44,5 +43,4 @@ public class AuthenticationEvent
         ", successful=" + successful +
         '}';
   }
-
 }

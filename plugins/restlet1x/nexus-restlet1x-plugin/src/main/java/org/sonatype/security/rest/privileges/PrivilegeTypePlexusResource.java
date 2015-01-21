@@ -90,18 +90,17 @@ public class PrivilegeTypePlexusResource
   {
     PrivilegeTypeResourceResponse result = new PrivilegeTypeResourceResponse();
 
-    for (PrivilegeDescriptor privDescriptor : privilegeDescriptors) {
+    for (PrivilegeDescriptor descriptor : privilegeDescriptors) {
       PrivilegeTypeResource type = new PrivilegeTypeResource();
-      type.setId(privDescriptor.getType());
-      type.setName(privDescriptor.getName());
+      type.setId(descriptor.getType());
+      type.setName(descriptor.getName());
 
-      for (PrivilegePropertyDescriptor propDescriptor : privDescriptor.getPropertyDescriptors()) {
+      for (PrivilegePropertyDescriptor property : descriptor.getPropertyDescriptors()) {
         PrivilegeTypePropertyResource typeProp = new PrivilegeTypePropertyResource();
-        typeProp.setId(propDescriptor.getId());
-        typeProp.setName(propDescriptor.getName());
-        typeProp.setHelpText(propDescriptor.getHelpText());
-        typeProp.setType(propDescriptor.getType());
-
+        typeProp.setId(property.getId());
+        typeProp.setName(property.getName());
+        typeProp.setHelpText(property.getHelpText());
+        typeProp.setType(property.getType());
         type.addProperty(typeProp);
       }
 

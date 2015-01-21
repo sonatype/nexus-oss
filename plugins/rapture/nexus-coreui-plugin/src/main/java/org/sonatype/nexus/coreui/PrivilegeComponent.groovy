@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import com.google.common.collect.Maps
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import groovy.transform.PackageScope
@@ -20,7 +21,6 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.hibernate.validator.constraints.NotEmpty
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
-import org.sonatype.nexus.proxy.NoSuchRepositoryException
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry
 import org.sonatype.nexus.proxy.repository.GroupRepository
 import org.sonatype.nexus.proxy.repository.Repository
@@ -143,44 +143,20 @@ extends DirectComponentSupport
     authorizationManager.deletePrivilege(id)
   }
 
+  /**
+   * Convert privilege to XO.
+   */
   @PackageScope
   PrivilegeXO asPrivilegeXO(Privilege input) {
-    def privilege = new PrivilegeXO(
+    return new PrivilegeXO(
         id: input.id,
         version: input.version,
         name: input.name,
         description: input.description,
         type: input.type,
-        typeName: privilegeDescriptors.findResult { PrivilegeDescriptor descriptor ->
-          return descriptor.type == input.type ? descriptor : null
-        }?.name,
         readOnly: input.readOnly,
-        method: input.getPrivilegeProperty('method'),
-        permission: input.getPrivilegeProperty('permission')
+        properties: Maps.newHashMap(input.properties),
+        permission: input.permission
     )
-    input.properties.each { String key, String value ->
-      if (key == 'repositoryTargetId') {
-        privilege.repositoryTargetId = value
-        privilege.repositoryTargetName = targetRegistry.getRepositoryTarget(value)?.name
-      }
-      else if (key == 'repositoryId' || key == 'repositoryGroupId') {
-        if (!privilege.repositoryId) { // check not already mapped
-          privilege.repositoryId = value
-          if (value && value != '*' && !value.isAllWhitespace()) {
-            try {
-              privilege.repositoryName = repositoryRegistry.getRepository(value).name
-            }
-            catch (NoSuchRepositoryException e) {
-              privilege.repositoryName = value
-            }
-          }
-          else {
-            privilege.repositoryName = 'All repositories'
-          }
-        }
-      }
-    }
-    return privilege
   }
-
 }

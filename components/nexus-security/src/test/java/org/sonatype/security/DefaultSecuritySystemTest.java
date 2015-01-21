@@ -18,24 +18,46 @@ import java.util.Set;
 
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
+import org.sonatype.security.authorization.AuthorizationManager;
+import org.sonatype.security.authorization.MockAuthorizationManagerB;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
+import com.google.inject.Binder;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import junit.framework.Assert;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
+/**
+ * Tests for {@link DefaultSecuritySystem}.
+ */
 public class DefaultSecuritySystemTest
     extends AbstractSecurityTest
 {
+  @Override
+  public void configure(final Binder binder) {
+    super.configure(binder);
 
-  public void testLogin()
-      throws Exception
-  {
+    binder.bind(AuthorizationManager.class)
+        .annotatedWith(Names.named("sourceB"))
+        .to(MockAuthorizationManagerB.class)
+        .in(Singleton.class);
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    this.getSecuritySystem().stop();
+
+    super.tearDown();
+  }
+
+  public void testLogin() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
     // login
@@ -52,9 +74,7 @@ public class DefaultSecuritySystemTest
     }
   }
 
-  public void testLogout()
-      throws Exception
-  {
+  public void testLogout() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
     // bind to a servlet request/response
@@ -80,9 +100,7 @@ public class DefaultSecuritySystemTest
     Assert.assertFalse(loggedinSubject.isAuthenticated());
   }
 
-  public void testAuthorization()
-      throws Exception
-  {
+  public void testAuthorization() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
     PrincipalCollection principal = new SimplePrincipalCollection("jcool", "ANYTHING");
     try {
@@ -94,35 +112,26 @@ public class DefaultSecuritySystemTest
     }
 
     securitySystem.checkPermission(principal, "test:read");
-
   }
 
   /*
    * FIXME: BROKEN
    */
-  public void BROKENtestPermissionFromRole()
-      throws Exception
-  {
+  public void BROKENtestPermissionFromRole() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
     PrincipalCollection principal = new SimplePrincipalCollection("jcool", "ANYTHING");
 
     securitySystem.checkPermission(principal, "from-role2:read");
-
   }
 
-  public void testGetUser()
-      throws Exception
-  {
+  public void testGetUser() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
     User jcoder = securitySystem.getUser("jcoder", "MockUserManagerA");
 
     Assert.assertNotNull(jcoder);
-
   }
 
-  public void testAuthorizationManager()
-      throws Exception
-  {
+  public void testAuthorizationManager() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
     Set<Role> roles = securitySystem.listRoles("sourceB");
@@ -141,12 +150,9 @@ public class DefaultSecuritySystemTest
 
     Assert.assertTrue(role1.getPrivileges().contains("from-role1:read"));
     Assert.assertTrue(role1.getPrivileges().contains("from-role1:delete"));
-
   }
 
-  public void testAddUser()
-      throws Exception
-  {
+  public void testAddUser() throws Exception {
     SecuritySystem securitySystem = this.getSecuritySystem();
 
     User user = new User();
@@ -158,16 +164,6 @@ public class DefaultSecuritySystemTest
 
     user.addRole(new RoleIdentifier("default", "test-role1"));
 
-    Assert.assertNotNull(securitySystem.addUser(user));
+    Assert.assertNotNull(securitySystem.addUser(user, "test123"));
   }
-
-  @Override
-  protected void tearDown()
-      throws Exception
-  {
-    this.getSecuritySystem().stop();
-
-    super.tearDown();
-  }
-
 }

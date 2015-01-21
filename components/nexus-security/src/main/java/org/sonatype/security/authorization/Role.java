@@ -41,10 +41,14 @@ public class Role
   private String version;
 
   public Role() {
-
   }
 
-  public Role(String roleId, String name, String description, String source, boolean readOnly, Set<String> roles,
+  public Role(String roleId,
+              String name,
+              String description,
+              String source,
+              boolean readOnly,
+              Set<String> roles,
               Set<String> privileges)
   {
     this.roleId = roleId;
@@ -246,5 +250,4 @@ public class Role
     }
     return true;
   }
-
 }

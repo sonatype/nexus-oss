@@ -47,8 +47,8 @@ public class ExceptionCatchingModularRealmAuthorizer
   }
 
   @Inject
-  public ExceptionCatchingModularRealmAuthorizer(Collection<Realm> realms,
-      Provider<RolePermissionResolver> rolePermissionResolverProvider)
+  public ExceptionCatchingModularRealmAuthorizer(final Collection<Realm> realms, 
+                                                 final Provider<RolePermissionResolver> rolePermissionResolverProvider)
   {
     this.rolePermissionResolverProvider = rolePermissionResolverProvider;
     setRealms(realms);
@@ -61,10 +61,8 @@ public class ExceptionCatchingModularRealmAuthorizer
 
   // Authorization
   @Override
-  public void checkPermission(PrincipalCollection subjectPrincipal, String permission)
-      throws AuthorizationException
-  {
-    if (!this.isPermitted(subjectPrincipal, permission)) {
+  public void checkPermission(PrincipalCollection subjectPrincipal, String permission) throws AuthorizationException {
+    if (!isPermitted(subjectPrincipal, permission)) {
       throw new AuthorizationException("User is not permitted: " + permission);
     }
   }
@@ -73,7 +71,7 @@ public class ExceptionCatchingModularRealmAuthorizer
   public void checkPermission(PrincipalCollection subjectPrincipal, Permission permission)
       throws AuthorizationException
   {
-    if (!this.isPermitted(subjectPrincipal, permission)) {
+    if (!isPermitted(subjectPrincipal, permission)) {
       throw new AuthorizationException("User is not permitted: " + permission);
     }
   }
@@ -97,10 +95,8 @@ public class ExceptionCatchingModularRealmAuthorizer
   }
 
   @Override
-  public void checkRole(PrincipalCollection subjectPrincipal, String roleIdentifier)
-      throws AuthorizationException
-  {
-    if (!this.hasRole(subjectPrincipal, roleIdentifier)) {
+  public void checkRole(PrincipalCollection subjectPrincipal, String roleIdentifier) throws AuthorizationException {
+    if (!hasRole(subjectPrincipal, roleIdentifier)) {
       throw new AuthorizationException("User is not permitted role: " + roleIdentifier);
     }
   }
@@ -109,7 +105,7 @@ public class ExceptionCatchingModularRealmAuthorizer
   public void checkRoles(PrincipalCollection subjectPrincipal, Collection<String> roleIdentifiers)
       throws AuthorizationException
   {
-    if (!this.hasAllRoles(subjectPrincipal, roleIdentifiers)) {
+    if (!hasAllRoles(subjectPrincipal, roleIdentifiers)) {
       throw new AuthorizationException("User is not permitted role: " + roleIdentifiers);
     }
   }
@@ -127,7 +123,7 @@ public class ExceptionCatchingModularRealmAuthorizer
 
   @Override
   public boolean hasRole(PrincipalCollection subjectPrincipal, String roleIdentifier) {
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
@@ -152,7 +148,7 @@ public class ExceptionCatchingModularRealmAuthorizer
   public boolean[] hasRoles(PrincipalCollection subjectPrincipal, List<String> roleIdentifiers) {
     boolean[] combinedResult = new boolean[roleIdentifiers.size()];
 
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
@@ -177,21 +173,21 @@ public class ExceptionCatchingModularRealmAuthorizer
 
   @Override
   public boolean isPermitted(PrincipalCollection subjectPrincipal, String permission) {
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
       try {
         if (((Authorizer) realm).isPermitted(subjectPrincipal, permission)) {
           if (logger.isTraceEnabled()) {
-            this.logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+            logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
                 + " has permission: " + permission);
           }
           return true;
         }
         else {
           if (logger.isTraceEnabled()) {
-            this.logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
+            logger.trace("Realm: " + realm.getName() + " user: " + subjectPrincipal.iterator().next()
                 + " does NOT have permission: " + permission);
           }
         }
@@ -210,7 +206,7 @@ public class ExceptionCatchingModularRealmAuthorizer
 
   @Override
   public boolean isPermitted(PrincipalCollection subjectPrincipal, Permission permission) {
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
@@ -234,7 +230,7 @@ public class ExceptionCatchingModularRealmAuthorizer
   public boolean[] isPermitted(PrincipalCollection subjectPrincipal, String... permissions) {
     boolean[] combinedResult = new boolean[permissions.length];
 
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
@@ -260,7 +256,7 @@ public class ExceptionCatchingModularRealmAuthorizer
   public boolean[] isPermitted(PrincipalCollection subjectPrincipal, List<Permission> permissions) {
     boolean[] combinedResult = new boolean[permissions.size()];
 
-    for (Realm realm : this.getRealms()) {
+    for (Realm realm : getRealms()) {
       if (!(realm instanceof Authorizer)) {
         continue; // ignore non-authorizing realms
       }
@@ -305,8 +301,6 @@ public class ExceptionCatchingModularRealmAuthorizer
   }
 
   private void logAndIgnore(Realm realm, Exception e) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e);
-    }
+    logger.trace("Realm '{}' failure", realm.getName(), e);
   }
 }
