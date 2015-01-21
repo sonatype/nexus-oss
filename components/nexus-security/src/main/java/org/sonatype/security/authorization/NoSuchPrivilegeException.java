@@ -14,8 +14,6 @@ package org.sonatype.security.authorization;
 
 /**
  * Thrown when a Privilege could not be found.
- *
- * @author Brian Demers
  */
 public class NoSuchPrivilegeException
     extends Exception
@@ -36,5 +34,4 @@ public class NoSuchPrivilegeException
   public NoSuchPrivilegeException(Throwable cause) {
     super(cause);
   }
-
 }

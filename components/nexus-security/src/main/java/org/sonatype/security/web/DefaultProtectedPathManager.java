@@ -53,11 +53,11 @@ public class DefaultProtectedPathManager
   }
 
   public void addProtectedResource(String pathPattern, String filterExpression) {
-    // Only save the pathPattern and filterExpression in the pseudoChains, does not put real filters into the real
-    // chain.
+    // Only save the pathPattern and filterExpression in the pseudoChains,
+    // does not put real filters into the real chain.
+
     // We can not get the real filters because this method is invoked when the application is starting, when
-    // ShiroSecurityFilter
-    // might not be located.
+    // ShiroSecurityFilter might not be located.
 
     if (this.filterChainManager != null) {
       this.filterChainManager.createChain(pathPattern, filterExpression);

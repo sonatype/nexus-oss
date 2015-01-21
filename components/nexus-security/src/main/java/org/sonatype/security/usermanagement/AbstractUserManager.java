@@ -31,7 +31,6 @@ public abstract class AbstractUserManager
     extends ComponentSupport
     implements UserManager
 {
-
   protected Set<User> filterListInMemeory(Set<User> users, UserSearchCriteria criteria) {
     HashSet<User> result = new HashSet<User>();
 
@@ -56,7 +55,9 @@ public abstract class AbstractUserManager
     return matchesCriteria(user.getUserId(), user.getSource(), userRoles, criteria);
   }
 
-  protected boolean matchesCriteria(String userId, String userSource, Collection<String> usersRoles,
+  protected boolean matchesCriteria(String userId,
+                                    String userSource,
+                                    Collection<String> usersRoles,
                                     UserSearchCriteria criteria)
   {
     if (StringUtils.isNotEmpty(criteria.getUserId())
@@ -82,5 +83,4 @@ public abstract class AbstractUserManager
 
     return true;
   }
-
 }

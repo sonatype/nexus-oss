@@ -12,57 +12,24 @@
  */
 package org.sonatype.security.configuration;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
-import org.sonatype.security.SecurityTestSupport;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
+import org.sonatype.security.AbstractSecurityTest;
 
 import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.eclipse.sisu.space.BeanScanning;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
+/**
+ * Tests for {@link SecurityConfigurationManager}.
+ */
 public class SecurityConfigurationManagerTest
-    extends SecurityTestSupport
+    extends AbstractSecurityTest
 {
-  private final TestUtil util = new TestUtil(this);
-
-  // FIXME: Upgrade to junit4
-
-  private File PLEXUS_HOME = util.createTempDir("plexus-home");
-
-  private File APP_CONF = new File(PLEXUS_HOME, "etc");
-
-  @Override
-  public void configure(Properties properties) {
-    properties.put("application-conf", APP_CONF.getAbsolutePath());
-    super.configure(properties);
-  }
-
-  @Override
-  public BeanScanning scanning() {
-    return BeanScanning.INDEX;
-  }
-
-  @Override
-  protected void setUp()
-      throws Exception
-  {
-    // delete the plexus home dir
-    FileUtils.deleteDirectory(PLEXUS_HOME);
-
-    super.setUp();
-  }
-
   //@Test
-  public void testLoadEmptyDefaults()
-      throws Exception
-  {
+  public void testLoadEmptyDefaults() throws Exception {
     SecurityConfigurationManager config = this.lookup(SecurityConfigurationManager.class);
 
     Assert.assertNotNull(config);
@@ -78,9 +45,7 @@ public class SecurityConfigurationManagerTest
   }
 
   //@Test
-  public void testWrite()
-      throws Exception
-  {
+  public void testWrite() throws Exception {
     SecurityConfigurationManager config = this.lookup(SecurityConfigurationManager.class);
 
     config.setAnonymousAccessEnabled(true);

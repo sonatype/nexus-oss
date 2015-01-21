@@ -12,10 +12,8 @@
  */
 package org.sonatype.nexus.security;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,9 +25,8 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
+import com.google.common.collect.Lists;
 import org.codehaus.plexus.util.StringUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Named("RepositoryViewPrivilegeDescriptor")
@@ -39,15 +36,6 @@ public class RepositoryViewPrivilegeDescriptor
 {
   public static final String TYPE = "repository";
 
-  private final PrivilegePropertyDescriptor repoProperty;
-
-  @Inject
-  public RepositoryViewPrivilegeDescriptor(
-      @Named("RepositoryPropertyDescriptor") PrivilegePropertyDescriptor repoProperty)
-  {
-    this.repoProperty = checkNotNull(repoProperty);
-  }
-
   @Override
   public String getName() {
     return "Repository View";
@@ -55,11 +43,9 @@ public class RepositoryViewPrivilegeDescriptor
 
   @Override
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
-    List<PrivilegePropertyDescriptor> propertyDescriptors = new ArrayList<PrivilegePropertyDescriptor>();
-
-    propertyDescriptors.add(repoProperty);
-
-    return propertyDescriptors;
+    List<PrivilegePropertyDescriptor> descriptors = Lists.newArrayList();
+    descriptors.add(new RepositoryPropertyDescriptor());
+    return descriptors;
   }
 
   @Override

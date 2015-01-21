@@ -14,8 +14,6 @@ package org.sonatype.security.usermanagement;
 
 /**
  * Thrown if the password isn't correct on reset password.
- *
- * @author cstamas
  */
 public class InvalidCredentialsException
     extends Exception

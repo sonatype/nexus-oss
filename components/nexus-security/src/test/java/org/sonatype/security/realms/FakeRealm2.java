@@ -14,10 +14,6 @@ package org.sonatype.security.realms;
 
 import java.util.Collections;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -28,12 +24,11 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-@Singleton
-@Typed(Realm.class)
-@Named("FakeRealm2")
+/**
+ * @see SecurityAuthenticationTest
+ */
 public class FakeRealm2
     extends AuthorizingRealm
 {
@@ -44,22 +39,15 @@ public class FakeRealm2
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
-
     SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(Collections.singleton("role"));
-
     Permission permission = new WildcardPermission("other:perm");
-
     info.setObjectPermissions(Collections.singleton(permission));
-
     return info;
   }
 
   @Override
-  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
-      throws AuthenticationException
-  {
+  protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-
     return new SimpleAuthenticationInfo(upToken.getUsername(), "password", getName());
   }
 }

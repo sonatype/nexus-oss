@@ -37,14 +37,12 @@ import org.apache.shiro.subject.Subject;
 
 /**
  * This is a facade around all things security ( authentication, authorization, user management, and configuration ).
- * It
- * is meant to be the single point of access.
+ * It is meant to be the single point of access.
  *
  * @author Brian Demers
  */
 public interface SecuritySystem
 {
-
   /**
    * Starts the SecuritySystem. Before this method is called the state is unknown.
    */
@@ -65,16 +63,14 @@ public interface SecuritySystem
    * @return the Subject representing the logged in user.
    * @throws AuthenticationException if the user can not be authenticated
    */
-  public Subject login(AuthenticationToken token)
-      throws AuthenticationException;
+  Subject login(AuthenticationToken token) throws AuthenticationException;
 
   /**
    * Authenticates a user and does NOT log them in. If successful returns a AuthenticationInfo.
    *
    * @return the AuthenticationInfo for this request.
    */
-  public AuthenticationInfo authenticate(AuthenticationToken token)
-      throws AuthenticationException;
+  AuthenticationInfo authenticate(AuthenticationToken token) throws AuthenticationException;
 
   // /**
   // * This method sets the current thread to use the <code>principal</code> passed in.
@@ -83,17 +79,17 @@ public interface SecuritySystem
   // * @param principal The account to login in as.
   // * @return The subject that was created as a result of the principal.
   // */
-  // public Subject runAs( PrincipalCollection principal );
+  // Subject runAs( PrincipalCollection principal );
 
   /**
    * Finds the current logged in Subject.
    */
-  public Subject getSubject();
+  Subject getSubject();
 
   /**
    * Logs the subject out.
    */
-  public void logout(Subject subject);
+  void logout(Subject subject);
 
   // *********************
   // * authorization
@@ -104,7 +100,7 @@ public interface SecuritySystem
    *
    * @return true only if the principal has the permission.
    */
-  public boolean isPermitted(PrincipalCollection principal, String permission);
+  boolean isPermitted(PrincipalCollection principal, String permission);
 
   /**
    * Checks if principal has a list of permission.
@@ -112,27 +108,25 @@ public interface SecuritySystem
    * @param permissions list of permission to check.
    * @return A boolean array, the results in the array match the order of the permission
    */
-  public boolean[] isPermitted(PrincipalCollection principal, List<String> permissions);
+  boolean[] isPermitted(PrincipalCollection principal, List<String> permissions);
 
   /**
    * Checks if principal has a permission, throws an AuthorizationException otherwise.
    */
-  public void checkPermission(PrincipalCollection principal, String permission)
-      throws AuthorizationException;
+  void checkPermission(PrincipalCollection principal, String permission) throws AuthorizationException;
 
   /**
    * Checks if principal has a list of permissions, throws an AuthorizationException unless the principal has all
    * permissions.
    */
-  public void checkPermission(PrincipalCollection principal, List<String> permissions)
-      throws AuthorizationException;
+  void checkPermission(PrincipalCollection principal, List<String> permissions) throws AuthorizationException;
 
   /**
    * Checks if a principal has a role.
    *
    * @return true if the principal has this role.
    */
-  public boolean hasRole(PrincipalCollection principals, String role);
+  boolean hasRole(PrincipalCollection principals, String role);
 
   // ******************************
   // * Role permission management
@@ -144,7 +138,7 @@ public interface SecuritySystem
    *
    * @return All the roles defined in the system.
    */
-  public Set<Role> listRoles();
+  Set<Role> listRoles();
 
   /**
    * NOTE: this method could be slow if there is a large list of roles coming from an external source (such as a
@@ -153,22 +147,11 @@ public interface SecuritySystem
    * @param sourceId The identifier of an {@link AuthorizationManager}.
    * @return All the roles defined by an {@link AuthorizationManager}.
    */
-  public Set<Role> listRoles(String sourceId)
-      throws NoSuchAuthorizationManagerException;
+  Set<Role> listRoles(String sourceId) throws NoSuchAuthorizationManagerException;
 
   // *********************
   // * user management
   // *********************
-
-  /**
-   * Adds a new User to the system. The users password will be generated.<BR/>
-   * Note: User.source must be set to specify where the user will be created.
-   *
-   * @param user User to be created.
-   * @return The User that was just created.
-   */
-  User addUser(User user)
-      throws NoSuchUserManagerException, InvalidConfigurationException;
 
   /**
    * Adds a new User to the system.<BR/>
@@ -178,18 +161,16 @@ public interface SecuritySystem
    * @param password The users initial password.
    * @return The User that was just created.
    */
-  User addUser(User user, String password)
-      throws NoSuchUserManagerException, InvalidConfigurationException;
+  User addUser(User user, String password) throws NoSuchUserManagerException, InvalidConfigurationException;
 
   /**
    * Get a User by id and source.
    *
    * @param userId   Id of the user to return.
-   * @param soruceId the Id of the source to get the user from.
+   * @param sourceId the Id of the source to get the user from.
    * @return The user
    */
-  User getUser(String userId, String sourceId)
-      throws UserNotFoundException, NoSuchUserManagerException;
+  User getUser(String userId, String sourceId) throws UserNotFoundException, NoSuchUserManagerException;
 
   /**
    * Get a User by id. This will search all sources (in order) looking for it. The first one found will be returned.
@@ -198,8 +179,7 @@ public interface SecuritySystem
    * @param userId Id of the user to return.
    * @return The user
    */
-  User getUser(String userId)
-      throws UserNotFoundException;
+  User getUser(String userId) throws UserNotFoundException;
 
   /**
    * Updates a new User to the system.<BR/>
@@ -208,8 +188,7 @@ public interface SecuritySystem
    * @param user User to be updated.
    * @return The User that was just updated.
    */
-  User updateUser(User user)
-      throws UserNotFoundException, NoSuchUserManagerException, InvalidConfigurationException;
+  User updateUser(User user) throws UserNotFoundException, NoSuchUserManagerException, InvalidConfigurationException;
 
   /**
    * Remove a user based on the Id.
@@ -218,8 +197,7 @@ public interface SecuritySystem
    * @Deprecated use deleteUser( String userId, String source )
    */
   @Deprecated
-  void deleteUser(String userId)
-      throws UserNotFoundException;
+  void deleteUser(String userId) throws UserNotFoundException;
 
   /**
    * Removes a user based on the userId and sourceId.
@@ -227,11 +205,10 @@ public interface SecuritySystem
    * @param userId   The id of the user to be removed.
    * @param sourceId The sourceId of the user to be removed.
    */
-  void deleteUser(String userId, String sourceId)
-      throws UserNotFoundException, NoSuchUserManagerException;
+  void deleteUser(String userId, String sourceId) throws UserNotFoundException, NoSuchUserManagerException;
 
   /**
-   * Returns a list of {@link RoleIdentifiers} which represents all the roles a given user has.
+   * Returns a list of {@link RoleIdentifier} which represents all the roles a given user has.
    *
    * @param userId   The Id of the user.
    * @param sourceId The source Id of the user.
@@ -261,36 +238,7 @@ public interface SecuritySystem
   /**
    * Searches for Users by criteria.
    */
-  public Set<User> searchUsers(UserSearchCriteria criteria);
-
-  // *********************
-  // * forget / change password
-  // *********************
-
-  /**
-   * Generate a new user password and will email it to the user.
-   *
-   * @param userId the user Id of the user
-   * @param email  email address of the user
-   */
-  void forgotPassword(String userId, String email)
-      throws UserNotFoundException, InvalidConfigurationException;
-
-  /**
-   * Sends an email to a user to recover his/her password.
-   *
-   * @param email The email address of the user.
-   */
-  void forgotUsername(String email)
-      throws UserNotFoundException;
-
-  /**
-   * Generate a new user password and will email it to the user.
-   *
-   * @param userId the user Id of the user
-   */
-  void resetPassword(String userId)
-      throws UserNotFoundException, InvalidConfigurationException;
+  Set<User> searchUsers(UserSearchCriteria criteria);
 
   /**
    * Updates a users password.
@@ -309,8 +257,7 @@ public interface SecuritySystem
    * @param userId      The id of the user.
    * @param newPassword The user's new password.
    */
-  void changePassword(String userId, String newPassword)
-      throws UserNotFoundException, InvalidConfigurationException;
+  void changePassword(String userId, String newPassword) throws UserNotFoundException, InvalidConfigurationException;
 
   // *********************
   // * Authorization Management
@@ -321,10 +268,9 @@ public interface SecuritySystem
    *
    * @return A set of all the privileges in the system.
    */
-  public Set<Privilege> listPrivileges();
+  Set<Privilege> listPrivileges();
 
-  public AuthorizationManager getAuthorizationManager(String source)
-      throws NoSuchAuthorizationManagerException;
+  AuthorizationManager getAuthorizationManager(String source) throws NoSuchAuthorizationManagerException;
 
   // //
   // Application configuration, TODO: I don't think all of these need to be exposed, but they currently are
@@ -340,8 +286,7 @@ public interface SecuritySystem
   /**
    * Set the currently configured realms.
    */
-  void setRealms(List<String> realms)
-      throws InvalidConfigurationException;
+  void setRealms(List<String> realms) throws InvalidConfigurationException;
 
   /**
    * Return true if anonymous access is enabled.
@@ -365,8 +310,7 @@ public interface SecuritySystem
    * Sets the name of the anonymous users. Could be something other then 'anonymous', for example Active Directory
    * uses 'Guest' TODO: consider removing this method.
    */
-  void setAnonymousUsername(String anonymousUsername)
-      throws InvalidConfigurationException;
+  void setAnonymousUsername(String anonymousUsername) throws InvalidConfigurationException;
 
   /**
    * Gets the anonymous user password.
@@ -376,12 +320,10 @@ public interface SecuritySystem
   /**
    * Sets the anonymous user password.
    */
-  void setAnonymousPassword(String anonymousPassword)
-      throws InvalidConfigurationException;
+  void setAnonymousPassword(String anonymousPassword) throws InvalidConfigurationException;
 
   /**
    * Returns the configured shiro SecurityManager
    */
-  public RealmSecurityManager getSecurityManager();
-
+  RealmSecurityManager getSecurityManager();
 }

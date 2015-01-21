@@ -79,12 +79,6 @@
       <artifactId>nexus-oss-edition</artifactId>
     </dependency>
 
-    <!-- NEXUS-2862 (url realm?) -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-security-realms</artifactId>
-    </dependency>
-
     <!-- NEXUS-2810 references this -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

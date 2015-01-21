@@ -26,8 +26,7 @@ import org.eclipse.sisu.space.BeanScanning;
 public abstract class AbstractSecurityTest
     extends SecurityTestSupport
 {
-
-  protected File PLEXUS_HOME = new File("./target/plexus-home/");
+  protected File PLEXUS_HOME = util.resolveFile("target/plexus-home/");
 
   protected File APP_CONF = new File(PLEXUS_HOME, "etc");
 
@@ -44,9 +43,7 @@ public abstract class AbstractSecurityTest
   }
 
   @Override
-  protected void setUp()
-      throws Exception
-  {
+  protected void setUp() throws Exception {
     super.setUp();
 
     // delete the plexus home dir
@@ -56,9 +53,7 @@ public abstract class AbstractSecurityTest
   }
 
   @Override
-  protected void tearDown()
-      throws Exception
-  {
+  protected void tearDown() throws Exception {
     try {
       getSecuritySystem().stop();
       lookup(CacheManager.class).shutdown();
@@ -74,9 +69,7 @@ public abstract class AbstractSecurityTest
     return BeanScanning.INDEX;
   }
 
-  protected SecuritySystem getSecuritySystem()
-      throws Exception
-  {
+  protected SecuritySystem getSecuritySystem() throws Exception {
     return this.lookup(SecuritySystem.class);
   }
 }

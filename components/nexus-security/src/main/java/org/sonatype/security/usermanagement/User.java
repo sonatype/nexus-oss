@@ -26,7 +26,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class User
     implements Comparable<User>
 {
-
   private String userId;
 
   private String firstName;
@@ -227,5 +226,4 @@ public class User
     }
     return true;
   }
-
 }

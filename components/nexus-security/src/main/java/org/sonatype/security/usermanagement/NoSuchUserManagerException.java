@@ -14,13 +14,10 @@ package org.sonatype.security.usermanagement;
 
 /**
  * Thrown when UserManager could not be found.
- *
- * @author Brian Demers
  */
 public class NoSuchUserManagerException
     extends Exception
 {
-
   private static final long serialVersionUID = -2561129270233203244L;
 
   public NoSuchUserManagerException() {
@@ -37,5 +34,4 @@ public class NoSuchUserManagerException
   public NoSuchUserManagerException(Throwable cause) {
     super(cause);
   }
-
 }

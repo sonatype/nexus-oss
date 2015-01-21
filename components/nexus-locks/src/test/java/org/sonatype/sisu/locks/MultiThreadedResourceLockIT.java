@@ -29,6 +29,8 @@ import org.junit.experimental.categories.Category;
 public class MultiThreadedResourceLockIT
     extends InjectedTestCase
 {
+  // FIXME: Convert to junit4
+
   @Provides
   @Parameters
   Properties systemProperties() {

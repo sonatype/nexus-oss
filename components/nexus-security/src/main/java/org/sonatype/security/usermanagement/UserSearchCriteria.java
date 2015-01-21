@@ -16,9 +16,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A UserSearchCriteria defines searchble fields. Null or empty fields will be ignored.
+ * A defines searchable fields.
  *
- * @author Brian Demers
+ * Null or empty fields will be ignored.
  */
 public class UserSearchCriteria
 {
@@ -74,5 +74,4 @@ public class UserSearchCriteria
   public void setEmail(String email) {
     this.email = email;
   }
-
 }

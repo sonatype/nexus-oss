@@ -17,25 +17,21 @@ import java.util.Set;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 
 /**
- * Extends the UserManager interface to allow a UserManager to add roles to users from other UserManagers. For example,
- * a User might come from a JDBC UserManager, but has additional roles mapped in Nexus.
+ * Extends the UserManager interface to allow a UserManager to add roles to users from other UserManagers.
  *
- * @author Brian Demers
+ * For example, a User might come from a JDBC UserManager, but has additional roles mapped in Nexus.
  */
 public interface RoleMappingUserManager
     extends UserManager
 {
-
   /**
    * Returns a list of roles for a user.
    */
-  Set<RoleIdentifier> getUsersRoles(String userId, String userSource)
-      throws UserNotFoundException;
+  Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException;
 
   /**
    * Sets a users roles.
    */
   void setUsersRoles(String userId, String userSource, Set<RoleIdentifier> roleIdentifiers)
       throws UserNotFoundException, InvalidConfigurationException;
-
 }
