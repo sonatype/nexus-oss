@@ -32,12 +32,12 @@ public class RebuildMavenMetadataTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to rebuild metadata.",
+            "Select the Maven repository to rebuild metadata",
             FormField.MANDATORY).includeAnEntryForAllRepositories().includingAnyOfFacets(MavenRepository.class),
         new StringTextFormField(
             TaskConfiguration.PATH_KEY,
             "Repository path",
-            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
             FormField.OPTIONAL)
     );
   }

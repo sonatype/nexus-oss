@@ -41,7 +41,7 @@ public class UnusedSnapshotRemoverTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to remove unused snapshots.",
+            "Select the Maven repository to remove unused snapshots from",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
             .includingAnyOfContentClasses(Maven2ContentClass.ID)

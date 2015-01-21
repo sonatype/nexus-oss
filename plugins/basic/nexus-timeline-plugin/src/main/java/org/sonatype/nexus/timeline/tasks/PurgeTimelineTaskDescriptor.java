@@ -36,7 +36,7 @@ public class PurgeTimelineTaskDescriptor
         new NumberTextFormField(
             OLDER_THAN_FIELD_ID,
             "Purge items older than (days)",
-            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            "Set the number of days, to purge all items that were trashed before the given number of days",
             FormField.MANDATORY)
     );
   }

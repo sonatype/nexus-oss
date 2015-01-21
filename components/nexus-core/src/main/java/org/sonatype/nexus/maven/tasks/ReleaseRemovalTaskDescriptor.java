@@ -45,10 +45,15 @@ public class ReleaseRemovalTaskDescriptor
             FormField.MANDATORY
         ).includingAnyOfContentClasses(Maven2ContentClass.ID).excludingAnyOfFacets(GroupRepository.class),
         new NumberTextFormField(
-            NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID, "Number to keep", "The number of versions for each GA to keep",
+            NUMBER_OF_VERSIONS_TO_KEEP_FIELD_ID,
+            "Number to keep",
+            "The number of versions for each GA to keep",
             FormField.MANDATORY),
-        new RepoTargetComboFormField(REPOSITORY_TARGET_FIELD_ID, "Repository Target",
-            "Select a repository target to apply", FormField.OPTIONAL)
+        new RepoTargetComboFormField(
+            REPOSITORY_TARGET_FIELD_ID,
+            "Repository Target",
+            "Select a repository target to apply",
+            FormField.OPTIONAL)
     );
   }
 }

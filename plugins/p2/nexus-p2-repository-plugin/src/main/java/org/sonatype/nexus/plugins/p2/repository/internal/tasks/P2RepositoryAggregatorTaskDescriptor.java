@@ -32,13 +32,13 @@ public class P2RepositoryAggregatorTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the repository to generate P2 repository.",
+            "Select the repository to generate P2 repository",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories().excludingAnyOfFacets(GroupRepository.class),
         new StringTextFormField(
             TaskConfiguration.PATH_KEY,
             "Repository path",
-            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
             FormField.OPTIONAL)
     );
   }

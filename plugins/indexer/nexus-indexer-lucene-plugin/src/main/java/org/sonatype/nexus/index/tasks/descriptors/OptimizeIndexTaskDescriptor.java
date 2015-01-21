@@ -32,7 +32,7 @@ public class OptimizeIndexTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to optimize the index.",
+            "Select the Maven repository to optimize the index",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
             .includingAnyOfContentClasses(Maven2ContentClass.ID)

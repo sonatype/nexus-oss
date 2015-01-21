@@ -36,13 +36,14 @@ public class UpdateSiteMirrorTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select Eclipse Update Site repository to assign to this task.",
+            "Select Eclipse Update Site repository to assign to this task",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories().includingAnyOfFacets(UpdateSiteProxyRepository.class,
             GroupRepository.class),
         new CheckboxFormField(
             FORCE_MIRROR_FIELD_ID, "Force mirror",
-            "Mirror eclipse update site content even if site.xml did not change.", FormField.OPTIONAL)
+            "Mirror eclipse update site content even if site.xml did not change",
+            FormField.OPTIONAL)
     );
   }
 }

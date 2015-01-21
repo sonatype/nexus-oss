@@ -33,14 +33,14 @@ public class ExpireCacheTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the proxy repository to expire cache.",
+            "Select the proxy repository to expire cache",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
             .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class),
         new StringTextFormField(
             TaskConfiguration.PATH_KEY,
             "Repository path",
-            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
             FormField.OPTIONAL)
     );
   }

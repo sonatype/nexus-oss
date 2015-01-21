@@ -44,33 +44,34 @@ public class SnapshotRemovalTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to remove snapshots.",
+            "Select the Maven repository to remove snapshots",
             FormField.MANDATORY).includeAnEntryForAllRepositories().includingAnyOfContentClasses(
             Maven2ContentClass.ID).excludingAnyOfFacets(ProxyRepository.class),
         new NumberTextFormField(
             MIN_TO_KEEP_FIELD_ID,
             "Minimum snapshot count",
-            "Minimum number of snapshots to keep for one GAV.",
+            "Minimum number of snapshots to keep for one GAV",
             FormField.MANDATORY),
         new NumberTextFormField(
             KEEP_DAYS_FIELD_ID,
             "Snapshot retention (days)",
-            "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep.",
+            "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep",
             FormField.MANDATORY),
         new CheckboxFormField(
             REMOVE_WHEN_RELEASED_FIELD_ID,
             "Remove if released",
-            "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT).",
+            "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)",
             FormField.OPTIONAL),
         new NumberTextFormField(
             GRACE_DAYS_AFTER_RELEASE_FIELD_ID,
             "Grace period after release (days)",
-            "The grace period (in days) that the task will not purge all snapshots that have a corresponding released artifact.",
+            "The grace period (in days) that the task will not purge all snapshots that have a corresponding released artifact",
             FormField.OPTIONAL),
         new CheckboxFormField(
             DELETE_IMMEDIATELY,
             "Delete immediately",
-            "The job will not move deleted items into the repository trash but delete immediately.", FormField.OPTIONAL)
+            "The job will not move deleted items into the repository trash but delete immediately",
+            FormField.OPTIONAL)
     );
   }
 }

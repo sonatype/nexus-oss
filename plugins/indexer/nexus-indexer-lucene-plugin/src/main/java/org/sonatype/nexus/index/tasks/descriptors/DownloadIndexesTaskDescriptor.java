@@ -35,7 +35,7 @@ public class DownloadIndexesTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven proxy repository to download the index.",
+            "Select the Maven proxy repository to download the index",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
             .includingAnyOfFacets(MavenProxyRepository.class, GroupRepository.class)

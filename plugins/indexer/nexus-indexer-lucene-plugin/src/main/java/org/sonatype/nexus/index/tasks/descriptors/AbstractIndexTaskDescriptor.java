@@ -28,13 +28,13 @@ public abstract class AbstractIndexTaskDescriptor<T extends Task>
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to " + name.toLowerCase() + " the index.",
+            "Select the Maven repository to " + name.toLowerCase() + " the index",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories().includingAnyOfContentClasses(Maven2ContentClass.ID),
         new StringTextFormField(
             TaskConfiguration.PATH_KEY,
             "Repository path",
-            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
             FormField.OPTIONAL)
     );
   }
