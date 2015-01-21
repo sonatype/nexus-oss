@@ -35,10 +35,9 @@ Ext.define('NX.controller.Menu', {
     'feature.Menu',
     'feature.NotFound',
     'feature.NotVisible',
-    'header.DashboardMode',
-    'header.SearchMode',
     'header.BrowseMode',
-    'header.AdminMode'
+    'header.AdminMode',
+    'header.Mode'
   ],
 
   models: [
