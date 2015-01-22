@@ -25,7 +25,9 @@ Ext.define('NX.view.header.AdminMode', {
   ],
   ui: 'nx-header',
   cls: 'nx-modebutton',
-  anchor: '100% 100%',
+  scale: 'medium',
+  height: 39,
+  width: 39,
 
   /**
    * @cfg mode Mode name

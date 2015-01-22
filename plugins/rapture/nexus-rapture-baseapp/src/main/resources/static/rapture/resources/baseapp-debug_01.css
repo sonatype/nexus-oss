@@ -7998,7 +7998,7 @@ a.x-tab .x-tab-inner-right {
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: white;
   padding: 0 8px;
@@ -9520,7 +9520,7 @@ a.x-tab .x-tab-inner-right {
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-default-toolbar-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
   padding: 0 8px;
@@ -20763,7 +20763,7 @@ a.x-color-picker-item:hover {
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-plain-toolbar-medium .x-btn-inner {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
   padding: 0 8px;
@@ -24392,7 +24392,7 @@ a.x-color-picker-item:hover {
 /* line 262, ../../../baseapp/ext/packages/ext-theme-neutral/sass/src/button/Button.scss */
 .x-btn-nx-drilldown-medium .x-btn-inner {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #006bbf;
   padding: 0 0;
