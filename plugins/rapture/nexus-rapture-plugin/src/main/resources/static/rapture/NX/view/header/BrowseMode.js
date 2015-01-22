@@ -32,14 +32,15 @@ Ext.define('NX.view.header.BrowseMode', {
    */
   mode: 'browse',
   toggleGroup: 'mode',
+  allowDepress: false,
 
   /**
-   * @cfg autoHide If button should auto hide when no features are available for selected mode (default true)
+   * @cfg autoHide If button should auto hide when no features are available for selected mode
    */
   autoHide: true,
 
   /**
-   * @cfg collapseMenu If menu should be collapsed automatically when mode is selected (default true)
+   * @cfg collapseMenu If menu should be collapsed automatically when mode is selected
    */
   collapseMenu: true,
 

@@ -17,7 +17,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.User', {
+Ext.define('NX.view.header.UserMode', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-user-mode',
   requires: [
@@ -32,6 +32,7 @@ Ext.define('NX.view.header.User', {
    */
   mode: 'user',
   toggleGroup: 'mode',
+  allowDepress: false,
 
   title: 'User',
   tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),

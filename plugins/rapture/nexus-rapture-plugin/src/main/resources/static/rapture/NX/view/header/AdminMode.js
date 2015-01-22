@@ -32,9 +32,10 @@ Ext.define('NX.view.header.AdminMode', {
    */
   mode: 'admin',
   toggleGroup: 'mode',
+  allowDepress: false,
 
   /**
-   * @cfg autoHide If button should auto hide when no features are available for selected mode (default true)
+   * @cfg autoHide If button should auto hide when no features are available for selected mode
    */
   autoHide: true,
 

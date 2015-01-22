@@ -31,7 +31,7 @@ Ext.define('NX.controller.User', {
   views: [
     'header.SignIn',
     'header.SignOut',
-    'header.User',
+    'header.UserMode',
     'Authenticate',
     'SignIn'
   ],
