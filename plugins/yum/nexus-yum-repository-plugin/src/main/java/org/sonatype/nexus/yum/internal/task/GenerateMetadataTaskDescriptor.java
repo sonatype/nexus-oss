@@ -46,7 +46,7 @@ public class GenerateMetadataTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository for createrepo",
-            "Maven Repository for which the yum metadata is generated via createrepo.",
+            "Maven Repository for which the yum metadata is generated via createrepo",
             MANDATORY
         ).includingAnyOfFacets(MavenRepository.class).excludingAnyOfFacets(GroupRepository.class),
         new StringTextFormField(
@@ -65,7 +65,7 @@ public class GenerateMetadataTaskDescriptor
         new CheckboxFormField(
             PARAM_FORCE_FULL_SCAN,
             "Full Rebuild",
-            "Forces a full rebuild and does not use the cached RPM file list.",
+            "Forces a full rebuild and does not use the cached RPM file list",
             OPTIONAL
         ).withInitialValue(false)
     );

@@ -33,12 +33,12 @@ public class EmptyTrashTaskDescriptor
         new NumberTextFormField(
             OLDER_THAN_FIELD_ID,
             "Purge items older than (days)",
-            "Set the number of days, to purge all items that were trashed before the given number of days.",
+            "Set the number of days, to purge all items that were trashed before the given number of days",
             FormField.OPTIONAL),
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the repository to empty the trash.",
+            "Select the repository whose trash will be emptied",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
     );

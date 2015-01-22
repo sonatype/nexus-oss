@@ -37,7 +37,7 @@ public class RebuildAttributesTaskDescriptor
         new StringTextFormField(
             TaskConfiguration.PATH_KEY,
             "Repository path",
-            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
+            "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
             FormField.OPTIONAL)
     );
   }

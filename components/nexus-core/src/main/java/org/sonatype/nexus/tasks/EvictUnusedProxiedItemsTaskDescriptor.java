@@ -35,14 +35,14 @@ public class EvictUnusedProxiedItemsTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the proxy repository to evict unused items.",
+            "Select the proxy repository to evict unused items",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories()
             .includingAnyOfFacets(ProxyRepository.class, GroupRepository.class),
         new NumberTextFormField(
             OLDER_THAN_FIELD_ID,
             "Evict items older than (days)",
-            "Set the number of days, to evict all unused proxied items that were not used the given number of days.",
+            "Set the number of days, to evict all unused proxied items that were not used the given number of days",
             FormField.MANDATORY)
     );
   }

@@ -32,7 +32,7 @@ public class PublishIndexesTaskDescriptor
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
             "Repository",
-            "Select the Maven repository to publish the index.",
+            "Select the Maven repository to publish the index",
             FormField.MANDATORY
         ).includeAnEntryForAllRepositories().includingAnyOfContentClasses(Maven2ContentClass.ID)
     );
