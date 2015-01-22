@@ -136,6 +136,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     BROWSE_UPLOAD_DISCARD_BUTTON: 'Discard',
     BROWSE_UPLOAD_WAIT: 'Uploading your files…',
 
+    // Browse -> Upload -> Nuget
+    BROWSE_NUGET_TITLE: 'NuGet',
+    BROWSE_NUGET_SUBTITLE: 'Upload packages to Nuget Hosted Repositories',
+
     // Browse -> Upload -> Maven
     BROWSE_MAVEN_TITLE: 'Maven',
     BROWSE_MAVEN_SUBTITLE: 'Upload artifacts to Maven Hosted Repositories',
