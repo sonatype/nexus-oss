@@ -34,7 +34,6 @@ Ext.define('NX.view.header.User', {
   toggleGroup: 'mode',
 
   title: 'User',
-  tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),
   glyph: 'xf007@FontAwesome', // fa-user
 
   autoHide: false,
