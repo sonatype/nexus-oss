@@ -173,7 +173,6 @@ Ext.define('NX.coreui.controller.Loggers', {
               '"?',
           function () {
             model.set('level', values.level);
-            me.getList().getSelectionModel().select(store.indexOf(model), 1);
             me.loadView(null, null, true);
           }
       );
@@ -181,7 +180,6 @@ Ext.define('NX.coreui.controller.Loggers', {
     else {
       model = me.getLoggerModel().create(values);
       store.addSorted(model);
-      me.getList().getSelectionModel().select(store.indexOf(model), 1);
       me.loadView(null, null, true);
     }
   },
