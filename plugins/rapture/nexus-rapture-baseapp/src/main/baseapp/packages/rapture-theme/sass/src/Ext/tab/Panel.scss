@@ -93,3 +93,8 @@
 .x-tab-nx-light-top-over {
   border-bottom: 1px solid $color-smoke;
 }
+
+// Force the tab panel body to sit underneath the tab bar
+.x-tab-bar + .x-panel-body {
+  z-index: 0;
+}

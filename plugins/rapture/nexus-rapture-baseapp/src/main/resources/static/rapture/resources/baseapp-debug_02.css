@@ -17189,6 +17189,11 @@
   border-bottom: 1px solid #ebebeb;
 }
 
+/* line 98, ../../../baseapp/packages/rapture-theme/sass/src/Ext/tab/Panel.scss */
+.x-tab-bar + .x-panel-body {
+  z-index: 0;
+}
+
 /**
  * @class Ext.tree.Panel
  */
