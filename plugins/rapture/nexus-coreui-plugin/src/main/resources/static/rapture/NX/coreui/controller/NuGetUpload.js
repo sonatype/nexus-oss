@@ -95,7 +95,8 @@ Ext.define('NX.coreui.controller.NuGetUpload', {
       features.registerFeature({
         mode: 'browse',
         path: '/Upload/NuGet',
-        description: 'Upload packages to Nuget Hosted Repositories',
+        text: NX.I18n.get('BROWSE_NUGET_TITLE'),
+        description: NX.I18n.get('BROWSE_NUGET_SUBTITLE'),
         view: { xtype: 'nx-coreui-nuget-upload' },
         // use preloaded icon to avoid a grey icon
         iconName: 'feature-nuget-upload',
