@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <eclipse-jetty.version>8.1.11.v20130520</eclipse-jetty.version>
+    <eclipse-jetty.version>9.2.7.v20150116</eclipse-jetty.version>
   </properties>
 
   <dependencyManagement>
@@ -89,7 +89,19 @@
 
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util-ajax</artifactId>
+        <version>${eclipse-jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlets</artifactId>
+        <version>${eclipse-jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-proxy</artifactId>
         <version>${eclipse-jetty.version}</version>
       </dependency>
 
@@ -131,7 +143,7 @@
 
       <dependency>
         <groupId>org.eclipse.jetty.aggregate</groupId>
-        <artifactId>jetty-all-server</artifactId>
+        <artifactId>jetty-all</artifactId>
         <version>${eclipse-jetty.version}</version>
         <exclusions>
           <exclusion>

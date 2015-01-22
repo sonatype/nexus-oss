@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.kenai.internal;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import org.sonatype.nexus.NexusAppTestSupport;
@@ -22,7 +21,6 @@ import org.sonatype.security.realms.kenai.KenaiConfiguration;
 import org.sonatype.tests.http.runner.junit.ServerResource;
 import org.sonatype.tests.http.server.fluent.Server;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -71,12 +69,7 @@ public abstract class AbstractKenaiRealmTest
 
   protected Kenai mockKenai() {
     KenaiConfiguration kenaiConfiguration = new KenaiConfiguration();
-    try {
-      kenaiConfiguration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
-    }
-    catch (MalformedURLException e) {
-      throw Throwables.propagate(e);
-    }
+    kenaiConfiguration.setBaseUrl(server.getServerProvider().getUrl() + AUTH_APP_NAME + "/");
     kenaiConfiguration.setDefaultRole(DEFAULT_ROLE);
 
     Kenai kenai = mock(Kenai.class);
