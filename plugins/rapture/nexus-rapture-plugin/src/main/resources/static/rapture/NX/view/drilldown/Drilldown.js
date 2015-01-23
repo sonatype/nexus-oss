@@ -211,6 +211,13 @@ Ext.define('NX.view.drilldown.Drilldown', {
       me.focus();
       me.currentIndex = index;
 
+      var form = me.down('nx-addwindow[defaultFocus]');
+      if (form) {
+        form.down('[name=' + form.defaultFocus + ']').focus();
+      } else {
+        me.focus();
+      }
+
       // Update the breadcrumb
       me.refreshBreadcrumb();
       me.resizeBreadcrumb();
