@@ -19,6 +19,9 @@
  */
 Ext.define('NX.view.dev.styles.Modals', {
   extend: 'NX.view.dev.styles.StyleSection',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: 'Modals',
 
