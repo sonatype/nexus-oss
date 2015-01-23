@@ -26,6 +26,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
     'NX.Icons'
   ],
 
+  layout: 'card',
+
   /**
    * @cfg [autoHideTabHeader=true] automatically hide tabs (header) when there is only one tab
    */
@@ -40,6 +42,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
   // List of actions to use in the detail view
   actions: null,
+
+  // Which card do we start with?
+  currentIndex: 0,
 
   /**
    * @override
@@ -87,20 +92,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
     }
 
     // Initialize this component’s items
-    me.items = {
-      xtype: 'container',
-
-      defaults: {
-        flex: 1
-      },
-
-      layout: {
-        type: 'hbox',
-        align: 'stretch'
-      },
-
-      items: items
-    };
+    me.items = items;
 
     me.callParent(arguments);
   },
@@ -206,39 +198,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /**
-   * Create an event handler so the panel will resize correctly when the window does
-   *
-   * @override
-   */
-  onRender: function () {
-    var me = this;
-
-    me.currentIndex = 0;
-
-    if (me.ownerCt) {
-      me.relayEvents(me.ownerCt, ['resize'], 'owner');
-      me.on({
-        ownerresize: me.syncSizeToOwner,
-        afterrender: me.syncSizeToOwner
-      });
-    }
-
-    me.callParent(arguments);
-  },
-
-  /**
-   * Given N drilldown items, this panel should have a width of N times the current screen width
-   */
-  syncSizeToOwner: function () {
-    var me = this,
-      owner = me.ownerCt.body.el,
-      container = me.down('container');
-
-    container.setSize(owner.getWidth() * container.items.length, owner.getHeight());
-    me.slidePanels(me.currentIndex, false);
-  },
-
-  /**
    * Slide the drilldown to reveal the specified panel
    */
   slidePanels: function (index, animate) {
@@ -247,15 +206,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
     if (item.el) {
 
-      // Hack to suppress resize events until the animation is complete
-      if (animate) {
-        me.ownerCt.suspendEvents(false);
-        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
-      }
-
       // Show the requested panel
-      var left = item.el.getLeft() - me.el.getLeft();
-      me.el.first().move('l', left, animate);
+      /*var left = item.el.getLeft() - me.el.getLeft();
+      me.el.first().move('l', left, animate);*/
+      me.getLayout().setActiveItem(index);
+      me.focus();
       me.currentIndex = index;
 
       // Update the breadcrumb
@@ -286,20 +241,15 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   padItems: function (index) {
     var me = this,
-      items = me.query('nx-drilldown-item'),
-      itemContainer;
+      items = me.query('nx-drilldown-item');
 
     // Create new drilldown items (if needed)
     if (index > items.length - 1) {
-      itemContainer = me.down('container');
 
       // Create empty panels if index > items.length
       for (var i = items.length; i <= index; ++i) {
-        itemContainer.add(me.createDrilldownItem(i, undefined, undefined));
+        me.add(me.createDrilldownItem(i, undefined, undefined));
       }
-
-      // Resize the panel
-      me.syncSizeToOwner();
     }
 
     return me.query('nx-drilldown-item');
