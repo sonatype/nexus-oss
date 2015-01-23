@@ -207,8 +207,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
     if (item.el) {
 
       // Show the requested panel
-      /*var left = item.el.getLeft() - me.el.getLeft();
-      me.el.first().move('l', left, animate);*/
       me.getLayout().setActiveItem(index);
       me.focus();
       me.currentIndex = index;
