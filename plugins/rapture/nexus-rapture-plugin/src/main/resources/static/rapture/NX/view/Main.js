@@ -97,16 +97,16 @@ Ext.define('NX.view.Main', {
         xtype: 'nx-header-mode',
         items: { xtype: 'nx-header-admin-mode' }
       },
-      {
-        xtype: 'nx-header-mode',
-        items: { xtype: 'nx-header-user-mode' }
-      },
       ' ',
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
       //{ xtype: 'nx-header-messages', ui: 'nx-header' },
       { xtype: 'nx-header-refresh', ui: 'nx-header' },
       { xtype: 'nx-header-help', ui: 'nx-header' },
+      {
+        xtype: 'nx-header-mode',
+        items: { xtype: 'nx-header-user-mode' }
+      },
       { xtype: 'nx-header-signin', ui: 'nx-header' },
       { xtype: 'nx-header-signout', ui: 'nx-header' }
     ]);

@@ -32,6 +32,8 @@ class PrivilegeRepositoryTargetXO
   @NotEmpty
   String repositoryTargetId
 
-  @NotEmpty
+  /**
+   * Empty value is interpreted as 'All Repositories'
+   */
   String repositoryId
 }

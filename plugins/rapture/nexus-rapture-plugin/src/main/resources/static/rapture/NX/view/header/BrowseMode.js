@@ -25,24 +25,26 @@ Ext.define('NX.view.header.BrowseMode', {
   ],
   ui: 'nx-header',
   cls: 'nx-modebutton',
-  anchor: '100% 100%',
+  scale: 'medium',
+  height: 39,
+  width: 39,
 
   /**
    * @cfg mode Mode name
    */
   mode: 'browse',
   toggleGroup: 'mode',
+  allowDepress: false,
 
   /**
-   * @cfg autoHide If button should auto hide when no features are available for selected mode (default true)
+   * @cfg autoHide If button should auto hide when no features are available for selected mode
    */
   autoHide: true,
 
   /**
-   * @cfg collapseMenu If menu should be collapsed automatically when mode is selected (default true)
+   * @cfg collapseMenu If menu should be collapsed automatically when mode is selected
    */
   collapseMenu: true,
-
   title: 'Browse',
   tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
   glyph: 'xf1b2@FontAwesome' /* fa-cube */

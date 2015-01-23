@@ -75,7 +75,11 @@ Ext.define('NX.controller.ExtDirect', {
     if (message) {
       NX.Messages.add({text: message, type: 'warning'});
     }
-    me.logDebug(transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK'));
+    var logMsg = transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK');
+    if (result.errors) {
+      logMsg += (' Errors: ' + Ext.encode(result.errors));
+    }
+    me.logDebug(logMsg);
   }
 
 });

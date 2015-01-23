@@ -22,8 +22,6 @@ Ext.define('NX.view.header.Mode', {
   alias: 'widget.nx-header-mode',
 
   layout: 'absolute',
-  height: 39,
-  width: 39,
 
   /**
    * @private

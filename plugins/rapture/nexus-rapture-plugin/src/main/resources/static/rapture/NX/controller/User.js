@@ -31,7 +31,7 @@ Ext.define('NX.controller.User', {
   views: [
     'header.SignIn',
     'header.SignOut',
-    'header.User',
+    'header.UserMode',
     'Authenticate',
     'SignIn'
   ],
@@ -336,6 +336,8 @@ Ext.define('NX.controller.User', {
       if (user) {
         signInButton.hide();
         userButton.up('nx-header-mode').show();
+        userButton.setText(user.id);
+        userButton.setTooltip(NX.I18n.format('GLOBAL_HEADER_USER_TOOLTIP', user.id));
         signOutButton.show();
       }
       else {

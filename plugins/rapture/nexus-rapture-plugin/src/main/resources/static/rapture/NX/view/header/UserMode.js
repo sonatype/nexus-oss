@@ -17,7 +17,7 @@
  *
  * @since 3.0
  */
-Ext.define('NX.view.header.User', {
+Ext.define('NX.view.header.UserMode', {
   extend: 'Ext.button.Button',
   alias: 'widget.nx-header-user-mode',
   requires: [
@@ -25,16 +25,17 @@ Ext.define('NX.view.header.User', {
   ],
   ui: 'nx-header',
   cls: 'nx-modebutton',
-  anchor: '100% 100%',
+  scale: 'medium',
+  height: 39,
 
   /**
    * @cfg mode Mode name
    */
   mode: 'user',
   toggleGroup: 'mode',
+  allowDepress: false,
 
   title: 'User',
-  tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),
   glyph: 'xf007@FontAwesome', // fa-user
 
   autoHide: false,
