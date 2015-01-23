@@ -46,7 +46,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
     GLOBAL_HEADER_USER_TOOLTIP: 'Hi, {0}. Manage your user account.',
     GLOBAL_HEADER_SIGN_IN: 'Sign in',
-    GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Administer the server',
+    GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Sign in',
     GLOBAL_HEADER_SIGN_OUT: 'Sign out',
     GLOBAL_HEADER_SIGN_OUT_TOOLTIP: 'Sign out',
     GLOBAL_HEADER_HELP_TOOLTIP: 'Help',
