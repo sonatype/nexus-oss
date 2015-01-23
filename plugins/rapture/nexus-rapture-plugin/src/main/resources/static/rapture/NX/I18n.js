@@ -40,8 +40,9 @@ Ext.define('NX.I18n', {
    */
   get: function(key) {
     var text = this.keys[key];
-    if (!text) {
+    if (text === null || text === undefined) {
       this.logWarn('Missing I18n key: ' + key);
+      return 'MISSING:' + key;
     }
     return text;
   },
