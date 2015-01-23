@@ -1,12 +1,8 @@
 <?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-  <Ref id="HTTPConnector">
-    <Set name="confidentialPort"><Property name="application-port-ssl"/></Set>
-  </Ref>
-
-  <Ref id="NexusWebAppContext">
+  <Ref refid="NexusWebAppContext">
     <!-- enforce use of the confidential port -->
     <Set name="securityHandler">
       <New class="org.eclipse.jetty.security.ConstraintSecurityHandler">

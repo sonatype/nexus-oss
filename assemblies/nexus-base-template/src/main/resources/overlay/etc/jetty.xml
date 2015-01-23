@@ -31,7 +31,7 @@
       <Set name="handlers">
         <Array type="org.eclipse.jetty.server.Handler">
           <Item>
-            <Ref id="NexusHandler"/>
+            <Ref refid="NexusHandler"/>
           </Item>
           <Item>
             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
