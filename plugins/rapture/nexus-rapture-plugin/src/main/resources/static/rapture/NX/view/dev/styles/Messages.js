@@ -36,11 +36,12 @@ Ext.define('NX.view.dev.styles.Messages', {
     var me = this;
 
     function message(type) {
-      var style = 'message-' + type;
+      var style = 'nx-message-' + type;
+      var icon = NX.Icons.cls('message-' + type, 'x16');
       return {
         xtype: 'window',
         ui: style,
-        iconCls: NX.Icons.cls(style, 'x16'),
+        iconCls: icon,
         title: type,
         html: "ui: '" + style + "'",
         hidden: false,

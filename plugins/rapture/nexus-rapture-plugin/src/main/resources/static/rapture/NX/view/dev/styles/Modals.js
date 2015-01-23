@@ -19,6 +19,9 @@
  */
 Ext.define('NX.view.dev.styles.Modals', {
   extend: 'NX.view.dev.styles.StyleSection',
+  requires: [
+    'NX.I18n'
+  ],
 
   title: 'Modals',
 
@@ -37,7 +40,7 @@ Ext.define('NX.view.dev.styles.Modals', {
       {
         xtype: 'window',
 
-        title: 'Sign In',
+        title: NX.I18n.get('GLOBAL_SIGN_IN_TITLE'),
 
         hidden: false,
         collapsible: false,
@@ -53,39 +56,35 @@ Ext.define('NX.view.dev.styles.Modals', {
           bodyPadding: 10,
           defaultType: 'textfield',
           defaults: {
-            labelAlign: 'left',
-            labelWidth: 100,
             anchor: '100%'
           },
           items: [
             {
               name: 'username',
               itemId: 'username',
-              fieldLabel: 'Username',
-              emptyText: 'enter your username',
+              emptyText: NX.I18n.get('GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER'),
               allowBlank: false,
               validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
             },
             {
               name: 'password',
               itemId: 'password',
-              fieldLabel: 'Password',
               inputType: 'password',
-              emptyText: 'enter your password',
+              emptyText: NX.I18n.get('GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER'),
               allowBlank: false,
               validateOnBlur: false // allow cancel to be clicked w/o validating this to be non-blank
             },
             {
               xtype: 'checkbox',
-              fieldLabel: 'Remember me',
+              boxLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
               name: 'remember'
             }
           ],
 
           buttonAlign: 'left',
           buttons: [
-            { text: 'Sign In', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-            { text: 'Cancel', scope: me }
+            { text: NX.I18n.get('GLOBAL_SIGN_IN_SUBMIT'), formBind: true, bindToEnter: true, ui: 'nx-primary' },
+            { text: NX.I18n.get('GLOBAL_SIGN_IN_CANCEL') }
           ]
         }
       },

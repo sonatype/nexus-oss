@@ -77,7 +77,7 @@ Ext.define('NX.view.dev.styles.Panels', {
       panelStyle('light'),
 
       // TODO: Consider adding flag to disable 'frame: true' example for subsection
-      panelStyle('subsection')
+      panelStyle('nx-subsection')
     ];
 
     me.callParent();

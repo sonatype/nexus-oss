@@ -40,10 +40,10 @@ Ext.define('NX.view.dev.styles.Tabs', {
         activeTab: 0,
         ui: name,
         items: [
-          { title: 'Settings', html: 'A simple tab' },
-          { title: 'Routing', html: 'Another one' },
-          { title: 'Smart Proxy', html: 'Yet another' },
-          { title: 'Health Check', html: 'And one more' }
+          { title: 'Settings', items: { xtype: 'panel', html: 'A simple tab', ui: 'nx-inset' } },
+          { title: 'Routing', items: { xtype: 'panel', html: 'Another one', ui: 'nx-inset' } },
+          { title: 'Smart Proxy', items: { xtype: 'panel', html: 'Yet another', ui: 'nx-inset' } },
+          { title: 'Health Check', items: { xtype: 'panel', html: 'And one more', ui: 'nx-inset' } }
         ]
       };
 
@@ -65,7 +65,7 @@ Ext.define('NX.view.dev.styles.Tabs', {
 
     me.items = [
       tabStyle('default'),
-      tabStyle('light')
+      tabStyle('nx-light')
     ];
 
     me.callParent();

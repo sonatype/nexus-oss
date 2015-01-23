@@ -52,7 +52,7 @@ Ext.define('NX.view.dev.styles.Buttons', {
         text: text,
         ui: ui,
         margin: "0 10 10 0",
-        width: 80
+        width: 100
       };
 
       // Initialize optional button parameters
@@ -95,7 +95,7 @@ Ext.define('NX.view.dev.styles.Buttons', {
     }
 
     me.items = [
-      buttonStyle('nx-default', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
+      buttonStyle('default', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
       buttonStyle('nx-plain', ['white', 'light-gainsboro', 'light-gray', 'silver', 'suva-gray', 'gray']),
       buttonStyle('nx-primary', ['denim', 'light-cobalt', 'dark-denim', 'smalt', 'dark-cerulean', 'prussian-blue']),
       buttonStyle('nx-danger', ['light-cerise', 'brick-red', 'old-rose', 'fire-brick', 'shiraz', 'falu-red']),
