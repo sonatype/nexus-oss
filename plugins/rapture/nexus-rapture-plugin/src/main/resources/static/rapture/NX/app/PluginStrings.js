@@ -42,6 +42,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse server contents',
     GLOBAL_HEADER_ADMIN_TOOLTIP: 'Server administration and configuration',
     GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components',
+    GLOBAL_HEADER_SEARCH_TOOLTIP: 'Quick component keyword search',
     GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
     GLOBAL_HEADER_USER_TOOLTIP: 'Hi, {0}. Manage your user account.',
     GLOBAL_HEADER_SIGN_IN: 'Sign in',

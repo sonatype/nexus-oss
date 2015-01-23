@@ -21,7 +21,8 @@ Ext.define('NX.view.dev.styles.Header', {
   extend: 'NX.view.dev.styles.StyleSection',
   requires: [
     'Ext.XTemplate',
-    'NX.State'
+    'NX.State',
+    'NX.I18n'
   ],
 
   title: 'Header',
@@ -38,7 +39,7 @@ Ext.define('NX.view.dev.styles.Header', {
         items = [],
         logo = [];
 
-    logo.push({ xtype: 'label', text: 'Sonatype Nexus', cls: 'nx-header-productname' });
+    logo.push({ xtype: 'label', text: NX.I18n.get('GLOBAL_HEADER_TITLE'), cls: 'nx-header-productname' });
 
     // HACK remove this
     var logoOnly = false;
@@ -63,30 +64,52 @@ Ext.define('NX.view.dev.styles.Header', {
       items.push(
           ' ', ' ', // 2x pad
           {
-            xtype: 'button',
-            ui: 'nx-header',
-            cls: 'nx-modebutton',
-            toggleGroup: 'examplemode',
-            title: 'Browse',
-            tooltip: 'Browse server contents',
-            glyph: 'xf1b2@FontAwesome' /* fa-cube */
+            xtype: 'nx-header-mode',
+            items: {
+              xtype: 'button',
+              ui: 'nx-header',
+              cls: 'nx-modebutton',
+              pressed: true,
+              anchor: '100% 100%',
+              toggleGroup: 'examplemode',
+              title: 'Browse',
+              tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
+              glyph: 'xf1b2@FontAwesome' /* fa-cube */
+            }
           },
           {
-            xtype: 'button',
-            ui: 'nx-header',
-            cls: 'nx-modebutton',
-            toggleGroup: 'examplemode',
-            title: 'Administration',
-            tooltip: 'Server administration and configuration',
-            glyph: 'xf013@FontAwesome' /* fa-gear */
+            xtype: 'nx-header-mode',
+            items: {
+              xtype: 'button',
+              ui: 'nx-header',
+              cls: 'nx-modebutton',
+              anchor: '100% 100%',
+              toggleGroup: 'examplemode',
+              title: 'Administration',
+              tooltip: NX.I18n.get('GLOBAL_HEADER_ADMIN_TOOLTIP'),
+              glyph: 'xf013@FontAwesome' /* fa-gear */
+            }
+          },
+          {
+            xtype: 'nx-header-mode',
+            items: {
+              xtype: 'button',
+              ui: 'nx-header',
+              cls: 'nx-modebutton',
+              anchor: '100% 100%',
+              toggleGroup: 'examplemode',
+              title: 'User',
+              tooltip: NX.I18n.get('GLOBAL_HEADER_USER_TOOLTIP'),
+              glyph: 'xf007@FontAwesome'
+            }
           },
           ' ',
           {
             xtype: 'nx-searchbox',
             cls: 'nx-quicksearch',
             width: 200,
-            emptyText: 'Search…',
-            inputAttrTpl: "data-qtip='Quick component keyword search'" // field tooltip
+            emptyText: NX.I18n.get('GLOBAL_HEADER_SEARCH_PLACEHOLDER'),
+            inputAttrTpl: "data-qtip='" + NX.I18n.get('GLOBAL_HEADER_SEARCH_TOOLTIP') + "'" // field tooltip
           },
           '->',
           //{
@@ -98,39 +121,13 @@ Ext.define('NX.view.dev.styles.Header', {
           {
             xtype: 'button',
             ui: 'nx-header',
-            tooltip: 'Refresh current view and data',
+            tooltip: NX.I18n.get('GLOBAL_HEADER_REFRESH_TOOLTIP'),
             glyph: 'xf021@FontAwesome' // fa-refresh
           },
           {
             xtype: 'button',
             ui: 'nx-header',
-            text: 'Sign In',
-            tooltip: 'Have an account?',
-            glyph: 'xf090@FontAwesome'
-          },
-          {
-            xtype: 'nx-header-mode',
-            ui: 'nx-header',
-            hidden: true,
-            mode: 'user',
-            title: 'User',
-            text: 'User',
-            tooltip: 'User profile and options',
-            glyph: 'xf007@FontAwesome',
-            autoHide: false,
-            collapseMenu: false
-          },
-          {
-            xtype: 'button',
-            ui: 'nx-header',
-            tooltip: "Sign out",
-            hidden: true,
-            glyph: 'xf08b@FontAwesome'
-          },
-          {
-            xtype: 'button',
-            ui: 'nx-header',
-            tooltip: 'Help',
+            tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_TOOLTIP'),
             glyph: 'xf059@FontAwesome', // fa-question-circle
             arrowCls: '', // hide the menu button arrow
             menu: [
@@ -145,6 +142,21 @@ Ext.define('NX.view.dev.styles.Header', {
                 text: 'Menu item 3'
               }
             ]
+          },
+          {
+            xtype: 'button',
+            ui: 'nx-header',
+            text: NX.I18n.get('GLOBAL_HEADER_SIGN_IN'),
+            tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_IN_TOOLTIP'),
+            glyph: 'xf090@FontAwesome'
+          },
+          {
+            xtype: 'button',
+            ui: 'nx-header',
+            text: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
+            tooltip: NX.I18n.get('GLOBAL_HEADER_SIGN_OUT'),
+            hidden: true,
+            glyph: 'xf08b@FontAwesome'
           }
       );
     }
