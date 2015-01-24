@@ -413,7 +413,7 @@ Ext.define('NX.controller.Menu', {
     });
 
     if (me.mode) {
-      modeButton = headerPanel.down('button[mode=' + me.mode + ']');
+      modeButton = headerPanel.down('button[mode=' + me.mode + ']').up('nx-header-mode');
       if (!modeButton || modeButton.isHidden()) {
         delete me.mode;
       }
