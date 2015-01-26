@@ -922,6 +922,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_HTTP_PARAMETERS: 'URL parameters',
     ADMIN_HTTP_PARAMETERS_HELP: 'Additional parameters appended to HTTP requests after \'?\'',
     ADMIN_HTTP_TIMEOUT: 'Timeout',
+    ADMIN_HTTP_TIMEOUT_HELP: 'Seconds before retry',
     ADMIN_HTTP_ATTEMPTS: 'Max retry attempts',
 
     // User -> Account
