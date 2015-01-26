@@ -49,7 +49,7 @@ public class RemoteBrowserResourceAuthIT
     ServletHolder servletHolder = new ServletHolder(new ValidHTMLJettyDefaultServlet());
     servletHolder.setInitParameter("resourceBase", util.resolvePath("target"));
     servletHolder.setInitParameter("dirAllowed", Boolean.TRUE.toString());
-    jettyServerProvider.addServlet("/auth-test", servletHolder);
+    jettyServerProvider.addServlet("/*", servletHolder);
     jettyServerProvider.start();
 
     // ping nexus to wake up
@@ -72,7 +72,7 @@ public class RemoteBrowserResourceAuthIT
   public void testSiteWithAuth()
       throws Exception
   {
-    String remoteUrl = jettyServerProvider.getUrl().toString() + "/auth-test/";
+    String remoteUrl = jettyServerProvider.getUrl().toString() + "/";
 
     String repoId = "testSiteWithAuth";
     RepositoryRegistry repoRegistry = this.lookup(RepositoryRegistry.class);
