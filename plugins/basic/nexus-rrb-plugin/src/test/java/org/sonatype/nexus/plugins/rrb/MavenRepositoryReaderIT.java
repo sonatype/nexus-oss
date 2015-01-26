@@ -199,7 +199,7 @@ public class MavenRepositoryReaderIT
   public void testAmazon_20100118() {
     // Fetched from URI http://s3.amazonaws.com/maven.springframework.org
     List<RepositoryDirectory> result =
-        reader.extract("/", localUrl, getFakeProxyRepository(getRemoteUrl() + "Amazon_20100118"), "test");
+        reader.extract("/", localUrl, getFakeProxyRepository(getRemoteUrl() + "/Amazon_20100118"), "test");
     assertEquals(997, result.size());
 
     for (RepositoryDirectory repositoryDirectory : result) {
@@ -214,7 +214,7 @@ public class MavenRepositoryReaderIT
     // and http://repository.springsource.com/maven/bundles/release/com
     List<RepositoryDirectory> result =
         reader.extract("/com/", localUrl, getFakeProxyRepository(getRemoteUrl()
-            + "Amazon_20110112/maven/bundles/release"), "test");
+            + "/Amazon_20110112/maven/bundles/release"), "test");
     assertEquals("Result: " + result, 1, result.size());
 
     RepositoryDirectory repositoryDirectory1 = result.get(0);
@@ -231,7 +231,7 @@ public class MavenRepositoryReaderIT
     // and http://repository.springsource.com/maven/bundles/release/
     List<RepositoryDirectory> result =
         reader.extract("/", localUrl,
-            getFakeProxyRepository(getRemoteUrl() + "Amazon_20110112/maven/bundles/release"), "test");
+            getFakeProxyRepository(getRemoteUrl() + "/Amazon_20110112/maven/bundles/release"), "test");
     assertEquals("Result: " + result, 2, result.size());
 
     RepositoryDirectory repositoryDirectory1 = result.get(0);
