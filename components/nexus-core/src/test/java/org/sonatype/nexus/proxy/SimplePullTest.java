@@ -608,6 +608,7 @@ public class SimplePullTest
     {
       response.setStatus(200);
       response.setContentType("application/octet-stream");
+      response.addHeader("Connection", "close");
       response.setContentLength(500);
       response.getOutputStream().write("partialcontent".getBytes());
       response.flushBuffer();
