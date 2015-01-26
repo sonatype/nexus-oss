@@ -92,10 +92,9 @@ public class NXCM1356LoginTestIT
               xstream.toXML(ldapServerLoginTestRequest),
               MediaType.APPLICATION_XML));
 
-      String responseText = response.getEntity().getText();
-
+      // we expect 204 NO CONTENT here
       Assert.assertEquals(
-          "Expected status 204, found: " + response.getStatus() + "\n" + responseText,
+          "Expected status 204, found: " + response.getStatus(),
           204,
           response.getStatus().getCode());
     }
