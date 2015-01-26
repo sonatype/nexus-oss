@@ -145,6 +145,8 @@ define('Sonatype/repoServer/RepositoryIndexBrowserContainer', function() {
 
                       var resourceURI = Sonatype.config.servicePath + '/repositories/' + options.cbPassThru.node.attributes.repositoryId + '/content' + json.data.repositoryPath;
 
+                      var payload = (options.cbPassThru.container.payload) ?  options.cbPassThru.container.payload : options.cbPassThru.container.repositoryBrowser.payload;
+                      
                       options.cbPassThru.container.artifactContainer.updateArtifact({
                             leaf : true,
                             resourceURI : resourceURI,
@@ -157,7 +159,7 @@ define('Sonatype/repoServer/RepositoryIndexBrowserContainer', function() {
                             artifactLink : options.cbPassThru.node.attributes.artifactUri,
                             pomLink : options.cbPassThru.node.attributes.pomUri,
                             nodeName : options.cbPassThru.node.attributes.nodeName,
-                            format : options.cbPassThru.container.payload.data.format
+                            format : payload.data.format
                           });
                     }
                   },
