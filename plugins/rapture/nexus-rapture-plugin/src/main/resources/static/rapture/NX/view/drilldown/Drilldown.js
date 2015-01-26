@@ -41,6 +41,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
   // List of actions to use in the detail view
   actions: null,
 
+  // Saved modes for each drilldown item
+  activeModes: [],
+
   /**
    * @override
    */
@@ -127,6 +130,11 @@ Ext.define('NX.view.drilldown.Drilldown', {
           layout: 'fit',
           itemId: 'create' + index,
           items: createPanel
+        },
+        {
+          type: 'container',
+          layout: 'fit',
+          itemId: 'nothin' + index
         }
       ]
     }
@@ -227,6 +235,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /**
+   * @private
    * Given N drilldown items, this panel should have a width of N times the current screen width
    */
   syncSizeToOwner: function () {
@@ -239,18 +248,58 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /**
+   * @private
+   * Hide all except the specified panel. Focus on a default form field, if available.
+   *
+   * This is needed to restrict focus to the visible panel only.
+   */
+  hideAllExceptAndFocus: function (index) {
+    var me = this,
+      items = me.query('nx-drilldown-item'),
+      form;
+
+    // Hide everything that’s not the specified panel
+    for (var i = 0; i < items.length; ++i) {
+      if (i != index) {
+        items[i].getLayout().setActiveItem(2);
+      }
+    }
+
+    // Set focus on the default field (if available) or the panel itself
+    form = items[index].down('nx-addwindow[defaultFocus]');
+    if (form) {
+      form.down('[name=' + form.defaultFocus + ']').focus();
+    } else {
+      me.focus();
+    }
+  },
+
+  /**
+   * @private
    * Slide the drilldown to reveal the specified panel
    */
   slidePanels: function (index, animate) {
     var me = this,
-      item = me.query('nx-drilldown-item')[index];
+      items = me.query('nx-drilldown-item'),
+      item = items[index],
+      form;
 
     if (item.el) {
+
+      // Restore the saved modes
+      for (var i = 0; i < items.length; ++i) {
+        items[i].getLayout().setActiveItem(me.activeModes[i]);
+      }
 
       // Hack to suppress resize events until the animation is complete
       if (animate) {
         me.ownerCt.suspendEvents(false);
-        setTimeout(function () { me.ownerCt.resumeEvents(); }, 300);
+        setTimeout(function () {
+          me.ownerCt.resumeEvents();
+          me.hideAllExceptAndFocus(index);
+        }, 300);
+      } else {
+        me.hideAllExceptAndFocus(index);
       }
 
       // Show the requested panel
@@ -263,22 +312,6 @@ Ext.define('NX.view.drilldown.Drilldown', {
       me.resizeBreadcrumb();
     }
   },
-
-  /**
-   * Shift this panel to display the referenced master or detail panel
-   *
-   * @param index The index of the master/detail panel to display
-   * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
-   */
-  showChild: function (index, animate) {
-    var me = this,
-      item = me.query('nx-drilldown-item')[index];
-
-    // Show the proper card
-    item.getLayout().setActiveItem(0);
-    me.slidePanels(index, animate);
-  },
-
 
   /**
    * @private
@@ -306,6 +339,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /**
+   * @public
    * Shift this panel to display the referenced step in the create wizard
    *
    * @param index The index of the create wizard to display
@@ -326,10 +360,33 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
     // Show the proper card
     items[index].getLayout().setActiveItem(1);
+
+    me.activeModes[index] = items[index].getLayout().getActiveItem();
+
     me.slidePanels(index, animate);
   },
 
   /**
+   * @public
+   * Shift this panel to display the referenced master or detail panel
+   *
+   * @param index The index of the master/detail panel to display
+   * @param animate Set to “true” if the view should slide into place, “false” if it should just appear
+   */
+  showChild: function (index, animate) {
+    var me = this,
+      item = me.query('nx-drilldown-item')[index];
+
+    // Show the proper card
+    item.getLayout().setActiveItem(0);
+
+    me.activeModes[index] = item.getLayout().getActiveItem();
+
+    me.slidePanels(index, animate);
+  },
+
+  /**
+   * @private
    * Update the breadcrumb based on the itemName and itemClass of drilldown items
    */
   refreshBreadcrumb: function() {
@@ -407,6 +464,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /*
+   * @private
    * Resize the breadcrumb, truncate individual elements with ellipses as needed
    */
   resizeBreadcrumb: function() {
@@ -435,6 +493,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
   },
 
   /*
+   * @private
    * Reduce the width of a set of buttons, longest first, to a specified width
    *
    * @param buttons The list of buttons to resize (sorted descending by width)
