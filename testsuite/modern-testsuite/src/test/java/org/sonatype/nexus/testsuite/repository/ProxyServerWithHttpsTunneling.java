@@ -21,18 +21,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.tests.http.server.jetty.impl.ProxyServlet;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
 import com.google.common.collect.Sets;
 import org.eclipse.jetty.http.HttpURI;
-import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.proxy.ConnectHandler;
+import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ConnectHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ArrayUtil;
 
 /**
  * An test proxy sever which works also for HTTPS.
@@ -57,22 +56,14 @@ public class ProxyServerWithHttpsTunneling
   }
 
   public void initialize() {
-    Server proxy = new Server();
-    Connector connector = new SelectChannelConnector();
-    connector.setPort(getPort());
-    proxy.addConnector(connector);
-
-    final HandlerCollection handlers = new HandlerCollection();
-    proxy.setHandler(handlers);
-
-    final ServletContextHandler context = new ServletContextHandler(
-        handlers, "/", ServletContextHandler.SESSIONS
-    );
-    final ProxyServlet proxyServlet = new RecordingProxyServlet();
-    context.addServlet(new ServletHolder(proxyServlet), "/*");
-
-    handlers.addHandler(new RecordingConnectHandler());
-
+    final JettyServerProvider jettyServerProvider = new JettyServerProvider();
+    jettyServerProvider.setPort(getPort());
+    jettyServerProvider.addServlet("/*", new RecordingProxyServlet());
+    Server proxy = jettyServerProvider.getServer();
+    // HACK: here we rely on imple detail of JettyServerProvider
+    Handler[] handlers = ((HandlerCollection) proxy.getHandler()).getHandlers();
+    ((HandlerCollection) proxy.getHandler()).setHandlers(
+        ArrayUtil.prependToArray(new RecordingConnectHandler(), handlers, Handler.class));
     setServer(proxy);
   }
 

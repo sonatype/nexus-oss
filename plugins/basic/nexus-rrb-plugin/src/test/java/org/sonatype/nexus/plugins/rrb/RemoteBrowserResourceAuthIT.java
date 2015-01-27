@@ -20,19 +20,10 @@ import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.BlockingChannelConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.util.security.Password;
 import org.junit.Test;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
@@ -44,7 +35,7 @@ import static org.hamcrest.Matchers.*;
 public class RemoteBrowserResourceAuthIT
     extends AbstractPluginTestCase
 {
-  private Server server = null;
+  private JettyServerProvider jettyServerProvider;
 
   @Override
   protected void setUp()
@@ -52,41 +43,14 @@ public class RemoteBrowserResourceAuthIT
   {
     super.setUp();
 
-    server = new Server();
-    server.addConnector(new BlockingChannelConnector());
-    ServletContextHandler webappContext = new ServletContextHandler();
-    webappContext.setContextPath("/auth-test");
-    HandlerCollection handlers = new HandlerCollection();
-    handlers.setHandlers(new Handler[]{webappContext, new DefaultHandler()});
-    server.setHandler(handlers);
-
-    final ServletHolder servletHolder = new ServletHolder(new ValidHTMLJettyDefaultServlet());
+    jettyServerProvider = new JettyServerProvider();
+    jettyServerProvider.addAuthentication("/*", Constraint.__BASIC_AUTH);
+    jettyServerProvider.addUser("admin", "admin");
+    ServletHolder servletHolder = new ServletHolder(new ValidHTMLJettyDefaultServlet());
     servletHolder.setInitParameter("resourceBase", util.resolvePath("target"));
     servletHolder.setInitParameter("dirAllowed", Boolean.TRUE.toString());
-
-    webappContext.getServletHandler().addServletWithMapping(servletHolder, "/*");
-
-    Constraint constraint = new Constraint();
-    constraint.setName(Constraint.__BASIC_AUTH);
-    constraint.setRoles(new String[]{"users"});
-    constraint.setAuthenticate(true);
-
-    ConstraintMapping cm = new ConstraintMapping();
-    cm.setConstraint(constraint);
-    cm.setPathSpec("/*");
-
-    ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-    securityHandler.setRealmName("Test Server");
-    securityHandler.setAuthMethod("BASIC");
-    securityHandler.setStrict(true);
-    securityHandler.setConstraintMappings(new ConstraintMapping[]{cm});
-    HashLoginService hashLoginService = new HashLoginService("Test Server");
-    securityHandler.setLoginService(hashLoginService);
-    webappContext.setSecurityHandler(securityHandler);
-
-    hashLoginService.putUser("admin", new Password("admin"), new String[]{"users"});
-
-    server.start();
+    jettyServerProvider.addServlet("/*", servletHolder);
+    jettyServerProvider.start();
 
     // ping nexus to wake up
     startNx();
@@ -97,8 +61,8 @@ public class RemoteBrowserResourceAuthIT
       throws Exception
   {
 
-    if (server != null) {
-      server.stop();
+    if (jettyServerProvider != null) {
+      jettyServerProvider.stop();
     }
 
     super.tearDown();
@@ -108,7 +72,7 @@ public class RemoteBrowserResourceAuthIT
   public void testSiteWithAuth()
       throws Exception
   {
-    String remoteUrl = "http://localhost:" + server.getConnectors()[0].getLocalPort() + "/auth-test/";
+    String remoteUrl = jettyServerProvider.getUrl().toString() + "/";
 
     String repoId = "testSiteWithAuth";
     RepositoryRegistry repoRegistry = this.lookup(RepositoryRegistry.class);

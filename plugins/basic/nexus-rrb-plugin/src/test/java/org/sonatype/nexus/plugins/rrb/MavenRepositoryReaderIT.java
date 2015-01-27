@@ -28,17 +28,15 @@ import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.http.QueryStringBuilder;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
 import junit.framework.Assert;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.nio.BlockingChannelConnector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,11 +58,9 @@ public class MavenRepositoryReaderIT
 {
   MavenRepositoryReader reader; // The "class under test"
 
-  Server server; // An embedded Jetty server
+  JettyServerProvider jettyServerProvider;
 
   String localUrl = "http://local"; // This URL doesn't matter for the tests
-
-  String nameOfConnector; // This is the host:portnumber of the Jetty connector
 
   @Mock
   private QueryStringBuilder queryStringBuilder;
@@ -124,32 +120,23 @@ public class MavenRepositoryReaderIT
       }
     };
 
-    server = new Server();// We choose an arbitrary server port
-    server.addConnector(new BlockingChannelConnector());
-    server.setHandler(handler); // Assign the handler of incoming requests
-    server.start();
-
-    // After starting we must find out the host:port, so we know how to
-    // connect to the server in the tests
-    for (Connector connector : server.getConnectors()) {
-      nameOfConnector = connector.getName();
-      break; // We only need one connector name (and there should only be
-      // one...)
-    }
+    jettyServerProvider = new JettyServerProvider();
+    jettyServerProvider.getServer().setHandler(handler);
+    jettyServerProvider.start();
   }
 
   @After
   public void shutDown()
       throws Exception
   {
-    server.stop();
+    jettyServerProvider.stop();
   }
 
   /**
    * Auxiliary methods
    */
   private String getRemoteUrl() {
-    return "http://" + nameOfConnector + "/";
+    return jettyServerProvider.getUrl().toString();
   }
 
   private ProxyRepository getFakeProxyRepository(final String remoteUrl) {
@@ -212,7 +199,7 @@ public class MavenRepositoryReaderIT
   public void testAmazon_20100118() {
     // Fetched from URI http://s3.amazonaws.com/maven.springframework.org
     List<RepositoryDirectory> result =
-        reader.extract("/", localUrl, getFakeProxyRepository(getRemoteUrl() + "Amazon_20100118"), "test");
+        reader.extract("/", localUrl, getFakeProxyRepository(getRemoteUrl() + "/Amazon_20100118"), "test");
     assertEquals(997, result.size());
 
     for (RepositoryDirectory repositoryDirectory : result) {
@@ -227,7 +214,7 @@ public class MavenRepositoryReaderIT
     // and http://repository.springsource.com/maven/bundles/release/com
     List<RepositoryDirectory> result =
         reader.extract("/com/", localUrl, getFakeProxyRepository(getRemoteUrl()
-            + "Amazon_20110112/maven/bundles/release"), "test");
+            + "/Amazon_20110112/maven/bundles/release"), "test");
     assertEquals("Result: " + result, 1, result.size());
 
     RepositoryDirectory repositoryDirectory1 = result.get(0);
@@ -244,7 +231,7 @@ public class MavenRepositoryReaderIT
     // and http://repository.springsource.com/maven/bundles/release/
     List<RepositoryDirectory> result =
         reader.extract("/", localUrl,
-            getFakeProxyRepository(getRemoteUrl() + "Amazon_20110112/maven/bundles/release"), "test");
+            getFakeProxyRepository(getRemoteUrl() + "/Amazon_20110112/maven/bundles/release"), "test");
     assertEquals("Result: " + result, 2, result.size());
 
     RepositoryDirectory repositoryDirectory1 = result.get(0);

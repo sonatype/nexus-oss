@@ -86,7 +86,7 @@
 
     <dependency>
       <groupId>com.codahale.metrics</groupId>
-      <artifactId>metrics-jetty8</artifactId>
+      <artifactId>metrics-jetty9</artifactId>
       <optional>true</optional>
     </dependency>
 

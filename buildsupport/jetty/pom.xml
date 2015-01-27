@@ -28,15 +28,15 @@
   <packaging>pom</packaging>
 
   <properties>
-    <eclipse-jetty.version>8.1.11.v20130520</eclipse-jetty.version>
+    <eclipse-jetty.version>9.2.7.v20150116</eclipse-jetty.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.eclipse.jetty.orbit</groupId>
-        <artifactId>javax.servlet</artifactId>
-        <version>3.0.0.v201112011016</version>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
       </dependency>
 
       <dependency>
@@ -89,7 +89,19 @@
 
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util-ajax</artifactId>
+        <version>${eclipse-jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlets</artifactId>
+        <version>${eclipse-jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-proxy</artifactId>
         <version>${eclipse-jetty.version}</version>
       </dependency>
 
@@ -122,33 +134,6 @@
         <artifactId>jetty-rewrite</artifactId>
         <version>${eclipse-jetty.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-ajp</artifactId>
-        <version>${eclipse-jetty.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jetty.aggregate</groupId>
-        <artifactId>jetty-all-server</artifactId>
-        <version>${eclipse-jetty.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.activation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.annotation</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.mail.glassfish</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 

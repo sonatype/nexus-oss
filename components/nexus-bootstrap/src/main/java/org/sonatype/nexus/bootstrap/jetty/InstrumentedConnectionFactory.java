@@ -13,16 +13,17 @@
 package org.sonatype.nexus.bootstrap.jetty;
 
 import com.codahale.metrics.SharedMetricRegistries;
+import org.eclipse.jetty.server.ConnectionFactory;
 
 /**
- * Extension of {@link com.codahale.metrics.jetty9.InstrumentedQueuedThreadPool} that restores the default constructor.
- * 
+ * Extension of {@link com.codahale.metrics.jetty9.InstrumentedConnectionFactory}.
+ *
  * @since 3.0
  */
-public final class InstrumentedQueuedThreadPool
-    extends com.codahale.metrics.jetty9.InstrumentedQueuedThreadPool
+public final class InstrumentedConnectionFactory
+    extends com.codahale.metrics.jetty9.InstrumentedConnectionFactory
 {
-  public InstrumentedQueuedThreadPool() {
-    super(SharedMetricRegistries.getOrCreate("nexus"));
+  public InstrumentedConnectionFactory(final ConnectionFactory connectionFactory) {
+    super(connectionFactory, SharedMetricRegistries.getOrCreate("nexus").timer("connection-duration"));
   }
 }
