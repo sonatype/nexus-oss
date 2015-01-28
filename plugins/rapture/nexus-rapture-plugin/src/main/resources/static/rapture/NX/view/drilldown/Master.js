@@ -21,12 +21,23 @@ Ext.define('NX.view.drilldown.Master', {
   extend: 'Ext.grid.Panel',
   alias: 'widget.nx-drilldown-master',
 
-  listeners: {
-    columnschanged: 'refreshDrilldown',
-    viewready: function(view) { view.refreshDrilldown(view.headerCt) }
+  // Prevent columns from expanding out of bounds
+  forceFit: true,
+
+  /**
+   * @private
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.callParent(arguments);
+
+    // Refresh drilldown affordances whenever a column is added
+    me.headerCt.on('add', me.refreshDrilldown);
   },
 
   /**
+   * @private
    * Put a drilldown affordance ‘>’ at the end of each item in the list
    *
    * @param ct The content header for the grid
