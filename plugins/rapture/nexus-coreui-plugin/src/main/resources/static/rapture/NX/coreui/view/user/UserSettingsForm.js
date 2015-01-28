@@ -55,7 +55,7 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
       { name: 'version', xtype: 'hiddenfield' },
       {
         name: 'firstName',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
+        fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST')
       },
       {
         name: 'lastName',
@@ -65,7 +65,7 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         xtype: 'nx-email',
         name: 'email',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP'),
+        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_EMAIL_HELP')
       },
       {
         xtype: 'combo',
@@ -85,7 +85,6 @@ Ext.define('NX.coreui.view.user.UserSettingsForm', {
         name: 'roles',
         itemId: 'roles',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_HELP'),
         buttons: ['add', 'remove'],
         fromTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_ROLES_PICKER'),
         toTitle: NX.I18n.get('ADMIN_USERS_SETTINGS_GIVEN_PICKER'),

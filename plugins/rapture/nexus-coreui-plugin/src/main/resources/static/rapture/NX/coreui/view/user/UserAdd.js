@@ -62,7 +62,7 @@ Ext.define('NX.coreui.view.user.UserAdd', {
         xtype: 'nx-password',
         name: 'password',
         itemId: 'password',
-        fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_PASSWORD'),
+        fieldLabel: NX.I18n.get('ADMIN_USERS_CREATE_PASSWORD')
       },
       {
         xtype: 'nx-password',

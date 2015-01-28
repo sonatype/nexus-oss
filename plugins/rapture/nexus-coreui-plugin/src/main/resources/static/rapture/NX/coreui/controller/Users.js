@@ -39,7 +39,6 @@ Ext.define('NX.coreui.controller.Users', {
     'User',
     'UserSource',
     'Role'
-
   ],
   views: [
     'user.UserAccount',
