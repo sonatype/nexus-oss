@@ -53,17 +53,18 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
       defaults: {
         anchor: '100%'
       },
-
       items: [
         {
           xtype: 'nx-password',
           name: 'password',
           itemId: 'password',
-          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW')
+          fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_NEW'),
+          allowBlank: false
         },
         {
           xtype: 'nx-password',
           fieldLabel: NX.I18n.get('ADMIN_USERS_PASSWORD_CONFIRM'),
+          allowBlank: false,
           submitValue: false,
           validator: function () {
             var me = this;
