@@ -32,8 +32,7 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
   autoShow: true,
   modal: true,
   constrain: true,
-  width: 630,
-  minWidth: 630,
+  width: 320,
 
   /**
    * @cfg userId to change password for
@@ -51,6 +50,9 @@ Ext.define('NX.coreui.view.user.UserChangePassword', {
       editableCondition: NX.Conditions.isPermitted('security:userschangepw', 'create'),
       editableMarker: NX.I18n.get('ADMIN_USERS_PASSWORD_ERROR'),
       ui: 'nx-inset',
+      defaults: {
+        anchor: '100%'
+      },
 
       items: [
         {
