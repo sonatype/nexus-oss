@@ -128,7 +128,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
           afterrender: me.bindDisableButton
         },
         'nx-coreui-capability-summary nx-settingsform': {
-          submitted: me.loadStore
+          submitted: function() { me.loadStore(Ext.emptyFn) }
         },
         'nx-coreui-capability-settings button[action=save]': {
           click: me.updateCapability
@@ -437,7 +437,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
             text: 'Capability updated: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
             type: 'success'
           });
-          me.loadStore();
+          me.loadStore(Ext.emptyFn);
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
