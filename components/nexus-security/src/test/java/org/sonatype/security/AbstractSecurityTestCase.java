@@ -15,6 +15,7 @@ package org.sonatype.security;
 import java.io.File;
 import java.util.Properties;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -29,7 +30,6 @@ import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import com.google.inject.Binder;
 import com.google.inject.name.Names;
 import net.sf.ehcache.CacheManager;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.sisu.launch.InjectedTestCase;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -76,7 +76,7 @@ public abstract class AbstractSecurityTestCase
 
   @Override
   protected void setUp() throws Exception {
-    FileUtils.deleteDirectory(PLEXUS_HOME);
+    DirSupport.deleteIfExists(PLEXUS_HOME.toPath());
     super.setUp();
     CONFIG_DIR.mkdirs();
     lookup(SecuritySystem.class).start();

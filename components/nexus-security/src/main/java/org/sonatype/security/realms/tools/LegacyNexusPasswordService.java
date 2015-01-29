@@ -21,8 +21,10 @@ import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.format.HexFormat;
 
-/*
- * PasswordService for handling legacy passwords (SHA-1 and MD5)
+/**
+ * Legacy {@link PasswordService}.
+ *
+ * PasswordService for handling legacy passwords (SHA-1 and MD5).
  */
 @Singleton
 @Typed(PasswordService.class)

@@ -14,6 +14,7 @@ package org.sonatype.security.web;
 
 import java.util.List;
 
+import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
 
 import junit.framework.Assert;
@@ -23,12 +24,9 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 
 public class WebRealmSecurityTest
-    extends AbstractWebSecurityTest
+    extends AbstractSecurityTest
 {
-
-  public void testCacheManagerInit()
-      throws Exception
-  {
+  public void testCacheManagerInit() throws Exception {
     // Start up security
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
     RealmSecurityManager plexusSecurityManager = this.lookup(RealmSecurityManager.class, "default");
@@ -54,5 +52,4 @@ public class WebRealmSecurityTest
       Assert.assertNotNull("Realm has null cacheManager", ((CachingRealm) realm).getCacheManager());
     }
   }
-
 }

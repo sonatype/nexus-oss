@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.authentication;
 
+// FIXME: Replace with Shiro version of this exception
+
 /**
  * Thrown when a Subject or Principal could not be authenticated.
  */

@@ -12,33 +12,25 @@
  */
 package org.sonatype.security.authorization;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 
 /**
- * A permission factory that creates instances of Shiro's {@link WildcardPermission} by directly invoking it's
- * constructor with passed in string representation of the permission. This is the default factory, as the
- * {@link WildcardPermission} is the default permission implementation used all over Security.
+ * {@link WildcardPermission} which caches {@link #hashCode} for improved performance.
+ *
+ * @since 3.0
  */
-@Named("wildcard")
-@Singleton
-@Typed(PermissionFactory.class)
-public class WildcardPermissionFactory
-    implements PermissionFactory
+public class WildcardPermission2
+  extends WildcardPermission
 {
-  @Override
-  public Permission create(final String permission) {
-    return new WildcardPermission(permission) {
-      private final int cachedHash = super.hashCode();
+  private final int cachedHash;
 
-      @Override
-      public int hashCode() {
-        return cachedHash;
-      }
-    };
+  public WildcardPermission2(final String wildcardString) {
+    super(wildcardString);
+    this.cachedHash = super.hashCode();
+  }
+
+  @Override
+  public int hashCode() {
+    return cachedHash;
   }
 }

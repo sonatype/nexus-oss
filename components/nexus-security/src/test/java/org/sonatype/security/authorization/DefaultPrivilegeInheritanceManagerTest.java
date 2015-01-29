@@ -14,21 +14,27 @@ package org.sonatype.security.authorization;
 
 import java.util.List;
 
-import org.eclipse.sisu.launch.InjectedTestCase;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Tests for {@link DefaultPrivilegeInheritanceManager}.
+ */
 public class DefaultPrivilegeInheritanceManagerTest
-    extends InjectedTestCase
+    extends TestSupport
 {
-  // FIXME: Convert to junit4
-
   private DefaultPrivilegeInheritanceManager manager;
 
-  protected void setUp() throws Exception {
-    super.setUp();
-
-    manager = (DefaultPrivilegeInheritanceManager) this.lookup(PrivilegeInheritanceManager.class);
+  @Before
+  public void setUp() throws Exception {
+    manager = new DefaultPrivilegeInheritanceManager();
   }
 
+  @Test
   public void testCreateInherit() throws Exception {
     List<String> methods = manager.getInheritedMethods("create");
 
@@ -37,6 +43,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     assertTrue(methods.contains("create"));
   }
 
+  @Test
   public void testReadInherit() throws Exception {
     List<String> methods = manager.getInheritedMethods("read");
 
@@ -44,6 +51,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     assertTrue(methods.contains("read"));
   }
 
+  @Test
   public void testUpdateInherit() throws Exception {
     List<String> methods = manager.getInheritedMethods("update");
 
@@ -52,6 +60,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     assertTrue(methods.contains("update"));
   }
 
+  @Test
   public void testDeleteInherit() throws Exception {
     List<String> methods = manager.getInheritedMethods("delete");
 

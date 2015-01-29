@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -65,7 +66,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -470,7 +470,7 @@ public class DefaultSecuritySystem
     Set<User> users = new HashSet<User>();
 
     // if the source is not set search all realms.
-    if (StringUtils.isEmpty(criteria.getSource())) {
+    if (Strings2.isEmpty(criteria.getSource())) {
       // search all user managers
       for (UserManager tmpUserManager : getUserManagers()) {
         Set<User> result = tmpUserManager.searchUsers(criteria);

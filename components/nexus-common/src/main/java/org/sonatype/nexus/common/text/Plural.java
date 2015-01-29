@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class Plural
+public final class Plural
 {
   private Plural() {}
 

@@ -36,7 +36,9 @@ public class LogoutAuthenticationFilter
    * We are letting everyone in.
    */
   @Override
-  protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+  protected boolean isAccessAllowed(final ServletRequest request,
+                                    final ServletResponse response,
+                                    final Object mappedValue) {
     return true;
   }
 
@@ -45,9 +47,7 @@ public class LogoutAuthenticationFilter
    * get here).
    */
   @Override
-  protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
-      throws Exception
-  {
+  protected boolean onAccessDenied(final ServletRequest request, final ServletResponse response) throws Exception {
     return true;
   }
 
@@ -64,9 +64,7 @@ public class LogoutAuthenticationFilter
    * @return true always to allow further handling of response content
    */
   @Override
-  public boolean preHandle(ServletRequest request, ServletResponse response)
-      throws Exception
-  {
+  public boolean preHandle(final ServletRequest request, final ServletResponse response) throws Exception {
     Subject subject = getSubject(request, response);
 
     if (subject != null) {

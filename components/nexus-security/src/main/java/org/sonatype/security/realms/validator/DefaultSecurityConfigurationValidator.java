@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
@@ -34,8 +35,6 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
-
-import org.codehaus.plexus.util.StringUtils;
 
 @Singleton
 @Typed(SecurityConfigurationValidator.class)
@@ -193,7 +192,7 @@ public class DefaultSecurityConfigurationValidator
   private String getRoleTextForDisplay(String roleId, SecurityValidationContext ctx) {
     String name = ctx.getExistingRoleNameMap().get(roleId);
 
-    if (StringUtils.isEmpty(name)) {
+    if (Strings2.isEmpty(name)) {
       return roleId;
     }
 
@@ -275,7 +274,7 @@ public class DefaultSecurityConfigurationValidator
       response.addValidationError(message);
     }
 
-    if (!update && (StringUtils.isEmpty(role.getId()) || "0".equals(role.getId()))) {
+    if (!update && (Strings2.isEmpty(role.getId()) || "0".equals(role.getId()))) {
       String newId = idGenerator.generateId();
 
       response.addValidationWarning("Fixed wrong role ID from '" + role.getId() + "' to '" + newId + "'");
@@ -287,7 +286,7 @@ public class DefaultSecurityConfigurationValidator
 
     Map<String, String> existingRoleNameMap = context.getExistingRoleNameMap();
 
-    if (StringUtils.isEmpty(role.getName())) {
+    if (Strings2.isEmpty(role.getName())) {
       ValidationMessage message =
           new ValidationMessage("name", "Role ID '" + role.getId() + "' requires a name.", "Name is required.");
       response.addValidationError(message);
@@ -359,14 +358,14 @@ public class DefaultSecurityConfigurationValidator
       existingIds = context.getExistingUserIds();
     }
 
-    if (!update && StringUtils.isEmpty(user.getId())) {
+    if (!update && Strings2.isEmpty(user.getId())) {
       ValidationMessage message =
           new ValidationMessage("userId", "User ID is required.", "User ID is required.");
 
       response.addValidationError(message);
     }
 
-    if (!update && StringUtils.isNotEmpty(user.getId()) && existingIds.contains(user.getId())) {
+    if (!update && Strings2.isNotEmpty(user.getId()) && existingIds.contains(user.getId())) {
       ValidationMessage message =
           new ValidationMessage("userId", "User ID '" + user.getId() + "' is already in use.", "User ID '"
               + user.getId() + "' is already in use.");
@@ -374,7 +373,7 @@ public class DefaultSecurityConfigurationValidator
       response.addValidationError(message);
     }
 
-    if (StringUtils.isNotEmpty(user.getId()) && user.getId().contains(" ")) {
+    if (Strings2.isNotEmpty(user.getId()) && user.getId().contains(" ")) {
       ValidationMessage message =
           new ValidationMessage("userId", "User ID '" + user.getId() + "' cannot contain spaces.", "User ID '"
               + user.getId() + "' cannot contain spaces.");
@@ -382,22 +381,22 @@ public class DefaultSecurityConfigurationValidator
       response.addValidationError(message);
     }
 
-    if (StringUtils.isNotEmpty(user.getFirstName())) {
+    if (Strings2.isNotEmpty(user.getFirstName())) {
       user.setFirstName(user.getFirstName());
     }
 
-    if (StringUtils.isNotEmpty(user.getLastName())) {
+    if (Strings2.isNotEmpty(user.getLastName())) {
       user.setLastName(user.getLastName());
     }
 
-    if (StringUtils.isEmpty(user.getPassword())) {
+    if (Strings2.isEmpty(user.getPassword())) {
       ValidationMessage message =
           new ValidationMessage("password", "User ID '" + user.getId()
               + "' has no password.  This is a required field.", "Password is required.");
       response.addValidationError(message);
     }
 
-    if (StringUtils.isEmpty(user.getEmail())) {
+    if (Strings2.isEmpty(user.getEmail())) {
       ValidationMessage message =
           new ValidationMessage("email", "User ID '" + user.getId() + "' has no email address",
               "Email address is required.");
@@ -440,7 +439,7 @@ public class DefaultSecurityConfigurationValidator
       }
     }
 
-    if (!StringUtils.isEmpty(user.getId())) {
+    if (!Strings2.isEmpty(user.getId())) {
       existingIds.add(user.getId());
     }
 
@@ -453,7 +452,7 @@ public class DefaultSecurityConfigurationValidator
     ValidationResponse response = new ValidationResponse();
 
     // ID must be not empty
-    if (StringUtils.isEmpty(userRoleMapping.getUserId())) {
+    if (Strings2.isEmpty(userRoleMapping.getUserId())) {
       ValidationMessage message =
           new ValidationMessage("userId", "UserRoleMapping has no userId." + "  This is a required field.",
               "UserId is required.");
@@ -461,7 +460,7 @@ public class DefaultSecurityConfigurationValidator
     }
 
     // source must be not empty
-    if (StringUtils.isEmpty(userRoleMapping.getSource())) {
+    if (Strings2.isEmpty(userRoleMapping.getSource())) {
       ValidationMessage message =
           new ValidationMessage("source", "User Role Mapping for user '" + userRoleMapping.getUserId()
               + "' has no source.  This is a required field.", "UserId is required.");
