@@ -13,6 +13,8 @@
 package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -27,16 +29,20 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteItemNotFoundException;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -55,6 +61,10 @@ public class HttpClientManagerImpl
     extends ComponentSupport
     implements HttpClientManager
 {
+  private static final String NX_REMOTE_ENABLE_CIRCULAR_REDIRECTIONS_KEY = "nexus.remoteStorage.enableCircularRedirectionsForHosts";
+
+  private static final String NX_REMOTE_USE_COOKIES_KEY = "nexus.remoteStorage.useCookiesForHosts";
+
   private final Hc4Provider hc4Provider;
 
   private final UserAgentBuilder userAgentBuilder;
@@ -76,6 +86,16 @@ public class HttpClientManagerImpl
     checkNotNull(proxyRepository);
     checkNotNull(ctx);
     final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    if (isProxiedHostnameEnlisted(proxyRepository, NX_REMOTE_ENABLE_CIRCULAR_REDIRECTIONS_KEY)) {
+      log.info("Allowing circular redirects in proxy {}", proxyRepository);
+      builder.getRequestConfigBuilder().setCircularRedirectsAllowed(true); // allow circular redirects
+      builder.getRequestConfigBuilder().setMaxRedirects(10); // lessen max redirects from default 50
+    }
+    if (isProxiedHostnameEnlisted(proxyRepository, NX_REMOTE_USE_COOKIES_KEY)) {
+      log.info("Allowing cookie use in proxy {}", proxyRepository);
+      builder.getHttpClientBuilder().setDefaultCookieStore(new BasicCookieStore()); // in memory only
+      builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY); // emulate browsers
+    }
     configure(proxyRepository, ctx, builder);
     return builder.build();
   }
@@ -86,6 +106,23 @@ public class HttpClientManagerImpl
   }
 
   // ==
+
+  /**
+   * Method that returns {@code true} if System property with key {@code propertyKey} contains comma delimited string
+   * list, and the passed in {@code proxyRepository} remote URL' hostname is enlisted in it.
+   */
+  protected boolean isProxiedHostnameEnlisted(final ProxyRepository proxyRepository, final String propertyKey) {
+    try {
+      final URI uri = new URI(proxyRepository.getRemoteUrl());
+      final List<String> enlistedIds = Lists.newArrayList(
+          Splitter.on(",").split(SystemPropertiesHelper.getString(propertyKey, "")));
+      return enlistedIds.contains(uri.getHost());
+    }
+    catch (URISyntaxException e) {
+      // ignore
+    }
+    return false;
+  }
 
   /**
    * Configures the fresh instance of HttpClient for given proxy repository specific needs. Right now it sets
