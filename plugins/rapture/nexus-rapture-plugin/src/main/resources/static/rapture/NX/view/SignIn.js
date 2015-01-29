@@ -43,8 +43,8 @@ Ext.define('NX.view.SignIn', {
     Ext.apply(this, {
       items: {
         xtype: 'form',
-        bodyPadding: 10,
         defaultType: 'textfield',
+        ui: 'nx-inset',
         defaults: {
           anchor: '100%'
         },
