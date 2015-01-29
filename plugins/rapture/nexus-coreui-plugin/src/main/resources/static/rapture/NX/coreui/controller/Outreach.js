@@ -61,14 +61,9 @@ Ext.define('NX.coreui.controller.Outreach', {
    */
   refreshOutreachContent: function () {
     var me = this,
-        welcomePage = me.getWelcomePage(),
-        outreachContent;
+        welcomePage = me.getWelcomePage();
 
     if (welcomePage) {
-      outreachContent = welcomePage.down('#outreach');
-      if (outreachContent) {
-        welcomePage.remove(outreachContent);
-      }
       NX.direct.outreach_Outreach.readStatus(function (response) {
         if (Ext.isObject(response) && response.success) {
           var user = NX.State.getUser(),
@@ -86,6 +81,11 @@ Ext.define('NX.coreui.controller.Outreach', {
               '&versionMm=' + NX.State.getVersionMajorMinor() +
               '&edition=' + NX.State.getEdition() +
               '&usertype=' + usertype);
+
+          var outreachContent = welcomePage.down('#outreach');
+          if (outreachContent) {
+            welcomePage.remove(outreachContent, true);
+          }
 
           // add the outreach iframe to the welcome view
           welcomePage.add({
