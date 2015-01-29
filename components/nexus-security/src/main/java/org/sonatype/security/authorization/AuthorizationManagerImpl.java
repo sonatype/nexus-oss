@@ -27,7 +27,6 @@ import org.sonatype.security.events.AuthorizationConfigurationChanged;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -49,20 +48,16 @@ public class AuthorizationManagerImpl
 
   private final ConfigurationManager configuration;
 
-  private final PrivilegeInheritanceManager privInheritance;
-
   private final EventBus eventBus;
 
   private final List<PrivilegeDescriptor> privilegeDescriptors;
 
   @Inject
   public AuthorizationManagerImpl(final ConfigurationManager configuration,
-                                  final PrivilegeInheritanceManager privInheritance,
                                   final EventBus eventBus,
                                   final List<PrivilegeDescriptor> privilegeDescriptors)
   {
     this.configuration = configuration;
-    this.privInheritance = privInheritance;
     this.eventBus = eventBus;
     this.privilegeDescriptors = checkNotNull(privilegeDescriptors);
   }
@@ -227,9 +222,6 @@ public class AuthorizationManagerImpl
 
   public Privilege addPrivilege(Privilege privilege) throws InvalidConfigurationException {
     final CPrivilege secPriv = this.toPrivilege(privilege);
-    // create implies read, so we need to add logic for that
-    addInheritedPrivileges(secPriv);
-
     configuration.createPrivilege(secPriv);
 
     // notify any listeners that the config changed
@@ -258,27 +250,6 @@ public class AuthorizationManagerImpl
 
   public boolean supportsWrite() {
     return true;
-  }
-
-  private void addInheritedPrivileges(CPrivilege privilege) {
-    String methodProperty = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
-
-    if (methodProperty != null) {
-      List<String> inheritedMethods = privInheritance.getInheritedMethods(methodProperty);
-
-      StringBuffer buf = new StringBuffer();
-
-      for (String method : inheritedMethods) {
-        buf.append(method);
-        buf.append(",");
-      }
-
-      if (buf.length() > 0) {
-        buf.setLength(buf.length() - 1);
-
-        privilege.setProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID, buf.toString());
-      }
-    }
   }
 
   private void fireAuthorizationChangedEvent() {

@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.authorization;
 
+// FIXME: Replace with Shiro version of this exception
+
 /**
  * Thrown when authorization fails.
  *

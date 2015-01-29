@@ -22,12 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.collect.Sets;
 import org.eclipse.sisu.Description;
 
 /**
@@ -56,10 +56,12 @@ public class ConfiguredUsersUserManager
     this.configuration = configuration;
   }
 
+  @Override
   public String getSource() {
     return SOURCE;
   }
 
+  @Override
   public Set<User> listUsers() {
     Set<User> users = new HashSet<User>();
 
@@ -86,6 +88,7 @@ public class ConfiguredUsersUserManager
     return users;
   }
 
+  @Override
   public Set<String> listUserIds() {
     Set<String> userIds = new HashSet<String>();
 
@@ -98,7 +101,7 @@ public class ConfiguredUsersUserManager
     List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
     for (CUserRoleMapping userRoleMapping : userRoleMappings) {
       String userId = userRoleMapping.getUserId();
-      if (StringUtils.isNotEmpty(userId)) {
+      if (Strings2.isNotEmpty(userId)) {
         userIds.add(userId);
       }
     }
@@ -106,11 +109,13 @@ public class ConfiguredUsersUserManager
     return userIds;
   }
 
+  @Override
   public User getUser(String userId) {
     // this resource will only list the users
     return null;
   }
 
+  @Override
   public Set<User> searchUsers(UserSearchCriteria criteria) {
     // we only want to do this if the criteria is set to the source
     if (this.getSource().equals(criteria.getSource())) {
@@ -125,13 +130,14 @@ public class ConfiguredUsersUserManager
     return this.securitySystem;
   }
 
+  @Override
   protected boolean matchesCriteria(final String userId,
                                     final String userSource,
                                     final Collection<String> usersRoles,
                                     final UserSearchCriteria criteria)
   {
     // basically the same as the super, but we don't want to check the source
-    if (StringUtils.isNotEmpty(criteria.getUserId())
+    if (Strings2.isNotEmpty(criteria.getUserId())
         && !userId.toLowerCase().startsWith(criteria.getUserId().toLowerCase())) {
       return false;
     }
@@ -143,7 +149,7 @@ public class ConfiguredUsersUserManager
       }
 
       // check the intersection of the roles
-      if (CollectionUtils.intersection(criteria.getOneOfRoleIds(), userRoles).isEmpty()) {
+      if (Sets.intersection(criteria.getOneOfRoleIds(), userRoles).isEmpty()) {
         return false;
       }
     }
@@ -151,6 +157,7 @@ public class ConfiguredUsersUserManager
     return true;
   }
 
+  @Override
   public String getAuthenticationRealmName() {
     return null;
   }

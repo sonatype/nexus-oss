@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.common.text.Strings2;
 
 /**
  * Default implementation of a User.
@@ -54,7 +54,7 @@ public class User
 
   public String getName() {
     String name = this.getFirstName() != null ? this.getFirstName() : "";
-    if (StringUtils.isNotEmpty(this.getLastName())) {
+    if (Strings2.isNotEmpty(this.getLastName())) {
       name += " " + this.getLastName();
     }
     return name;
@@ -62,7 +62,7 @@ public class User
 
   public void setName(String name) {
     // deprecated, but attempt to use
-    if (StringUtils.isNotEmpty(name)) {
+    if (Strings2.isNotEmpty(name)) {
       String[] nameParts = name.trim().split(" ", 2);
       this.setFirstName(nameParts[0]);
       if (nameParts.length > 1) {

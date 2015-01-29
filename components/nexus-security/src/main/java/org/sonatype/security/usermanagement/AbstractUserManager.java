@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.StringUtils;
+import com.google.common.collect.Sets;
 
 /**
  * An abstract UserManager that handles filtering UserSearchCriteria in memory, this can be used in addition to an
@@ -60,7 +60,7 @@ public abstract class AbstractUserManager
                                     Collection<String> usersRoles,
                                     UserSearchCriteria criteria)
   {
-    if (StringUtils.isNotEmpty(criteria.getUserId())
+    if (Strings2.isNotEmpty(criteria.getUserId())
         && !userId.toLowerCase().startsWith(criteria.getUserId().toLowerCase())) {
       return false;
     }
@@ -76,7 +76,7 @@ public abstract class AbstractUserManager
       }
 
       // check the intersection of the roles
-      if (CollectionUtils.intersection(criteria.getOneOfRoleIds(), userRoles).isEmpty()) {
+      if (Sets.intersection(criteria.getOneOfRoleIds(), userRoles).isEmpty()) {
         return false;
       }
     }

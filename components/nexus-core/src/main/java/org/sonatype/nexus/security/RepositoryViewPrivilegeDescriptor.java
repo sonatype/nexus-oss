@@ -65,7 +65,7 @@ public class RepositoryViewPrivilegeDescriptor
       repoId = "*";
     }
 
-    return buildPermission(NexusItemAuthorizer.VIEW_REPOSITORY_KEY, repoId);
+    return "nexus:view:" + NexusItemAuthorizer.VIEW_REPOSITORY_KEY + ":" + repoId;
   }
 
   @Override
@@ -77,9 +77,5 @@ public class RepositoryViewPrivilegeDescriptor
     }
 
     return response;
-  }
-
-  public static String buildPermission(String objectType, String objectId) {
-    return "nexus:view:" + objectType + ":" + objectId;
   }
 }
