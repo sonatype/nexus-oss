@@ -20,6 +20,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.privileges.AbstractPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
@@ -27,7 +28,6 @@ import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
 import com.google.common.collect.Lists;
-import org.codehaus.plexus.util.StringUtils;
 
 @Singleton
 @Typed(PrivilegeDescriptor.class)
@@ -38,14 +38,17 @@ public class ApplicationPrivilegeDescriptor
 {
   public static final String TYPE = "method";
 
+  @Override
   public String getName() {
     return "Application";
   }
 
+  @Override
   public String getType() {
     return TYPE;
   }
 
+  @Override
   public List<PrivilegePropertyDescriptor> getPropertyDescriptors() {
     return Lists.newArrayList(
         new ApplicationPrivilegeMethodPropertyDescriptor(),
@@ -53,6 +56,7 @@ public class ApplicationPrivilegeDescriptor
     );
   }
 
+  @Override
   public String buildPermission(CPrivilege privilege) {
     if (!TYPE.equals(privilege.getType())) {
       return null;
@@ -61,11 +65,11 @@ public class ApplicationPrivilegeDescriptor
     String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
     String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
 
-    if (StringUtils.isEmpty(permission)) {
+    if (Strings2.isEmpty(permission)) {
       permission = "*:*";
     }
 
-    if (StringUtils.isEmpty(method)) {
+    if (Strings2.isEmpty(method)) {
       method = "*";
     }
 
@@ -87,11 +91,11 @@ public class ApplicationPrivilegeDescriptor
     String method = privilege.getProperty(ApplicationPrivilegeMethodPropertyDescriptor.ID);
     String permission = privilege.getProperty(ApplicationPrivilegePermissionPropertyDescriptor.ID);
 
-    if (StringUtils.isEmpty(permission)) {
+    if (Strings2.isEmpty(permission)) {
       response.addValidationError("Permission cannot be empty on a privilege!");
     }
 
-    if (StringUtils.isEmpty(method)) {
+    if (Strings2.isEmpty(method)) {
       response.addValidationError("Method cannot be empty on a privilege!");
     }
     else {

@@ -10,19 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.authorization;
+package org.sonatype.nexus.common.text
 
-import org.apache.shiro.authz.Permission;
+import org.junit.Test
+import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 /**
- * A permission factory that creates Permission instances.
- *
- * It may apply other stuff, like caching instances for example,
- * based on permission string representation. This is just a concept to be able to hide caching of it. Which
- * implementation you use, depends on your app very much, but usually you'd want the one producing the most widely used
- * permission in Shiro: the {@link WildcardPermissionFactory}.
+ * Tests for {@link Strings2}
  */
-public interface PermissionFactory
+class Strings2Test
+  extends TestSupport
 {
-  Permission create(final String permission);
+  @Test
+  void 'is empty'() {
+    assert Strings2.isEmpty(null)
+    assert Strings2.isEmpty('')
+    assert Strings2.isEmpty('   ')
+    assert !Strings2.isEmpty('foo')
+  }
+
+  @Test
+  void 'is not empty'() {
+    assert !Strings2.isNotEmpty(null)
+    assert !Strings2.isNotEmpty('')
+    assert !Strings2.isNotEmpty('   ')
+    assert Strings2.isNotEmpty('foo')
+  }
 }

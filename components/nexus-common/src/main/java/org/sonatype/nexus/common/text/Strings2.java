@@ -10,30 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.security.realms.publickey;
+package org.sonatype.nexus.common.text;
 
-import java.security.PublicKey;
-
-public class MockPublicKey
-    implements PublicKey
+/**
+ * String helpers.
+ *
+ * @since 3.0
+ */
+public class Strings2
 {
-  private static final long serialVersionUID = -1748932588224311551L;
+  private Strings2() {}
 
-  private String content;
-
-  public MockPublicKey(String content) {
-    this.content = content;
+  public static boolean isEmpty(final String value) {
+    return value == null || value.trim().isEmpty();
   }
 
-  public String getAlgorithm() {
-    return "mock";
-  }
-
-  public byte[] getEncoded() {
-    return content.getBytes();
-  }
-
-  public String getFormat() {
-    return "ummm";
+  public static boolean isNotEmpty(final String value) {
+    return !isEmpty(value);
   }
 }

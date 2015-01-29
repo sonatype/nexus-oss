@@ -15,11 +15,11 @@ package org.sonatype.security;
 import java.io.File;
 import java.util.Properties;
 
+import org.sonatype.nexus.common.io.DirSupport;
 import org.sonatype.security.guice.SecurityModule;
 
 import com.google.inject.Binder;
 import net.sf.ehcache.CacheManager;
-import org.apache.commons.io.FileUtils;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -46,8 +46,7 @@ public abstract class AbstractSecurityTest
   protected void setUp() throws Exception {
     super.setUp();
 
-    // delete the plexus home dir
-    FileUtils.deleteDirectory(PLEXUS_HOME);
+    DirSupport.deleteIfExists(PLEXUS_HOME.toPath());
 
     getSecuritySystem().start();
   }
