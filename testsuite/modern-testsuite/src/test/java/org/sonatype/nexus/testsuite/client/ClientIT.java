@@ -10,6 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
+
 package org.sonatype.nexus.testsuite.client;
 
 import java.io.File;
@@ -26,7 +27,6 @@ import org.sonatype.nexus.client.core.exception.NexusClientBadRequestException;
 import org.sonatype.nexus.client.core.exception.NexusClientErrorResponseException;
 import org.sonatype.nexus.client.core.exception.NexusClientException;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.core.filter.NexusClientExceptionsConverterFilter;
 import org.sonatype.nexus.client.core.subsystem.Restlet1xClient;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveRequest;
 import org.sonatype.nexus.client.core.subsystem.artifact.ResolveResponse;
@@ -38,7 +38,6 @@ import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenM1VirtualR
 import org.sonatype.nexus.client.core.subsystem.repository.maven.MavenProxyRepository;
 import org.sonatype.nexus.client.core.subsystem.routing.DiscoveryConfiguration;
 import org.sonatype.nexus.client.core.subsystem.routing.Status;
-import org.sonatype.nexus.client.core.subsystem.security.Privilege;
 import org.sonatype.nexus.client.core.subsystem.security.Role;
 import org.sonatype.nexus.client.core.subsystem.security.User;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
@@ -50,7 +49,6 @@ import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
-import org.sonatype.sisu.siesta.client.Filters;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 import org.hamcrest.core.Is;
@@ -757,86 +755,6 @@ public class ClientIT
     final User user = users().get("admin");
     assertThat(user, is(notNullValue()));
     assertThat(user.id(), is("admin"));
-  }
-
-  @Test
-  public void getPrivileges() {
-    assertThat(privileges().get(), is(not(empty())));
-  }
-
-  @Test
-  public void getPrivilege() {
-    // admin privilege
-    final Privilege privilege = privileges().get("admin");
-    assertThat(privilege, is(not(nullValue())));
-    assertThat(privilege.name(), containsString("Administrator"));
-  }
-
-  @Test
-  public void createPrivilege() {
-    final String targetId = createRepoTarget("createPrivileges").id();
-    final Privilege saved = privileges().create()
-        .withName("foo")
-        .withDescription("bar")
-        .withMethods("read")
-        .withRepositoryGroupId("public")
-        .withTargetId(targetId)
-        .create().iterator().next();
-
-    final Privilege privilege = privileges().get(saved.id());
-    assertThat(privilege, is(notNullValue()));
-    assertThat(privilege.description(), is("bar"));
-
-    // name is mangled on creation - "$name - ($method)"
-    assertThat(privilege.name(), is(saved.name()));
-
-    assertThat(privilege.methods(), contains("read"));
-    assertThat(privilege.repositoryGroupId(), is("public"));
-    assertThat(privilege.targetId(), is(targetId));
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void refuseCreateAlreadyExistingPrivilege() {
-    final String targetId = createRepoTarget("refuseCreatePrivileges").id();
-    final Privilege saved = privileges().create()
-        .withName("foo")
-        .withDescription("bar")
-        .withMethods("read")
-        .withRepositoryGroupId("public")
-        .withTargetId(targetId)
-        .create().iterator().next();
-
-    saved.create();
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void unsupportedUpdatePrivilege() {
-    final String targetId = createRepoTarget("unsupportedUpdatePrivileges").id();
-    final Privilege saved = privileges().create()
-        .withName("foo")
-        .withDescription("bar")
-        .withMethods("read")
-        .withRepositoryGroupId("public")
-        .withTargetId(targetId)
-        .create().iterator().next();
-
-    saved.save();
-  }
-
-  @Test(expected = NexusClientNotFoundException.class)
-  public void deletePrivilege() {
-    final String targetId = createRepoTarget("deletePrivileges").id();
-    final Privilege saved = privileges().create()
-        .withName("foo")
-        .withDescription("bar")
-        .withMethods("read")
-        .withRepositoryGroupId("public")
-        .withTargetId(targetId)
-        .create().iterator().next();
-
-    saved.remove();
-
-    privileges().get(saved.id());
   }
 
   /**

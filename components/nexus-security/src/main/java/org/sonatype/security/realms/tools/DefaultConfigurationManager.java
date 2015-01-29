@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.text.Strings2;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.events.AuthorizationConfigurationChanged;
@@ -47,10 +48,12 @@ import org.sonatype.sisu.goodies.eventbus.EventBus;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.shiro.authc.credential.PasswordService;
-import org.codehaus.plexus.util.StringUtils;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * Default {@link ConfigurationManager}.
+ */
 @Named
 @Singleton
 public class DefaultConfigurationManager
@@ -642,14 +645,14 @@ public class DefaultConfigurationManager
     newRole.setPrivileges(Sets.newHashSet(privs));
 
     // now for the name and description
-    if (StringUtils.isNotEmpty(roleA.getName())) {
+    if (Strings2.isNotEmpty(roleA.getName())) {
       newRole.setName(roleA.getName());
     }
     else {
       newRole.setName(roleB.getName());
     }
 
-    if (StringUtils.isNotEmpty(roleA.getDescription())) {
+    if (Strings2.isNotEmpty(roleA.getDescription())) {
       newRole.setDescription(roleA.getDescription());
     }
     else {

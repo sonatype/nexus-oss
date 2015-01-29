@@ -18,10 +18,8 @@ import org.sonatype.nexus.client.core.subsystem.artifact.ArtifactMaven;
 import org.sonatype.nexus.client.core.subsystem.content.Content;
 import org.sonatype.nexus.client.core.subsystem.repository.Repositories;
 import org.sonatype.nexus.client.core.subsystem.routing.Routing;
-import org.sonatype.nexus.client.core.subsystem.security.Privileges;
 import org.sonatype.nexus.client.core.subsystem.security.Roles;
 import org.sonatype.nexus.client.core.subsystem.security.Users;
-import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTarget;
 import org.sonatype.nexus.client.core.subsystem.targets.RepositoryTargets;
 import org.sonatype.nexus.testsuite.support.NexusRunningParametrizedITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
@@ -63,11 +61,6 @@ public abstract class ClientITSupport
     return client().getSubsystem(Routing.class);
   }
 
-  protected RepositoryTarget createRepoTarget(final String id) {
-    return targets().create(id).withContentClass("maven2").withName(id).withPatterns(
-        "some_pattern").save();
-  }
-
   protected Roles roles() {
     return client().getSubsystem(Roles.class);
   }
@@ -75,9 +68,4 @@ public abstract class ClientITSupport
   protected Users users() {
     return client().getSubsystem(Users.class);
   }
-
-  protected Privileges privileges() {
-    return client().getSubsystem(Privileges.class);
-  }
-
 }

@@ -105,17 +105,17 @@ extends DirectComponentSupport
     }
     def manager = securitySystem.getAuthorizationManager(DEFAULT_SOURCE)
     List<PrivilegeXO> created = []
-    ['create', 'read', 'update', 'delete'].each { String method ->
+    ['create,read', 'read', 'update,read', 'delete,read'].each { String methods ->
       created << asPrivilegeXO(
           manager.addPrivilege(
               new Privilege(
                   id: Long.toHexString(System.nanoTime()),
-                  name: privilegeXO.name ? "${privilegeXO.name} - (${method})" : null,
+                  name: privilegeXO.name ? "${privilegeXO.name} - (${methods})" : null,
                   description: privilegeXO.description,
                   type: TargetPrivilegeDescriptor.TYPE,
                   readOnly: false,
                   properties: [
-                      (ApplicationPrivilegeMethodPropertyDescriptor.ID)     : method,
+                      (ApplicationPrivilegeMethodPropertyDescriptor.ID)     : methods,
                       (TargetPrivilegeRepositoryTargetPropertyDescriptor.ID): privilegeXO.repositoryTargetId,
                       (TargetPrivilegeRepositoryPropertyDescriptor.ID)      : repositoryId,
                       (TargetPrivilegeGroupPropertyDescriptor.ID)           : groupId

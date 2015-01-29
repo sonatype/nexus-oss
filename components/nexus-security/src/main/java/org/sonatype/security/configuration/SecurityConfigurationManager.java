@@ -18,23 +18,19 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 
 public interface SecurityConfigurationManager
 {
-
   void setAnonymousAccessEnabled(boolean anonymousAccessEnabled);
 
   boolean isAnonymousAccessEnabled();
 
-  void setAnonymousUsername(String anonymousUsername)
-      throws InvalidConfigurationException;
+  void setAnonymousUsername(String anonymousUsername) throws InvalidConfigurationException;
 
   String getAnonymousUsername();
 
-  void setAnonymousPassword(String anonymousPassword)
-      throws InvalidConfigurationException;
+  void setAnonymousPassword(String anonymousPassword) throws InvalidConfigurationException;
 
   String getAnonymousPassword();
 
-  void setRealms(List<String> realms)
-      throws InvalidConfigurationException;
+  void setRealms(List<String> realms) throws InvalidConfigurationException;
 
   List<String> getRealms();
 

@@ -23,8 +23,10 @@ import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.Hash;
 
-/*
- * A PasswordService that provides a default password policy
+/**
+ * Default {@link PasswordService}.
+ *
+ * A PasswordService that provides a default password policy.
  * 
  * The intent of the password service is to encapsulate all password handling
  * details, such as password comparisons, hashing algorithm, hash iterations, salting policy, etc.

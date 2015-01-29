@@ -67,9 +67,7 @@ public class DefaultSecurityConfigurationManager
     return this.getConfiguration().getAnonymousPassword();
   }
 
-  public void setAnonymousPassword(String anonymousPassword)
-      throws InvalidConfigurationException
-  {
+  public void setAnonymousPassword(String anonymousPassword) throws InvalidConfigurationException {
     ValidationResponse vr = validator.validateAnonymousPassword(this.initializeContext(), anonymousPassword);
 
     if (vr.isValid()) {
@@ -84,9 +82,7 @@ public class DefaultSecurityConfigurationManager
     return this.getConfiguration().getAnonymousUsername();
   }
 
-  public void setAnonymousUsername(String anonymousUsername)
-      throws InvalidConfigurationException
-  {
+  public void setAnonymousUsername(String anonymousUsername) throws InvalidConfigurationException {
     ValidationResponse vr = validator.validateAnonymousUsername(this.initializeContext(), anonymousUsername);
 
     if (vr.isValid()) {
@@ -101,9 +97,7 @@ public class DefaultSecurityConfigurationManager
     return Collections.unmodifiableList(this.getConfiguration().getRealms());
   }
 
-  public void setRealms(List<String> realms)
-      throws InvalidConfigurationException
-  {
+  public void setRealms(List<String> realms) throws InvalidConfigurationException {
     ValidationResponse vr = validator.validateRealms(this.initializeContext(), realms);
 
     if (vr.isValid()) {

@@ -10,25 +10,22 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.client.core.subsystem.security;
-
-import org.sonatype.nexus.client.core.subsystem.EntityRepository;
+package org.sonatype.nexus.common.text;
 
 /**
- * Nexus {@link Privilege} repository.
+ * String helpers.
  *
- * @since 2.4
+ * @since 3.0
  */
-public interface Privileges
-    extends EntityRepository<Privilege>
+public final class Strings2
 {
+  private Strings2() {}
 
-  /**
-   * @see #create()
-   * @deprecated ID is not used for privileges.
-   */
-  @Override
-  Privilege create(String id);
+  public static boolean isEmpty(final String value) {
+    return value == null || value.trim().isEmpty();
+  }
 
-  Privilege create();
+  public static boolean isNotEmpty(final String value) {
+    return !isEmpty(value);
+  }
 }

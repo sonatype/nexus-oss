@@ -19,6 +19,7 @@ import javax.servlet.ServletContext;
 
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.web.ProtectedPathManager;
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -48,11 +49,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createMock;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.mock;
 
 /**
  * Verifies functionality of SecurityWebModule.
@@ -60,6 +60,7 @@ import static org.hamcrest.Matchers.sameInstance;
  * @since 2.6.1
  */
 public class SecurityWebModuleTest
+  extends TestSupport
 {
   private Injector injector;
 
@@ -116,7 +117,7 @@ public class SecurityWebModuleTest
   }
 
   private Module getShiroModule() {
-    return new SecurityWebModule(createMock(ServletContext.class), true)
+    return new SecurityWebModule(mock(ServletContext.class), true)
     {
       @Override
       protected void configureShiroWeb() {
@@ -151,5 +152,4 @@ public class SecurityWebModuleTest
       extends BasicHttpAuthenticationFilter
   {
   }
-
 }

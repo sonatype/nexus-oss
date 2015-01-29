@@ -18,12 +18,17 @@ import javax.inject.Inject;
 
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.common.text.Strings2;
+import org.sonatype.security.authorization.WildcardPermission2;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.validator.ConfigurationIdGenerator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.shiro.authz.Permission;
 
+/**
+ * Abstract {@link PrivilegeDescriptor}.
+ */
 public abstract class AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
@@ -32,6 +37,13 @@ public abstract class AbstractPrivilegeDescriptor
   @Inject
   public void installDependencies(final ConfigurationIdGenerator idGenerator) {
     this.idGenerator = idGenerator;
+  }
+
+  @Override
+  public Permission createPermission(final CPrivilege privilege) {
+    assert privilege != null;
+    assert getType().equals(privilege.getType());
+    return new WildcardPermission2(buildPermission(privilege));
   }
 
   public ValidationResponse validatePrivilege(CPrivilege privilege, SecurityValidationContext ctx, boolean update) {
@@ -49,7 +61,7 @@ public abstract class AbstractPrivilegeDescriptor
       existingIds = context.getExistingPrivilegeIds();
     }
 
-    if (!update && (StringUtils.isEmpty(privilege.getId()) || "0".equals(privilege.getId()) || (existingIds.contains(privilege.getId())))) {
+    if (!update && (Strings2.isEmpty(privilege.getId()) || "0".equals(privilege.getId()) || (existingIds.contains(privilege.getId())))) {
       String newId = idGenerator.generateId();
 
       ValidationMessage message = new ValidationMessage("id",
@@ -59,14 +71,14 @@ public abstract class AbstractPrivilegeDescriptor
       response.setModified(true);
     }
 
-    if (StringUtils.isEmpty(privilege.getType())) {
+    if (Strings2.isEmpty(privilege.getType())) {
       ValidationMessage message = new ValidationMessage("type",
           "Cannot have an empty type", "Privilege cannot have an invalid type");
 
       response.addValidationError(message);
     }
 
-    if (StringUtils.isEmpty(privilege.getName())) {
+    if (Strings2.isEmpty(privilege.getName())) {
       ValidationMessage message = new ValidationMessage("name",
           "Privilege ID '" + privilege.getId() + "' requires a name.", "Name is required.");
       response.addValidationError(message);
