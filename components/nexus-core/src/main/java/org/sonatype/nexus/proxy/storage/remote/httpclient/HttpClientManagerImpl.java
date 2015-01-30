@@ -94,7 +94,9 @@ public class HttpClientManagerImpl
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     checkNotNull(proxyRepository);
     checkNotNull(ctx);
-    return configure(proxyRepository,ctx).build();
+    final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    configure(proxyRepository, ctx, builder);
+    return builder.build();
   }
 
   @Override
@@ -103,27 +105,6 @@ public class HttpClientManagerImpl
   }
 
   // ==
-
-  /**
-   * Creates a {@link Builder} and applies configuration to it, never returns {@code null}.
-   */
-  @VisibleForTesting
-  Builder configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
-    final Builder builder = hc4Provider.prepareHttpClient(ctx);
-    final String proxyHostName = normalizeHostname(proxyRepository);
-    if (enableCircularRedirectsForHosts.contains(proxyHostName)) {
-      log.info("Allowing circular redirects in proxy {}", proxyRepository);
-      builder.getRequestConfigBuilder().setCircularRedirectsAllowed(true); // allow circular redirects
-      builder.getRequestConfigBuilder().setMaxRedirects(10); // lessen max redirects from default 50
-    }
-    if (useCookiesForHosts.contains(proxyHostName)) {
-      log.info("Allowing cookie use in proxy {}", proxyRepository);
-      builder.getHttpClientBuilder().setDefaultCookieStore(new BasicCookieStore()); // in memory only
-      builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY); // emulate browsers
-    }
-    configure(proxyRepository, ctx, builder);
-    return builder;
-  }
 
   /**
    * Normalizes proxy repository's hostname extracted from it's {@link ProxyRepository#getRemoteUrl()} method. Never
@@ -188,6 +169,18 @@ public class HttpClientManagerImpl
 
     // set proxy redirect strategy
     builder.getHttpClientBuilder().setRedirectStrategy(getProxyRepositoryRedirectStrategy(proxyRepository, ctx));
+
+    final String proxyHostName = normalizeHostname(proxyRepository);
+    if (enableCircularRedirectsForHosts.contains(proxyHostName)) {
+      log.info("Allowing circular redirects in proxy {}", proxyRepository);
+      builder.getRequestConfigBuilder().setCircularRedirectsAllowed(true); // allow circular redirects
+      builder.getRequestConfigBuilder().setMaxRedirects(10); // lessen max redirects from default 50
+    }
+    if (useCookiesForHosts.contains(proxyHostName)) {
+      log.info("Allowing cookie use in proxy {}", proxyRepository);
+      builder.getHttpClientBuilder().setDefaultCookieStore(new BasicCookieStore()); // in memory only
+      builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY); // emulate browsers
+    }
   }
 
   /**
