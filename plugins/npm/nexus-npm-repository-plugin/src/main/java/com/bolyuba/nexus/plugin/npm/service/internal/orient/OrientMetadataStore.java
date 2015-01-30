@@ -190,7 +190,7 @@ public class OrientMetadataStore
       try {
         final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
             "select from " + entityHandler.getSchemaName() + " where repositoryId='" + repository.getId() +
-                "' and @rid > ? limit 1000");
+                "' and @rid > ? order by @rid limit 1000");
         ORID last = new ORecordId();
         final List<String> result = Lists.newArrayList();
         List<ODocument> resultset = db.query(query, last);
@@ -311,7 +311,7 @@ public class OrientMetadataStore
       try {
         final OSQLSynchQuery<ODocument> query = new OSQLSynchQuery<>(
             "select from " + entityHandler.getSchemaName() + " where repositoryId='" + repository.getId() +
-                "' and @rid > ? limit 1000");
+                "' and @rid > ? order by @rid limit 1000");
         ORID last = new ORecordId();
         List<ODocument> resultset = db.query(query, last);
         int count = 0;
