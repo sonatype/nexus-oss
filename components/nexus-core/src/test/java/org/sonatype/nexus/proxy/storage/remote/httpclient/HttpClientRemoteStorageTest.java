@@ -199,6 +199,7 @@ public class HttpClientRemoteStorageTest
       final ProxyRepository repository = mock(ProxyRepository.class);
       when(repository.getId()).thenReturn("foo");
       when(repository.getName()).thenReturn("foo");
+      when(repository.getRemoteUrl()).thenReturn("http://www.somehost.com/");
       when(repository.getRemoteStorageContext()).thenReturn(proxyContext);
 
       // a mock remote server that will simply "hang" to occupy the request socket
