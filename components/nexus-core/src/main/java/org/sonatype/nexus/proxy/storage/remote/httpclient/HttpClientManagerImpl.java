@@ -14,9 +14,9 @@ package org.sonatype.nexus.proxy.storage.remote.httpclient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -32,8 +32,11 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -61,13 +64,17 @@ public class HttpClientManagerImpl
     extends ComponentSupport
     implements HttpClientManager
 {
-  private static final String NX_REMOTE_ENABLE_CIRCULAR_REDIRECTIONS_KEY = "nexus.remoteStorage.enableCircularRedirectionsForHosts";
+  private static final String NX_REMOTE_ENABLE_CIRCULAR_REDIRECTS_KEY = "nexus.remoteStorage.enableCircularRedirectsForHosts";
 
   private static final String NX_REMOTE_USE_COOKIES_KEY = "nexus.remoteStorage.useCookiesForHosts";
 
   private final Hc4Provider hc4Provider;
 
   private final UserAgentBuilder userAgentBuilder;
+
+  private final Set<String> enableCircularRedirectsForHosts;
+
+  private final Set<String> useCookiesForHosts;
 
   /**
    * Constructor.
@@ -79,25 +86,15 @@ public class HttpClientManagerImpl
   public HttpClientManagerImpl(final Hc4Provider hc4Provider, final UserAgentBuilder userAgentBuilder) {
     this.hc4Provider = checkNotNull(hc4Provider);
     this.userAgentBuilder = checkNotNull(userAgentBuilder);
+    this.enableCircularRedirectsForHosts = parseAndNormalizeCsvProperty(NX_REMOTE_ENABLE_CIRCULAR_REDIRECTS_KEY);
+    this.useCookiesForHosts = parseAndNormalizeCsvProperty(NX_REMOTE_USE_COOKIES_KEY);
   }
 
   @Override
   public HttpClient create(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
     checkNotNull(proxyRepository);
     checkNotNull(ctx);
-    final Builder builder = hc4Provider.prepareHttpClient(ctx);
-    if (isProxiedHostnameEnlisted(proxyRepository, NX_REMOTE_ENABLE_CIRCULAR_REDIRECTIONS_KEY)) {
-      log.info("Allowing circular redirects in proxy {}", proxyRepository);
-      builder.getRequestConfigBuilder().setCircularRedirectsAllowed(true); // allow circular redirects
-      builder.getRequestConfigBuilder().setMaxRedirects(10); // lessen max redirects from default 50
-    }
-    if (isProxiedHostnameEnlisted(proxyRepository, NX_REMOTE_USE_COOKIES_KEY)) {
-      log.info("Allowing cookie use in proxy {}", proxyRepository);
-      builder.getHttpClientBuilder().setDefaultCookieStore(new BasicCookieStore()); // in memory only
-      builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY); // emulate browsers
-    }
-    configure(proxyRepository, ctx, builder);
-    return builder.build();
+    return configure(proxyRepository,ctx).build();
   }
 
   @Override
@@ -108,20 +105,75 @@ public class HttpClientManagerImpl
   // ==
 
   /**
-   * Method that returns {@code true} if System property with key {@code propertyKey} contains comma delimited string
-   * list, and the passed in {@code proxyRepository} remote URL' hostname is enlisted in it.
+   * Creates a {@link Builder} and applies configuration to it, never returns {@code null}.
    */
-  protected boolean isProxiedHostnameEnlisted(final ProxyRepository proxyRepository, final String propertyKey) {
+  @VisibleForTesting
+  Builder configure(final ProxyRepository proxyRepository, final RemoteStorageContext ctx) {
+    final Builder builder = hc4Provider.prepareHttpClient(ctx);
+    final String proxyHostName = normalizeHostname(proxyRepository);
+    if (enableCircularRedirectsForHosts.contains(proxyHostName)) {
+      log.info("Allowing circular redirects in proxy {}", proxyRepository);
+      builder.getRequestConfigBuilder().setCircularRedirectsAllowed(true); // allow circular redirects
+      builder.getRequestConfigBuilder().setMaxRedirects(10); // lessen max redirects from default 50
+    }
+    if (useCookiesForHosts.contains(proxyHostName)) {
+      log.info("Allowing cookie use in proxy {}", proxyRepository);
+      builder.getHttpClientBuilder().setDefaultCookieStore(new BasicCookieStore()); // in memory only
+      builder.getRequestConfigBuilder().setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY); // emulate browsers
+    }
+    configure(proxyRepository, ctx, builder);
+    return builder;
+  }
+
+  /**
+   * Normalizes proxy repository's hostname extracted from it's {@link ProxyRepository#getRemoteUrl()} method. Never
+   * returns {@code null}.
+   *
+   * @see #normalizeHostname(String)
+   */
+  private String normalizeHostname(final ProxyRepository proxyRepository) {
     try {
       final URI uri = new URI(proxyRepository.getRemoteUrl());
-      final List<String> enlistedIds = Lists.newArrayList(
-          Splitter.on(",").split(SystemPropertiesHelper.getString(propertyKey, "")));
-      return enlistedIds.contains(uri.getHost());
+      return normalizeHostname(uri.getHost());
     }
     catch (URISyntaxException e) {
       // ignore
     }
-    return false;
+    return "";
+  }
+
+  /**
+   * Normalizes passed in host name string by lower casing it. Never returns {@code null} even if input was {@code
+   * null}.
+   */
+  private String normalizeHostname(final String hostName) {
+    if (hostName == null) {
+      return "";
+    } else {
+      return hostName.toLowerCase(Locale.US).trim();
+    }
+  }
+
+  /**
+   * Parses and normalizes (by lower-casing) CSV of host names under given property key. Never returns {@code null}.
+   * Never returns a set that contains {@code null} or empty strings.
+   */
+  private Set<String> parseAndNormalizeCsvProperty(final String systemPropertyKey) {
+    return Sets.newHashSet(
+        Iterables.transform(
+            Splitter.on(",")
+                .trimResults()
+                .omitEmptyStrings()
+                .split(SystemPropertiesHelper.getString(systemPropertyKey, "")),
+            new Function<String, String>()
+            {
+              @Override
+              public String apply(final String input) {
+                return normalizeHostname(input);
+              }
+            }
+        )
+    );
   }
 
   /**
