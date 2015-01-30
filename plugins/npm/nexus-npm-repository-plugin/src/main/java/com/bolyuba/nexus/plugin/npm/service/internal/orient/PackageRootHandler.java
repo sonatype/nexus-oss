@@ -51,7 +51,7 @@ public class PackageRootHandler
     // TODO: sort out schema for raw?
     clazz.createProperty("raw", OType.LINK); // Using linked "blob" record
     clazz.createIndex(clazz.getName() + ".componentId", INDEX_TYPE.UNIQUE_HASH_INDEX, "componentId");
-    clazz.createIndex(clazz.getName() + ".repositoryId", INDEX_TYPE.NOTUNIQUE_HASH_INDEX, "repositoryId");
+    clazz.createIndex(clazz.getName() + ".pagedRepositoryId", INDEX_TYPE.UNIQUE, "repositoryId", "@rid");
   }
 
   @Override
