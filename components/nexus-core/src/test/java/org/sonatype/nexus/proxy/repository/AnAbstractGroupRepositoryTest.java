@@ -33,7 +33,7 @@ import static org.mockito.Mockito.doReturn;
  *
  * @since 2.2
  */
-public class AbstractGroupRepositoryTest
+public class AnAbstractGroupRepositoryTest
     extends TestSupport
 {
 

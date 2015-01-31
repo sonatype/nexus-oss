@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  *
  * @since 2.2
  */
-public class AbstractGroupRepositoryConfigurationTest
+public class AnAbstractGroupRepositoryConfigurationTest
     extends TestSupport
 {
 
