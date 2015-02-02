@@ -82,9 +82,9 @@ Ext.define('NX.coreui.controller.UploadFile', {
         form = button.up('form');
 
     form.submit({
-      waitMsg: NX.I18n.get('BROWSE_UPLOAD_WAIT'),
+      waitMsg: NX.I18n.get('BROWSE_UPLOAD_FILE_WAIT'),
       success: function() {
-        NX.Messages.add({ text: Ext.String.capitalize(form.entryName) + 's uploaded', type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('BROWSE_UPLOAD_FILE_SUCCESS', Ext.String.capitalize(form.entryName)), type: 'success' });
         me.discardForm(form);
       }
     });

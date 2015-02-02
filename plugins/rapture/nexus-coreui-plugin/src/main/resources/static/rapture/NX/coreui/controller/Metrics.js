@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       return;
     }
 
-    panel.getEl().mask('Loading...');
+    panel.getEl().mask(NX.I18n.get('ADMIN_METRICS_LOAD_MASK'));
 
     Ext.Ajax.request({
       url: NX.util.Url.urlOf('internal/metrics'),
@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.Metrics', {
       },
 
       failure: function (response) {
-        NX.Messages.add({ type: 'warning', text: 'Failed to refresh metrics data' });
+        NX.Messages.add({ type: 'warning', text: NX.I18n.get('ADMIN_METRICS_REFRESH_WARNING') });
       },
 
       success: function (response) {

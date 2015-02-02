@@ -191,7 +191,7 @@ Ext.define('NX.coreui.controller.Log', {
     if (logPanel) {
       size = logPanel.down('#refreshSize').getValue();
 
-      logPanel.getEl().mask('Loading...');
+      logPanel.getEl().mask(NX.I18n.get('ADMIN_LOG_VIEWER_LOAD_MASK'));
 
       me.logDebug('Retrieving last ' + size + 'kb from log');
 
@@ -212,7 +212,7 @@ Ext.define('NX.coreui.controller.Log', {
         },
         failure: function (response) {
           logPanel.getEl().unmask();
-          me.showLog('Failed to retrieve log due to "' + response.statusText + '".');
+          me.showLog(NX.I18n.format('ADMIN_LOG_VIEWER_LOAD_FAILURE', response.statusText));
         }
       });
     }

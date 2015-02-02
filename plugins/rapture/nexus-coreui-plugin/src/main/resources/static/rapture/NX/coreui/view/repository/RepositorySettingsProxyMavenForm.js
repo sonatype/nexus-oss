@@ -71,7 +71,7 @@ Ext.define('NX.coreui.view.repository.RepositorySettingsProxyMavenForm', {
       {
         xtype: 'checkbox',
         name: 'downloadRemoteIndexes',
-        fieldLabel: NX.I18n.get('ADMIN_REPOSTIORIES_SETTINGS_DOWNLOAD'),
+        fieldLabel: NX.I18n.get('ADMIN_REPOSITORIES_SETTINGS_DOWNLOAD'),
         value: true
       },
       {

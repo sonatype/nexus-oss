@@ -179,7 +179,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
               inIndex: inService,
               inStorage: inService,
               text: model.get('name'),
-              qtip: inService ? undefined : 'Out of Service',
+              qtip: inService ? undefined : NX.I18n.get('BROWSE_REPOSITORY_OUT_OF_SERVICE_TOOLTIP'),
               leaf: !inService,
               iconCls: NX.Icons.cls(inService ? 'repository-default' : 'repository-out-of-service', 'x16')
             });
@@ -240,7 +240,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     if (node.get('inIndex') && !node.get('indexLoaded')) {
       node.set('indexLoaded', true);
-      tree.getEl().mask('Loading...');
+      tree.getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
       NX.direct.coreui_BrowseIndex.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
@@ -274,7 +274,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
 
     if (node.get('inStorage') && !node.get('storageLoaded')) {
       node.set('storageLoaded', true);
-      tree.getEl().mask('Loading...');
+      tree.getEl().mask(NX.I18n.get('BROWSE_REPOSITORY_LOAD_CHILDREN_MASK'));
       NX.direct.coreui_RepositoryStorage.readChildren(node.get('repositoryId'), node.get('path'), function(response) {
         if (Ext.isObject(response) && response.success && response.data && response.data.length) {
           Ext.suspendLayouts();
@@ -399,7 +399,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     if (NX.Permissions.check('nexus:cache', 'delete')
         && repository.get('type') !== 'virtual' && repository.get('userManaged')) {
       menu.add({
-        text: 'Expire Cache', action: 'expirecache',
+        text: NX.I18n.get('BROWSE_REPOSITORY_EXPIRE_CACHE_ITEM'), action: 'expirecache',
         handler: Ext.bind(me.expireCache, me, [repository, node.get('path')])
       });
     }
@@ -410,7 +410,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
         && (repository.get('type') === 'hosted' || repository.get('type') === 'group' )
         && repository.get('userManaged')) {
       menu.add({
-        text: 'Rebuild Metadata', action: 'rebuildmetadata',
+        text: NX.I18n.get('BROWSE_REPOSITORY_REBUILD_METADATA_ITEM'), action: 'rebuildmetadata',
         handler: Ext.bind(me.rebuildMavenMetadata, me, [repository, node.get('path')])
       });
     }
@@ -418,7 +418,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     me.removeMenuItem(button, 'downloadfromremote');
     if (node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'Download From Remote', action: 'downloadfromremote',
+        text: NX.I18n.get('BROWSE_REPOSITORY_DOWNLOAD_REMOTE_ITEM'), action: 'downloadfromremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
@@ -426,7 +426,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     me.removeMenuItem(button, 'viewremote');
     if (!node.isRoot() && !node.isLeaf() && repository.get('type') === 'proxy') {
       menu.add({
-        text: 'View Remote', action: 'viewremote',
+        text: NX.I18n.get('BROWSE_REPOSITORY_VIEW_REMOTE_ITEM'), action: 'viewremote',
         handler: Ext.bind(me.downloadPath, me, [repository.get('remoteStorageUrl'), node.get('path')])
       });
     }
@@ -434,7 +434,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     me.removeMenuItem(button, 'download');
     if (node.isLeaf()) {
       menu.add({
-        text: 'Download', action: 'download',
+        text: NX.I18n.get('BROWSE_REPOSITORY_DOWNLOAD_ITEM'), action: 'download',
         handler: Ext.bind(me.downloadStorageFile, me, [repository.getId(), node.get('path')])
       });
     }
@@ -442,7 +442,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     me.removeMenuItem(button, 'delete');
     if ((node.get('path') !== '/') && (repository.get('type') !== 'group')) {
       menu.add({
-        text: 'Delete', action: 'delete',
+        text: NX.I18n.get('BROWSE_REPOSITORY_DELETE_ITEM'), action: 'delete',
         handler: Ext.bind(me.deleteStorageFile, me, [repository, node])
       });
     }
@@ -471,7 +471,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     NX.direct.coreui_Repository.clearCache(repository.getId(), path, function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started expiring caches of "' + repository.get('name') + '", path "' + path + '"',
+          text: NX.I18n.format('BROWSE_REPOSITORY_EXPIRE_CACHE_SUCCESS', repository.get('name'), path),
           type: 'success'
         });
       }
@@ -488,7 +488,7 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     NX.direct.coreui_Maven.rebuildMetadata(repository.getId(), path, function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started rebuilding metadata of "' + repository.get('name') + '", path "' + path + '"',
+          text: NX.I18n.format('BROWSE_REPOSITORY_REBUILD_SUCCESS', repository.get('name'), path),
           type: 'success'
         });
       }
@@ -543,14 +543,14 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
     var path = node.get('path');
 
     NX.Dialogs.askConfirmation(
-        'Delete Repository Item',
-        'Delete the selected "' + path + '" ' + (node.isLeaf() ? 'file' : 'folder'),
+        NX.I18n.get('BROWSE_REPOSITORY_DELETE_DIALOG'),
+        NX.I18n.format('BROWSE_REPOSITORY_DELETE_DIALOG_HELP', path, (node.isLeaf() ? 'file' : 'folder')),
         function() {
           NX.direct.coreui_RepositoryStorage.remove(repository.getId(), path, function(response) {
             if (Ext.isObject(response) && response.success) {
               node.parentNode.removeChild(node);
               NX.Messages.add({
-                text: 'Deleted "' + repository.get('name') + '", path "' + path + '"',
+                text: NX.I18n.format('BROWSE_REPOSITORY_DELETE_SUCCESS', repository.get('name'), path),
                 type: 'success'
               });
             }

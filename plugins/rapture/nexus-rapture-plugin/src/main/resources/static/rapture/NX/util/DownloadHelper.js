@@ -21,7 +21,8 @@ Ext.define('NX.util.DownloadHelper', {
   singleton: true,
   requires: [
     'NX.Messages',
-    'NX.Windows'
+    'NX.Windows',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -87,7 +88,7 @@ Ext.define('NX.util.DownloadHelper', {
 
     // open new window in hidden download-from to initiate download
     if (NX.Windows.open(url, me.windowName) !== null) {
-      NX.Messages.add({text: 'Download initiated', type: 'success'});
+      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_DOWNLOAD_SUCCESS'), type: 'success'});
     }
   }
 });

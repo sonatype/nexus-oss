@@ -21,7 +21,7 @@ Ext.define('NX.view.ExpireSession', {
   extend: 'Ext.window.Window',
   alias: 'widget.nx-expire-session',
 
-  title: 'Session',
+  title: NX.I18n.get('GLOBAL_EXPIRE_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -41,16 +41,16 @@ Ext.define('NX.view.ExpireSession', {
         {
           xtype: 'label',
           id: 'expire',
-          text: 'Session is about to expire',
+          text: NX.I18n.get('GLOBAL_EXPIRE_HELP'),
           style: {
             'color': 'red',
             'font-size': '20px',
-            'margin': '10px'
+            'margin': '108px'
           }
         }
       ],
       buttons: [
-        { text: 'Cancel', action: 'cancel' }
+        { text: NX.I18n.get('GLOBAL_EXPIRE_CANCEL_BUTTON'), action: 'cancel' }
       ]
     });
 

@@ -76,7 +76,7 @@ Ext.define('NX.coreui.controller.NuGetRepositorySettings', {
 
     if (model && NX.Permissions.check('apikey:access', 'read') && model.get('format') === 'nuget') {
       if (!panel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-nuget-repository-settings', title: 'NuGet' });
+        me.getFeature().addTab({ xtype: 'nx-coreui-nuget-repository-settings', title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_NUGET_TAB') });
         panel = me.getPanel();
       }
       panel.setRepository(model);
@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.NuGetRepositorySettings', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        'Accessing NuGet API Key requires validation of your credentials.',
+        NX.I18n.get('ADMIN_REPOSITORIES_NUGET_ACCESS'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGet.readKey(authToken, function(response) {
@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.NuGetRepositorySettings', {
     var me = this;
 
     NX.Security.doWithAuthenticationToken(
-        'Resetting NuGet API Key requires validation of your credentials.',
+        NX.I18n.get('ADMIN_REPOSITORIES_NUGET_RESET'),
         {
           success: function(authToken) {
             NX.direct.nuget_NuGet.resetKey(authToken, function(response) {

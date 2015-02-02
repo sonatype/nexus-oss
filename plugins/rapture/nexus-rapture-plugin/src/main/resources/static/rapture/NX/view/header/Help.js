@@ -39,45 +39,45 @@ Ext.define('NX.view.header.Help', {
     me.menu = [
       {
         // text and iconCls is dynamic
-        tooltip: 'Help and documentation for the currently selected feature',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_FEATURE_TOOLTIP'),
         action: 'feature'
       },
       '-',
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_ABOUT'),
         iconCls: 'nx-icon-nexus-x16',
-        tooltip: 'About Sonatype Nexus',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_ABOUT_TOOLTIP'),
         action: 'about'
       },
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_DOCUMENTATION'),
         iconCls: 'nx-icon-help-manual-x16',
-        tooltip: 'Sonatype Nexus product documentation',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_DOCUMENTATION_TOOLTIP'),
         action: 'docs'
       },
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_KB'),
         iconCls: 'nx-icon-help-kb-x16',
-        tooltip: 'Sonatype Nexus knowledge base',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_KB_TOOLTIP'),
         action: 'kb'
       },
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_COMMUNITY'),
         iconCls: 'nx-icon-help-community-x16',
-        tooltip: 'Sonatype Nexus community information',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_COMMUNITY_TOOLTIP'),
         action: 'community'
       },
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_ISSUES'),
         iconCls: 'nx-icon-help-issues-x16',
-        tooltip: 'Sonatype Nexus issue and bug tracker',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_ISSUES_TOOLTIP'),
         action: 'issues'
       },
       '-',
       {
         text: NX.I18n.get('GLOBAL_HEADER_HELP_SUPPORT'),
         iconCls: 'nx-icon-help-support-x16',
-        tooltip: 'Sonatype Nexus product support',
+        tooltip: NX.I18n.get('GLOBAL_HEADER_HELP_SUPPORT_TOOLTIP'),
         action: 'support'
       }
     ];

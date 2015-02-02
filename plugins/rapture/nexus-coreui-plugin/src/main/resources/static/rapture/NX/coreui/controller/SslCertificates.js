@@ -178,7 +178,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         win = button.up('nx-coreui-sslcertificate-add-from-pem'),
         pem = button.up('form').getForm().getFieldValues().pem;
 
-    win.getEl().mask('Loading certificate...');
+    win.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.details({ value: pem }, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
@@ -198,7 +198,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
         parsed = me.parseHostAndPort(server),
         protocolHint = server && Ext.String.startsWith(server, "https://") ? 'https' : undefined;
 
-    win.getEl().mask('Loading certificate...');
+    win.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.retrieveFromHost(parsed[0], parsed[1], protocolHint, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
@@ -246,7 +246,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_TrustStore.create({ value: model.get('pem') }, function (response) {
       if (Ext.isObject(response) && response.success) {
         me.loadStoreAndSelect(model.internalId, false);
-        NX.Messages.add({ text: 'SSL Certificate created: ' + description, type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_LOAD_SUCCESS', description), type: 'success' });
       }
     });
   },
@@ -264,7 +264,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       if (Ext.isObject(response) && response.success) {
         me.loadStore(Ext.emptyFn);
-        NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
       }
     });
   },
@@ -282,7 +282,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     NX.direct.ssl_TrustStore.remove(model.getId(), function (response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: 'SSL Certificate deleted: ' + description, type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('ADMIN_SSL_DETAILS_DELETE_SUCCESS', description), type: 'success' });
       }
     });
   }

@@ -286,7 +286,7 @@ Ext.define('NX.coreui.controller.Roles', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Role deleted: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_ROLES_DETAILS_DELETE_ROLE', description), type: 'success'
         });
       }
     });

@@ -90,21 +90,21 @@ Ext.define('NX.coreui.controller.StorageFileInfo', {
    */
   toSizeString: function(v) {
     if (typeof v !== 'number') {
-      return '<unknown>';
+      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
     }
     if (v < 0) {
-      return 'Unknown';
+      return NX.I18n.get('BROWSE_STANDARD_INFO_SIZE_UNKNOWN');
     }
     if (v < 1024) {
-      return v + ' Bytes';
+      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_BYTES', v);
     }
     if (v < 1048576) {
-      return (v / 1024).toFixed(2) + ' KB';
+      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_KB', (v / 1024).toFixed(2));
     }
     if (v < 1073741824) {
-      return (v / 1048576).toFixed(2) + ' MB';
+      return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_MB', (v / 1048576).toFixed(2));
     }
-    return (v / 1073741824).toFixed(2) + ' GB';
+    return NX.I18n.format('BROWSE_STANDARD_INFO_SIZE_GB', (v / 1073741824).toFixed(2));
   }
 
 });

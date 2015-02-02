@@ -307,15 +307,15 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
       return 'Loading...';
     }
     else if (searchResultModel.get('healthCheckDisabled')) {
-      metadata.tdAttr = 'data-qtip="The age and popularity data is only available once Repository Health Check (RHC) has been enabled."';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_DISABLED') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('information.png') + '">';
     }
     else if (searchResultModel.get('healthCheckError')) {
-      metadata.tdAttr = 'data-qtip="Error retrieving data from Sonatype CLM"';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_ERROR') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('exclamation.gif') + '">';
     }
     else if (searchResultModel.get('healthCheckCapped') || (model && model.get('capped'))) {
-      metadata.tdAttr = 'data-qtip="The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits."';
+      metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_QUOTA_REACHED') + '"';
       return '<img class="opaqueWarning" src="' + me.imageUrl('warning.gif') + '">';
     }
     return undefined;
@@ -329,7 +329,7 @@ Ext.define('NX.coreui.controller.HealthCheckSearch', {
    */
   renderNotAvailable: function(metadata) {
     var me = this;
-    metadata.tdAttr = 'data-qtip="CLM data is not available for this component.<br/>Internal components are not covered in Sonatype CLM."';
+    metadata.tdAttr = 'data-qtip="' + NX.I18n.get('BROWSE_SEARCH_VERSIONS_HEALTH_CHECK_NOT_AVAILABLE') + '"';
     return '<span class="fa fa-ban"/>';
   },
 

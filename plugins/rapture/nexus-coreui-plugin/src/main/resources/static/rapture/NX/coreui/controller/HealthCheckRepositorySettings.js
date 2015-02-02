@@ -90,7 +90,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositorySettings', {
         ((model.get('format') !== 'maven2') || model.get('repositoryPolicy') === 'RELEASE'))) {
 
       if (!panel) {
-        me.getFeature().addTab({ xtype: 'nx-coreui-healthcheck-repository-settings', title: 'Health Check' });
+        me.getFeature().addTab({ xtype: 'nx-coreui-healthcheck-repository-settings', title: NX.I18n.get('ADMIN_REPOSITORIES_DETAILS_HEALTH_CHECK_TAB') });
         panel = me.getPanel();
       }
       panel.setRepository(model);

@@ -37,7 +37,7 @@ Ext.define('NX.view.AboutWindow', {
   width: 640,
   height: 480,
 
-  title: 'About Sonatype Nexus',
+  title: NX.I18n.get('GLOBAL_ABOUT_TITLE'),
 
   /**
    * @override
@@ -73,12 +73,12 @@ Ext.define('NX.view.AboutWindow', {
         flex: 1,
         items: [
           {
-            title: 'Copyright',
+            title: NX.I18n.get('GLOBAL_ABOUT_COPYRIGHT_TAB'),
             xtype: 'uxiframe',
             src: NX.util.Url.urlOf('/COPYRIGHT.html')
           },
           {
-            title: 'License',
+            title: NX.I18n.get('GLOBAL_ABOUT_LICENSE_TAB'),
             xtype: 'uxiframe',
             src: NX.util.Url.urlOf('/LICENSE.html')
           }
@@ -87,7 +87,7 @@ Ext.define('NX.view.AboutWindow', {
     ];
 
     me.buttons = [
-      { text: 'Close', action: 'close', ui: 'nx-primary', handler: function () { me.close(); }}
+      { text: NX.I18n.get('GLOBAL_ABOUT_CLOSE_BUTTON'), action: 'close', ui: 'nx-primary', handler: function () { me.close(); }}
     ];
     me.buttonAlign = 'left';
 

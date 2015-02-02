@@ -36,7 +36,7 @@ Ext.define('NX.view.feature.NotFound', {
     me.items = [
       {
         xtype: 'label',
-        text: me.path ? 'Path "' + me.path + '" not found' : 'Path not found',
+        text: me.path ? NX.I18n.format('GLOBAL_404_PATH', me.path) : NX.I18n.get('GLOBAL_404_NO_PATH'),
         style: {
           'color': '#000000',
           'font-size': '20px',

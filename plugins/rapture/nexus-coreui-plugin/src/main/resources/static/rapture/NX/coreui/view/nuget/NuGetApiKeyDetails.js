@@ -22,7 +22,8 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
   alias: 'widget.nx-coreui-nuget-apikeydetails',
   requires: [
     'NX.Icons',
-    'NX.Messages'
+    'NX.Messages',
+    'NX.I18n'
   ],
 
   title: 'NuGet API Key',
@@ -109,7 +110,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
     // Automatically close the window
     Ext.defer(function() {
       if (me.isVisible()) { // ignore if already closed
-        NX.Messages.add({ text: 'Automatically closing NuGet API Key details due to timeout' });
+        NX.Messages.add({ text: NX.I18n.get('BROWSE_NUGET_TIMEOUT_SUCCESS') });
         me.close();
       }
     }, 1 * 60 * 1000); // 1 minute

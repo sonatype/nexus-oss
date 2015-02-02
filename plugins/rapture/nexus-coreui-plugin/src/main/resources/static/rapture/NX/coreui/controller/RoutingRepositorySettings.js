@@ -169,7 +169,7 @@ Ext.define('NX.coreui.controller.RoutingRepositorySettings', {
     NX.direct.coreui_RoutingRepositorySettings.updatePrefixFile(panel.getRepository().getId(), function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Discovery started for: ' + panel.getRepository().get('name'), type: 'success'
+          text: NX.I18n.format('ADMIN_REPOSITORIES_ROUTING_DISCOVERY_SUCCESS', panel.getRepository().get('name')), type: 'success'
         });
         me.loadSettings(panel);
       }

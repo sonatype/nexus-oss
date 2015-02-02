@@ -409,7 +409,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: 'Capability created: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
+            text: NX.I18n.format('ADMIN_CAPABILITIES_CREATE_SUCCESS', me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
           me.loadStoreAndSelect(response.data.id, false);
@@ -434,7 +434,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: 'Capability updated: ' + me.getDescription(me.getCapabilityModel().create(response.data)),
+            text: NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
           me.loadStore(Ext.emptyFn);
@@ -459,7 +459,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Capability deleted: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_CAPABILITIES_DELETE_SUCCESS', description),
+          type: 'success'
         });
       }
     });
@@ -482,7 +483,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Capability enabled: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_ENABLE_SUCCESS', description),
+          type: 'success'
         });
       }
     });
@@ -505,7 +507,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Capability disabled: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_CAPABILITIES_DETAILS_DISABLE_SUCCESS', description),
+          type: 'success'
         });
       }
     });

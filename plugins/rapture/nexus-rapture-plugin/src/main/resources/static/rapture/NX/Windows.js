@@ -20,7 +20,8 @@
 Ext.define('NX.Windows', {
   singleton: true,
   requires: [
-    'NX.Messages'
+    'NX.Messages',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -39,7 +40,7 @@ Ext.define('NX.Windows', {
 
     win = NX.global.open(url, name, specs, replace);
     if (win === null) {
-      NX.Messages.add({text: 'Window pop-up was blocked!', type: 'danger'});
+      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_BLOCKED_POPUP_DANGER'), type: 'danger'});
     }
     return win;
   }

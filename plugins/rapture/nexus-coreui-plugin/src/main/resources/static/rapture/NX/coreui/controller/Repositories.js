@@ -362,7 +362,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Repository deleted: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_DELETE_SUCCESS', description), type: 'success'
         });
       }
     });
@@ -465,7 +465,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     NX.direct.coreui_Repository.clearCache(model.getId(), '/', function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started expiring caches of "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_EXPIRE_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -480,7 +480,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     NX.direct.coreui_Maven.rebuildMetadata(model.getId(), '/', function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started rebuilding metadata of "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_REBUILD_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -498,7 +498,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         NX.Messages.add({
-          text: 'Blocked proxy on "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_BLOCK_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -516,7 +516,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         NX.Messages.add({
-          text: 'Allowed proxy on "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_ALLOW_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -534,7 +534,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         NX.Messages.add({
-          text: 'Repository "' + model.get('name') + ' was put out of service',
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_POOS_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -552,7 +552,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       if (Ext.isObject(response) && response.success) {
         me.loadStore();
         NX.Messages.add({
-          text: 'Repository "' + model.get('name') + ' was put in service',
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_PRIS_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -567,7 +567,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     NX.direct.indexerLucene_Index.repair(model.getId(), '/', function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started repairing index of "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_REPAIR_SUCCESS', model.get('name')),
           type: 'success'
         });
       }
@@ -582,7 +582,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     NX.direct.indexerLucene_Index.update(model.getId(), '/', function(response) {
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'Started updating index of "' + model.get('name'),
+          text: NX.I18n.format('ADMIN_REPOSITORIES_DETAILS_UPDATE_SUCCESS', model.get('name')),
           type: 'success'
         });
       }

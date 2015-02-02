@@ -168,7 +168,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     if (statusModel) {
       if (statusModel.get('enabled')) {
         if (statusModel.get('analyzing')) {
-          return 'Analyzing...';
+          return NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZING');
         }
         return '<div><img src="' + me.imageUrl('security-alert.png') + '">&nbsp;'
             + statusModel.get('securityIssueCount') + '&nbsp;&nbsp;<img src="' + me.imageUrl('license-alert.png')
@@ -176,18 +176,18 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
       }
       else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
         var classes = "x-btn x-unselectable x-btn-nx-primary-small x-btn-nx-primary-toolbar-small-disabled";
-        var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
+        var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">' + NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE') + '</span>';
         var button = '<a class="' + classes + '" hidefocus="on" unselectable="on">' + text + '</a>';
         return button;
       }
     }
     else if (me.getHealthCheckRepositoryStatusStore().loaded) {
       var classes = "x-btn x-unselectable x-btn-nx-plain-small x-btn-nx-plain-toolbar-small-disabled";
-      var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">Analyze</span>';
+      var text = '<span class="x-btn-inner x-btn-inner-center" unselectable="on">' + NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE') + '</span>';
       var button = '<a class="' + classes + '" disabled="true" hidefocus="on" unselectable="on">' + text + '</a>';
       return button;
     }
-    return 'Loading...';
+    return NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_LOADING');
   },
 
   /**
@@ -208,10 +208,7 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
         if (status) {
           if (status.get('enabled')) {
             if (status.get('analyzing')) {
-              html = '<span><h2>The Analysis is Under Way</h2>The contents of your repository are being analyzed.  ' +
-                  'This process should only take a few minutes.<br><br>When complete, the ANALYZING button will be ' +
-                  'replaced by a set of icons that indicate how many security and licensing issues were discovered.' +
-                  '<br><br>Hover your mouse over these icons to see additional information about the issues that were found.</span>';
+              html = NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZING_TOOLTIP');
             }
             else {
               if (NX.Permissions.check('nexus:healthchecksummary', 'read')) {
@@ -219,27 +216,18 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
                 Ext.defer(me.showSummary, 0, me, [status, cell.getX(), cell.getY()]);
                 return false;
               }
-              html = '<span><h2>Insufficient Permissions to View Summary Report</h2>' +
-                  'To view healthcheck summary report for a repository your user account must have the necessary permissions.</span>';
+              html = NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_VIEW_PERMISSION_ERROR');
             }
           }
           else if (NX.Permissions.check('nexus:healthcheck', 'update')) {
-            html = '<span><h2>Repository Health Check Analysis</h2>Click this button to request a Repository Health Check (RHC) ' +
-                'by the Sonatype CLM service.  The process is non-invasive and non-disruptive.  Sonatype CLM ' +
-                'will return actionable quality, security, and licensing information about the open source components in the repository.' +
-                '<br><br><a href="http://links.sonatype.com/products/clm/rhc/home" ' +
-                'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
+            html = NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_TOOLTIP');
           }
           else {
-            html = '<span><h2>Insufficient Permissions to Analyze a Repository</h2>' +
-                'To analyze a repository your user account must have permissions to start analysis.</span>';
+            html = NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_PERMISSION_ERROR');
           }
         }
         else if (me.getHealthCheckRepositoryStatusStore().loaded) {
-          html = '<span><h2>Repository Health Check Unavailable</h2>A Repository Health Check (RHC) ' +
-              'cannot be performed by the Sonatype CLM service on this repository, because it is an unsupported type or out of service.<br><br>' +
-              '<a href="http://links.sonatype.com/products/clm/rhc/home" ' +
-              'target="_blank">How the Sonatype CLM Repository Health Check can help you make better software faster</a></span>';
+          html = NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_UNAVAILABLE_TOOLTIP');
         }
         tip.update(html);
         return true;
@@ -300,11 +288,13 @@ Ext.define('NX.coreui.controller.HealthCheckRepositoryColumn', {
     if (status && !status.get('enabled') && NX.Permissions.check('nexus:healthcheck', 'update')) {
       list.healthCheckTooltip.hide();
       Ext.Msg.show({
-        title: 'Analyze Repository',
-        msg: 'Do you want to analyze the repository ' + Ext.util.Format.htmlEncode(repositoryModel.get('name'))
-            + ' and others for security vulnerabilities and license issues?',
+        title: NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_DIALOG'),
+        msg: NX.I18n.format('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_DIALOG_HELP', Ext.util.Format.htmlEncode(repositoryModel.get('name'))),
         buttons: 7, // OKYESNO
-        buttonText: { ok: 'Yes, all repositories', yes: 'Yes, only this repository' },
+        buttonText: {
+          ok: NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_DIALOG_OK'),
+          yes: NX.I18n.get('ADMIN_REPOSITORIES_LIST_HEALTH_CHECK_ANALYZE_DIALOG_YES')
+        },
         icon: Ext.MessageBox.QUESTION,
         closeable: false,
         fn: function(buttonName) {

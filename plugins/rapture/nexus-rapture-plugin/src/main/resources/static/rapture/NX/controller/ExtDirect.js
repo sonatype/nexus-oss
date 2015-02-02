@@ -69,7 +69,7 @@ Ext.define('NX.controller.ExtDirect', {
       }
     }
     else {
-      message = 'Operation failed as server could not be contacted';
+      message = NX.I18n.get('GLOBAL_MESSAGES_EXTDIRECT_WARNING');
     }
 
     if (message) {

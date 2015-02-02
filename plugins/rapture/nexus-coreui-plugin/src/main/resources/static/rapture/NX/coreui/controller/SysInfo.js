@@ -94,7 +94,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
     if (panel) {
       me.logDebug('Refreshing sysinfo');
 
-      panel.getEl().mask('Loading...');
+      panel.getEl().mask(NX.I18n.get('ADMIN_SYSTEM_INFORMATION_LOAD_MASK'));
       NX.direct.atlas_SystemInformation.read(function (response) {
         panel.getEl().unmask();
         if (Ext.isObject(response) && response.success) {
@@ -124,7 +124,7 @@ Ext.define('NX.coreui.controller.SysInfo', {
     win = NX.Windows.open('', '', 'width=640,height=480');
     if (win !== null) {
       win.document.write('<html><head>');
-      win.document.write('<title>System Information</title>');
+      win.document.write('<title>' + NX.I18n.get('ADMIN_SYSTEM_INFORMATION_TITLE') + '</title>');
 
       // FIXME: Ideally want some of the style in here
       // FIXME: ... but unsure how to resolve that URL (since it could change for debug, etc)

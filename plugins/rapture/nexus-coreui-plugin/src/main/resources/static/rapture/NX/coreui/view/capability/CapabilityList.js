@@ -41,7 +41,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   viewConfig: {
-    emptyText: 'No capabilities defined',
+    emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_EMPTY_STATE'),
     deferEmptyText: false,
     getRowClass: function (record) {
       if (record.get('enabled') && !record.get('active')) {
@@ -68,7 +68,7 @@ Ext.define('NX.coreui.view.capability.CapabilityList', {
   ],
 
   plugins: [
-    { ptype: 'gridfilterbox', emptyText: 'No capability matched criteria "$filter"' }
+    { ptype: 'gridfilterbox', emptyText: NX.I18n.get('ADMIN_CAPABILITIES_LIST_FILTER_EMPTY') }
   ],
 
   /**

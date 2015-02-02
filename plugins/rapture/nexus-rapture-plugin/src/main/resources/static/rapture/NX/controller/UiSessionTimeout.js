@@ -23,7 +23,8 @@ Ext.define('NX.controller.UiSessionTimeout', {
     'Ext.ux.ActivityMonitor',
     'NX.Messages',
     'NX.Security',
-    'NX.State'
+    'NX.State',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -141,7 +142,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
   showExpirationWindow: function () {
     var me = this;
 
-    NX.Messages.add({text: 'Session is about to expire', type: 'warning' });
+    NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_EXPIRE_WARNING'), type: 'warning' });
     me.getExpireSessionView().create();
   },
 
@@ -157,9 +158,7 @@ Ext.define('NX.controller.UiSessionTimeout', {
         if (count === me.SECONDS_TO_EXPIRE) {
           win.close();
           NX.Messages.add({
-            text: 'Session expired after being inactive for '
-                + NX.State.getValue('uiSettings')['sessionTimeout']
-                + ' minutes',
+            text: NX.I18n.format('GLOBAL_SERVER_EXPIRED_WARNING', NX.State.getValue('uiSettings')['sessionTimeout']),
             type: 'warning'
           });
           NX.Security.signOut();

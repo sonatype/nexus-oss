@@ -500,7 +500,7 @@ Ext.define('NX.coreui.controller.Users', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: 'User deleted: ' + description, type: 'success'
+          text: NX.I18n.format('ADMIN_USERS_DETAILS_DELETE_SUCCESS', description), type: 'success'
         });
       }
     });
@@ -580,7 +580,7 @@ Ext.define('NX.coreui.controller.Users', {
     NX.direct.coreui_User.changePassword(win.authToken, win.userId, password, function(response) {
       if (Ext.isObject(response) && response.success) {
         win.close();
-        NX.Messages.add({ text: 'Password changed', type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('ADMIN_USERS_DETAILS_CHANGE_SUCCESS'), type: 'success' });
       }
     });
   },
@@ -602,7 +602,7 @@ Ext.define('NX.coreui.controller.Users', {
             NX.Dialogs.askConfirmation('Reset user password', 'Reset the ' + userId + ' user password?', function() {
               NX.direct.coreui_User.resetPassword(authToken, userId, function(response) {
                 if (Ext.isObject(response) && response.success) {
-                  NX.Messages.add({ text: 'Password reset', type: 'success' });
+                  NX.Messages.add({ text: NX.I18n.format('ADMIN_USERS_DETAILS_RESET_SUCCESS'), type: 'success' });
                 }
               });
             });

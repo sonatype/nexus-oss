@@ -186,7 +186,7 @@ Ext.define('NX.coreui.controller.RepositoryRoutes', {
     NX.direct.coreui_RepositoryRoute.remove(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: 'Route deleted: ' + description, type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('ADMIN_ROUTING_DELETE_SUCCESS', description), type: 'success' });
       }
     });
   }

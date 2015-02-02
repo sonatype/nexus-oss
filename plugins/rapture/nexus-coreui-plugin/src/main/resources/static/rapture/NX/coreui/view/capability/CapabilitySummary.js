@@ -50,7 +50,7 @@ Ext.define('NX.coreui.view.capability.CapabilitySummary', {
           submit: 'NX.direct.capability_Capability.updateNotes'
         },
         settingsFormSuccessMessage: function (data) {
-          var description = NX.I18n.get('ADMIN_CAPABILITIES_UPDATE_SUCCESS') + data['typeName'];
+          var description = NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', data['typeName']);
           if (data['description']) {
             description += ' - ' + data['description'];
           }

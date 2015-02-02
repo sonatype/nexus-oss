@@ -193,7 +193,7 @@ Ext.define('NX.coreui.controller.Privileges', {
       me.loadStoreAndSelect(action.result.data[0].id, false);
       Ext.Array.each(action.result.data, function (privilege) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_PRIVILEGES_MESSAGE_CREATED', privilege.name),
+          text: NX.I18n.format('ADMIN_PRIVILEGES_CREATE_SUCCESS', privilege.name),
           type: 'success'
         });
       });
@@ -216,7 +216,7 @@ Ext.define('NX.coreui.controller.Privileges', {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
-          text: NX.I18n.format('ADMIN_PRIVILEGES_MESSAGE_DELETED', model.get('name')),
+          text: NX.I18n.format('ADMIN_PRIVILEGES_DELETE_SUCCESS', model.get('name')),
           type: 'success'
         });
       }

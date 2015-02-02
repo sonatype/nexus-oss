@@ -39,11 +39,15 @@ Ext.define('NX.app.PluginStrings', {
 
     // Header
     GLOBAL_HEADER_TITLE: 'Sonatype Nexus',
+    GLOBAL_HEADER_BROWSE_TITLE: 'Browse',
     GLOBAL_HEADER_BROWSE_TOOLTIP: 'Browse server contents',
+    GLOBAL_HEADER_ADMIN_TITLE: 'Administration',
     GLOBAL_HEADER_ADMIN_TOOLTIP: 'Server administration and configuration',
     GLOBAL_HEADER_SEARCH_PLACEHOLDER: 'Search components',
     GLOBAL_HEADER_SEARCH_TOOLTIP: 'Quick component keyword search',
     GLOBAL_HEADER_REFRESH_TOOLTIP: 'Refresh current view and data',
+    GLOBAL_HEADER_REFRESH_DEFAULT: 'Refreshed',
+    GLOBAL_HEADER_USER: 'User',
     GLOBAL_HEADER_USER_TOOLTIP: 'Hi, {0}. Manage your user account.',
     GLOBAL_HEADER_SIGN_IN: 'Sign in',
     GLOBAL_HEADER_SIGN_IN_TOOLTIP: 'Sign in',
@@ -51,12 +55,19 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_HEADER_SIGN_OUT_TOOLTIP: 'Sign out',
     GLOBAL_HEADER_HELP_TOOLTIP: 'Help',
     GLOBAL_HEADER_HELP_FEATURE: 'Help for: ',
+    GLOBAL_HEADER_HELP_FEATURE_TOOLTIP: 'Help and documentation for the currently selected feature',
     GLOBAL_HEADER_HELP_ABOUT: 'About',
+    GLOBAL_HEADER_HELP_ABOUT_TOOLTIP: 'About Sonatype Nexus',
     GLOBAL_HEADER_HELP_DOCUMENTATION: 'Documentation',
+    GLOBAL_HEADER_HELP_DOCUMENTATION_TOOLTIP: 'Sonatype Nexus product documentation',
     GLOBAL_HEADER_HELP_KB: 'Knowledge base',
+    GLOBAL_HEADER_HELP_KB_TOOLTIP: 'Sonatype Nexus knowledge base',
     GLOBAL_HEADER_HELP_COMMUNITY: 'Community',
+    GLOBAL_HEADER_HELP_COMMUNITY_TOOLTIP: 'Sonatype Nexus community information',
     GLOBAL_HEADER_HELP_ISSUES: 'Issue tracker',
+    GLOBAL_HEADER_HELP_ISSUES_TOOLTIP: 'Sonatype Nexus issue and bug tracker',
     GLOBAL_HEADER_HELP_SUPPORT: 'Support',
+    GLOBAL_HEADER_HELP_SUPPORT_TOOLTIP: 'Sonatype Nexus product support',
 
     // Footer
     GLOBAL_FOOTER_COPYRIGHT: 'Copyright © 2008-2015, Sonatype Inc. All rights reserved.',
@@ -82,7 +93,50 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_DIALOG_ORDER_CANCEL_BUTTON: 'Cancel',
 
     // Messages
+    GLOBAL_MESSAGES_TOOLTIP: 'Toggle messages display',
     GLOBAL_MESSAGES_EMPTY_STATE: 'No messages',
+
+    // Server
+    GLOBAL_SERVER_EXTDIRECT_WARNING: 'Operation failed as server could not be contacted',
+    GLOBAL_SERVER_RECONNECTED_SUCCESS: 'Server reconnected',
+    GLOBAL_SERVER_DISCONNECTED: 'Server disconnected',
+    GLOBAL_SERVER_EXPIRE_WARNING: 'Session is about to expire',
+    GLOBAL_SERVER_EXPIRED_WARNING: 'Session expired after being inactive for {0} minutes',
+    GLOBAL_SERVER_SIGNED_IN: 'User signed in: {0}',
+    GLOBAL_SERVER_SIGNED_OUT: 'User signed out',
+    GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING: 'Incorrect username and/or password or no permission to use the Nexus User Interface.',
+    GLOBAL_SERVER_DOWNLOAD_SUCCESS: 'Download initiated',
+    GLOBAL_SERVER_BLOCKED_POPUP_DANGER: 'Window pop-up was blocked!',
+
+    // License
+    GLOBAL_LICENSE_INSTALLED_SUCCESS: 'License installed',
+    GLOBAL_LICENSE_UNINSTALLED_WARNING: 'License uninstalled',
+
+    // About modal
+    GLOBAL_ABOUT_TITLE: 'About Sonatype Nexus',
+    GLOBAL_ABOUT_CLOSE_BUTTON: 'Close',
+    GLOBAL_ABOUT_COPYRIGHT_TAB: 'Copyright',
+    GLOBAL_ABOUT_LICENSE_TAB: 'License',
+
+    // Authentication modal
+    GLOBAL_AUTHENTICATE_TITLE: 'Authenticate',
+    GLOBAL_AUTHENTICATE_HELP: 'You have requested an operation which requires validation of your credentials.',
+    GLOBAL_AUTHENTICATE_SUBMIT_BUTTON: 'Authenticate',
+    GLOBAL_AUTHENTICATE_CANCEL_BUTTON: 'Cancel',
+
+    // Expiry modal
+    GLOBAL_EXPIRE_TITLE: 'Session',
+    GLOBAL_EXPIRE_HELP: 'Session is about to expire',
+    GLOBAL_EXPIRE_CANCEL_BUTTON: 'Cancel',
+
+    // Unsupported browser
+    GLOBAL_UNSUPPORTED_TITLE: 'The browser you are using is not supported',
+    GLOBAL_UNSUPPORTED_ALTERNATIVES: 'Below is a list of alternatives that are supported by this web application',
+    GLOBAL_UNSUPPORTED_CONTINUE_BUTTON: 'Ignore and continue',
+
+    // 404
+    GLOBAL_404_PATH: 'Path "{0}" not found',
+    GLOBAL_404_NO_PATH: 'Path not found',
 
     // Buttons
     GLOBAL_BUTTON_SAVE: 'Save',

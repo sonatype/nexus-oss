@@ -24,7 +24,7 @@ Ext.define('NX.view.Authenticate', {
     'NX.I18n'
   ],
 
-  title: 'Authenticate',
+  title: NX.I18n.get('GLOBAL_AUTHENTICATE_TITLE'),
 
   layout: 'fit',
   autoShow: true,
@@ -46,7 +46,7 @@ Ext.define('NX.view.Authenticate', {
     var me = this;
 
     if (!me.message) {
-      me.message = 'You have requested an operation which requires validation of your credentials.';
+      me.message = NX.I18n.get('GLOBAL_AUTHENTICATE_HELP');
     }
 
     Ext.apply(this, {
@@ -88,8 +88,8 @@ Ext.define('NX.view.Authenticate', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: 'Authenticate', action: 'authenticate', formBind: true, bindToEnter: true, ui: 'nx-primary' },
-          { text: 'Cancel', handler: me.close, scope: me }
+          { text: NX.I18n.get('GLOBAL_AUTHENTICATE_SUBMIT_BUTTON'), action: 'authenticate', formBind: true, bindToEnter: true, ui: 'nx-primary' },
+          { text: NX.I18n.get('GLOBAL_AUTHENTICATE_CANCEL_BUTTON'), handler: me.close, scope: me }
         ]
       }
     });

@@ -107,7 +107,7 @@ Ext.define('NX.coreui.controller.SslTrustStore', {
         hostAndPort = me.getHostAndPort(button.up('nx-coreui-sslusetruststore').useTrustStoreConfig),
         sslCertificates = me.getController('NX.coreui.controller.SslCertificates');
 
-    panel.getEl().mask('Loading certificate...');
+    panel.getEl().mask(NX.I18n.get('ADMIN_SSL_LOAD_MASK'));
     NX.direct.ssl_Certificate.retrieveFromHost(hostAndPort.host, hostAndPort.port, undefined, function(response) {
       panel.getEl().unmask();
       if (Ext.isObject(response) && response.success) {

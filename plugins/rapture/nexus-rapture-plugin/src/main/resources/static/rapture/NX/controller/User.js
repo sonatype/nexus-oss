@@ -22,7 +22,8 @@ Ext.define('NX.controller.User', {
   requires: [
     'NX.util.Base64',
     'NX.Messages',
-    'NX.State'
+    'NX.State',
+    'NX.I18n'
   ],
   mixins: {
     logAware: 'NX.LogAware'
@@ -117,11 +118,11 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (user && !oldUser) {
-      NX.Messages.add({text: 'User signed in: ' + user.id, type: 'default' });
+      NX.Messages.add({text: NX.I18n.format('GLOBAL_SERVER_SIGNED_IN', user.id), type: 'default' });
       me.fireEvent('signin', user);
     }
     else if (!user && oldUser) {
-      NX.Messages.add({text: 'User signed out', type: 'default' });
+      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_SIGNED_OUT'), type: 'default' });
       me.fireEvent('signout');
     }
 
@@ -236,7 +237,7 @@ Ext.define('NX.controller.User', {
       failure: function() {
         win.getEl().unmask();
         NX.Messages.add({
-          text: 'Incorrect username and/or password or no permission to use the Nexus User Interface.',
+          text: NX.I18n.get('GLOBAL_SERVER_INCORRECT_CREDENTIALS_WARNING'),
           type: 'warning'
         });
       }

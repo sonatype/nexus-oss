@@ -89,9 +89,9 @@ Ext.define('NX.coreui.controller.UploadArtifact', {
         form = button.up('form');
 
     form.submit({
-      waitMsg: 'Uploading your artifacts...',
+      waitMsg: NX.I18n.get('BROWSE_UPLOAD_ARTIFACT_WAIT'),
       success: function() {
-        NX.Messages.add({ text: 'Artifacts uploaded', type: 'success' });
+        NX.Messages.add({ text: NX.I18n.get('BROWSE_UPLOAD_ARTIFACT_SUCCESS'), type: 'success' });
         me.discardForm(form);
       }
     });

@@ -45,7 +45,7 @@ Ext.define('NX.view.header.BrowseMode', {
    * @cfg collapseMenu If menu should be collapsed automatically when mode is selected
    */
   collapseMenu: true,
-  title: 'Browse',
+  title: NX.I18n.get('GLOBAL_HEADER_BROWSE_TITLE'),
   tooltip: NX.I18n.get('GLOBAL_HEADER_BROWSE_TOOLTIP'),
   glyph: 'xf1b2@FontAwesome' /* fa-cube */
 });

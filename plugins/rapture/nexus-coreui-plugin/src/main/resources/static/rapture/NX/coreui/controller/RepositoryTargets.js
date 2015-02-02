@@ -40,7 +40,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     'repositorytarget.RepositoryTargetFeature',
     'repositorytarget.RepositoryTargetList',
     'repositorytarget.RepositoryTargetSettings',
-    'repositorytarget.RepositoryTargetSettingsForm',
+    'repositorytarget.RepositoryTargetSettingsForm'
   ],
   refs: [
     { ref: 'feature', selector: 'nx-coreui-repositorytarget-feature' },
@@ -172,7 +172,7 @@ Ext.define('NX.coreui.controller.RepositoryTargets', {
     NX.direct.coreui_RepositoryTarget.remove(model.getId(), function(response) {
       me.loadStore();
       if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: 'Target deleted: ' + description, type: 'success' });
+        NX.Messages.add({ text: NX.I18n.format('ADMIN_TARGETS_DETAILS_DELETE_SUCCESS', description), type: 'success' });
       }
     });
   }
