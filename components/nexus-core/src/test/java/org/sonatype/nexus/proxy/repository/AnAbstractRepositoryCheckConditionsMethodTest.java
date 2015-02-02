@@ -13,7 +13,6 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -25,7 +24,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.uid.CoreRepositoryItemUidAttributeSource;
 import org.sonatype.nexus.proxy.item.uid.DefaultRepositoryItemUidAttributeManager;
-import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeSource;
 import org.sonatype.nexus.proxy.maven.uid.MavenRepositoryItemUidAttributeSource;
@@ -36,7 +34,6 @@ import org.sonatype.sisu.locks.LocalResourceLockFactory;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -156,25 +153,18 @@ public class AnAbstractRepositoryCheckConditionsMethodTest
   }
 
   @Test
-  @Ignore("Does not work with Java8, but does with Java7: static final boolean value changing via reflection")
   public void attributeExternalRequestWithFeatureDisabled() throws Exception {
-    // HACK: changing final static boolean might not work on all JVMs! It works for me on OSX+Oracle Java7
-    // but it might fail as those might be inlined at compile time!
-    Field disabledField = IsItemAttributeMetacontentAttribute.class.getDeclaredField("disabled");
-    disabledField.setAccessible(true);
-    Field modifiers = disabledField.getClass().getDeclaredField("modifiers");
-    modifiers.setAccessible(true);
-    modifiers.setInt(disabledField, disabledField.getModifiers() & ~Modifier.FINAL);
-    final boolean originalValue = disabledField.getBoolean(null);
+    final String attributeAccessEnabled = "nexus.content.attributeAccessEnabled";
+    System.setProperty(attributeAccessEnabled, Boolean.TRUE.toString());
+    // need to prepare again, to pick up system property changes
+    prepare();
     try {
-      disabledField.set(null, true);
       final ResourceStoreRequest resourceStoreRequest = new ResourceStoreRequest("/.nexus/attributes/some/path");
       resourceStoreRequest.setExternal(true);
       abstractRepository.checkConditions(resourceStoreRequest, Action.read);
     }
     finally {
-      // HACK: must reset it to not screw other tests in this or other classes running in same JVM
-      disabledField.set(null, originalValue);
+      System.clearProperty(attributeAccessEnabled);
     }
   }
 }
