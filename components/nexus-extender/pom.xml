@@ -39,6 +39,16 @@
     </dependency>
 
     <!--
+    Optional support for Pax-Exam if/when deployed alongside Nexus
+    -->
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam</artifactId>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
     To be removed once all plugins are migrated off the Plexus API
     -->
     <dependency>

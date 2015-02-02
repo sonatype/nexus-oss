@@ -28,6 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
+    <pax-exam.version>4.4.0</pax-exam.version>
     <selenium.version>2.38.0</selenium.version>
   </properties>
 
@@ -136,6 +137,28 @@
         <artifactId>junit</artifactId>
         <version>4.11</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam</artifactId>
+        <version>${pax-exam.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-junit4</artifactId>
+        <version>${pax-exam.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-container-karaf</artifactId>
+        <version>${pax-exam.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.url</groupId>
+        <artifactId>pax-url-aether</artifactId>
+        <version>2.3.0</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.web.NexusServletModule;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -41,8 +43,10 @@ import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.features.FeaturesService.Option;
 import org.eclipse.sisu.inject.BeanLocator;
+import org.eclipse.sisu.wire.ParameterKeys;
 import org.eclipse.sisu.wire.WireModule;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceRegistration;
@@ -65,6 +69,20 @@ public class NexusContextListener
     extends GuiceServletContextListener
     implements FrameworkListener
 {
+  static {
+    boolean hasPaxExam;
+    try {
+      // detect if running with Pax-Exam so we can register our locator
+      hasPaxExam = org.ops4j.pax.exam.util.Injector.class.isInterface();
+    }
+    catch (final LinkageError e) {
+      hasPaxExam = false;
+    }
+    HAS_PAX_EXAM = hasPaxExam;
+  }
+
+  private static final boolean HAS_PAX_EXAM;
+
   private static final int NEXUS_PLUGIN_START_LEVEL = 200;
 
   private static final Logger log = LoggerFactory.getLogger(NexusContextListener.class);
@@ -154,6 +172,10 @@ public class NexusContextListener
       final Filter filter = injector.getInstance(NexusGuiceFilter.class);
       final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
       registration = bundleContext.registerService(Filter.class, filter, properties);
+
+      if (HAS_PAX_EXAM) {
+        registerLocatorWithPaxExam(injector.getProvider(BeanLocator.class));
+      }
     }
   }
 
@@ -233,5 +255,38 @@ public class NexusContextListener
     }
 
     log.info("Installed {} features", features.size());
+  }
+
+  /**
+   * Registers our locator service with Pax-Exam to handle injection of test classes.
+   */
+  private void registerLocatorWithPaxExam(final Provider<BeanLocator> locatorProvider) {
+
+    // ensure this service is ranked higher than the Pax-Exam one
+    final Dictionary<String, Object> properties = new Hashtable<>();
+    properties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
+    properties.put("name", "nexus");
+
+    bundleContext.registerService(org.ops4j.pax.exam.util.Injector.class, new org.ops4j.pax.exam.util.Injector()
+    {
+      public void injectFields(final Object target) {
+        Guice.createInjector(new WireModule(new AbstractModule()
+        {
+          @Override
+          protected void configure() {
+            // support injection of application components by wiring via shared locator
+            // (use provider to avoid auto-publishing test-instance to the application)
+            bind(BeanLocator.class).toProvider(locatorProvider);
+
+            // support injection of application properties
+            bind(ParameterKeys.PROPERTIES).toInstance(
+                locatorProvider.get().locate(ParameterKeys.PROPERTIES).iterator().next().getValue());
+
+            // inject the test-instance
+            requestInjection(target);
+          }
+        }));
+      }
+    }, properties);
   }
 }
