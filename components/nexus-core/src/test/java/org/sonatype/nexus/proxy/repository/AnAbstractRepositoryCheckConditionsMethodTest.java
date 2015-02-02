@@ -36,6 +36,7 @@ import org.sonatype.sisu.locks.LocalResourceLockFactory;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -155,6 +156,7 @@ public class AnAbstractRepositoryCheckConditionsMethodTest
   }
 
   @Test
+  @Ignore("Does not work with Java8, but does with Java7: static final boolean value changing via reflection")
   public void attributeExternalRequestWithFeatureDisabled() throws Exception {
     // HACK: changing final static boolean might not work on all JVMs! It works for me on OSX+Oracle Java7
     // but it might fail as those might be inlined at compile time!
