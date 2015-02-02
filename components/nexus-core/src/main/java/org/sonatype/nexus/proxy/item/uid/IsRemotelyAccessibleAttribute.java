@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.proxy.item.uid;
 
+import org.sonatype.nexus.common.property.SystemPropertiesHelper;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * Attribute saying is UID covering a content deliverable remotely.
