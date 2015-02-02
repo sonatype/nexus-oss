@@ -41,8 +41,10 @@ Ext.define('NX.view.drilldown.Drilldown', {
   // List of actions to use in the detail view
   actions: null,
 
-  // Saved modes for each drilldown item
-  activeModes: [],
+  // Constants which represent card indexes
+  BROWSE_INDEX: 0,
+  CREATE_INDEX: 1,
+  BLANK_INDEX: 2,
 
   /**
    * @override
@@ -261,7 +263,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
     // Hide everything that’s not the specified panel
     for (var i = 0; i < items.length; ++i) {
       if (i != index) {
-        items[i].getLayout().setActiveItem(2);
+        items[i].getLayout().setActiveItem(me.BLANK_INDEX);
       }
     }
 
@@ -286,10 +288,8 @@ Ext.define('NX.view.drilldown.Drilldown', {
 
     if (item.el) {
 
-      // Restore the saved modes
-      for (var i = 0; i < items.length; ++i) {
-        items[i].getLayout().setActiveItem(me.activeModes[i]);
-      }
+      // Restore the current card
+      items[index].getLayout().setActiveItem(items[index].cardIndex);
 
       // Hack to suppress resize events until the animation is complete
       if (animate) {
@@ -302,7 +302,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
         me.hideAllExceptAndFocus(index);
       }
 
-      // Show the requested panel
+      // Slide the requested panel into view
       var left = item.el.getLeft() - me.el.getLeft();
       me.el.first().move('l', left, animate);
       me.currentIndex = index;
@@ -359,9 +359,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
     }
 
     // Show the proper card
-    items[index].getLayout().setActiveItem(1);
-
-    me.activeModes[index] = items[index].getLayout().getActiveItem();
+    items[index].setCardIndex(me.CREATE_INDEX);
 
     me.slidePanels(index, animate);
   },
@@ -378,9 +376,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
       item = me.query('nx-drilldown-item')[index];
 
     // Show the proper card
-    item.getLayout().setActiveItem(0);
-
-    me.activeModes[index] = item.getLayout().getActiveItem();
+    item.setCardIndex(me.BROWSE_INDEX);
 
     me.slidePanels(index, animate);
   },
