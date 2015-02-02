@@ -18,6 +18,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 /**
  * Attribute yielding "false" for real repository content, and "true" for all the "item attributes", that is actually
  * not holding data serving the basic purpose of this given repository.
+ * <em>This attribute must not be configurable, as it drives interal storage logic and may introduce endless loops!</em>
  *
  * @author cstamas
  * @since 2.0
@@ -25,12 +26,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class IsItemAttributeMetacontentAttribute
     implements Attribute<Boolean>
 {
-  // HACK: Allow this attribute function to be disabled
-  private static final boolean disabled = SystemPropertiesHelper.getBoolean(
-      IsItemAttributeMetacontentAttribute.class.getName() + ".disabled", false);
-
   public Boolean getValueFor(RepositoryItemUid subject) {
-    if (!disabled && subject.getPath() != null) {
+    if (subject.getPath() != null) {
       return subject.getPath().startsWith("/.nexus/attributes");
     }
 

@@ -17,6 +17,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 /**
  * Attribute yielding "false" for real repository content, and "true" for all the "trash content", that is actually not
  * holding data serving the basic purpose of this given repository.
+ * <em>This attribute must not be configurable, as it drives interal storage logic and may introduce endless loops!</em>
  *
  * @author cstamas
  * @since 2.0
