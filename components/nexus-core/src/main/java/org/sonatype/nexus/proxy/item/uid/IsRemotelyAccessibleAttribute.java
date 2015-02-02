@@ -23,9 +23,13 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class IsRemotelyAccessibleAttribute
     implements Attribute<Boolean>
 {
-  // HACK: Allow this attribute function to be disabled for NEXUS-8060
-  private static final boolean attributes = SystemPropertiesHelper.getBoolean(
-      IsRemotelyAccessibleAttribute.class.getName() + ".attributes", false);
+  private static final String ATTRIBUTES_REMOTELY_ACCESSIBLE = "nexus.content.attributeAccessEnabled";
+
+  private final boolean attributes;
+
+  public IsRemotelyAccessibleAttribute() {
+    this.attributes = SystemPropertiesHelper.getBoolean(ATTRIBUTES_REMOTELY_ACCESSIBLE, false);
+  }
 
   public Boolean getValueFor(RepositoryItemUid subject) {
     return (attributes || !subject.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class))
