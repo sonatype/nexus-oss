@@ -202,18 +202,20 @@ Ext.define('NX.controller.Drilldown', {
     var me = this,
       lists = me.getLists();
 
-    lists[index].getStore().clearFilter();
-    if (index < lists.length - 1 && bookmark.length) {
-      lists[index].getStore().load(function(records, operation, success) {
-        me.loadStoreAtIndex(index + 1, bookmark, cb);
-      });
-    } else {
-      lists[index].getStore().load(function(records, operation, success) {
-        if (cb) {
-          cb(records, operation, success);
-        }
-        me.onStoreLoad();
-      });
+    if (lists[index]) {
+      lists[index].getStore().clearFilter();
+      if (index < lists.length - 1 && bookmark.length) {
+        lists[index].getStore().load(function(records, operation, success) {
+          me.loadStoreAtIndex(index + 1, bookmark, cb);
+        });
+      } else {
+        lists[index].getStore().load(function(records, operation, success) {
+          if (cb) {
+            cb(records, operation, success);
+          }
+          me.onStoreLoad();
+        });
+      }
     }
   },
 

@@ -185,7 +185,9 @@ Ext.define('NX.coreui.controller.BrowseRepositories', {
             });
           });
           Ext.resumeLayouts(true);
-          me.getStorageFileContainer().showStorageFile();
+          if (me.getStorageFileContainer()) {
+            me.getStorageFileContainer().showStorageFile();
+          }
           me.navigateTo(NX.Bookmarks.getBookmark());
         }
       });
