@@ -34,7 +34,8 @@ Ext.define('NX.controller.User', {
     'header.SignOut',
     'header.UserMode',
     'Authenticate',
-    'SignIn'
+    'SignIn',
+    'ExpireSession'
   ],
 
   refs: [
@@ -81,6 +82,9 @@ Ext.define('NX.controller.User', {
           afterrender: me.manageButtons
         },
         'nx-header-signin': {
+          click: me.showSignInWindow
+        },
+        'nx-expire-session button[action=signin]': {
           click: me.showSignInWindow
         },
         'nx-header-signout': {
@@ -215,7 +219,7 @@ Ext.define('NX.controller.User', {
 
     me.logDebug('Sign-in user: ' + values['username']);
 
-    win.getEl().mask('Signing in...');
+    win.getEl().mask(NX.I18n.get('GLOBAL_SIGN_IN_MASK'));
 
     Ext.Ajax.request({
       url: NX.util.Url.urlOf('service/local/authentication/login'),
@@ -268,7 +272,7 @@ Ext.define('NX.controller.User', {
         userName = NX.util.Base64.encode(values.username),
         userPass = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask('Authenticate...');
+    win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_MASK'));
 
     me.logDebug('Authenticate...');
 
@@ -296,7 +300,7 @@ Ext.define('NX.controller.User', {
         userName = NX.util.Base64.encode(values.username),
         userPass = NX.util.Base64.encode(values.password);
 
-    win.getEl().mask('Retrieving authentication token...');
+    win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_RETRIEVING_MASK'));
 
     me.logDebug('Retrieving authentication token...');
 

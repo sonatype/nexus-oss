@@ -74,6 +74,7 @@ Ext.define('NX.app.PluginStrings', {
 
     // Sign in
     GLOBAL_SIGN_IN_TITLE: 'Sign In',
+    GLOBAL_SIGN_IN_MASK: 'Signing in…',
     GLOBAL_SIGN_IN_USERNAME_PLACEHOLDER: 'Username',
     GLOBAL_SIGN_IN_PASSWORD_PLACEHOLDER: 'Password',
     GLOBAL_SIGN_IN_REMEMBER_ME: 'Remember me',
@@ -121,13 +122,19 @@ Ext.define('NX.app.PluginStrings', {
     // Authentication modal
     GLOBAL_AUTHENTICATE_TITLE: 'Authenticate',
     GLOBAL_AUTHENTICATE_HELP: 'You have requested an operation which requires validation of your credentials.',
+    GLOBAL_AUTHENTICATE_MASK: 'Authenticate…',
     GLOBAL_AUTHENTICATE_SUBMIT_BUTTON: 'Authenticate',
+    GLOBAL_AUTHENTICATE_RETRIEVING_MASK: 'Retrieving authentication token…',
     GLOBAL_AUTHENTICATE_CANCEL_BUTTON: 'Cancel',
 
     // Expiry modal
     GLOBAL_EXPIRE_TITLE: 'Session',
     GLOBAL_EXPIRE_HELP: 'Session is about to expire',
+    GLOBAL_EXPIRE_SECONDS: 'Session will expire in {0} seconds',
+    GLOBAL_EXPIRE_SIGNED_OUT: 'Your session has expired. Please log in.',
     GLOBAL_EXPIRE_CANCEL_BUTTON: 'Cancel',
+    GLOBAL_EXPIRE_SIGN_IN_BUTTON: 'Sign in',
+    GLOBAL_EXPIRE_CLOSE_BUTTON: 'Close',
 
     // Unsupported browser
     GLOBAL_UNSUPPORTED_TITLE: 'The browser you are using is not supported',

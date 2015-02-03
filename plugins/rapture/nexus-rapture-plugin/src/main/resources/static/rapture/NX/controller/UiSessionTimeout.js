@@ -154,9 +154,12 @@ Ext.define('NX.controller.UiSessionTimeout', {
 
     me.expirationTicker = Ext.util.TaskManager.newTask({
       run: function (count) {
-        win.down('label').setText('Session will expire in ' + (me.SECONDS_TO_EXPIRE - count) + ' seconds');
+        win.down('label').setText(NX.I18n.format('GLOBAL_EXPIRE_SECONDS', me.SECONDS_TO_EXPIRE - count));
         if (count === me.SECONDS_TO_EXPIRE) {
-          win.close();
+          win.down('label').setText(NX.I18n.get('GLOBAL_EXPIRE_SIGNED_OUT'));
+          win.down('button[action=close]').show();
+          win.down('button[action=signin]').show();
+          win.down('button[action=cancel]').hide();
           NX.Messages.add({
             text: NX.I18n.format('GLOBAL_SERVER_EXPIRED_WARNING', NX.State.getValue('uiSettings')['sessionTimeout']),
             type: 'warning'
