@@ -24,6 +24,10 @@ Ext.define('NX.view.drilldown.Master', {
   // Prevent columns from expanding out of bounds
   forceFit: true,
 
+  listeners: {
+    viewready: function(view) { view.refreshDrilldown(view.headerCt) }
+  },
+
   /**
    * @private
    */
