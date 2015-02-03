@@ -131,7 +131,7 @@ Ext.define('NX.app.PluginStrings', {
     GLOBAL_EXPIRE_TITLE: 'Session',
     GLOBAL_EXPIRE_HELP: 'Session is about to expire',
     GLOBAL_EXPIRE_SECONDS: 'Session will expire in {0} seconds',
-    GLOBAL_EXPIRE_SIGNED_OUT: 'Your session has expired. Please log in.',
+    GLOBAL_EXPIRE_SIGNED_OUT: 'Your session has expired. Please sign in.',
     GLOBAL_EXPIRE_CANCEL_BUTTON: 'Cancel',
     GLOBAL_EXPIRE_SIGN_IN_BUTTON: 'Sign in',
     GLOBAL_EXPIRE_CLOSE_BUTTON: 'Close',
