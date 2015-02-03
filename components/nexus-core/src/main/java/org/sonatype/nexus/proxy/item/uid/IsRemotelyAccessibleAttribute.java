@@ -13,16 +13,25 @@
 package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * Attribute saying is UID covering a content deliverable remotely.
- *
- * @author cstamas
  */
 public class IsRemotelyAccessibleAttribute
     implements Attribute<Boolean>
 {
+  private static final String ATTRIBUTE_ACCESS_ENABLED = "nexus.content.attributeAccessEnabled";
+
+  private final boolean attributeAccessEnabled;
+
+  public IsRemotelyAccessibleAttribute() {
+    this.attributeAccessEnabled = SystemPropertiesHelper.getBoolean(ATTRIBUTE_ACCESS_ENABLED, false);
+  }
+
+  @Override
   public Boolean getValueFor(RepositoryItemUid subject) {
-    return !subject.getBooleanAttributeValue(IsMetacontentAttribute.class);
+    return (attributeAccessEnabled || !subject.getBooleanAttributeValue(IsItemAttributeMetacontentAttribute.class))
+        && !subject.getBooleanAttributeValue(IsTrashMetacontentAttribute.class);
   }
 }

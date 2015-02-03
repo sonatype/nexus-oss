@@ -24,7 +24,7 @@ import org.junit.Test;
  *
  * @since 2.2
  */
-public class AbstractRepositoryTest
+public class AnAbstractRepositoryTest
     extends TestSupport
 {
 

@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.notNullValue;
  *
  * @author plynch
  */
-public class AbstractFileNexusPluginRepositoryTest
+public class AnAbstractFileNexusPluginRepositoryTest
 {
 
   @Test

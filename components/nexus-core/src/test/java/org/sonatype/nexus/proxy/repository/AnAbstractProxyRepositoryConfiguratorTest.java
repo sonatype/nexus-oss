@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
-public class AbstractProxyRepositoryConfiguratorTest
+public class AnAbstractProxyRepositoryConfiguratorTest
     extends TestSupport
 {
 
