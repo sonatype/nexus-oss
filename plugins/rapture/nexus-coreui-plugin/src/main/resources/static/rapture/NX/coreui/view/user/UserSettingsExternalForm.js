@@ -58,7 +58,6 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
       {
         name: 'firstName',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_FIRST_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -66,7 +65,6 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
       {
         name: 'lastName',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_LAST_HELP'),
         allowBlank: true,
         readOnly: true,
         submitValue: false
@@ -83,7 +81,6 @@ Ext.define('NX.coreui.view.user.UserSettingsExternalForm', {
         xtype: 'combo',
         name: 'status',
         fieldLabel: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS'),
-        helpText: NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_HELP'),
         editable: false,
         store: [
           ['active', NX.I18n.get('ADMIN_USERS_SETTINGS_STATUS_ACTIVE')],
