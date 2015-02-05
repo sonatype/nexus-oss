@@ -94,17 +94,14 @@ public class NxApplication
     this.eventSubscriberHost = checkNotNull(eventSubscriberHost);
     this.orientBootstrap = checkNotNull(orientBootstrap);
     this.beanManager = checkNotNull(beanManager);
-
-    logInitialized();
   }
 
-  @VisibleForTesting
-  protected void logInitialized() {
-    final StringBuilder sysInfoLog = new StringBuilder();
-    sysInfoLog.append("\n-------------------------------------------------\n\n");
-    sysInfoLog.append("Initializing ").append(getNexusNameForLogs());
-    sysInfoLog.append("\n\n-------------------------------------------------");
-    log.info(sysInfoLog.toString());
+  private void logStarted() {
+    StringBuilder buff = new StringBuilder();
+    buff.append("\n-------------------------------------------------\n\n");
+    buff.append("Started ").append(getNexusNameForLogs());
+    buff.append("\n\n-------------------------------------------------");
+    log.info(buff.toString());
   }
 
   @VisibleForTesting
@@ -161,21 +158,9 @@ public class NxApplication
 
       synchronizeShadowsAtStartup();
 
-      if (log.isInfoEnabled()) {
-        final File workDir = nexusConfiguration.getWorkingDirectory();
-        String workDirPath = null;
-        if (workDir != null) {
-          try {
-            workDirPath = workDir.getCanonicalPath();
-          }
-          catch (IOException ioe) {
-            workDirPath = workDir.getAbsolutePath();
-          }
-        }
-        log.info("Nexus Work Directory : {}", workDirPath);
-        log.info("Started {}", getNexusNameForLogs());
-      }
       eventBus.post(new NexusStartedEvent(this));
+
+      logStarted();
     }
     catch (IOException e) {
       applicationStatusSource.getSystemStatus().setState(SystemState.BROKEN_IO);
