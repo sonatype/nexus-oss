@@ -145,7 +145,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     BROWSE_STANDARD_INFO_SHA1: 'SHA1',
     BROWSE_STANDARD_INFO_MD5: 'MD5',
     BROWSE_STANDARD_INFO_CONTAINED: 'Contained in',
-    //BROWSE_STANDARD_COMPONENT_INFO_EMPTY_STATE: 'CLM data is not available for this artifact. Unable to properly identify the groupId, artifactId or version.',
 
     // Browse -> Repository -> Managed
     BROWSE_MANAGED_TITLE: 'Managed',

@@ -305,7 +305,7 @@ Ext.define('NX.controller.State', {
     // re-enable the UI we are now connected again
     if (me.disconnectedTimes > 0) {
       me.disconnectedTimes = 0;
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_MESSAGES_RECONNECTED_SUCCESS'), type: 'success' });
+      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_RECONNECTED_SUCCESS'), type: 'success' });
     }
 
     NX.State.setValue('receiving', true);

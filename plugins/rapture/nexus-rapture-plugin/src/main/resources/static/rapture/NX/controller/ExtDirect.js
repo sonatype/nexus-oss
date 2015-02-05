@@ -69,14 +69,14 @@ Ext.define('NX.controller.ExtDirect', {
       }
     }
     else {
-      message = NX.I18n.get('GLOBAL_MESSAGES_EXTDIRECT_WARNING');
+      message = NX.I18n.get('GLOBAL_SERVER_EXTDIRECT_WARNING');
     }
 
     if (message) {
       NX.Messages.add({text: message, type: 'warning'});
     }
     var logMsg = transaction.action + ':' + transaction.method + " -> " + (message ? 'Failed: ' + message : 'OK');
-    if (result.errors) {
+    if (Ext.isDefined(result) && result.errors) {
       logMsg += (' Errors: ' + Ext.encode(result.errors));
     }
     me.logDebug(logMsg);
