@@ -51,22 +51,27 @@ Ext.define('NX.coreui.view.capability.CapabilitySelectType', {
     }
   ],
 
-  listeners: {
-    'afterrender': function(grid) {
-      var view = grid.getView();
-      grid.tip = Ext.create('Ext.tip.ToolTip', {
-        target: view.el,
-        delegate: view.itemSelector,
-        trackMouse: true,
-        renderTo: Ext.getBody(),
-        dismissDelay: 0,
-        listeners: {
-          beforeshow: function updateTipBody(tip) {
-            tip.update(view.getRecord(tip.triggerElement).get('about'));
+  initComponent: function() {
+    var me = this;
+
+    me.on('afterrender', function(grid) {
+        var view = grid.getView();
+        grid.tip = Ext.create('Ext.tip.ToolTip', {
+          target: view.el,
+          delegate: view.itemSelector,
+          trackMouse: true,
+          renderTo: Ext.getBody(),
+          dismissDelay: 0,
+          listeners: {
+            beforeshow: function updateTipBody(tip) {
+              tip.update(view.getRecord(tip.triggerElement).get('about'));
+            }
           }
-        }
-      });
-    }
+        });
+      }
+    );
+
+    me.callParent(arguments);
   }
 
 });
