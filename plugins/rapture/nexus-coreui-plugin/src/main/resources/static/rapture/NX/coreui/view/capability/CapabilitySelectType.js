@@ -34,16 +34,39 @@ Ext.define('NX.coreui.view.capability.CapabilitySelectType', {
         return 'capability-default';
       }
     },
-    { header: NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TYPE_NAME_COLUMN'), dataIndex: 'name', flex: 1 }
+    { header: NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TYPE_NAME_COLUMN'), dataIndex: 'name', flex: 1 },
+    { header: NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TYPE_DESCRIPTION_COLUMN'), dataIndex: 'about', flex: 2,
+      renderer: function(val) {
+        var i;
+        if (val) {
+          i = val.indexOf('.');
+          if (i > 0) {
+            val = val.substring(0, i);
+          }
+          // replace HTML
+          return val.replace(/(<([^>]+)>)/ig, '');
+        }
+        return val;
+      }
+    }
   ],
 
-  plugins: [
-    {
-      ptype: 'rowexpander',
-      rowBodyTpl: Ext.create('Ext.XTemplate',
-          '{about}'
-      )
+  listeners: {
+    'afterrender': function(grid) {
+      var view = grid.getView();
+      grid.tip = Ext.create('Ext.tip.ToolTip', {
+        target: view.el,
+        delegate: view.itemSelector,
+        trackMouse: true,
+        renderTo: Ext.getBody(),
+        dismissDelay: 0,
+        listeners: {
+          beforeshow: function updateTipBody(tip) {
+            tip.update(view.getRecord(tip.triggerElement).get('about'));
+          }
+        }
+      });
     }
-  ]
+  }
 
 });
