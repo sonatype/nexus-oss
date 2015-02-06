@@ -24,10 +24,6 @@ Ext.define('NX.view.drilldown.Master', {
   // Prevent columns from expanding out of bounds
   forceFit: true,
 
-  listeners: {
-    viewready: function(view) { view.refreshDrilldown(view.headerCt) }
-  },
-
   /**
    * @private
    */
@@ -36,7 +32,8 @@ Ext.define('NX.view.drilldown.Master', {
 
     me.callParent(arguments);
 
-    // Refresh drilldown affordances whenever a column is added
+    // Refresh drilldown affordances on load, and when a column is added
+    me.on('viewready', function(view) { view.refreshDrilldown(view.headerCt) });
     me.headerCt.on('add', me.refreshDrilldown);
   },
 

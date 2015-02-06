@@ -41,6 +41,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     'capability.CapabilityFeature',
     'capability.CapabilityList',
     'capability.CapabilitySummary',
+    'capability.CapabilitySelectType',
     'capability.CapabilitySettings',
     'capability.CapabilitySettingsForm',
     'capability.CapabilityStatus',
@@ -117,7 +118,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
           beforerender: me.onRefresh
         },
         'nx-coreui-capability-list button[action=new]': {
-          click: me.showAddWindow
+          click: me.showSelectTypePanel
         },
         'nx-coreui-capability-feature button[action=enable]': {
           click: me.enableCapability,
@@ -128,16 +129,18 @@ Ext.define('NX.coreui.controller.Capabilities', {
           afterrender: me.bindDisableButton
         },
         'nx-coreui-capability-summary nx-settingsform': {
-          submitted: function() { me.loadStore(Ext.emptyFn) }
+          submitted: function() {
+            me.loadStore(Ext.emptyFn)
+          }
         },
         'nx-coreui-capability-settings button[action=save]': {
           click: me.updateCapability
         },
-        'nx-coreui-capability-add combo[name=typeId]': {
-          select: me.changeCapabilityType
-        },
         'nx-coreui-capability-add button[action=add]': {
           click: me.createCapability
+        },
+        'nx-coreui-capability-selecttype': {
+          cellclick: me.showAddPanel
         }
       }
     });
@@ -246,27 +249,41 @@ Ext.define('NX.coreui.controller.Capabilities', {
   /**
    * @private
    */
-  showAddWindow: function() {
+  showSelectTypePanel: function() {
     var me = this,
-      feature = me.getFeature();
+        feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TITLE'));
-    me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-capability-add', { capabilityTypeStore: this.getCapabilityTypeStore() }));
+    feature.setItemName(1, NX.I18n.get('ADMIN_CAPABILITIES_SELECT_TITLE'));
+    me.loadCreateWizard(1, true, Ext.widget({
+      xtype: 'panel',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
+      items: [
+        { xtype: 'nx-drilldown-actions' },
+        {
+          xtype: 'nx-coreui-capability-selecttype',
+          flex: 1
+        }
+      ]
+    }));
   },
 
   /**
    * @private
-   * Change about text and settings according to selected capability type (in add window).
-   * @combo {Ext.form.field.ComboBox} combobox capability type combobox
    */
-  changeCapabilityType: function(combobox) {
-    var form = combobox.up('nx-settingsform'),
-        capabilityTypeModel;
+  showAddPanel: function(list, td, cellIndex, model) {
+    var me = this,
+        feature = me.getFeature(),
+        panel;
 
-    capabilityTypeModel = this.getCapabilityTypeStore().getById(combobox.value);
-    form.down('nx-coreui-capability-about').showAbout(capabilityTypeModel.get('about'));
-    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(capabilityTypeModel.get('formFields'));
+    // Show the first panel in the create wizard, and set the breadcrumb
+    feature.setItemName(2, NX.I18n.format('ADMIN_CAPABILITIES_CREATE_TITLE', model.get('name')));
+    me.loadCreateWizard(2, true, panel = Ext.create('widget.nx-coreui-capability-add'));
+    panel.down('nx-settingsform').loadRecord(me.getCapabilityModel().create({ typeId: model.getId() }));
   },
 
   /**
@@ -279,9 +296,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
 
     if (list) {
       me.getCapabilityTypeStore().load(
-        function() {
-          me.reselect();
-        }
+          function() {
+            me.reselect();
+          }
       );
     }
   },
@@ -409,7 +426,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_CAPABILITIES_CREATE_SUCCESS', me.getDescription(me.getCapabilityModel().create(response.data))),
+            text: NX.I18n.format('ADMIN_CAPABILITIES_CREATE_SUCCESS',
+                me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
           me.loadStoreAndSelect(response.data.id, false);
@@ -434,7 +452,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
       if (Ext.isObject(response)) {
         if (response.success) {
           NX.Messages.add({
-            text: NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS', me.getDescription(me.getCapabilityModel().create(response.data))),
+            text: NX.I18n.format('ADMIN_CAPABILITIES_UPDATE_SUCCESS',
+                me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
           me.loadStore(Ext.emptyFn);
@@ -472,8 +491,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   enableCapability: function() {
     var me = this,
-      bookmark = NX.Bookmarks.getBookmark(),
-      model, modelId, description;
+        bookmark = NX.Bookmarks.getBookmark(),
+        model, modelId, description;
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
@@ -496,8 +515,8 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   disableCapability: function() {
     var me = this,
-      bookmark = NX.Bookmarks.getBookmark(),
-      model, modelId, description;
+        bookmark = NX.Bookmarks.getBookmark(),
+        model, modelId, description;
 
     modelId = decodeURIComponent(bookmark.getSegment(1));
     model = me.getList().getStore().getById(modelId);
