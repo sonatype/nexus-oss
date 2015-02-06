@@ -1,0 +1,13 @@
+/**
+ * @class Ext.form.field.Base
+ */
+
+/**
+ * Style for read-only fields
+ *
+ * cls: 'x-form-readonly'
+ */
+
+.x-form-field[readonly="readonly"] {
+  background-color: $color-smoke;
+}
