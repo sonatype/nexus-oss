@@ -282,9 +282,9 @@ Ext.define('NX.view.drilldown.Drilldown', {
    */
   slidePanels: function (index, animate) {
     var me = this,
+      feature = me.up('nx-feature-content'),
       items = me.query('nx-drilldown-item'),
-      item = items[index],
-      form;
+      item = items[index];
 
     if (item.el) {
 
@@ -303,7 +303,7 @@ Ext.define('NX.view.drilldown.Drilldown', {
       }
 
       // Slide the requested panel into view
-      var left = item.el.getLeft() - me.el.getLeft();
+      var left = item.el.getLeft() - feature.el.getLeft();
       me.el.first().move('l', left, animate);
       me.currentIndex = index;
 
