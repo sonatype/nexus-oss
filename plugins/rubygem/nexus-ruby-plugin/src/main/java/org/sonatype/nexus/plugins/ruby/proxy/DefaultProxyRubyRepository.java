@@ -24,6 +24,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.ruby.NexusRubygemsFacade;
+import org.sonatype.nexus.plugins.ruby.PurgeBrokenFilesRubygemsWalkerProcessor;
 import org.sonatype.nexus.plugins.ruby.RubyContentClass;
 import org.sonatype.nexus.plugins.ruby.RubyRepository;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -41,8 +42,10 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerProcessor;
 import org.sonatype.nexus.ruby.FileType;
-import org.sonatype.nexus.ruby.RepairHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
 import org.sonatype.nexus.ruby.SpecsIndexType;
@@ -259,12 +262,19 @@ public class DefaultProxyRubyRepository
   @Override
   public void purgeBrokenMetadataFiles() throws IllegalOperationException, ItemNotFoundException, IOException
   {
-    String directory = this.getLocalUrl().replace("file:", "");
-    if (log.isDebugEnabled()) {
-      log.debug("purge broken *.gemspec.rz and *.ruby files in {}", directory);
+    log.info("Recreating Rubygems index in hosted repository {}", this);
+    final WalkerProcessor wp = new PurgeBrokenFilesRubygemsWalkerProcessor(log, gateway);
+    final DefaultWalkerContext ctx = new DefaultWalkerContext(this, new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT));
+    ctx.getProcessors().add(wp);
+    try {
+      getWalker().walk(ctx);
     }
-    RepairHelper repair = gateway.newRepairHelper();
-    repair.purgeBrokenDepencencyFiles(directory);
-    repair.purgeBrokenGemspecFiles(directory);
+    catch (WalkerException e) {
+      if (!(e.getWalkerContext().getStopCause() instanceof ItemNotFoundException)) {
+        // everything that is not ItemNotFound should be reported,
+        // otherwise just neglect it
+        throw e;
+      }
+    }
   }
 }

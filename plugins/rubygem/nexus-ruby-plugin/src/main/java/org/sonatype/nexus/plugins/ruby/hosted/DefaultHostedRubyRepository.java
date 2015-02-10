@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.ruby.NexusRubygemsFacade;
 import org.sonatype.nexus.plugins.ruby.NexusStorage;
+import org.sonatype.nexus.plugins.ruby.PurgeBrokenFilesRubygemsWalkerProcessor;
 import org.sonatype.nexus.plugins.ruby.RubyContentClass;
 import org.sonatype.nexus.plugins.ruby.RubyRepository;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -43,6 +44,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerProcessor;
 import org.sonatype.nexus.ruby.RepairHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
@@ -150,7 +154,6 @@ public class DefaultHostedRubyRepository
     throw new UnsupportedStorageOperationException(from.getRequestPath());
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public StorageItem retrieveDirectItem(ResourceStoreRequest request)
       throws IllegalOperationException, ItemNotFoundException, IOException
@@ -172,24 +175,19 @@ public class DefaultHostedRubyRepository
 
   @Override
   public void recreateMetadata() throws LocalStorageException, ItemNotFoundException {
-    String directory = null;  
-    if (getLocalUrl() != null
-        && getLocalStorage() instanceof DefaultFSLocalRepositoryStorage) {
-      try {
-        directory = ((DefaultFSLocalRepositoryStorage) getLocalStorage()).getBaseDir(this,
-            new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT)).getAbsolutePath();
-      } 
-      catch (LocalStorageException e) {
-        log.warn(String.format("Cannot determine \"%s\" (ID=%s) repository's basedir:",
-            getName(), getId()), e);
-        return;
+    log.info("Recreating Rubygems index in hosted repository {}", this);
+    final RecreateIndexRubygemsWalkerProcessor wp = new RecreateIndexRubygemsWalkerProcessor(log, gateway, facade);
+    final DefaultWalkerContext ctx = new DefaultWalkerContext(this, new ResourceStoreRequest(RepositoryItemUid.PATH_ROOT));
+    ctx.getProcessors().add(wp);
+    try {
+      getWalker().walk(ctx);
+    }
+    catch (WalkerException e) {
+      if (!(e.getWalkerContext().getStopCause() instanceof ItemNotFoundException)) {
+        // everything that is not ItemNotFound should be reported,
+        // otherwise just neglect it
+        throw e;
       }
     }
-    if (log.isDebugEnabled()) {
-      log.debug("recreate rubygems metadata in {}", directory);
-    }
-    RepairHelper repair = gateway.newRepairHelper();
-    repair.recreateRubygemsIndex(directory);
-    repair.purgeBrokenDepencencyFiles(directory);
   }
 }
