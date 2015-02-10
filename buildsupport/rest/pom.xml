@@ -28,9 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <siesta1.version>1.7</siesta1.version>
     <siesta2.version>2.0.4</siesta2.version>
-    <jersey1.version>1.18.1</jersey1.version>
     <jackson2.version>2.4.1</jackson2.version>
   </properties>
 
@@ -49,6 +47,9 @@
         <version>2.0-NEXUS-3758</version>
       </dependency>
 
+      <!--
+      FIXME: Remove all xstream?
+      -->
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
@@ -166,97 +167,6 @@
         <artifactId>jackson-datatype-joda</artifactId>
         <version>${jackson2.version}</version>
       </dependency>
-
-      <!--
-      Siesta 1.x (for legacy REST client based on Jersey 1.x)
-      -->
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-client</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-core</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-apache-client4</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-multipart</artifactId>
-        <version>${jersey1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.siesta</groupId>
-        <artifactId>siesta-common</artifactId>
-        <version>${siesta1.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.siesta</groupId>
-        <artifactId>siesta-client</artifactId>
-        <version>${siesta1.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.siesta</groupId>
-        <artifactId>siesta-jackson</artifactId>
-        <version>${siesta1.version}</version>
-      </dependency>
-
-      <!--
-      Jacksbee (for legacy REST models)
-      -->
-
-      <dependency>
-        <groupId>org.sonatype.sisu.jacksbee</groupId>
-        <artifactId>jacksbee-runtime</artifactId>
-        <version>1.3</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jsr173_api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.jacksbee</groupId>
-        <artifactId>jacksbee-xjc</artifactId>
-        <version>1.3</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 

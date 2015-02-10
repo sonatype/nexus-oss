@@ -25,7 +25,7 @@ import com.sonatype.nexus.ssl.client.Certificates;
 import com.sonatype.nexus.ssl.model.CertificatePemXO;
 import com.sonatype.nexus.ssl.model.CertificateXO;
 
-import org.sonatype.nexus.client.core.subsystem.SiestaClient;
+import org.sonatype.nexus.client.core.SiestaClient;
 import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
 import static com.google.common.base.Preconditions.checkNotNull;

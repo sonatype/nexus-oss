@@ -48,8 +48,6 @@ public class UserManagerImpl
 
   private final ConfigurationManager configuration;
 
-  //private final SecurityConfigurationManager securityConfiguration;
-
   private final SecuritySystem securitySystem;
 
   private final PasswordService passwordService;
@@ -117,8 +115,7 @@ public class UserManagerImpl
     try {
       CRole role = configuration.readRole(roleId);
 
-      RoleIdentifier roleIdentifier = new RoleIdentifier(SOURCE, role.getId());
-      return roleIdentifier;
+      return new RoleIdentifier(SOURCE, role.getId());
     }
     catch (NoSuchRoleException e) {
       return null;
@@ -145,9 +142,7 @@ public class UserManagerImpl
     return userIds;
   }
 
-  public User getUser(String userId)
-      throws UserNotFoundException
-  {
+  public User getUser(String userId) throws UserNotFoundException {
     return toUser(configuration.readUser(userId));
   }
 
@@ -159,9 +154,7 @@ public class UserManagerImpl
     return true;
   }
 
-  public User addUser(final User user, String password)
-      throws InvalidConfigurationException
-  {
+  public User addUser(final User user, String password) throws InvalidConfigurationException {
     final CUser secUser = this.toUser(user);
     secUser.setPassword(this.hashPassword(password));
 
@@ -172,16 +165,14 @@ public class UserManagerImpl
   }
 
   public void changePassword(final String userId, final String newPassword)
-      throws UserNotFoundException, InvalidConfigurationException
+    throws UserNotFoundException, InvalidConfigurationException
   {
     final CUser secUser = configuration.readUser(userId);
     secUser.setPassword(hashPassword(newPassword));
     configuration.updateUser(secUser);
   }
 
-  public User updateUser(final User user)
-      throws UserNotFoundException, InvalidConfigurationException
-  {
+  public User updateUser(final User user) throws UserNotFoundException, InvalidConfigurationException {
     // we need to pull the users password off off the old user object
     CUser oldSecUser = configuration.readUser(user.getUserId());
     CUser newSecUser = toUser(user);
@@ -191,15 +182,11 @@ public class UserManagerImpl
     return user;
   }
 
-  public void deleteUser(final String userId)
-      throws UserNotFoundException
-  {
+  public void deleteUser(final String userId) throws UserNotFoundException {
     configuration.deleteUser(userId);
   }
 
-  public Set<RoleIdentifier> getUsersRoles(final String userId, final String source)
-      throws UserNotFoundException
-  {
+  public Set<RoleIdentifier> getUsersRoles(final String userId, final String source) throws UserNotFoundException {
     final Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
 
     try {
@@ -218,9 +205,6 @@ public class UserManagerImpl
     }
 
     return roles;
-  }
-
-  private void saveConfiguration() {
   }
 
   public Set<User> searchUsers(final UserSearchCriteria criteria) {

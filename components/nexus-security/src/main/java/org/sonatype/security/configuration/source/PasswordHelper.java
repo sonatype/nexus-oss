@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.configuration.source;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,7 +25,6 @@ import org.sonatype.sisu.goodies.crypto.maven.PasswordCipherMavenImpl;
  * base-configuration (or something) it becomes less secure, as we are using the same key for everything)
  */
 @Singleton
-@Typed(PasswordHelper.class)
 @Named("default")
 public class PasswordHelper
 {

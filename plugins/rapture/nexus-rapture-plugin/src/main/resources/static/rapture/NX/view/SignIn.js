@@ -67,7 +67,7 @@ Ext.define('NX.view.SignIn', {
           {
             xtype: 'checkbox',
             boxLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
-            name: 'remember'
+            name: 'rememberMe'
           }
         ],
 

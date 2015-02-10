@@ -1,4 +1,0 @@
-
-<site>
-  <feature id="com.sonatype.nexus.p2.its.feature3" url="features/com.sonatype.nexus.p2.its.feature3_1.0.0.jar" version="1.0.0"/>
-</site>

@@ -12,7 +12,7 @@
  */
 package com.sonatype.nexus.ssl.client;
 
-import org.sonatype.nexus.client.core.subsystem.Entity;
+import org.sonatype.nexus.client.core.Entity;
 
 /**
  * An SSL certificate.

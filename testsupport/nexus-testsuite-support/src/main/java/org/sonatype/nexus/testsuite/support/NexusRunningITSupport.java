@@ -19,8 +19,6 @@ import javax.inject.Provider;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.NexusClient;
-import org.sonatype.nexus.testsuite.client.RemoteLoggerFactory;
 import org.sonatype.sisu.bl.BundleStatistics;
 
 import com.google.common.base.Throwables;
@@ -48,12 +46,6 @@ public abstract class NexusRunningITSupport
    */
   @Inject
   private Provider<NexusBundle> nexusProvider;
-
-  /**
-   * Nexus client.
-   * Lazy created on first usage.
-   */
-  private NexusClient nexusClient;
 
   /**
    * Current running Nexus. Lazy created by {@link #nexus()}.
@@ -108,15 +100,15 @@ public abstract class NexusRunningITSupport
 
     assertThat("Nexus was not in running state", nexus().isRunning());
 
-    logRemoteThatTestIs("STARTING");
+    //logRemoteThatTestIs("STARTING");
   }
 
   @After
   public void afterTestWasRunning() {
     if (nexus != null) {
-      if (nexus.isRunning()) {
-        logRemoteThatTestIs("FINISHED");
-      }
+      //if (nexus.isRunning()) {
+      //  logRemoteThatTestIs("FINISHED");
+      //}
       testIndex().recordAndCopyLink("karaf.log", new File(nexus.getNexusDirectory(), "data/log/karaf.log"));
       testIndex().recordAndCopyLink("nexus.log", new File(nexus.getWorkDirectory(), "logs/nexus.log"));
     }
@@ -185,36 +177,6 @@ public abstract class NexusRunningITSupport
    */
   protected NexusStartAndStopStrategy getStartAndStopStrategy() {
     return getClass().getAnnotation(NexusStartAndStopStrategy.class);
-  }
-
-  /**
-   * Lazy creates a Nexus client for "admin"/"admin123".
-   *
-   * @return Nexus client. Never null.
-   */
-  protected NexusClient client() {
-    if (nexusClient == null) {
-      nexusClient = createNexusClientForAdmin(nexus());
-    }
-    return nexusClient;
-  }
-
-  /**
-   * Returns a logger that is forwarding logging to remote nexus log so logged message will appear in nexus.log.
-   *
-   * @return remote logger. Never null.
-   */
-  protected Logger remoteLogger() {
-    return client().getSubsystem(RemoteLoggerFactory.class).getLogger(this.getClass().getName());
-  }
-
-  /**
-   * Logs remote (in nexus.log) what the test is doing.
-   *
-   * @param doingWhat test state
-   */
-  private void logRemoteThatTestIs(final String doingWhat) {
-    logRemoteThatTestIs(remoteLogger(), doingWhat);
   }
 
   private void startNexus(final NexusBundle nexusBundle) {

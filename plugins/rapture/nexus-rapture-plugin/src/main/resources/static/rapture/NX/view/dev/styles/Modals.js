@@ -77,7 +77,7 @@ Ext.define('NX.view.dev.styles.Modals', {
             {
               xtype: 'checkbox',
               boxLabel: NX.I18n.get('GLOBAL_SIGN_IN_REMEMBER_ME'),
-              name: 'remember'
+              name: 'rememberMe'
             }
           ],
 

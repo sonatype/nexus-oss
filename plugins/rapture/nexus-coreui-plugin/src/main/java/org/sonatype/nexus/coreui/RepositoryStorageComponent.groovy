@@ -42,8 +42,6 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
-import static org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource.OVERRIDE_FILENAME_KEY
-
 /**
  * Repository Storage {@link DirectComponent}.
  *
@@ -55,6 +53,7 @@ import static org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource
 class RepositoryStorageComponent
 extends DirectComponentSupport
 {
+  private static final String OVERRIDE_FILENAME_KEY = "override-filename"
 
   @Named("protected")
   @Inject

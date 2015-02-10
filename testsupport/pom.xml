@@ -30,10 +30,8 @@
   <modules>
     <module>nexus-test-common</module>
     <module>nexus-plugin-testsupport</module>
-    <module>nexus-testsuite-client</module>
     <module>nexus-testsuite-support</module>
     <module>nexus-it-helper-plugin</module>
-    <module>nexus-test-harness-launcher</module>
     <module>nexus-ldap-testsupport</module>
   </modules>
 

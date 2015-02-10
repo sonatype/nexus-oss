@@ -122,11 +122,11 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (user && !oldUser) {
-      NX.Messages.add({text: NX.I18n.format('GLOBAL_SERVER_SIGNED_IN', user.id), type: 'default' });
+      NX.Messages.add({text: NX.I18n.format('GLOBAL_SERVER_SIGNED_IN', user.id), type: 'default'});
       me.fireEvent('signin', user);
     }
     else if (!user && oldUser) {
-      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_SIGNED_OUT'), type: 'default' });
+      NX.Messages.add({text: NX.I18n.get('GLOBAL_SERVER_SIGNED_OUT'), type: 'default'});
       me.fireEvent('signout');
     }
 
@@ -153,7 +153,7 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (me.hasUser()) {
-      me.showAuthenticateWindow(message, Ext.apply(options || {}, { authenticateAction: me.authenticate }));
+      me.showAuthenticateWindow(message, Ext.apply(options || {}, {authenticateAction: me.authenticate}));
     }
     else {
       me.showSignInWindow(options);
@@ -170,7 +170,7 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     me.showAuthenticateWindow(message,
-        Ext.apply(options || {}, { authenticateAction: me.retrieveAuthenticationToken })
+        Ext.apply(options || {}, {authenticateAction: me.retrieveAuthenticationToken})
     );
   },
 
@@ -183,7 +183,7 @@ Ext.define('NX.controller.User', {
     var me = this;
 
     if (!me.getSignIn()) {
-      me.getSignInView().create({ options: options });
+      me.getSignInView().create({options: options});
     }
   },
 
@@ -199,9 +199,9 @@ Ext.define('NX.controller.User', {
         win;
 
     if (!me.getAuthenticate()) {
-      win = me.getAuthenticateView().create({ message: message, options: options });
+      win = me.getAuthenticateView().create({message: message, options: options});
       if (me.hasUser()) {
-        win.down('form').getForm().setValues({ username: user.id });
+        win.down('form').getForm().setValues({username: user.id});
         win.down('#password').focus();
       }
     }
@@ -215,18 +215,20 @@ Ext.define('NX.controller.User', {
         win = button.up('window'),
         form = button.up('form'),
         values = form.getValues(),
-        basicAuth = 'Basic: ' + NX.util.Base64.encode(values['username'] + ':' + values['password']);
-
-    me.logDebug('Sign-in user: ' + values['username']);
+        b64username = NX.util.Base64.encode(values.username),
+        b64password = NX.util.Base64.encode(values.password);
 
     win.getEl().mask(NX.I18n.get('GLOBAL_SIGN_IN_MASK'));
 
+    me.logDebug('Sign-in user: "' + values.username + '" ...');
+
     Ext.Ajax.request({
-      url: NX.util.Url.urlOf('service/local/authentication/login'),
-      method: 'GET',
-      headers: {
-        'Authorization': basicAuth,
-        'X-Nexus-RememberMe': values['remember'] === 'on'
+      url: NX.util.Url.urlOf('service/rapture/session'),
+      method: 'POST',
+      params: {
+        username: b64username,
+        password: b64password,
+        rememberMe: values.rememberMe
       },
       scope: me,
       suppressStatus: true,
@@ -234,6 +236,8 @@ Ext.define('NX.controller.User', {
         win.getEl().unmask();
         NX.State.setUser({ id: values.username });
         win.close();
+
+        // invoke optional success callback registered on window
         if (win.options && Ext.isFunction(win.options.success)) {
           win.options.success.call(win.options.scope, win.options);
         }
@@ -255,10 +259,15 @@ Ext.define('NX.controller.User', {
     var me = this,
         win = button.up('window');
 
+    // invoke optional authenticateAction callback registered on window
     if (win.options && Ext.isFunction(win.options.authenticateAction)) {
       win.options.authenticateAction.call(me, button);
     }
   },
+
+  // TODO: anything that may change the authentication/session should probably not be
+  // TODO: done via extjs as it can batch, and the batch operation could implact the
+  // TODO: sanity of the requests if authentication changes mid execution of batch operations
 
   /**
    * @private
@@ -268,19 +277,21 @@ Ext.define('NX.controller.User', {
         win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
-        values = Ext.applyIf(form.getValues(), { username: user ? user.id : undefined }),
-        userName = NX.util.Base64.encode(values.username),
-        userPass = NX.util.Base64.encode(values.password);
+        values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
+        b64username = NX.util.Base64.encode(values.username),
+        b64password = NX.util.Base64.encode(values.password);
 
     win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_MASK'));
 
-    me.logDebug('Authenticate...');
+    me.logDebug('Authenticating user "' + values.username + '" ...');
 
-    NX.direct.rapture_Security.authenticate(userName, userPass, function (response) {
+    NX.direct.rapture_Security.authenticate(b64username, b64password, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         NX.State.setUser(response.data);
         win.close();
+
+        // invoke optional success callback registered on window
         if (win.options && Ext.isFunction(win.options.success)) {
           win.options.success.call(win.options.scope, win.options);
         }
@@ -296,18 +307,20 @@ Ext.define('NX.controller.User', {
         win = button.up('window'),
         form = button.up('form'),
         user = NX.State.getUser(),
-        values = Ext.applyIf(form.getValues(), { username: user ? user.id : undefined }),
-        userName = NX.util.Base64.encode(values.username),
-        userPass = NX.util.Base64.encode(values.password);
+        values = Ext.applyIf(form.getValues(), {username: user ? user.id : undefined}),
+        b64username = NX.util.Base64.encode(values.username),
+        b64password = NX.util.Base64.encode(values.password);
 
     win.getEl().mask(NX.I18n.get('GLOBAL_AUTHENTICATE_RETRIEVING_MASK'));
 
     me.logDebug('Retrieving authentication token...');
 
-    NX.direct.rapture_Security.authenticationToken(userName, userPass, function (response) {
+    NX.direct.rapture_Security.authenticationToken(b64username, b64password, function (response) {
       win.getEl().unmask();
       if (Ext.isObject(response) && response.success) {
         win.close();
+
+        // invoke optional success callback registered on window
         if (win.options && Ext.isFunction(win.options.success)) {
           win.options.success.call(win.options.scope, response.data, win.options);
         }
@@ -323,8 +336,14 @@ Ext.define('NX.controller.User', {
 
     me.logDebug('Sign-out');
 
-    NX.direct.rapture_Security.signOut(function (response) {
-      if (Ext.isObject(response) && response.success) {
+    // TODO: Mask?
+
+    Ext.Ajax.request({
+      url: NX.util.Url.urlOf('service/rapture/session'),
+      method: 'DELETE',
+      scope: me,
+      suppressStatus: true,
+      success: function() {
         NX.State.setUser(undefined);
       }
     });

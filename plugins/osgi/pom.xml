@@ -30,7 +30,6 @@
 
   <modules>
     <module>nexus-obr-plugin</module>
-    <module>nexus-obr-client</module>
   </modules>
 
   <dependencyManagement>

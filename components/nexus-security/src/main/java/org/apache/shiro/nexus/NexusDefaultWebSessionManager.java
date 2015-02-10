@@ -37,10 +37,7 @@ public class NexusDefaultWebSessionManager
 {
   private static final Logger log = LoggerFactory.getLogger(NexusDefaultWebSessionManager.class);
 
-  /**
-   * Default HTTP session cookie name that Nexus uses - NXSESSIONID
-   */
-  public static final String DEFAULT_NEXUS_SESSION_COOKIE_NAME = "NXSESSIONID";
+  private static final String DEFAULT_NEXUS_SESSION_COOKIE_NAME = "NXSESSIONID";
 
   @Inject
   public void configureProperties(

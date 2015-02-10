@@ -191,7 +191,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-client-core</artifactId>
+        <artifactId>nexus-client</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -357,18 +357,6 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-test-harness-launcher</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-testsuite-client</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -548,56 +536,6 @@
           <version>1.5</version>
           <configuration>
             <providerSelection>2.0</providerSelection>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.jvnet.jaxb2.maven2</groupId>
-          <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.11.0</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.sisu.jacksbee</groupId>
-              <artifactId>jacksbee-xjc</artifactId>
-              <version>1.3</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <extension>true</extension>
-            <schemaDirectory>src/main/schema</schemaDirectory>
-            <plugins>
-              <plugin>
-                <groupId>org.sonatype.sisu.jacksbee</groupId>
-                <artifactId>jacksbee-xjc</artifactId>
-                <version>1.3</version>
-              </plugin>
-            </plugins>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>jaxb2-maven-plugin</artifactId>
-          <version>1.6</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.sonatype.sisu.jacksbee</groupId>
-              <artifactId>jacksbee-xjc</artifactId>
-              <version>1.3</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <extension>true</extension>
-            <schemaDirectory>src/main/schema</schemaDirectory>
-            <bindingDirectory>src/main/schema</bindingDirectory>
-            <arguments>-Xsetters -Xfluent-api -Xgenerated -Xannotate -XjsonProperty</arguments>
-            <plugins>
-              <plugin>
-                <groupId>org.sonatype.sisu.jacksbee</groupId>
-                <artifactId>jacksbee-xjc</artifactId>
-                <version>1.3</version>
-              </plugin>
-            </plugins>
           </configuration>
         </plugin>
 
@@ -884,12 +822,6 @@
                     Ban log4j.
                     -->
                     <exclude>log4j:*</exclude>
-
-                    <!--
-                    Ban old jetty.
-                    FIXME: nexus-restlet-bridge tests depend on this, we can not exclude/ban it ATM.
-                    -->
-                    <!--<exclude>org.mortbay.jetty:*</exclude>-->
 
                     <!--
                     Ban old bouncycastle.
@@ -1222,19 +1154,6 @@
                         <goals>
                           <goal>copy</goal>
                           <goal>unpack</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore/>
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>port-allocator-maven-plugin</artifactId>
-                        <versionRange>[1.0,)</versionRange>
-                        <goals>
-                          <goal>allocate-ports</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>

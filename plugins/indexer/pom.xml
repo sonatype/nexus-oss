@@ -28,8 +28,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>nexus-indexer-lucene-model</module>
-    <module>nexus-indexer-lucene-client</module>
     <module>nexus-indexer-lucene-plugin</module>
   </modules>
 

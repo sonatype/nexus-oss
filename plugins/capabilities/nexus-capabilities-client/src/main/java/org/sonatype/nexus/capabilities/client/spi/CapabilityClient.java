@@ -27,7 +27,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.capabilities.model.CapabilityXO;
-import org.sonatype.nexus.client.core.subsystem.SiestaClient;
+import org.sonatype.nexus.client.core.SiestaClient;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 

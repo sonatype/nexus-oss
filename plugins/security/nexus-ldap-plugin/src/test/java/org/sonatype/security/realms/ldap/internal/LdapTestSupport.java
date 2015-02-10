@@ -24,8 +24,6 @@ import org.sonatype.ldaptestsuite.LdapServerConfiguration;
 import org.sonatype.ldaptestsuite.Partition;
 import org.sonatype.nexus.proxy.maven.routing.Config;
 import org.sonatype.nexus.proxy.maven.routing.internal.ConfigImpl;
-import org.sonatype.plexus.rest.DefaultReferenceFactory;
-import org.sonatype.plexus.rest.ReferenceFactory;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.guice.SecurityModule;
 import org.sonatype.security.realms.ldap.internal.persist.LdapConfigurationSource;
@@ -94,7 +92,6 @@ public abstract class LdapTestSupport
       @Override
       public void configure(final Binder binder) {
         binder.bind(Config.class).toInstance(new ConfigImpl(false));
-        binder.bind(ReferenceFactory.class).toInstance(new DefaultReferenceFactory());
         binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
         final SecuritySystem securitySystem = getBoundSecuritySystem();
         if (securitySystem != null) {

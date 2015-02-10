@@ -12,38 +12,37 @@
  */
 package org.sonatype.nexus.testsuite.capabilities.client.internal;
 
-import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
-import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
-import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
-import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+//import org.sonatype.nexus.capabilities.client.support.CapabilityImpl;
+//import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+//import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 
 /**
  * @since 2.2
  */
 public class JerseyCapabilityA
-    extends CapabilityImpl<CapabilityA>
-    implements CapabilityA
+    //extends CapabilityImpl<CapabilityA>
+    //implements CapabilityA
 {
 
-  public JerseyCapabilityA(final CapabilityClient client) {
-    super(client, "[a]");
-  }
+  //public JerseyCapabilityA(final CapabilityClient client) {
+  //  super(client, "[a]");
+  //}
 
-  public JerseyCapabilityA(final CapabilityClient client, final CapabilityStatusXO settings) {
-    super(client, settings);
-  }
+  //public JerseyCapabilityA(final CapabilityClient client, final CapabilityStatusXO settings) {
+  //  super(client, settings);
+  //}
 
-  @Override
-  public String propertyA1() {
-    return property("a1");
-  }
-
-  @Override
-  public CapabilityA withPropertyA1(final String value) {
-    withProperty("a1", value);
-    return this;
-  }
+  //@Override
+  //public String propertyA1() {
+  //  return property("a1");
+  //}
+  //
+  //@Override
+  //public CapabilityA withPropertyA1(final String value) {
+  //  withProperty("a1", value);
+  //  return this;
+  //}
 
 
 }

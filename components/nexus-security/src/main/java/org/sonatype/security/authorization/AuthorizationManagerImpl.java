@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -40,7 +39,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Default {@link AuthorizationManager}.
  */
 @Singleton
-@Typed(AuthorizationManager.class)
 @Named("default")
 public class AuthorizationManagerImpl
     implements AuthorizationManager

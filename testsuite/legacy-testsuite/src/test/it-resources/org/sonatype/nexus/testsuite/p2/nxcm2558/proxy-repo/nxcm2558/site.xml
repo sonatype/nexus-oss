@@ -1,4 +1,0 @@
-
-<site url="${proxy-repo-base-url}nxcm2558-redirect">
-  <feature id="com.sonatype.nexus.p2.its.feature" url="features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" version="1.0.0"/>
-</site>

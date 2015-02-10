@@ -34,7 +34,6 @@
   <modules>
     <module>nexus-p2-bridge-plugin</module>
     <module>nexus-p2-repository-plugin</module>
-    <module>nexus-p2-client</module>
   </modules>
 
   <dependencyManagement>

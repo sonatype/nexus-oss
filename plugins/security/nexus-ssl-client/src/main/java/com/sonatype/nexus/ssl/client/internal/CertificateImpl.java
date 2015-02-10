@@ -16,7 +16,7 @@ import com.sonatype.nexus.ssl.client.Certificate;
 import com.sonatype.nexus.ssl.model.CertificatePemXO;
 import com.sonatype.nexus.ssl.model.CertificateXO;
 
-import org.sonatype.nexus.client.rest.support.EntitySupport;
+import org.sonatype.nexus.client.core.EntitySupport;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

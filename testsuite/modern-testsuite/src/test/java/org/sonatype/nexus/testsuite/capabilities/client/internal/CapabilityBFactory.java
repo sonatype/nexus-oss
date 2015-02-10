@@ -15,9 +15,8 @@ package org.sonatype.nexus.testsuite.capabilities.client.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
-import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityFactory;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityB;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+//import org.sonatype.nexus.capabilities.client.support.ReflectiveCapabilityFactory;
 
 /**
  * @since 2.2
@@ -25,12 +24,12 @@ import org.sonatype.nexus.testsuite.capabilities.client.CapabilityB;
 @Named
 @Singleton
 public class CapabilityBFactory
-    extends ReflectiveCapabilityFactory<CapabilityB>
-    implements CapabilityFactory<CapabilityB>
+    //extends ReflectiveCapabilityFactory<CapabilityB>
+    //implements CapabilityFactory<CapabilityB>
 {
-
-  public CapabilityBFactory() {
-    super(CapabilityB.class);
-  }
+  //
+  //public CapabilityBFactory() {
+  //  super(CapabilityB.class);
+  //}
 
 }

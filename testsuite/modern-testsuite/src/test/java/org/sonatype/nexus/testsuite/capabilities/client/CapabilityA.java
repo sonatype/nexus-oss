@@ -12,13 +12,13 @@
  */
 package org.sonatype.nexus.testsuite.capabilities.client;
 
-import org.sonatype.nexus.capabilities.client.Capability;
+//import org.sonatype.nexus.capabilities.client.Capability;
 
 /**
  * @since 2.2
  */
 public interface CapabilityA
-    extends Capability<CapabilityA>
+    //extends Capability<CapabilityA>
 {
 
   String propertyA1();

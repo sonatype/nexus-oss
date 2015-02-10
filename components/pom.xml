@@ -34,7 +34,8 @@
     <module>nexus-blobstore-api</module>
     <module>nexus-blobstore-file</module>
     <module>nexus-bootstrap</module>
-    <module>nexus-client-core</module>
+    <module>nexus-client</module>
+    <!--<module>nexus-client-core</module>-->
     <module>nexus-commands</module>
     <module>nexus-configuration-model</module>
     <module>nexus-core</module>

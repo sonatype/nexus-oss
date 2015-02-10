@@ -12,15 +12,12 @@
  */
 package org.sonatype.nexus.capabilities.client.internal;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.capabilities.client.Capabilities;
 import org.sonatype.nexus.capabilities.client.Capability;
@@ -31,13 +28,10 @@ import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
-import org.sonatype.nexus.client.rest.jersey.ContextAwareUniformInterfaceException;
 import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
 import com.google.common.base.Function;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
-import com.sun.jersey.api.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

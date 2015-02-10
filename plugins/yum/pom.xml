@@ -29,7 +29,6 @@
 
   <modules>
     <module>nexus-yum-repository-plugin</module>
-    <module>nexus-yum-repository-client</module>
   </modules>
 
   <dependencyManagement>

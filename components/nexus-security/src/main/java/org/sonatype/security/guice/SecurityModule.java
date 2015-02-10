@@ -37,7 +37,7 @@ import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 
 /**
- * Extends ShiroModule to configure commonly set commponents such as SessionDAO, Authenticator, Authorizer, etc.
+ * Extends ShiroModule to configure commonly set components such as SessionDAO, Authenticator, Authorizer, etc.
  *
  * @since 2.6.1
  */
@@ -98,7 +98,7 @@ public class SecurityModule
   /**
    * @return Public constructor with given parameterTypes; wraps checked exceptions
    */
-  private static final <T> Constructor<T> ctor(Class<T> clazz, Class<?>... parameterTypes) {
+  private static <T> Constructor<T> ctor(final Class<T> clazz, final Class<?>... parameterTypes) {
     try {
       return clazz.getConstructor(parameterTypes);
     }
