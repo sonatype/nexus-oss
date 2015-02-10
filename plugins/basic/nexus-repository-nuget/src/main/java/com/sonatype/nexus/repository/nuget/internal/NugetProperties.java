@@ -17,6 +17,9 @@ package com.sonatype.nexus.repository.nuget.internal;
  */
 public interface NugetProperties
 {
+  //-------------------------------------------------------------
+  // ODATA metadata attributes, referenced in ODATA queries
+
   String AUTHORS = "AUTHORS";
 
   String COPYRIGHT = "COPYRIGHT";
@@ -74,6 +77,9 @@ public interface NugetProperties
   String VERSION = "VERSION";
 
   String VERSION_DOWNLOAD_COUNT = "VERSIONDOWNLOADCOUNT";
+
+  //-------------------------------------------------------------
+  // Component metadata property names, stored under attributes.nuget
 
   String P_AUTHORS = "authors";
 
