@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,16 +13,13 @@ import java.util.SortedSet;
 import javax.inject.Named;
 
 import com.sonatype.nexus.repository.nuget.internal.odata.ComponentQuery;
-import com.sonatype.nexus.repository.nuget.internal.odata.NuspecSplicer;
+import com.sonatype.nexus.repository.nuget.internal.odata.NugetPackageUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataFeedUtils;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataTemplates;
 import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 
-import org.sonatype.nexus.blobstore.api.Blob;
-import org.sonatype.nexus.blobstore.api.BlobRef;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
@@ -30,15 +28,11 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Parameters;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.hash.HashCode;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
-import org.apache.commons.codec.binary.Base64;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -64,7 +58,6 @@ public class NugetGalleryFacetImpl
     extends FacetSupport
     implements NugetGalleryFacet
 {
-
   public static final String NUGET = "nuget";
 
   public static final String NO_NAMESPACES = "";
@@ -72,31 +65,6 @@ public class NugetGalleryFacetImpl
   private static final VersionScheme SCHEME = new GenericVersionScheme();
 
   private StorageFacet storage;
-
-  // ----------------------------------------------------------------------
-
-  @Deprecated
-  private static final String TABLE = "PACKAGES";
-
-  @Deprecated
-  private static final String IS_MEMBER = " LOCATE(CONCAT(CONCAT(':',REPOSITORYID),':'),?1) ";
-
-  @Deprecated
-  private static final String ISABSOLUTELATESTVERSION = ",MAX_VERSION(VERSION) AS AV";
-
-  @Deprecated
-  private static final String ISLATESTVERSION = ",MAX_VERSION(CASEWHEN(ISPRERELEASE,'',VERSION)) AS V";
-
-  @Deprecated
-  private static final String JOIN_VERSIONS = "(SELECT ID" + ISABSOLUTELATESTVERSION + ISLATESTVERSION + " FROM "
-      + TABLE + " WHERE" + IS_MEMBER + "GROUP BY ID) AS L INNER JOIN " + TABLE + " AS P ON L.ID=P.ID";
-
-  @Deprecated
-  private static final String ALL_MEMBERS = JOIN_VERSIONS + " WHERE" + IS_MEMBER;
-
-  @Deprecated
-  private static final String SELECT_MEMBERS =
-      "SELECT P.*,(P.VERSION=L.AV) AS ISABSOLUTELATESTVERSION,(P.VERSION=L.V) AS ISLATESTVERSION FROM " + ALL_MEMBERS;
 
   @Override
   protected void doConfigure() throws Exception {
@@ -231,32 +199,45 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    try (StorageTx storageTx = storage.openTx()) {
+    try (StorageTx storageTx = storage.openTx();
+         TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
 
-      // We need to read the blob content multiple times; this is temporary storage and it's not important that it's a blob
-      final BlobRef tempBlobRef = storageTx.createBlob(inputStream,
-          ImmutableMap.of(BlobStore.BLOB_NAME_HEADER, "", BlobStore.CREATED_BY_HEADER, "unknown"));
-
-      final Blob tempBlob = checkNotNull(storageTx.getBlob(tempBlobRef));
-
-      Map<String, String> metadata = determineMetadata(tempBlob);
-
-      final OrientVertex bucket = storageTx.getBucket();
-      final OrientVertex component = createOrUpdateComponent(storageTx, bucket, metadata);
-
-      try (InputStream in = tempBlob.getInputStream()) {
-        createOrUpdateAsset(storageTx, bucket, component, in);
+      final HashMap<String, String> recordMetadata = Maps.newHashMap();
+      Map<String, String> packageMetadata;
+      try (InputStream in = tempStream.get()) {
+        packageMetadata = NugetPackageUtils.packageMetadata(in);
       }
-      // TODO: Add whatever other properties we care about for nuget assets
 
-      maintainAggregateInfo(storageTx, metadata.get(ID));
+      recordMetadata.putAll(packageMetadata);
 
-      storageTx.deleteBlob(tempBlobRef);
+      // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
+      // Note: These are defaults that hold for locally-published packages,
+      // but should be overridden for remotely fetched content
+      final String creationTime = ODataFeedUtils.datetime(System.currentTimeMillis());
+      recordMetadata.put(CREATED, creationTime);
+      recordMetadata.put(LAST_UPDATED, creationTime);
+      recordMetadata.put(PUBLISHED, creationTime);
+
+      try (InputStream in = tempStream.get()) {
+        createOrUpdatePackage(storageTx, recordMetadata, in);
+      }
+
+      maintainAggregateInfo(storageTx, recordMetadata.get(ID));
+
       storageTx.commit();
     }
   }
 
-  private String createBlobName(OrientVertex component) {
+  private void createOrUpdatePackage(final StorageTx storageTx, final HashMap<String, String> recordMetadata,
+                                     final InputStream packageStream)
+  {
+    final OrientVertex bucket = storageTx.getBucket();
+    final OrientVertex component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
+
+    createOrUpdateAsset(storageTx, bucket, component, packageStream);
+  }
+
+  private String blobName(OrientVertex component) {
     return component.getProperty(P_NAME) + " " + component.getProperty(P_VERSION) + "@" + getRepository().getName();
   }
 
@@ -266,7 +247,7 @@ public class NugetGalleryFacetImpl
    * - have up to date aggregate download count info
    * (updating download counts is different for hosted and proxies; proxies possibly don't need to..)
    */
-  private void maintainAggregateInfo(final StorageTx storageTx, final String id) {
+  protected void maintainAggregateInfo(final StorageTx storageTx, final String id) {
     long totalDownloadCount = 0;
 
     SortedSet<OrientVertex> releases = Sets.newTreeSet(new ComponentVersionComparator());
@@ -320,46 +301,11 @@ public class NugetGalleryFacetImpl
     }
 
     final ImmutableMap<String, String> headers = ImmutableMap
-        .of(BlobStore.BLOB_NAME_HEADER, createBlobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
+        .of(BlobStore.BLOB_NAME_HEADER, blobName(component), BlobStore.CREATED_BY_HEADER, "unknown");
 
     storageTx.setBlob(in, headers, asset, Arrays.asList(HashAlgorithm.SHA512), "application/zip");
 
     return asset;
-  }
-
-  /**
-   * Determine the metadata for a .nupkg Blob.
-   * - nuspec data (comes from .nuspec)
-   * - size (package size)
-   * - hash(es) (package hash sha-512)
-   * - publication dates (current date or...)
-   */
-  private Map<String, String> determineMetadata(final Blob tempBlob) throws NugetPackageException {
-    try (InputStream inputStream = tempBlob.getInputStream()) {
-      MultiHashingInputStream hashingStream = new MultiHashingInputStream(Arrays.asList(HashAlgorithm.SHA512),
-          inputStream);
-      Map<String, String> metadata = NuspecSplicer.extractNuspecData(hashingStream);
-
-      metadata.put(PACKAGE_SIZE, String.valueOf(hashingStream.count()));
-      HashCode code = hashingStream.hashes().get(HashAlgorithm.SHA512);
-      metadata.put(PACKAGE_HASH, new String(Base64.encodeBase64(code.asBytes()), Charsets.UTF_8));
-      metadata.put(PACKAGE_HASH_ALGORITHM, "SHA512");
-
-      // Note: These are defaults that hold for locally-published packages,
-      // but should be overridden for remotely fetched content
-      final String creationTime = ODataFeedUtils.datetime(System.currentTimeMillis());
-      metadata.put(CREATED, creationTime);
-      metadata.put(LAST_UPDATED, creationTime);
-      metadata.put(PUBLISHED, creationTime);
-
-      return metadata;
-    }
-    catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
-    catch (XmlPullParserException e) {
-      throw new NugetPackageException("Unable to read .nuspec from package stream", e);
-    }
   }
 
   private String checkVersion(String stringValue) {
@@ -387,29 +333,34 @@ public class NugetGalleryFacetImpl
     if (!data.containsKey(VERSION_DOWNLOAD_COUNT) && !nugetAttr.contains(P_VERSION_DOWNLOAD_COUNT)) {
       data.put(VERSION_DOWNLOAD_COUNT, "0");
     }
-
-    nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
-    nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
-    nugetAttr.set(P_CREATED, data.get(CREATED));
-    nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
-    nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
     if (data.containsKey(DOWNLOAD_COUNT)) {
       // for proxies, take whatever they give us here. for hosted, it will be computed later anyway
       nugetAttr.set(P_DOWNLOAD_COUNT, Integer.parseInt(data.get(DOWNLOAD_COUNT)));
     }
+    if (data.containsKey(VERSION_DOWNLOAD_COUNT)) {
+      nugetAttr.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(data.get(VERSION_DOWNLOAD_COUNT)));
+    }
+
+    // TODO: Make sure this is maintained correctly in the case of republished packages
+    nugetAttr.set(P_CREATED, data.get(CREATED));
+    nugetAttr.set(P_PUBLISHED, data.get(PUBLISHED));
+    nugetAttr.set(P_LAST_UPDATED, data.get(LAST_UPDATED));
+
+    nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
+    nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
+    nugetAttr.set(P_DEPENDENCIES, data.get(DEPENDENCIES));
+    nugetAttr.set(P_DESCRIPTION, data.get(DESCRIPTION));
     nugetAttr.set(P_GALLERY_DETAILS_URL, data.get(GALLERY_DETAILS_URL));
     nugetAttr.set(P_ICON_URL, data.get(ICON_URL));
     nugetAttr.set(P_ID, data.get(ID));
     nugetAttr.set(P_IS_PRERELEASE, Boolean.parseBoolean(data.get(IS_PRERELEASE)));
     nugetAttr.set(P_LANGUAGE, data.get(LANGUAGE));
-    nugetAttr.set(P_LAST_UPDATED, data.get(LAST_UPDATED));
     nugetAttr.set(P_LICENSE_URL, data.get(LICENSE_URL));
     nugetAttr.set(P_LOCATION, data.get(LOCATION));
     nugetAttr.set(P_PACKAGE_HASH, data.get(PACKAGE_HASH));
     nugetAttr.set(P_PACKAGE_HASH_ALGORITHM, data.get(PACKAGE_HASH_ALGORITHM));
     nugetAttr.set(P_PACKAGE_SIZE, data.get(PACKAGE_SIZE));
     nugetAttr.set(P_PROJECT_URL, data.get(PROJECT_URL));
-    nugetAttr.set(P_PUBLISHED, data.get(PUBLISHED));
     nugetAttr.set(P_RELEASE_NOTES, data.get(RELEASE_NOTES));
     nugetAttr.set(P_REPORT_ABUSE_URL, data.get(REPORT_ABUSE_URL));
     nugetAttr.set(P_REQUIRE_LICENSE_ACCEPTANCE, Boolean.parseBoolean(data.get(REQUIRE_LICENSE_ACCEPTANCE)));
@@ -417,9 +368,7 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_TAGS, data.get(TAGS));
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
-    if (data.containsKey(VERSION_DOWNLOAD_COUNT)) {
-      nugetAttr.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(data.get(VERSION_DOWNLOAD_COUNT)));
-    }
+
 
     return component;
   }
