@@ -76,20 +76,20 @@ class NugetHostedRecipe
     // Metadata operations
     // <galleryBase>/Operation(param1='whatever',...)/?queryParameters
     router.route(new Route.Builder()
-            .matcher(new TokenMatcher("/{operation}({paramString:.*})"))
+        .matcher(new TokenMatcher("/{operation}({paramString:.*})"))
         .handler(timingHandler)
-            .handler(securityHandler)
-            .handler(galleryHandler)
-            .handler(notFound())
-            .create())
+    //        .handler(securityHandler)
+        .handler(galleryHandler)
+        .handler(notFound())
+        .create())
 
     // Temporary means of uploading .nupkg archives to rip out their .nuspec
     router.route(new Route.Builder()
-            .matcher(new AlwaysMatcher())
-            .handler(timingHandler)
-            .handler(securityHandler)
-            .handler(contentHandler)
-            .create())
+        .matcher(new AlwaysMatcher())
+        .handler(timingHandler)
+    //            .handler(securityHandler)
+        .handler(contentHandler)
+        .create())
 
     // By default, return a 404
     router.defaultHandlers(notFound())
