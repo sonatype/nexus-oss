@@ -15,6 +15,7 @@ package org.sonatype.nexus.yum;
 import java.util.Map;
 
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.yum.internal.createrepo.YumStore;
 
 /**
  * Provides access to Yum functionality around a Nexus hosted repository.
@@ -115,5 +116,7 @@ public interface YumHosted
   void regenerateWhenDirectoryIsRemoved(String path);
 
   void markDirty(String version);
+
+  YumStore getYumStore();
 
 }

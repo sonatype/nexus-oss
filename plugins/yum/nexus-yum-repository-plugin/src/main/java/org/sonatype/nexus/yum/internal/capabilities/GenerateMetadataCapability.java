@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
+import org.sonatype.nexus.yum.internal.createrepo.YumStoreFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,11 +35,15 @@ public class GenerateMetadataCapability
     extends MetadataCapabilitySupport<GenerateMetadataCapabilityConfiguration>
 {
 
+  private final YumStoreFactory yumStoreFactory;
+
   @Inject
   public GenerateMetadataCapability(final YumRegistry yumRegistry,
-                                    final RepositoryRegistry repositoryRegistry)
+                                    final RepositoryRegistry repositoryRegistry,
+                                    final YumStoreFactory yumStoreFactory)
   {
     super(yumRegistry, repositoryRegistry);
+    this.yumStoreFactory = checkNotNull(yumStoreFactory);
   }
 
   @Override
@@ -56,6 +61,11 @@ public class GenerateMetadataCapability
   @Override
   protected GenerateMetadataCapabilityConfiguration createConfig(final Map<String, String> properties) {
     return new GenerateMetadataCapabilityConfiguration(properties);
+  }
+
+  @Override
+  protected void onRemove(final GenerateMetadataCapabilityConfiguration config) throws Exception {
+    yumStoreFactory.create(config.repository()).deleteAll();
   }
 
 }

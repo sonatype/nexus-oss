@@ -14473,8 +14473,20 @@
  * cls: 'x-form-readonly'
  */
 /* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
-.x-form-field[readonly="readonly"] {
+.x-form-field[readonly="readonly"].x-form-field:not([role="combobox"]) {
+  color: #777777;
   background-color: #ebebeb;
+}
+
+/* line 16, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.nx-log-viewer-field textarea {
+  background-color: white !important;
+}
+
+/* line 20, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.x-form-fieldcontainer .x-mask {
+  background-color: #dddddd;
+  opacity: 0.6;
 }
 
 /**

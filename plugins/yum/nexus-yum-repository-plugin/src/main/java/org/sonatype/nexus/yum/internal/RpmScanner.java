@@ -60,7 +60,7 @@ public class RpmScanner
     return rpms;
   }
 
-  static String getRelativePath(final File baseDir, final File file) {
+  public static String getRelativePath(final File baseDir, final File file) {
     String baseDirPath = baseDir.getAbsolutePath() + (baseDir.isDirectory() ? separator : "");
     String filePath = file.getAbsolutePath() + (file.isDirectory() ? separator : "");
     if (filePath.startsWith(baseDirPath)) {

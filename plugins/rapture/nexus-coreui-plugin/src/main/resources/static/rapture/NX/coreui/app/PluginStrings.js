@@ -744,7 +744,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     ADMIN_LOGGING_CREATE_TITLE: 'Save search filter',
     ADMIN_LOGGING_CREATE_NAME: 'Logger name',
     ADMIN_LOGGING_CREATE_LEVEL: 'Logging level',
-    ADMIN_LOGGING_WRITE_SUCCESS: 'Logger {0} d: {1}',
+    ADMIN_LOGGING_WRITE_SUCCESS: 'Logger {0}d: {1}',
     ADMIN_LOGGING_NEW_BUTTON: 'Create logger',
     ADMIN_LOGGING_UPDATE_TITLE: 'Confirm update?',
     ADMIN_LOGGING_UPDATE_HELP: 'Logger "{0}" is already configured. Would you like to update its level to "{1}"?',

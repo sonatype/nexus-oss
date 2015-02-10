@@ -305,19 +305,6 @@ public class HttpClientFactoryImpl
     // Apply default user-agent
     final String userAgent = getUserAgent();
     builder.setUserAgent(userAgent);
-    builder.getHttpClientBuilder().setRequestExecutor(new HttpRequestExecutor()
-    {
-      @Override
-      public void preProcess(final HttpRequest request, final HttpProcessor processor, final HttpContext ctx)
-          throws HttpException, IOException
-      {
-        // NEXUS-7575: In case of HTTP Proxy tunnel, add generic UA while performing CONNECT
-        if (!request.containsHeader(HTTP.USER_AGENT)) {
-          request.addHeader(new BasicHeader(HTTP.USER_AGENT, userAgent));
-        }
-        super.preProcess(request, processor, ctx);
-      }
-    });
 
     customizer.customize(builder);
 
