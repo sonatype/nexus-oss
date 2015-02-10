@@ -47,9 +47,9 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerProcessor;
-import org.sonatype.nexus.ruby.RepairHelper;
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.RubygemsGateway;
+import org.sonatype.nexus.ruby.cuba.RootCuba;
 import org.sonatype.nexus.ruby.layout.HostedRubygemsFileSystem;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -189,5 +189,6 @@ public class DefaultHostedRubyRepository
         throw e;
       }
     }
+    wp.storeIndex();
   }
 }
