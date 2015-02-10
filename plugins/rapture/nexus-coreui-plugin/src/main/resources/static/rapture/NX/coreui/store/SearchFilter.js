@@ -50,6 +50,17 @@ Ext.define('NX.coreui.store.SearchFilter', {
       ]
     },
     {
+      id: 'raw',
+      name: 'Raw',
+      text: NX.I18n.get('BROWSE_SEARCH_RAW_TITLE'),
+      description: NX.I18n.get('BROWSE_SEARCH_RAW_SUBTITLE'),
+      readOnly: true,
+      criterias: [
+        { id: 'format', value: 'raw', hidden: true },
+        { id: 'attributes.raw.path' }
+      ]
+    },
+    {
       id: 'keyword',
       name: 'Keyword',
       text: 'Keyword',

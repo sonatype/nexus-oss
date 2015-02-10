@@ -85,6 +85,13 @@ Ext.define('NX.coreui.store.SearchCriteria', {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
         width: 250
       }
+    },
+    {
+      id: 'attributes.raw.path',
+      config: {
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH'),
+        width: 300
+      }
     }
   ],
 

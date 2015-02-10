@@ -44,6 +44,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     BROWSE_SEARCH_COMPONENTS_CRITERIA_FORMAT: 'Format',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP: 'Group',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING: 'Packaging',
+    BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH: 'Raw Path',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1: 'SHA-1',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_VERSION: 'Version',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_FILTER_PLACEHOLDER: 'Any',
@@ -81,9 +82,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     //BROWSE_SEARCH_COMPONENT_INFO_PROBLEM_CODE_COLUMN: 'Problem Code',
     //BROWSE_SEARCH_COMPONENT_INFO_SUMMARY_COLUMN: 'Summary',
 
-    // Browse -> Search -> Class Name
-    BROWSE_SEARCH_CLASS_TITLE: 'Class Name',
-    BROWSE_SEARCH_CLASS_SUBTITLE: 'Search for components by class-name',
+    // Browse -> Search -> Raw
+    BROWSE_SEARCH_RAW_TITLE: 'Raw',
+    BROWSE_SEARCH_RAW_SUBTITLE: 'Search for components by in raw repositories by path',
 
     // Browse -> Search -> Custom
     BROWSE_SEARCH_CUSTOM_TITLE: 'Custom',
