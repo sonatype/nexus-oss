@@ -63,25 +63,6 @@ public class YumITSupport
         .addFeatures("nexus-yum-repository-plugin");
   }
 
-  @BeforeClass
-  public static void ignoreIfCreateRepoNotPresent() {
-    List<String> command = Lists.newArrayList();
-    command.add("createrepo");
-    command.add("--version");
-
-    ProcessBuilder processBuilder = new ProcessBuilder(command);
-    processBuilder.redirectErrorStream(true);
-    processBuilder.redirectOutput(Redirect.INHERIT);
-
-    try {
-      int exitCode = processBuilder.start().waitFor();
-      assumeTrue("createrepo is present", exitCode == 0);
-    }
-    catch (Exception e) {
-      assumeTrue("createrepo is present", false);
-    }
-  }
-
   @Before
   public void setBaseUrl() {
     final RestApi restApi = serverConfiguration().restApi();

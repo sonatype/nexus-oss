@@ -71,20 +71,6 @@ public class YumMergeMetadataIT
   }
 
   @Test
-  public void removeYumRepositoryWhenOnlyOneMember()
-      throws Exception
-  {
-    final GroupRepository groupRepo = givenAYumGroupRepoWith2RPMs();
-    groupRepo.removeMember(repositoryIdForTest("1")).save();
-    groupRepo.removeMember(repositoryIdForTest("2")).save();
-
-    waitForNexusToSettleDown();
-
-    thrown.expect(NexusClientNotFoundException.class);
-    getPrimaryXmlOf(groupRepo);
-  }
-
-  @Test
   public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded()
       throws Exception
   {

@@ -31,7 +31,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +54,6 @@ public class YumRegistryImpl
   private final YumFactory yumFactory;
 
   private int maxNumberOfParallelThreads;
-
-  private String createrepoPath;
-
-  private String mergerepoPath;
 
   @Inject
   public YumRegistryImpl(final NexusConfiguration nexusConfiguration,
@@ -129,38 +124,6 @@ public class YumRegistryImpl
   @Override
   public int maxNumberOfParallelThreads() {
     return maxNumberOfParallelThreads;
-  }
-
-  /**
-   * @since 2.11
-   */
-  @Override
-  public String getCreaterepoPath() {
-    return StringUtils.isBlank(createrepoPath) ? DEFAULT_CREATEREPO_PATH : createrepoPath;
-  }
-
-  /**
-   * @since 2.11
-   */
-  @Override
-  public void setCreaterepoPath(final String path) {
-    this.createrepoPath = path;
-  }
-
-  /**
-   * @since 2.11
-   */
-  @Override
-  public String getMergerepoPath() {
-    return StringUtils.isBlank(mergerepoPath) ? DEFAULT_MERGEREPO_PATH : mergerepoPath;
-  }
-
-  /**
-   * @since 2.11
-   */
-  @Override
-  public void setMergerepoPath(final String path) {
-    this.mergerepoPath = path;
   }
 
   @Override

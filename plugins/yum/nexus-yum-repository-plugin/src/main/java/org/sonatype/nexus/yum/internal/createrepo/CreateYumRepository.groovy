@@ -10,18 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.yum.internal;
-
-import java.io.File;
+package org.sonatype.nexus.yum.internal.createrepo
 
 /**
- * @since yum 3.0
+ * Creates a yum repository (similar to createrepo).
+ * @since 3.0
  */
-public interface ListFileFactory
+class CreateYumRepository
+extends YumRepositoryWriter
 {
 
-  File getRpmListFile();
+  CreateYumRepository(final File repoDir, final Integer timestamp = null, final File groupFile = null) {
+    super(repoDir, timestamp, groupFile)
+  }
 
-  File getRpmListFile(String version);
+  /**
+   * Write a yum package metadata.
+   */
+  void write(final YumPackage yumPackage) {
+    maybeStart()
+    writePrimary(yumPackage)
+    writeFileLists(yumPackage)
+    writeOther(yumPackage)
+  }
 
 }

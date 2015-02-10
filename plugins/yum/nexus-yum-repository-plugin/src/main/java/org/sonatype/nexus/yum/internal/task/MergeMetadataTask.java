@@ -16,10 +16,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -40,16 +39,21 @@ import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskScheduler;
+import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
-import org.sonatype.nexus.yum.internal.MetadataProcessor;
 import org.sonatype.nexus.yum.internal.RepoMD;
 import org.sonatype.nexus.yum.internal.RepositoryUtils;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
+import org.sonatype.nexus.yum.internal.createrepo.CreateYumRepository;
+import org.sonatype.nexus.yum.internal.createrepo.MergeYumRepository;
+import org.sonatype.nexus.yum.internal.createrepo.YumPackage;
+import org.sonatype.nexus.yum.internal.createrepo.YumStore;
+
+import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPODATA;
 import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
@@ -67,16 +71,11 @@ public class MergeMetadataTask
 
   private final YumRegistry yumRegistry;
 
-  private final CommandLineExecutor commandLineExecutor;
-
   private GroupRepository groupRepository;
 
   @Inject
-  public MergeMetadataTask(final YumRegistry yumRegistry,
-                           final CommandLineExecutor commandLineExecutor)
-  {
+  public MergeMetadataTask(final YumRegistry yumRegistry) {
     this.yumRegistry = checkNotNull(yumRegistry);
-    this.commandLineExecutor = checkNotNull(commandLineExecutor);
   }
 
   @Override
@@ -93,26 +92,16 @@ public class MergeMetadataTask
       final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
       DirSupport.mkdir(repoTmpDir);
       final File repoTmpRepodataDir = new File(repoTmpDir, PATH_OF_REPODATA);
+      DirSupport.mkdir(repoTmpRepodataDir);
 
       RepositoryItemUid groupRepoMdUid = groupRepository.createUid("/" + PATH_OF_REPOMD_XML);
       try {
         groupRepoMdUid.getLock().lock(Action.update);
 
-        final List<File> memberReposBaseDirs = getBaseDirsOfMemberRepositories();
-        if (memberReposBaseDirs.size() > 1) {
-          log.debug("Merging repository group '{}' out of {}", groupRepository.getId(), memberReposBaseDirs);
-          commandLineExecutor.exec(buildCommand(repoTmpDir, memberReposBaseDirs));
-          MetadataProcessor.processMergedMetadata(groupRepository, memberReposBaseDirs);
-          log.debug("Group repository '{}' merged", groupRepository.getId());
-        }
-        else {
-          // just copy into newly created tmpDir
-          if (memberReposBaseDirs.size() == 1) {
-            log.debug(
-                "Copying Yum metadata from {} to group repository {}",
-                memberReposBaseDirs.get(0), groupRepository.getId()
-            );
-            copyDirectory(new File(memberReposBaseDirs.get(0), PATH_OF_REPODATA), repoTmpRepodataDir);
+        List<File> memberBaseDirs = getBaseDirsOfMemberRepositories();
+        try (MergeYumRepository mergeRepo = new MergeYumRepository(repoTmpRepodataDir)) {
+          for (File memberBaseDir : memberBaseDirs) {
+            mergeRepo.merge(memberBaseDir);
           }
         }
 
@@ -196,20 +185,6 @@ public class MergeMetadataTask
 
   private boolean isValidRepository() {
     return groupRepository != null && !groupRepository.getMemberRepositories().isEmpty();
-  }
-
-  private String buildCommand(File repoBaseDir, List<File> memberRepoBaseDirs)
-      throws MalformedURLException, URISyntaxException
-  {
-    final StringBuilder repos = new StringBuilder();
-    for (File memberRepoBaseDir : memberRepoBaseDirs) {
-      repos.append(" --repo=");
-      repos.append(memberRepoBaseDir.toURI().toASCIIString());
-    }
-    return format(
-        "%s --no-database %s -o %s",
-        yumRegistry.getMergerepoPath(), repos.toString(), repoBaseDir.getAbsolutePath()
-    );
   }
 
   public static TaskInfo<YumRepository> createTaskFor(final TaskScheduler nexusScheduler,

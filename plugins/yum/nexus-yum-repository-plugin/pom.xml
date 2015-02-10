@@ -62,6 +62,16 @@
     </dependency>
 
     <dependency>
+      <groupId>org.redline-rpm</groupId>
+      <artifactId>redline</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.stax-utils</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-testsupport</artifactId>
       <scope>test</scope>
@@ -79,11 +89,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.redline-rpm</groupId>
-      <artifactId>redline</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

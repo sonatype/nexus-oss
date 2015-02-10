@@ -13,11 +13,14 @@
 package org.sonatype.nexus.yum.internal.task;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -38,18 +41,21 @@ import org.sonatype.nexus.scheduling.CancelableSupport;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.yum.Yum;
 import org.sonatype.nexus.yum.YumGroup;
+import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
-import org.sonatype.nexus.yum.internal.ListFileFactory;
 import org.sonatype.nexus.yum.internal.RepositoryUtils;
-import org.sonatype.nexus.yum.internal.RpmListWriter;
 import org.sonatype.nexus.yum.internal.RpmScanner;
 import org.sonatype.nexus.yum.internal.YumRepositoryImpl;
+import org.sonatype.nexus.yum.internal.createrepo.CreateYumRepository;
+import org.sonatype.nexus.yum.internal.createrepo.YumPackage;
+import org.sonatype.nexus.yum.internal.createrepo.YumPackageParser;
+import org.sonatype.nexus.yum.internal.createrepo.YumStore;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,14 +77,10 @@ import static org.sonatype.nexus.yum.Yum.PATH_OF_REPOMD_XML;
 @Named
 public class GenerateMetadataTask
     extends RepositoryTaskSupport<YumRepository>
-    implements ListFileFactory, Cancelable
+    implements Cancelable
 {
   // TODO: is defined in DefaultFSPeer. Do we want to expose it over there?
   private static final String REPO_TMP_FOLDER = ".nexus/tmp";
-
-  private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
-
-  private static final String CACHE_DIR_PREFIX = ".cache-";
 
   private static final Logger LOG = LoggerFactory.getLogger(GenerateMetadataTask.class);
 
@@ -90,7 +92,7 @@ public class GenerateMetadataTask
 
   public static final String PARAM_ADDED_FILES = "addedFiles";
 
-  public static final String PARAM_SINGLE_RPM_PER_DIR = "singleRpmPerDir";
+  public static final String PARAM_REMOVED_FILE = "removedFile";
 
   public static final String PARAM_FORCE_FULL_SCAN = "forceFullScan";
 
@@ -102,20 +104,14 @@ public class GenerateMetadataTask
 
   private final Manager routingManager;
 
-  private final CommandLineExecutor commandLineExecutor;
-
   @Inject
   public GenerateMetadataTask(final YumRegistry yumRegistry,
                               final RpmScanner scanner,
-                              final Manager routingManager,
-                              final CommandLineExecutor commandLineExecutor)
+                              final Manager routingManager)
   {
     this.yumRegistry = checkNotNull(yumRegistry);
     this.scanner = checkNotNull(scanner);
     this.routingManager = checkNotNull(routingManager);
-    this.commandLineExecutor = checkNotNull(commandLineExecutor);
-
-    getConfiguration().setString(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
   }
 
   /**
@@ -145,18 +141,20 @@ public class GenerateMetadataTask
       throws Exception
   {
     String repositoryId = getRepositoryId();
+    checkState(
+        repositoryId != null,
+        "Metadata regeneration can only be run when repository id is set"
+    );
 
-    if (!StringUtils.isEmpty(repositoryId)) {
-      checkState(
-          yumRegistry.isRegistered(repositoryId),
-          "Metadata regeneration can only be run on repositories that have an enabled 'Yum: Generate Metadata' capability"
-      );
-      Yum yum = yumRegistry.get(repositoryId);
-      checkState(
-          yum.getNexusRepository().getRepositoryKind().isFacetAvailable(HostedRepository.class),
-          "Metadata generation can only be run on hosted repositories"
-      );
-    }
+    checkState(
+        yumRegistry.isRegistered(repositoryId),
+        "Metadata regeneration can only be run on repositories that have an enabled 'Yum: Generate Metadata' capability"
+    );
+    Yum yum = yumRegistry.get(repositoryId);
+    checkState(
+        yum.getNexusRepository().getRepositoryKind().isFacetAvailable(HostedRepository.class),
+        "Metadata generation can only be run on hosted repositories"
+    );
 
     setDefaults();
 
@@ -172,20 +170,19 @@ public class GenerateMetadataTask
       final File repoTmpDir = new File(repoBaseDir, REPO_TMP_FOLDER + File.separator + UUID.randomUUID().toString());
       DirSupport.mkdir(repoTmpDir);
       final File repoTmpRepodataDir = new File(repoTmpDir, PATH_OF_REPODATA);
+      DirSupport.mkdir(repoTmpRepodataDir);
 
       try {
-        // NEXUS-6680: Nuke cache dir if force rebuild in effect
-        if (shouldForceFullScan()) {
-          DirSupport.deleteIfExists(getCacheDir().toPath());
+        YumStore yumStore = ((YumHosted) yum).getYumStore();
+        syncYumPackages(yumStore);
+        try (CreateYumRepository createRepo = new CreateYumRepository(repoTmpRepodataDir, null, resolveYumGroups())) {
+          String version = getVersion();
+          for (YumPackage yumPackage : yumStore.get()) {
+            if (version == null || hasRequiredVersion(version, yumPackage.getLocation())) {
+              createRepo.write(yumPackage);
+            }
+          }
         }
-
-        // copy existing metadata to perform update
-        if (repoRepodataDir.isDirectory()) {
-          DirSupport.copy(repoRepodataDir.toPath(), repoTmpRepodataDir.toPath());
-        }
-
-        File rpmListFile = createRpmListFile();
-        commandLineExecutor.exec(buildCreateRepositoryCommand(repoTmpDir, rpmListFile));
 
         // at the end check for cancellation
         CancelableSupport.checkCancellation();
@@ -204,15 +201,13 @@ public class GenerateMetadataTask
       // TODO dubious
       Thread.sleep(100);
 
-      if (repository != null) {
-        final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
-        if (mavenRepository != null) {
-          try {
-            routingManager.forceUpdatePrefixFile(mavenRepository);
-          }
-          catch (Exception e) {
-            log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
-          }
+      final MavenRepository mavenRepository = repository.adaptToFacet(MavenRepository.class);
+      if (mavenRepository != null) {
+        try {
+          routingManager.forceUpdatePrefixFile(mavenRepository);
+        }
+        catch (Exception e) {
+          log.warn("Could not update Whitelist for repository '{}'", mavenRepository, e);
         }
       }
 
@@ -221,6 +216,69 @@ public class GenerateMetadataTask
     }
     finally {
       mdUid.getLock().unlock();
+    }
+  }
+
+  private File resolveYumGroups() {
+    String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
+    if (yumGroupsDefinitionFile != null) {
+      File file = new File(getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile);
+      String path = file.getAbsolutePath();
+      if (file.exists()) {
+        if (file.getName().toLowerCase().endsWith(".xml")) {
+          return file;
+        }
+        else {
+          LOG.warn("Yum groups definition file '{}' must have an '.xml' extension, ignoring", path);
+        }
+      }
+      else {
+        LOG.warn("Yum groups definition file '{}' doesn't exist, ignoring", path);
+      }
+    }
+    return null;
+  }
+
+  private boolean hasRequiredVersion(final String version, String path) {
+    String[] segments = path.split("\\/");
+    return (segments.length >= 2) && version.equals(segments[segments.length - 2]);
+  }
+
+  private void syncYumPackages(final YumStore yumStore) {
+    Set<File> files = null;
+    File rpmDir = new File(getRpmDir());
+    if (shouldForceFullScan()) {
+      files = scanner.scan(rpmDir);
+      yumStore.deleteAll();
+    }
+    else if (getAddedFiles() != null) {
+      String[] addedFiles = getAddedFiles().split(File.pathSeparator);
+      files = Sets.newHashSet();
+      for (String addedFile : addedFiles) {
+        files.add(new File(rpmDir, addedFile));
+      }
+    }
+    if (files != null) {
+      for (File file : files) {
+        String location = RpmScanner.getRelativePath(rpmDir, file.getAbsoluteFile());
+        try {
+          YumPackage yumPackage = new YumPackageParser().parse(
+              new FileInputStream(file), location, file.lastModified()
+          );
+          yumStore.put(yumPackage);
+        }
+        catch (FileNotFoundException e) {
+          log.warn("Could not parse yum metadata for {}", location, e);
+        }
+      }
+    }
+
+    String removedPath = getRemovedFile();
+    if (removedPath != null) {
+      if (removedPath.startsWith("/")) {
+        removedPath = "/".equals(removedPath) ? "" : removedPath.substring(1);
+      }
+      yumStore.delete(removedPath);
     }
   }
 
@@ -270,88 +328,6 @@ public class GenerateMetadataTask
     }
   }
 
-  private File createRpmListFile()
-      throws IOException
-  {
-    return new RpmListWriter(
-        new File(getRpmDir()),
-        getAddedFiles(),
-        getVersion(),
-        isSingleRpmPerDirectory(),
-        shouldForceFullScan(),
-        this,
-        scanner
-    ).writeList();
-  }
-
-  private String getRepositoryIdVersion() {
-    return getRepositoryId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
-  }
-
-  private String buildCreateRepositoryCommand(File tmpDir, File packageList) {
-    StringBuilder commandLine = new StringBuilder();
-    commandLine.append(yumRegistry.getCreaterepoPath());
-    if (!shouldForceFullScan()) {
-      commandLine.append(" --update");
-    }
-    commandLine.append(" --verbose --no-database");
-    commandLine.append(" --outputdir ").append(tmpDir.getAbsolutePath());
-    commandLine.append(" --pkglist ").append(packageList.getAbsolutePath());
-    commandLine.append(" --cachedir ").append(createCacheDir().getAbsolutePath());
-    final String yumGroupsDefinitionFile = getYumGroupsDefinitionFile();
-    if (yumGroupsDefinitionFile != null) {
-      final File file = new File(getRepoDir().getAbsolutePath(), yumGroupsDefinitionFile);
-      final String path = file.getAbsolutePath();
-      if (file.exists()) {
-        if (file.getName().toLowerCase().endsWith(".xml")) {
-          commandLine.append(" --groupfile ").append(path);
-        }
-        else {
-          LOG.warn("Yum groups definition file '{}' must have an '.xml' extension, ignoring", path);
-        }
-      }
-      else {
-        LOG.warn("Yum groups definition file '{}' doesn't exist, ignoring", path);
-      }
-    }
-    commandLine.append(" ").append(getRpmDir());
-
-    return commandLine.toString();
-  }
-
-  @Override
-  public File getRpmListFile() {
-    return new File(createPackageDir(), getRepositoryId() + ".txt");
-  }
-
-  private File createCacheDir() {
-    return getCacheDir(getRepositoryIdVersion());
-  }
-
-  private File createPackageDir() {
-    return getCacheDir(PACKAGE_FILE_DIR_NAME);
-  }
-
-  private File getCacheDir(final String name) {
-    final File cacheDir = new File(getCacheDir(), name);
-    try {
-      DirSupport.mkdir(cacheDir.toPath());
-    }
-    catch (IOException e) {
-      Throwables.propagate(e);
-    }
-    return cacheDir;
-  }
-
-  private File getCacheDir() {
-    return new File(yumRegistry.getTemporaryDirectory(), CACHE_DIR_PREFIX + getRepositoryId());
-  }
-
-  @Override
-  public File getRpmListFile(String version) {
-    return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
-  }
-
   public String getRepositoryId() {
     return getConfiguration().getRepositoryId();
   }
@@ -366,6 +342,14 @@ public class GenerateMetadataTask
 
   public void setAddedFiles(String addedFiles) {
     getConfiguration().setString(PARAM_ADDED_FILES, addedFiles);
+  }
+
+  public String getRemovedFile() {
+    return getConfiguration().getString(PARAM_REMOVED_FILE);
+  }
+
+  public void setRemovedFile(String removedFile) {
+    getConfiguration().setString(PARAM_REMOVED_FILE, removedFile);
   }
 
   public File getRepoDir() {
@@ -400,15 +384,8 @@ public class GenerateMetadataTask
     getConfiguration().setString(PARAM_YUM_GROUPS_DEFINITION_FILE, file);
   }
 
-  public boolean isSingleRpmPerDirectory() {
-    return getConfiguration().getBoolean(PARAM_SINGLE_RPM_PER_DIR, false);
-  }
-
   public boolean shouldForceFullScan() {
     return getConfiguration().getBoolean(PARAM_FORCE_FULL_SCAN, false);
   }
 
-  public void setSingleRpmPerDirectory(boolean singleRpmPerDirectory) {
-    getConfiguration().setBoolean(PARAM_SINGLE_RPM_PER_DIR, singleRpmPerDirectory);
-  }
 }

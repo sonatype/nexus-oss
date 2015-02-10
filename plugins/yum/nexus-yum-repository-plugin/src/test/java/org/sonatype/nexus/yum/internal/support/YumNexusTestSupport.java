@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -38,39 +39,40 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.yum.internal.task.CommandLineExecutor;
+import org.sonatype.nexus.yum.internal.createrepo.YumPackage;
+import org.sonatype.nexus.yum.internal.createrepo.YumStore;
+import org.sonatype.nexus.yum.internal.createrepo.YumStoreFactory;
 import org.sonatype.sisu.litmus.testsupport.TestTracer;
-import org.sonatype.sisu.litmus.testsupport.TestUtil;
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule;
 import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
-import com.google.common.collect.ObjectArrays;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import org.apache.commons.lang.RandomStringUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.freecompany.redline.Builder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.mockito.Mockito;
+import org.redline_rpm.Builder;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.freecompany.redline.header.Architecture.NOARCH;
-import static org.freecompany.redline.header.Os.LINUX;
-import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.redline_rpm.header.Architecture.NOARCH;
+import static org.redline_rpm.header.Os.LINUX;
+import static org.redline_rpm.header.RpmType.BINARY;
 
 public class YumNexusTestSupport
     extends NexusAppTestSupport
@@ -146,21 +148,19 @@ public class YumNexusTestSupport
     super.customizeContainerConfiguration(configuration);
     configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
   }
+
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
-    modules.add( new Module()
+    YumStore store = mock(YumStore.class);
+    final YumStoreFactory factory = mock(YumStoreFactory.class);
+    when(factory.create(Mockito.anyString())).thenReturn(store);
+    when(store.get()).thenReturn(Collections.<YumPackage>emptyList());
+    modules.add(new Module()
     {
       @Override
       public void configure(final Binder binder) {
-        binder.bind(CommandLineExecutor.class).toInstance(new CommandLineExecutor()
-        {
-          @Override
-          public int exec(final String command) throws IOException {
-            // do nothing
-            return 0;
-          }
-        });
+        binder.bind(YumStoreFactory.class).toInstance(factory);
       }
     });
   }
