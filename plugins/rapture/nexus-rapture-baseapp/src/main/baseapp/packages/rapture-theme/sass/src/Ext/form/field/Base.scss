@@ -8,6 +8,16 @@
  * cls: 'x-form-readonly'
  */
 
-.x-form-field[readonly="readonly"] {
+.x-form-field[readonly="readonly"].x-form-field:not([role="combobox"]) {
+  color: $color-dark-gray;
   background-color: $color-smoke;
+}
+
+.nx-log-viewer-field textarea {
+  background-color: $color-white !important;
+}
+
+.x-form-fieldcontainer .x-mask {
+  background-color: $color-gainsboro;
+  opacity: 0.6;
 }
