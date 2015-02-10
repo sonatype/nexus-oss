@@ -14465,6 +14465,19 @@
 }
 
 /**
+ * @class Ext.form.field.Base
+ */
+/**
+ * Style for read-only fields
+ *
+ * cls: 'x-form-readonly'
+ */
+/* line 11, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/field/Base.scss */
+.x-form-field[readonly="readonly"] {
+  background-color: #ebebeb;
+}
+
+/**
  * @class Ext.form.Fieldset
  */
 /* line 5, ../../../baseapp/packages/rapture-theme/sass/src/Ext/form/Fieldset.scss */
