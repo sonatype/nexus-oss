@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.raw.RawContent;
-import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Response;
@@ -56,7 +55,6 @@ public class RawContentHandler
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     RawContentFacet storage = repository.facet(RawContentFacet.class);
-    SearchFacet indexer = repository.facet(SearchFacet.class);
 
     switch (method) {
       case GET: {
@@ -70,8 +68,7 @@ public class RawContentHandler
       case PUT: {
         RawContent content = toContent(context.getRequest().getPayload(), new DateTime());
 
-        Object componentId = storage.put(name, content);
-        indexer.index(componentId);
+        storage.put(name, content);
         return HttpResponses.created();
       }
 
@@ -80,7 +77,6 @@ public class RawContentHandler
         if (!deleted) {
           return HttpResponses.notFound(name);
         }
-        // TODO deindex
         return HttpResponses.noContent();
       }
 

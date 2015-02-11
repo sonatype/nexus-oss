@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -105,7 +106,8 @@ public class RawContentFacetImpl
 
   @Nullable
   @Override
-  public Object put(final String path, final RawContent content) throws IOException, InvalidContentException {
+  public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
+    Object componentId;
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex bucket = tx.getBucket();
       OrientVertex component = getComponent(tx, path, bucket);
@@ -144,9 +146,9 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-
-      return component.getId();
+      componentId = component.getId();
     }
+    getRepository().facet(SearchFacet.class).index(componentId);
   }
 
   /**
@@ -204,6 +206,7 @@ public class RawContentFacetImpl
 
   @Override
   public boolean delete(final String path) throws IOException {
+    Object componentId;
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = getComponent(tx, path, tx.getBucket());
       if (component == null) {
@@ -216,9 +219,10 @@ public class RawContentFacetImpl
       tx.deleteVertex(component);
 
       tx.commit();
-
-      return true;
+      componentId = component.getId();
     }
+    getRepository().facet(SearchFacet.class).deindex(componentId);
+    return true;
   }
 
   @Override
