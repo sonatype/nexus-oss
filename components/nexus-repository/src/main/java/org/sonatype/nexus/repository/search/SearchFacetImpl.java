@@ -63,6 +63,7 @@ public class SearchFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void index(final Object vertexId) {
+    checkNotNull(vertexId);
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex bucket = tx.getBucket();
       OrientVertex component = tx.findComponent(vertexId, bucket);
@@ -78,7 +79,7 @@ public class SearchFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void deindex(final Object vertexId) {
-    // TODO shall
+    checkNotNull(vertexId);
     client.get().prepareDelete(getRepository().getName(), TYPE, vertexId.toString()).execute();
   }
 
