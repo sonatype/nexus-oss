@@ -1,9 +1,12 @@
 package com.sonatype.nexus.repository.nuget.internal.odata;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.sonatype.nexus.repository.nuget.internal.NugetPackageException;
 
@@ -11,7 +14,9 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.MultiHashingInputStream;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.hash.HashCode;
+import com.google.common.io.ByteStreams;
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -36,7 +41,8 @@ public class NugetPackageUtils
     try {
       MultiHashingInputStream hashingStream = new MultiHashingInputStream(Arrays.asList(HashAlgorithm.SHA512),
           inputStream);
-      Map<String, String> metadata = NuspecSplicer.extractNuspecData(hashingStream);
+      final byte[] nuspec = extractNuspec(hashingStream);
+      Map<String, String> metadata = NuspecSplicer.extractNuspecData(new ByteArrayInputStream(nuspec));
 
       metadata.put(PACKAGE_SIZE, String.valueOf(hashingStream.count()));
       HashCode code = hashingStream.hashes().get(HashAlgorithm.SHA512);
@@ -48,5 +54,23 @@ public class NugetPackageUtils
     catch (XmlPullParserException e) {
       throw new NugetPackageException("Unable to read .nuspec from package stream", e);
     }
+  }
+
+  private static byte[] extractNuspec(final InputStream is)
+  {
+    try {
+      try (ZipInputStream zis = new ZipInputStream(is)) {
+        for (ZipEntry e = zis.getNextEntry(); e != null; e = zis.getNextEntry()) {
+          if (e.getName().endsWith(".nuspec")) {
+            return ByteStreams.toByteArray(zis);
+          }
+        }
+      }
+    }
+    // TODO: Revisit this exception handling
+    catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+    throw new RuntimeException("Missing nuspec");
   }
 }
