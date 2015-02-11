@@ -64,7 +64,11 @@ public class HttpResponses
   }
 
   public static Response created() {
-    return created(null);
+    return created((String) null);
+  }
+
+  public static Response created(final Payload payload) {
+    return new PayloadResponse(Status.success(CREATED), payload);
   }
 
   // No Content: 204

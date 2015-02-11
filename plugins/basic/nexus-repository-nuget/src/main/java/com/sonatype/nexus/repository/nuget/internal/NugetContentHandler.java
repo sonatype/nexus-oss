@@ -36,6 +36,8 @@ public class NugetContentHandler
     extends ComponentSupport
     implements Handler
 {
+  private static final String EMPTY_HTMLDOC = "<html><body></body></html>";
+
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
@@ -56,7 +58,7 @@ public class NugetContentHandler
           }
           checkArgument(created, "No content was provided");
 
-          return HttpResponses.created();
+          return HttpResponses.created(new StringPayload(EMPTY_HTMLDOC, Charsets.UTF_8, "text/html"));
         default:
           return HttpResponses.methodNotAllowed(action, HttpMethods.PUT /* TODO: , HttpMethods.GET */);
       }

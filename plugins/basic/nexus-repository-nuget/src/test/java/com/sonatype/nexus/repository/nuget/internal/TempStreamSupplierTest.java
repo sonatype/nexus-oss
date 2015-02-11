@@ -3,6 +3,8 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.sonatype.sisu.litmus.testsupport.TestSupport;
+
 import org.apache.commons.fileupload.util.Streams;
 import org.junit.Test;
 
@@ -10,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class TempStreamSupplierTest
+    extends TestSupport
 {
   final String content = "foo";
 
