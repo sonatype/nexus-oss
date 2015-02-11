@@ -14,6 +14,7 @@ package org.sonatype.nexus.testsuite.npm.smoke;
 
 import java.io.File;
 
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.client.core.exception.NexusClientNotFoundException;
 import org.sonatype.nexus.client.core.subsystem.content.Location;
 import org.sonatype.nexus.testsuite.npm.NpmMockRegistryITSupport;
@@ -33,6 +34,12 @@ public class NpmCacheDeleteIT
     super(nexusBundleCoordinates);
   }
 
+  @Override
+  protected NexusBundleConfiguration configureNexus(final NexusBundleConfiguration configuration) {
+    return super.configureNexus(configuration)
+        .setLogLevel("remote.storage.outbound", "DEBUG");
+  }
+
   @Test
   public void cacheDelete() throws Exception {
     // create a NPM Proxy repository that proxies mock NPM registry
@@ -48,7 +55,6 @@ public class NpmCacheDeleteIT
 
     // block proxy
     proxy.block().save();
-
     // delete it from cache (should delete both: db and local storage)
     content().delete(commonjs);
 
