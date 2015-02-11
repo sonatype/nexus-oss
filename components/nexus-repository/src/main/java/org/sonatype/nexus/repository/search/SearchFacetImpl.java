@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.search;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +27,11 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Resources;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
@@ -55,6 +59,8 @@ public class SearchFacetImpl
     implements SearchFacet
 {
 
+  private static final String TYPE = "component";
+
   private final Provider<Client> client;
 
   @Inject
@@ -80,7 +86,7 @@ public class SearchFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void deindex(final Object vertexId) {
-    client.get().prepareDelete(getRepository().getName(), "component", vertexId.toString())
+    client.get().prepareDelete(getRepository().getName(), TYPE, vertexId.toString())
         .execute()
         .actionGet();
   }
@@ -90,16 +96,43 @@ public class SearchFacetImpl
   public void reindex() {
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex bucket = tx.getBucket();
-      // TODO remove all / repository
+      deleteIndex();
+      configureIndex();
       for (OrientVertex component : tx.browseComponents(bucket)) {
         index(bucket, component);
       }
     }
   }
 
+  @Override
+  protected void doConfigure() throws Exception {
+    configureIndex();
+  }
+
+  private void configureIndex() {
+    if (!client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
+      URL resource = Resources.getResource(SearchFacetImpl.class, "es-mapping.json");
+      try {
+        client.get().admin().indices().prepareCreate(getRepository().getName())
+            .addMapping(TYPE, Resources.toString(resource, Charsets.UTF_8))
+            .execute()
+            .actionGet();
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+    }
+  }
+
+  private void deleteIndex() {
+    if (client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
+      client.get().admin().indices().prepareDelete(getRepository().getName()).execute().actionGet();
+    }
+  }
+
   private void index(final OrientVertex bucket, final OrientVertex component) {
     try {
-      client.get().prepareIndex(getRepository().getName(), "component", component.getId().toString())
+      client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
           .setSource(extract(bucket, component))
           .execute()
           .actionGet();
