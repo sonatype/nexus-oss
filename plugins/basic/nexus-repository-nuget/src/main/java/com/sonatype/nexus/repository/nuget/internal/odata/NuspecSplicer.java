@@ -36,16 +36,16 @@ public final class NuspecSplicer
   }
 
   /**
-   * Extracts details NuGet metadata from a .nupkg.
+   * Extracts the .nuspec metdata from .nuspec XML in an input stream
    *
-   * @param inputStream NuGet package
+   * @param nuspecInputStream .nuspec input stream
    * @return Metadata in key-value form
    */
-  public static Map<String, String> extractNuspecData(final InputStream inputStream)
+  public static Map<String, String> extractNuspecData(final InputStream nuspecInputStream)
       throws XmlPullParserException, IOException
   {
     final NuspecSplicer splicer = new NuspecSplicer();
-    splicer.consume(ReaderFactory.newXmlReader(inputStream));
+    splicer.consume(ReaderFactory.newXmlReader(nuspecInputStream));
     return splicer.populateItemData();
   }
 
