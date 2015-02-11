@@ -24,6 +24,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
@@ -35,6 +36,8 @@ public class NugetContentHandler
     extends ComponentSupport
     implements Handler
 {
+  private static final String EMPTY_HTMLDOC = "<html><body></body></html>";
+
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
@@ -45,24 +48,32 @@ public class NugetContentHandler
         // TODO: Implement GET
 
         case HttpMethods.PUT:
-          final Payload payload = request.getPayload();
+          checkArgument(request.isMultipart(), "Multipart request required");
 
-          if (payload == null) {
-            return HttpResponses.badRequest("A .nupkg or .nar file must be part of the request.");
+          boolean created = false;
+          final Iterable<Payload> multiparts = request.getMultiparts();
+          for (Payload payload : multiparts) {
+            storePayload(context, payload);
+            created = true;
           }
+          checkArgument(created, "No content was provided");
 
-          final NugetGalleryFacet facet = context.getRepository().facet(NugetGalleryFacet.class);
-
-          try (InputStream payloadInputStream = payload.openInputStream()) {
-            facet.put(payloadInputStream);
-          }
-
+          return HttpResponses.created(new StringPayload(EMPTY_HTMLDOC, Charsets.UTF_8, "text/html"));
         default:
           return HttpResponses.methodNotAllowed(action, HttpMethods.PUT /* TODO: , HttpMethods.GET */);
       }
     }
     catch (Exception e) {
       return convertToXmlError(e);
+    }
+  }
+
+  private void storePayload(final Context context, final Payload payload) throws IOException, NugetPackageException
+  {
+    final NugetGalleryFacet facet = context.getRepository().facet(NugetGalleryFacet.class);
+
+    try (InputStream payloadInputStream = payload.openInputStream()) {
+      facet.put(payloadInputStream);
     }
   }
 

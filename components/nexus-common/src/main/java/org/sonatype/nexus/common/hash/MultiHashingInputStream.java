@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class MultiHashingInputStream
-  extends FilterInputStream
+    extends FilterInputStream
 {
   private final Map<HashAlgorithm, Hasher> hashers = Maps.newLinkedHashMap();
 

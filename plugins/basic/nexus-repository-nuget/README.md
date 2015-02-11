@@ -22,4 +22,4 @@
 
 ## Hosted
 
-    curl -v --user 'admin:admin123' --upload-file src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/upload
+    curl -X PUT -v -include -F package=@src/test/resources/SONATYPE.TEST.1.0.nupkg http://localhost:8081/repository/nugethosted1/upload
