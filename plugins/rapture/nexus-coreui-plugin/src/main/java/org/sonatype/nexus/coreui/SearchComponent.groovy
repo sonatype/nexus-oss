@@ -65,10 +65,10 @@ extends DirectComponentSupport
   Map<String, SearchContribution> searchContributions
 
   /**
-   * Search based on configured filters and return search results grouped on GA level.
+   * Search based on configured filters and return search results grouped on group / name.
    *
    * @param parameters store parameters
-   * @return paged search results
+   * @return search results
    */
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
@@ -116,7 +116,7 @@ extends DirectComponentSupport
 
   /**
    * Search based on configured filters and return versions / search result.
-   * Search filters are expected to contain filters for groupid / artifactid.
+   * Search filters are expected to contain filters for group / name.
    *
    * @param parameters store parameters
    * @return version / search result
