@@ -18,13 +18,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
 import org.elasticsearch.common.unit.TimeValue
+import org.elasticsearch.index.query.BoolFilterBuilder
 import org.elasticsearch.index.query.BoolQueryBuilder
+import org.elasticsearch.index.query.FilterBuilders
+import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.SearchHit
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
+import org.sonatype.nexus.repository.search.SearchContribution
 
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -49,8 +53,13 @@ class SearchComponent
 extends DirectComponentSupport
 {
 
+  static final String COMPONENT = 'component'
+
   @Inject
   Provider<Client> client
+
+  @Inject
+  Map<String, SearchContribution> searchContributions
 
   /**
    * Search based on configured filters and return search results grouped on GA level.
@@ -63,7 +72,7 @@ extends DirectComponentSupport
   List<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
 
     SearchResponse response = client.get().prepareSearch()
-        .setTypes('component')
+        .setTypes(COMPONENT)
         .setQuery(buildQuery(parameters))
         .setScroll(new TimeValue(10, TimeUnit.SECONDS))
         .setSize(100)
@@ -121,15 +130,21 @@ extends DirectComponentSupport
    * @param parameters store parameters
    */
   private QueryBuilder buildQuery(final StoreLoadParameters parameters) {
-    BoolQueryBuilder query = QueryBuilders.boolQuery()
+    BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery()
+    BoolFilterBuilder filterBuilder = FilterBuilders.boolFilter()
     parameters.filters?.each { filter ->
-      if ('keyword' == filter.property) {
-        query.must(QueryBuilders.queryString(filter.value))
+      SearchContribution contribution = searchContributions[filter.property]
+      if (!contribution) {
+        contribution = searchContributions['default']
       }
-      else {
-        query.must(QueryBuilders.matchQuery(filter.property, filter.value))
-      }
+      contribution.contribute(queryBuilder, filter.property, filter.value)
+      contribution.contribute(filterBuilder, filter.property, filter.value)
     }
+    FilteredQueryBuilder query = QueryBuilders.filteredQuery(
+        queryBuilder.hasClauses() ? queryBuilder : null,
+        filterBuilder.hasClauses() ? filterBuilder : null
+    )
+    log.info('Query: {}', query)
     return query
   }
 

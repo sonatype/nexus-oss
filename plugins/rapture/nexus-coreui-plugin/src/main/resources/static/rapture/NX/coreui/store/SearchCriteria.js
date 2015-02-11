@@ -54,14 +54,14 @@ Ext.define('NX.coreui.store.SearchCriteria', {
       }
     },
     {
-      id: 'group',
+      id: 'group.raw',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP'),
         width: 250
       }
     },
     {
-      id: 'name',
+      id: 'name.raw',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_NAME'),
         width: 200

@@ -42,8 +42,8 @@ Ext.define('NX.coreui.store.SearchFilter', {
       readOnly: true,
       criterias: [
         { id: 'format', value: 'maven2', hidden: true },
-        { id: 'group' },
-        { id: 'name' },
+        { id: 'group.raw' },
+        { id: 'name.raw' },
         { id: 'version' },
         { id: 'attributes.maven.classifier'},
         { id: 'attributes.maven.packaging' }
