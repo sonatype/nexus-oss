@@ -73,10 +73,14 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<SearchResultXO> read(final @Nullable StoreLoadParameters parameters) {
+    QueryBuilder query = buildQuery(parameters)
+    if (!query) {
+      return null
+    }
 
     SearchResponse response = client.get().prepareSearch()
         .setTypes(COMPONENT)
-        .setQuery(buildQuery(parameters))
+        .setQuery(query)
         .setScroll(new TimeValue(10, TimeUnit.SECONDS))
         .setSize(100)
         .execute()
@@ -124,9 +128,14 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<SearchResultVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
+    QueryBuilder query = buildQuery(parameters)
+    if (!query) {
+      return null
+    }
+
     SearchResponse response = client.get().prepareSearch()
         .setTypes(COMPONENT)
-        .setQuery(buildQuery(parameters))
+        .setQuery(query)
         .setScroll(new TimeValue(10, TimeUnit.SECONDS))
         .setSize(100)
         .execute()
@@ -175,6 +184,10 @@ extends DirectComponentSupport
       }
       contribution.contribute(queryBuilder, filter.property, filter.value)
       contribution.contribute(filterBuilder, filter.property, filter.value)
+    }
+
+    if (!queryBuilder.hasClauses() && !filterBuilder.hasClauses()) {
+      return null
     }
     FilteredQueryBuilder query = QueryBuilders.filteredQuery(
         queryBuilder.hasClauses() ? queryBuilder : null,
