@@ -25,10 +25,10 @@ import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.SearchHit
+import org.sonatype.nexus.coreui.search.SearchContribution
 import org.sonatype.nexus.extdirect.DirectComponent
 import org.sonatype.nexus.extdirect.DirectComponentSupport
 import org.sonatype.nexus.extdirect.model.StoreLoadParameters
-import org.sonatype.nexus.repository.search.SearchContribution
 
 import javax.annotation.Nullable
 import javax.inject.Inject

@@ -10,28 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.search;
+package org.sonatype.nexus.coreui.search;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 
 /**
  * ???
  *
  * @since 3.0
  */
-public class SearchContributionSupport
-    implements SearchContribution
+@Named
+@Singleton
+public class DefaultSearchContribution
+    extends SearchContributionSupport
 {
 
   @Override
-  public void contribute(final BoolQueryBuilder query, final String type, final String value) {
-    // do nothing
-  }
-
-  @Override
   public void contribute(final BoolFilterBuilder filter, final String type, final String value) {
-    // do nothing
+    filter.must(FilterBuilders.termFilter(type, value));
   }
 
 }
