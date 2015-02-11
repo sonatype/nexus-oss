@@ -27,7 +27,7 @@ public final class NuspecSplicer
   private static final List<String> ACCEPTED_TAGS = ImmutableList.of("id", "version", "authors", "description",
       "title", "releaseNotes", "summary", "tags",
       "projectUrl", "iconUrl", "licenseUrl",
-      "copyright", "requireLicenseAcceptance");
+      "copyright", "language", "requireLicenseAcceptance");
 
   final Map<String, String> data = new HashMap<String, String>();
 

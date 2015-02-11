@@ -38,11 +38,12 @@ public class NugetPackageUtils
   public static Map<String, String> packageMetadata(final InputStream inputStream)
       throws IOException, NugetPackageException
   {
-    try {
-      MultiHashingInputStream hashingStream = new MultiHashingInputStream(Arrays.asList(HashAlgorithm.SHA512),
-          inputStream);
+    try (MultiHashingInputStream hashingStream =
+             new MultiHashingInputStream(Arrays.asList(HashAlgorithm.SHA512), inputStream)) {
       final byte[] nuspec = extractNuspec(hashingStream);
       Map<String, String> metadata = NuspecSplicer.extractNuspecData(new ByteArrayInputStream(nuspec));
+
+      ByteStreams.copy(hashingStream, ByteStreams.nullOutputStream());
 
       metadata.put(PACKAGE_SIZE, String.valueOf(hashingStream.count()));
       HashCode code = hashingStream.hashes().get(HashAlgorithm.SHA512);
@@ -59,15 +60,13 @@ public class NugetPackageUtils
   private static byte[] extractNuspec(final InputStream is)
   {
     try {
-      try (ZipInputStream zis = new ZipInputStream(is)) {
-        for (ZipEntry e = zis.getNextEntry(); e != null; e = zis.getNextEntry()) {
-          if (e.getName().endsWith(".nuspec")) {
-            return ByteStreams.toByteArray(zis);
-          }
+      ZipInputStream zis = new ZipInputStream(is);
+      for (ZipEntry e = zis.getNextEntry(); e != null; e = zis.getNextEntry()) {
+        if (e.getName().endsWith(".nuspec")) {
+          return ByteStreams.toByteArray(zis);
         }
       }
     }
-    // TODO: Revisit this exception handling
     catch (IOException e) {
       throw Throwables.propagate(e);
     }
