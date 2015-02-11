@@ -326,6 +326,7 @@ public class DefaultNpmHostedRepository
     }
   }
 
+  // TODO: npm hosted and proxy repositories have same deleteItem code, factor it out
   @Override
   public void deleteItem(boolean fromTask, ResourceStoreRequest storeRequest)
       throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
@@ -337,6 +338,7 @@ public class DefaultNpmHostedRepository
     catch (IllegalArgumentException e) {
       // something completely different
     }
+    boolean supressItemNotFound = false;
     if (packageRequest != null) {
       if (packageRequest.isMetadata()) {
         if (packageRequest.isRegistryRoot()) {
@@ -345,10 +347,18 @@ public class DefaultNpmHostedRepository
         }
         else if (packageRequest.isPackageRoot()) {
           log.debug("Deleting package {} root...", packageRequest.getName());
-          getMetadataService().deletePackage(packageRequest.getName());
+          supressItemNotFound = getMetadataService().deletePackage(packageRequest.getName());
         }
       }
     }
-    super.deleteItem(fromTask, storeRequest);
+    try {
+      super.deleteItem(fromTask, storeRequest);
+    }
+    catch (ItemNotFoundException e) {
+      // this allows to delete package metadata only, where no tarballs were cached/deployed for some reason
+      if (!supressItemNotFound) {
+        throw e;
+      }
+    }
   }
 }

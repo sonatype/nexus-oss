@@ -40,17 +40,29 @@ public class NpmCacheDeleteIT
 
     final File irrelevant = util.createTempFile();
     final Location commonjs = Location.repositoryLocation(proxy.id(), "/commonjs");
+    final Location commonjs001Tar = Location.repositoryLocation(proxy.id(), "/commonjs/-/commonjs-0.0.1.tgz");
 
     // fetch to populate the cache
-    content().download(commonjs, irrelevant);
+    content().download(commonjs, irrelevant); // package root (goes into DB)
+    content().download(commonjs001Tar, irrelevant); // one tarball (goes into local storage)
 
     // block proxy
     proxy.block().save();
 
-    // delete it from cache
+    // delete it from cache (should delete both: db and local storage)
     content().delete(commonjs);
 
     try {
+      // try the tarball
+      content().download(commonjs001Tar, irrelevant);
+      fail("Should be 404");
+    }
+    catch (NexusClientNotFoundException e) {
+      // good
+    }
+
+    try {
+      // try the metadata
       content().download(commonjs, irrelevant);
       fail("Should be 404");
     }
