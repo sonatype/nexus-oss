@@ -38,17 +38,17 @@ public class ComponentQuery
     }
 
     /**
-     * Appends a parameterized value to the query.
+     * Appends a parameterized value to the where clause.
      */
-    public Builder param(String name, Object value) {
-      final String mangledName = checkNotNull(name) + parameterNumber++;
+    public Builder param(Object value) {
+      return param("p", value);
+    }
+
+    private Builder param(String parameterName, Object value) {
+      final String mangledName = checkNotNull(parameterName) + parameterNumber++;
       parameters.put(mangledName, value);
       where(":" + mangledName);
       return this;
-    }
-
-    public Builder param(Object value) {
-      return param("p", value);
     }
 
     public Builder suffix(String suffix) {
@@ -62,7 +62,9 @@ public class ComponentQuery
       );
     }
 
-    private String clean(final StringBuilder str) {return Strings.emptyToNull(str.toString().trim());}
+    private String clean(final StringBuilder str) {
+      return Strings.emptyToNull(str.toString().trim());
+    }
   }
 
   private final String where, suffix;

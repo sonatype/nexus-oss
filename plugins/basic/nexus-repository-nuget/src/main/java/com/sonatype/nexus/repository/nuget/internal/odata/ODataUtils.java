@@ -95,7 +95,7 @@ public final class ODataUtils
       if (q.hasWhere()) {
         q.where(" AND ");
       }
-      q.where(nugat("id") + " = ").param("id", id);
+      q.where(nugat("id") + " = ").param(id);
     }
 
     if ("false".equalsIgnoreCase(StringUtils.strip(query.get("includePrerelease"), "\" '"))) {
