@@ -180,7 +180,7 @@ extends DirectComponentSupport
         queryBuilder.hasClauses() ? queryBuilder : null,
         filterBuilder.hasClauses() ? filterBuilder : null
     )
-    log.info('Query: {}', query)
+    log.debug('Query: {}', query)
     return query
   }
 

@@ -49,7 +49,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
- * ???
+ * Default {@link StorageFacet} implementation.
  *
  * @since 3.0
  */
@@ -86,19 +86,20 @@ public class SearchFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void deindex(final Object vertexId) {
-    client.get().prepareDelete(getRepository().getName(), TYPE, vertexId.toString())
-        .execute()
-        .actionGet();
+    // TODO shall
+    client.get().prepareDelete(getRepository().getName(), TYPE, vertexId.toString()).execute();
   }
 
   @Override
   @Guarded(by = STARTED)
   public void reindex() {
+    // TODO shall we block indexing during re-index?
     try (StorageTx tx = getStorage().openTx()) {
       OrientVertex bucket = tx.getBucket();
       deleteIndex();
       configureIndex();
       for (OrientVertex component : tx.browseComponents(bucket)) {
+        // TODO maybe use batch indexing
         index(bucket, component);
       }
     }
@@ -134,8 +135,7 @@ public class SearchFacetImpl
     try {
       client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
           .setSource(extract(bucket, component))
-          .execute()
-          .actionGet();
+          .execute();
     }
     catch (Exception e) {
       throw Throwables.propagate(e);

@@ -19,7 +19,7 @@ import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
 /**
- * ???
+ * "default" {@link SearchContribution} (adds filter as an ES term filter).
  *
  * @since 3.0
  */

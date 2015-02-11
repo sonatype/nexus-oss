@@ -19,7 +19,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
 /**
- * ???
+ * "Keyword" {@link SearchContribution} (adds filter as an ES query string).
  *
  * @since 3.0
  */
