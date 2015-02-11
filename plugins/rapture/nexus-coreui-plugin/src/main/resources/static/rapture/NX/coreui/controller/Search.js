@@ -166,6 +166,14 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
+   * Avoid store load; manage load of search results by oursevles.
+   */
+  loadStore: function(){
+    // do nothing for now
+  },
+
+  /**
+   * @private
    * Show quick search when user has 'nexus:repositories:read' permission.
    */
   bindQuickSearch: function(quickSearch) {
