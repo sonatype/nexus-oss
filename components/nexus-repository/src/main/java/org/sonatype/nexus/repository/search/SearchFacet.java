@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Facet;
 
+import com.tinkerpop.blueprints.impls.orient.OrientVertex;
+
 /**
  * Search {@link Facet}, providing means to index/de-index/reindex components.
  *
@@ -25,18 +27,18 @@ public interface SearchFacet
 {
 
   /**
-   * Index component with specified id.
+   * Index component.
    *
-   * @param vertexId id of component to be indexed
+   * @param component component to be indexed
    */
-  void index(Object vertexId);
+  void index(OrientVertex component);
 
   /**
-   * Removes component with specified id from index.
+   * Removes component from index.
    *
-   * @param vertexId id of component to be removed
+   * @param component component to be removed from index
    */
-  void deindex(Object vertexId);
+  void deindex(OrientVertex component);
 
   /**
    * Re-index all components.

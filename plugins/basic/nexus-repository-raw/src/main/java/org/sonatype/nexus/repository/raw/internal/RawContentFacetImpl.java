@@ -104,10 +104,8 @@ public class RawContentFacetImpl
     }
   }
 
-  @Nullable
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
-    Object componentId;
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex bucket = tx.getBucket();
       OrientVertex component = getComponent(tx, path, bucket);
@@ -146,9 +144,8 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-      componentId = component.getId();
+      getRepository().facet(SearchFacet.class).index(component);
     }
-    getRepository().facet(SearchFacet.class).index(componentId);
   }
 
   /**
@@ -206,7 +203,6 @@ public class RawContentFacetImpl
 
   @Override
   public boolean delete(final String path) throws IOException {
-    Object componentId;
     try (StorageTx tx = getStorage().openTx()) {
       final OrientVertex component = getComponent(tx, path, tx.getBucket());
       if (component == null) {
@@ -219,10 +215,11 @@ public class RawContentFacetImpl
       tx.deleteVertex(component);
 
       tx.commit();
-      componentId = component.getId();
+
+      getRepository().facet(SearchFacet.class).deindex(component);
+
+      return true;
     }
-    getRepository().facet(SearchFacet.class).deindex(componentId);
-    return true;
   }
 
   @Override

@@ -27,6 +27,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
@@ -44,9 +45,11 @@ public class DefaultSourceProducer
 {
 
   @Override
-  public String getSource(final OrientVertex bucket, final OrientVertex component) {
+  public String getSource(String repositoryName, final OrientVertex component) {
+    checkNotNull(repositoryName);
+    checkNotNull(component);
     Map<String, Object> source = Maps.newHashMap();
-    source.put(P_REPOSITORY_NAME, bucket.getProperty(P_REPOSITORY_NAME));
+    source.put(P_REPOSITORY_NAME, repositoryName);
     for (String key : component.getPropertyKeys()) {
       source.put(key, component.getProperty(key));
     }

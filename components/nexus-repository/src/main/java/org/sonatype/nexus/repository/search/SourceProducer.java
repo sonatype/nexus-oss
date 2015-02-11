@@ -22,6 +22,6 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 public interface SourceProducer
 {
 
-  String getSource(OrientVertex bucket, OrientVertex component);
+  String getSource(String repositoryName, OrientVertex component);
 
 }

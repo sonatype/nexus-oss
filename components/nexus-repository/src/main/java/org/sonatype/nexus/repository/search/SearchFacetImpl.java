@@ -62,25 +62,24 @@ public class SearchFacetImpl
 
   @Override
   @Guarded(by = STARTED)
-  public void index(final Object vertexId) {
-    checkNotNull(vertexId);
-    try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex bucket = tx.getBucket();
-      OrientVertex component = tx.findComponent(vertexId, bucket);
-      if (component == null) {
-        // component may had been deleted in the mean time
-        // TODO log?
-        return;
-      }
-      index(bucket, component);
+  public void index(final OrientVertex component) {
+    checkNotNull(component);
+    String format = getRepository().getFormat().getValue();
+    SourceProducer sourceProducer = sourceProducers.get(format);
+    if (sourceProducer == null) {
+      sourceProducer = sourceProducers.get("default");
     }
+    checkState(sourceProducer != null, "Could not find a source producer for format: {}", format);
+    client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
+        .setSource(sourceProducer.getSource(getRepository().getName(), component))
+        .execute();
   }
 
   @Override
   @Guarded(by = STARTED)
-  public void deindex(final Object vertexId) {
-    checkNotNull(vertexId);
-    client.get().prepareDelete(getRepository().getName(), TYPE, vertexId.toString()).execute();
+  public void deindex(final OrientVertex component) {
+    checkNotNull(component);
+    client.get().prepareDelete(getRepository().getName(), TYPE, component.getId().toString()).execute();
   }
 
   @Override
@@ -93,7 +92,7 @@ public class SearchFacetImpl
       configureIndex();
       for (OrientVertex component : tx.browseComponents(bucket)) {
         // TODO maybe use batch indexing
-        index(bucket, component);
+        index(component);
       }
     }
   }
@@ -122,18 +121,6 @@ public class SearchFacetImpl
     if (client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
       client.get().admin().indices().prepareDelete(getRepository().getName()).execute().actionGet();
     }
-  }
-
-  private void index(final OrientVertex bucket, final OrientVertex component) {
-    String format = getRepository().getFormat().getValue();
-    SourceProducer sourceProducer = sourceProducers.get(format);
-    if (sourceProducer == null) {
-      sourceProducer = sourceProducers.get("default");
-    }
-    checkState(sourceProducer != null, "Could not find a source producer for format: {}", format);
-    client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
-        .setSource(sourceProducer.getSource(bucket, component))
-        .execute();
   }
 
   private StorageFacet getStorage() {
