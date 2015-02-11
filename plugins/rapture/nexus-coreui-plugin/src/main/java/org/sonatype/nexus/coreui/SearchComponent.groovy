@@ -37,9 +37,12 @@ import javax.inject.Provider
 import javax.inject.Singleton
 import java.util.concurrent.TimeUnit
 
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_FORMAT
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_GROUP
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION
 
 /**
  * Search {@link DirectComponent}.
@@ -89,7 +92,7 @@ extends DirectComponentSupport
           def group = hit.source[P_GROUP]
           def name = hit.source[P_NAME]
           def ga = new SearchResultXO(
-              id: "${group}:${name} (${hit.score})",
+              id: "${group}:${name}",
               groupId: group,
               artifactId: name,
               format: hit.source[P_FORMAT]
@@ -121,7 +124,40 @@ extends DirectComponentSupport
   @DirectMethod
   @RequiresPermissions('nexus:repositories:read')
   List<SearchResultVersionXO> readVersions(final @Nullable StoreLoadParameters parameters) {
-    return null
+    SearchResponse response = client.get().prepareSearch()
+        .setTypes(COMPONENT)
+        .setQuery(buildQuery(parameters))
+        .setScroll(new TimeValue(10, TimeUnit.SECONDS))
+        .setSize(100)
+        .execute()
+        .actionGet()
+
+    def versions = [] as SortedSet<SearchResultVersionXO>
+    while (response.hits.hits.length > 0) {
+      response.hits.hits.each { hit ->
+        // TODO check security
+        versions << new SearchResultVersionXO(
+            groupId: hit.source[P_GROUP],
+            artifactId: hit.source[P_NAME],
+            version: hit.source[P_VERSION] ?: '1',
+            repositoryId: hit.source[P_REPOSITORY_NAME],
+            repositoryName: hit.source[P_REPOSITORY_NAME],
+            name: hit.source[P_NAME],
+            // FIXME: how we get the path
+            path: hit.source[P_ATTRIBUTES]['raw']['path']
+        )
+      }
+      response = client.get().prepareSearchScroll(response.getScrollId())
+          .setScroll(new TimeValue(10, TimeUnit.SECONDS))
+          .execute()
+          .actionGet();
+    }
+
+    def versionOrder = 0
+    return versions.collect { version ->
+      version.versionOrder = versionOrder++
+      return version
+    }
   }
 
   /**

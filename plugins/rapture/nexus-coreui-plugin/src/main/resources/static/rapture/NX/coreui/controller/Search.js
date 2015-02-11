@@ -424,11 +424,11 @@ Ext.define('NX.coreui.controller.Search', {
       searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
       searchResultVersionStore.addFilter([
         {
-          property: 'groupid',
+          property: 'group.raw',
           value: searchResultModel.get('groupId')
         },
         {
-          property: 'artifactid',
+          property: 'name.raw',
           value: searchResultModel.get('artifactId')
         }
       ]);
