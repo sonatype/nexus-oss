@@ -166,7 +166,7 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
-   * Avoid store load; manage load of search results by oursevles.
+   * Avoid store load; manage load of search results by ourselves.
    */
   loadStore: function(){
     // do nothing for now

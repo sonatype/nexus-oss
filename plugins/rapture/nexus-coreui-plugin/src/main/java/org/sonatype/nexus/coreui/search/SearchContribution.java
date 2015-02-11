@@ -26,7 +26,7 @@ public interface SearchContribution
   /**
    * Contribute to search query.
    *
-   * @param filter to contribute to
+   * @param query to contribute to
    * @param type   type of filter
    * @param value  value of filter
    */
