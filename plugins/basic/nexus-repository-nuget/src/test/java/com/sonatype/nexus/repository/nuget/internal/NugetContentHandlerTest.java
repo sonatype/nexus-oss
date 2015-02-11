@@ -21,6 +21,7 @@ import org.junit.Test;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -47,7 +48,7 @@ public class NugetContentHandlerTest
   }
 
   @Test
-  public void testPutMultipart() throws Exception {
+  public void testPutOneMultipart() throws Exception {
     Payload requestPayload = mock(Payload.class);
     InputStream inputStream = mock(InputStream.class);
 
@@ -60,6 +61,23 @@ public class NugetContentHandlerTest
     checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
 
     verify(nugetGalleryFacet).put(inputStream);
+    verifyNoMoreInteractions(nugetGalleryFacet);
+  }
+
+  @Test
+  public void testPutTwoMultipart() throws Exception {
+    Payload requestPayload = mock(Payload.class);
+    InputStream inputStream = mock(InputStream.class);
+
+    when(request.getAction()).thenReturn(HttpMethods.PUT);
+    when(request.isMultipart()).thenReturn(true);
+    when(request.getMultiparts()).thenReturn(Lists.newArrayList(requestPayload, requestPayload));
+    when(requestPayload.openInputStream()).thenReturn(inputStream);
+
+    Response response = underTest.handle(context);
+    checkResponse(response, HttpStatus.CREATED, "text/html", "<html><body></body></html>");
+
+    verify(nugetGalleryFacet, times(2)).put(inputStream);
     verifyNoMoreInteractions(nugetGalleryFacet);
   }
 
