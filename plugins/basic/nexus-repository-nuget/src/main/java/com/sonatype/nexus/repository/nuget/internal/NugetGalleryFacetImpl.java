@@ -21,6 +21,7 @@ import com.sonatype.nexus.repository.nuget.internal.odata.ODataUtils;
 import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.common.time.Clock;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -62,9 +63,11 @@ public class NugetGalleryFacetImpl
 
   public static final String NO_NAMESPACES = "";
 
-  private static final VersionScheme SCHEME = new GenericVersionScheme();
+  protected Clock clock = new Clock();
 
   private StorageFacet storage;
+
+  private static final VersionScheme SCHEME = new GenericVersionScheme();
 
   @Override
   protected void doConfigure() throws Exception {
@@ -213,7 +216,7 @@ public class NugetGalleryFacetImpl
       // TODO: Do something cleaner with this derived data, as well as the derived stuff inside createOrUpdateComponent
       // Note: These are defaults that hold for locally-published packages,
       // but should be overridden for remotely fetched content
-      final String creationTime = ODataFeedUtils.datetime(System.currentTimeMillis());
+      final String creationTime = ODataFeedUtils.datetime(clock.millis());
       recordMetadata.put(CREATED, creationTime);
       recordMetadata.put(LAST_UPDATED, creationTime);
       recordMetadata.put(PUBLISHED, creationTime);
