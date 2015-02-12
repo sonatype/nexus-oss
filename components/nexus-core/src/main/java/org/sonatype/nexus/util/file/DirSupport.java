@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileStore;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -394,6 +395,37 @@ public final class DirSupport
   // MOVE: recursive copy of whole directory tree and then deleting it
 
   /**
+   * Perform a move of existing directory (empty or not, does not matter) on same FileStore (volume or partition).
+   */
+  private static void sameFileStoreMove(final Path from, final Path to) throws IOException {
+    Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+  }
+
+  /**
+   * Perform a pseudo-move of existing directory (empty or not, does not matter) between different FileStores (volume or
+   * partition) using {@link #copyDeleteMove(Path, Path, Predicate)} method.
+   */
+  private static void crossFileStoreMove(final Path from, final Path to) throws IOException {
+    copyDeleteMove(from, to, null);
+  }
+
+  /**
+   * Return {@code true} if paths {@code from} and {@code to} are expected to be on same FileStore (volume or
+   * partition). The {@code from} must exists, while {@code to} does not have to, but it must have ultimate existing
+   * parent.
+   */
+  private static boolean areOnSameFileStore(final Path from, final Path to) throws IOException {
+    final FileStore fromStore = Files.getFileStore(from); // from must exist
+    Path toExistingParent = to.normalize(); // to usually does not exists, is about to be created as part of move
+    while(toExistingParent != null && !Files.exists(toExistingParent)) {
+      toExistingParent = toExistingParent.getParent();
+    }
+    checkArgument(toExistingParent != null, "Passed in to path '%s' does not have existing parent", to);
+    final FileStore toStore = Files.getFileStore(toExistingParent);
+    return fromStore.equals(toStore);
+  }
+
+  /**
    * Performs a move operation. It will attempt a real move (if source and target are on same file store), but will
    * fallback to a sequence of "copy" and then "delete" (not a real move!). This method accepts
    * existing Paths that might denote a regular file or a directory. It basically delegates to {@link Files#move(Path,
@@ -402,7 +434,11 @@ public final class DirSupport
   public static void move(final Path from, final Path to)
       throws IOException
   {
-    Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+    if (areOnSameFileStore(from, to)) {
+      sameFileStoreMove(from, to);
+    } else {
+      crossFileStoreMove(from, to);
+    }
   }
 
   /**
