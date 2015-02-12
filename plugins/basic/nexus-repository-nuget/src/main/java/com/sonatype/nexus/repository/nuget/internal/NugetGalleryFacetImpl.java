@@ -1,3 +1,15 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2008-2015 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package com.sonatype.nexus.repository.nuget.internal;
 
 import java.io.IOException;
@@ -259,27 +271,31 @@ public class NugetGalleryFacetImpl
    * (updating download counts is different for hosted and proxies; proxies possibly don't need to..)
    */
   protected void maintainAggregateInfo(final StorageTx storageTx, final String id) {
+    maintainAggregateInfo(storageTx, findComponentsById(storageTx, id));
+  }
+
+  @VisibleForTesting
+  void maintainAggregateInfo(final StorageTx storageTx, final Iterable<OrientVertex> versions) {
     long totalDownloadCount = 0;
 
     SortedSet<OrientVertex> releases = Sets.newTreeSet(new ComponentVersionComparator());
     SortedSet<OrientVertex> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
-    final Iterable<OrientVertex> components = findComponentsById(storageTx, id);
-    for (OrientVertex component : components) {
-      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
+    for (OrientVertex version : versions) {
+      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(version).child(NUGET);
 
       final boolean isPrerelease = checkNotNull(nugetAttributes.get(P_IS_PRERELEASE, Boolean.class));
       if (!isPrerelease) {
-        releases.add(component);
+        releases.add(version);
       }
-      allReleases.add(component);
+      allReleases.add(version);
 
       final int versionDownloadCount = checkNotNull(nugetAttributes.get(P_VERSION_DOWNLOAD_COUNT, Integer.class));
       totalDownloadCount += versionDownloadCount;
     }
 
     OrientVertex latestVersion = releases.isEmpty() ? null : releases.last();
-    OrientVertex absoluteLatestVersion = allReleases.isEmpty() ? null : releases.last();
+    OrientVertex absoluteLatestVersion = allReleases.isEmpty() ? null : allReleases.last();
 
     for (OrientVertex component : allReleases) {
       final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
@@ -371,8 +387,8 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-   void setDerivedAttributes(final Map<String, String> incomingMetadata,
-                                    final NestedAttributesMap storedMetadata, final boolean republishing)
+  void setDerivedAttributes(final Map<String, String> incomingMetadata,
+                            final NestedAttributesMap storedMetadata, final boolean republishing)
   {
     // Force the version download count to zero if it wasn't provided nor previously set
     if (!republishing) {
@@ -443,7 +459,8 @@ public class NugetGalleryFacetImpl
     return asList(getRepository());
   }
 
-  private static class ComponentVersionComparator
+  @VisibleForTesting
+   static class ComponentVersionComparator
       implements Comparator<OrientVertex>
   {
     @Override
