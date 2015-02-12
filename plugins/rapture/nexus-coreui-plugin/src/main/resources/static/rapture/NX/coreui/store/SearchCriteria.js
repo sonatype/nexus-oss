@@ -87,6 +87,13 @@ Ext.define('NX.coreui.store.SearchCriteria', {
       }
     },
     {
+      id: 'assets.attributes.checksum.md5',
+      config: {
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5'),
+        width: 250
+      }
+    },
+    {
       id: 'attributes.raw.path.tree',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH'),
