@@ -375,15 +375,9 @@ public class NugetGalleryFacetImpl
                                     final NestedAttributesMap storedMetadata, final boolean republishing)
   {
     // Force the version download count to zero if it wasn't provided nor previously set
-    if (!incomingMetadata.containsKey(VERSION_DOWNLOAD_COUNT) && !storedMetadata.contains(P_VERSION_DOWNLOAD_COUNT)) {
-      incomingMetadata.put(VERSION_DOWNLOAD_COUNT, "0");
-    }
-    if (incomingMetadata.containsKey(DOWNLOAD_COUNT)) {
-      // for proxies, take whatever they give us here. for hosted, it will be computed later anyway
-      storedMetadata.set(P_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(DOWNLOAD_COUNT)));
-    }
-    if (incomingMetadata.containsKey(VERSION_DOWNLOAD_COUNT)) {
-      storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(VERSION_DOWNLOAD_COUNT)));
+    if (!republishing) {
+      storedMetadata.set(P_DOWNLOAD_COUNT, 0);
+      storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, 0);
     }
 
     // TODO: Make sure this is maintained correctly in the case of republished packages
