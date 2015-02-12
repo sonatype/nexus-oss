@@ -41,12 +41,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-restlet1x-plugin</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
       <scope>provided</scope>
     </dependency>
@@ -59,6 +53,16 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.redline-rpm</groupId>
+      <artifactId>redline</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.stax-utils</artifactId>
     </dependency>
 
     <dependency>
@@ -79,11 +83,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.redline-rpm</groupId>
-      <artifactId>redline</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

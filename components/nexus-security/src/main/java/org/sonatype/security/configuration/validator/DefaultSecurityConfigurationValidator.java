@@ -14,7 +14,6 @@ package org.sonatype.security.configuration.validator;
 
 import java.util.List;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -23,7 +22,6 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 @Singleton
-@Typed(SecurityConfigurationValidator.class)
 @Named("default")
 public class DefaultSecurityConfigurationValidator
     implements SecurityConfigurationValidator

@@ -22,7 +22,7 @@ import org.sonatype.nexus.web.internal.ErrorPageFilter;
 import org.sonatype.nexus.web.internal.ErrorPageServlet;
 import org.sonatype.nexus.web.internal.StandardHttpResponseHeadersFilter;
 import org.sonatype.nexus.web.metrics.MetricsModule;
-import org.sonatype.security.web.guice.SecurityWebModule;
+import org.sonatype.security.web.SecurityWebModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -83,7 +83,7 @@ public class NexusServletModule
 
     install(new MetricsModule());
 
-    install(new SecurityWebModule(servletContext, true));
+    install(new SecurityWebModule(servletContext));
 
     install(new OrientModule());
   }

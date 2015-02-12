@@ -33,7 +33,7 @@ import com.sonatype.nexus.ssl.model.CertificateXO;
 import com.sonatype.nexus.ssl.model.TrustStoreKey;
 import com.sonatype.nexus.ssl.model.TrustStoreKeyXO;
 
-import org.sonatype.nexus.client.core.subsystem.SiestaClient;
+import org.sonatype.nexus.client.core.SiestaClient;
 import org.sonatype.sisu.siesta.client.ClientBuilder.Target.Factory;
 
 import com.google.common.base.Function;

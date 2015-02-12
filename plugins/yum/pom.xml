@@ -29,17 +29,10 @@
 
   <modules>
     <module>nexus-yum-repository-plugin</module>
-    <module>nexus-yum-repository-client</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.redline-rpm</groupId>
-        <artifactId>redline</artifactId>
-        <version>1.1.9</version>
-      </dependency>
-
       <dependency>
         <groupId>com.google.code.tempus-fugit</groupId>
         <artifactId>tempus-fugit</artifactId>

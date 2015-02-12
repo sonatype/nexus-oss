@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mirrors>
-  <mirror label="A mirror" url="${proxy-repo-base-url}nxcm0359-mirror" />
-</mirrors>

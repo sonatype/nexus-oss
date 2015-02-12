@@ -1,5 +1,0 @@
-
-<site>
-  <feature id="com.sonatype.nexus.p2.its.feature" url="${proxy.repo.base.url}nxcm1381-remote/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" version="1.0.0"/>
-  <archive path="plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" url="${proxy.repo.base.url}nxcm1381-remote/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar"/>
-</site>

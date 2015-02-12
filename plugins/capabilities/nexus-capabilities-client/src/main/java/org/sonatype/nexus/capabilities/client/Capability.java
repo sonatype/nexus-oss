@@ -14,7 +14,7 @@ package org.sonatype.nexus.capabilities.client;
 
 import java.util.Map;
 
-import org.sonatype.nexus.client.core.subsystem.Entity;
+import org.sonatype.nexus.client.core.Entity;
 
 /**
  * A Nexus capability.

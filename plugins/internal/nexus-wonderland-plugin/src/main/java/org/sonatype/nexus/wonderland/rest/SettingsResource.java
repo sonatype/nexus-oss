@@ -59,5 +59,4 @@ public class SettingsResource
 
     return properties;
   }
-
 }

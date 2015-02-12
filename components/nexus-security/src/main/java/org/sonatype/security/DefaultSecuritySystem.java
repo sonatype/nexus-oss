@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -73,7 +72,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
 @Singleton
-@Typed(SecuritySystem.class)
 @Named("default")
 public class DefaultSecuritySystem
     extends ComponentSupport
@@ -178,19 +176,6 @@ public class DefaultSecuritySystem
       throw new AuthorizationException(e.getMessage(), e);
     }
 
-  }
-
-  public void checkPermission(PrincipalCollection principal, List<String> permissions) throws AuthorizationException {
-    try {
-      this.getSecurityManager().checkPermissions(principal, permissions.toArray(new String[permissions.size()]));
-    }
-    catch (org.apache.shiro.authz.AuthorizationException e) {
-      throw new AuthorizationException(e.getMessage(), e);
-    }
-  }
-
-  public boolean hasRole(PrincipalCollection principals, String string) {
-    return this.getSecurityManager().hasRole(principals, string);
   }
 
   private Collection<Realm> getRealmsFromConfigSource() {
@@ -371,13 +356,6 @@ public class DefaultSecuritySystem
 
     // flush authc
     eventBus.post(new UserPrincipalsExpired(userId, source));
-  }
-
-  public Set<RoleIdentifier> getUsersRoles(String userId, String source)
-      throws UserNotFoundException, NoSuchUserManagerException
-  {
-    User user = this.getUser(userId, source);
-    return user.getRoles();
   }
 
   public void setUsersRoles(String userId, String source, Set<RoleIdentifier> roleIdentifiers)

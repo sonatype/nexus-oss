@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
+import org.sonatype.nexus.proxy.repository.RepositoryURLBuilder;
 
 /**
  * @since yum 3.0

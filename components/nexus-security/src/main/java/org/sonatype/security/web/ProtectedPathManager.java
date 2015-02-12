@@ -12,13 +12,15 @@
  */
 package org.sonatype.security.web;
 
+// FIXME: Remove use the FilterChainManager directly?
+
 /**
  * This component will manage how paths are dynamically added to the security infrastructure.
  */
 public interface ProtectedPathManager
 {
   /**
-   * Adds a protected resource for the <codepathPattern</code>, and configures it with the
+   * Adds a protected resource for the <code>pathPattern</code>, and configures it with the
    * <code>filterExpression</code>.
    *
    * @param pathPattern      the pattern of the path to protect (i.e. ant pattern)

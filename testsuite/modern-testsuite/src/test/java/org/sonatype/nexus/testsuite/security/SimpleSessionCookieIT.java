@@ -17,8 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.nexus.client.core.subsystem.ServerConfiguration;
-import org.sonatype.nexus.client.core.subsystem.config.Security;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.support.NexusStartAndStopStrategy;
 
@@ -42,7 +40,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.cookie.BrowserCompatSpecFactory;
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
@@ -66,6 +63,8 @@ public class SimpleSessionCookieIT
     extends NexusHttpsITSupport
 {
 
+  // FIXME: Remove or replace with siesta/wonderland/session
+
   private static final String LEGACY_LOGIN_PATH = "service/local/authentication/login";
 
   private static final String LEGACY_LOGOUT_PATH = "service/local/authentication/logout";
@@ -85,12 +84,12 @@ public class SimpleSessionCookieIT
     return super.configureNexus(configuration).setContextPath("/customcontextpath");
   }
 
-  @Before
-  public void disableAnonymousSoThatAllRequestsRequireAuthentication() throws Exception {
-    Security security = client().getSubsystem(ServerConfiguration.class).security();
-    security.settings().withAnonymousAccessEnabled(false);
-    security.save();
-  }
+  //@Before
+  //public void disableAnonymousSoThatAllRequestsRequireAuthentication() throws Exception {
+  //  Security security = client().getSubsystem(ServerConfiguration.class).security();
+  //  security.settings().withAnonymousAccessEnabled(false);
+  //  security.save();
+  //}
 
   @Test
   public void authenticatedContentCRUDActionsShouldNotCreateSession() throws Exception {
@@ -138,15 +137,15 @@ public class SimpleSessionCookieIT
     }
   }
 
-  @Test
-  public void sessionCookieSpecUsingHttpWithLegacyResources() throws Exception {
-    exerciseCookieSpec(nexus().getUrl(), true);
-  }
-
-  @Test
-  public void sessionCookieSpecUsingHttpsWithLegacyResources() throws Exception {
-    exerciseCookieSpec(nexus().getSecureUrl(), true);
-  }
+  //@Test
+  //public void sessionCookieSpecUsingHttpWithLegacyResources() throws Exception {
+  //  exerciseCookieSpec(nexus().getUrl(), true);
+  //}
+  //
+  //@Test
+  //public void sessionCookieSpecUsingHttpsWithLegacyResources() throws Exception {
+  //  exerciseCookieSpec(nexus().getSecureUrl(), true);
+  //}
 
   @Test
   public void sessionCookieSpecUsingHttpWithModernResources() throws Exception {

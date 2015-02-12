@@ -90,7 +90,7 @@ Ext.define('NX.coreui.view.nuget.NuGetRepositorySettings', {
   applyRepository: function(repositoryModel) {
     var me = this,
         packageSource = me.down('#packageSource'),
-        url = NX.util.Url.urlOf('service/local/nuget/' + repositoryModel.getId() + '/');
+        url = NX.util.Url.urlOf('service/local/nuget/' + repositoryModel.getId() + '/');  // FIXME: This is a restlet endpoint
 
     packageSource.setValue('nuget sources add -name ' + repositoryModel.getId() + ' -source ' + url);
 

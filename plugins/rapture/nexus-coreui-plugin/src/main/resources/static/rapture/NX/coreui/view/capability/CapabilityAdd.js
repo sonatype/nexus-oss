@@ -32,74 +32,14 @@ Ext.define('NX.coreui.view.capability.CapabilityAdd', {
     var me = this;
 
     me.items = {
-      xtype: 'nx-settingsform',
-      items: [
-        {
-          xtype: 'combo',
-          fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE'),
-          itemCls: 'required-field',
-          helpText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE_HELP'),
-          name: 'typeId',
-          store: me.capabilityTypeStore,
-          displayField: 'name',
-          valueField: 'id',
-          forceSelection: true,
-          editable: false,
-          mode: 'local',
-          triggerAction: 'all',
-          emptyText: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_TYPE_PLACEHOLDER'),
-          selectOnFocus: false,
-          allowBlank: false
-        },
-        {
-          xtype: 'fieldset',
-          title: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ABOUT'),
-          autoHeight: true,
-          autoScroll: true,
-          collapsible: true,
-          collapsed: false,
-          border: '1 0 1 0',
-          items: {
-            xtype: 'nx-coreui-capability-about',
-            bodyPadding: '0 0 5 0'
-          }
-        },
-        {
-          xtype: 'checkbox',
-          fieldLabel: NX.I18n.get('ADMIN_CAPABILITIES_CREATE_ENABLED'),
-          name: 'enabled',
-          allowBlank: false,
-          checked: true,
-          editable: true
-        },
-        {
-          xtype: 'nx-coreui-formfield-settingsfieldset'
-        }
-      ],
+      xtype: 'nx-coreui-capability-settings-form',
 
       buttons: [
         { text: NX.I18n.get('ADMIN_CAPABILITIES_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
-      ],
-
-      getValues: function () {
-        var values = me.down('form').getForm().getFieldValues(),
-            capability = {
-              typeId: values.typeId,
-              enabled: values.enabled,
-              properties: {}
-            };
-
-        Ext.apply(capability.properties, me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values));
-        return capability;
-      },
-
-      markInvalid: function (errors) {
-        return me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
-      }
-
+      ]
     };
 
     me.callParent(arguments);

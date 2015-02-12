@@ -32,9 +32,9 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
-import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
+import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.yum.YumHosted;
 import org.sonatype.nexus.yum.YumRegistry;
 import org.sonatype.nexus.yum.YumRepository;
@@ -97,7 +97,8 @@ public class GenerateMetadataTaskConcurrencyIT
   }
 
   @Test
-  @Ignore("One cannot override Task execute as done in createYumRepositoryTask anymore, as Quartz is re-instantiating the task instance")
+  @Ignore(
+      "One cannot override Task execute as done in createYumRepositoryTask anymore, as Quartz is re-instantiating the task instance")
   public void shouldExecuteSeveralThreadInParallel()
       throws Exception
   {
@@ -188,8 +189,7 @@ public class GenerateMetadataTaskConcurrencyIT
     final GenerateMetadataTask task = new GenerateMetadataTask(
         yumRegistry,
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     )
     {
       @Override

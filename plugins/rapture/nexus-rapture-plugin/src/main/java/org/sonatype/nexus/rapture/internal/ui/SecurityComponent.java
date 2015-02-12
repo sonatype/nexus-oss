@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
 
 import org.sonatype.nexus.extdirect.DirectComponentSupport;
 import org.sonatype.nexus.rapture.StateContributor;
@@ -36,7 +35,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.softwarementors.extjs.djn.config.annotations.DirectAction;
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod;
-import com.softwarementors.extjs.djn.servlet.ssm.WebContextManager;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.Permission;
@@ -82,6 +80,8 @@ public class SecurityComponent
     this.authTickets = checkNotNull(authTickets);
   }
 
+  // FIXME: Move authenticate to session servlet
+
   @DirectMethod
   @Validate
   public UserXO authenticate(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
@@ -93,40 +93,19 @@ public class SecurityComponent
     if (subject != null) {
       rememberMe = subject.isRemembered();
     }
-    return signIn(base64Username, base64Password, rememberMe);
-  }
 
-  @DirectMethod
-  @Validate
-  public UserXO signIn(final @NotEmpty(message = "[base64Username] may not be empty") String base64Username,
-                       final @NotEmpty(message = "[base64Password] may not be empty") String base64Password,
-                       final boolean rememberMe) throws Exception
-  {
     try {
       securitySystem.login(new UsernamePasswordToken(
-          Tokens.decodeBase64String(base64Username), Tokens.decodeBase64String(base64Password), rememberMe
+          Tokens.decodeBase64String(base64Username),
+          Tokens.decodeBase64String(base64Password),
+          rememberMe
       ));
     }
     catch (Exception e) {
       throw new Exception("Authentication failed", e);
     }
+
     return getUser();
-  }
-
-  @DirectMethod
-  public void signOut() {
-    Subject subject = securitySystem.getSubject();
-
-    if (subject != null) {
-      subject.logout();
-    }
-
-    if (WebContextManager.isWebContextAttachedToCurrentThread()) {
-      HttpSession session = WebContextManager.get().getRequest().getSession(false);
-      if (session != null) {
-        session.invalidate();
-      }
-    }
   }
 
   @DirectMethod

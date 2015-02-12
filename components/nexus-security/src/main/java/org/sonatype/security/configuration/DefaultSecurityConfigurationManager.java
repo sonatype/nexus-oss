@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,7 +29,6 @@ import org.sonatype.security.configuration.validator.SecurityValidationContext;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 @Singleton
-@Typed(SecurityConfigurationManager.class)
 @Named("default")
 public class DefaultSecurityConfigurationManager
     extends ComponentSupport

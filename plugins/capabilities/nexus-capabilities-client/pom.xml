@@ -28,10 +28,10 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-client-core</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-client-core</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.sisu</groupId>

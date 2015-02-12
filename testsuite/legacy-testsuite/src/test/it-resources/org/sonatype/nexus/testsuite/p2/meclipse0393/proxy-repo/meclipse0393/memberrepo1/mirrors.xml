@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mirrors>
-  <mirror label="A mirror 1" url="${proxy-repo-base-url}meclipse0393-mirror1" />
-</mirrors>

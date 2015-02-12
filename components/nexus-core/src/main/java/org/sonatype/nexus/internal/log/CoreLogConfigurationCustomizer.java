@@ -31,7 +31,6 @@ public class CoreLogConfigurationCustomizer
   @Override
   public void customize(final Configuration configuration) {
     // non Nexus loggers
-    configuration.setLoggerLevel("org.restlet", LoggerLevel.INFO);
     configuration.setLoggerLevel("org.apache.commons", LoggerLevel.WARN);
     configuration.setLoggerLevel("org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter", LoggerLevel.INFO);
     configuration.setLoggerLevel("org.apache.shiro.web.filter.mgt.DefaultFilterChainManager", LoggerLevel.INFO);

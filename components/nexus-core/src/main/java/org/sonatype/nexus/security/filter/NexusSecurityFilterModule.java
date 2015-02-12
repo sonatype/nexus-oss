@@ -19,10 +19,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authc.NexusAuthenticationFilter;
 import org.sonatype.nexus.security.filter.authz.FailureLoggingHttpMethodPermissionFilter;
-import org.sonatype.security.web.filter.authc.LogoutAuthenticationFilter;
 
 import com.google.inject.AbstractModule;
-import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 
 import static org.sonatype.nexus.security.filter.FilterProviderSupport.filterKey;
 
@@ -36,11 +34,7 @@ public class NexusSecurityFilterModule
   @Override
   protected void configure() {
     bind(filterKey("authcBasic")).toProvider(AuthcBasicFilterProvider.class);
-    bind(filterKey("authcNxBasic")).toProvider(AuthcNxBasicFilterProvider.class);
-
-    bind(filterKey("logout")).to(LogoutAuthenticationFilter.class).in(Singleton.class);
     bind(filterKey("perms")).to(FailureLoggingHttpMethodPermissionFilter.class).in(Singleton.class);
-
     bind(filterKey("authcApiKey")).toProvider(AuthcApiKeyFilterProvider.class);
   }
 
@@ -53,21 +47,6 @@ public class NexusSecurityFilterModule
       super(filter);
       filter.setApplicationName("Sonatype Nexus Repository Manager API");
       filter.setFakeAuthScheme(Boolean.toString(false));
-    }
-  }
-
-  /**
-   * Special filter used by login resource so that browser BASIC auth dialogs will not be shown.
-   */
-  @Singleton
-  static class AuthcNxBasicFilterProvider
-      extends FilterProviderSupport
-  {
-    @Inject
-    AuthcNxBasicFilterProvider(final NexusAuthenticationFilter filter) {
-      super(filter);
-      filter.setApplicationName("Sonatype Nexus Repository Manager API (specialized auth)");
-      filter.setFakeAuthScheme(Boolean.toString(true));
     }
   }
 

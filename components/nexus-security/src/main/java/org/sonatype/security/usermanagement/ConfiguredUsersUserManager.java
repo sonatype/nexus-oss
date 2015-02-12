@@ -92,12 +92,6 @@ public class ConfiguredUsersUserManager
   public Set<String> listUserIds() {
     Set<String> userIds = new HashSet<String>();
 
-    Set<User> users = new HashSet<User>();
-
-    for (User user : users) {
-      userIds.add(user.getUserId());
-    }
-
     List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
     for (CUserRoleMapping userRoleMapping : userRoleMappings) {
       String userId = userRoleMapping.getUserId();

@@ -29,7 +29,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.RepositoryURLBuilder;
+import org.sonatype.nexus.proxy.repository.RepositoryURLBuilder;
 
 import org.apache.maven.index.NexusIndexer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -42,14 +42,9 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.Mockito.mock;
 
 /**
- * Test that verifies that "inconsistent state" when archetype-content XML generated it IS present in repo root, but
- * the
- * corresponding repository does NOT have indexing context for whatever reason, no NPE happens but the fact is caught
- * by
- * corresponding IOEx.
- *
- * @author cstamas
- * @since 2.6
+ * Test that verifies that "inconsistent state" when archetype-content XML generated it IS present in repo root,
+ * but the corresponding repository does NOT have indexing context for whatever reason,
+ * no NPE happens but the fact is caught by corresponding IOEx.
  */
 public class ArchetypeContentGeneratorTest
     extends AbstractMacPluginTest

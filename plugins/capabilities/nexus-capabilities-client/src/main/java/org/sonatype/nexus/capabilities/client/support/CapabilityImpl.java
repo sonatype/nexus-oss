@@ -20,7 +20,7 @@ import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
 import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
 import org.sonatype.nexus.capabilities.model.CapabilityXO;
 import org.sonatype.nexus.capabilities.model.PropertyXO;
-import org.sonatype.nexus.client.rest.support.EntitySupport;
+import org.sonatype.nexus.client.core.EntitySupport;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

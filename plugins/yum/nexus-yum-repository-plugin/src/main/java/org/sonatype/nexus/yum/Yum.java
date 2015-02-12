@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.yum;
 
-import java.io.File;
-
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -39,7 +37,5 @@ public interface Yum
 
   YumRepository getYumRepository()
       throws Exception;
-
-  File getBaseDir();
 
 }
