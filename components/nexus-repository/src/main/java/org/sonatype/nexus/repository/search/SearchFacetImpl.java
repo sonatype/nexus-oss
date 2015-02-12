@@ -111,6 +111,8 @@ public class SearchFacetImpl
   }
 
   private void configureIndex() {
+    // TODO we should calculate the checksum of index settings and compare it with a value stored in index _meta tags
+    // in case that they not match (settings changed) we should drop the index, recreate it and re-index all components
     if (!client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
       try {
         String source = Resources.toString(Resources.getResource(SearchFacetImpl.class, "es-mapping.json"), UTF_8);
