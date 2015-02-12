@@ -15,6 +15,7 @@ package org.sonatype.nexus.coreui
 import com.softwarementors.extjs.djn.config.annotations.DirectAction
 import com.softwarementors.extjs.djn.config.annotations.DirectMethod
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
 import org.elasticsearch.common.unit.TimeValue
@@ -35,6 +36,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import javax.inject.Singleton
+import javax.validation.ValidationException
 import java.util.concurrent.TimeUnit
 
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_ATTRIBUTES
@@ -194,6 +196,11 @@ extends DirectComponentSupport
         filterBuilder.hasClauses() ? filterBuilder : null
     )
     log.debug('Query: {}', query)
+
+    if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().valid) {
+      throw new ValidationException("Invalid query")
+    }
+
     return query
   }
 
