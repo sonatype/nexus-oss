@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -184,6 +185,9 @@ public class MetadataServiceIT
 
       @Override
       public RepositoryItemUid createUid(String path) { return uid; }
+
+      @Override
+      public ProxyMode getProxyMode() { return ProxyMode.ALLOW; }
     };
 
     // not using mock as it would OOM when it tracks invocations, as we work with large files here
