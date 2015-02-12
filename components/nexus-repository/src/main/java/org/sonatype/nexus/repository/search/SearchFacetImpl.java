@@ -54,17 +54,17 @@ public class SearchFacetImpl
 
   private final Provider<Client> client;
 
-  private final List<MappingContributor> mappingContributors;
+  private final List<IndexSettingsContributor> indexSettingsContributors;
 
   private final Map<String, SourceProducer> sourceProducers;
 
   @Inject
   public SearchFacetImpl(final Provider<Client> client,
-                         final List<MappingContributor> mappingContributors,
+                         final List<IndexSettingsContributor> indexSettingsContributors,
                          final Map<String, SourceProducer> sourceProducers)
   {
     this.client = checkNotNull(client);
-    this.mappingContributors = checkNotNull(mappingContributors);
+    this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
     this.sourceProducers = checkNotNull(sourceProducers);
   }
 
@@ -114,8 +114,8 @@ public class SearchFacetImpl
     if (!client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
       try {
         String source = Resources.toString(Resources.getResource(SearchFacetImpl.class, "es-mapping.json"), UTF_8);
-        for (MappingContributor contributor : mappingContributors) {
-          String contributed = contributor.getSource(getRepository());
+        for (IndexSettingsContributor contributor : indexSettingsContributors) {
+          String contributed = contributor.getIndexSettings(getRepository());
           if (contributed != null) {
             source = merge(source, contributed);
           }

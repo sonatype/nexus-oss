@@ -10,37 +10,20 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal;
+package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.search.MappingContributor;
-
-import com.google.common.io.Resources;
-
-import static com.google.common.base.Charsets.UTF_8;
 
 /**
  * Contributor to ES index settings.
  *
  * @since 3.0
  */
-@Named
-@Singleton
-public class RawMappingContributor
-    implements MappingContributor
+public interface IndexSettingsContributor
 {
 
-  @Override
-  public String getSource(final Repository repository) throws IOException {
-    if (RawFormat.NAME.equals(repository.getFormat().getValue())) {
-      return Resources.toString(Resources.getResource(RawMappingContributor.class, "es-mapping-raw.json"), UTF_8);
-    }
-    return null;
-  }
+  String getIndexSettings(Repository repository) throws IOException;
 
 }
