@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
     'NX.Conditions',
     'NX.I18n'
   ],
+  ui: 'nx-inset',
 
   /**
    * @override
@@ -32,105 +33,16 @@ Ext.define('NX.coreui.view.task.TaskAdd', {
     var me = this;
 
     me.items = {
-      xtype: 'nx-settingsform',
-      api: {
-        submit: 'NX.direct.coreui_Task.create'
-      },
-      settingsFormSuccessMessage: function (data) {
-        return NX.I18n.get('ADMIN_TASKS_CREATE_SUCCESS') + data['name'] + ' (' + data['typeName'] + ')';
-      },
-      editableCondition: NX.Conditions.isPermitted('nexus:tasks', 'create'),
-      editableMarker: NX.I18n.get('ADMIN_TASKS_CREATE_ERROR'),
+      xtype: 'nx-coreui-task-settings-form',
+
       buttons: [
         { text: NX.I18n.get('ADMIN_TASKS_LIST_NEW_BUTTON'), action: 'add', formBind: true, ui: 'nx-primary' },
         { text: NX.I18n.get('GLOBAL_DIALOG_ADD_CANCEL_BUTTON'), handler: function () {
           this.up('nx-drilldown').showChild(0, true);
         }}
-      ],
-      items: {
-        xtype: 'tabpanel',
-        ui: 'nx-light',
-        items: [
-          {
-            xtype: 'panel',
-            title: 'Settings',
-            ui: 'nx-inset',
-            defaults: {
-              xtype: 'textfield',
-              allowBlank: false
-            },
-            items: [
-              {
-                xtype: 'combo',
-                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE'),
-                itemCls: 'required-field',
-                name: 'typeId',
-                store: me.taskTypeStore,
-                displayField: 'name',
-                valueField: 'id',
-                forceSelection: true,
-                editable: false,
-                mode: 'local',
-                triggerAction: 'all',
-                emptyText: NX.I18n.get('ADMIN_TASKS_CREATE_TYPE_PLACEHOLDER'),
-                selectOnFocus: false
-              },
-              {
-                xtype: 'checkbox',
-                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_ENABLED'),
-                name: 'enabled',
-                checked: true,
-                editable: true
-              },
-              {
-                name: 'name',
-                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_NAME')
-              },
-              {
-                xtype: 'nx-email',
-                name: 'alertEmail',
-                fieldLabel: NX.I18n.get('ADMIN_TASKS_CREATE_EMAIL'),
-                allowBlank: true
-              },
-              {
-                xtype: 'nx-coreui-formfield-settingsfieldset'
-              }
-            ]
-          },
-          {
-            xtype: 'panel',
-            title: NX.I18n.get('ADMIN_TASKS_CREATE_SCHEDULE'),
-            ui: 'nx-inset',
-            items: { xtype: 'nx-coreui-task-schedulefieldset' }
-          }
-        ]
-      }
+      ]
     };
 
     me.callParent(arguments);
-
-    Ext.override(me.down('form').getForm(), {
-      /**
-       * @override
-       * Additionally, gets value of properties, start timestamp and recurring days checkboxes (if any).
-       */
-      getValues: function () {
-        var values = this.callParent(arguments);
-
-        values.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
-        values.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
-        values.startDate = me.down('nx-coreui-task-schedulefieldset').getStartDate();
-        return values;
-      },
-
-      /**
-       * @override
-       * Additionally, marks invalid properties.
-       */
-      markInvalid: function (errors) {
-        this.callParent(arguments);
-        me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
-      }
-    });
   }
 });

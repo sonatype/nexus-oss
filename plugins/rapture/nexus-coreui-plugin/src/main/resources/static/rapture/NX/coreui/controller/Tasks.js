@@ -33,13 +33,15 @@ Ext.define('NX.coreui.controller.Tasks', {
     'Task',
     'TaskType'
   ],
+  models: [
+    'Task'
+  ],
   views: [
     'task.TaskAdd',
     'task.TaskFeature',
     'task.TaskList',
-    'task.TaskSchedule',
+    'task.TaskSelectType',
     'task.TaskScheduleFieldSet',
-    'task.TaskScheduleForm',
     'task.TaskScheduleAdvanced',
     'task.TaskScheduleDaily',
     'task.TaskScheduleHourly',
@@ -55,7 +57,6 @@ Ext.define('NX.coreui.controller.Tasks', {
     { ref: 'feature', selector: 'nx-coreui-task-feature' },
     { ref: 'list', selector: 'nx-coreui-task-list' },
     { ref: 'info', selector: 'nx-coreui-task-feature nx-info-panel' },
-    { ref: 'schedule', selector: 'nx-coreui-task-schedule' },
     { ref: 'settings', selector: 'nx-coreui-task-settings' }
   ],
   icons: {
@@ -99,16 +100,7 @@ Ext.define('NX.coreui.controller.Tasks', {
           beforerender: me.onRefresh
         },
         'nx-coreui-task-list button[action=new]': {
-          click: me.showAddWindow
-        },
-        'nx-coreui-task-add form': {
-          submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-task-settings-form': {
-          submitted: me.onSettingsSubmitted
-        },
-        'nx-coreui-task-schedule-form': {
-          submitted: me.onSettingsSubmitted
+          click: me.showSelectTypePanel
         },
         'nx-coreui-task-feature button[action=run]': {
           click: me.runTask,
@@ -118,8 +110,14 @@ Ext.define('NX.coreui.controller.Tasks', {
           click: me.stopTask,
           afterrender: me.bindStopButton
         },
-        'nx-coreui-task-add combo[name=typeId]': {
-          select: me.changeTaskType
+        'nx-coreui-task-settings button[action=save]': {
+          click: me.updateTask
+        },
+        'nx-coreui-task-add button[action=add]': {
+          click: me.createTask
+        },
+        'nx-coreui-task-selecttype': {
+          cellclick: me.showAddPanel
         }
       }
     });
@@ -143,7 +141,6 @@ Ext.define('NX.coreui.controller.Tasks', {
   onSelection: function(list, model) {
     var me = this,
         settings = me.getSettings(),
-        schedule = me.getSchedule(),
         taskTypeModel;
 
     if (Ext.isDefined(model)) {
@@ -158,17 +155,6 @@ Ext.define('NX.coreui.controller.Tasks', {
       else {
         if (settings) {
           me.getFeature().removeTab(settings);
-        }
-      }
-      if (taskTypeModel && model.get('schedule') !== 'internal') {
-        if (!schedule) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-schedule', title: NX.I18n.get('ADMIN_TASKS_DETAILS_SCHEDULE_TAB'), weight: 30 });
-        }
-        me.showSchedule(model);
-      }
-      else {
-        if (schedule) {
-          me.getFeature().removeTab(schedule);
         }
       }
     }
@@ -205,22 +191,13 @@ Ext.define('NX.coreui.controller.Tasks', {
 
   /**
    * @private
-   * Displays task schedule.
-   * @param {NX.coreui.model.Task} model task model
    */
-  showSchedule: function(model) {
-    this.getSchedule().loadRecord(model);
-  },
-
-  /**
-   * @private
-   */
-  showAddWindow: function() {
+  showSelectTypePanel: function() {
     var me = this,
       feature = me.getFeature();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_CREATE_TITLE'));
+    feature.setItemName(1, NX.I18n.get('ADMIN_TASKS_SELECT_TITLE'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -231,8 +208,7 @@ Ext.define('NX.coreui.controller.Tasks', {
       items: [
         { xtype: 'nx-drilldown-actions' },
         {
-          xtype: 'nx-coreui-task-add',
-          taskTypeStore: this.getTaskTypeStore(),
+          xtype: 'nx-coreui-task-selecttype',
           flex: 1
         }
       ]
@@ -241,15 +217,31 @@ Ext.define('NX.coreui.controller.Tasks', {
 
   /**
    * @private
-   * Change settings according to selected task type (in add window).
-   * @combo {Ext.form.field.ComboBox} combobox task type combobox
    */
-  changeTaskType: function(combobox) {
-    var form = combobox.up('nx-settingsform'),
-        taskTypeModel;
+  showAddPanel: function(list, td, cellIndex, model) {
+    var me = this,
+      feature = me.getFeature(),
+      panel;
 
-    taskTypeModel = this.getTaskTypeStore().getById(combobox.value);
-    form.down('nx-coreui-formfield-settingsfieldset').setFormFields(taskTypeModel.get('formFields'));
+    // Show the second panel in the create wizard, and set the breadcrumb
+    feature.setItemName(2, NX.I18n.format('ADMIN_TASKS_CREATE_TITLE', model.get('name')));
+    me.loadCreateWizard(2, true, panel = Ext.widget({
+      xtype: 'panel',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
+      items: [
+        { xtype: 'nx-drilldown-actions' },
+        {
+          xtype: 'nx-coreui-task-add',
+          flex: 1
+        }
+      ]
+    }));
+    var m = me.getTaskModel().create({ typeId: model.getId() });
+    panel.down('nx-settingsform').loadRecord(m);
   },
 
   /**
@@ -270,15 +262,51 @@ Ext.define('NX.coreui.controller.Tasks', {
   /**
    * @private
    */
-  onSettingsSubmitted: function(form, action) {
+  updateTask: function(button) {
     var me = this,
-        win = form.up('nx-coreui-task-add');
+      form = button.up('form'),
+      values = form.getValues();
 
-    if (win) {
-      me.loadStoreAndSelect(action.result.data.id, false);
-    } else {
-      me.loadStore(Ext.emptyFn);
-    }
+    NX.direct.coreui_Task.update(values, function(response) {
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          NX.Messages.add({
+            text: NX.I18n.format('ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS',
+              me.getDescription(me.getTaskModel().create(response.data))),
+            type: 'success'
+          });
+          me.loadStore(Ext.emptyFn);
+        }
+        else if (Ext.isDefined(response.errors)) {
+          form.markInvalid(response.errors);
+        }
+      }
+    });
+  },
+
+  /**
+   * @private
+   */
+  createTask: function(button) {
+    var me = this,
+      form = button.up('form'),
+      values = form.getValues();
+
+    NX.direct.coreui_Task.create(values, function(response) {
+      if (Ext.isObject(response)) {
+        if (response.success) {
+          NX.Messages.add({
+            text: NX.I18n.format('ADMIN_TASKS_CREATE_SUCCESS',
+              me.getDescription(me.getTaskModel().create(response.data))),
+            type: 'success'
+          });
+          me.loadStoreAndSelect(response.data.id, false);
+        }
+        else if (Ext.isDefined(response.errors)) {
+          form.markInvalid(response.errors);
+        }
+      }
+    });
   },
 
   /**

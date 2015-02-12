@@ -13,14 +13,28 @@
 /*global Ext, NX*/
 
 /**
- * Task "Schedule" panel.
+ * Select task type window.
  *
  * @since 3.0
  */
-Ext.define('NX.coreui.view.task.TaskSchedule', {
-  extend: 'NX.view.SettingsPanel',
-  alias: 'widget.nx-coreui-task-schedule',
+Ext.define('NX.coreui.view.task.TaskSelectType', {
+  extend: 'NX.view.drilldown.Master',
+  alias: 'widget.nx-coreui-task-selecttype',
+  requires: [
+    'NX.I18n'
+  ],
 
-  items: { xtype: 'nx-coreui-task-schedule-form' }
+  store: 'TaskType',
+  columns: [
+    {
+      xtype: 'nx-iconcolumn',
+      width: 36,
+      iconVariant: 'x16',
+      iconName: function() {
+        return 'task-default';
+      }
+    },
+    { header: NX.I18n.get('ADMIN_TASKS_SELECT_TYPE_NAME_COLUMN'), dataIndex: 'name', flex: 1 }
+  ]
 
 });

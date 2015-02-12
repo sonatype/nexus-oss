@@ -25,19 +25,14 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     'NX.I18n'
   ],
 
-  api: {
-    submit: 'NX.direct.coreui_Task.update'
-  },
-  settingsFormSuccessMessage: function(data) {
-    return NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_SUCCESS') + data['name'] + ' (' + data['typeName'] + ')';
-  },
-
-  editableMarker: NX.I18n.get('ADMIN_TASKS_SETTINGS_UPDATE_ERROR'),
-
   items: [
     {
       xtype: 'hiddenfield',
       name: 'id'
+    },
+    {
+      xtype: 'hiddenfield',
+      name: 'typeId'
     },
     {
       xtype: 'checkbox',
@@ -57,7 +52,8 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
       fieldLabel: NX.I18n.get('ADMIN_TASKS_SETTINGS_EMAIL'),
       allowBlank: true
     },
-    { xtype: 'nx-coreui-formfield-settingsfieldset' }
+    { xtype: 'nx-coreui-formfield-settingsfieldset' },
+    { xtype: 'nx-coreui-task-schedulefieldset' }
   ],
 
   /**
@@ -67,50 +63,68 @@ Ext.define('NX.coreui.view.task.TaskSettingsForm', {
     var me = this;
 
     me.editableCondition = me.editableCondition || NX.Conditions.and(
-        NX.Conditions.isPermitted('nexus:tasks', 'update'),
-        NX.Conditions.formHasRecord('nx-coreui-task-settings-form', function(model) {
-          return model.get('schedule') !== 'internal';
-        })
+      NX.Conditions.isPermitted('nexus:tasks', 'update'),
+      NX.Conditions.formHasRecord('nx-coreui-task-settings-form', function (model) {
+        return model.get('schedule') !== 'internal';
+      })
     );
 
     me.callParent(arguments);
+  },
 
-    Ext.override(me.getForm(), {
-      /**
-       * @override
-       * Additionally, gets value of properties.
-       */
-      getValues: function() {
-        var values = this.callParent(arguments);
+  /**
+   * @override
+   * Additionally, gets value of properties.
+   */
+  getValues: function() {
+    var me = this,
+      values = me.getForm().getFieldValues(),
+      task = {
+        id: values.id,
+        typeId: values.typeId,
+        enabled: values.enabled ? true : false,
+        name: values.name,
+        alertEmail: values.alertEmail,
+        schedule: values.schedule
+      };
 
-        values.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
-        return values;
-      },
+    task.properties = me.down('nx-coreui-formfield-settingsfieldset').exportProperties(values);
+    task.recurringDays = me.down('nx-coreui-task-schedulefieldset').getRecurringDays();
+    task.startDate = me.down('nx-coreui-task-schedulefieldset').getStartDate();
+    if (task.startDate) {
+      task.startDate = task.startDate.toJSON();
+    }
 
-      /**
-       * @override
-       * Additionally, sets properties values.
-       */
-      loadRecord: function(model) {
-        var taskTypeModel = NX.getApplication().getStore('TaskType').getById(model.get('typeId')),
-            settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset');
+    return task;
+  },
 
-        this.callParent(arguments);
+  /**
+   * @override
+   * Additionally, sets properties values.
+   */
+  loadRecord: function(model) {
+    var me = this,
+        taskTypeModel = NX.getApplication().getStore('TaskType').getById(model.get('typeId')),
+        settingsFieldSet = me.down('nx-coreui-formfield-settingsfieldset'),
+        scheduleFieldSet = me.down('nx-coreui-task-schedulefieldset');
 
-        if (taskTypeModel) {
-          settingsFieldSet.importProperties(model.get('properties'), taskTypeModel.get('formFields'));
-        }
-      },
+    this.callParent(arguments);
 
-      /**
-       * @override
-       * Additionally, marks invalid properties.
-       */
-      markInvalid: function(errors) {
-        this.callParent(arguments);
-        me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
-      }
-    });
+    if (taskTypeModel) {
+      settingsFieldSet.importProperties(model.get('properties'), taskTypeModel.get('formFields'));
+      scheduleFieldSet.setRecurringDays(model.get('recurringDays'));
+      scheduleFieldSet.setStartDate(model.get('startDate'));
+    }
+  },
+
+  /**
+   * @override
+   * Additionally, marks invalid properties.
+   */
+  markInvalid: function(errors) {
+    var me = this;
+
+    me.down('nx-coreui-formfield-settingsfieldset').markInvalid(errors);
   }
 
 });

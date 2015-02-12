@@ -158,6 +158,7 @@ class TaskComponent
   TaskXO update(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
     TaskInfo task = nexusScheduler.getTaskById(taskXO.id);
     validateState(task)
+    Schedule schedule = asSchedule(taskXO)
     task.configuration.enabled = taskXO.enabled
     task.configuration.name = taskXO.name
     taskXO.properties.each { key, value ->
@@ -165,25 +166,6 @@ class TaskComponent
     }
     task.configuration.setAlertEmail(taskXO.alertEmail)
     task.configuration.setName(taskXO.name)
-
-    task = nexusScheduler.scheduleTask(task.configuration, task.schedule)
-
-    return asTaskXO(task)
-  }
-
-  /**
-   * Updates a task schedule.
-   * @param taskXO to be updated
-   * @return updated task
-   */
-  @DirectMethod
-  @RequiresAuthentication
-  @RequiresPermissions('nexus:tasks:update')
-  @Validate(groups = [TaskXO.Schedule.class, Default.class])
-  TaskXO updateSchedule(final @NotNull(message = '[taskXO] may not be null') @Valid TaskXO taskXO) {
-    TaskInfo task = nexusScheduler.getTaskById(taskXO.id);
-    validateState(task)
-    Schedule schedule = asSchedule(taskXO)
 
     task = nexusScheduler.rescheduleTask(task.configuration.id, schedule)
 

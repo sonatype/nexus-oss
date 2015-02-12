@@ -59,15 +59,19 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
               combo.ownerCt.remove(oldCmp);
             }
           }
-          combo.ownerCt.add({ xtype: 'nx-coreui-task-schedule-' + newValue });
-          form.getForm().checkValidity();
-          form.isValid();
+
+          if (newValue) {
+            combo.ownerCt.add({ xtype: 'nx-coreui-task-schedule-' + newValue });
+            form.getForm().checkValidity();
+            form.isValid();
+          }
         }
       }
     }
   ],
 
   /**
+   * @public
    * Exports recurring days.
    * @returns {Array} recurring
    */
@@ -86,6 +90,7 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
   },
 
   /**
+   * @public
    * Returns start date out of start date/time.
    * @returns {Date} start date
    */
@@ -102,6 +107,35 @@ Ext.define('NX.coreui.view.task.TaskScheduleFieldSet', {
       }
     }
     return startDate;
-  }
+  },
 
+  /**
+   * @public
+   * Set values of start date and time
+   */
+  setStartDate: function(date) {
+    var me = this,
+      startDate = me.down('#startDate'),
+      startTime = me.down('#startTime');
+
+    if (startDate && startTime) {
+      startDate.setValue(date);
+      startTime.setValue(date);
+    }
+  },
+
+  /**
+   * @public
+   * Set values of recurring days checkboxes
+   */
+  setRecurringDays: function(recurringDays) {
+    var me = this;
+
+    Ext.Array.each(recurringDays, function(day) {
+      var checkbox = me.down('checkbox[name=recurringDay-' + day + ']');
+      if (checkbox) {
+        checkbox.setValue(true);
+      }
+    });
+  }
 });
