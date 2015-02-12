@@ -34,14 +34,14 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
- * Default {@link SourceProducer} implementation.
+ * Default {@link IndexDataProducer} implementation.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class DefaultSourceProducer
-    implements SourceProducer
+public class DefaultIndexDataProducer
+    implements IndexDataProducer
 {
 
   @Override

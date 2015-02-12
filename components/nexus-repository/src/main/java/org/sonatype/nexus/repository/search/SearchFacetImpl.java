@@ -56,16 +56,16 @@ public class SearchFacetImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
-  private final Map<String, SourceProducer> sourceProducers;
+  private final Map<String, IndexDataProducer> indexDataProducers;
 
   @Inject
   public SearchFacetImpl(final Provider<Client> client,
                          final List<IndexSettingsContributor> indexSettingsContributors,
-                         final Map<String, SourceProducer> sourceProducers)
+                         final Map<String, IndexDataProducer> indexDataProducers)
   {
     this.client = checkNotNull(client);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
-    this.sourceProducers = checkNotNull(sourceProducers);
+    this.indexDataProducers = checkNotNull(indexDataProducers);
   }
 
   @Override
@@ -73,13 +73,13 @@ public class SearchFacetImpl
   public void index(final OrientVertex component) {
     checkNotNull(component);
     String format = getRepository().getFormat().getValue();
-    SourceProducer sourceProducer = sourceProducers.get(format);
-    if (sourceProducer == null) {
-      sourceProducer = sourceProducers.get("default");
+    IndexDataProducer indexDataProducer = indexDataProducers.get(format);
+    if (indexDataProducer == null) {
+      indexDataProducer = indexDataProducers.get("default");
     }
-    checkState(sourceProducer != null, "Could not find a source producer for format: {}", format);
+    checkState(indexDataProducer != null, "Could not find an index data producer for format: {}", format);
     client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
-        .setSource(sourceProducer.getSource(getRepository().getName(), component))
+        .setSource(indexDataProducer.getSource(getRepository().getName(), component))
         .execute();
   }
 

@@ -19,7 +19,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
  *
  * @since 3.0
  */
-public interface SourceProducer
+public interface IndexDataProducer
 {
 
   String getSource(String repositoryName, OrientVertex component);
