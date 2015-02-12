@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 /**
@@ -20,6 +21,7 @@ import groovy.transform.ToString
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
+@EqualsAndHashCode(includes = ["format", "groupId", "artifactId"])
 class SearchResultXO
 {
   String id

@@ -40,23 +40,9 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
         return 'search-component';
       }
     },
-    {
-      header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_COMPONENT_COLUMN'),
-      dataIndex: 'id',
-      menuDisabled: true,
-      resizable: false,
-      flex: 1
-    },
-    { header: 'Format', dataIndex: 'format', width: 70, hidden: true }
-  ],
-
-  dockedItems: [
-    {
-      xtype: 'pagingtoolbar',
-      store: 'SearchResult',
-      dock: 'top',
-      displayInfo: false
-    }
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN'), dataIndex: 'groupId', flex: 2 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_NAME_COLUMN'), dataIndex: 'artifactId', flex: 1 },
+    { header: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN'), dataIndex: 'format', width: 70 }
   ]
 
 });

@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.search.SearchFacet;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -103,7 +104,6 @@ public class RawContentFacetImpl
     }
   }
 
-  @Nullable
   @Override
   public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
     try (StorageTx tx = getStorage().openTx()) {
@@ -144,6 +144,7 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
+      getRepository().facet(SearchFacet.class).index(component);
     }
   }
 
@@ -214,6 +215,8 @@ public class RawContentFacetImpl
       tx.deleteVertex(component);
 
       tx.commit();
+
+      getRepository().facet(SearchFacet.class).deindex(component);
 
       return true;
     }

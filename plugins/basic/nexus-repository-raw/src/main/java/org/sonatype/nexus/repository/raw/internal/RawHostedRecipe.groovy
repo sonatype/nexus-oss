@@ -16,6 +16,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.types.HostedType
@@ -50,13 +51,13 @@ class RawHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<RawIndexFacet> rawIndexFacet
-
-  @Inject
   Provider<RawContentFacetImpl> rawContentFacet
 
   @Inject
   Provider<StorageFacetImpl> storageFacet
+
+  @Inject
+  Provider<SearchFacet> searchFacet
 
   @Inject
   TimingHandler timingHandler
@@ -78,9 +79,9 @@ class RawHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(rawIndexFacet.get())
     repository.attach(rawContentFacet.get())
     repository.attach(storageFacet.get())
+    repository.attach(searchFacet.get());
   }
 
   /**

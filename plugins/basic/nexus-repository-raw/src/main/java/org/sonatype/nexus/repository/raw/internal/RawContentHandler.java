@@ -55,7 +55,6 @@ public class RawContentHandler
     log.debug("{} repository '{}' content-name: {}", method, repository.getName(), name);
 
     RawContentFacet storage = repository.facet(RawContentFacet.class);
-    RawIndexFacet index = repository.facet(RawIndexFacet.class);
 
     switch (method) {
       case GET: {
@@ -70,7 +69,6 @@ public class RawContentHandler
         RawContent content = toContent(context.getRequest().getPayload(), new DateTime());
 
         storage.put(name, content);
-        index.put(name);
         return HttpResponses.created();
       }
 
@@ -79,7 +77,6 @@ public class RawContentHandler
         if (!deleted) {
           return HttpResponses.notFound(name);
         }
-        index.delete(name);
         return HttpResponses.noContent();
       }
 
