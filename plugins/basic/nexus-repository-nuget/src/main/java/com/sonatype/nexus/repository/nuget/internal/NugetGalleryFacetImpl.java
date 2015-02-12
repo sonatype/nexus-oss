@@ -3,11 +3,13 @@ package com.sonatype.nexus.repository.nuget.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import javax.inject.Named;
 
@@ -29,10 +31,10 @@ import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Parameters;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -41,9 +43,6 @@ import org.eclipse.aether.version.VersionScheme;
 import org.odata4j.producer.InlineCount;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.and;
-import static com.google.common.collect.Iterables.all;
-import static com.google.common.collect.Iterables.filter;
 import static com.sonatype.nexus.repository.nuget.internal.NugetProperties.*;
 import static java.util.Arrays.asList;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseInlineCount;
@@ -259,167 +258,36 @@ public class NugetGalleryFacetImpl
    * - have up to date aggregate download count info
    * (updating download counts is different for hosted and proxies; proxies possibly don't need to..)
    */
-  protected void maintainAggregateInfo(final StorageTx tx, final String id) {
-    final Iterable<OrientVertex> allReleases = findComponentsById(tx, id);
-    final Iterable<OrientVertex> finalReleases = filter(allReleases, new NoPrereleases(tx));
+  protected void maintainAggregateInfo(final StorageTx storageTx, final String id) {
+    long totalDownloadCount = 0;
 
-    final Integer downloadCount = new DownloadCounter(tx).visit(allReleases);
+    SortedSet<OrientVertex> releases = Sets.newTreeSet(new ComponentVersionComparator());
+    SortedSet<OrientVertex> allReleases = Sets.newTreeSet(new ComponentVersionComparator());
 
-    final String latestFinalVersion = new LatestVersion(tx).visit(finalReleases);
-    final String absoluteLatestVersion = new LatestVersion(tx).visit(allReleases);
+    final Iterable<OrientVertex> components = findComponentsById(storageTx, id);
+    for (OrientVertex component : components) {
+      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
 
-    all(allReleases, and(
-            new UpdateLatestVersionFlags(tx,latestFinalVersion, absoluteLatestVersion),
-            new UpdateDownloadCount(tx, (long) downloadCount))
-    );
-  }
-
-  abstract class AttributePredicate
-      implements Predicate<OrientVertex>
-
-  {
-    private final StorageTx tx;
-
-    public AttributePredicate(final StorageTx tx) {
-      this.tx = tx;
-    }
-
-    protected NestedAttributesMap nugetAttributes(final OrientVertex item) {
-      return tx.getAttributes(item).child(NUGET);
-    }
-
-    public AttributePredicate visitEach(Iterable<OrientVertex> iterable){
-      all(iterable,this);
-      return this;
-    }
-  }
-
-  public abstract class Visitor<O>
-      extends AttributePredicate
-  {
-    public Visitor(final StorageTx tx) {
-      super(tx);
-    }
-
-    abstract O result();
-
-    public O visit(Iterable<OrientVertex> each){
-      visitEach(each);
-      return (O) result();
-    }
-  }
-
-
-  private class DownloadCounter
-      extends Visitor<Integer>
-  {
-    private int count = 0;
-
-    public DownloadCounter(final StorageTx tx) {
-      super(tx);
-    }
-
-    @Override
-    public boolean apply(final OrientVertex item) {
-      count += checkNotNull(nugetAttributes(item).get(P_VERSION_DOWNLOAD_COUNT, Integer.class));
-      return false;
-    }
-
-    @Override
-    public Integer result() {
-      return count;
-    }
-  }
-
-  private class LatestVersion
-      extends Visitor<String>
-  {
-    private Version latestVersion = null;
-
-    public LatestVersion(final StorageTx tx) {
-      super(tx);
-    }
-
-    @Override
-    public boolean apply(final OrientVertex item) {
-      final String s = nugetAttributes(item).get(P_VERSION, String.class);
-      try {
-        Version v = SCHEME.parseVersion(s);
-        if (latestVersion == null || latestVersion.compareTo(v) < 0) {
-          latestVersion = v;
-        }
+      final boolean isPrerelease = checkNotNull(nugetAttributes.get(P_IS_PRERELEASE, Boolean.class));
+      if (!isPrerelease) {
+        releases.add(component);
       }
-      catch (InvalidVersionSpecificationException e) {
-        throw Throwables.propagate(e);
-      }
-      return false;
+      allReleases.add(component);
+
+      final int versionDownloadCount = checkNotNull(nugetAttributes.get(P_VERSION_DOWNLOAD_COUNT, Integer.class));
+      totalDownloadCount += versionDownloadCount;
     }
 
-    @Override
-    public String result() {
-      return latestVersion.toString();
-    }
-  }
+    OrientVertex latestVersion = releases.isEmpty() ? null : releases.last();
+    OrientVertex absoluteLatestVersion = allReleases.isEmpty() ? null : releases.last();
 
-  private class NoPrereleases
-      extends Visitor<Void>
-  {
-    public NoPrereleases(final StorageTx tx) {
-      super(tx);
-    }
+    for (OrientVertex component : allReleases) {
+      final NestedAttributesMap nugetAttributes = storageTx.getAttributes(component).child(NUGET);
 
-    @Override
-    public boolean apply(final OrientVertex item) {
-      return !nugetAttributes(item).get(P_IS_PRERELEASE, Boolean.class);
-    }
+      nugetAttributes.set(P_IS_LATEST_VERSION, component.equals(latestVersion));
+      nugetAttributes.set(P_IS_ABSOLUTE_LATEST_VERSION, component.equals(absoluteLatestVersion));
 
-    @Override
-    public Void result() {
-      return null;
-    }
-  }
-
-  private class UpdateDownloadCount
-      extends AttributePredicate
-  {
-    private final long totalDownloadCount;
-
-    public UpdateDownloadCount(final StorageTx storageTx, final long totalDownloadCount) {
-      super(storageTx);
-      this.totalDownloadCount = totalDownloadCount;
-    }
-
-    @Override
-    public boolean apply(final OrientVertex v) {
-      nugetAttributes(v).set(P_DOWNLOAD_COUNT, totalDownloadCount);
-      return false;
-    }
-  }
-
-  private class UpdateLatestVersionFlags
-      extends AttributePredicate
-  {
-    private final String latestFinalVersion;
-
-    private final String absoluteLatestVersion;
-
-    public UpdateLatestVersionFlags(final StorageTx tx, final String latestFinalVersion,
-                                    final String absoluteLatestVersion)
-    {
-      super(tx);
-      this.latestFinalVersion = latestFinalVersion;
-      this.absoluteLatestVersion = absoluteLatestVersion;
-    }
-
-    @Override
-    public boolean apply(final OrientVertex v) {
-
-      nugetAttributes(v).set(P_IS_LATEST_VERSION,
-          nugetAttributes(v).get(P_VERSION).equals(latestFinalVersion));
-      nugetAttributes(v).set(P_IS_ABSOLUTE_LATEST_VERSION,
-          nugetAttributes(v).get(P_VERSION).equals(absoluteLatestVersion));
-
-      return false;
+      nugetAttributes.set(P_DOWNLOAD_COUNT, totalDownloadCount);
     }
   }
 
@@ -503,8 +371,8 @@ public class NugetGalleryFacetImpl
   }
 
   @VisibleForTesting
-  void setDerivedAttributes(final Map<String, String> incomingMetadata,
-                            final NestedAttributesMap storedMetadata, final boolean republishing)
+   void setDerivedAttributes(final Map<String, String> incomingMetadata,
+                                    final NestedAttributesMap storedMetadata, final boolean republishing)
   {
     // Force the version download count to zero if it wasn't provided nor previously set
     if (!republishing) {
@@ -573,5 +441,21 @@ public class NugetGalleryFacetImpl
   private List<Repository> getRepositories() {
     // TODO: Consider groups
     return asList(getRepository());
+  }
+
+  private static class ComponentVersionComparator
+      implements Comparator<OrientVertex>
+  {
+    @Override
+    public int compare(final OrientVertex o1, final OrientVertex o2) {
+      try {
+        Version v1 = SCHEME.parseVersion((String) o1.getProperty(P_VERSION));
+        Version v2 = SCHEME.parseVersion((String) o2.getProperty(P_VERSION));
+        return v1.compareTo(v2);
+      }
+      catch (InvalidVersionSpecificationException e) {
+        throw Throwables.propagate(e);
+      }
+    }
   }
 }
