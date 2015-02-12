@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
 import org.sonatype.nexus.repository.view.Parameters;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -87,7 +89,7 @@ public class NugetGalleryFacetImpl
 
     final ComponentQuery componentQuery = ODataUtils.query(query, true);
 
-    try (StorageTx storageTx = storage.openTx()) {
+    try (StorageTx storageTx = openStorageTx()) {
 
       int count = executeCount(componentQuery, storageTx);
 
@@ -129,7 +131,7 @@ public class NugetGalleryFacetImpl
 
     ComponentQuery componentQuery = ODataUtils.query(query, false);
 
-    try (StorageTx storageTx = storage.openTx()) {
+    try (StorageTx storageTx = openStorageTx()) {
 
       // NXCM-4502 add inlinecount only if requested
       if (inlineCountRequested(query)) {
@@ -202,7 +204,7 @@ public class NugetGalleryFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void put(final InputStream inputStream) throws IOException, NugetPackageException {
-    try (StorageTx storageTx = storage.openTx();
+    try (StorageTx storageTx = openStorageTx();
          TempStreamSupplier tempStream = new TempStreamSupplier(inputStream)) {
 
       final HashMap<String, String> recordMetadata = Maps.newHashMap();
@@ -231,8 +233,14 @@ public class NugetGalleryFacetImpl
     }
   }
 
-  private void createOrUpdatePackage(final StorageTx storageTx, final HashMap<String, String> recordMetadata,
-                                     final InputStream packageStream)
+  @VisibleForTesting
+  StorageTx openStorageTx() {
+    return storage.openTx();
+  }
+
+  @VisibleForTesting
+  void createOrUpdatePackage(final StorageTx storageTx, final Map<String, String> recordMetadata,
+                             final InputStream packageStream)
   {
     final OrientVertex bucket = storageTx.getBucket();
     final OrientVertex component = createOrUpdateComponent(storageTx, bucket, recordMetadata);
@@ -329,25 +337,12 @@ public class NugetGalleryFacetImpl
 
     final OrientVertex component = findOrCreateComponent(storageTx, bucket, id, version);
 
+    final boolean republishing = component.getIdentity().isNew();
+
     final NestedAttributesMap attributes = storageTx.getAttributes(component);
     final NestedAttributesMap nugetAttr = attributes.child(NUGET);
 
-    // Force the version download count to zero if it wasn't provided nor previously set
-    if (!data.containsKey(VERSION_DOWNLOAD_COUNT) && !nugetAttr.contains(P_VERSION_DOWNLOAD_COUNT)) {
-      data.put(VERSION_DOWNLOAD_COUNT, "0");
-    }
-    if (data.containsKey(DOWNLOAD_COUNT)) {
-      // for proxies, take whatever they give us here. for hosted, it will be computed later anyway
-      nugetAttr.set(P_DOWNLOAD_COUNT, Integer.parseInt(data.get(DOWNLOAD_COUNT)));
-    }
-    if (data.containsKey(VERSION_DOWNLOAD_COUNT)) {
-      nugetAttr.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(data.get(VERSION_DOWNLOAD_COUNT)));
-    }
-
-    // TODO: Make sure this is maintained correctly in the case of republished packages
-    nugetAttr.set(P_CREATED, data.get(CREATED));
-    nugetAttr.set(P_PUBLISHED, data.get(PUBLISHED));
-    nugetAttr.set(P_LAST_UPDATED, data.get(LAST_UPDATED));
+    setDerivedAttributes(data, nugetAttr, republishing);
 
     nugetAttr.set(P_AUTHORS, data.get(AUTHORS));
     nugetAttr.set(P_COPYRIGHT, data.get(COPYRIGHT));
@@ -372,8 +367,32 @@ public class NugetGalleryFacetImpl
     nugetAttr.set(P_TITLE, data.get(TITLE));
     nugetAttr.set(NugetProperties.P_VERSION, data.get(VERSION));
 
-
     return component;
+  }
+
+  @VisibleForTesting
+   void setDerivedAttributes(final Map<String, String> incomingMetadata,
+                                    final NestedAttributesMap storedMetadata, final boolean republishing)
+  {
+    // Force the version download count to zero if it wasn't provided nor previously set
+    if (!incomingMetadata.containsKey(VERSION_DOWNLOAD_COUNT) && !storedMetadata.contains(P_VERSION_DOWNLOAD_COUNT)) {
+      incomingMetadata.put(VERSION_DOWNLOAD_COUNT, "0");
+    }
+    if (incomingMetadata.containsKey(DOWNLOAD_COUNT)) {
+      // for proxies, take whatever they give us here. for hosted, it will be computed later anyway
+      storedMetadata.set(P_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(DOWNLOAD_COUNT)));
+    }
+    if (incomingMetadata.containsKey(VERSION_DOWNLOAD_COUNT)) {
+      storedMetadata.set(P_VERSION_DOWNLOAD_COUNT, Integer.parseInt(incomingMetadata.get(VERSION_DOWNLOAD_COUNT)));
+    }
+
+    // TODO: Make sure this is maintained correctly in the case of republished packages
+
+    final Date now = new Date(clock.millis());
+
+    storedMetadata.set(P_CREATED, now);
+    storedMetadata.set(P_PUBLISHED, now);
+    storedMetadata.set(P_LAST_UPDATED, now);
   }
 
   private OrientVertex findOrCreateComponent(final StorageTx storageTx, final OrientVertex bucket, final String name,

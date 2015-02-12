@@ -45,4 +45,6 @@ public class NugetPackageUtilsTest
     assertThat(metadata.get(PACKAGE_HASH), is(equalTo("Hy5FP+mjtRqJmQfOqO19QLR+W71NGufkmOhQxcPomQMG1HOTILCnTpdMXJD4u9716DO7a0LzMI1qR7paZiDE9A==")));
     assertThat(metadata.get(PACKAGE_HASH_ALGORITHM), is(equalTo("SHA512")));
   }
+
+  // TODO: Add a test for when an InputStream contains a corrupt/non-package
 }
