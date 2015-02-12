@@ -27,6 +27,7 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.content.InvalidContentException;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
@@ -150,7 +151,12 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-      getRepository().facet(SearchFacet.class).put(searchableComponentFactory.from(component));
+      try {
+        getRepository().facet(SearchFacet.class).put(searchableComponentFactory.from(component));
+      }
+      catch (MissingFacetException e) {
+        // skip indexing if no search facet
+      }
     }
   }
 
@@ -222,7 +228,12 @@ public class RawContentFacetImpl
 
       tx.commit();
 
-      getRepository().facet(SearchFacet.class).delete(component.getId().toString());
+      try {
+        getRepository().facet(SearchFacet.class).delete(component.getId().toString());
+      }
+      catch (MissingFacetException e) {
+        // skip indexing if no search facet
+      }
 
       return true;
     }
