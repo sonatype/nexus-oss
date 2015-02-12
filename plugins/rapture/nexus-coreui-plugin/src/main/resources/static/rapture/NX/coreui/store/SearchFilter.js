@@ -57,7 +57,7 @@ Ext.define('NX.coreui.store.SearchFilter', {
       readOnly: true,
       criterias: [
         { id: 'format', value: 'raw', hidden: true },
-        { id: 'attributes.raw.path' }
+        { id: 'attributes.raw.path.tree' }
       ]
     },
     {

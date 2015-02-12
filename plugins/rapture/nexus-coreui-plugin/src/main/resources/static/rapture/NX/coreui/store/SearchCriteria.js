@@ -87,7 +87,7 @@ Ext.define('NX.coreui.store.SearchCriteria', {
       }
     },
     {
-      id: 'attributes.raw.path',
+      id: 'attributes.raw.path.tree',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH'),
         width: 300

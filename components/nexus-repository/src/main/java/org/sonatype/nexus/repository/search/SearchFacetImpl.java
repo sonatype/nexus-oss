@@ -13,7 +13,8 @@
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -25,12 +26,15 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
-import com.google.common.base.Charsets;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.elasticsearch.client.Client;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
@@ -50,13 +54,17 @@ public class SearchFacetImpl
 
   private final Provider<Client> client;
 
+  private final List<MappingContributor> mappingContributors;
+
   private final Map<String, SourceProducer> sourceProducers;
 
   @Inject
   public SearchFacetImpl(final Provider<Client> client,
+                         final List<MappingContributor> mappingContributors,
                          final Map<String, SourceProducer> sourceProducers)
   {
     this.client = checkNotNull(client);
+    this.mappingContributors = checkNotNull(mappingContributors);
     this.sourceProducers = checkNotNull(sourceProducers);
   }
 
@@ -104,10 +112,16 @@ public class SearchFacetImpl
 
   private void configureIndex() {
     if (!client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
-      URL resource = Resources.getResource(SearchFacetImpl.class, "es-mapping.json");
       try {
+        String source = Resources.toString(Resources.getResource(SearchFacetImpl.class, "es-mapping.json"), UTF_8);
+        for (MappingContributor contributor : mappingContributors) {
+          String contributed = contributor.getSource(getRepository());
+          if (contributed != null) {
+            source = merge(source, contributed);
+          }
+        }
         client.get().admin().indices().prepareCreate(getRepository().getName())
-            .addMapping(TYPE, Resources.toString(resource, Charsets.UTF_8))
+            .setSource(source)
             .execute()
             .actionGet();
       }
@@ -125,6 +139,39 @@ public class SearchFacetImpl
 
   private StorageFacet getStorage() {
     return getRepository().facet(StorageFacet.class);
+  }
+
+  private static String merge(final String... jsons) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode merged = mapper.readTree("{}");
+    for (String json : jsons) {
+      merged = merge(merged, mapper.readTree(json));
+    }
+    return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(merged);
+  }
+
+  private static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
+
+    Iterator<String> fieldNames = updateNode.fieldNames();
+    while (fieldNames.hasNext()) {
+
+      String fieldName = fieldNames.next();
+      JsonNode jsonNode = mainNode.get(fieldName);
+      // if field exists and is an embedded object
+      if (jsonNode != null && jsonNode.isObject()) {
+        merge(jsonNode, updateNode.get(fieldName));
+      }
+      else {
+        if (mainNode instanceof ObjectNode) {
+          // Overwrite field
+          JsonNode value = updateNode.get(fieldName);
+          ((ObjectNode) mainNode).put(fieldName, value);
+        }
+      }
+
+    }
+
+    return mainNode;
   }
 
 }
