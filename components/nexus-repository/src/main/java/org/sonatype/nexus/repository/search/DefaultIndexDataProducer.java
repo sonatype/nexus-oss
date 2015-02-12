@@ -18,6 +18,8 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.repository.Repository;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
@@ -34,7 +36,7 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
- * Default {@link IndexDataProducer} implementation.
+ * Default {@link IndexDataProducer} implementation that indexes all properties of a component & its assets.
  *
  * @since 3.0
  */
@@ -45,11 +47,11 @@ public class DefaultIndexDataProducer
 {
 
   @Override
-  public String getSource(String repositoryName, final OrientVertex component) {
-    checkNotNull(repositoryName);
+  public String getIndexData(final Repository repository, final OrientVertex component) {
+    checkNotNull(repository);
     checkNotNull(component);
     Map<String, Object> source = Maps.newHashMap();
-    source.put(P_REPOSITORY_NAME, repositoryName);
+    source.put(P_REPOSITORY_NAME, repository.getName());
     for (String key : component.getPropertyKeys()) {
       source.put(key, component.getProperty(key));
     }

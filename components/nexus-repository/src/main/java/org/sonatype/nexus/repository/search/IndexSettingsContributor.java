@@ -27,7 +27,7 @@ public interface IndexSettingsContributor
 {
 
   /**
-   * Get index settings for specific repository.
+   * Retrieves index settings for specific repository.
    *
    * @return ES index settings in json format or null if this contributor has no settings for repository
    */

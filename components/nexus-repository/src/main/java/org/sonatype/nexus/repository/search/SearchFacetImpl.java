@@ -79,7 +79,7 @@ public class SearchFacetImpl
     }
     checkState(indexDataProducer != null, "Could not find an index data producer for format: {}", format);
     client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
-        .setSource(indexDataProducer.getSource(getRepository().getName(), component))
+        .setSource(indexDataProducer.getIndexData(getRepository(), component))
         .execute();
   }
 
