@@ -15,7 +15,6 @@ package org.sonatype.security.authorization;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,7 +25,6 @@ import javax.inject.Singleton;
  * @author Brian Demers
  */
 @Singleton
-@Typed(PrivilegeInheritanceManager.class)
 @Named("default")
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager

@@ -157,6 +157,21 @@ def normalMode = {
   }
 }
 
+/**
+ * Mode 'dummy', generates number of shard configurations which have a dummy test.
+ */
+def dummyMode = {
+  def count = property('autoshard.count') as int
+  def testName = property('autoshard.dummytest', 'DummyIT.java') as String
+
+  println "Creating $count dummy shards with test: $testName in: $outputDir"
+  outputDir.mkdirs()
+  for (i in 0..<count) {
+    def file = new File(outputDir, "shard-${i}.txt")
+    file.text = sourceToClass(testName)
+  }
+}
+
 println "Mode: $mode"
 
 switch (mode) {
@@ -166,6 +181,10 @@ switch (mode) {
 
   case 'normal':
     normalMode()
+    break
+
+  case 'dummy':
+    dummyMode()
     break
 
   default:

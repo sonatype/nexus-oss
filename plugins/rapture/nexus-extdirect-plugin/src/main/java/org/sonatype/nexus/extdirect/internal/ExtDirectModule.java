@@ -16,8 +16,6 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.guice.FilterChainModule;
-import org.sonatype.nexus.web.CookieFilter;
 import org.sonatype.nexus.web.SecurityFilter;
 
 import com.google.common.collect.Maps;
@@ -28,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Ext.Direct module.
+ * Ext.Direct Guice module.
  *
  * @since 3.0
  */
@@ -36,7 +34,6 @@ import org.slf4j.LoggerFactory;
 public class ExtDirectModule
     extends AbstractModule
 {
-
   private static final Logger log = LoggerFactory.getLogger(ExtDirectModule.class);
 
   private static final String MOUNT_POINT = "/service/extdirect";
@@ -47,30 +44,18 @@ public class ExtDirectModule
     {
       @Override
       protected void configureServlets() {
-        Map<String, String> directServletConfig = Maps.newHashMap();
-        directServletConfig.put(GlobalParameters.PROVIDERS_URL, MOUNT_POINT.substring(1));
-        directServletConfig.put("minify", Boolean.FALSE.toString());
-        directServletConfig.put(GlobalParameters.DEBUG, Boolean.toString(log.isDebugEnabled()));
-        directServletConfig.put(
-            GlobalParameters.JSON_REQUEST_PROCESSOR_THREAD_CLASS, ExtDirectJsonRequestProcessorThread.class.getName()
-        );
-        directServletConfig.put(
-            GlobalParameters.GSON_BUILDER_CONFIGURATOR_CLASS, ExtDirectGsonBuilderConfigurator.class.getName()
-        );
+        Map<String, String> config = Maps.newHashMap();
+        config.put(GlobalParameters.PROVIDERS_URL, MOUNT_POINT.substring(1));
+        config.put("minify", Boolean.FALSE.toString());
+        config.put(GlobalParameters.DEBUG, Boolean.toString(log.isDebugEnabled()));
+        config.put(GlobalParameters.JSON_REQUEST_PROCESSOR_THREAD_CLASS,
+            ExtDirectJsonRequestProcessorThread.class.getName());
+        config.put(GlobalParameters.GSON_BUILDER_CONFIGURATOR_CLASS,
+            ExtDirectGsonBuilderConfigurator.class.getName());
 
-        serve(MOUNT_POINT + "*").with(ExtDirectServlet.class, directServletConfig);
+        serve(MOUNT_POINT + "*").with(ExtDirectServlet.class, config);
         filter(MOUNT_POINT + "*").through(SecurityFilter.class);
-        filter(MOUNT_POINT + "*").through(CookieFilter.class);
       }
-    });
-
-    install(new FilterChainModule()
-    {
-      @Override
-      protected void configure() {
-        addFilterChain(MOUNT_POINT + "/**", "noSessionCreation,authcBasic");
-      }
-
     });
   }
 }

@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.scheduling.TaskScheduler;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.yum.YumHosted;
+import org.sonatype.nexus.yum.internal.createrepo.YumStoreFactory;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTask;
 import org.sonatype.nexus.yum.internal.task.GenerateMetadataTaskDescriptor;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -79,6 +80,7 @@ public class YumHostedImplDeletionsTest
         new GenerateMetadataTaskDescriptor(),
         new ScheduledThreadPoolExecutor(10),
         new BlockSqliteDatabasesRequestStrategy(),
+        mock(YumStoreFactory.class),
         repository,
         new File(util.getTargetDir(), "tmp")
     ).setProcessDeletes(true)

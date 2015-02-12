@@ -107,8 +107,7 @@ public class GenerateMetadataTaskSettingsIT
     GenerateMetadataTask task = new GenerateMetadataTask(
         mock(YumRegistry.class),
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     );
     task.setRepositoryRegistry(repoRegistry());
     task.setRpmDir(rpmsDir().getAbsolutePath());
@@ -126,8 +125,7 @@ public class GenerateMetadataTaskSettingsIT
     GenerateMetadataTask task = new GenerateMetadataTask(
         mock(YumRegistry.class),
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     );
     task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
@@ -145,8 +143,7 @@ public class GenerateMetadataTaskSettingsIT
     GenerateMetadataTask task = new GenerateMetadataTask(
         mock(YumRegistry.class),
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     );
     task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
@@ -173,8 +170,7 @@ public class GenerateMetadataTaskSettingsIT
     GenerateMetadataTask task = new GenerateMetadataTask(
         yumRegistry,
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     );
     task.setRepositoryRegistry(repoRegistry());
     task.setRepositoryId(REPO);
@@ -224,8 +220,7 @@ public class GenerateMetadataTaskSettingsIT
     GenerateMetadataTask task = new GenerateMetadataTask(
         yumRegistry,
         mock(RpmScanner.class),
-        mock(Manager.class),
-        mock(CommandLineExecutor.class)
+        mock(Manager.class)
     )
     {
       @Override
@@ -245,7 +240,6 @@ public class GenerateMetadataTaskSettingsIT
     task.setRepositoryId(repo);
     task.setVersion(version);
     task.setAddedFiles(null);
-    task.setSingleRpmPerDirectory(true);
 
     return task;
   }

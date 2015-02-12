@@ -23,7 +23,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.usermanagement.MockUserManager;
 import org.sonatype.security.usermanagement.UserManager;
 
@@ -57,14 +57,14 @@ public class ExternalRoleMappedTest
     SecuritySystem securitySystem = this.lookup(SecuritySystem.class);
 
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put(MethodPrivilegeDescriptor.P_METHOD, "read");
-    properties.put(MethodPrivilegeDescriptor.P_PERMISSION, "permissionOne");
+    properties.put(ApplicationPrivilegeDescriptor.P_METHOD, "read");
+    properties.put(ApplicationPrivilegeDescriptor.P_PERMISSION, "permissionOne");
 
     securitySystem.getAuthorizationManager("default").addPrivilege(new Privilege(
         "randomId",
         "permissionOne",
         "permissionOne",
-        MethodPrivilegeDescriptor.TYPE,
+        ApplicationPrivilegeDescriptor.TYPE,
         properties, false));
 
     securitySystem.getAuthorizationManager("default").addRole(new Role("mockrole1", "mockrole1", "mockrole1",

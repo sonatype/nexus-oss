@@ -13,6 +13,7 @@
 package org.sonatype.nexus.wonderland.rest
 
 import org.apache.shiro.authz.annotation.RequiresPermissions
+import org.jetbrains.annotations.NonNls
 import org.sonatype.nexus.util.Tokens
 import org.sonatype.nexus.wonderland.DownloadService
 import org.sonatype.siesta.Resource
@@ -48,7 +49,8 @@ class DownloadResource
     extends ComponentSupport
     implements Resource
 {
-  static final String RESOURCE_URI = '/wonderland/download'
+  @NonNls
+  static final String RESOURCE_URI = /* WonderlandPlugin.REST_PREFIX */ '/wonderland/download'
 
   private final DownloadService downloadService
 

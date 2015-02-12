@@ -17,7 +17,6 @@ import java.util.List;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.TaskConfiguration;
 import org.sonatype.nexus.scheduling.TaskInfo;
 import org.sonatype.nexus.scheduling.TaskInfo.CurrentState;
@@ -47,9 +46,7 @@ public class MergeMetadataTaskIT
   public void shouldNotAllowConcurrentExecutionForSameRepo()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(
-        mock(YumRegistry.class), mock(CommandLineExecutor.class)
-    );
+    final MergeMetadataTask task = new MergeMetadataTask(mock(YumRegistry.class));
     TaskConfiguration taskConfiguration = new TaskConfiguration();
     taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());
@@ -63,9 +60,7 @@ public class MergeMetadataTaskIT
   public void shouldAllowConcurrentExecutionIfAnotherTaskIsRunning()
       throws Exception
   {
-    final MergeMetadataTask task = new MergeMetadataTask(
-        mock(YumRegistry.class), mock(CommandLineExecutor.class)
-    );
+    final MergeMetadataTask task = new MergeMetadataTask(mock(YumRegistry.class));
     TaskConfiguration taskConfiguration = new TaskConfiguration();
     taskConfiguration.setId("foo");
     taskConfiguration.setTypeId(MergeMetadataTask.class.getSimpleName());

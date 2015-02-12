@@ -27,11 +27,16 @@
   <artifactId>nexus-ssl-client</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
+
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-client-core</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-client-core</artifactId>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
@@ -43,12 +48,6 @@
       <artifactId>nexus-ssl-model</artifactId>
     </dependency>
   </dependencies>
-
-  <properties>
-    <!-- compiler plugin configuration, we are Java6 -->
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
-  </properties>
 
   <build>
     <pluginManagement>

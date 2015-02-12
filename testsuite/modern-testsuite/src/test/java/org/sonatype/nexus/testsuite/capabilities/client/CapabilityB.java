@@ -11,23 +11,23 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.testsuite.capabilities.client;
-
-import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
+//
+//import org.sonatype.nexus.capabilities.client.Capability;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityProperty;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityType;
 
 /**
  * @since 2.2
  */
-@CapabilityType("[b]")
+//@CapabilityType("[b]")
 public interface CapabilityB
-    extends Capability<CapabilityB>
+    //extends Capability<CapabilityB>
 {
 
-  @CapabilityProperty("b1")
-  String propertyB1();
-
-  @CapabilityProperty("b1")
-  CapabilityB withPropertyB1(String value);
+  //@CapabilityProperty("b1")
+  //String propertyB1();
+  //
+  //@CapabilityProperty("b1")
+  //CapabilityB withPropertyB1(String value);
 
 }

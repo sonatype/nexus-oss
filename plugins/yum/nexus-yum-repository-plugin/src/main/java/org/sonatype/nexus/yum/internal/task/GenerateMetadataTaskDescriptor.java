@@ -27,7 +27,6 @@ import static org.sonatype.nexus.formfields.FormField.MANDATORY;
 import static org.sonatype.nexus.formfields.FormField.OPTIONAL;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_FORCE_FULL_SCAN;
 import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_REPO_DIR;
-import static org.sonatype.nexus.yum.internal.task.GenerateMetadataTask.PARAM_SINGLE_RPM_PER_DIR;
 
 /**
  * @since yum 3.0
@@ -40,8 +39,7 @@ public class GenerateMetadataTaskDescriptor
 
   public static final String NAME = "Yum: Generate Metadata";
 
-  public GenerateMetadataTaskDescriptor()
-  {
+  public GenerateMetadataTaskDescriptor() {
     super(GenerateMetadataTask.class, NAME,
         new RepositoryCombobox(
             TaskConfiguration.REPOSITORY_ID_KEY,
@@ -56,12 +54,6 @@ public class GenerateMetadataTaskDescriptor
                 + " If not set, yum will generate the metadata into the root directory of the selected repository.",
             OPTIONAL
         ),
-        new CheckboxFormField(
-            PARAM_SINGLE_RPM_PER_DIR,
-            "Single RPM per directory",
-            "Only process one RPM per directory",
-            OPTIONAL
-        ).withInitialValue(true),
         new CheckboxFormField(
             PARAM_FORCE_FULL_SCAN,
             "Full Rebuild",

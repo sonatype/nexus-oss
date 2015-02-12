@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.yum.internal;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
@@ -38,8 +37,6 @@ public class YumProxyImpl
 
   private final ProxyRepository repository;
 
-  private final File baseDir;
-
   private final YumRepository yumRepository;
 
   @Inject
@@ -50,8 +47,7 @@ public class YumProxyImpl
 
   {
     this.repository = checkNotNull(repository);
-    this.baseDir = RepositoryUtils.getBaseDir(repository);
-    this.yumRepository = new YumRepositoryImpl(baseDir, repository.getId(), null);
+    this.yumRepository = new YumRepositoryImpl(RepositoryUtils.getBaseDir(repository), repository.getId(), null);
 
     repository.registerRequestStrategy(
         BlockSqliteDatabasesRequestStrategy.class.getName(), checkNotNull(blockSqliteDatabasesRequestStrategy)
@@ -59,11 +55,6 @@ public class YumProxyImpl
     repository.registerRequestStrategy(
         ProxyMetadataRequestStrategy.class.getName(), checkNotNull(proxyMetadataRequestStrategy)
     );
-  }
-
-  @Override
-  public File getBaseDir() {
-    return baseDir;
   }
 
   @Override

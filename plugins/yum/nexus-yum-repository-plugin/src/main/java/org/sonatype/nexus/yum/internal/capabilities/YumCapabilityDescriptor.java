@@ -28,7 +28,6 @@ import org.sonatype.nexus.capability.support.CapabilityDescriptorSupport;
 import org.sonatype.nexus.capability.support.validator.Validators;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.NumberTextFormField;
-import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.sisu.goodies.i18n.I18N;
 import org.sonatype.sisu.goodies.i18n.MessageBundle;
 
@@ -64,18 +63,6 @@ public class YumCapabilityDescriptor
 
     @DefaultMessage("Maximum number of threads to be used for generating Yum repositories (default 10 threads)")
     String maxNumberParallelThreadsHelp();
-
-    @DefaultMessage("Path of \"createrepo\"")
-    String createrepoPathLabel();
-
-    @DefaultMessage("Path of \"createrepo\" (e.g. /usr/bin/createrepo)")
-    String createrepoPathHelp();
-
-    @DefaultMessage("Path of \"mergerepo\"")
-    String mergerepoPathLabel();
-
-    @DefaultMessage("Path of \"mergerepo\" (e.g. /usr/bin/mergerepo)")
-    String mergerepoPathHelp();
   }
 
   private static final Messages messages = I18N.create(Messages.class);
@@ -94,19 +81,7 @@ public class YumCapabilityDescriptor
             messages.maxNumberParallelThreadsLabel(),
             messages.maxNumberParallelThreadsHelp(),
             FormField.OPTIONAL
-        ).withInitialValue(10),
-        new StringTextFormField(
-            YumCapabilityConfiguration.CREATEREPO_PATH,
-            messages.createrepoPathLabel(),
-            messages.createrepoPathHelp(),
-            FormField.OPTIONAL
-        ),
-        new StringTextFormField(
-            YumCapabilityConfiguration.MERGEREPO_PATH,
-            messages.mergerepoPathLabel(),
-            messages.mergerepoPathHelp(),
-            FormField.OPTIONAL
-        )
+        ).withInitialValue(10)
     );
   }
 

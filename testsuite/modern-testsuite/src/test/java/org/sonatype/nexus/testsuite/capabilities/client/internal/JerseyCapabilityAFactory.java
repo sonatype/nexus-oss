@@ -15,12 +15,12 @@ package org.sonatype.nexus.testsuite.capabilities.client.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.capabilities.client.Capability;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
-import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
-import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
-import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
-import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
+//import org.sonatype.nexus.capabilities.client.Capability;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityClient;
+//import org.sonatype.nexus.capabilities.client.spi.CapabilityFactory;
+//import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+//import org.sonatype.nexus.capabilities.model.CapabilityStatusXO;
+//import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 
 /**
  * @since 2.2
@@ -28,24 +28,24 @@ import org.sonatype.nexus.testsuite.capabilities.client.CapabilityA;
 @Named
 @Singleton
 public class JerseyCapabilityAFactory
-    implements CapabilityFactory<CapabilityA>
+    //implements CapabilityFactory<CapabilityA>
 {
 
-  public CapabilityA create(final CapabilityClient client) {
-    return new JerseyCapabilityA(client);
-  }
-
-  @Override
-  public CapabilityA create(final CapabilityClient client, final CapabilityStatusXO settings) {
-    return new JerseyCapabilityA(client, settings);
-  }
-
-  public boolean canCreate(final String type) {
-    return "[a]".equals(type);
-  }
-
-  public boolean canCreate(final Class<Capability> type) {
-    return CapabilityA.class.equals(type);
-  }
+  //public CapabilityA create(final CapabilityClient client) {
+  //  return new JerseyCapabilityA(client);
+  //}
+  //
+  //@Override
+  //public CapabilityA create(final CapabilityClient client, final CapabilityStatusXO settings) {
+  //  return new JerseyCapabilityA(client, settings);
+  //}
+  //
+  //public boolean canCreate(final String type) {
+  //  return "[a]".equals(type);
+  //}
+  //
+  //public boolean canCreate(final Class<Capability> type) {
+  //  return CapabilityA.class.equals(type);
+  //}
 
 }

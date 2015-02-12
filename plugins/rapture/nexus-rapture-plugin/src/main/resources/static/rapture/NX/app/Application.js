@@ -41,6 +41,7 @@ Ext.define('NX.app.Application', {
     // framework patches
     'Ext.patch.Ticket_18960',
     'Ext.patch.Ticket_18964',
+    'Ext.patch.Ticket_21425',
 
     // direct overrides
     'NX.ext.form.action.DirectLoad',

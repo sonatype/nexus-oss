@@ -115,19 +115,6 @@ public interface SecuritySystem
    */
   void checkPermission(PrincipalCollection principal, String permission) throws AuthorizationException;
 
-  /**
-   * Checks if principal has a list of permissions, throws an AuthorizationException unless the principal has all
-   * permissions.
-   */
-  void checkPermission(PrincipalCollection principal, List<String> permissions) throws AuthorizationException;
-
-  /**
-   * Checks if a principal has a role.
-   *
-   * @return true if the principal has this role.
-   */
-  boolean hasRole(PrincipalCollection principals, String role);
-
   // ******************************
   // * Role permission management
   // ******************************
@@ -206,16 +193,6 @@ public interface SecuritySystem
    * @param sourceId The sourceId of the user to be removed.
    */
   void deleteUser(String userId, String sourceId) throws UserNotFoundException, NoSuchUserManagerException;
-
-  /**
-   * Returns a list of {@link RoleIdentifier} which represents all the roles a given user has.
-   *
-   * @param userId   The Id of the user.
-   * @param sourceId The source Id of the user.
-   * @return All roles for a given user.
-   */
-  Set<RoleIdentifier> getUsersRoles(String userId, String sourceId)
-      throws UserNotFoundException, NoSuchUserManagerException;
 
   /**
    * Sets the list of roles a user has.
