@@ -26,7 +26,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
@@ -494,19 +494,19 @@ public class Nexus537RepoTargetsIT
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
       if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("create,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("create,read")) {
         fooPrivCreateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("read")) {
         fooPrivReadId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("update,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("update,read")) {
         fooPrivUpdateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
         fooPrivDeleteId = privilegeBaseStatusResource.getId();
       }
       else {
@@ -514,7 +514,7 @@ public class Nexus537RepoTargetsIT
             + privilegeBaseStatusResource.getId()
             + " method: "
             + getPrivilegeProperty(privilegeBaseStatusResource,
-            MethodPrivilegeDescriptor.P_METHOD));
+            ApplicationPrivilegeDescriptor.P_METHOD));
       }
     }
 
@@ -536,19 +536,19 @@ public class Nexus537RepoTargetsIT
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
       if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("create,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("create,read")) {
         barPrivCreateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("read")) {
         barPrivReadId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("update,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("update,read")) {
         barPrivUpdateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
         barPrivDeleteId = privilegeBaseStatusResource.getId();
       }
       else {
@@ -556,7 +556,7 @@ public class Nexus537RepoTargetsIT
             + privilegeBaseStatusResource.getId()
             + " method: "
             + getPrivilegeProperty(privilegeBaseStatusResource,
-            MethodPrivilegeDescriptor.P_METHOD));
+            ApplicationPrivilegeDescriptor.P_METHOD));
       }
     }
 
@@ -581,19 +581,19 @@ public class Nexus537RepoTargetsIT
       PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
       if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("create,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("create,read")) {
         groupFooPrivCreateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("read")) {
         groupFooPrivReadId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("update,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("update,read")) {
         groupFooPrivUpdateId = privilegeBaseStatusResource.getId();
       }
       else if (getPrivilegeProperty(privilegeBaseStatusResource,
-          MethodPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
+          ApplicationPrivilegeDescriptor.P_METHOD).equals("delete,read")) {
         groupFooPrivDeleteId = privilegeBaseStatusResource.getId();
       }
       else {
@@ -601,7 +601,7 @@ public class Nexus537RepoTargetsIT
             + privilegeBaseStatusResource.getId()
             + " method: "
             + getPrivilegeProperty(privilegeBaseStatusResource,
-            MethodPrivilegeDescriptor.P_METHOD));
+            ApplicationPrivilegeDescriptor.P_METHOD));
       }
     }
 

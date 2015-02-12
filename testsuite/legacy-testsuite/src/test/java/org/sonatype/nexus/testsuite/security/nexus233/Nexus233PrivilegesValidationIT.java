@@ -21,7 +21,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -207,7 +207,7 @@ public class Nexus233PrivilegesValidationIT
     PrivilegeResource resource = new PrivilegeResource();
     resource.addMethod("read");
     resource.setName("createApplicationResource");
-    resource.setType(MethodPrivilegeDescriptor.TYPE);
+    resource.setType(ApplicationPrivilegeDescriptor.TYPE);
     // resource.setRepositoryTargetId( "testTarget" );
 
     Response response = this.messageUtil.sendMessage(Method.POST, resource);

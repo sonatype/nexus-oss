@@ -27,7 +27,7 @@ import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
 import org.restlet.Context;
@@ -129,7 +129,7 @@ public class PrivilegePlexusResource
 
       priv = authzManager.getPrivilege(getPrivilegeId(request));
 
-      if (priv.getType().equals(MethodPrivilegeDescriptor.TYPE)) {
+      if (priv.getType().equals(ApplicationPrivilegeDescriptor.TYPE)) {
         throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
             "Cannot delete an application type privilege");
       }

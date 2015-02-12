@@ -20,7 +20,7 @@ import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.UserStatus;
 
@@ -81,10 +81,10 @@ public class AuthorizingRealmImplTest
     CPrivilege priv = new CPrivilege();
     priv.setId("priv");
     priv.setName("somepriv");
-    priv.setType(MethodPrivilegeDescriptor.TYPE);
+    priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.setProperty(MethodPrivilegeDescriptor.P_PERMISSION, "app:config");
-    priv.setProperty(MethodPrivilegeDescriptor.P_METHOD, "read");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_PERMISSION, "app:config");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_METHOD, "read");
 
     configurationManager.createPrivilege(priv);
 

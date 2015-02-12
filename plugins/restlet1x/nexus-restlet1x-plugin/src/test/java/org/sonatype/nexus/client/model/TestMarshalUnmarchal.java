@@ -118,7 +118,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
@@ -1392,15 +1392,15 @@ public class TestMarshalUnmarchal
     appResource1.setResourceURI("ResourceURI1");
     appResource1.setName("Name1");
     appResource1.setDescription("Description1");
-    appResource1.setType(MethodPrivilegeDescriptor.TYPE);
+    appResource1.setType(ApplicationPrivilegeDescriptor.TYPE);
 
     PrivilegeProperty prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method1");
     appResource1.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_PERMISSION);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_PERMISSION);
     prop.setValue("Permission1");
     appResource1.addProperty(prop);
 
@@ -1409,15 +1409,15 @@ public class TestMarshalUnmarchal
     appResource2.setResourceURI("ResourceURI2");
     appResource2.setName("Name2");
     appResource2.setDescription("Description2");
-    appResource2.setType(MethodPrivilegeDescriptor.TYPE);
+    appResource2.setType(ApplicationPrivilegeDescriptor.TYPE);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method2");
     appResource2.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_PERMISSION);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_PERMISSION);
     prop.setValue("Permission2");
     appResource2.addProperty(prop);
 
@@ -1444,7 +1444,7 @@ public class TestMarshalUnmarchal
     targetResource1.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method1");
     targetResource1.addProperty(prop);
 
@@ -1471,7 +1471,7 @@ public class TestMarshalUnmarchal
     targetResource2.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method2");
     targetResource2.addProperty(prop);
 
@@ -1492,15 +1492,15 @@ public class TestMarshalUnmarchal
     appResource1.setResourceURI("ResourceURI1");
     appResource1.setName("Name1");
     appResource1.setDescription("Description1");
-    appResource1.setType(MethodPrivilegeDescriptor.TYPE);
+    appResource1.setType(ApplicationPrivilegeDescriptor.TYPE);
 
     PrivilegeProperty prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_PERMISSION);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_PERMISSION);
     prop.setValue("Permission1");
     appResource1.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method1");
     appResource1.addProperty(prop);
 
@@ -1533,7 +1533,7 @@ public class TestMarshalUnmarchal
     targetResource1.addProperty(prop);
 
     prop = new PrivilegeProperty();
-    prop.setKey(MethodPrivilegeDescriptor.P_METHOD);
+    prop.setKey(ApplicationPrivilegeDescriptor.P_METHOD);
     prop.setValue("Method1");
     targetResource1.addProperty(prop);
 

@@ -31,8 +31,8 @@ import org.sonatype.nexus.validation.Validate
 import org.sonatype.security.SecuritySystem
 import org.sonatype.security.authorization.AuthorizationManager
 import org.sonatype.security.authorization.Privilege
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor
 import org.sonatype.security.usermanagement.UserManagerImpl
 
 import javax.inject.Inject
@@ -112,7 +112,7 @@ extends DirectComponentSupport
                   type: TargetPrivilegeDescriptor.TYPE,
                   readOnly: false,
                   properties: [
-                      (MethodPrivilegeDescriptor.P_METHOD)     : method,
+                      (ApplicationPrivilegeDescriptor.P_METHOD)     : method,
                       (TargetPrivilegeDescriptor.P_TARGET_ID): privilegeXO.repositoryTargetId,
                       (TargetPrivilegeDescriptor.P_REPOSITORY_ID)      : repositoryId,
                       (TargetPrivilegeDescriptor.P_GROUP_ID)           : groupId

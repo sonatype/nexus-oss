@@ -18,7 +18,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.targets.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 import org.junit.Assert;
@@ -54,7 +54,7 @@ public class Nexus448PrivilegeUrlIT
     Assert.assertEquals("Type", resource.getType(), TargetPrivilegeDescriptor.TYPE);
 
     resource = this.messageUtil.getPrivilegeResource("status");
-    Assert.assertEquals("Type", resource.getType(), MethodPrivilegeDescriptor.TYPE);
+    Assert.assertEquals("Type", resource.getType(), ApplicationPrivilegeDescriptor.TYPE);
 
   }
 

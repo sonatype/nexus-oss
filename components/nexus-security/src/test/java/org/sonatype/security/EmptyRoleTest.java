@@ -23,7 +23,7 @@ import org.sonatype.security.authorization.Role;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.realms.AuthenticatingRealmImpl;
 import org.sonatype.security.realms.AuthorizingRealmImpl;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -155,10 +155,10 @@ public class EmptyRoleTest
     CPrivilege priv = new CPrivilege();
     priv.setId("priv-" + Math.random());
     priv.setName("somepriv");
-    priv.setType(MethodPrivilegeDescriptor.TYPE);
+    priv.setType(ApplicationPrivilegeDescriptor.TYPE);
     priv.setDescription("somedescription");
-    priv.setProperty(MethodPrivilegeDescriptor.P_PERMISSION, "app:config");
-    priv.setProperty(MethodPrivilegeDescriptor.P_METHOD, "read");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_PERMISSION, "app:config");
+    priv.setProperty(ApplicationPrivilegeDescriptor.P_METHOD, "read");
 
     this.lookup(DefaultConfigurationManager.class).createPrivilege(priv);
 

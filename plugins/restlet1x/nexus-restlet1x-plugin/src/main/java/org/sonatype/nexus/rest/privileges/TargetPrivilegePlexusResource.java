@@ -29,7 +29,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Privilege;
-import org.sonatype.security.realms.privileges.MethodPrivilegeDescriptor;
+import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.privileges.AbstractPrivilegePlexusResource;
 
@@ -115,7 +115,7 @@ public class TargetPrivilegePlexusResource
             priv.setDescription(resource.getDescription());
             priv.setType(TargetPrivilegeDescriptor.TYPE);
 
-            priv.addProperty(MethodPrivilegeDescriptor.P_METHOD, method);
+            priv.addProperty(ApplicationPrivilegeDescriptor.P_METHOD, method);
 
             priv.addProperty(TargetPrivilegeDescriptor.P_TARGET_ID, resource
                 .getRepositoryTargetId());
