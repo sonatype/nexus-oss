@@ -51,9 +51,6 @@ class RawHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<RawIndexFacet> rawIndexFacet
-
-  @Inject
   Provider<RawContentFacetImpl> rawContentFacet
 
   @Inject
@@ -82,7 +79,6 @@ class RawHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(rawIndexFacet.get())
     repository.attach(rawContentFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get());
