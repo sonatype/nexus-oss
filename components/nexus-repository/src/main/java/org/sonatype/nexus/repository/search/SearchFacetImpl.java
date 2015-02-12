@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,20 +23,16 @@ import javax.inject.Provider;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageTx;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import org.elasticsearch.client.Client;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
  * Default {@link StorageFacet} implementation.
@@ -56,53 +51,34 @@ public class SearchFacetImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
-  private final Map<String, IndexDataProducer> indexDataProducers;
-
   @Inject
   public SearchFacetImpl(final Provider<Client> client,
-                         final List<IndexSettingsContributor> indexSettingsContributors,
-                         final Map<String, IndexDataProducer> indexDataProducers)
+                         final List<IndexSettingsContributor> indexSettingsContributors)
   {
     this.client = checkNotNull(client);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
-    this.indexDataProducers = checkNotNull(indexDataProducers);
   }
 
   @Override
   @Guarded(by = STARTED)
-  public void index(final OrientVertex component) {
-    checkNotNull(component);
-    String format = getRepository().getFormat().getValue();
-    IndexDataProducer indexDataProducer = indexDataProducers.get(format);
-    if (indexDataProducer == null) {
-      indexDataProducer = indexDataProducers.get("default");
+  public void put(final SearchableComponent searchable) {
+    checkNotNull(searchable);
+    try {
+      Map<String, Object> additional = Maps.newHashMap();
+      additional.put(P_REPOSITORY_NAME, getRepository().getName());
+      String json = JsonUtils.merge(searchable.toJson(), JsonUtils.from(additional));
+      client.get().prepareIndex(getRepository().getName(), TYPE, searchable.getId()).setSource(json).execute();
     }
-    checkState(indexDataProducer != null, "Could not find an index data producer for format: {}", format);
-    client.get().prepareIndex(getRepository().getName(), TYPE, component.getId().toString())
-        .setSource(indexDataProducer.getIndexData(getRepository(), component))
-        .execute();
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public void deindex(final OrientVertex component) {
-    checkNotNull(component);
-    client.get().prepareDelete(getRepository().getName(), TYPE, component.getId().toString()).execute();
-  }
-
-  @Override
-  @Guarded(by = STARTED)
-  public void reindex() {
-    // TODO shall we block indexing during re-index?
-    try (StorageTx tx = getStorage().openTx()) {
-      OrientVertex bucket = tx.getBucket();
-      deleteIndex();
-      configureIndex();
-      for (OrientVertex component : tx.browseComponents(bucket)) {
-        // TODO maybe use batch indexing
-        index(component);
-      }
+    catch (IOException e) {
+      throw Throwables.propagate(e);
     }
+  }
+
+  @Override
+  @Guarded(by = STARTED)
+  public void delete(final String id) {
+    checkNotNull(id);
+    client.get().prepareDelete(getRepository().getName(), TYPE, id).execute();
   }
 
   @Override
@@ -119,7 +95,7 @@ public class SearchFacetImpl
         for (IndexSettingsContributor contributor : indexSettingsContributors) {
           String contributed = contributor.getIndexSettings(getRepository());
           if (contributed != null) {
-            source = merge(source, contributed);
+            source = JsonUtils.merge(source, contributed);
           }
         }
         client.get().admin().indices().prepareCreate(getRepository().getName())
@@ -133,47 +109,11 @@ public class SearchFacetImpl
     }
   }
 
+  // TODO use for re-indexing
   private void deleteIndex() {
     if (client.get().admin().indices().prepareExists(getRepository().getName()).execute().actionGet().isExists()) {
       client.get().admin().indices().prepareDelete(getRepository().getName()).execute().actionGet();
     }
-  }
-
-  private StorageFacet getStorage() {
-    return getRepository().facet(StorageFacet.class);
-  }
-
-  private static String merge(final String... jsons) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode merged = mapper.readTree("{}");
-    for (String json : jsons) {
-      merged = merge(merged, mapper.readTree(json));
-    }
-    return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(merged);
-  }
-
-  private static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
-
-    Iterator<String> fieldNames = updateNode.fieldNames();
-    while (fieldNames.hasNext()) {
-
-      String fieldName = fieldNames.next();
-      JsonNode jsonNode = mainNode.get(fieldName);
-      // if field exists and is an embedded object
-      if (jsonNode != null && jsonNode.isObject()) {
-        merge(jsonNode, updateNode.get(fieldName));
-      }
-      else {
-        if (mainNode instanceof ObjectNode) {
-          // Overwrite field
-          JsonNode value = updateNode.get(fieldName);
-          ((ObjectNode) mainNode).put(fieldName, value);
-        }
-      }
-
-    }
-
-    return mainNode;
   }
 
 }

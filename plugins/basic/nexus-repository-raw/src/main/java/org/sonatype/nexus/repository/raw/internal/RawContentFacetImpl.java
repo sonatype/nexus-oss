@@ -32,6 +32,7 @@ import org.sonatype.nexus.repository.negativecache.NegativeCacheKey;
 import org.sonatype.nexus.repository.negativecache.NegativeCacheKeySource;
 import org.sonatype.nexus.repository.raw.RawContent;
 import org.sonatype.nexus.repository.search.SearchFacet;
+import org.sonatype.nexus.repository.search.SearchableComponentFactory;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.NestedAttributesMap;
@@ -73,11 +74,16 @@ public class RawContentFacetImpl
 
   private final MimeSupport mimeSupport;
 
+  private final SearchableComponentFactory searchableComponentFactory;
+
   private boolean strictContentTypeValidation = false;
 
   @Inject
-  public RawContentFacetImpl(MimeSupport mimeSupport) {
+  public RawContentFacetImpl(final MimeSupport mimeSupport,
+                             final SearchableComponentFactory searchableComponentFactory)
+  {
     this.mimeSupport = checkNotNull(mimeSupport);
+    this.searchableComponentFactory = checkNotNull(searchableComponentFactory);
   }
 
   @Override
@@ -144,7 +150,7 @@ public class RawContentFacetImpl
       }
 
       tx.commit();
-      getRepository().facet(SearchFacet.class).index(component);
+      getRepository().facet(SearchFacet.class).put(searchableComponentFactory.from(component));
     }
   }
 
@@ -216,7 +222,7 @@ public class RawContentFacetImpl
 
       tx.commit();
 
-      getRepository().facet(SearchFacet.class).deindex(component);
+      getRepository().facet(SearchFacet.class).delete(component.getId().toString());
 
       return true;
     }

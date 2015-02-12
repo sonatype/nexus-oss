@@ -12,12 +12,10 @@
  */
 package org.sonatype.nexus.repository.search;
 
-import org.sonatype.nexus.repository.Repository;
-
 import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 
 /**
- * Producer of source (json) to be indexed.
+ * Producer of metadata to be indexed in JSON format.
  *
  * @since 3.0
  */
@@ -29,6 +27,6 @@ public interface IndexDataProducer
    *
    * @return data to be indexed in json format
    */
-  String getIndexData(Repository repository, OrientVertex component);
+  String getIndexData(OrientVertex component);
 
 }

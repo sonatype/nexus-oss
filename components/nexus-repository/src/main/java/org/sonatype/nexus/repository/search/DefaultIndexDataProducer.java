@@ -18,8 +18,6 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.Repository;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
@@ -32,7 +30,6 @@ import com.tinkerpop.blueprints.impls.orient.OrientVertex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.storage.StorageFacet.E_PART_OF_COMPONENT;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_BLOB_REF;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_SIZE;
 
 /**
@@ -47,11 +44,9 @@ public class DefaultIndexDataProducer
 {
 
   @Override
-  public String getIndexData(final Repository repository, final OrientVertex component) {
-    checkNotNull(repository);
+  public String getIndexData(final OrientVertex component) {
     checkNotNull(component);
     Map<String, Object> source = Maps.newHashMap();
-    source.put(P_REPOSITORY_NAME, repository.getName());
     for (String key : component.getPropertyKeys()) {
       source.put(key, component.getProperty(key));
     }
