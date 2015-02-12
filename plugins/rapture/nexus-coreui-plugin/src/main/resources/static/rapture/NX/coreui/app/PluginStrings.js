@@ -97,10 +97,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     BROWSE_SEARCH_MAVEN_TITLE: 'Maven',
     BROWSE_SEARCH_MAVEN_SUBTITLE: 'Search for components by Maven coordinates',
 
-    // Browse -> Search -> SHA-1
-    BROWSE_SEARCH_SHA_1_TITLE: 'SHA-1',
-    BROWSE_SEARCH_SHA_1_SUBTITLE: 'Search for components by SHA-1',
-
     // Browse -> Feeds
     BROWSE_FEEDS_TITLE: 'Feeds',
     BROWSE_FEEDS_SUBTITLE: 'Browse and subscribe to system events',

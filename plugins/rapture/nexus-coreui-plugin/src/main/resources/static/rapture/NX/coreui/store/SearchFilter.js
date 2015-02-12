@@ -71,16 +71,6 @@ Ext.define('NX.coreui.store.SearchFilter', {
       ]
     },
     {
-      id: 'sha-1',
-      name: 'SHA-1',
-      text: NX.I18n.get('BROWSE_SEARCH_SHA_1_TITLE'),
-      description: NX.I18n.get('BROWSE_SEARCH_SHA_1_SUBTITLE'),
-      readOnly: true,
-      criterias: [
-        { id: 'assets.attributes.checksum.sha1' }
-      ]
-    },
-    {
       id: 'custom',
       name: 'Custom',
       text: NX.I18n.get('BROWSE_SEARCH_CUSTOM_TITLE'),
