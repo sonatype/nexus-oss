@@ -35,6 +35,8 @@ import org.sonatype.sisu.goodies.common.SimpleFormat;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,6 +51,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class DirSupport
 {
+  private static final Logger log = LoggerFactory.getLogger(DirSupport.class);
+
   public static final Set<FileVisitOption> DEFAULT_FILE_VISIT_OPTIONS = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 
   private DirSupport() {
@@ -410,19 +414,27 @@ public final class DirSupport
   }
 
   /**
-   * Return {@code true} if paths {@code from} and {@code to} are expected to be on same FileStore (volume or
-   * partition). The {@code from} must exists, while {@code to} does not have to, but it must have ultimate existing
-   * parent.
+   * Return {@code true} if paths {@code from} and {@code to} are located on same FileStore (volume or
+   * partition). The {@code from} must exists, while {@code to} does not have to.
    */
-  private static boolean areOnSameFileStore(final Path from, final Path to) throws IOException {
-    final FileStore fromStore = Files.getFileStore(from); // from must exist
-    Path toExistingParent = to.normalize(); // to usually does not exists, is about to be created as part of move
-    while(toExistingParent != null && !Files.exists(toExistingParent)) {
-      toExistingParent = toExistingParent.getParent();
+  private static boolean areOnSameFileStore(final Path from, final Path to) {
+    try {
+      final FileStore fromStore = Files.getFileStore(from); // from must exist
+      Path toExistingParent = to.normalize(); // to usually does not exists, is about to be created as part of move
+      while (toExistingParent != null && !Files.exists(toExistingParent)) {
+        toExistingParent = toExistingParent.getParent();
+      }
+      if (toExistingParent != null) {
+        final FileStore toStore = Files.getFileStore(toExistingParent);
+        return fromStore.equals(toStore);
+      } else {
+        log.warn("No parent path found for target while move '{}'->'{}'", from, to, new RuntimeException("marker")); // record the stack trace?
+        return false; // no ultimate parent? be on safe side
+      }
     }
-    checkArgument(toExistingParent != null, "Passed in to path '%s' does not have existing parent", to);
-    final FileStore toStore = Files.getFileStore(toExistingParent);
-    return fromStore.equals(toStore);
+    catch (IOException e) {
+      return false; // be on safe side
+    }
   }
 
   /**
