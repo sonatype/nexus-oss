@@ -35,7 +35,6 @@ Ext.define('NX.coreui.store.SearchResult', {
     }
   },
 
-  pageSize: 100,
   remoteFilter: true
 
 });

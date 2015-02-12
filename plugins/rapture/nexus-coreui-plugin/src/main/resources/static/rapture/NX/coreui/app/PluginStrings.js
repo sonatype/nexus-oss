@@ -38,17 +38,21 @@ Ext.define('NX.coreui.app.PluginStrings', {
     BROWSE_SEARCH_SAVE_NAME: 'Filter name',
     BROWSE_SEARCH_SAVE_DESCRIPTION: 'Filter description',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_KEYWORD: 'Keyword',
-    BROWSE_SEARCH_COMPONENTS_CRITERIA_ARTIFACT_ID: 'Artifact ID',
+    BROWSE_SEARCH_COMPONENTS_CRITERIA_NAME: 'Name',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASSIFIER: 'Classifier',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASS_NAME: 'Class name',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_FORMAT: 'Format',
-    BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_ID: 'Group ID',
+    BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP: 'Group',
+    BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5: 'MD5',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING: 'Packaging',
+    BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH: 'Raw Path',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1: 'SHA-1',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_VERSION: 'Version',
     BROWSE_SEARCH_COMPONENTS_CRITERIA_FILTER_PLACEHOLDER: 'Any',
     BROWSE_SEARCH_COMPONENTS_MORE_BUTTON: 'More criteria',
-    BROWSE_SEARCH_COMPONENTS_COMPONENT_COLUMN: 'Component',
+    BROWSE_SEARCH_COMPONENTS_FORMAT_COLUMN: 'Format',
+    BROWSE_SEARCH_COMPONENTS_GROUP_COLUMN: 'Group',
+    BROWSE_SEARCH_COMPONENTS_NAME_COLUMN: 'Name',
     BROWSE_SEARCH_COMPONENTS_EMPTY_STATE: 'No components matched the filter criteria',
     BROWSE_SEARCH_VERSIONS_GROUP: 'Group',
     BROWSE_SEARCH_VERSIONS_NAME: 'Name',
@@ -81,9 +85,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     //BROWSE_SEARCH_COMPONENT_INFO_PROBLEM_CODE_COLUMN: 'Problem Code',
     //BROWSE_SEARCH_COMPONENT_INFO_SUMMARY_COLUMN: 'Summary',
 
-    // Browse -> Search -> Class Name
-    BROWSE_SEARCH_CLASS_TITLE: 'Class Name',
-    BROWSE_SEARCH_CLASS_SUBTITLE: 'Search for components by class-name',
+    // Browse -> Search -> Raw
+    BROWSE_SEARCH_RAW_TITLE: 'Raw',
+    BROWSE_SEARCH_RAW_SUBTITLE: 'Search for components by in raw repositories by path',
 
     // Browse -> Search -> Custom
     BROWSE_SEARCH_CUSTOM_TITLE: 'Custom',
@@ -92,10 +96,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     // Browse -> Search -> Maven
     BROWSE_SEARCH_MAVEN_TITLE: 'Maven',
     BROWSE_SEARCH_MAVEN_SUBTITLE: 'Search for components by Maven coordinates',
-
-    // Browse -> Search -> SHA-1
-    BROWSE_SEARCH_SHA_1_TITLE: 'SHA-1',
-    BROWSE_SEARCH_SHA_1_SUBTITLE: 'Search for components by SHA-1',
 
     // Browse -> Feeds
     BROWSE_FEEDS_TITLE: 'Feeds',

@@ -166,6 +166,14 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
+   * Avoid store load; manage load of search results by ourselves.
+   */
+  loadStore: function(){
+    // do nothing for now
+  },
+
+  /**
+   * @private
    * Show quick search when user has 'nexus:repositories:read' permission.
    */
   bindQuickSearch: function(quickSearch) {
@@ -424,11 +432,11 @@ Ext.define('NX.coreui.controller.Search', {
       searchResultVersionStore.addFilter(me.getSearchResultStore().filters.items, false);
       searchResultVersionStore.addFilter([
         {
-          property: 'groupid',
+          property: 'group.raw',
           value: searchResultModel.get('groupId')
         },
         {
-          property: 'artifactid',
+          property: 'name.raw',
           value: searchResultModel.get('artifactId')
         }
       ]);

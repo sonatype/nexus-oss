@@ -54,51 +54,52 @@ Ext.define('NX.coreui.store.SearchCriteria', {
       }
     },
     {
-      id: 'groupid',
+      id: 'group.raw',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP_ID'),
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_GROUP'),
         width: 250
       }
     },
     {
-      id: 'artifactid',
+      id: 'name.raw',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_ARTIFACT_ID')
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_NAME'),
+        width: 200
       }
     },
     {
-      id: 'classifier',
+      id: 'attributes.maven.classifier',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASSIFIER')
       }
     },
     {
-      id: 'packaging',
+      id: 'attributes.maven.packaging',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PACKAGING')
       }
     },
     {
-      id: 'sha-1',
+      id: 'assets.attributes.checksum.sha1',
       config: {
         fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_SHA_1'),
         width: 250
       }
     },
     {
-      id: 'classname',
+      id: 'assets.attributes.checksum.md5',
       config: {
-        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_CLASS_NAME'),
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_MD5'),
         width: 250
       }
+    },
+    {
+      id: 'attributes.raw.path.tree',
+      config: {
+        fieldLabel: NX.I18n.get('BROWSE_SEARCH_COMPONENTS_CRITERIA_PATH'),
+        width: 300
+      }
     }
-    // TODO Comment for now as we do not yet support symbolic name search
-    //{
-    //  id: 'symbolicname',
-    //  config: {
-    //    fieldLabel: 'Symbolic name'
-    //  }
-    //}
   ],
 
   sortOnLoad: true,

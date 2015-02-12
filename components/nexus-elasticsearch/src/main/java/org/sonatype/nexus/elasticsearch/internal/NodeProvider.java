@@ -57,7 +57,13 @@ public class NodeProvider
   public Node get() {
     if (node == null) {
       try {
-        node = create();
+        Node node = create();
+
+        // yellow status means that node is up (green will mean that replicas are online but we have only one node)
+        log.debug("Waiting for yellow-status");
+        node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+
+        this.node = node;
       }
       catch (Exception e) {
         log.warn("Failed to create node", e);

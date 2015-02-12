@@ -10,22 +10,35 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.raw.internal;
+package org.sonatype.nexus.coreui.search;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.repository.Facet;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 
 /**
- * Search index facet.
+ * Contributor to search query/filter.
  *
  * @since 3.0
  */
-@Facet.Exposed
-public interface RawIndexFacet
-    extends Facet
+public interface SearchContribution
 {
-  void put(String name) throws IOException;
 
-  void delete(String name);
+  /**
+   * Contribute to search query.
+   *
+   * @param query to contribute to
+   * @param type   type of filter
+   * @param value  value of filter
+   */
+  void contribute(BoolQueryBuilder query, String type, String value);
+
+  /**
+   * Contribute to search filter.
+   *
+   * @param filter to contribute to
+   * @param type   type of filter
+   * @param value  value of filter
+   */
+  void contribute(BoolFilterBuilder filter, String type, String value);
+
 }

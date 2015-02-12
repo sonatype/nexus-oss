@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.coreui
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import org.eclipse.aether.util.version.GenericVersionScheme
 
@@ -21,6 +22,7 @@ import org.eclipse.aether.util.version.GenericVersionScheme
  * @since 3.0
  */
 @ToString(includePackage = false, includeNames = true)
+@EqualsAndHashCode(includes = ["repositoryId", "groupId", "artifactId", "version"])
 class SearchResultVersionXO
 implements Comparable<SearchResultVersionXO>
 {
@@ -36,32 +38,11 @@ implements Comparable<SearchResultVersionXO>
   String name
   String type
 
-  boolean equals(final o) {
-    if (this.is(o)) return true
-    if (getClass() != o.class) return false
-
-    SearchResultVersionXO that = (SearchResultVersionXO) o
-
-    if (path != that.path) return false
-    if (repositoryId != that.repositoryId) return false
-    if (version != that.version) return false
-
-    return true
-  }
-
-  int hashCode() {
-    int result
-    result = version.hashCode()
-    result = 31 * result + repositoryId.hashCode()
-    result = 31 * result + path.hashCode()
-    return result
-  }
-
   @Override
   int compareTo(final SearchResultVersionXO o) {
     def result = repositoryName.compareTo(o.repositoryName)
     if (result == 0) {
-      result = versionScheme.parseVersion(version).compareTo(versionScheme.parseVersion(o.version))
+      result = versionScheme.parseVersion(version ?: "0").compareTo(versionScheme.parseVersion(o.version ?: "0"))
       if (result == 0) {
         result = path.compareTo(o.path)
       }
