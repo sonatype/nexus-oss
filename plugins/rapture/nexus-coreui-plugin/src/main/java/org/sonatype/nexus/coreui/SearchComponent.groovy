@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.FilteredQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.indices.IndexMissingException
 import org.elasticsearch.search.SearchHit
 import org.sonatype.nexus.coreui.search.SearchContribution
 import org.sonatype.nexus.extdirect.DirectComponent
@@ -197,8 +198,14 @@ extends DirectComponentSupport
     )
     log.debug('Query: {}', query)
 
-    if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().valid) {
-      throw new ValidationException("Invalid query")
+    try {
+      if (!client.get().admin().indices().prepareValidateQuery().setQuery(query).execute().actionGet().valid) {
+        throw new ValidationException("Invalid query")
+      }
+    }
+    catch (IndexMissingException e) {
+      // no repositories were created yet, so there is no point in searching
+      return null;
     }
 
     return query
